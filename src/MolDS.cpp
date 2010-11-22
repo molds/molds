@@ -190,7 +190,7 @@ int main(){
    InputParser::DeleteInstance();
 
 
-   // Farewell Message
+   // Farewell Messages
    clock_t endTick = clock();
    double consumedTime = (double)(endTick - startTick)/(double)CLOCKS_PER_SEC;
    cout << "\n\n     >>>>>  The MolDS finished normally!  <<<<<\n";
