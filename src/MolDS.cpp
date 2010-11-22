@@ -32,7 +32,7 @@ using namespace MolDS_mkl_wrapper;
 
 
 int main(){
-   // Welcome Message
+   // Welcome Messages
    time_t startTime;
    struct tm *ltm;
    char s[50];
