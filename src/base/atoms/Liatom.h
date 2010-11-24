@@ -26,15 +26,11 @@ Liatom::Liatom(double x, double y, double z) : Atom(x, y, z){
    this->imuAmuS = 3.106*Parameters::GetInstance()->GetEV2AU();
    this->imuAmuP = 1.258*Parameters::GetInstance()->GetEV2AU();
    this->imuAmuD = 0.0;
-   this->averageIonizationPotentialS = 5.39*Parameters::GetInstance()->GetEV2AU();
-   this->averageIonizationPotentialP = 3.54*Parameters::GetInstance()->GetEV2AU();
    this->valenceShellType = l;
    this->effectiveNuclearChargeK = 2.7;
    this->effectiveNuclearChargeL = 1.3;
    this->effectiveNuclearChargeM = 0.0;
    this->numberValenceElectrons = 1;
-   this->electronicConfigM = 1;
-   this->electronicConfigN = 0;
    this->indoG1 = 0.092012;
    this->indoF2 = 0.049865;
 }
@@ -57,7 +53,8 @@ double Liatom::GetIndoCoreIntegral(OrbitalType orbital, double gamma, bool isGue
    }
    else{
       cout << this->errorMessageIndoCoreIntegral;
-      cout << this->errorMessageAtomType << this->atomType << endl;
+      cout << this->errorMessageAtomType << AtomTypeStr(this->atomType) << endl;
+      cout << this->errorMessageOrbitalType << OrbitalTypeStr(orbital) << endl;
       exit(EXIT_FAILURE);
    }
    return value;

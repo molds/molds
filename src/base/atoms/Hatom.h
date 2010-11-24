@@ -23,15 +23,11 @@ Hatom::Hatom(double x, double y, double z) : Atom(x, y, z){
    this->imuAmuS = 7.176*Parameters::GetInstance()->GetEV2AU();
    this->imuAmuP = 0.0;
    this->imuAmuD = 0.0;
-   this->averageIonizationPotentialS = 13.06*Parameters::GetInstance()->GetEV2AU();
-   this->averageIonizationPotentialP = 0.0;
    this->valenceShellType = k;
    this->effectiveNuclearChargeK = 1.2; // see P78 in J. A. Pople book
    this->effectiveNuclearChargeL = 0.0;
    this->effectiveNuclearChargeM = 0.0;
    this->numberValenceElectrons = 1;
-   this->electronicConfigM = 1;
-   this->electronicConfigN = 0;
    this->indoG1 = 0.0;
    this->indoF2 = 0.0;
 }
@@ -47,7 +43,8 @@ double Hatom::GetIndoCoreIntegral(OrbitalType orbital, double gamma, bool isGues
    }
    else{
       cout << this->errorMessageIndoCoreIntegral;
-      cout << this->errorMessageAtomType << this->atomType << endl;
+      cout << this->errorMessageAtomType << AtomTypeStr(this->atomType) << endl;
+      cout << this->errorMessageOrbitalType << OrbitalTypeStr(orbital) << endl;
       exit(EXIT_FAILURE);
    }
    return value;

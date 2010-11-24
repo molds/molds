@@ -25,15 +25,11 @@ Catom::Catom(double x, double y, double z) : Atom(x, y, z){
    this->imuAmuS = 14.051*Parameters::GetInstance()->GetEV2AU();
    this->imuAmuP = 5.572*Parameters::GetInstance()->GetEV2AU();
    this->imuAmuD = 0.0;
-   this->averageIonizationPotentialS = 19.44*Parameters::GetInstance()->GetEV2AU();
-   this->averageIonizationPotentialP = 10.67*Parameters::GetInstance()->GetEV2AU();
    this->valenceShellType = l;
    this->effectiveNuclearChargeK = 5.7;
    this->effectiveNuclearChargeL = 3.25;
    this->effectiveNuclearChargeM = 0.0;
    this->numberValenceElectrons = 4;
-   this->electronicConfigM = 2;
-   this->electronicConfigN = 2;
    this->indoG1 = 0.267708;
    this->indoF2 = 0.17372;
 }
@@ -57,7 +53,8 @@ double Catom::GetIndoCoreIntegral(OrbitalType orbital, double gamma, bool isGues
    }
    else{
       cout << this->errorMessageIndoCoreIntegral;
-      cout << this->errorMessageAtomType << this->atomType << endl;
+      cout << this->errorMessageAtomType << AtomTypeStr(this->atomType) << endl;
+      cout << this->errorMessageOrbitalType << OrbitalTypeStr(orbital) << endl;
       exit(EXIT_FAILURE);
    }
    return value;

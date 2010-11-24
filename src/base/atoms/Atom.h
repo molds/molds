@@ -17,23 +17,20 @@ private:
    void SetMessages();
    string errorMessageImuAmu;
    string errorMessageOrbitalExponent;
-   string errorMessageAverageIonPot;
    string errorMessageIndoCoulombInt;
    string errorMessageIndoExchangeInt;
-   string errorMessageOrbitalType;
    string errorMessageShellType;
    string errorMessageEffectivPrincipalQuantumNumber;
 protected:
    string errorMessageIndoCoreIntegral;
    string errorMessageAtomType;
+   string errorMessageOrbitalType;
    double* xyz;
    AtomType atomType;
    vector<OrbitalType> valence;
    double imuAmuS;
    double imuAmuP;
    double imuAmuD;
-   double averageIonizationPotentialS;  // see Table 3.1 in J. A. Pople book 
-   double averageIonizationPotentialP;  // see Table 3.1 in J. A. Pople book 
    double bondingParameter;             // see Table 3.2 and 3.4 in J. A. Pople book
    double coreCharge;                   // = Z_A
    double effectiveNuclearChargeK;
@@ -43,8 +40,6 @@ protected:
    int firstAOIndex;
    int GetEffectivePrincipalQuantumNumber(ShellType shellType);
    int numberValenceElectrons;
-   int electronicConfigM;                // see (3.54) in J. A. Pople book
-   int electronicConfigN;                // see (3.54) in J. A. Pople book
    double indoF2;                   // see (3.89) in J. A. Pople book
    double indoG1;                   // see (3.88) in J. A. Pople book
 public:
@@ -61,10 +56,7 @@ public:
    void SetFirstAOIndex(int firstAOIndex);
    ShellType GetValenceShellType();
    int GetNumberValenceElectrons();
-   int GetElectronicConfigM();
-   int GetElectronicConfigN();
    double GetImuAmu(OrbitalType orbitalType);  // return 0.5*(I_mu + A_mu)
-   double GetAverageIonizationPotential(OrbitalType orbitalType);
    double GetOrbitalExponent(ShellType shellType, OrbitalType orbitalType);  // (1.73) in J. A. Pople book.
    double GetIndoCoulombInt(OrbitalType orbital1, OrbitalType orbital2, double gamma); // (3.87) - (3.91) in J. A. Pople book.
    double GetIndoExchangeInt(OrbitalType orbital1, OrbitalType orbital2, double gamma); // (3.87) - (3.91) in J. A. Pople book.
@@ -92,7 +84,6 @@ Atom::~Atom(){
 }
 
 void Atom::SetMessages(){
-   this->errorMessageAverageIonPot = "Error in base_atoms::Atom::GetAverageIonizationPotential: Invalid orbitalType.\n";
    this->errorMessageImuAmu = "Error in base_atoms::Atom::GetImuAmu: Invalid orbitalType.\n";
    this->errorMessageOrbitalExponent = "Error in base_atoms::Atom::GetOrbitalExponent: Invalid shelltype or orbitalType.\n";
    this->errorMessageIndoCoulombInt = "Error in base_atoms::Atom::GetIndoCoulombInt: Invalid orbitalType.\n";
@@ -165,13 +156,6 @@ int Atom::GetNumberValenceElectrons(){
    return this->numberValenceElectrons;
 }
 
-int Atom::GetElectronicConfigM(){
-   return this->electronicConfigM;
-}
-
-int Atom::GetElectronicConfigN(){
-   return this->electronicConfigN;
-}
 
 // return 0.5*(I_mu + A_mu)
 double Atom::GetImuAmu(OrbitalType orbitalType){
@@ -180,6 +164,13 @@ double Atom::GetImuAmu(OrbitalType orbitalType){
    }   
    else if(orbitalType == px || orbitalType == py || orbitalType == pz ){
       return this->imuAmuP;
+   }   
+   else if(orbitalType == dxy || 
+           orbitalType == dyz || 
+           orbitalType == dzz || 
+           orbitalType == dzx || 
+           orbitalType == dxxyy ){
+      return this->imuAmuD;
    }   
    else{
       cout << errorMessageImuAmu;
@@ -198,6 +189,17 @@ double Atom::GetOrbitalExponent(ShellType shellType, OrbitalType orbitalType){
    else if(shellType == l && (orbitalType == s || orbitalType == px || orbitalType == py || orbitalType == pz)){
       return this->effectiveNuclearChargeL/this->GetEffectivePrincipalQuantumNumber(shellType);
    }   
+   else if(shellType == m && (orbitalType == s  || 
+                              orbitalType == px || 
+                              orbitalType == py || 
+                              orbitalType == pz ||
+                              orbitalType == dxy ||
+                              orbitalType == dyz ||
+                              orbitalType == dzz ||
+                              orbitalType == dzx ||
+                              orbitalType == dxxyy)){
+      return this->effectiveNuclearChargeM/this->GetEffectivePrincipalQuantumNumber(shellType);
+   }   
    else{
       cout << this->errorMessageOrbitalExponent;
       cout << this->errorMessageAtomType << AtomTypeStr(this->atomType) << "\n";
@@ -207,22 +209,6 @@ double Atom::GetOrbitalExponent(ShellType shellType, OrbitalType orbitalType){
    }   
 }
 
-
-// return U_{mu mu} see Table 3.1 in J. A. Pople book
-double Atom::GetAverageIonizationPotential(OrbitalType orbitalType){
-   if(orbitalType == s){ 
-      return this->averageIonizationPotentialS;
-   }   
-   else if(orbitalType == px || orbitalType == py || orbitalType == pz ){
-      return this->averageIonizationPotentialP;
-   }   
-   else{
-      cout << this->errorMessageAverageIonPot;
-      cout << this->errorMessageAtomType << AtomTypeStr(this->atomType) << "\n";
-      cout << this->errorMessageOrbitalType << OrbitalTypeStr(orbitalType) << "\n";
-      exit(EXIT_FAILURE);
-   }   
-}
 
 // (3.87) - (3.91) in J. A. Pople book.
 // Indo Coulomb Interaction
