@@ -165,6 +165,9 @@ void InputParser::Parse(Molecule* molecule){
             else if(inputTerms[j] == "c"){
                molecule->GetAtomVect()->push_back(new Catom(x, y, z));
             }
+            else if(inputTerms[j] == "s"){
+               molecule->GetAtomVect()->push_back(new Satom(x, y, z));
+            }
             j += 4;
          }
          i = j;

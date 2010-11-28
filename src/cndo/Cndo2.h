@@ -659,7 +659,7 @@ void Cndo2::CalcOverlap(double** overlap, Molecule* molecule){
 
 }
 
-// see J. Mol. Struc. (Theochem), 419, 19 (1997)
+// see J. Mol. Struc. (Theochem), 419, 19 (1997) (ref. [BFB_1997])
 // we set gamma=0 always.
 void Cndo2::CalcRotatingMatrix(double** rotatingMatrix, Atom* atomA, Atom* atomB){
    MallocerFreer::GetInstance()->InitializeDoubleMatrix2d
@@ -677,7 +677,7 @@ void Cndo2::CalcRotatingMatrix(double** rotatingMatrix, Atom* atomA, Atom* atomB
    rotatingMatrix[s][s] = 1.0;
 
    // rotating matrix for p-function
-   // dMatrix is (53) with gamma=0 in J. Mol. Strct. 419, 19(1997) 
+   // dMatrix is (53) with gamma=0 in J. Mol. Strct. 419, 19(1997) (ref. [BFB_1997])
    rotatingMatrix[py][py] = cos(alpha);
    rotatingMatrix[py][pz] = sin(alpha)*sin(beta);
    rotatingMatrix[py][px] = sin(alpha)*cos(beta);
@@ -691,7 +691,7 @@ void Cndo2::CalcRotatingMatrix(double** rotatingMatrix, Atom* atomA, Atom* atomB
    rotatingMatrix[px][px] = cos(alpha)*cos(beta);
 
    // rotating matrix for d-function
-   // dMatrix is (37) in J. Mol. Strct. 419, 19(1997)
+   // dMatrix is (37) in J. Mol. Strct. 419, 19(1997) (ref. [BFB_1997])
    double** dMatrix;
    dMatrix =  MallocerFreer::GetInstance()->MallocDoubleMatrix2d
               (OrbitalType_end, OrbitalType_end);

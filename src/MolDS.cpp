@@ -15,6 +15,7 @@
 #include"base/atoms/Hatom.h"
 #include"base/atoms/Catom.h"
 #include"base/atoms/Liatom.h"
+#include"base/atoms/Satom.h"
 #include"base/MallocerFreer.h"
 #include"base/InputParser.h"
 #include"base/Utilities.h"
@@ -54,19 +55,16 @@ int main(){
    InputParser::GetInstance()->Parse(molecule);
 
    // cndo2
-   /*
    MolDS_cndo::Cndo2* cndo2 = new MolDS_cndo::Cndo2();
    cndo2->SetMolecule(molecule);
    cndo2->DoesSCF();
    delete cndo2;
-   */
 
    // indo
    MolDS_indo::Indo* indo = new MolDS_indo::Indo();
    indo->SetMolecule(molecule);
    indo->DoesSCF();
    delete indo;
-
 
 
    /*** test lapack ***

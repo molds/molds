@@ -1,0 +1,9 @@
+[PSS_1965] J. A. Pople, D. P. Santry, and G. A. Segal, J. Chem. Phys., 43, S129 (1965)
+[PS_1965] J. A. Pople and G. A. Segal, J. Chem. Phys., 43, S136 (1965)
+[PS_1966] J. A. Pople and G. A. Segal, J. Chem. Phys., 44, 3289 (1966)
+[PB_1970] J. A. Pople and D. L. Beveridge, "Approximate Molecular Orbital Theory", ISBN-13:978-0070505124 (1970)
+[BFB_1997] M. A. Blanco, M. Fl{\'o}rez, and M. Bermejo, J. Mol. Struct. 419, 19 (1997)
+
+
+
+
