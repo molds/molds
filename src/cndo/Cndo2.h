@@ -24,6 +24,7 @@ namespace MolDS_cndo{
  */
 class Cndo2{
 private:
+   string errorMessageAtomType;
    string messageEnergiesMOs;
    string messageEnergiesMOsTitle;
    string messageMullikenAtoms;
@@ -69,15 +70,19 @@ private:
    double GetAuxiliaryB(int k, double rho);
    double GetAuxiliaryD(int la, int lb, int m);
    void OutputMOs(double** fockMatrix, double* energiesMO, double* atomicElectronPopulation, Molecule* molecule);
+   void CheckEnableAtomType(Molecule* molecule);
 
 protected:
    string errorMessageSCFNotConverged;
    string errorMessageMoleculeNotSet;
    string errorMessageOddTotalValenceElectrions;
+   string errorMessageNotEnebleAtomType;
    string messageSCFMetConvergence;
    string messageStartSCF;
    string messageDoneSCF;
+   vector<AtomType> enableAtomTypes;
    virtual void SetMessages();
+   virtual void SetEnableAtomTypes();
    virtual double GetFockDiagElement(Atom* atomA, int atomAIndex, int firstAOIndexA, 
                              int mu, Molecule* molecule, double** gammaAB,
                              double** orbitalElectronPopulation, double* atomicElectronPopulation,
@@ -86,7 +91,6 @@ protected:
                                 int firstAOIndexA, int firstAOIndexB,
                                 int mu, int nu, Molecule* molecule, double** gammaAB, double** overlap,
                                 double** orbitalElectronPopulation, bool isGuess);
-
 public:
    Cndo2();
    ~Cndo2();
@@ -96,6 +100,7 @@ public:
 
 Cndo2::Cndo2(){
    this->SetMessages();
+   this->SetEnableAtomTypes();
    //cout << "Cndo created\n";
 }
 
@@ -146,6 +151,10 @@ void Cndo2::SetMessages(){
       = "Error in cndo::Cndo2::DoesSCF: A molecule is not set.\n";
    this->errorMessageOddTotalValenceElectrions 
       = "Error in cndo::Cndo2::SetMolecule: Total number of valence electrons is odd. totalNumberValenceElectrons=";
+   this->errorMessageNotEnebleAtomType  
+      = "Error in cndo::Cndo2::ChecEnableAtomType: Not enable atom is contained.\n";
+   this->errorMessageAtomType  
+      = "\tatom type = ";
    this->messageSCFMetConvergence = "\n\n\n\t\tCNDO/2-SCF met convergence criterion(^^b\n\n\n";
    this->messageStartSCF = "**********  START: CNDO/2-SCF  **********\n";
    this->messageDoneSCF = "**********  DONE: CNDO/2-SCF  **********\n\n\n";
@@ -158,6 +167,25 @@ void Cndo2::SetMessages(){
 
 }
 
+void Cndo2::SetEnableAtomTypes(){
+   this->enableAtomTypes.clear();
+   this->enableAtomTypes.push_back(H);
+   this->enableAtomTypes.push_back(Li);
+   this->enableAtomTypes.push_back(Be);
+   this->enableAtomTypes.push_back(B);
+   this->enableAtomTypes.push_back(C);
+   this->enableAtomTypes.push_back(N);
+   this->enableAtomTypes.push_back(O);
+   this->enableAtomTypes.push_back(F);
+   this->enableAtomTypes.push_back(Na);
+   this->enableAtomTypes.push_back(Mg);
+   this->enableAtomTypes.push_back(Al);
+   this->enableAtomTypes.push_back(Si);
+   this->enableAtomTypes.push_back(P);
+   this->enableAtomTypes.push_back(S);
+   this->enableAtomTypes.push_back(Cl);
+}
+
 void Cndo2::SetMolecule(Molecule* molecule){
 
    // check of number of valence electrons
@@ -166,6 +194,10 @@ void Cndo2::SetMolecule(Molecule* molecule){
       exit(EXIT_FAILURE);
    }
 
+   // check enable atom type
+   this->CheckEnableAtomType(molecule);
+
+   // set molecule and malloc
    this->molecule = molecule;
    this->gammaAB = MallocerFreer::GetInstance()->MallocDoubleMatrix2d
                    (this->molecule->GetAtomVect()->size(), this->molecule->GetAtomVect()->size());
@@ -181,6 +213,27 @@ void Cndo2::SetMolecule(Molecule* molecule){
                    (this->molecule->GetTotalNumberAOs());
 
    
+}
+
+void Cndo2::CheckEnableAtomType(Molecule* molecule){
+
+   for(int i=0; i<molecule->GetAtomVect()->size(); i++){
+      AtomType atomType = (*molecule->GetAtomVect())[i]->GetAtomType();
+      bool enable = false;
+      for(int j=0; j<this->enableAtomTypes.size(); j++){
+         if(atomType == this->enableAtomTypes[j]){
+            enable = true;
+            break;
+         }
+      }
+      if(!enable){
+         cout << this->errorMessageNotEnebleAtomType;
+         cout << this->errorMessageAtomType << AtomTypeStr(atomType) << endl;
+         exit(EXIT_FAILURE);
+      }
+   }
+
+
 }
 
 /*******

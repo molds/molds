@@ -31,10 +31,12 @@ protected:
                                 int firstAOIndexA, int firstAOIndexB,
                                 int mu, int nu, Molecule* molecule, double** gammaAB, double** overelap,
                                 double** orbitalElectronPopulation, bool isGuess);
+   void SetEnableAtomTypes();
 };
 
 Indo::Indo() : MolDS_cndo::Cndo2(){
    this->SetMessages();
+   this->SetEnableAtomTypes();
    //cout << "Indo created\n";
 }
 
@@ -49,9 +51,23 @@ void Indo::SetMessages(){
       = "Error in indo::Indo::DoesSCF: A molecule is not set.\n";
    this->errorMessageOddTotalValenceElectrions 
       = "Error in indo::Indo::SetMolecule: Total number of valence electrons is odd. totalNumberValenceElectrons=";
+   this->errorMessageNotEnebleAtomType  
+      = "Error in indo::Indo::ChecEnableAtomType: Not enable atom is contained.\n";
    this->messageSCFMetConvergence = "\n\n\n\t\tINDO-SCF met convergence criterion(^^b\n\n\n";
    this->messageStartSCF = "**********  START: INDO-SCF  **********\n";
    this->messageDoneSCF = "**********  DONE: INDO-SCF  **********\n\n\n";
+}
+
+void Indo::SetEnableAtomTypes(){
+   this->enableAtomTypes.clear();
+   this->enableAtomTypes.push_back(H);
+   this->enableAtomTypes.push_back(Li);
+   this->enableAtomTypes.push_back(Be);
+   this->enableAtomTypes.push_back(B);
+   this->enableAtomTypes.push_back(C);
+   this->enableAtomTypes.push_back(N);
+   this->enableAtomTypes.push_back(O);
+   this->enableAtomTypes.push_back(F);
 }
 
 double Indo::GetFockDiagElement(Atom* atomA, int atomAIndex, int firstAOIndexA, int mu, 
