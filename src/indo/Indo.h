@@ -14,6 +14,9 @@ using namespace MolDS_base_atoms;
 
 namespace MolDS_indo{
 
+/***
+ *  Refferences for Indo are [PB_1970] and [PS_1966].
+ */
 class Indo : public MolDS_cndo::Cndo2{
 public:
    Indo();
