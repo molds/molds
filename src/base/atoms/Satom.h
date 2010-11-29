@@ -33,7 +33,8 @@ Satom::Satom(double x, double y, double z) : Atom(x, y, z){
    this->valenceShellType = m;
    this->effectiveNuclearChargeK = 15.70;
    this->effectiveNuclearChargeL = 11.85;
-   this->effectiveNuclearChargeM = 5.45;
+   this->effectiveNuclearChargeMsp = 5.45;
+   this->effectiveNuclearChargeMd = 5.45;
    this->numberValenceElectrons = 6;
    //this->indoG1 = 0.267708;
    //this->indoF2 = 0.17372;

@@ -29,7 +29,8 @@ Liatom::Liatom(double x, double y, double z) : Atom(x, y, z){
    this->valenceShellType = l;
    this->effectiveNuclearChargeK = 2.7;
    this->effectiveNuclearChargeL = 1.3;
-   this->effectiveNuclearChargeM = 0.0;
+   this->effectiveNuclearChargeMsp = 0.0;
+   this->effectiveNuclearChargeMd = 0.0;
    this->numberValenceElectrons = 1;
    this->indoG1 = 0.092012;
    this->indoF2 = 0.049865;

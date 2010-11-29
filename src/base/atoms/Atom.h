@@ -35,7 +35,8 @@ protected:
    double coreCharge;                   // = Z_A
    double effectiveNuclearChargeK;
    double effectiveNuclearChargeL;
-   double effectiveNuclearChargeM;
+   double effectiveNuclearChargeMsp;
+   double effectiveNuclearChargeMd;
    ShellType valenceShellType;
    int firstAOIndex;
    int GetEffectivePrincipalQuantumNumber(ShellType shellType);
@@ -192,13 +193,15 @@ double Atom::GetOrbitalExponent(ShellType shellType, OrbitalType orbitalType){
    else if(shellType == m && (orbitalType == s  || 
                               orbitalType == px || 
                               orbitalType == py || 
-                              orbitalType == pz ||
-                              orbitalType == dxy ||
+                              orbitalType == pz )){
+      return this->effectiveNuclearChargeMsp/this->GetEffectivePrincipalQuantumNumber(shellType);
+   }   
+   else if(shellType == m && (orbitalType == dxy  || 
                               orbitalType == dyz ||
                               orbitalType == dzz ||
                               orbitalType == dzx ||
                               orbitalType == dxxyy)){
-      return this->effectiveNuclearChargeM/this->GetEffectivePrincipalQuantumNumber(shellType);
+      return this->effectiveNuclearChargeMd/this->GetEffectivePrincipalQuantumNumber(shellType);
    }   
    else{
       cout << this->errorMessageOrbitalExponent;

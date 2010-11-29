@@ -28,7 +28,8 @@ Catom::Catom(double x, double y, double z) : Atom(x, y, z){
    this->valenceShellType = l;
    this->effectiveNuclearChargeK = 5.7;
    this->effectiveNuclearChargeL = 3.25;
-   this->effectiveNuclearChargeM = 0.0;
+   this->effectiveNuclearChargeMsp = 0.0;
+   this->effectiveNuclearChargeMd = 0.0;
    this->numberValenceElectrons = 4;
    this->indoG1 = 0.267708;
    this->indoF2 = 0.17372;
