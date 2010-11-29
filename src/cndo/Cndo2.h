@@ -71,6 +71,7 @@ private:
    double GetAuxiliaryD(int la, int lb, int m);
    void OutputMOs(double** fockMatrix, double* energiesMO, double* atomicElectronPopulation, Molecule* molecule);
    void CheckEnableAtomType(Molecule* molecule);
+   void CheckNumberValenceElectrons(Molecule* molecule);
 
 protected:
    string errorMessageSCFNotConverged;
@@ -189,10 +190,7 @@ void Cndo2::SetEnableAtomTypes(){
 void Cndo2::SetMolecule(Molecule* molecule){
 
    // check of number of valence electrons
-   if(molecule->GetTotalNumberValenceElectrons() % 2 == 1){
-      cout << this->errorMessageOddTotalValenceElectrions << molecule->GetTotalNumberValenceElectrons() << "\n";
-      exit(EXIT_FAILURE);
-   }
+   this->CheckNumberValenceElectrons(molecule);
 
    // check enable atom type
    this->CheckEnableAtomType(molecule);
@@ -213,6 +211,14 @@ void Cndo2::SetMolecule(Molecule* molecule){
                    (this->molecule->GetTotalNumberAOs());
 
    
+}
+
+void Cndo2::CheckNumberValenceElectrons(Molecule* molecule){
+
+   if(molecule->GetTotalNumberValenceElectrons() % 2 == 1){
+      cout << this->errorMessageOddTotalValenceElectrions << molecule->GetTotalNumberValenceElectrons() << "\n";
+      exit(EXIT_FAILURE);
+   }
 }
 
 void Cndo2::CheckEnableAtomType(Molecule* molecule){
