@@ -11,7 +11,7 @@ class Catom : public Atom {
 private:
 public:
    Catom(double x, double y, double z);
-   double GetIndoCoreIntegral(OrbitalType orbital, double gamma, bool isGuess); // P82 - 83 in J. A. Pople book.
+   double GetCoreIntegral(OrbitalType orbital, double gamma, bool isGuess, TheoryType theory); 
 };
 
 Catom::Catom(double x, double y, double z) : Atom(x, y, z){
@@ -33,31 +33,62 @@ Catom::Catom(double x, double y, double z) : Atom(x, y, z){
    this->numberValenceElectrons = 4;
    this->indoG1 = 0.267708;
    this->indoF2 = 0.17372;
+   this->zindoF0ss = 11.11 * Parameters::GetInstance()->GetEV2AU();                  
+   this->zindoF0sd = 0.0;                   
+   this->zindoF0dd = 0.0;                  
+   this->zindoG1sp = 55635*Parameters::GetInstance()->GetKayser2AU();                 
+   this->zindoF2pp = 36375*Parameters::GetInstance()->GetKayser2AU();                 
+   this->zindoG2sd = 0.0;                 
+   this->zindoG1pd = 0.0;                 
+   this->zindoF2pd = 0.0;                 
+   this->zindoG3pd = 0.0;                 
+   this->zindoF2dd = 0.0;                 
+   this->zindoF4dd = 0.0;                 
+   this->IonPotS = -19.84 * Parameters::GetInstance()->GetEV2AU();
+   this->IonPotP = -10.93 * Parameters::GetInstance()->GetEV2AU();
+   this->IonPotD = 0.0 * Parameters::GetInstance()->GetEV2AU();
 }
 
-// P82 - 83 in J. A. Pople book.
-double Catom::GetIndoCoreIntegral(OrbitalType orbital, double gamma, bool isGuess){
+double Catom::GetCoreIntegral(OrbitalType orbital, double gamma, bool isGuess, TheoryType theory){
    double value = 0.0;
-   if(orbital == s){
-      value = -1.0*this->imuAmuS;
-      if(!isGuess){
-         value -= (this->coreCharge-0.5)*gamma - (this->coreCharge - 1.5)*this->indoG1/6.0;
+
+   if(theory == INDO){
+      if(orbital == s){
+         value = -1.0*this->imuAmuS;
+         if(!isGuess){
+            value -= (this->coreCharge-0.5)*gamma - (this->coreCharge - 1.5)*this->indoG1/6.0;
+         }
+      }
+      else if(orbital == px || orbital == py || orbital == pz){
+         value = -1.0*this->imuAmuP;
+         if(!isGuess){
+            value -= (this->coreCharge-0.5)*gamma 
+                    - this->indoG1/3.0 
+                    - (this->coreCharge - 2.5)*this->indoF2*2.0/25.0;
+         }
+      }
+      else{
+         cout << this->errorMessageIndoCoreIntegral;
+         cout << this->errorMessageAtomType << AtomTypeStr(this->atomType) << endl;
+         cout << this->errorMessageOrbitalType << OrbitalTypeStr(orbital) << endl;
+         exit(EXIT_FAILURE);
       }
    }
-   else if(orbital == px || orbital == py || orbital == pz){
-      value = -1.0*this->imuAmuP;
-      if(!isGuess){
-         value -= (this->coreCharge-0.5)*gamma 
-                 - this->indoG1/3.0 
-                 - (this->coreCharge - 2.5)*this->indoF2*2.0/25.0;
+   else if(theory == ZINDOS){
+      if(orbital == s){
+         value = this->GetZindoCoreIntegral(orbital, 2, 2, 0);
+      }
+      else if(orbital == px || orbital == py || orbital == pz){
+         value = this->GetZindoCoreIntegral(orbital, 2, 2, 0);
+      }
+      else{
+         cout << this->errorMessageZindoSCoreIntegral;
+         cout << this->errorMessageAtomType << AtomTypeStr(this->atomType) << endl;
+         cout << this->errorMessageOrbitalType << OrbitalTypeStr(orbital) << endl;
+         exit(EXIT_FAILURE);
       }
    }
-   else{
-      cout << this->errorMessageIndoCoreIntegral;
-      cout << this->errorMessageAtomType << AtomTypeStr(this->atomType) << endl;
-      cout << this->errorMessageOrbitalType << OrbitalTypeStr(orbital) << endl;
-      exit(EXIT_FAILURE);
-   }
+
    return value;
 }
 

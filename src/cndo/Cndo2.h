@@ -513,10 +513,12 @@ double Cndo2::GetFockOffDiagElement(Atom* atomA, Atom* atomB, int atomAIndex, in
                                     int mu, int nu, Molecule* molecule, double** gammaAB, double** overlap,
                                     double** orbitalElectronPopulation, bool isGuess){
    double value;
-   double K = 1.0;
+
+   double K = 1.0;  // = 1.0 or 0.75, see Eq. (3.79) in J. A. Pople book
    if(atomA->GetValenceShellType() >= m || atomB->GetValenceShellType() >= m){
       K = 0.75;
    }
+
    double bondParameter = 0.5*K*(atomA->GetBondingParameter() + atomB->GetBondingParameter()); 
    value =  bondParameter*overlap[mu][nu];
    if(!isGuess){

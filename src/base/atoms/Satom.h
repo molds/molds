@@ -11,7 +11,7 @@ class Satom : public Atom {
 private:
 public:
    Satom(double x, double y, double z);
-   double GetIndoCoreIntegral(OrbitalType orbital, double gamma, bool isGuess); // P82 - 83 in J. A. Pople book.
+   double GetCoreIntegral(OrbitalType orbital, double gamma, bool isGuess, TheoryType theory); 
 };
 
 Satom::Satom(double x, double y, double z) : Atom(x, y, z){
@@ -39,17 +39,48 @@ Satom::Satom(double x, double y, double z) : Atom(x, y, z){
    this->effectiveNuclearChargeMsp = 5.45;
    this->effectiveNuclearChargeMd = 5.45;
    this->numberValenceElectrons = 6;
-   //this->indoG1 = 0.267708;
-   //this->indoF2 = 0.17372;
+   this->indoG1 = 0.267708;
+   this->indoF2 = 0.17372;
+   this->zindoF0ss = 8.96 * Parameters::GetInstance()->GetEV2AU();                  
+   this->zindoF0sd = 0.0;                   
+   this->zindoF0dd = 0.0;                 
+   this->zindoG1sp = 24807*Parameters::GetInstance()->GetKayser2AU();                 
+   this->zindoF2pp = 36600*Parameters::GetInstance()->GetKayser2AU();                 
+   this->zindoG2sd = 25972*Parameters::GetInstance()->GetKayser2AU();     
+   this->zindoG1pd = 34486*Parameters::GetInstance()->GetKayser2AU();        
+   this->zindoF2pd = 29173*Parameters::GetInstance()->GetKayser2AU();           
+   this->zindoG3pd = 20587*Parameters::GetInstance()->GetKayser2AU();           
+   this->zindoF2dd = 28411*Parameters::GetInstance()->GetKayser2AU();           
+   this->zindoF4dd = 18529*Parameters::GetInstance()->GetKayser2AU();           
+   this->IonPotS = -21.11 * Parameters::GetInstance()->GetEV2AU();
+   this->IonPotP = -12.39 * Parameters::GetInstance()->GetEV2AU();
+   this->IonPotD = -4.11 * Parameters::GetInstance()->GetEV2AU();
 }
 
-// P82 - 83 in J. A. Pople book.
-double Satom::GetIndoCoreIntegral(OrbitalType orbital, double gamma, bool isGuess){
+double Satom::GetCoreIntegral(OrbitalType orbital, double gamma, bool isGuess, TheoryType theory){
    double value = 0.0;
-   cout << this->errorMessageIndoCoreIntegral;
-   cout << this->errorMessageAtomType << AtomTypeStr(this->atomType) << endl;
-   cout << this->errorMessageOrbitalType << OrbitalTypeStr(orbital) << endl;
-   exit(EXIT_FAILURE);
+
+   if(theory == INDO){
+      cout << this->errorMessageIndoCoreIntegral;
+      cout << this->errorMessageAtomType << AtomTypeStr(this->atomType) << endl;
+      cout << this->errorMessageOrbitalType << OrbitalTypeStr(orbital) << endl;
+      exit(EXIT_FAILURE);
+   }
+   else if(theory == ZINDOS){
+      if(orbital == s){
+         value = this->GetZindoCoreIntegral(orbital, 2, 4, 0);
+      }
+      else if(orbital == px || orbital == py || orbital == pz){
+         value = this->GetZindoCoreIntegral(orbital, 2, 4, 0);
+      }
+      else{
+         cout << this->errorMessageZindoSCoreIntegral;
+         cout << this->errorMessageAtomType << AtomTypeStr(this->atomType) << endl;
+         cout << this->errorMessageOrbitalType << OrbitalTypeStr(orbital) << endl;
+         exit(EXIT_FAILURE);
+      }
+   }
+
    return value;
 }
 

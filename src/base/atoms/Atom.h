@@ -21,28 +21,52 @@ private:
    string errorMessageIndoExchangeInt;
    string errorMessageShellType;
    string errorMessageEffectivPrincipalQuantumNumber;
+   string errorMessageZindoCoreIntegral;
+   double GetJss();  // Part of Eq. (13) in [BZ_1979]
+   double GetJsp();  // Part of Eq. (13) in [BZ_1979]
+   double GetJsd();  // Part of Eq. (13) in [BZ_1979]
+   double GetJpp();  // Part of Eq. (13) in [BZ_1979]
+   double GetJpd();  // Part of Eq. (13) in [BZ_1979]
+   double GetJdd();  // Part of Eq. (13) in [BZ_1979]
 protected:
    string errorMessageIndoCoreIntegral;
+   string errorMessageZindoSCoreIntegral;
    string errorMessageAtomType;
    string errorMessageOrbitalType;
    double* xyz;
    AtomType atomType;
    vector<OrbitalType> valence;
-   double imuAmuS;
-   double imuAmuP;
-   double imuAmuD;
-   double bondingParameter;             // see Table 3.2 and 3.4 in J. A. Pople book
-   double coreCharge;                   // = Z_A
-   double effectiveNuclearChargeK;
-   double effectiveNuclearChargeL;
-   double effectiveNuclearChargeMsp;
-   double effectiveNuclearChargeMd;
    ShellType valenceShellType;
    int firstAOIndex;
-   int GetEffectivePrincipalQuantumNumber(ShellType shellType);
    int numberValenceElectrons;
-   double indoF2;                   // see (3.89) in J. A. Pople book
-   double indoG1;                   // see (3.88) in J. A. Pople book
+   double imuAmuS;                      // Table 3.4 or 3.5 in J. A. Pople book
+   double imuAmuP;                      // Table 3.4 or 3.5 in J. A. Pople book
+   double imuAmuD;                      // Table 3.4 or 3.5 in J. A. Pople book
+   double bondingParameter;             // Table 3.2 and 3.4 in J. A. Pople book
+   double coreCharge;                   // = Z_A in J. A. Pople book.
+   double effectiveNuclearChargeK;      // Table 1.5 in J. A. Pople book
+   double effectiveNuclearChargeL;      // Table 1.5 in J. A. Pople book
+   double effectiveNuclearChargeMsp;    // Table 1.5 in J. A. Pople book
+   double effectiveNuclearChargeMd;     // Table 1.5 in J. A. Pople book
+   int GetEffectivePrincipalQuantumNumber(ShellType shellType); // Table 1.4 in J. A. Pople book
+   double indoF2;                   // (3.89) in J. A. Pople book
+   double indoG1;                   // (3.88) in J. A. Pople book
+   double zindoF0ss;                // Table 1 in ref. [RZ_1976], Table 1 in [AEZ_1986], or Table 1 in [GD_1972]
+   double zindoF0sd;                  // Table 1 in [AEZ_1986]
+   double zindoF0dd;                  // Table 1 in [AEZ_1986]
+   double zindoG1sp;                 // Table 3 in ref. [BZ_1979]
+   double zindoF2pp;                 // Table 3 in ref. [BZ_1979]
+   double zindoG2sd;                 // Table 3 in ref. [BZ_1979]
+   double zindoG1pd;                 // Table 3 in ref. [BZ_1979]
+   double zindoF2pd;                 // Table 3 in ref. [BZ_1979]
+   double zindoG3pd;                 // Table 3 in ref. [BZ_1979]
+   double zindoF2dd;                 // Table 3 in ref. [BZ_1979]
+   double zindoF4dd;                 // Table 3 in ref. [BZ_1979]
+   double IonPotS;   // Ionization potential, Table 4 in [BZ_1979]
+   double IonPotP;   // Ionization potential, Table 4 in [BZ_1979]
+   double IonPotD;   // Ionization potential, Table 4 in [BZ_1979]
+   double GetZindoCoreIntegral(OrbitalType orbital, int l, int m, int n); // Eq. (13) in [BZ_1979]
+
 public:
    Atom();
    Atom(double x, double y, double z);
@@ -61,7 +85,7 @@ public:
    double GetOrbitalExponent(ShellType shellType, OrbitalType orbitalType);  // (1.73) in J. A. Pople book.
    double GetIndoCoulombInt(OrbitalType orbital1, OrbitalType orbital2, double gamma); // (3.87) - (3.91) in J. A. Pople book.
    double GetIndoExchangeInt(OrbitalType orbital1, OrbitalType orbital2, double gamma); // (3.87) - (3.91) in J. A. Pople book.
-   virtual double GetIndoCoreIntegral(OrbitalType orbital, double gamma, bool isGuess) = 0; // P82 - 83 in J. A. Pople book. 
+   virtual double GetCoreIntegral(OrbitalType orbital, double gamma, bool isGuess, TheoryType theory) = 0; // P82 - 83 in J. A. Pople book for INDO or Eq. (13) in [BZ_1979] for ZINDO/S
 };
 
 Atom::Atom(){
@@ -89,12 +113,14 @@ void Atom::SetMessages(){
    this->errorMessageOrbitalExponent = "Error in base_atoms::Atom::GetOrbitalExponent: Invalid shelltype or orbitalType.\n";
    this->errorMessageIndoCoulombInt = "Error in base_atoms::Atom::GetIndoCoulombInt: Invalid orbitalType.\n";
    this->errorMessageIndoExchangeInt = "Error in base_atoms::Atom::GetIndoExchangeInt: Invalid orbitalType.\n";
-   this->errorMessageIndoCoreIntegral = "Error in base_atoms::Atom::GetIndoCoreIntegral: Invalid orbitalType.\n";
+   this->errorMessageIndoCoreIntegral = "Error in base_atoms::Atom::GetCoreIntegral: Invalid orbitalType for INDO.\n";
+   this->errorMessageZindoSCoreIntegral = "Error in base_atoms::Atom::GetCoreIntegral: Invalid orbitalType for ZINDO/S.\n";
    this->errorMessageAtomType = "\tatom type = ";
    this->errorMessageOrbitalType = "\torbital type = ";
    this->errorMessageShellType = "\tshell type = ";
    this->errorMessageEffectivPrincipalQuantumNumber = 
       "Error in base::Atom::GetEffectivePrincipalQuantumNumber: invalid shelltype.\n";
+   this->errorMessageZindoCoreIntegral = "Error in base_stoms::Atom::GetZindoCoreINtegral: Invalid orbitalType.\n";
 }
 
 AtomType Atom::GetAtomType(){
@@ -275,6 +301,74 @@ double Atom::GetIndoExchangeInt(OrbitalType orbital1, OrbitalType orbital2, doub
 
    return value;
 }
+
+// Part of Eq. (13) in [BZ_1979]
+double Atom::GetJss(){
+   return this->zindoF0ss;
+}
+
+// Part of Eq. (13) in [BZ_1979]
+double Atom::GetJsp(){
+   // F0ss = F0sp
+   return this->zindoF0ss - this->zindoG1sp/6.0;
+}
+
+// Part of Eq. (13) in [BZ_1979]
+double Atom::GetJsd(){
+   return this->zindoF0sd - this->zindoG2sd/10.0;
+}
+
+// Part of Eq. (13) in [BZ_1979]
+double Atom::GetJpp(){
+   // F0pp = F0ss
+   return this->zindoF0ss - 2.0*this->zindoF2pp/25.0;
+}
+
+// Part of Eq. (13) in [BZ_1979]
+double Atom::GetJpd(){
+   // F0pd = F0sd
+   return this->zindoF0sd - this->zindoG1pd/15.0 - 3.0*this->zindoG3pd/70.0;
+}
+
+// Part of Eq. (13) in [BZ_1979]
+double Atom::GetJdd(){
+   return this->zindoF0dd - 2.0*(this->zindoF2dd - this->zindoF4dd)/63.0;
+}
+
+// Eq. (13) in [BZ_1979]
+double Atom::GetZindoCoreIntegral(OrbitalType orbital, int l, int m, int n){
+   double value=0.0;
+
+   if(orbital == s){
+      value = -1.0*this->IonPotS 
+              - this->GetJss()*(double)(l-1) 
+              - this->GetJsp()*(double)m 
+              - this->GetJsd()*(double)n;
+   }
+   else if(orbital == px || orbital == py || orbital == pz){
+      value = -1.0*this->IonPotP
+              - this->GetJpp()*(double)(m-1) 
+              - this->GetJsp()*(double)l
+              - this->GetJpd()*(double)n;
+   }
+   else if(orbital == dxy || orbital == dyz || orbital == dzz || orbital == dzx || orbital == dxxyy ){
+      value = -1.0*this->IonPotD
+              - this->GetJdd()*(double)(n-1) 
+              - this->GetJsd()*(double)l
+              - this->GetJpd()*(double)m;
+   }
+   else{
+      cout << this->errorMessageZindoCoreIntegral;
+      cout << this->errorMessageAtomType << AtomTypeStr(this->atomType) << endl;
+      cout << this->errorMessageOrbitalType << OrbitalTypeStr(orbital) << endl;
+      exit(EXIT_FAILURE);
+   }
+
+   return value;
+}
+
+
+
 
 }
 #endif

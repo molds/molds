@@ -23,6 +23,7 @@ private:
    void SetDefaultValues();
    double eV2AU;
    double angstrom2AU;
+   double kayser2AU;
    double bondingAdjustParameterK; //see (3.79) in J. A. Pople book
    TheoryType currentTheory;
 
@@ -36,6 +37,7 @@ public:
    void SetMaxIterationsSCF(int maxIterationsSCF);
    double GetEV2AU();
    double GetAngstrom2AU();
+   double GetKayser2AU();
    double GetBondingAdjustParameterK();
    TheoryType GetCurrentTheory();
    void SetCurrentTheory(TheoryType theory);
@@ -67,9 +69,9 @@ void Parameters::DeleteInstance(){
 void Parameters::SetDefaultValues(){
    this->eV2AU = 0.03674903;
    this->angstrom2AU = 1.0/0.5291772;
+   this->kayser2AU = 4.556336*pow(10.0,-6.0);
    this->thresholdSCF = pow(10.0, -8.0);
    this->maxIterationsSCF = 100;
-   this->bondingAdjustParameterK = 0.75;
    this->currentTheory = CNDO2;
 }
 
@@ -95,6 +97,10 @@ double Parameters::GetEV2AU(){
 
 double Parameters::GetAngstrom2AU(){
    return this->angstrom2AU;
+}
+
+double Parameters::GetKayser2AU(){
+   return this->kayser2AU;
 }
 
 double Parameters::GetBondingAdjustParameterK(){

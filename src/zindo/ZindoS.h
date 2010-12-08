@@ -12,16 +12,17 @@ using namespace std;
 using namespace MolDS_base;
 using namespace MolDS_base_atoms;
 
-namespace MolDS_indo{
+namespace MolDS_zindo{
 
 /***
  *  Refferences for Indo are [PB_1970] and [PS_1966].
  */
-class Indo : public MolDS_cndo::Cndo2{
+class ZindoS : public MolDS_cndo::Cndo2{
 public:
-   Indo();
-   ~Indo();
+   ZindoS();
+   ~ZindoS();
 protected:
+   void CalcGammaAB(double** gammaAB, Molecule* molecule);
    void SetMessages();
    double GetFockDiagElement(Atom* atomA, int atomAIndex, int firstAOIndexA, 
                              int mu, Molecule* molecule, double** gammaAB,
@@ -34,51 +35,48 @@ protected:
    void SetEnableAtomTypes();
 };
 
-Indo::Indo() : MolDS_cndo::Cndo2(){
-   this->theory = INDO;
+ZindoS::ZindoS() : MolDS_cndo::Cndo2(){
+   this->theory = ZINDOS;
    this->SetMessages();
    this->SetEnableAtomTypes();
-   //cout << "Indo created\n";
+   //cout << "ZindoS created\n";
 }
 
-Indo::~Indo(){
-   //cout << "Indo deleted\n";
+ZindoS::~ZindoS(){
+   //cout << "ZindoS deleted\n";
 }
 
-void Indo::SetMessages(){
+void ZindoS::SetMessages(){
    this->errorMessageSCFNotConverged 
-      = "Error in indo::Indo::DoesSCF: SCF did not met convergence criterion. maxIterationsSCF=";
+      = "Error in zindo::ZindoS::DoesSCF: SCF did not met convergence criterion. maxIterationsSCF=";
    this->errorMessageMoleculeNotSet 
-      = "Error in indo::Indo::DoesSCF: A molecule is not set.\n";
+      = "Error in zindo::ZindoS::DoesSCF: A molecule is not set.\n";
    this->errorMessageOddTotalValenceElectrions 
-      = "Error in indo::Indo::SetMolecule: Total number of valence electrons is odd. totalNumberValenceElectrons=";
+      = "Error in zindo::ZindoS::SetMolecule: Total number of valence electrons is odd. totalNumberValenceElectrons=";
    this->errorMessageNotEnebleAtomType  
-      = "Error in indo::Indo::ChecEnableAtomType: Not enable atom is contained.\n";
-   this->messageSCFMetConvergence = "\n\n\n\t\tINDO-SCF met convergence criterion(^^b\n\n\n";
-   this->messageStartSCF = "**********  START: INDO-SCF  **********\n";
-   this->messageDoneSCF = "**********  DONE: INDO-SCF  **********\n\n\n";
+      = "Error in zindo::ZindoS::CheckEnableAtomType: Not enable atom is contained.\n";
+   this->messageSCFMetConvergence = "\n\n\n\t\tZINDO/S-SCF met convergence criterion(^^b\n\n\n";
+   this->messageStartSCF = "**********  START: ZINDO/S-SCF  **********\n";
+   this->messageDoneSCF = "**********  DONE: ZINDO/S-SCF  **********\n\n\n";
 }
 
-void Indo::SetEnableAtomTypes(){
+void ZindoS::SetEnableAtomTypes(){
    this->enableAtomTypes.clear();
    this->enableAtomTypes.push_back(H);
-   this->enableAtomTypes.push_back(Li);
-   this->enableAtomTypes.push_back(Be);
-   this->enableAtomTypes.push_back(B);
    this->enableAtomTypes.push_back(C);
    this->enableAtomTypes.push_back(N);
    this->enableAtomTypes.push_back(O);
-   this->enableAtomTypes.push_back(F);
+   this->enableAtomTypes.push_back(S);
 }
 
-double Indo::GetFockDiagElement(Atom* atomA, int atomAIndex, int firstAOIndexA, int mu, 
+double ZindoS::GetFockDiagElement(Atom* atomA, int atomAIndex, int firstAOIndexA, int mu, 
                                  Molecule* molecule, double** gammaAB,
                                  double** orbitalElectronPopulation, double* atomicElectronPopulation,
                                  bool isGuess){
    double value;
-   value = atomA->GetCoreIntegral(atomA->GetValence()[mu-firstAOIndexA], 
+   value = atomA->GetIndoCoreIntegral(atomA->GetValence()[mu-firstAOIndexA], 
                                      gammaAB[atomAIndex][atomAIndex], 
-                                     isGuess, this->theory);
+                                     isGuess);
 
    if(!isGuess){
       double temp = 0.0;
@@ -109,7 +107,7 @@ double Indo::GetFockDiagElement(Atom* atomA, int atomAIndex, int firstAOIndexA, 
    return value;
 }
 
-double Indo::GetFockOffDiagElement(Atom* atomA, Atom* atomB, int atomAIndex, int atomBIndex, 
+double ZindoS::GetFockOffDiagElement(Atom* atomA, Atom* atomB, int atomAIndex, int atomBIndex, 
                                     int firstAOIndexA, int firstAOIndexB,
                                     int mu, int nu, Molecule* molecule, double** gammaAB, double** overlap,
                                     double** orbitalElectronPopulation, bool isGuess){
@@ -142,6 +140,9 @@ double Indo::GetFockOffDiagElement(Atom* atomA, Atom* atomB, int atomAIndex, int
    return value;
 }
 
+void ZindoS::CalcGammaAB(double** gammaAB, Molecule* molecule){
+   // Do nothing;
+}
 
 
 }
