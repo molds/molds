@@ -35,6 +35,7 @@ protected:
 };
 
 Indo::Indo() : MolDS_cndo::Cndo2(){
+   this->theory = INDO;
    this->SetMessages();
    this->SetEnableAtomTypes();
    //cout << "Indo created\n";

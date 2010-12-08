@@ -55,7 +55,6 @@ private:
                                       Molecule* molecule, double** fockMatrix);
    void CalcAtomicElectronPopulation(double* atomicElectronPopulation,
                                      double** orbitalElectronPopulation, Molecule* molecule);
-   void CalcGammaAB(double** gammaAB, Molecule* molecule);
    void CalcOverlap(double** overlap, Molecule* molecule);
    void CalcRotatingMatrix(double** rotatingMatrix, Atom* atomA, Atom* atomB);
    void CalcDiatomicOverlapInDiatomicFrame(double** diatomicOverlap, Atom* atomA, Atom* atomB);
@@ -82,6 +81,7 @@ protected:
    string messageStartSCF;
    string messageDoneSCF;
    vector<AtomType> enableAtomTypes;
+   virtual void CalcGammaAB(double** gammaAB, Molecule* molecule);
    virtual void SetMessages();
    virtual void SetEnableAtomTypes();
    virtual double GetFockDiagElement(Atom* atomA, int atomAIndex, int firstAOIndexA, 
@@ -92,6 +92,7 @@ protected:
                                 int firstAOIndexA, int firstAOIndexB,
                                 int mu, int nu, Molecule* molecule, double** gammaAB, double** overlap,
                                 double** orbitalElectronPopulation, bool isGuess);
+   TheoryType theory;
 public:
    Cndo2();
    ~Cndo2();
@@ -100,6 +101,7 @@ public:
 };
 
 Cndo2::Cndo2(){
+   this->theory = CNDO2;
    this->SetMessages();
    this->SetEnableAtomTypes();
    //cout << "Cndo created\n";
@@ -197,8 +199,10 @@ void Cndo2::SetMolecule(Molecule* molecule){
 
    // set molecule and malloc
    this->molecule = molecule;
-   this->gammaAB = MallocerFreer::GetInstance()->MallocDoubleMatrix2d
-                   (this->molecule->GetAtomVect()->size(), this->molecule->GetAtomVect()->size());
+   if(this->theory == CNDO2 || this->theory == INDO){
+      this->gammaAB = MallocerFreer::GetInstance()->MallocDoubleMatrix2d
+                      (this->molecule->GetAtomVect()->size(), this->molecule->GetAtomVect()->size());
+   }
    this->overlap = MallocerFreer::GetInstance()->MallocDoubleMatrix2d
                    (this->molecule->GetTotalNumberAOs(), this->molecule->GetTotalNumberAOs());
    this->orbitalElectronPopulation = MallocerFreer::GetInstance()->MallocDoubleMatrix2d

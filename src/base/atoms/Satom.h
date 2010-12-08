@@ -20,11 +20,14 @@ Satom::Satom(double x, double y, double z) : Atom(x, y, z){
    this->valence.push_back(py);
    this->valence.push_back(pz);
    this->valence.push_back(px);
-   this->valence.push_back(dxy);
-   this->valence.push_back(dyz);
-   this->valence.push_back(dzz);
-   this->valence.push_back(dzx);
-   this->valence.push_back(dxxyy);
+   if(Parameters::GetInstance()->GetCurrentTheory() == CNDO2 || 
+      Parameters::GetInstance()->GetCurrentTheory() == INDO){
+      this->valence.push_back(dxy);
+      this->valence.push_back(dyz);
+      this->valence.push_back(dzz);
+      this->valence.push_back(dzx);
+      this->valence.push_back(dxxyy);
+   }
    this->bondingParameter = -18.150*Parameters::GetInstance()->GetEV2AU();
    this->coreCharge = 6.0;
    this->imuAmuS = 17.650*Parameters::GetInstance()->GetEV2AU();
