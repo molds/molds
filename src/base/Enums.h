@@ -7,6 +7,13 @@
 
 namespace MolDS_base{
 
+RENUMSTR_BEGIN( TheoryType, TheoryTypeStr )
+   RENUMSTR( CNDO2,  "CNDO/2" )
+   RENUMSTR( INDO,   "INDO" )
+   RENUMSTR( ZINDOS, "ZINDO/S" )
+   RENUMSTR( TheoryType_end,  "TheoryType_end" )
+RENUMSTR_END()
+
 RENUMSTR_BEGIN( ShellType, ShellTypeStr )
    RENUMSTR( k,  "k" )
    RENUMSTR( l,  "l" )

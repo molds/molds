@@ -3,6 +3,11 @@ SCF
    rms_density 0.00000001
 SCF_END
 
+THEORY
+   //cndo/2
+   indo
+   //zindo/s
+THEORY_END
 
 //metane
 //GEOMETRY
@@ -33,11 +38,11 @@ SCF_END
 //GEOMETRY_END
 
 // sh2
-GEOMETRY
-     S       -0.559299    0.471698    0.000000
-     H        0.750701    0.471698    0.000000
-     H       -0.996586    1.706558    0.000000
-GEOMETRY_END
+//GEOMETRY
+//     S       -0.559299    0.471698    0.000000
+//     H        0.750701    0.471698    0.000000
+//     H       -0.996586    1.706558    0.000000
+//GEOMETRY_END
 
 // benzene
 //GEOMETRY
@@ -56,12 +61,12 @@ GEOMETRY_END
 //GEOMETRY_END
 
 // acetylene
-//GEOMETRY
-// C                     0.24933   0.0   0.0 
-// C                     1.45053   0.0   0.0 
-// H                    -0.82067   0.0   0.0 
-// H                     2.52053   0.0   0.0 
-//GEOMETRY_END
+GEOMETRY
+ C                     0.24933   0.0   0.0 
+ C                     1.45053   0.0   0.0 
+ H                    -0.82067   0.0   0.0 
+ H                     2.52053   0.0   0.0 
+GEOMETRY_END
 
 // acetylene2
 //GEOMETRY

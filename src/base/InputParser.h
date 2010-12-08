@@ -41,6 +41,11 @@ private:
    string stringCommentOut;
    string stringGeometry;
    string stringGeometryEnd;
+   string stringTheory;
+   string stringTheoryEnd;
+   string stringTheoryCNDO2;
+   string stringTheoryINDO;
+   string stringTheoryZINDOS;
    string stringScf;
    string stringScfEnd;
    string stringScfMaxIter;
@@ -77,10 +82,15 @@ InputParser::InputParser(){
    this->stringCommentOut = "//";
    this->stringGeometry =    "geometry";
    this->stringGeometryEnd = "geometry_end";
+   this->stringTheory = "theory";
+   this->stringTheoryEnd = "theory_end";
    this->stringScf = "scf";
    this->stringScfEnd = "scf_end";
    this->stringScfMaxIter = "max_iter";
    this->stringScfRmsDensity = "rms_density";
+   this->stringTheoryCNDO2 = "cndo/2";
+   this->stringTheoryINDO = "indo";
+   this->stringTheoryZINDOS = "zindo/s";
 }
 
 InputParser::~InputParser(){
@@ -192,6 +202,29 @@ void InputParser::Parse(Molecule* molecule){
          i = j;
       }
       
+      // theory
+      if(inputTerms[i].compare(this->stringTheory) == 0){
+         int j=i+1;
+         while(inputTerms[j].compare(this->stringTheoryEnd) != 0){
+
+            // CNDO/2
+            if(inputTerms[j].compare(this->stringTheoryCNDO2) == 0){
+               Parameters::GetInstance()->SetCurrentTheory(CNDO2);
+            }
+
+            // INDO
+            else if(inputTerms[j].compare(this->stringTheoryINDO) == 0){
+               Parameters::GetInstance()->SetCurrentTheory(INDO);
+            }
+
+            // ZINDO/S
+            else if(inputTerms[j].compare(this->stringTheoryZINDOS) == 0){
+               Parameters::GetInstance()->SetCurrentTheory(ZINDOS);
+            }
+            j++;
+         }
+         i = j;
+      }
 
    }
 

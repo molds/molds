@@ -24,6 +24,7 @@ private:
    double eV2AU;
    double angstrom2AU;
    double bondingAdjustParameterK; //see (3.79) in J. A. Pople book
+   TheoryType currentTheory;
 
 public:
    static Parameters* GetInstance();
@@ -36,6 +37,8 @@ public:
    double GetEV2AU();
    double GetAngstrom2AU();
    double GetBondingAdjustParameterK();
+   TheoryType GetCurrentTheory();
+   void SetCurrentTheory(TheoryType theory);
 
 };
 Parameters* Parameters::parameters = NULL;
@@ -67,6 +70,7 @@ void Parameters::SetDefaultValues(){
    this->thresholdSCF = pow(10.0, -8.0);
    this->maxIterationsSCF = 100;
    this->bondingAdjustParameterK = 0.75;
+   this->currentTheory = CNDO2;
 }
 
 double Parameters::GetThresholdSCF(){
@@ -95,6 +99,14 @@ double Parameters::GetAngstrom2AU(){
 
 double Parameters::GetBondingAdjustParameterK(){
    return this->bondingAdjustParameterK;
+}
+
+TheoryType Parameters::GetCurrentTheory(){
+   return this->currentTheory;
+}
+
+void Parameters::SetCurrentTheory(TheoryType theory){
+   this->currentTheory = theory;
 }
 
 }

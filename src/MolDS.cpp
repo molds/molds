@@ -54,18 +54,25 @@ int main(){
    // Parse input
    InputParser::GetInstance()->Parse(molecule);
 
-   // cndo2
-   MolDS_cndo::Cndo2* cndo2 = new MolDS_cndo::Cndo2();
-   cndo2->SetMolecule(molecule);
-   cndo2->DoesSCF();
-   delete cndo2;
+   // CNDO/2
+   if(Parameters::GetInstance()->GetCurrentTheory() == CNDO2){
+      MolDS_cndo::Cndo2* cndo2 = new MolDS_cndo::Cndo2();
+      cndo2->SetMolecule(molecule);
+      cndo2->DoesSCF();
+      delete cndo2;
+   }
 
-   // indo
-   MolDS_indo::Indo* indo = new MolDS_indo::Indo();
-   indo->SetMolecule(molecule);
-   indo->DoesSCF();
-   delete indo;
+   // INDO
+   else if(Parameters::GetInstance()->GetCurrentTheory() == INDO){
+      MolDS_indo::Indo* indo = new MolDS_indo::Indo();
+      indo->SetMolecule(molecule);
+      indo->DoesSCF();
+      delete indo;
+   }
 
+   // ZINDO/S
+   else if(Parameters::GetInstance()->GetCurrentTheory() == ZINDOS){
+   }
 
    /*** test lapack ***
    {
