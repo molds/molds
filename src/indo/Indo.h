@@ -18,20 +18,24 @@ namespace MolDS_indo{
  *  Refferences for Indo are [PB_1970] and [PS_1966].
  */
 class Indo : public MolDS_cndo::Cndo2{
-public:
-   Indo();
-   ~Indo();
+private:
+   double GetCoulombInt(OrbitalType orbital1, OrbitalType orbital2, double gamma, Atom* atom); // Indo Coulomb Interaction, (3.87) - (3.91) in J. A. Pople book.
+   double GetExchangeInt(OrbitalType orbital1, OrbitalType orbital2, double gamma, Atom* atom); // Indo Exchange Interaction, (3.87) - (3.91) in J. A. Pople book.
 protected:
-   void SetMessages();
-   double GetFockDiagElement(Atom* atomA, int atomAIndex, int firstAOIndexA, 
-                             int mu, Molecule* molecule, double** gammaAB,
-                             double** orbitalElectronPopulation, double* atomicElectronPopulation,
-                             bool isGuess);
-   double GetFockOffDiagElement(Atom* atomA, Atom* atomB, int atomAIndex, int atomBIndex, 
+   virtual void SetMessages();
+   virtual double GetFockDiagElement(Atom* atomA, int atomAIndex, int firstAOIndexA, 
+                                     int mu, Molecule* molecule, double** gammaAB,
+                                     double** orbitalElectronPopulation, double* atomicElectronPopulation,
+                                     bool isGuess);
+   virtual double GetFockOffDiagElement(Atom* atomA, Atom* atomB, int atomAIndex, int atomBIndex, 
                                 int firstAOIndexA, int firstAOIndexB,
                                 int mu, int nu, Molecule* molecule, double** gammaAB, double** overelap,
                                 double** orbitalElectronPopulation, bool isGuess);
-   void SetEnableAtomTypes();
+   virtual void SetEnableAtomTypes();
+
+public:
+   Indo();
+   ~Indo();
 };
 
 Indo::Indo() : MolDS_cndo::Cndo2(){
@@ -54,6 +58,8 @@ void Indo::SetMessages(){
       = "Error in indo::Indo::SetMolecule: Total number of valence electrons is odd. totalNumberValenceElectrons=";
    this->errorMessageNotEnebleAtomType  
       = "Error in indo::Indo::ChecEnableAtomType: Not enable atom is contained.\n";
+   this->errorMessageCoulombInt = "Error in base_indo::Indo::GetCoulombInt: Invalid orbitalType.\n";
+   this->errorMessageExchangeInt = "Error in base_indo::Indo::GetExchangeInt: Invalid orbitalType.\n";
    this->messageSCFMetConvergence = "\n\n\n\t\tINDO-SCF met convergence criterion(^^b\n\n\n";
    this->messageStartSCF = "**********  START: INDO-SCF  **********\n";
    this->messageDoneSCF = "**********  DONE: INDO-SCF  **********\n\n\n";
@@ -88,8 +94,8 @@ double Indo::GetFockDiagElement(Atom* atomA, int atomAIndex, int firstAOIndexA, 
       OrbitalType orbitalMu = atomA->GetValence()[mu-firstAOIndexA];
       for(int v=0; v<atomA->GetValence().size(); v++){
          OrbitalType orbitalLam = atomA->GetValence()[v];
-         coulomb  = atomA->GetIndoCoulombInt(orbitalMu, orbitalLam, gammaAB[atomAIndex][atomAIndex]);
-         exchange = atomA->GetIndoExchangeInt(orbitalMu, orbitalLam, gammaAB[atomAIndex][atomAIndex]);
+         coulomb  = this->GetCoulombInt(orbitalMu, orbitalLam, gammaAB[atomAIndex][atomAIndex], atomA);
+         exchange = this->GetExchangeInt(orbitalMu, orbitalLam, gammaAB[atomAIndex][atomAIndex], atomA);
          lammda = firstAOIndexA + v;
          temp += orbitalElectronPopulation[lammda][lammda]*(coulomb - 0.5*exchange);
       }
@@ -129,8 +135,8 @@ double Indo::GetFockOffDiagElement(Atom* atomA, Atom* atomB, int atomAIndex, int
       if(atomAIndex == atomBIndex){
          OrbitalType orbitalMu = atomA->GetValence()[mu-firstAOIndexA];
          OrbitalType orbitalNu = atomA->GetValence()[nu-firstAOIndexA];
-         coulomb  = atomA->GetIndoCoulombInt(orbitalMu, orbitalNu, gammaAB[atomAIndex][atomAIndex]); 
-         exchange = atomA->GetIndoExchangeInt(orbitalMu, orbitalNu, gammaAB[atomAIndex][atomAIndex]); 
+         coulomb  = this->GetCoulombInt(orbitalMu, orbitalNu, gammaAB[atomAIndex][atomAIndex], atomA); 
+         exchange = this->GetExchangeInt(orbitalMu, orbitalNu, gammaAB[atomAIndex][atomAIndex], atomA); 
          value = (1.5*exchange - 0.5*coulomb)*orbitalElectronPopulation[mu][nu];
       }
       else{
@@ -142,6 +148,71 @@ double Indo::GetFockOffDiagElement(Atom* atomA, Atom* atomB, int atomAIndex, int
    return value;
 }
 
+// (3.87) - (3.91) in J. A. Pople book.
+// Indo Coulomb Interaction
+double Indo::GetCoulombInt(OrbitalType orbital1, OrbitalType orbital2, double gamma, Atom* atom){
+
+   double value=0.0;
+   if( orbital1 == s && orbital2 == s){ 
+      value = gamma;
+   }   
+   else if( orbital1 == s && ( orbital2 == px || orbital2 == py || orbital2 == pz )){ 
+      value = gamma;
+   }   
+   else if( (orbital1 == px || orbital1 == py || orbital1 == pz ) && orbital2 == s){ 
+      value = gamma;
+   }   
+   else if( (orbital1 == orbital2) && ( orbital1 == px || orbital1 == py || orbital1 == pz )){ 
+      value = gamma + 4.0*atom->GetIndoF2()/25.0;
+   }   
+   else if( (orbital1 != orbital2) 
+         && ( orbital1 == px || orbital1 == py || orbital1 == pz )
+         && ( orbital2 == px || orbital2 == py || orbital2 == pz ) ){
+      value = gamma - 2.0*atom->GetIndoF2()/25.0;
+   }   
+   else{
+      cout << this->errorMessageCoulombInt;
+      cout << this->errorMessageAtomType << AtomTypeStr(atom->GetAtomType()) << "\n";
+      cout << this->errorMessageOrbitalType << OrbitalTypeStr(orbital1) << "\n";
+      cout << this->errorMessageOrbitalType << OrbitalTypeStr(orbital2) << "\n";
+      exit(EXIT_FAILURE);
+   }   
+
+   return value;
+
+}
+
+// (3.87) - (3.91) in J. A. Pople book.
+// Indo Exchange Interaction
+double Indo::GetExchangeInt(OrbitalType orbital1, OrbitalType orbital2, double gamma, Atom* atom){
+
+   double value=0.0;
+
+   if( orbital1 == orbital2){
+      value = this->GetCoulombInt(orbital1, orbital2, gamma, atom);
+   }   
+   else if( (orbital1 == s) && (orbital2 == px || orbital2 == py || orbital2 == pz ) ){
+      value = atom->GetIndoG1()/3.0;
+   }   
+   else if( (orbital1 == px || orbital1 == py || orbital1 == pz) && orbital2 == s  ){  
+      value = atom->GetIndoG1()/3.0;
+   }   
+   else if( (orbital1 != orbital2) 
+         && ( orbital1 == px || orbital1 == py || orbital1 == pz )
+         && ( orbital2 == px || orbital2 == py || orbital2 == pz ) ){
+      value = 3.0*atom->GetIndoF2()/25.0;
+   }   
+   else{
+      cout << this->errorMessageExchangeInt;
+      cout << this->errorMessageAtomType << AtomTypeStr(atom->GetAtomType()) << "\n";
+      cout << this->errorMessageOrbitalType << OrbitalTypeStr(orbital1) << "\n";
+      cout << this->errorMessageOrbitalType << OrbitalTypeStr(orbital2) << "\n";
+      exit(EXIT_FAILURE);
+   }   
+
+   return value;
+
+}
 
 
 }

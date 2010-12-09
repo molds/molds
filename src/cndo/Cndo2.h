@@ -24,7 +24,6 @@ namespace MolDS_cndo{
  */
 class Cndo2{
 private:
-   string errorMessageAtomType;
    string messageEnergiesMOs;
    string messageEnergiesMOsTitle;
    string messageMullikenAtoms;
@@ -73,10 +72,14 @@ private:
    void CheckNumberValenceElectrons(Molecule* molecule);
 
 protected:
+   string errorMessageAtomType;
+   string errorMessageOrbitalType;
    string errorMessageSCFNotConverged;
    string errorMessageMoleculeNotSet;
    string errorMessageOddTotalValenceElectrions;
    string errorMessageNotEnebleAtomType;
+   string errorMessageCoulombInt;
+   string errorMessageExchangeInt;
    string messageSCFMetConvergence;
    string messageStartSCF;
    string messageDoneSCF;
@@ -156,8 +159,8 @@ void Cndo2::SetMessages(){
       = "Error in cndo::Cndo2::SetMolecule: Total number of valence electrons is odd. totalNumberValenceElectrons=";
    this->errorMessageNotEnebleAtomType  
       = "Error in cndo::Cndo2::ChecEnableAtomType: Not enable atom is contained.\n";
-   this->errorMessageAtomType  
-      = "\tatom type = ";
+   this->errorMessageAtomType = "\tatom type = ";
+   this->errorMessageOrbitalType = "\torbital type = ";
    this->messageSCFMetConvergence = "\n\n\n\t\tCNDO/2-SCF met convergence criterion(^^b\n\n\n";
    this->messageStartSCF = "**********  START: CNDO/2-SCF  **********\n";
    this->messageDoneSCF = "**********  DONE: CNDO/2-SCF  **********\n\n\n";

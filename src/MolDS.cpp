@@ -23,6 +23,7 @@
 #include"base/Parameters.h"
 #include"cndo/Cndo2.h"
 #include"indo/Indo.h"
+#include"zindo/ZindoS.h"
 #include"mkl_wrapper/LapackWrapper.h"
 
 
@@ -72,6 +73,10 @@ int main(){
 
    // ZINDO/S
    else if(Parameters::GetInstance()->GetCurrentTheory() == ZINDOS){
+      MolDS_zindo::ZindoS* zindoS = new MolDS_zindo::ZindoS();
+      //zindoS->SetMolecule(molecule);
+      //zindoS->DoesSCF();
+      delete zindoS;
    }
 
    /*** test lapack ***

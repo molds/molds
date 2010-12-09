@@ -17,8 +17,6 @@ private:
    void SetMessages();
    string errorMessageImuAmu;
    string errorMessageOrbitalExponent;
-   string errorMessageIndoCoulombInt;
-   string errorMessageIndoExchangeInt;
    string errorMessageShellType;
    string errorMessageEffectivPrincipalQuantumNumber;
    string errorMessageZindoCoreIntegral;
@@ -83,9 +81,9 @@ public:
    int GetNumberValenceElectrons();
    double GetImuAmu(OrbitalType orbitalType);  // return 0.5*(I_mu + A_mu)
    double GetOrbitalExponent(ShellType shellType, OrbitalType orbitalType);  // (1.73) in J. A. Pople book.
-   double GetIndoCoulombInt(OrbitalType orbital1, OrbitalType orbital2, double gamma); // (3.87) - (3.91) in J. A. Pople book.
-   double GetIndoExchangeInt(OrbitalType orbital1, OrbitalType orbital2, double gamma); // (3.87) - (3.91) in J. A. Pople book.
    virtual double GetCoreIntegral(OrbitalType orbital, double gamma, bool isGuess, TheoryType theory) = 0; // P82 - 83 in J. A. Pople book for INDO or Eq. (13) in [BZ_1979] for ZINDO/S
+   double GetIndoF2();
+   double GetIndoG1();
 };
 
 Atom::Atom(){
@@ -111,8 +109,6 @@ Atom::~Atom(){
 void Atom::SetMessages(){
    this->errorMessageImuAmu = "Error in base_atoms::Atom::GetImuAmu: Invalid orbitalType.\n";
    this->errorMessageOrbitalExponent = "Error in base_atoms::Atom::GetOrbitalExponent: Invalid shelltype or orbitalType.\n";
-   this->errorMessageIndoCoulombInt = "Error in base_atoms::Atom::GetIndoCoulombInt: Invalid orbitalType.\n";
-   this->errorMessageIndoExchangeInt = "Error in base_atoms::Atom::GetIndoExchangeInt: Invalid orbitalType.\n";
    this->errorMessageIndoCoreIntegral = "Error in base_atoms::Atom::GetCoreIntegral: Invalid orbitalType for INDO.\n";
    this->errorMessageZindoSCoreIntegral = "Error in base_atoms::Atom::GetCoreIntegral: Invalid orbitalType for ZINDO/S.\n";
    this->errorMessageAtomType = "\tatom type = ";
@@ -239,69 +235,6 @@ double Atom::GetOrbitalExponent(ShellType shellType, OrbitalType orbitalType){
 }
 
 
-// (3.87) - (3.91) in J. A. Pople book.
-// Indo Coulomb Interaction
-double Atom::GetIndoCoulombInt(OrbitalType orbital1, OrbitalType orbital2, double gamma){
-
-   double value=0.0;
-   if( orbital1 == s && orbital2 == s){
-      value = gamma;
-   }
-   else if( orbital1 == s && ( orbital2 == px || orbital2 == py || orbital2 == pz )){
-      value = gamma;
-   }
-   else if( (orbital1 == px || orbital1 == py || orbital1 == pz ) && orbital2 == s){
-      value = gamma;
-   }
-   else if( (orbital1 == orbital2) && ( orbital1 == px || orbital1 == py || orbital1 == pz )){
-      value = gamma + 4.0*this->indoF2/25.0;
-   }
-   else if( (orbital1 != orbital2) 
-         && ( orbital1 == px || orbital1 == py || orbital1 == pz )
-         && ( orbital2 == px || orbital2 == py || orbital2 == pz ) ){
-      value = gamma - 2.0*this->indoF2/25.0;
-   }
-   else{
-      cout << this->errorMessageIndoCoulombInt;
-      cout << this->errorMessageAtomType << AtomTypeStr(this->atomType) << "\n";
-      cout << this->errorMessageOrbitalType << OrbitalTypeStr(orbital1) << "\n";
-      cout << this->errorMessageOrbitalType << OrbitalTypeStr(orbital2) << "\n";
-      exit(EXIT_FAILURE);
-   }
-
-   return value;
-}
-
-// (3.87) - (3.91) in J. A. Pople book.
-// Indo Exchange interaction
-double Atom::GetIndoExchangeInt(OrbitalType orbital1, OrbitalType orbital2, double gamma){
-   double value=0.0;
-
-   if( orbital1 == orbital2){
-      value = this->GetIndoCoulombInt(orbital1, orbital2, gamma);
-   }
-   else if( (orbital1 == s) && (orbital2 == px || orbital2 == py || orbital2 == pz ) ){
-      value = this->indoG1/3.0;
-   }
-   else if( (orbital1 == px || orbital1 == py || orbital1 == pz) && orbital2 == s  ){
-      value = this->indoG1/3.0;
-   }
-   else if( (orbital1 != orbital2) 
-         && ( orbital1 == px || orbital1 == py || orbital1 == pz )
-         && ( orbital2 == px || orbital2 == py || orbital2 == pz ) ){
-      value = 3.0*this->indoF2/25.0;
-   }
-   else{
-      cout << this->errorMessageIndoExchangeInt;
-      cout << this->errorMessageAtomType << AtomTypeStr(this->atomType) << "\n";
-      cout << this->errorMessageOrbitalType << OrbitalTypeStr(orbital1) << "\n";
-      cout << this->errorMessageOrbitalType << OrbitalTypeStr(orbital2) << "\n";
-      exit(EXIT_FAILURE);
-   }
-
-   return value;
-}
-
 // Part of Eq. (13) in [BZ_1979]
 double Atom::GetJss(){
    return this->zindoF0ss;
@@ -367,6 +300,13 @@ double Atom::GetZindoCoreIntegral(OrbitalType orbital, int l, int m, int n){
    return value;
 }
 
+double Atom::GetIndoF2(){
+   return this->indoF2;
+}
+
+double Atom::GetIndoG1(){
+   return this->indoG1;
+}
 
 
 
