@@ -57,7 +57,7 @@ void Indo::SetMessages(){
    this->errorMessageOddTotalValenceElectrions 
       = "Error in indo::Indo::SetMolecule: Total number of valence electrons is odd. totalNumberValenceElectrons=";
    this->errorMessageNotEnebleAtomType  
-      = "Error in indo::Indo::ChecEnableAtomType: Not enable atom is contained.\n";
+      = "Error in indo::Indo::CheckEnableAtomType: Not enable atom is contained.\n";
    this->errorMessageCoulombInt = "Error in base_indo::Indo::GetCoulombInt: Invalid orbitalType.\n";
    this->errorMessageExchangeInt = "Error in base_indo::Indo::GetExchangeInt: Invalid orbitalType.\n";
    this->messageSCFMetConvergence = "\n\n\n\t\tINDO-SCF met convergence criterion(^^b\n\n\n";
