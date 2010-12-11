@@ -158,7 +158,7 @@ void Cndo2::SetMessages(){
    this->errorMessageOddTotalValenceElectrions 
       = "Error in cndo::Cndo2::SetMolecule: Total number of valence electrons is odd. totalNumberValenceElectrons=";
    this->errorMessageNotEnebleAtomType  
-      = "Error in cndo::Cndo2::ChecEnableAtomType: Not enable atom is contained.\n";
+      = "Error in cndo::Cndo2::ChecEnableAtomType: Non available atom is contained.\n";
    this->errorMessageAtomType = "\tatom type = ";
    this->errorMessageOrbitalType = "\torbital type = ";
    this->messageSCFMetConvergence = "\n\n\n\t\tCNDO/2-SCF met convergence criterion(^^b\n\n\n";

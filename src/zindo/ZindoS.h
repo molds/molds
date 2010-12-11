@@ -57,7 +57,7 @@ void ZindoS::SetMessages(){
    this->errorMessageOddTotalValenceElectrions 
       = "Error in zindo::ZindoS::SetMolecule: Total number of valence electrons is odd. totalNumberValenceElectrons=";
    this->errorMessageNotEnebleAtomType  
-      = "Error in zindo::ZindoS::CheckEnableAtomType: Not enable atom is contained.\n";
+      = "Error in zindo::ZindoS::CheckEnableAtomType: Non available atom is contained.\n";
    this->errorMessageCoulombInt = "Error in base_zindo::ZindoS::GetCoulombInt: Invalid orbitalType.\n";
    this->errorMessageExchangeInt = "Error in base_zindo::ZindoS::GetExchangeInt: Invalid orbitalType.\n";
    this->messageSCFMetConvergence = "\n\n\n\t\tZINDO/S-SCF met convergence criterion(^^b\n\n\n";
