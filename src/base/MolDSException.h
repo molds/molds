@@ -1,6 +1,8 @@
 #ifndef INCLUDED_MOLDSEXCEPTION
 #define INCLUDED_MOLDSEXCEPTION
 
+#include <stdexcept>
+
 using namespace std;
 
 namespace MolDS_base{

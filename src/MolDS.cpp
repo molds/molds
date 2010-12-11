@@ -6,6 +6,7 @@
 #include<time.h>
 #include<list>
 #include<vector>
+#include"base/MolDSException.h"
 #include"base/Enums.h"
 #undef INCLUDED_ENUMS
 #define RENUMSTR_BODY 1  
