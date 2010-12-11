@@ -5,6 +5,7 @@
 #include<stdlib.h>
 #include<math.h>
 #include<iostream>
+#include<sstream>
 #include<vector>
 #include"../base/Molecule.h"
 #include"../base/atoms/Atom.h"
@@ -70,6 +71,7 @@ private:
    void OutputMOs(double** fockMatrix, double* energiesMO, double* atomicElectronPopulation, Molecule* molecule);
    void CheckEnableAtomType(Molecule* molecule);
    void CheckNumberValenceElectrons(Molecule* molecule);
+   void FreeDiatomicOverlapAndRotatingMatrix(double** diatomicOverlap, double** rotatingMatrix);
 
 protected:
    string errorMessageAtomType;
@@ -230,8 +232,9 @@ void Cndo2::SetMolecule(Molecule* molecule){
 void Cndo2::CheckNumberValenceElectrons(Molecule* molecule){
 
    if(molecule->GetTotalNumberValenceElectrons() % 2 == 1){
-      cout << this->errorMessageOddTotalValenceElectrions << molecule->GetTotalNumberValenceElectrons() << "\n";
-      exit(EXIT_FAILURE);
+      stringstream ss;
+      ss << this->errorMessageOddTotalValenceElectrions << molecule->GetTotalNumberValenceElectrons() << "\n";
+      throw MolDSException(ss.str());
    }
 }
 
@@ -247,9 +250,10 @@ void Cndo2::CheckEnableAtomType(Molecule* molecule){
          }
       }
       if(!enable){
-         cout << this->errorMessageNotEnebleAtomType;
-         cout << this->errorMessageAtomType << AtomTypeStr(atomType) << endl;
-         exit(EXIT_FAILURE);
+         stringstream ss;
+         ss << this->errorMessageNotEnebleAtomType;
+         ss << this->errorMessageAtomType << AtomTypeStr(atomType) << endl;
+         throw MolDSException(ss.str());
       }
    }
 
@@ -267,8 +271,9 @@ void Cndo2::DoesSCF(){
    cout << this->messageStartSCF;
 
    if(this->molecule == NULL){
-      cout << this->errorMessageMoleculeNotSet;
-      exit(EXIT_FAILURE);
+      stringstream ss;
+      ss << this->errorMessageMoleculeNotSet;
+      throw MolDSException(ss.str());
    }
 
    double** oldOrbitalElectronPopulation = MallocerFreer::GetInstance()->MallocDoubleMatrix2d
@@ -328,8 +333,9 @@ void Cndo2::DoesSCF(){
 
       // SCF fails
       if(i==maxIterationsSCF-1){
-         cout << this->errorMessageSCFNotConverged << maxIterationsSCF << "\n";
-         exit(EXIT_FAILURE);
+         stringstream ss;
+         ss << this->errorMessageSCFNotConverged << maxIterationsSCF << "\n";
+         throw MolDSException(ss.str());
       }
 
 
@@ -680,6 +686,22 @@ void Cndo2::CalcGammaAB(double** gammaAB, Molecule* molecule){
 
 }
 
+void Cndo2::FreeDiatomicOverlapAndRotatingMatrix(double** diatomicOverlap, double** rotatingMatrix){
+
+   // free
+   if(diatomicOverlap != NULL){
+      MallocerFreer::GetInstance()->FreeDoubleMatrix2d(diatomicOverlap, OrbitalType_end);
+      diatomicOverlap = NULL;
+      //cout << "diatomicOverlap deleted\n";
+   }
+   if(rotatingMatrix != NULL){
+      MallocerFreer::GetInstance()->FreeDoubleMatrix2d(rotatingMatrix, OrbitalType_end);
+      rotatingMatrix = NULL;
+      //cout << "rotatingMatrix deleted\n";
+   }
+
+}
+
 // calculate Overlap matrix. E.g. S_{\mu\nu} in (3.74) in J. A. Pople book.
 void Cndo2::CalcOverlap(double** overlap, Molecule* molecule){
    int totalAONumber = molecule->GetTotalNumberAOs();
@@ -695,35 +717,29 @@ void Cndo2::CalcOverlap(double** overlap, Molecule* molecule){
    rotatingMatrix = MallocerFreer::GetInstance()->MallocDoubleMatrix2d
                       (OrbitalType_end, OrbitalType_end);
 
-   // calculation overlap matrix
-   for(int mu=0; mu<totalAONumber; mu++){
-      overlap[mu][mu] = 1.0;
-   }
+   try{
+      // calculation overlap matrix
+      for(int mu=0; mu<totalAONumber; mu++){
+         overlap[mu][mu] = 1.0;
+      }
 
-   for(int A=0; A<totalAtomNumber; A++){
-      atomA = (*(molecule->GetAtomVect()))[A];
-      for(int B=A+1; B<totalAtomNumber; B++){
-         atomB = (*(molecule->GetAtomVect()))[B];
+      for(int A=0; A<totalAtomNumber; A++){
+         atomA = (*(molecule->GetAtomVect()))[A];
+         for(int B=A+1; B<totalAtomNumber; B++){
+            atomB = (*(molecule->GetAtomVect()))[B];
 
-         this->CalcDiatomicOverlapInDiatomicFrame(diatomicOverlap, atomA, atomB);
-         this->CalcRotatingMatrix(rotatingMatrix, atomA, atomB);
-         this->RotateDiatmicOverlapToSpaceFrame(diatomicOverlap, rotatingMatrix);
-         this->SetOverlapElement(overlap, diatomicOverlap, atomA, atomB);
+            this->CalcDiatomicOverlapInDiatomicFrame(diatomicOverlap, atomA, atomB);
+            this->CalcRotatingMatrix(rotatingMatrix, atomA, atomB);
+            this->RotateDiatmicOverlapToSpaceFrame(diatomicOverlap, rotatingMatrix);
+            this->SetOverlapElement(overlap, diatomicOverlap, atomA, atomB);
 
+         }
       }
    }
-
-   // free
-   if(diatomicOverlap != NULL){
-      MallocerFreer::GetInstance()->FreeDoubleMatrix2d(diatomicOverlap, OrbitalType_end);
-      diatomicOverlap = NULL;
-      //cout << "diatomicOverlap deleted\n";
+   catch(MolDSException ex){
+      this->FreeDiatomicOverlapAndRotatingMatrix(diatomicOverlap, rotatingMatrix);
    }
-   if(rotatingMatrix != NULL){
-      MallocerFreer::GetInstance()->FreeDoubleMatrix2d(rotatingMatrix, OrbitalType_end);
-      rotatingMatrix = NULL;
-      //cout << "rotatingMatrix deleted\n";
-   }
+   this->FreeDiatomicOverlapAndRotatingMatrix(diatomicOverlap, rotatingMatrix);
 
    /* 
    printf("overlap matrix\n"); 
@@ -1041,8 +1057,9 @@ double Cndo2::GetAuxiliaryD(int la, int lb, int m){
    double value = 0.0;
 
    if(m<0){
-      cout << errorMessageAuxiliaryDNegativeM;
-      exit(EXIT_FAILURE);
+      stringstream ss;
+      ss << errorMessageAuxiliaryDNegativeM;
+      throw MolDSException(ss.str());
    }
 
    double pre = pow(Factorial(m+1)/8.0, 2.0);

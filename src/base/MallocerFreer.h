@@ -18,6 +18,7 @@ private:
    void operator = (MallocerFreer&);
    ~MallocerFreer();
    static MallocerFreer* mallocerFreer;
+   string errorMessageMallocFailure;
 public:
    static MallocerFreer* GetInstance();
    static void DeleteInstance();
@@ -46,6 +47,7 @@ public:
 MallocerFreer* MallocerFreer::mallocerFreer = NULL;
 
 MallocerFreer::MallocerFreer(){
+   this->errorMessageMallocFailure = "Error in base::MallocFreere: Malloc failure...\n";
 }
 
 MallocerFreer::~MallocerFreer(){
@@ -111,13 +113,13 @@ double** MallocerFreer::MallocDoubleMatrix2d(int size1, int size2){
 
    matrix = new double*[size1];
    if(matrix==NULL){
-      exit(EXIT_FAILURE); // malloc failure
+      throw MolDSException(this->errorMessageMallocFailure);
    }
 
    for(int i=0;i<size1;i++) {
       matrix[i] = new double[size2];
       if (matrix[i]==NULL){
-         exit(EXIT_FAILURE); //malloc failure
+         throw MolDSException(this->errorMessageMallocFailure);
       }
    }
 
@@ -149,22 +151,22 @@ double**** MallocerFreer::MallocDoubleMatrix4d(int size1, int size2, int size3, 
 
    matrix = new double***[size1];
    if(matrix==NULL){
-      exit(EXIT_FAILURE); //malloc failure
+      throw MolDSException(this->errorMessageMallocFailure);
    }
    for(int i=0;i<size1;i++) {
       matrix[i] = new double**[size2];
       if(matrix[i]==NULL){
-         exit(EXIT_FAILURE); //malloc failure
+         throw MolDSException(this->errorMessageMallocFailure);
       }
       for(int j=0;j<size2;j++){
          matrix[i][j] = new double*[size3];
          if(matrix[i][j]==NULL){
-           exit(EXIT_FAILURE); //malloc failure
+            throw MolDSException(this->errorMessageMallocFailure);
          }
          for(int k=0;k<size3;k++){
             matrix[i][j][k] = new double[size4];
             if(matrix[i][j][k]==NULL){
-               exit(EXIT_FAILURE); //malloc failure
+               throw MolDSException(this->errorMessageMallocFailure);
             }
          }
       }

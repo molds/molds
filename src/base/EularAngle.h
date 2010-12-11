@@ -32,8 +32,9 @@ EularAngle::EularAngle(double x, double y, double z){
 
    // calc. beta
    if(x==0.0 && y==0.0 && z==0.0){
-      cout << this->errorMessageInvalidXYZ;
-      exit(EXIT_FAILURE);
+      stringstream ss;
+      ss << this->errorMessageInvalidXYZ;
+      throw MolDSException(ss.str());
    }
 
    r = sqrt( pow(x, 2.0) + pow(y, 2.0) + pow(z, 2.0) );

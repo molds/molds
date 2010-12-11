@@ -171,11 +171,12 @@ double Indo::GetCoulombInt(OrbitalType orbital1, OrbitalType orbital2, double ga
       value = gamma - 2.0*atom->GetIndoF2()/25.0;
    }   
    else{
-      cout << this->errorMessageCoulombInt;
-      cout << this->errorMessageAtomType << AtomTypeStr(atom->GetAtomType()) << "\n";
-      cout << this->errorMessageOrbitalType << OrbitalTypeStr(orbital1) << "\n";
-      cout << this->errorMessageOrbitalType << OrbitalTypeStr(orbital2) << "\n";
-      exit(EXIT_FAILURE);
+      stringstream ss;
+      ss << this->errorMessageCoulombInt;
+      ss << this->errorMessageAtomType << AtomTypeStr(atom->GetAtomType()) << "\n";
+      ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbital1) << "\n";
+      ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbital2) << "\n";
+      throw MolDSException(ss.str());
    }   
 
    return value;
@@ -203,11 +204,12 @@ double Indo::GetExchangeInt(OrbitalType orbital1, OrbitalType orbital2, double g
       value = 3.0*atom->GetIndoF2()/25.0;
    }   
    else{
-      cout << this->errorMessageExchangeInt;
-      cout << this->errorMessageAtomType << AtomTypeStr(atom->GetAtomType()) << "\n";
-      cout << this->errorMessageOrbitalType << OrbitalTypeStr(orbital1) << "\n";
-      cout << this->errorMessageOrbitalType << OrbitalTypeStr(orbital2) << "\n";
-      exit(EXIT_FAILURE);
+      stringstream ss;
+      ss << this->errorMessageExchangeInt;
+      ss << this->errorMessageAtomType << AtomTypeStr(atom->GetAtomType()) << "\n";
+      ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbital1) << "\n";
+      ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbital2) << "\n";
+      throw MolDSException(ss.str());
    }   
 
    return value;

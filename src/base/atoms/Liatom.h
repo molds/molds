@@ -68,17 +68,19 @@ double Liatom::GetCoreIntegral(OrbitalType orbital, double gamma, bool isGuess, 
          }
       }
       else{
-         cout << this->errorMessageIndoCoreIntegral;
-         cout << this->errorMessageAtomType << AtomTypeStr(this->atomType) << endl;
-         cout << this->errorMessageOrbitalType << OrbitalTypeStr(orbital) << endl;
-         exit(EXIT_FAILURE);
+         stringstream ss;
+         ss << this->errorMessageIndoCoreIntegral;
+         ss << this->errorMessageAtomType << AtomTypeStr(this->atomType) << endl;
+         ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbital) << endl;
+         throw MolDSException(ss.str());
       }
    }
    else if(theory == ZINDOS){
-      cout << this->errorMessageZindoSCoreIntegral;
-      cout << this->errorMessageAtomType << AtomTypeStr(this->atomType) << endl;
-      cout << this->errorMessageOrbitalType << OrbitalTypeStr(orbital) << endl;
-      exit(EXIT_FAILURE);
+      stringstream ss;
+      ss << this->errorMessageZindoSCoreIntegral;
+      ss << this->errorMessageAtomType << AtomTypeStr(this->atomType) << endl;
+      ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbital) << endl;
+      throw MolDSException(ss.str());
    }
 
    return value;

@@ -82,8 +82,9 @@ int LapackWrapper::Dsyevd(double** matrix, double* eigenValues, int size, bool c
 
    // calc. lwork and liwork
    if(size < 1 ){
-      cout << errorMessageDsyevdSize;
-      exit(EXIT_FAILURE);
+      stringstream ss;
+      ss << errorMessageDsyevdSize;
+      throw MolDSException(ss.str());
    }
    else if(size == 1){
       lwork = 1;
@@ -146,8 +147,9 @@ int LapackWrapper::Dsyevd(double** matrix, double* eigenValues, int size, bool c
    iwork = NULL;
   
    if(info != 0){
-      cout << errorMessageDsyevdInfo;
-      exit(EXIT_FAILURE);
+      stringstream ss;
+      ss << errorMessageDsyevdInfo;
+      throw MolDSException(ss.str());
    }
    return info;
 }

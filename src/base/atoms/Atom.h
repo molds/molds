@@ -168,10 +168,11 @@ int Atom::GetEffectivePrincipalQuantumNumber(ShellType shellType){
       return 3.0;
    }
    else{
-      cout << this->errorMessageEffectivPrincipalQuantumNumber;
-      cout << this->errorMessageAtomType << AtomTypeStr(this->atomType) << "\n";
-      cout << this->errorMessageShellType << ShellTypeStr(shellType) << "\n";
-      exit(EXIT_FAILURE);
+      stringstream ss;
+      ss << this->errorMessageEffectivPrincipalQuantumNumber;
+      ss << this->errorMessageAtomType << AtomTypeStr(this->atomType) << "\n";
+      ss << this->errorMessageShellType << ShellTypeStr(shellType) << "\n";
+      throw MolDSException(ss.str());
    }
 }   
 
@@ -196,10 +197,11 @@ double Atom::GetImuAmu(OrbitalType orbitalType){
       return this->imuAmuD;
    }   
    else{
-      cout << errorMessageImuAmu;
-      cout << this->errorMessageAtomType << AtomTypeStr(this->atomType) << "\n";
-      cout << this->errorMessageOrbitalType << OrbitalTypeStr(orbitalType) << "\n";
-      exit(EXIT_FAILURE);
+      stringstream ss;
+      ss << errorMessageImuAmu;
+      ss << this->errorMessageAtomType << AtomTypeStr(this->atomType) << "\n";
+      ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbitalType) << "\n";
+      throw MolDSException(ss.str());
    }   
 }
 
@@ -226,11 +228,12 @@ double Atom::GetOrbitalExponent(ShellType shellType, OrbitalType orbitalType){
       return this->effectiveNuclearChargeMd/this->GetEffectivePrincipalQuantumNumber(shellType);
    }   
    else{
-      cout << this->errorMessageOrbitalExponent;
-      cout << this->errorMessageAtomType << AtomTypeStr(this->atomType) << "\n";
-      cout << this->errorMessageShellType << ShellTypeStr(shellType) << "\n";
-      cout << this->errorMessageOrbitalType << OrbitalTypeStr(orbitalType) << "\n";
-      exit(EXIT_FAILURE);
+      stringstream ss;
+      ss << this->errorMessageOrbitalExponent;
+      ss << this->errorMessageAtomType << AtomTypeStr(this->atomType) << "\n";
+      ss << this->errorMessageShellType << ShellTypeStr(shellType) << "\n";
+      ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbitalType) << "\n";
+      throw MolDSException(ss.str());
    }   
 }
 
@@ -291,10 +294,11 @@ double Atom::GetZindoCoreIntegral(OrbitalType orbital, int l, int m, int n){
               - this->GetJpd()*(double)m;
    }
    else{
-      cout << this->errorMessageZindoCoreIntegral;
-      cout << this->errorMessageAtomType << AtomTypeStr(this->atomType) << endl;
-      cout << this->errorMessageOrbitalType << OrbitalTypeStr(orbital) << endl;
-      exit(EXIT_FAILURE);
+      stringstream ss;
+      ss << this->errorMessageZindoCoreIntegral;
+      ss << this->errorMessageAtomType << AtomTypeStr(this->atomType) << endl;
+      ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbital) << endl;
+      throw MolDSException(ss.str());
    }
 
    return value;

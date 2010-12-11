@@ -61,10 +61,11 @@ double Satom::GetCoreIntegral(OrbitalType orbital, double gamma, bool isGuess, T
    double value = 0.0;
 
    if(theory == INDO){
-      cout << this->errorMessageIndoCoreIntegral;
-      cout << this->errorMessageAtomType << AtomTypeStr(this->atomType) << endl;
-      cout << this->errorMessageOrbitalType << OrbitalTypeStr(orbital) << endl;
-      exit(EXIT_FAILURE);
+      stringstream ss;
+      ss << this->errorMessageIndoCoreIntegral;
+      ss << this->errorMessageAtomType << AtomTypeStr(this->atomType) << endl;
+      ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbital) << endl;
+      throw MolDSException(ss.str());
    }
    else if(theory == ZINDOS){
       if(orbital == s){
@@ -74,10 +75,11 @@ double Satom::GetCoreIntegral(OrbitalType orbital, double gamma, bool isGuess, T
          value = this->GetZindoCoreIntegral(orbital, 2, 4, 0);
       }
       else{
-         cout << this->errorMessageZindoSCoreIntegral;
-         cout << this->errorMessageAtomType << AtomTypeStr(this->atomType) << endl;
-         cout << this->errorMessageOrbitalType << OrbitalTypeStr(orbital) << endl;
-         exit(EXIT_FAILURE);
+         stringstream ss;
+         ss << this->errorMessageZindoSCoreIntegral;
+         ss << this->errorMessageAtomType << AtomTypeStr(this->atomType) << endl;
+         ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbital) << endl;
+         throw MolDSException(ss.str());
       }
    }
 

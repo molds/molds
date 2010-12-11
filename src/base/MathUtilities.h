@@ -12,8 +12,9 @@ namespace MolDS_base{
 int Factorial(int n){
 
    if(n<0){
-      cout << "Error in base::MathUtility::Factorial: n<0 \n";
-      exit(EXIT_FAILURE);
+      stringstream ss;
+      ss << "Error in base::MathUtility::Factorial: n<0 \n";
+      throw MolDSException(ss.str());
    }
    else if (n>1){
       return n*Factorial(n-1);
@@ -27,16 +28,19 @@ int Factorial(int n){
 int Conbination(int n, int k){
    
    if(n < 0){ 
-      cout << "Error in base::MathUtility::Conbination: n<0 \n";
-      exit(EXIT_FAILURE);
+      stringstream ss;
+      ss << "Error in base::MathUtility::Conbination: n<0 \n";
+      throw MolDSException(ss.str());
    }
    else if(k < 0){ 
-      cout << "Error in base::MathUtility::Conbination: k<0 \n";
-      exit(EXIT_FAILURE);
+      stringstream ss;
+      ss << "Error in base::MathUtility::Conbination: k<0 \n";
+      throw MolDSException(ss.str());
    }
    else if(n < k){ 
-      cout << "Error in base::MathUtility::Conbination: n<k \n";
-      exit(EXIT_FAILURE);
+      stringstream ss;
+      ss << "Error in base::MathUtility::Conbination: n<k \n";
+      throw MolDSException(ss.str());
    }
    else{
       return Factorial(n)/(Factorial(k)*Factorial(n-k));

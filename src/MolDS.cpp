@@ -1,6 +1,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<iostream>
+#include<sstream>
 #include<math.h>
 #include<string>
 #include<time.h>
@@ -35,178 +36,97 @@ using namespace MolDS_mkl_wrapper;
 
 
 int main(){
-   // Welcome Messages
-   time_t startTime;
-   struct tm *ltm;
-   char s[50];
-   clock_t startTick = clock();
-   time(&startTime);
-   ltm = localtime(&startTime);
-   fmttm(s, ltm);
-   cout << "\n\n     >>>>>  Welcome to the MolDS world at " << s << "  <<<<<\n\n\n";
 
-   // declare
-   InputParser::GetInstance();
-   Molecule* molecule = new Molecule();
-   MallocerFreer::GetInstance();
-   Parameters::GetInstance();
-   LapackWrapper::GetInstance();
+   try{
+      bool runingNormally = true;
+      // Welcome Messages
+      time_t startTime;
+      struct tm *ltm;
+      char s[50];
+      clock_t startTick = clock();
+      time(&startTime);
+      ltm = localtime(&startTime);
+      fmttm(s, ltm);
+      cout << "\n\n     >>>>>  Welcome to the MolDS world at " << s << "  <<<<<\n\n\n";
+
+      // declare
+      InputParser::GetInstance();
+      Molecule* molecule = new Molecule();
+      MallocerFreer::GetInstance();
+      Parameters::GetInstance();
+      LapackWrapper::GetInstance();
 
 
-   // Parse input
-   InputParser::GetInstance()->Parse(molecule);
+      // Parse input
+      InputParser::GetInstance()->Parse(molecule);
 
-   // CNDO/2
-   if(Parameters::GetInstance()->GetCurrentTheory() == CNDO2){
-      MolDS_cndo::Cndo2* cndo2 = new MolDS_cndo::Cndo2();
-      cndo2->SetMolecule(molecule);
-      cndo2->DoesSCF();
-      delete cndo2;
-   }
-
-   // INDO
-   else if(Parameters::GetInstance()->GetCurrentTheory() == INDO){
-      MolDS_indo::Indo* indo = new MolDS_indo::Indo();
-      indo->SetMolecule(molecule);
-      indo->DoesSCF();
-      delete indo;
-   }
-
-   // ZINDO/S
-   else if(Parameters::GetInstance()->GetCurrentTheory() == ZINDOS){
-      MolDS_zindo::ZindoS* zindoS = new MolDS_zindo::ZindoS();
-      //zindoS->SetMolecule(molecule);
-      //zindoS->DoesSCF();
-      delete zindoS;
-   }
-
-   /*** test lapack ***
-   {
-   int size = 3;
-   double** matrix;
-   double* eigenValues;
-   eigenValues = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(size);
-   matrix = MallocerFreer::GetInstance()->MallocDoubleMatrix2d(size,size);
-
-   matrix[0][0] = 3.0;  matrix[0][1] = 2.0;  matrix[0][2] = 1.0;
-   matrix[1][0] = 2.0;  matrix[1][1] = 4.0;  matrix[1][2] = 1.0;
-   matrix[2][0] = 1.0;  matrix[2][1] = 1.0;  matrix[2][2] = 6.0;
-
-   double oldMatrix[3][3];
-   for(int i=0;i<3;i++){
-      for(int j=0;j<3;j++){
-         oldMatrix[i][j] = matrix[i][j];
-      }
-   }
-      
-
-   LapackWrapper::GetInstance()->Dsyevd(matrix, eigenValues, size, true);
-
-   double diag[3][3];
-   for(int i=0;i<3;i++){
-      for(int j=0;j<3;j++){
-         diag[i][j] = 0.0;
-         for(int k=0;k<3;k++){
-            for(int l=0;l<3;l++){
-               diag[i][j] += matrix[i][l] * oldMatrix[l][k] * matrix[j][k];
-            }
+      // CNDO/2
+      if(Parameters::GetInstance()->GetCurrentTheory() == CNDO2 && runingNormally){
+         MolDS_cndo::Cndo2* cndo2 = new MolDS_cndo::Cndo2();
+         try{
+            cndo2->SetMolecule(molecule);
+            cndo2->DoesSCF();
          }
-         printf("diag[%d][%d] = %lf\t",i,j,diag[i][j]);
-      }
-      cout << "\n";
-   }
-
-   cout << "eigen:1 " << eigenValues[0] << "\n";
-   cout << matrix[0][0] << "\t" << matrix[0][1] << "\t" << matrix[0][2] << "\n";
-
-   cout << "eigen:2 " << eigenValues[1] << "\n";
-   cout << matrix[1][0] << "\t" << matrix[1][1] << "\t" << matrix[1][2] << "\n";
-
-   cout << "eigen:3 " << eigenValues[2] << "\n";
-   cout << matrix[2][0] << "\t" << matrix[2][1] << "\t" << matrix[2][2] << "\n";
-
-   MallocerFreer::GetInstance()->FreeDoubleMatrix2d(matrix,size);
-   MallocerFreer::GetInstance()->FreeDoubleMatrix1d(eigenValues);
-   }
-   /*** end( test lapack ) ***/
-
-   /*** test lapack ***
-   {
-   int size = 8;
-   double** matrix;
-   double* eigenValues;
-   eigenValues = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(size);
-   matrix = MallocerFreer::GetInstance()->MallocDoubleMatrix2d(size,size);
-
-   matrix[0][0] = -0.114142;  
-   matrix[0][1] = 0.2;
-   matrix[0][4] = -0.209441;  
-   matrix[0][6] = 0.168121;
-
-   matrix[1][1] = -0.046230;  
-   matrix[1][5] = -0.153291;  
-   matrix[2][2] = -0.046230;
-   matrix[2][4] = 0.168121;  
-   matrix[2][6] = -0.054602;  
-
-   matrix[3][3] = -0.046230;
-   matrix[3][7] = -0.153291;
-
-   matrix[4][4] = -0.114142;
-   matrix[5][5] = -0.046230;
-   matrix[6][6] = -0.046230;
-   matrix[7][7] = -0.046230;
-
-
-   double oldMatrix[size][size];
-   for(int i=0;i<size;i++){
-      for(int j=i;j<size;j++){
-         oldMatrix[i][j] = matrix[i][j];
-      }
-      for(int j=0;j<i;j++){
-         oldMatrix[i][j] = matrix[j][i];
-      }
-   }
-      
-
-   LapackWrapper::GetInstance()->Dsyevd(matrix, eigenValues, size, true);
-
-   double diag[size][size];
-   for(int i=0;i<size;i++){
-      for(int j=0;j<size;j++){
-         diag[i][j] = 0.0;
-         for(int k=0;k<size;k++){
-            for(int l=0;l<size;l++){
-               diag[i][j] += matrix[i][l] * oldMatrix[l][k] * matrix[j][k];
-            }
+         catch(MolDSException ex){
+            cout << ex.what() << endl;
+            runingNormally = false;
          }
-         printf("diag[%d][%d] = %lf\t",i,j,diag[i][j]);
+         delete cndo2;
       }
-      cout << "\n";
+
+      // INDO
+      else if(Parameters::GetInstance()->GetCurrentTheory() == INDO && runingNormally){
+         MolDS_indo::Indo* indo = new MolDS_indo::Indo();
+         try{
+            indo->SetMolecule(molecule);
+            indo->DoesSCF();
+         }
+         catch(MolDSException ex){
+            cout << ex.what() << endl;
+            runingNormally = false;
+         }
+         delete indo;
+      }
+
+      // ZINDO/S
+      else if(Parameters::GetInstance()->GetCurrentTheory() == ZINDOS && runingNormally){
+         MolDS_zindo::ZindoS* zindoS = new MolDS_zindo::ZindoS();
+         try{
+            zindoS->SetMolecule(molecule);
+            zindoS->DoesSCF();
+         }
+         catch(MolDSException ex){
+            cout << ex.what() << endl;
+            runingNormally = false;
+         }
+         delete zindoS;
+      }
+
+
+      //Free 
+      LapackWrapper::DeleteInstance(); 
+      Parameters::DeleteInstance();
+      MallocerFreer::DeleteInstance();
+      delete molecule;
+      InputParser::DeleteInstance();
+
+
+      // Farewell Messages
+      clock_t endTick = clock();
+      double consumedTime = (double)(endTick - startTick)/(double)CLOCKS_PER_SEC;
+      if(runingNormally){
+         cout << "\n\n     >>>>>  The MolDS finished normally!  <<<<<\n";
+      }
+      else{
+         cout << "\n\n     >>>>>  The MolDS finished abnormally..............  <<<<<\n";
+      }
+      cout <<     "     >>>>>  Consumed time (CPU time): " << consumedTime << "[s].  <<<<<\n";
+      cout <<     "     >>>>>  See you.  <<<<<\n\n\n";
+
    }
-
-
-   MallocerFreer::GetInstance()->FreeDoubleMatrix2d(matrix,size);
-   MallocerFreer::GetInstance()->FreeDoubleMatrix1d(eigenValues);
+   catch(MolDSException ex){
+      cout << ex.what();
    }
-   /*** end( test lapack ) ***/
-
-
-
-   //Free 
-   LapackWrapper::DeleteInstance(); 
-   Parameters::DeleteInstance();
-   MallocerFreer::DeleteInstance();
-   delete molecule;
-   InputParser::DeleteInstance();
-
-
-   // Farewell Messages
-   clock_t endTick = clock();
-   double consumedTime = (double)(endTick - startTick)/(double)CLOCKS_PER_SEC;
-   cout << "\n\n     >>>>>  The MolDS finished normally!  <<<<<\n";
-   cout <<     "     >>>>>  Consumed time (CPU time): " << consumedTime << "[s].  <<<<<\n";
-   cout <<     "     >>>>>  See you.  <<<<<\n\n\n";
 
    return 0;
 }
