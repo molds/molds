@@ -107,6 +107,13 @@ Cndo2::Cndo2(){
    this->theory = CNDO2;
    this->SetMessages();
    this->SetEnableAtomTypes();
+   this->gammaAB = NULL;
+   this->overlap = NULL;
+   this->orbitalElectronPopulation = NULL;
+   this->atomicElectronPopulation = NULL;
+   this->fockMatrix = NULL;
+   this->energiesMO = NULL;
+   this->molecule = NULL;
    //cout << "Cndo created\n";
 }
 
