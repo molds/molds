@@ -19,6 +19,8 @@ Hatom::Hatom(double x, double y, double z) : Atom(x, y, z){
    this->atomType = H;
    this->valence.push_back(s);
    this->bondingParameter = -9.0*Parameters::GetInstance()->GetEV2AU();
+   this->bondingParameterSZindo = -9.0*Parameters::GetInstance()->GetEV2AU();
+   this->bondingParameterDZindo = 0.0;
    this->coreCharge = 1.0;
    this->imuAmuS = 7.176*Parameters::GetInstance()->GetEV2AU();
    this->imuAmuP = 0.0;
@@ -42,7 +44,7 @@ Hatom::Hatom(double x, double y, double z) : Atom(x, y, z){
    this->zindoG3pd = 0.0;                 
    this->zindoF2dd = 0.0;                 
    this->zindoF4dd = 0.0;                 
-   this->IonPotS = -13.06 * Parameters::GetInstance()->GetEV2AU();
+   this->IonPotS = 13.06 * Parameters::GetInstance()->GetEV2AU();
    this->IonPotP = 0.0 * Parameters::GetInstance()->GetEV2AU();
    this->IonPotD = 0.0 * Parameters::GetInstance()->GetEV2AU();
 }

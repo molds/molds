@@ -23,15 +23,14 @@ private:
    double GetExchangeInt(OrbitalType orbital1, OrbitalType orbital2, double gamma, Atom* atom); // Indo Exchange Interaction, (3.87) - (3.91) in J. A. Pople book.
 protected:
    virtual void SetMessages();
-   virtual double GetFockDiagElement(Atom* atomA, int atomAIndex, int firstAOIndexA, 
+   virtual void SetEnableAtomTypes();
+   virtual double GetFockDiagElement(Atom* atomA, int atomAIndex, 
                                      int mu, Molecule* molecule, double** gammaAB,
                                      double** orbitalElectronPopulation, double* atomicElectronPopulation,
                                      bool isGuess);
    virtual double GetFockOffDiagElement(Atom* atomA, Atom* atomB, int atomAIndex, int atomBIndex, 
-                                int firstAOIndexA, int firstAOIndexB,
                                 int mu, int nu, Molecule* molecule, double** gammaAB, double** overelap,
                                 double** orbitalElectronPopulation, bool isGuess);
-   virtual void SetEnableAtomTypes();
 
 public:
    Indo();
@@ -77,11 +76,12 @@ void Indo::SetEnableAtomTypes(){
    this->enableAtomTypes.push_back(F);
 }
 
-double Indo::GetFockDiagElement(Atom* atomA, int atomAIndex, int firstAOIndexA, int mu, 
+double Indo::GetFockDiagElement(Atom* atomA, int atomAIndex, int mu, 
                                  Molecule* molecule, double** gammaAB,
                                  double** orbitalElectronPopulation, double* atomicElectronPopulation,
                                  bool isGuess){
    double value;
+   int firstAOIndexA = atomA->GetFirstAOIndex();
    value = atomA->GetCoreIntegral(atomA->GetValence()[mu-firstAOIndexA], 
                                      gammaAB[atomAIndex][atomAIndex], 
                                      isGuess, this->theory);
@@ -102,11 +102,11 @@ double Indo::GetFockDiagElement(Atom* atomA, int atomAIndex, int firstAOIndexA, 
       value += temp;
    
       temp = 0.0;
-      for(int BB=0; BB<molecule->GetAtomVect()->size(); BB++){
-         if(BB != atomAIndex){
-            Atom* atomBB = (*molecule->GetAtomVect())[BB];
-            temp += ( atomicElectronPopulation[BB] - atomBB->GetCoreCharge()  )
-                     *gammaAB[atomAIndex][BB];
+      for(int B=0; B<molecule->GetAtomVect()->size(); B++){
+         if(B != atomAIndex){
+            Atom* atomB = (*molecule->GetAtomVect())[B];
+            temp += ( atomicElectronPopulation[B] - atomB->GetCoreCharge()  )
+                     *gammaAB[atomAIndex][B];
          }
       }
       value += temp;
@@ -116,7 +116,6 @@ double Indo::GetFockDiagElement(Atom* atomA, int atomAIndex, int firstAOIndexA, 
 }
 
 double Indo::GetFockOffDiagElement(Atom* atomA, Atom* atomB, int atomAIndex, int atomBIndex, 
-                                    int firstAOIndexA, int firstAOIndexB,
                                     int mu, int nu, Molecule* molecule, double** gammaAB, double** overlap,
                                     double** orbitalElectronPopulation, bool isGuess){
    double value;
@@ -133,8 +132,8 @@ double Indo::GetFockOffDiagElement(Atom* atomA, Atom* atomB, int atomAIndex, int
       double coulomb = 0.0;
       double exchange = 0.0;
       if(atomAIndex == atomBIndex){
-         OrbitalType orbitalMu = atomA->GetValence()[mu-firstAOIndexA];
-         OrbitalType orbitalNu = atomA->GetValence()[nu-firstAOIndexA];
+         OrbitalType orbitalMu = atomA->GetValence()[mu-atomA->GetFirstAOIndex()];
+         OrbitalType orbitalNu = atomA->GetValence()[nu-atomA->GetFirstAOIndex()];
          coulomb  = this->GetCoulombInt(orbitalMu, orbitalNu, gammaAB[atomAIndex][atomAIndex], atomA); 
          exchange = this->GetExchangeInt(orbitalMu, orbitalNu, gammaAB[atomAIndex][atomAIndex], atomA); 
          value = (1.5*exchange - 0.5*coulomb)*orbitalElectronPopulation[mu][nu];

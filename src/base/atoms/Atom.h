@@ -41,6 +41,8 @@ protected:
    double imuAmuP;                      // Table 3.4 or 3.5 in J. A. Pople book
    double imuAmuD;                      // Table 3.4 or 3.5 in J. A. Pople book
    double bondingParameter;             // Table 3.2 and 3.4 in J. A. Pople book
+   double bondingParameterSZindo;        // Table 1 in [RZ_1976], table 1 in [HKLWNZ_1982], or table 3 in [AEZ_1986]
+   double bondingParameterDZindo;        // Table 1 in [RZ_1976], table 1 in [HKLWNZ_1982], or table 3 in [AEZ_1986]
    double coreCharge;                   // = Z_A in J. A. Pople book.
    double effectiveNuclearChargeK;      // Table 1.5 in J. A. Pople book
    double effectiveNuclearChargeL;      // Table 1.5 in J. A. Pople book
@@ -74,6 +76,7 @@ public:
    void SetXyz(double x, double y, double z);
    vector<OrbitalType> GetValence();
    double GetBondingParameter();
+   double GetBondingParameter(TheoryType theory, OrbitalType orbital);
    double GetCoreCharge();
    int GetFirstAOIndex();
    void SetFirstAOIndex(int firstAOIndex);
@@ -82,8 +85,31 @@ public:
    double GetImuAmu(OrbitalType orbitalType);  // return 0.5*(I_mu + A_mu)
    double GetOrbitalExponent(ShellType shellType, OrbitalType orbitalType);  // (1.73) in J. A. Pople book.
    virtual double GetCoreIntegral(OrbitalType orbital, double gamma, bool isGuess, TheoryType theory) = 0; // P82 - 83 in J. A. Pople book for INDO or Eq. (13) in [BZ_1979] for ZINDO/S
+   double GetCoreIntegral(OrbitalType orbital, bool isGuess, TheoryType theory);
    double GetIndoF2();
    double GetIndoG1();
+   double GetZindoF0ss();                // Table 1 in ref. [RZ_1976], Table 1 in [AEZ_1986], or Table 1 in [GD_1972]
+   double GetZindoF0sd();                  // Table 1 in [AEZ_1986]
+   double GetZindoF0dd();                  // Table 1 in [AEZ_1986]
+   double GetZindoG1sp();                 // Table 3 in ref. [BZ_1979]
+   double GetZindoF2pp();                 // Table 3 in ref. [BZ_1979]
+   double GetZindoG2sd();                 // Table 3 in ref. [BZ_1979]
+   double GetZindoG1pd();                 // Table 3 in ref. [BZ_1979]
+   double GetZindoF2pd();                 // Table 3 in ref. [BZ_1979]
+   double GetZindoG3pd();                 // Table 3 in ref. [BZ_1979]
+   double GetZindoF2dd();                 // Table 3 in ref. [BZ_1979]
+   double GetZindoF4dd();                 // Table 3 in ref. [BZ_1979]
+   double GetZindoF0ssLower();                 // Apendix in ref. [BZ_1979] 
+   double GetZindoF0sdLower();                 // Apendix in ref. [BZ_1979]
+   double GetZindoF0ddLower();                 // Apendix in ref. [BZ_1979]
+   double GetZindoG1spLower();                 // Apendix in ref. [BZ_1979]
+   double GetZindoF2ppLower();                 // Apendix in ref. [BZ_1979]
+   double GetZindoG2sdLower();                 // Apendix in ref. [BZ_1979]
+   double GetZindoG1pdLower();                 // Apendix in ref. [BZ_1979]
+   double GetZindoF2pdLower();                 // Apendix in ref. [BZ_1979]
+   double GetZindoG3pdLower();                 // Apendix in ref. [BZ_1979]
+   double GetZindoF2ddLower();                 // Apendix in ref. [BZ_1979]
+   double GetZindoF4ddLower();                 // Apendix in ref. [BZ_1979]
 };
 
 Atom::Atom(){
@@ -137,8 +163,32 @@ vector<OrbitalType> Atom::GetValence(){
    return this->valence;
 }
 
+double Atom::GetBondingParameter(TheoryType theory, OrbitalType orbital){
+
+   double value = 0.0;
+   if(theory == CNDO2 || theory == INDO){
+      value = this->bondingParameter;
+   }     
+   else if(theory == ZINDOS && ( orbital == s ||
+                                 orbital == px ||
+                                 orbital == py ||
+                                 orbital == pz ) ){
+      value = this->bondingParameterSZindo;
+   }
+   else if(theory == ZINDOS && ( orbital == dxy ||
+                                 orbital == dyz ||
+                                 orbital == dzz ||
+                                 orbital == dzx ||
+                                 orbital == dxxyy ) ){
+      value = this->bondingParameterDZindo;
+   }
+
+   return value;
+
+}
+
 double Atom::GetBondingParameter(){
-   return this->bondingParameter;
+   return this->GetBondingParameter(CNDO2, s);
 }
 
 double Atom::GetCoreCharge(){
@@ -268,7 +318,7 @@ double Atom::GetJpd(){
 
 // Part of Eq. (13) in [BZ_1979]
 double Atom::GetJdd(){
-   return this->zindoF0dd - 2.0*(this->zindoF2dd - this->zindoF4dd)/63.0;
+   return this->zindoF0dd - 2.0*(this->zindoF2dd + this->zindoF4dd)/63.0;
 }
 
 // Eq. (13) in [BZ_1979]
@@ -313,9 +363,141 @@ double Atom::GetIndoG1(){
 }
 
 
+// Table 1 in ref. [RZ_1976], Table 1 in [AEZ_1986], or Table 1 in [GD_1972]
+double Atom::GetZindoF0ss(){
+   return this->zindoF0ss;
+}
+
+// Table 1 in [AEZ_1986]
+double Atom::GetZindoF0sd(){
+   return this->zindoF0sd;
+}
+
+
+// Table 1 in [AEZ_1986]
+double Atom::GetZindoF0dd(){
+   return this->zindoF0dd;
+}
+
+// Table 3 in ref. [BZ_1979]
+double Atom::GetZindoG1sp(){
+   return this->zindoG1sp;
+}
+
+// Table 3 in ref. [BZ_1979]
+double Atom::GetZindoF2pp(){
+   return this->zindoF2pp;
+}
+
+// Table 3 in ref. [BZ_1979]
+double Atom::GetZindoG2sd(){
+   return this->zindoG2sd;
+}
+
+// Table 3 in ref. [BZ_1979]
+double Atom::GetZindoG1pd(){
+   return this->zindoG1pd;
+}
+
+// Table 3 in ref. [BZ_1979]
+double Atom::GetZindoF2pd(){
+   return this->zindoF2pd;
+}
+
+// Table 3 in ref. [BZ_1979]
+double Atom::GetZindoG3pd(){
+   return this->zindoG3pd;
+}
+
+// Table 3 in ref. [BZ_1979]
+double Atom::GetZindoF2dd(){
+   return this->zindoF2dd;
+}
+
+// Table 3 in ref. [BZ_1979]
+double Atom::GetZindoF4dd(){
+   return this->zindoF4dd;
+}
+
+// Apendix in ref. [BZ_1979]
+double Atom::GetZindoF0ssLower(){
+   return this->zindoF0ss;
+}
+
+// Apendix in ref. [BZ_1979]
+double Atom::GetZindoF0sdLower(){
+   return this->zindoF0sd;
+}
+
+// Apendix in ref. [BZ_1979]
+double Atom::GetZindoF0ddLower(){
+   return this->zindoF0dd;
+}
+
+// Apendix in ref. [BZ_1979]
+double Atom::GetZindoG1spLower(){
+   return this->zindoG1sp/3.0;
+}
+
+// Apendix in ref. [BZ_1979]
+double Atom::GetZindoF2ppLower(){
+   return this->zindoF2pp/25.0;
+}
+
+// Apendix in ref. [BZ_1979]
+double Atom::GetZindoG2sdLower(){
+   return this->zindoG2sd/5.0;
+}
+
+// Apendix in ref. [BZ_1979]
+double Atom::GetZindoG1pdLower(){
+   return this->zindoG1pd/15.0;
+}
+
+// Apendix in ref. [BZ_1979]
+double Atom::GetZindoF2pdLower(){
+   return this->zindoF2pd/35.0;
+}
+
+// Apendix in ref. [BZ_1979]
+double Atom::GetZindoG3pdLower(){
+   return this->zindoG3pd/245.0;
+}
+
+// Apendix in ref. [BZ_1979]
+double Atom::GetZindoF2ddLower(){
+   return this->zindoF2dd/49.0;
+}
+
+// Apendix in ref. [BZ_1979]
+double Atom::GetZindoF4ddLower(){
+   return this->zindoF4dd/441.0;
+}
+
+
+double Atom::GetCoreIntegral(OrbitalType orbital, bool isGuess, TheoryType theory){
+   return this->GetCoreIntegral(orbital, 0.0, isGuess, theory);
+}
+
+
 
 }
 #endif
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

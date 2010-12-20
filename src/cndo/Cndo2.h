@@ -57,12 +57,9 @@ private:
                                      double** orbitalElectronPopulation, Molecule* molecule);
    void CalcOverlap(double** overlap, Molecule* molecule);
    void CalcRotatingMatrix(double** rotatingMatrix, Atom* atomA, Atom* atomB);
-   void CalcDiatomicOverlapInDiatomicFrame(double** diatomicOverlap, Atom* atomA, Atom* atomB);
    void CalcFockMatrix(double** fockMatrix, Molecule* molecule, double** overlap, double** gammaAB,
                        double** orbitalElectronPopulation, double* atomicElectronPopulation,
                        bool isGuess);
-   double GetReducedOverlap(int na, int la, int m, int nb, int lb, double alpha, double beta);
-   double GetReducedOverlap(int na, int nb, double alpha, double beta);
    void RotateDiatmicOverlapToSpaceFrame(double** diatomicOverlap, double** rotatingMatrix);
    void SetOverlapElement(double** overlap, double** diatomicOverlap, Atom* atomA, Atom* atomB);
    double GetAuxiliaryA(int k, double rho);
@@ -86,17 +83,19 @@ protected:
    string messageStartSCF;
    string messageDoneSCF;
    vector<AtomType> enableAtomTypes;
+   double GetReducedOverlap(int na, int la, int m, int nb, int lb, double alpha, double beta);
+   double GetReducedOverlap(int na, int nb, double alpha, double beta);
    virtual void CalcGammaAB(double** gammaAB, Molecule* molecule);
    virtual void SetMessages();
    virtual void SetEnableAtomTypes();
-   virtual double GetFockDiagElement(Atom* atomA, int atomAIndex, int firstAOIndexA, 
+   virtual double GetFockDiagElement(Atom* atomA, int atomAIndex, 
                              int mu, Molecule* molecule, double** gammaAB,
                              double** orbitalElectronPopulation, double* atomicElectronPopulation,
                              bool isGuess);
    virtual double GetFockOffDiagElement(Atom* atomA, Atom* atomB, int atomAIndex, int atomBIndex, 
-                                int firstAOIndexA, int firstAOIndexB,
                                 int mu, int nu, Molecule* molecule, double** gammaAB, double** overlap,
                                 double** orbitalElectronPopulation, bool isGuess);
+   virtual void CalcDiatomicOverlapInDiatomicFrame(double** diatomicOverlap, Atom* atomA, Atom* atomB);
    TheoryType theory;
 public:
    Cndo2();
@@ -453,7 +452,6 @@ void Cndo2::CalcFockMatrix(double** fockMatrix, Molecule* molecule, double** ove
                   // diagonal part
                   fockMatrix[mu][mu] = this->GetFockDiagElement(atomA, 
                                                                 A, 
-                                                                firstAOIndexA, 
                                                                 mu, 
                                                                 molecule, 
                                                                 gammaAB,
@@ -467,8 +465,6 @@ void Cndo2::CalcFockMatrix(double** fockMatrix, Molecule* molecule, double** ove
                                                                    atomB,
                                                                    A, 
                                                                    B, 
-                                                                   firstAOIndexA, 
-                                                                   firstAOIndexB,
                                                                    mu, 
                                                                    nu, 
                                                                    molecule, 
@@ -499,11 +495,12 @@ void Cndo2::CalcFockMatrix(double** fockMatrix, Molecule* molecule, double** ove
 
 }
 
-double Cndo2::GetFockDiagElement(Atom* atomA, int atomAIndex, int firstAOIndexA, int mu, 
+double Cndo2::GetFockDiagElement(Atom* atomA, int atomAIndex, int mu, 
                                  Molecule* molecule, double** gammaAB,
                                  double** orbitalElectronPopulation, double* atomicElectronPopulation,
                                  bool isGuess){
    double value;
+   int firstAOIndexA = atomA->GetFirstAOIndex();
    value = -1.0 * atomA->GetImuAmu(atomA->GetValence()[mu-firstAOIndexA]);
    if(!isGuess){
       double temp = atomicElectronPopulation[atomAIndex] - atomA->GetCoreCharge() 
@@ -525,7 +522,6 @@ double Cndo2::GetFockDiagElement(Atom* atomA, int atomAIndex, int firstAOIndexA,
 }
 
 double Cndo2::GetFockOffDiagElement(Atom* atomA, Atom* atomB, int atomAIndex, int atomBIndex, 
-                                    int firstAOIndexA, int firstAOIndexB,
                                     int mu, int nu, Molecule* molecule, double** gammaAB, double** overlap,
                                     double** orbitalElectronPopulation, bool isGuess){
    double value;
