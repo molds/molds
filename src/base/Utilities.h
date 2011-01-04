@@ -1,8 +1,7 @@
 #ifndef INCLUDED_UTILITIES
 #define INCLUDED_UTILITIES
 
-#include <stdio.h>     // printf, sprintf使用
-#include <time.h>     // tm構造体, time, localtime, gmtime使用
+using namespace std;
 
 namespace MolDS_base{
 
@@ -25,6 +24,33 @@ char *fmttm(char *buf, struct tm *st)
 
     return buf;
 }
+
+
+string TrimString(const string str){
+
+   int nStart = 0;
+   int nEnd = str.length() - 1;
+
+   // left trim 
+   for(int n = 0; n < str.length(); n++ ){
+      if( str.data()[n] != ' ' ){
+         nStart = n;
+         break;
+      }
+   }
+
+   // right trim 
+   for(int n = str.length() - 1; n >= 0; n-- ){
+      if( str.data()[n] != ' ' ){
+         nEnd = n;
+         break;
+      }
+   }
+
+   return(str.substr( nStart, nEnd - nStart + 1 ));
+
+}
+
 
 }
 #endif

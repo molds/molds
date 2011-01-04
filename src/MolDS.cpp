@@ -7,6 +7,7 @@
 #include<time.h>
 #include<list>
 #include<vector>
+#include"base/Utilities.h"
 #include"base/MolDSException.h"
 #include"base/Enums.h"
 #undef INCLUDED_ENUMS
@@ -20,7 +21,6 @@
 #include"base/atoms/Satom.h"
 #include"base/MallocerFreer.h"
 #include"base/InputParser.h"
-#include"base/Utilities.h"
 #include"base/EularAngle.h"
 #include"base/Parameters.h"
 #include"cndo/Cndo2.h"

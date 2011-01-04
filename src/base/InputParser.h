@@ -304,7 +304,9 @@ void InputParser::OutputInputTerms(vector<string> inputTerms){
  *  # or // are treated as comment out 
  *
  ****/
-bool InputParser::IsCommentOut(string str){
+bool InputParser::IsCommentOut(string tempStr){
+
+   string str = TrimString(tempStr);
 
    string commentPrefix1 = "#";
    string prefix1;
