@@ -46,6 +46,7 @@ private:
    string stringTheoryCNDO2;
    string stringTheoryINDO;
    string stringTheoryZINDOS;
+   string stringTheoryNONE;
    string stringScf;
    string stringScfEnd;
    string stringScfMaxIter;
@@ -91,6 +92,7 @@ InputParser::InputParser(){
    this->stringTheoryCNDO2 = "cndo/2";
    this->stringTheoryINDO = "indo";
    this->stringTheoryZINDOS = "zindo/s";
+   this->stringTheoryNONE = "none";
 }
 
 InputParser::~InputParser(){
@@ -220,6 +222,11 @@ void InputParser::Parse(Molecule* molecule){
             // ZINDO/S
             else if(inputTerms[j].compare(this->stringTheoryZINDOS) == 0){
                Parameters::GetInstance()->SetCurrentTheory(ZINDOS);
+            }
+
+            // NONE 
+            else if(inputTerms[j].compare(this->stringTheoryNONE) == 0){
+               Parameters::GetInstance()->SetCurrentTheory(NONE);
             }
             j++;
          }

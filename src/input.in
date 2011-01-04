@@ -6,7 +6,8 @@ SCF_END
 THEORY
    //cndo/2
    //indo
-   zindo/s
+   //zindo/s
+   none 
 THEORY_END
 
 //metane
