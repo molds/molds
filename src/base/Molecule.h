@@ -15,12 +15,16 @@ namespace MolDS_base{
 class Molecule{
 private:
    vector<Atom*>* atomVect;
+   double* COMXyz;
+   bool wasCalculatedCOMXyz;
    int totalNumberAO;
    int totalNumberValenceElectrons;
 public:
    Molecule();
    ~Molecule();
    vector<Atom*>* GetAtomVect(); 
+   double* GetCOMXyz();
+   void CalcCOMXyz();
    int GetTotalNumberAOs();
    void CalcTotalNumberAOs();
    int GetTotalNumberValenceElectrons();
@@ -28,23 +32,59 @@ public:
 };
 
 Molecule::Molecule(){
-   atomVect = new vector<Atom*>;
+   this->atomVect = new vector<Atom*>;
+   this->COMXyz = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(3);
+   this->wasCalculatedCOMXyz = false;
 }
 
 Molecule::~Molecule(){
-   if(atomVect != NULL){
-      for(int i=0; i<atomVect->size(); i++){
+   if(this->atomVect != NULL){
+      for(int i=0; i<this->atomVect->size(); i++){
          delete (*atomVect)[i];
          (*atomVect)[i] = NULL;
       }
-      delete atomVect;
-      atomVect = NULL;
-      //cout << "mol deleted\n";
+      delete this->atomVect;
+      this->atomVect = NULL;
+      //cout << "atomVect deleted\n";
+   }
+   if(this->COMXyz != NULL){
+      MallocerFreer::GetInstance()->FreeDoubleMatrix1d(this->COMXyz);
+      this->COMXyz = NULL;
+      //cout << "COMXyz deleted\n";
    }
 }
 
 vector<Atom*>* Molecule::GetAtomVect(){
    return this->atomVect;
+}
+
+double* Molecule::GetCOMXyz(){
+   if(!this->wasCalculatedCOMXyz){
+      this->CalcCOMXyz();
+   }
+   return this->COMXyz;
+}
+
+void Molecule::CalcCOMXyz(){
+   if(!this->wasCalculatedCOMXyz){
+      double totalAtomicMass;
+      Atom* atom;
+      double* atomicXyz;
+      double atomicMass;
+      for(int i=0; i<this->atomVect->size(); i++){
+         atom = (*this->atomVect)[i]; 
+         atomicXyz = atom->GetXyz();
+         atomicMass = atom->GetAtomicMass();
+         totalAtomicMass += atomicMass;
+         for(int j=0; j<3; j++){
+            this->COMXyz[j] += atomicXyz[j] * atomicMass;
+         }
+      }
+      for(int i=0; i<3; i++){
+         this->COMXyz[i]/=totalAtomicMass;
+      }
+   }
+   this->wasCalculatedCOMXyz = true;
 }
 
 int Molecule::GetTotalNumberAOs(){

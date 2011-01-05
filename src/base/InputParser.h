@@ -33,6 +33,9 @@ private:
    string messageConfigration;
    string messageConfigrationTitleAU;
    string messageConfigrationTitleAng;
+   string messageCOM;
+   string messageCOMTitleAU;
+   string messageCOMTitleAng;
    string messageInputTerms;
    string messageScfConditions;
    string messageScfMaxIterations;
@@ -75,6 +78,9 @@ InputParser::InputParser(){
    this->messageConfigration = "\tMolecular configration:\n";
    this->messageConfigrationTitleAU = "\t\t| i-th | atom type | x [a.u.] | y[a.u.] | z[a.u.] |\n";
    this->messageConfigrationTitleAng = "\t\t| i-th | atom type | x [angst.] | y[angst.] | z[angst.] |\n";
+   this->messageCOM = "\tCenter of Mass:\n";
+   this->messageCOMTitleAU = "\t\t| x [a.u.] | y[a.u.] | z[a.u.] |\n";
+   this->messageCOMTitleAng = "\t\t| x [angst.] | y[angst.] | z[angst.] |\n";
    this->messageInputTerms = "Input terms:\n";
    this->messageScfConditions = "\tSCF conditions:\n";
    this->messageScfMaxIterations = "\t\tMax iterations: ";
@@ -247,15 +253,18 @@ void InputParser::CalcMolecularBasics(Molecule* molecule){
 
    molecule->CalcTotalNumberAOs();
    molecule->CalcTotalNumberValenceElectrons();
+   molecule->CalcCOMXyz();
 
 }
 
 void InputParser::OutputMolecularBasics(Molecule* molecule){
 
+   // Total number of Atoms
    cout << this->messageTotalNumberAtoms << molecule->GetAtomVect()->size() << "\n";
    cout << this->messageTotalNumberAOs << molecule->GetTotalNumberAOs() << "\n";
    cout << this->messageTotalNumberValenceElectrons << molecule->GetTotalNumberValenceElectrons() << "\n\n";
 
+   // configuration
    cout << this->messageConfigration;
    cout << this->messageConfigrationTitleAng;
    double ang2AU = Parameters::GetInstance()->GetAngstrom2AU();
@@ -272,6 +281,20 @@ void InputParser::OutputMolecularBasics(Molecule* molecule){
       printf("\t\t%d\t%s\t%e\t%e\t%e\n",a,AtomTypeStr(atom->GetAtomType()),
             atom->GetXyz()[0], atom->GetXyz()[1], atom->GetXyz()[2]);
    }
+   cout << "\n";
+
+   // Center of Mass
+   cout << this->messageCOM;
+   cout << this->messageCOMTitleAng;
+   printf("\t\t%e\t%e\t%e\n",molecule->GetCOMXyz()[0]/ang2AU, 
+                             molecule->GetCOMXyz()[1]/ang2AU, 
+                             molecule->GetCOMXyz()[2]/ang2AU);
+   cout << "\n";
+
+   cout << this->messageCOMTitleAU;
+   printf("\t\t%e\t%e\t%e\n",molecule->GetCOMXyz()[0], 
+                             molecule->GetCOMXyz()[1], 
+                             molecule->GetCOMXyz()[2]);
    cout << "\n";
 
 }

@@ -33,6 +33,7 @@ protected:
    string errorMessageOrbitalType;
    double* xyz;
    AtomType atomType;
+   double atomicMass;
    vector<OrbitalType> valence;
    ShellType valenceShellType;
    int firstAOIndex;
@@ -72,6 +73,7 @@ public:
    Atom(double x, double y, double z);
    ~Atom();
    AtomType GetAtomType();
+   double GetAtomicMass();
    double* GetXyz();
    void SetXyz(double x, double y, double z);
    vector<OrbitalType> GetValence();
@@ -147,6 +149,10 @@ void Atom::SetMessages(){
 
 AtomType Atom::GetAtomType(){
    return this->atomType;
+}
+
+double Atom::GetAtomicMass(){
+   return this->atomicMass;
 }
 
 double* Atom::GetXyz(){
