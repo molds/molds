@@ -58,8 +58,14 @@ int main(){
 
 
       // Parse input
-      InputParser::GetInstance()->Parse(molecule);
-
+      try{
+         InputParser::GetInstance()->Parse(molecule);
+      }
+      catch(MolDSException ex){
+         cout << ex.what() << endl;
+         runingNormally = false;
+      }
+      
       // CNDO/2
       if(Parameters::GetInstance()->GetCurrentTheory() == CNDO2 && runingNormally){
          MolDS_cndo::Cndo2* cndo2 = new MolDS_cndo::Cndo2();
