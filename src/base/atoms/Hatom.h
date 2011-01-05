@@ -17,7 +17,7 @@ public:
 
 Hatom::Hatom(double x, double y, double z) : Atom(x, y, z){
    this->atomType = H;
-   this->atomicMass = 1.00794;
+   this->atomicMass = 1.00794*Parameters::GetInstance()->GetGMolin2AU();
    this->valence.push_back(s);
    this->bondingParameter = -9.0*Parameters::GetInstance()->GetEV2AU();
    this->bondingParameterSZindo = -9.0*Parameters::GetInstance()->GetEV2AU();

@@ -160,9 +160,9 @@ double* Atom::GetXyz(){
 }
 
 void Atom::SetXyz(double x, double y, double z){
-   xyz[0]= x * Parameters::GetInstance()->GetAngstrom2AU();
-   xyz[1]= y * Parameters::GetInstance()->GetAngstrom2AU();
-   xyz[2]= z * Parameters::GetInstance()->GetAngstrom2AU();
+   xyz[0]= x;
+   xyz[1]= y;
+   xyz[2]= z;
 }
 
 vector<OrbitalType> Atom::GetValence(){

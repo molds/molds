@@ -43,11 +43,15 @@ private:
    string stringTheoryCNDO2;
    string stringTheoryINDO;
    string stringTheoryZINDOS;
+   string stringTheoryPrincipalAxes;
    string stringTheoryNONE;
    string stringScf;
    string stringScfEnd;
    string stringScfMaxIter;
    string stringScfRmsDensity;
+   string stringInertiaTensor;
+   string stringInertiaTensorEnd;
+   string stringInertiaTensorOrigin;
    void CalcMolecularBasics(Molecule* molecule);
    void OutputMolecularBasics(Molecule* molecule);
    void OutputScfConditions();
@@ -86,6 +90,10 @@ InputParser::InputParser(){
    this->stringTheoryCNDO2 = "cndo/2";
    this->stringTheoryINDO = "indo";
    this->stringTheoryZINDOS = "zindo/s";
+   this->stringTheoryPrincipalAxes = "principal-axes";
+   this->stringInertiaTensor = "inertia";
+   this->stringInertiaTensorEnd = "inertia_end";
+   this->stringInertiaTensorOrigin = "origin";
    this->stringTheoryNONE = "none";
 }
 
@@ -159,9 +167,9 @@ void InputParser::Parse(Molecule* molecule){
       if(inputTerms[i].compare(this->stringGeometry) == 0){
          int j=i+1;
          while(inputTerms[j].compare(this->stringGeometryEnd) != 0){
-            double x = atof(inputTerms[j+1].c_str());
-            double y = atof(inputTerms[j+2].c_str());
-            double z = atof(inputTerms[j+3].c_str());
+            double x = atof(inputTerms[j+1].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
+            double y = atof(inputTerms[j+2].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
+            double z = atof(inputTerms[j+3].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
             if(inputTerms[j] == "h"){
                molecule->GetAtomVect()->push_back(new Hatom(x, y, z));
             }
@@ -198,6 +206,23 @@ void InputParser::Parse(Molecule* molecule){
          i = j;
       }
       
+      // inertia tensor condition
+      if(inputTerms[i].compare(this->stringInertiaTensor) == 0){
+         int j=i+1;
+         while(inputTerms[j].compare(this->stringInertiaTensorEnd) != 0){
+            // origin
+            if(inputTerms[j].compare(this->stringInertiaTensorOrigin) == 0){
+               double x = atof(inputTerms[j+1].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
+               double y = atof(inputTerms[j+2].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
+               double z = atof(inputTerms[j+3].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
+               molecule->SetInertiaTensorOrigin(x, y, z);
+               j+=3;
+            }
+            j++;   
+         }
+         i = j;
+      }
+      
       // theory
       if(inputTerms[i].compare(this->stringTheory) == 0){
          int j=i+1;
@@ -218,10 +243,16 @@ void InputParser::Parse(Molecule* molecule){
                Parameters::GetInstance()->SetCurrentTheory(ZINDOS);
             }
 
+            // Princepal axes
+            else if(inputTerms[j].compare(this->stringTheoryPrincipalAxes) == 0){
+               Parameters::GetInstance()->SetCurrentTheory(PrincipalAxes);
+            }
+
             // NONE 
             else if(inputTerms[j].compare(this->stringTheoryNONE) == 0){
                Parameters::GetInstance()->SetCurrentTheory(NONE);
             }
+
             j++;
          }
          i = j;
@@ -299,6 +330,7 @@ bool InputParser::IsCommentOut(string tempStr){
    return 0==prefix1.compare(commentPrefix1) || 0==prefix2.compare(commentPrefix2) ;
 
 }
+
 
 }
 #endif

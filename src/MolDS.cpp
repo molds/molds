@@ -108,6 +108,17 @@ int main(){
          delete zindoS;
       }
 
+      // Diagonalize Inertia Tensor
+      else if(Parameters::GetInstance()->GetCurrentTheory() == PrincipalAxes && runingNormally){
+         try{
+            molecule->CalcPrincipalAxes();
+         }
+         catch(MolDSException ex){
+            cout << ex.what() << endl;
+            runingNormally = false;
+         }
+
+      }
 
       //Free 
       LapackWrapper::DeleteInstance(); 

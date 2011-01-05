@@ -16,9 +16,12 @@ class Molecule{
 private:
    vector<Atom*>* atomVect;
    double* COMXyz;
+   double* inertiaTensorOrigin;
    bool wasCalculatedCOMXyz;
    int totalNumberAOs;
    int totalNumberValenceElectrons;
+   void CalcInertiaTensor(double** inertiaTensor);
+   void FreeInertiaTensorMoments(double** inertiaTensor, double* inertiaMoments);
    string messageTotalNumberAOs;
    string messageTotalNumberAtoms;
    string messageTotalNumberValenceElectrons;
@@ -41,11 +44,14 @@ public:
    void OutputCOMXyz();
    void OutputTotalNumberAtomsAOsValenceelectrons();
    void OutputConfiguration();
+   void SetInertiaTensorOrigin(double x, double y, double z);
+   void CalcPrincipalAxes();
 };
 
 Molecule::Molecule(){
    this->atomVect = new vector<Atom*>;
    this->COMXyz = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(3);
+   this->inertiaTensorOrigin = NULL;
    this->wasCalculatedCOMXyz = false;
    this->messageTotalNumberAOs = "\tTotal number of valence AOs: ";
    this->messageTotalNumberAtoms = "\tTotal number of atoms: ";
@@ -72,6 +78,11 @@ Molecule::~Molecule(){
       MallocerFreer::GetInstance()->FreeDoubleMatrix1d(this->COMXyz);
       this->COMXyz = NULL;
       //cout << "COMXyz deleted\n";
+   }
+   if(this->inertiaTensorOrigin != NULL){
+      MallocerFreer::GetInstance()->FreeDoubleMatrix1d(this->inertiaTensorOrigin);
+      this->inertiaTensorOrigin = NULL;
+      //cout << "inertiaTensorOrigin deleted\n";
    }
 }
 
@@ -174,6 +185,89 @@ void Molecule::OutputTotalNumberAtomsAOsValenceelectrons(){
    cout << this->messageTotalNumberAOs << this->totalNumberAOs << "\n";
    cout << this->messageTotalNumberValenceElectrons << this->totalNumberValenceElectrons << "\n\n";
 }
+
+void Molecule::SetInertiaTensorOrigin(double x, double y, double z){
+   if(this->inertiaTensorOrigin == NULL){
+      this->inertiaTensorOrigin = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(3);
+   }
+
+   this->inertiaTensorOrigin[0] = x;
+   this->inertiaTensorOrigin[1] = y;
+   this->inertiaTensorOrigin[2] = z;
+
+}
+
+void Molecule::CalcPrincipalAxes(){
+
+   if(this->inertiaTensorOrigin == NULL){
+      this->SetInertiaTensorOrigin(this->COMXyz[0], this->COMXyz[1], this->COMXyz[2]);
+   }
+
+   double** inertiaTensor = MallocerFreer::GetInstance()->MallocDoubleMatrix2d(3, 3);
+   double*  inertiaMoments = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(3);
+
+   try{
+      this->CalcInertiaTensor(inertiaTensor);
+      
+      // ToDo: diagonalization!!!!!!
+      
+   }
+   catch(MolDSException ex){
+      this->FreeInertiaTensorMoments(inertiaTensor, inertiaMoments);
+      throw ex;
+   }
+
+   this->FreeInertiaTensorMoments(inertiaTensor, inertiaMoments);
+   
+}
+
+void Molecule::CalcInertiaTensor(double** inertiaTensor){
+
+   Atom* atom;
+   double x;
+   double y;
+   double z;
+   double atomicMass;
+   for(int a=0; a<this->atomVect->size(); a++){
+      atom = (*this->atomVect)[a];
+      atomicMass = atom->GetAtomicMass();
+      x = atom->GetXyz()[0] - this->inertiaTensorOrigin[0];
+      y = atom->GetXyz()[1] - this->inertiaTensorOrigin[1];
+      z = atom->GetXyz()[2] - this->inertiaTensorOrigin[2];
+
+      inertiaTensor[0][0] += atomicMass*(y*y + z*z);
+      inertiaTensor[0][1] -= atomicMass*x*y;
+      inertiaTensor[0][2] -= atomicMass*x*z;
+
+      inertiaTensor[1][0] -= atomicMass*y*x;
+      inertiaTensor[1][1] += atomicMass*(x*x + z*z);
+      inertiaTensor[1][2] -= atomicMass*y*z;
+
+      inertiaTensor[2][0] -= atomicMass*z*x;
+      inertiaTensor[2][1] -= atomicMass*z*y;
+      inertiaTensor[2][2] += atomicMass*(x*x + y*y);
+
+   }
+   
+}
+
+void Molecule::FreeInertiaTensorMoments(double** inertiaTensor, double* inertiaMoments){
+
+   if(inertiaTensor != NULL){
+      MallocerFreer::GetInstance()->FreeDoubleMatrix2d(inertiaTensor, 3);
+      inertiaTensor = NULL;
+      //cout << "inertiaTensor deleted\n";
+   }
+
+   if(inertiaMoments != NULL){
+      MallocerFreer::GetInstance()->FreeDoubleMatrix1d(inertiaMoments);
+      inertiaMoments = NULL;
+      //cout << "inertiaMoments deleted\n";
+   }
+
+}
+
+
 
 }
 #endif

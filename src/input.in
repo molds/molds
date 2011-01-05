@@ -7,8 +7,14 @@ THEORY
    //cndo/2
    //indo
    //zindo/s
-   none 
+   //none 
+   principal-axes
 THEORY_END
+
+INERTIA
+   origin 1.0 2.0 3.0
+INERTIA_END
+
 
 //metane
 //GEOMETRY

@@ -16,7 +16,7 @@ public:
 
 Catom::Catom(double x, double y, double z) : Atom(x, y, z){
    this->atomType = C;
-   this->atomicMass = 12.0107;
+   this->atomicMass = 12.0107*Parameters::GetInstance()->GetGMolin2AU();
    this->valence.push_back(s);
    this->valence.push_back(py);
    this->valence.push_back(pz);

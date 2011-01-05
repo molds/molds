@@ -17,7 +17,7 @@ public:
 
 Liatom::Liatom(double x, double y, double z) : Atom(x, y, z){
    this->atomType = Li;
-   this->atomicMass = 6.941;
+   this->atomicMass = 6.941*Parameters::GetInstance()->GetGMolin2AU();
    this->valence.push_back(s);
    this->valence.push_back(py);
    this->valence.push_back(pz);

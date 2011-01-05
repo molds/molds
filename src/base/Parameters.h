@@ -24,6 +24,7 @@ private:
    double eV2AU;
    double angstrom2AU;
    double kayser2AU;
+   double gMolin2AU;
    double bondingAdjustParameterK; //see (3.79) in J. A. Pople book
    TheoryType currentTheory;
 
@@ -38,6 +39,7 @@ public:
    double GetEV2AU();
    double GetAngstrom2AU();
    double GetKayser2AU();
+   double GetGMolin2AU();
    double GetBondingAdjustParameterK();
    TheoryType GetCurrentTheory();
    void SetCurrentTheory(TheoryType theory);
@@ -73,6 +75,7 @@ void Parameters::SetDefaultValues(){
    this->thresholdSCF = pow(10.0, -8.0);
    this->maxIterationsSCF = 100;
    this->currentTheory = CNDO2;
+   this->gMolin2AU = pow(10.0,5.0)/(6.0221415*9.1095);
 }
 
 double Parameters::GetThresholdSCF(){
@@ -101,6 +104,10 @@ double Parameters::GetAngstrom2AU(){
 
 double Parameters::GetKayser2AU(){
    return this->kayser2AU;
+}
+
+double Parameters::GetGMolin2AU(){
+   return this->gMolin2AU;
 }
 
 double Parameters::GetBondingAdjustParameterK(){
