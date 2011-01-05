@@ -734,6 +734,7 @@ void Cndo2::CalcOverlap(double** overlap, Molecule* molecule){
    }
    catch(MolDSException ex){
       this->FreeDiatomicOverlapAndRotatingMatrix(diatomicOverlap, rotatingMatrix);
+      throw ex;
    }
    this->FreeDiatomicOverlapAndRotatingMatrix(diatomicOverlap, rotatingMatrix);
 
