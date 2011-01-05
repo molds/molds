@@ -9,6 +9,7 @@
 [HKLWNZ_1982] Z. S. Herman, R. F. Kirachner, G. H. Loew, U. T. M.-WesterHoff, A. Nazzal, and M. C. Zerner, Inorg. Chem., 21, 46 (1982)
 [AEZ_1986] W. P. Anderson, W. D. Edwards, and M. C. Zerner, Inorg. Chem. 25, 2728 (1986)
 [BFB_1997] M. A. Blanco, M. Fl{\'o}rez, and M. Bermejo, J. Mol. Struct. 419, 19 (1997)
+[I_1998] IWANAMI-SHOTEN "IWANAMI RIKAGAKUJITEN", ISBN4-00-080090-6 (1988)
 
 
 

@@ -33,7 +33,7 @@ protected:
    string errorMessageOrbitalType;
    double* xyz;
    AtomType atomType;
-   double atomicMass;
+   double atomicMass;  // Appendix 1 in [I_1998]
    vector<OrbitalType> valence;
    ShellType valenceShellType;
    int firstAOIndex;
