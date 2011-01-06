@@ -118,6 +118,11 @@ void Molecule::CalcCOMXyz(){
       Atom* atom;
       double* atomicXyz;
       double atomicMass;
+
+      for(int j=0; j<3; j++){
+         this->COMXyz[j] += 0.0;
+      }
+      
       for(int i=0; i<this->atomVect->size(); i++){
          atom = (*this->atomVect)[i]; 
          atomicXyz = atom->GetXyz();
@@ -258,6 +263,9 @@ void Molecule::SetInertiaTensorOrigin(double x, double y, double z){
 void Molecule::CalcPrincipalAxes(){
 
    if(this->inertiaTensorOrigin == NULL){
+      if(!this->wasCalculatedCOMXyz){
+         this->CalcCOMXyz();
+      }
       this->SetInertiaTensorOrigin(this->COMXyz[0], this->COMXyz[1], this->COMXyz[2]);
    }
 
