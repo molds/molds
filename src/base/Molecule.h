@@ -61,6 +61,8 @@ private:
    string messageCOM;
    string messageCOMTitleAU;
    string messageCOMTitleAng;
+   string messageStartPrincipalAxes;
+   string messageDonePrincipalAxes;
    string messagePrincipalAxes;
    string messagePrincipalAxesTitleAU;
    string messagePrincipalAxesTitleAng;
@@ -100,6 +102,8 @@ Molecule::Molecule(){
    this->messageCOM = "\tCenter of Mass:\n";
    this->messageCOMTitleAU = "\t\t| x [a.u.] | y[a.u.] | z[a.u.] |\n";
    this->messageCOMTitleAng = "\t\t| x [angst.] | y[angst.] | z[angst.] |\n";
+   this->messageStartPrincipalAxes = "**********  START: Principal Axes Analysis  **********\n";
+   this->messageDonePrincipalAxes =  "**********  DONE: Principal Axes Analysis  ***********\n\n\n";
    this->messagePrincipalAxes = "\tPrincipal Axes:\n";
    this->messagePrincipalAxesTitleAU = "\t\t| inertia moments [a.u.] | x [a.u.] | y[a.u.] | z[a.u.] | (normalized)\n";
    this->messagePrincipalAxesTitleAng = "\t\t| inertia moments [g*angust**2/mol] | x [angst.] | y[angst.] | z[angst.] | (not normalized)\n";
@@ -318,6 +322,8 @@ void Molecule::SetInertiaTensorOrigin(double x, double y, double z){
 
 void Molecule::CalcPrincipalAxes(){
 
+   cout << this->messageStartPrincipalAxes;
+
    if(this->inertiaTensorOrigin == NULL){
       if(!this->wasCalculatedCOMXyz){
          this->CalcCOMXyz();
@@ -343,8 +349,9 @@ void Molecule::CalcPrincipalAxes(){
       this->FreeInertiaTensorMoments(inertiaTensor, inertiaMoments);
       throw ex;
    }
-
    this->FreeInertiaTensorMoments(inertiaTensor, inertiaMoments);
+
+   cout << this->messageDonePrincipalAxes;
    
 }
 
@@ -456,6 +463,9 @@ void Molecule::Rotate(){
    }
 
    this->OutputRotatingConditions(); 
+
+   // ToDo: rotate
+
    cout << this->messageDoneRotate;
 }
 
