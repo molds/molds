@@ -12,7 +12,7 @@ Carring Out:
 
 
 Principal Axes (Diagonalizing the inertia tensor):
-   Write "principal-axes" in theory-directive.
+   Write "principal_axes" in theory-directive.
 
    E.g. 
          THEORY

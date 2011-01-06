@@ -8,8 +8,8 @@ THEORY
    //indo
    //zindo/s
    //none 
-   //principal-axes
-   rotate
+   principal_axes
+   //rotate
 THEORY_END
 
 INERTIA

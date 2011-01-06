@@ -90,7 +90,7 @@ InputParser::InputParser(){
    this->stringTheoryCNDO2 = "cndo/2";
    this->stringTheoryINDO = "indo";
    this->stringTheoryZINDOS = "zindo/s";
-   this->stringTheoryPrincipalAxes = "principal-axes";
+   this->stringTheoryPrincipalAxes = "principal_axes";
    this->stringTheoryRotate = "rotate";
    this->stringTheoryNONE = "none";
    this->stringGeometry =    "geometry";
