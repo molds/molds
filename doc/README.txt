@@ -75,4 +75,23 @@ Rotate Molecule:
          ROTATE_END
 
 
+Translate Molecule:
+   Write "translate" in theory-directive.
+
+   E.g. 
+         THEORY
+            translate 
+         THEORY_END
+
+   -options
+    "difference" indicates difference for the translation in angstrom unit.
+    This option is written in translate-directive.
+    Default values are 0, 0, and 0.
+
+   E.g. 
+         TRANSLATE
+            difference 12 30 45
+         TRANSLATE_END
+
+
 

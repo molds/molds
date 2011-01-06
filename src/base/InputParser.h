@@ -46,6 +46,7 @@ private:
    string stringTheoryINDO;
    string stringTheoryZINDOS;
    string stringTheoryPrincipalAxes;
+   string stringTheoryTranslate;
    string stringTheoryRotate;
    string stringTheoryNONE;
    string stringGeometry;
@@ -66,6 +67,9 @@ private:
    string stringRotatingType;
    string stringRotatingTypeAxis;
    string stringRotatingTypeEularAngle;
+   string stringTranslate;
+   string stringTranslateEnd;
+   string stringTranslatingDifference;
    void CalcMolecularBasics(Molecule* molecule);
    void OutputMolecularBasics(Molecule* molecule);
    void OutputScfConditions();
@@ -91,6 +95,7 @@ InputParser::InputParser(){
    this->stringTheoryINDO = "indo";
    this->stringTheoryZINDOS = "zindo/s";
    this->stringTheoryPrincipalAxes = "principal_axes";
+   this->stringTheoryTranslate = "translate";
    this->stringTheoryRotate = "rotate";
    this->stringTheoryNONE = "none";
    this->stringGeometry =    "geometry";
@@ -113,6 +118,9 @@ InputParser::InputParser(){
    this->stringRotatingType = "type";
    this->stringRotatingTypeAxis = "axis";
    this->stringRotatingTypeEularAngle = "eular_angle";
+   this->stringTranslate = "translate";
+   this->stringTranslateEnd = "translate_end";
+   this->stringTranslatingDifference = "difference";
 }
 
 InputParser::~InputParser(){
@@ -241,6 +249,23 @@ void InputParser::Parse(Molecule* molecule){
          i = j;
       }
       
+      // translating condition
+      if(inputTerms[i].compare(this->stringTranslate) == 0){
+         int j=i+1;
+         while(inputTerms[j].compare(this->stringTranslateEnd) != 0){
+            // origin
+            if(inputTerms[j].compare(this->stringTranslatingDifference) == 0){
+               double x = atof(inputTerms[j+1].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
+               double y = atof(inputTerms[j+2].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
+               double z = atof(inputTerms[j+3].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
+               molecule->SetTranslatingDifference(x, y, z);
+               j+=3;
+            }
+            j++;   
+         }
+         i = j;
+      }
+      
       // rotating condition
       if(inputTerms[i].compare(this->stringRotate) == 0){
          int j=i+1;
@@ -313,6 +338,11 @@ void InputParser::Parse(Molecule* molecule){
             // Princepal axes
             else if(inputTerms[j].compare(this->stringTheoryPrincipalAxes) == 0){
                Parameters::GetInstance()->SetCurrentTheory(PrincipalAxes);
+            }
+
+            // Translate
+            else if(inputTerms[j].compare(this->stringTheoryTranslate) == 0){
+               Parameters::GetInstance()->SetCurrentTheory(Translate);
             }
 
             // Rotate

@@ -35,6 +35,8 @@ public:
    void SetRotatingAngle(double angle);
    void SetRotatingEularAngles(double alpha, double beta, double gamma);
    void SetRotatingType(RotatingType rotatingType);
+   void SetTranslatingDifference(double x, double y, double z);
+   void Translate();
 private:
    vector<Atom*>* atomVect;
    double* COMXyz;
@@ -42,6 +44,7 @@ private:
    double* rotatingOrigin;
    double* rotatingAxis;
    double  rotatingAngle;
+   double* translatingDifference;
    EularAngle* rotatingEularAngles;
    RotatingType rotatingType;
    bool wasCalculatedCOMXyz;
@@ -52,6 +55,7 @@ private:
    void OutputPrincipalAxes(double** inertiaTensor, double* inertiaMoments);
    void OutputInertiaTensorOrigin();
    void OutputRotatingConditions();
+   void OutputTranslatingConditions();
    string messageTotalNumberAOs;
    string messageTotalNumberAtoms;
    string messageTotalNumberValenceElectrons;
@@ -81,6 +85,11 @@ private:
    string messageRotatingType;
    string messageRotatingEularAngles;
    string messageRotatingEularAnglesTitle;
+   string messageStartTranslate;
+   string messageDoneTranslate;
+   string messageTranslatingDifference;
+   string messageTranslatingDifferenceTitleAU;
+   string messageTranslatingDifferenceTitleAng;
 };
 
 Molecule::Molecule(){
@@ -102,8 +111,8 @@ Molecule::Molecule(){
    this->messageCOM = "\tCenter of Mass:\n";
    this->messageCOMTitleAU = "\t\t| x [a.u.] | y[a.u.] | z[a.u.] |\n";
    this->messageCOMTitleAng = "\t\t| x [angst.] | y[angst.] | z[angst.] |\n";
-   this->messageStartPrincipalAxes = "**********  START: Principal Axes Analysis  **********\n";
-   this->messageDonePrincipalAxes =  "**********  DONE: Principal Axes Analysis  ***********\n\n\n";
+   this->messageStartPrincipalAxes = "**********  START: Principal Axes of Inertia  **********\n";
+   this->messageDonePrincipalAxes =  "**********  DONE: Principal Axes of Inertia  ***********\n\n\n";
    this->messagePrincipalAxes = "\tPrincipal Axes:\n";
    this->messagePrincipalAxesTitleAU = "\t\t| inertia moments [a.u.] | x [a.u.] | y[a.u.] | z[a.u.] | (normalized)\n";
    this->messagePrincipalAxesTitleAng = "\t\t| inertia moments [g*angust**2/mol] | x [angst.] | y[angst.] | z[angst.] | (not normalized)\n";
@@ -122,6 +131,11 @@ Molecule::Molecule(){
    this->messageRotatingType = "\tType: ";
    this->messageRotatingEularAngles = "\tEular Angles:\n";
    this->messageRotatingEularAnglesTitle = "\t\t| alpha[degree] | beta[degree] | gamma[degree] |\n";
+   this->messageStartTranslate = "**********  START: Translate molecule  **********\n";
+   this->messageDoneTranslate =  "**********  DONE: Translate molecule  ***********\n\n\n";
+   this->messageTranslatingDifference = "\tTranslating Difference:\n";
+   this->messageTranslatingDifferenceTitleAU = "\t\t| x [a.u.] | y[a.u.] | z[a.u.] |\n";
+   this->messageTranslatingDifferenceTitleAng = "\t\t| x [angst.] | y[angst.] | z[angst.] |\n";
 }
 
 Molecule::~Molecule(){
@@ -159,6 +173,11 @@ Molecule::~Molecule(){
       this->rotatingEularAngles = NULL;
       //cout << "rotatingEularAngles deleted\n";
    }
+   if(this->translatingDifference != NULL){
+      MallocerFreer::GetInstance()->FreeDoubleMatrix1d(this->translatingDifference);
+      this->translatingDifference = NULL;
+      //cout << "translatingDifference deleted\n";
+   }
 }
 
 vector<Atom*>* Molecule::GetAtomVect(){
@@ -180,7 +199,7 @@ void Molecule::CalcCOMXyz(){
       double atomicMass;
 
       for(int j=0; j<3; j++){
-         this->COMXyz[j] += 0.0;
+         this->COMXyz[j] = 0.0;
       }
       
       for(int i=0; i<this->atomVect->size(); i++){
@@ -514,6 +533,62 @@ void Molecule::OutputRotatingConditions(){
                                     this->rotatingEularAngles->GetGamma()/degree2Radian);
    }
 
+}
+
+void Molecule::SetTranslatingDifference(double x, double y, double z){
+   if(this->translatingDifference == NULL){
+      this->translatingDifference = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(3);
+   }
+
+   this->translatingDifference[0] = x;
+   this->translatingDifference[1] = y;
+   this->translatingDifference[2] = z;
+
+}
+
+void Molecule::Translate(){
+
+   cout << this->messageStartTranslate;
+
+   if(this->translatingDifference == NULL){
+      this->SetTranslatingDifference(0.0, 0.0, 0.0);
+   }
+
+
+   this->OutputTranslatingConditions(); 
+
+   Atom* atom;
+   for(int i=0; i<this->atomVect->size(); i++){
+         atom = (*this->atomVect)[i]; 
+         atom->GetXyz()[0] += this->translatingDifference[0];
+         atom->GetXyz()[1] += this->translatingDifference[1];
+         atom->GetXyz()[2] += this->translatingDifference[2];
+   }
+   
+   this->wasCalculatedCOMXyz = false;
+   this->CalcCOMXyz();
+
+   this->OutputConfiguration();
+   this->OutputCOMXyz();
+
+   cout << this->messageDoneTranslate;
+}
+
+void Molecule::OutputTranslatingConditions(){
+
+   double angst2AU = Parameters::GetInstance()->GetAngstrom2AU();
+
+   // rotating origin
+   cout << this->messageTranslatingDifference;
+   cout << this->messageTranslatingDifferenceTitleAng;
+   printf("\t\t%e\t%e\t%e\n\n",this->translatingDifference[0]/angst2AU,
+                               this->translatingDifference[1]/angst2AU,
+                               this->translatingDifference[2]/angst2AU);
+
+   cout << this->messageTranslatingDifferenceTitleAU;
+   printf("\t\t%e\t%e\t%e\n\n",this->translatingDifference[0],
+                               this->translatingDifference[1],
+                               this->translatingDifference[2]);
 
 }
 

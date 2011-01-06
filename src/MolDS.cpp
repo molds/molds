@@ -120,6 +120,18 @@ int main(){
 
       }
 
+      // Translate molecule
+      else if(Parameters::GetInstance()->GetCurrentTheory() == Translate && runingNormally){
+         try{
+            molecule->Translate();
+         }
+         catch(MolDSException ex){
+            cout << ex.what() << endl;
+            runingNormally = false;
+         }
+
+      }
+
       // Rotate molecule
       else if(Parameters::GetInstance()->GetCurrentTheory() == Rotate && runingNormally){
          try{

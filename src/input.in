@@ -8,7 +8,8 @@ THEORY
    //indo
    //zindo/s
    //none 
-   principal_axes
+   //principal_axes
+   translate
    //rotate
 THEORY_END
 
@@ -17,13 +18,19 @@ INERTIA
 INERTIA_END
 
 ROTATE
-   type axis
+   //type axis
    //type eular_angle
-   origin 1.0 2.0 3.0
-   axis 3.0 4.0 5.0
-   angle 30
-   angles 15 25 35
+   //origin 1.0 2.0 3.0
+   //axis 3.0 4.0 5.0
+   //angle 30
+   //angles 15 25 35
 ROTATE_END
+
+TRANSLATE
+   //difference 100.0 200.0 300.0
+TRANSLATE_END
+
+
 
 //metane
 //GEOMETRY
