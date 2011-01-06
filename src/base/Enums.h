@@ -11,9 +11,17 @@ RENUMSTR_BEGIN( TheoryType, TheoryTypeStr )
    RENUMSTR( CNDO2,  "CNDO/2" )
    RENUMSTR( INDO,   "INDO" )
    RENUMSTR( ZINDOS, "ZINDO/S" )
-   RENUMSTR( PrincipalAxes, "Principal Axes" )
+   RENUMSTR( PrincipalAxes, "PrincipalAxes" )
+   RENUMSTR( Rotate, "Rotate" )
    RENUMSTR( NONE, "NONE" )
    RENUMSTR( TheoryType_end,  "TheoryType_end" )
+RENUMSTR_END()
+
+
+RENUMSTR_BEGIN( RotatingType, RotatingTypeStr )
+   RENUMSTR( Axis,  "Axis" )
+   RENUMSTR( Eular,  "EularAngle" )
+   RENUMSTR( RotatingType_end,  "RotatingType_end" )
 RENUMSTR_END()
 
 RENUMSTR_BEGIN( ShellType, ShellTypeStr )

@@ -23,6 +23,7 @@ public:
    double GetAngstrom2AU();
    double GetKayser2AU();
    double GetGMolin2AU();
+   double GetDegree2Radian();
    double GetBondingAdjustParameterK();
    TheoryType GetCurrentTheory();
    void SetCurrentTheory(TheoryType theory);
@@ -41,6 +42,7 @@ private:
    double angstrom2AU;
    double kayser2AU;
    double gMolin2AU;
+   double degree2Radian;
    double bondingAdjustParameterK; //see (3.79) in J. A. Pople book
    TheoryType currentTheory;
 
@@ -76,6 +78,7 @@ void Parameters::SetDefaultValues(){
    this->maxIterationsSCF = 100;
    this->currentTheory = CNDO2;
    this->gMolin2AU = pow(10.0,5.0)/(6.0221415*9.1095);
+   this->degree2Radian = M_PI / 180.0;
 }
 
 double Parameters::GetThresholdSCF(){
@@ -108,6 +111,10 @@ double Parameters::GetKayser2AU(){
 
 double Parameters::GetGMolin2AU(){
    return this->gMolin2AU;
+}
+
+double Parameters::GetDegree2Radian(){
+   return this->degree2Radian;
 }
 
 double Parameters::GetBondingAdjustParameterK(){

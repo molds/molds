@@ -40,15 +40,16 @@ private:
    string messageScfRmsDensity;
    string stringSpace;
    string stringCommentOut;
-   string stringGeometry;
-   string stringGeometryEnd;
    string stringTheory;
    string stringTheoryEnd;
    string stringTheoryCNDO2;
    string stringTheoryINDO;
    string stringTheoryZINDOS;
    string stringTheoryPrincipalAxes;
+   string stringTheoryRotate;
    string stringTheoryNONE;
+   string stringGeometry;
+   string stringGeometryEnd;
    string stringScf;
    string stringScfEnd;
    string stringScfMaxIter;
@@ -56,6 +57,15 @@ private:
    string stringInertiaTensor;
    string stringInertiaTensorEnd;
    string stringInertiaTensorOrigin;
+   string stringRotate;
+   string stringRotateEnd;
+   string stringRotatingOrigin;
+   string stringRotatingAxis;
+   string stringRotatingAngle;
+   string stringRotatingAngles;
+   string stringRotatingType;
+   string stringRotatingTypeAxis;
+   string stringRotatingTypeEularAngle;
    void CalcMolecularBasics(Molecule* molecule);
    void OutputMolecularBasics(Molecule* molecule);
    void OutputScfConditions();
@@ -77,6 +87,12 @@ InputParser::InputParser(){
    this->messageScfRmsDensity = "\t\tRMS density: ";
    this->stringSpace = " ";
    this->stringCommentOut = "//";
+   this->stringTheoryCNDO2 = "cndo/2";
+   this->stringTheoryINDO = "indo";
+   this->stringTheoryZINDOS = "zindo/s";
+   this->stringTheoryPrincipalAxes = "principal-axes";
+   this->stringTheoryRotate = "rotate";
+   this->stringTheoryNONE = "none";
    this->stringGeometry =    "geometry";
    this->stringGeometryEnd = "geometry_end";
    this->stringTheory = "theory";
@@ -85,14 +101,18 @@ InputParser::InputParser(){
    this->stringScfEnd = "scf_end";
    this->stringScfMaxIter = "max_iter";
    this->stringScfRmsDensity = "rms_density";
-   this->stringTheoryCNDO2 = "cndo/2";
-   this->stringTheoryINDO = "indo";
-   this->stringTheoryZINDOS = "zindo/s";
-   this->stringTheoryPrincipalAxes = "principal-axes";
    this->stringInertiaTensor = "inertia";
    this->stringInertiaTensorEnd = "inertia_end";
    this->stringInertiaTensorOrigin = "origin";
-   this->stringTheoryNONE = "none";
+   this->stringRotate = "rotate";
+   this->stringRotateEnd = "rotate_end";
+   this->stringRotatingOrigin = "origin";
+   this->stringRotatingAxis = "axis";
+   this->stringRotatingAngle = "angle";
+   this->stringRotatingAngles = "angles";
+   this->stringRotatingType = "type";
+   this->stringRotatingTypeAxis = "axis";
+   this->stringRotatingTypeEularAngle = "eular_angle";
 }
 
 InputParser::~InputParser(){
@@ -221,6 +241,55 @@ void InputParser::Parse(Molecule* molecule){
          i = j;
       }
       
+      // rotating condition
+      if(inputTerms[i].compare(this->stringRotate) == 0){
+         int j=i+1;
+         while(inputTerms[j].compare(this->stringRotateEnd) != 0){
+            // origin
+            if(inputTerms[j].compare(this->stringRotatingOrigin) == 0){
+               double x = atof(inputTerms[j+1].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
+               double y = atof(inputTerms[j+2].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
+               double z = atof(inputTerms[j+3].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
+               molecule->SetRotatingOrigin(x, y, z);
+               j+=3;
+            }
+            // axis
+            else if(inputTerms[j].compare(this->stringRotatingAxis) == 0){
+               double x = atof(inputTerms[j+1].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
+               double y = atof(inputTerms[j+2].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
+               double z = atof(inputTerms[j+3].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
+               molecule->SetRotatingAxis(x, y, z);
+               j+=3;
+            }
+            // angle 
+            else if(inputTerms[j].compare(this->stringRotatingAngle) == 0){
+               double angle = atof(inputTerms[j+1].c_str()) * Parameters::GetInstance()->GetDegree2Radian();
+               molecule->SetRotatingAngle(angle);
+               j++;
+            }
+            // angles (EularAngle)
+            else if(inputTerms[j].compare(this->stringRotatingAngles) == 0){
+               double alpha = atof(inputTerms[j+1].c_str()) * Parameters::GetInstance()->GetDegree2Radian();
+               double beta  = atof(inputTerms[j+2].c_str()) * Parameters::GetInstance()->GetDegree2Radian();
+               double gamma = atof(inputTerms[j+3].c_str()) * Parameters::GetInstance()->GetDegree2Radian();
+               molecule->SetRotatingEularAngles(alpha, beta, gamma);
+               j += 3;
+            }
+            // type
+            else if(inputTerms[j].compare(this->stringRotatingType) == 0){
+               if(inputTerms[j+1].compare(this->stringRotatingTypeAxis) == 0){
+                  molecule->SetRotatingType(Axis);
+               }
+               else if(inputTerms[j+1].compare(this->stringRotatingTypeEularAngle) == 0){
+                  molecule->SetRotatingType(Eular);
+               }
+               j++;
+            }
+            j++;   
+         }
+         i = j;
+      }
+      
       // theory
       if(inputTerms[i].compare(this->stringTheory) == 0){
          int j=i+1;
@@ -244,6 +313,11 @@ void InputParser::Parse(Molecule* molecule){
             // Princepal axes
             else if(inputTerms[j].compare(this->stringTheoryPrincipalAxes) == 0){
                Parameters::GetInstance()->SetCurrentTheory(PrincipalAxes);
+            }
+
+            // Rotate
+            else if(inputTerms[j].compare(this->stringTheoryRotate) == 0){
+               Parameters::GetInstance()->SetCurrentTheory(Rotate);
             }
 
             // NONE 

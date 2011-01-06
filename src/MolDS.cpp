@@ -13,6 +13,7 @@
 #undef INCLUDED_ENUMS
 #define RENUMSTR_BODY 1  
 #include"base/Enums.h"
+#include"base/EularAngle.h"
 #include"base/Molecule.h"
 #include"base/atoms/Atom.h"
 #include"base/atoms/Hatom.h"
@@ -21,7 +22,6 @@
 #include"base/atoms/Satom.h"
 #include"base/MallocerFreer.h"
 #include"base/InputParser.h"
-#include"base/EularAngle.h"
 #include"base/Parameters.h"
 #include"cndo/Cndo2.h"
 #include"indo/Indo.h"
@@ -112,6 +112,18 @@ int main(){
       else if(Parameters::GetInstance()->GetCurrentTheory() == PrincipalAxes && runingNormally){
          try{
             molecule->CalcPrincipalAxes();
+         }
+         catch(MolDSException ex){
+            cout << ex.what() << endl;
+            runingNormally = false;
+         }
+
+      }
+
+      // Rotate molecule
+      else if(Parameters::GetInstance()->GetCurrentTheory() == Rotate && runingNormally){
+         try{
+            molecule->Rotate();
          }
          catch(MolDSException ex){
             cout << ex.what() << endl;
