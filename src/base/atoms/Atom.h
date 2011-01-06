@@ -13,61 +13,6 @@ using namespace MolDS_base;
 namespace MolDS_base_atoms{
 
 class Atom{
-private:
-   void SetMessages();
-   string errorMessageImuAmu;
-   string errorMessageOrbitalExponent;
-   string errorMessageShellType;
-   string errorMessageEffectivPrincipalQuantumNumber;
-   string errorMessageZindoCoreIntegral;
-   double GetJss();  // Part of Eq. (13) in [BZ_1979]
-   double GetJsp();  // Part of Eq. (13) in [BZ_1979]
-   double GetJsd();  // Part of Eq. (13) in [BZ_1979]
-   double GetJpp();  // Part of Eq. (13) in [BZ_1979]
-   double GetJpd();  // Part of Eq. (13) in [BZ_1979]
-   double GetJdd();  // Part of Eq. (13) in [BZ_1979]
-protected:
-   string errorMessageIndoCoreIntegral;
-   string errorMessageZindoSCoreIntegral;
-   string errorMessageAtomType;
-   string errorMessageOrbitalType;
-   double* xyz;
-   AtomType atomType;
-   double atomicMass;  // Appendix 1 in [I_1998]
-   vector<OrbitalType> valence;
-   ShellType valenceShellType;
-   int firstAOIndex;
-   int numberValenceElectrons;
-   double imuAmuS;                      // Table 3.4 or 3.5 in J. A. Pople book
-   double imuAmuP;                      // Table 3.4 or 3.5 in J. A. Pople book
-   double imuAmuD;                      // Table 3.4 or 3.5 in J. A. Pople book
-   double bondingParameter;             // Table 3.2 and 3.4 in J. A. Pople book
-   double bondingParameterSZindo;        // Table 1 in [RZ_1976], table 1 in [HKLWNZ_1982], or table 3 in [AEZ_1986]
-   double bondingParameterDZindo;        // Table 1 in [RZ_1976], table 1 in [HKLWNZ_1982], or table 3 in [AEZ_1986]
-   double coreCharge;                   // = Z_A in J. A. Pople book.
-   double effectiveNuclearChargeK;      // Table 1.5 in J. A. Pople book
-   double effectiveNuclearChargeL;      // Table 1.5 in J. A. Pople book
-   double effectiveNuclearChargeMsp;    // Table 1.5 in J. A. Pople book
-   double effectiveNuclearChargeMd;     // Table 1.5 in J. A. Pople book
-   int GetEffectivePrincipalQuantumNumber(ShellType shellType); // Table 1.4 in J. A. Pople book
-   double indoF2;                   // (3.89) in J. A. Pople book
-   double indoG1;                   // (3.88) in J. A. Pople book
-   double zindoF0ss;                // Table 1 in ref. [RZ_1976], Table 1 in [AEZ_1986], or Table 1 in [GD_1972]
-   double zindoF0sd;                  // Table 1 in [AEZ_1986]
-   double zindoF0dd;                  // Table 1 in [AEZ_1986]
-   double zindoG1sp;                 // Table 3 in ref. [BZ_1979]
-   double zindoF2pp;                 // Table 3 in ref. [BZ_1979]
-   double zindoG2sd;                 // Table 3 in ref. [BZ_1979]
-   double zindoG1pd;                 // Table 3 in ref. [BZ_1979]
-   double zindoF2pd;                 // Table 3 in ref. [BZ_1979]
-   double zindoG3pd;                 // Table 3 in ref. [BZ_1979]
-   double zindoF2dd;                 // Table 3 in ref. [BZ_1979]
-   double zindoF4dd;                 // Table 3 in ref. [BZ_1979]
-   double IonPotS;   // Ionization potential, Table 4 in [BZ_1979]
-   double IonPotP;   // Ionization potential, Table 4 in [BZ_1979]
-   double IonPotD;   // Ionization potential, Table 4 in [BZ_1979]
-   double GetZindoCoreIntegral(OrbitalType orbital, int l, int m, int n); // Eq. (13) in [BZ_1979]
-
 public:
    Atom();
    Atom(double x, double y, double z);
@@ -112,6 +57,61 @@ public:
    double GetZindoG3pdLower();                 // Apendix in ref. [BZ_1979]
    double GetZindoF2ddLower();                 // Apendix in ref. [BZ_1979]
    double GetZindoF4ddLower();                 // Apendix in ref. [BZ_1979]
+protected:
+   string errorMessageIndoCoreIntegral;
+   string errorMessageZindoSCoreIntegral;
+   string errorMessageAtomType;
+   string errorMessageOrbitalType;
+   double* xyz;
+   AtomType atomType;
+   double atomicMass;  // Appendix 1 in [I_1998]
+   vector<OrbitalType> valence;
+   ShellType valenceShellType;
+   int firstAOIndex;
+   int numberValenceElectrons;
+   double imuAmuS;                      // Table 3.4 or 3.5 in J. A. Pople book
+   double imuAmuP;                      // Table 3.4 or 3.5 in J. A. Pople book
+   double imuAmuD;                      // Table 3.4 or 3.5 in J. A. Pople book
+   double bondingParameter;             // Table 3.2 and 3.4 in J. A. Pople book
+   double bondingParameterSZindo;        // Table 1 in [RZ_1976], table 1 in [HKLWNZ_1982], or table 3 in [AEZ_1986]
+   double bondingParameterDZindo;        // Table 1 in [RZ_1976], table 1 in [HKLWNZ_1982], or table 3 in [AEZ_1986]
+   double coreCharge;                   // = Z_A in J. A. Pople book.
+   double effectiveNuclearChargeK;      // Table 1.5 in J. A. Pople book
+   double effectiveNuclearChargeL;      // Table 1.5 in J. A. Pople book
+   double effectiveNuclearChargeMsp;    // Table 1.5 in J. A. Pople book
+   double effectiveNuclearChargeMd;     // Table 1.5 in J. A. Pople book
+   int GetEffectivePrincipalQuantumNumber(ShellType shellType); // Table 1.4 in J. A. Pople book
+   double indoF2;                   // (3.89) in J. A. Pople book
+   double indoG1;                   // (3.88) in J. A. Pople book
+   double zindoF0ss;                // Table 1 in ref. [RZ_1976], Table 1 in [AEZ_1986], or Table 1 in [GD_1972]
+   double zindoF0sd;                  // Table 1 in [AEZ_1986]
+   double zindoF0dd;                  // Table 1 in [AEZ_1986]
+   double zindoG1sp;                 // Table 3 in ref. [BZ_1979]
+   double zindoF2pp;                 // Table 3 in ref. [BZ_1979]
+   double zindoG2sd;                 // Table 3 in ref. [BZ_1979]
+   double zindoG1pd;                 // Table 3 in ref. [BZ_1979]
+   double zindoF2pd;                 // Table 3 in ref. [BZ_1979]
+   double zindoG3pd;                 // Table 3 in ref. [BZ_1979]
+   double zindoF2dd;                 // Table 3 in ref. [BZ_1979]
+   double zindoF4dd;                 // Table 3 in ref. [BZ_1979]
+   double IonPotS;   // Ionization potential, Table 4 in [BZ_1979]
+   double IonPotP;   // Ionization potential, Table 4 in [BZ_1979]
+   double IonPotD;   // Ionization potential, Table 4 in [BZ_1979]
+   double GetZindoCoreIntegral(OrbitalType orbital, int l, int m, int n); // Eq. (13) in [BZ_1979]
+private:
+   void SetMessages();
+   string errorMessageImuAmu;
+   string errorMessageOrbitalExponent;
+   string errorMessageShellType;
+   string errorMessageEffectivPrincipalQuantumNumber;
+   string errorMessageZindoCoreIntegral;
+   double GetJss();  // Part of Eq. (13) in [BZ_1979]
+   double GetJsp();  // Part of Eq. (13) in [BZ_1979]
+   double GetJsd();  // Part of Eq. (13) in [BZ_1979]
+   double GetJpp();  // Part of Eq. (13) in [BZ_1979]
+   double GetJpd();  // Part of Eq. (13) in [BZ_1979]
+   double GetJdd();  // Part of Eq. (13) in [BZ_1979]
+
 };
 
 Atom::Atom(){

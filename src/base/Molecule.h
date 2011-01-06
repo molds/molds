@@ -14,6 +14,21 @@ using namespace MolDS_base_atoms;
 namespace MolDS_base{
 
 class Molecule{
+public:
+   Molecule();
+   ~Molecule();
+   vector<Atom*>* GetAtomVect(); 
+   double* GetCOMXyz();
+   void CalcCOMXyz();
+   int GetTotalNumberAOs();
+   void CalcTotalNumberAOs();
+   int GetTotalNumberValenceElectrons();
+   void CalcTotalNumberValenceElectrons();
+   void OutputCOMXyz();
+   void OutputTotalNumberAtomsAOsValenceelectrons();
+   void OutputConfiguration();
+   void SetInertiaTensorOrigin(double x, double y, double z);
+   void CalcPrincipalAxes();
 private:
    vector<Atom*>* atomVect;
    double* COMXyz;
@@ -40,21 +55,6 @@ private:
    string messageInertiaTensorOrigin;
    string messageInertiaTensorOriginTitleAU;
    string messageInertiaTensorOriginTitleAng;
-public:
-   Molecule();
-   ~Molecule();
-   vector<Atom*>* GetAtomVect(); 
-   double* GetCOMXyz();
-   void CalcCOMXyz();
-   int GetTotalNumberAOs();
-   void CalcTotalNumberAOs();
-   int GetTotalNumberValenceElectrons();
-   void CalcTotalNumberValenceElectrons();
-   void OutputCOMXyz();
-   void OutputTotalNumberAtomsAOsValenceelectrons();
-   void OutputConfiguration();
-   void SetInertiaTensorOrigin(double x, double y, double z);
-   void CalcPrincipalAxes();
 };
 
 Molecule::Molecule(){

@@ -12,13 +12,6 @@ namespace MolDS_base{
 
 // MallocerFreer is singleton
 class MallocerFreer{
-private:
-   MallocerFreer();
-   MallocerFreer(MallocerFreer&);
-   void operator = (MallocerFreer&);
-   ~MallocerFreer();
-   static MallocerFreer* mallocerFreer;
-   string errorMessageMallocFailure;
 public:
    static MallocerFreer* GetInstance();
    static void DeleteInstance();
@@ -42,6 +35,13 @@ public:
    double**** MallocDoubleMatrix4d(int size1, int size2, int size3, int size4);
    void InitializeDoubleMatrix4d(double**** matrix, int size1, int size2, int size3, int size4);
    void FreeDoubleMatrix4d(double**** matrix, int size1, int size2, int size3);
+private:
+   MallocerFreer();
+   MallocerFreer(MallocerFreer&);
+   void operator = (MallocerFreer&);
+   ~MallocerFreer();
+   static MallocerFreer* mallocerFreer;
+   string errorMessageMallocFailure;
 
 };
 MallocerFreer* MallocerFreer::mallocerFreer = NULL;

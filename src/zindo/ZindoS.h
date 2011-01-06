@@ -18,16 +18,9 @@ namespace MolDS_zindo{
  *  Refferences for 
  */
 class ZindoS : public MolDS_cndo::Cndo2{
-private:
-   double GetCoulombInt(OrbitalType orbital1, 
-                        OrbitalType orbital2, 
-                        Atom* atom); // Apendix in [BZ_1979]
-   double GetExchangeInt(OrbitalType orbital1, 
-                         OrbitalType orbital2, 
-                         Atom* atom); // Apendix in [BZ_1979]
-   double GetNishimotoMatagaTwoEleInt(Atom* atomA, OrbitalType orbitalA, 
-                                           Atom* atomB, OrbitalType orbitalB); // ref. [MN_1957] and (5a) in [AEZ_1986]
-   string errorMessageNishimotoMataga;
+public:
+   ZindoS();
+   ~ZindoS();
 protected:
    virtual void CalcGammaAB(double** gammaAB, Molecule* molecule);
    virtual void SetMessages();
@@ -40,9 +33,16 @@ protected:
                                         int mu, int nu, Molecule* molecule, double** gammaAB, double** overelap,
                                         double** orbitalElectronPopulation, bool isGuess);
    virtual void CalcDiatomicOverlapInDiatomicFrame(double** diatomicOverlap, Atom* atomA, Atom* atomB);
-public:
-   ZindoS();
-   ~ZindoS();
+private:
+   double GetCoulombInt(OrbitalType orbital1, 
+                        OrbitalType orbital2, 
+                        Atom* atom); // Apendix in [BZ_1979]
+   double GetExchangeInt(OrbitalType orbital1, 
+                         OrbitalType orbital2, 
+                         Atom* atom); // Apendix in [BZ_1979]
+   double GetNishimotoMatagaTwoEleInt(Atom* atomA, OrbitalType orbitalA, 
+                                           Atom* atomB, OrbitalType orbitalB); // ref. [MN_1957] and (5a) in [AEZ_1986]
+   string errorMessageNishimotoMataga;
 };
 
 ZindoS::ZindoS() : MolDS_cndo::Cndo2(){

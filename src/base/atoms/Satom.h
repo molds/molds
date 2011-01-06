@@ -8,10 +8,10 @@ using namespace MolDS_base;
 namespace MolDS_base_atoms{
 
 class Satom : public Atom {
-private:
 public:
    Satom(double x, double y, double z);
    double GetCoreIntegral(OrbitalType orbital, double gamma, bool isGuess, TheoryType theory); 
+private:
 };
 
 Satom::Satom(double x, double y, double z) : Atom(x, y, z){

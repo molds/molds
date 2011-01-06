@@ -14,6 +14,10 @@ namespace MolDS_mkl_wrapper{
 
 // LapackWrapper is singleton
 class LapackWrapper{
+public:
+   static LapackWrapper* GetInstance();
+   static void DeleteInstance();
+   int Dsyevd(double** matrix, double* eigenValues, int size, bool calcEigenVectors);
 private:
    LapackWrapper();
    LapackWrapper(LapackWrapper&);
@@ -23,10 +27,6 @@ private:
 
    string errorMessageDsyevdInfo;
    string errorMessageDsyevdSize;
-public:
-   static LapackWrapper* GetInstance();
-   static void DeleteInstance();
-   int Dsyevd(double** matrix, double* eigenValues, int size, bool calcEigenVectors);
 };
 LapackWrapper* LapackWrapper::lapackWrapper = NULL;
 

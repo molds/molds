@@ -18,9 +18,9 @@ namespace MolDS_indo{
  *  Refferences for Indo are [PB_1970] and [PS_1966].
  */
 class Indo : public MolDS_cndo::Cndo2{
-private:
-   double GetCoulombInt(OrbitalType orbital1, OrbitalType orbital2, double gamma, Atom* atom); // Indo Coulomb Interaction, (3.87) - (3.91) in J. A. Pople book.
-   double GetExchangeInt(OrbitalType orbital1, OrbitalType orbital2, double gamma, Atom* atom); // Indo Exchange Interaction, (3.87) - (3.91) in J. A. Pople book.
+public:
+   Indo();
+   ~Indo();
 protected:
    virtual void SetMessages();
    virtual void SetEnableAtomTypes();
@@ -31,10 +31,9 @@ protected:
    virtual double GetFockOffDiagElement(Atom* atomA, Atom* atomB, int atomAIndex, int atomBIndex, 
                                 int mu, int nu, Molecule* molecule, double** gammaAB, double** overelap,
                                 double** orbitalElectronPopulation, bool isGuess);
-
-public:
-   Indo();
-   ~Indo();
+private:
+   double GetCoulombInt(OrbitalType orbital1, OrbitalType orbital2, double gamma, Atom* atom); // Indo Coulomb Interaction, (3.87) - (3.91) in J. A. Pople book.
+   double GetExchangeInt(OrbitalType orbital1, OrbitalType orbital2, double gamma, Atom* atom); // Indo Exchange Interaction, (3.87) - (3.91) in J. A. Pople book.
 };
 
 Indo::Indo() : MolDS_cndo::Cndo2(){

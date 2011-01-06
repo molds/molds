@@ -9,10 +9,10 @@ using namespace MolDS_base;
 namespace MolDS_base_atoms{
 
 class Hatom : public Atom {
-private:
 public:
    Hatom(double x, double y, double z);
    double GetCoreIntegral(OrbitalType orbital, double gamma, bool isGuess, TheoryType theory); 
+private:
 };
 
 Hatom::Hatom(double x, double y, double z) : Atom(x, y, z){

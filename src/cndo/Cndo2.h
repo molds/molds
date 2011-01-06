@@ -24,6 +24,38 @@ namespace MolDS_cndo{
  *  Refferences for Cndo2 are [PB_1970], [PSS_1965], and [PS_1965].
  */
 class Cndo2{
+public:
+   Cndo2();
+   ~Cndo2();
+   void SetMolecule(Molecule* molecule);
+   void DoesSCF();
+protected:
+   string errorMessageAtomType;
+   string errorMessageOrbitalType;
+   string errorMessageSCFNotConverged;
+   string errorMessageMoleculeNotSet;
+   string errorMessageOddTotalValenceElectrions;
+   string errorMessageNotEnebleAtomType;
+   string errorMessageCoulombInt;
+   string errorMessageExchangeInt;
+   string messageSCFMetConvergence;
+   string messageStartSCF;
+   string messageDoneSCF;
+   vector<AtomType> enableAtomTypes;
+   double GetReducedOverlap(int na, int la, int m, int nb, int lb, double alpha, double beta);
+   double GetReducedOverlap(int na, int nb, double alpha, double beta);
+   virtual void CalcGammaAB(double** gammaAB, Molecule* molecule);
+   virtual void SetMessages();
+   virtual void SetEnableAtomTypes();
+   virtual double GetFockDiagElement(Atom* atomA, int atomAIndex, 
+                             int mu, Molecule* molecule, double** gammaAB,
+                             double** orbitalElectronPopulation, double* atomicElectronPopulation,
+                             bool isGuess);
+   virtual double GetFockOffDiagElement(Atom* atomA, Atom* atomB, int atomAIndex, int atomBIndex, 
+                                int mu, int nu, Molecule* molecule, double** gammaAB, double** overlap,
+                                double** orbitalElectronPopulation, bool isGuess);
+   virtual void CalcDiatomicOverlapInDiatomicFrame(double** diatomicOverlap, Atom* atomA, Atom* atomB);
+   TheoryType theory;
 private:
    string messageEnergiesMOs;
    string messageEnergiesMOsTitle;
@@ -70,38 +102,6 @@ private:
    void CheckNumberValenceElectrons(Molecule* molecule);
    void FreeDiatomicOverlapAndRotatingMatrix(double** diatomicOverlap, double** rotatingMatrix);
 
-protected:
-   string errorMessageAtomType;
-   string errorMessageOrbitalType;
-   string errorMessageSCFNotConverged;
-   string errorMessageMoleculeNotSet;
-   string errorMessageOddTotalValenceElectrions;
-   string errorMessageNotEnebleAtomType;
-   string errorMessageCoulombInt;
-   string errorMessageExchangeInt;
-   string messageSCFMetConvergence;
-   string messageStartSCF;
-   string messageDoneSCF;
-   vector<AtomType> enableAtomTypes;
-   double GetReducedOverlap(int na, int la, int m, int nb, int lb, double alpha, double beta);
-   double GetReducedOverlap(int na, int nb, double alpha, double beta);
-   virtual void CalcGammaAB(double** gammaAB, Molecule* molecule);
-   virtual void SetMessages();
-   virtual void SetEnableAtomTypes();
-   virtual double GetFockDiagElement(Atom* atomA, int atomAIndex, 
-                             int mu, Molecule* molecule, double** gammaAB,
-                             double** orbitalElectronPopulation, double* atomicElectronPopulation,
-                             bool isGuess);
-   virtual double GetFockOffDiagElement(Atom* atomA, Atom* atomB, int atomAIndex, int atomBIndex, 
-                                int mu, int nu, Molecule* molecule, double** gammaAB, double** overlap,
-                                double** orbitalElectronPopulation, bool isGuess);
-   virtual void CalcDiatomicOverlapInDiatomicFrame(double** diatomicOverlap, Atom* atomA, Atom* atomB);
-   TheoryType theory;
-public:
-   Cndo2();
-   ~Cndo2();
-   void SetMolecule(Molecule* molecule);
-   void DoesSCF();
 };
 
 Cndo2::Cndo2(){

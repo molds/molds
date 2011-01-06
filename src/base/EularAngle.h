@@ -7,17 +7,17 @@
 namespace MolDS_base{
 
 class EularAngle{
-private:
-   string errorMessageInvalidXYZ;
-   double alpha;
-   double beta;
-   double gamma;
 public:
    EularAngle();
    EularAngle(double x, double y, double z);
    double GetAlpha();
    double GetBeta();
    double GetGamma();
+private:
+   string errorMessageInvalidXYZ;
+   double alpha;
+   double beta;
+   double gamma;
 };
 
 EularAngle::EularAngle(){

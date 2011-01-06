@@ -19,6 +19,10 @@ namespace MolDS_base{
 
 // InputParser is singleton
 class InputParser{
+public:
+   static InputParser* GetInstance();
+   static void DeleteInstance();
+   void Parse(Molecule* molecule);
 private:
    static InputParser* inputParser;
    InputParser();
@@ -58,12 +62,6 @@ private:
    void OutputInputTerms(vector<string> inputTerms);
    bool IsCommentOut(string str);
    vector<string> GetInputTerms();
-
-public:
-   static InputParser* GetInstance();
-   static void DeleteInstance();
-   void Parse(Molecule* molecule);
-
 };
 InputParser* InputParser::inputParser = NULL;
 

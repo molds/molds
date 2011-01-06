@@ -8,10 +8,10 @@ using namespace MolDS_base;
 namespace MolDS_base_atoms{
 
 class Catom : public Atom {
-private:
 public:
    Catom(double x, double y, double z);
    double GetCoreIntegral(OrbitalType orbital, double gamma, bool isGuess, TheoryType theory); 
+private:
 };
 
 Catom::Catom(double x, double y, double z) : Atom(x, y, z){

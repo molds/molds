@@ -11,6 +11,22 @@ namespace MolDS_base{
 
 // Parameters is singleton
 class Parameters{
+public:
+   static Parameters* GetInstance();
+   static void DeleteInstance();
+
+   double GetThresholdSCF();
+   void SetThresholdSCF(double thresholdSCF);
+   int GetMaxIterationsSCF();
+   void SetMaxIterationsSCF(int maxIterationsSCF);
+   double GetEV2AU();
+   double GetAngstrom2AU();
+   double GetKayser2AU();
+   double GetGMolin2AU();
+   double GetBondingAdjustParameterK();
+   TheoryType GetCurrentTheory();
+   void SetCurrentTheory(TheoryType theory);
+
 private:
    static Parameters* parameters;
    Parameters();
@@ -27,22 +43,6 @@ private:
    double gMolin2AU;
    double bondingAdjustParameterK; //see (3.79) in J. A. Pople book
    TheoryType currentTheory;
-
-public:
-   static Parameters* GetInstance();
-   static void DeleteInstance();
-
-   double GetThresholdSCF();
-   void SetThresholdSCF(double thresholdSCF);
-   int GetMaxIterationsSCF();
-   void SetMaxIterationsSCF(int maxIterationsSCF);
-   double GetEV2AU();
-   double GetAngstrom2AU();
-   double GetKayser2AU();
-   double GetGMolin2AU();
-   double GetBondingAdjustParameterK();
-   TheoryType GetCurrentTheory();
-   void SetCurrentTheory(TheoryType theory);
 
 };
 Parameters* Parameters::parameters = NULL;
