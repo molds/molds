@@ -12,7 +12,7 @@ THEORY
 THEORY_END
 
 INERTIA
-   origin 1.0 2.0 3.0
+   //origin 1.0 2.0 3.0
 INERTIA_END
 
 

@@ -6,6 +6,7 @@
 #include<iostream>
 #include<vector>
 #include"atoms/Atom.h"
+#include"../mkl_wrapper/LapackWrapper.h"
 
 using namespace std;
 using namespace MolDS_base_atoms;
@@ -22,6 +23,8 @@ private:
    int totalNumberValenceElectrons;
    void CalcInertiaTensor(double** inertiaTensor);
    void FreeInertiaTensorMoments(double** inertiaTensor, double* inertiaMoments);
+   void OutputPrincipalAxes(double** inertiaTensor, double* inertiaMoments);
+   void OutputInertiaTensorOrigin();
    string messageTotalNumberAOs;
    string messageTotalNumberAtoms;
    string messageTotalNumberValenceElectrons;
@@ -31,6 +34,12 @@ private:
    string messageCOM;
    string messageCOMTitleAU;
    string messageCOMTitleAng;
+   string messagePrincipalAxes;
+   string messagePrincipalAxesTitleAU;
+   string messagePrincipalAxesTitleAng;
+   string messageInertiaTensorOrigin;
+   string messageInertiaTensorOriginTitleAU;
+   string messageInertiaTensorOriginTitleAng;
 public:
    Molecule();
    ~Molecule();
@@ -62,6 +71,12 @@ Molecule::Molecule(){
    this->messageCOM = "\tCenter of Mass:\n";
    this->messageCOMTitleAU = "\t\t| x [a.u.] | y[a.u.] | z[a.u.] |\n";
    this->messageCOMTitleAng = "\t\t| x [angst.] | y[angst.] | z[angst.] |\n";
+   this->messagePrincipalAxes = "\tPrincipal Axes:\n";
+   this->messagePrincipalAxesTitleAU = "\t\t| inertia moments [a.u.] | x [a.u.] | y[a.u.] | z[a.u.] | (normalized)\n";
+   this->messagePrincipalAxesTitleAng = "\t\t| inertia moments [g*angust**2/mol] | x [angst.] | y[angst.] | z[angst.] | (not normalized)\n";
+   this->messageInertiaTensorOrigin = "\tInertia Tensor Origin:\n";
+   this->messageInertiaTensorOriginTitleAU = "\t\t| x [a.u.] | y[a.u.] | z[a.u.] |\n";
+   this->messageInertiaTensorOriginTitleAng = "\t\t| x [angst.] | y[angst.] | z[angst.] |\n";
 }
 
 Molecule::~Molecule(){
@@ -186,6 +201,49 @@ void Molecule::OutputTotalNumberAtomsAOsValenceelectrons(){
    cout << this->messageTotalNumberValenceElectrons << this->totalNumberValenceElectrons << "\n\n";
 }
 
+void Molecule::OutputPrincipalAxes(double** inertiaTensor, double* inertiaMoments){
+   double ang2AU = Parameters::GetInstance()->GetAngstrom2AU();
+   double gMolin2AU = Parameters::GetInstance()->GetGMolin2AU();
+
+   cout << this->messagePrincipalAxes;
+   cout << this->messagePrincipalAxesTitleAng;
+   for(int i=0; i<3; i++){
+      printf("\t\t%e\t%e\t%e\t%e\n",inertiaMoments[i]/gMolin2AU, 
+                                    inertiaTensor[i][0]/ang2AU,
+                                    inertiaTensor[i][1]/ang2AU,
+                                    inertiaTensor[i][2]/ang2AU);
+   }
+   cout << "\n";
+
+   cout << this->messagePrincipalAxesTitleAU;
+   for(int i=0; i<3; i++){
+      printf("\t\t%e\t%e\t%e\t%e\n",inertiaMoments[i], 
+                                    inertiaTensor[i][0],
+                                    inertiaTensor[i][1],
+                                    inertiaTensor[i][2]);
+   }
+   cout << "\n";
+
+}
+
+void Molecule::OutputInertiaTensorOrigin(){
+   double ang2AU = Parameters::GetInstance()->GetAngstrom2AU();
+
+   cout << this->messageInertiaTensorOrigin;
+   cout << this->messageInertiaTensorOriginTitleAng;
+   printf("\t\t%e\t%e\t%e\n",this->inertiaTensorOrigin[0]/ang2AU,
+                                 this->inertiaTensorOrigin[1]/ang2AU,
+                                 this->inertiaTensorOrigin[2]/ang2AU);
+   cout << "\n";
+
+   cout << this->messageInertiaTensorOriginTitleAU;
+   printf("\t\t%e\t%e\t%e\n",this->inertiaTensorOrigin[0],
+                                 this->inertiaTensorOrigin[1],
+                                 this->inertiaTensorOrigin[2]);
+   cout << "\n";
+
+}
+
 void Molecule::SetInertiaTensorOrigin(double x, double y, double z){
    if(this->inertiaTensorOrigin == NULL){
       this->inertiaTensorOrigin = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(3);
@@ -209,8 +267,13 @@ void Molecule::CalcPrincipalAxes(){
    try{
       this->CalcInertiaTensor(inertiaTensor);
       
-      // ToDo: diagonalization!!!!!!
-      
+      bool calcEigenVectors = true;
+      MolDS_mkl_wrapper::LapackWrapper::GetInstance()->Dsyevd(inertiaTensor,
+                                                              inertiaMoments,
+                                                              3,
+                                                              calcEigenVectors);
+      this->OutputPrincipalAxes(inertiaTensor, inertiaMoments);
+      this->OutputInertiaTensorOrigin();
    }
    catch(MolDSException ex){
       this->FreeInertiaTensorMoments(inertiaTensor, inertiaMoments);
