@@ -27,7 +27,6 @@ public:
    void OutputCOMXyz();
    void OutputTotalNumberAtomsAOsValenceelectrons();
    void OutputConfiguration();
-   void SetInertiaTensorOrigin(double x, double y, double z);
    void CalcPrincipalAxes();
    void Rotate();
    void Rotate(EularAngle eularAngle);
@@ -40,7 +39,6 @@ public:
 private:
    vector<Atom*>* atomVect;
    double* COMXyz;
-   double* inertiaTensorOrigin;
    double* rotatingOrigin;
    double* rotatingAxis;
    double  rotatingAngle;
@@ -49,10 +47,10 @@ private:
    bool wasCalculatedCOMXyz;
    int totalNumberAOs;
    int totalNumberValenceElectrons;
-   void CalcInertiaTensor(double** inertiaTensor);
+   void CalcInertiaTensor(double** inertiaTensor, double* inertiaTensorOrigin);
    void FreeInertiaTensorMoments(double** inertiaTensor, double* inertiaMoments);
    void OutputPrincipalAxes(double** inertiaTensor, double* inertiaMoments);
-   void OutputInertiaTensorOrigin();
+   void OutputInertiaTensorOrigin(double* inertiaTensorOrigin);
    void OutputRotatingConditions();
    void OutputTranslatingConditions(double* translatingDifference);
    string messageTotalNumberAOs;
@@ -94,7 +92,6 @@ private:
 Molecule::Molecule(){
    this->atomVect = new vector<Atom*>;
    this->COMXyz = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(3);
-   this->inertiaTensorOrigin = NULL;
    this->rotatingOrigin = NULL;
    this->rotatingAxis = NULL;
    this->rotatingAngle = 0.0;
@@ -151,11 +148,6 @@ Molecule::~Molecule(){
       MallocerFreer::GetInstance()->FreeDoubleMatrix1d(this->COMXyz);
       this->COMXyz = NULL;
       //cout << "COMXyz deleted\n";
-   }
-   if(this->inertiaTensorOrigin != NULL){
-      MallocerFreer::GetInstance()->FreeDoubleMatrix1d(this->inertiaTensorOrigin);
-      this->inertiaTensorOrigin = NULL;
-      //cout << "inertiaTensorOrigin deleted\n";
    }
    if(this->rotatingOrigin != NULL){
       MallocerFreer::GetInstance()->FreeDoubleMatrix1d(this->rotatingOrigin);
@@ -304,54 +296,40 @@ void Molecule::OutputPrincipalAxes(double** inertiaTensor, double* inertiaMoment
 
 }
 
-void Molecule::OutputInertiaTensorOrigin(){
+void Molecule::OutputInertiaTensorOrigin(double* inertiaTensorOrigin){
    double ang2AU = Parameters::GetInstance()->GetAngstrom2AU();
 
    cout << this->messageInertiaTensorOrigin;
    cout << this->messageInertiaTensorOriginTitleAng;
-   printf("\t\t%e\t%e\t%e\n",this->inertiaTensorOrigin[0]/ang2AU,
-                                 this->inertiaTensorOrigin[1]/ang2AU,
-                                 this->inertiaTensorOrigin[2]/ang2AU);
+   printf("\t\t%e\t%e\t%e\n",inertiaTensorOrigin[0]/ang2AU,
+                             inertiaTensorOrigin[1]/ang2AU,
+                             inertiaTensorOrigin[2]/ang2AU);
    cout << "\n";
 
    cout << this->messageInertiaTensorOriginTitleAU;
-   printf("\t\t%e\t%e\t%e\n",this->inertiaTensorOrigin[0],
-                                 this->inertiaTensorOrigin[1],
-                                 this->inertiaTensorOrigin[2]);
+   printf("\t\t%e\t%e\t%e\n",inertiaTensorOrigin[0],
+                             inertiaTensorOrigin[1],
+                             inertiaTensorOrigin[2]);
    cout << "\n";
 
 }
 
-void Molecule::SetInertiaTensorOrigin(double x, double y, double z){
-   if(this->inertiaTensorOrigin == NULL){
-      this->inertiaTensorOrigin = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(3);
-   }
-
-   this->inertiaTensorOrigin[0] = x;
-   this->inertiaTensorOrigin[1] = y;
-   this->inertiaTensorOrigin[2] = z;
-
-}
-
-/****
- * Call this->SetInertiaTensorOrigin before calling this-function.
- ***/
 void Molecule::CalcPrincipalAxes(){
 
    cout << this->messageStartPrincipalAxes;
 
-   if(this->inertiaTensorOrigin == NULL){
-      if(!this->wasCalculatedCOMXyz){
-         this->CalcCOMXyz();
-      }
-      this->SetInertiaTensorOrigin(this->COMXyz[0], this->COMXyz[1], this->COMXyz[2]);
+   double inertiaTensorOrigin[3] = {this->COMXyz[0], this->COMXyz[1], this->COMXyz[2]};
+   if(Parameters::GetInstance()->GetInertiaTensorOrigin() != NULL){
+      inertiaTensorOrigin[0] = Parameters::GetInstance()->GetInertiaTensorOrigin()[0];
+      inertiaTensorOrigin[1] = Parameters::GetInstance()->GetInertiaTensorOrigin()[1];
+      inertiaTensorOrigin[2] = Parameters::GetInstance()->GetInertiaTensorOrigin()[2];
    }
 
    double** inertiaTensor = MallocerFreer::GetInstance()->MallocDoubleMatrix2d(3, 3);
    double*  inertiaMoments = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(3);
 
    try{
-      this->CalcInertiaTensor(inertiaTensor);
+      this->CalcInertiaTensor(inertiaTensor, inertiaTensorOrigin);
       
       bool calcEigenVectors = true;
       MolDS_mkl_wrapper::LapackWrapper::GetInstance()->Dsyevd(inertiaTensor,
@@ -359,7 +337,7 @@ void Molecule::CalcPrincipalAxes(){
                                                               3,
                                                               calcEigenVectors);
       this->OutputPrincipalAxes(inertiaTensor, inertiaMoments);
-      this->OutputInertiaTensorOrigin();
+      this->OutputInertiaTensorOrigin(inertiaTensorOrigin);
    }
    catch(MolDSException ex){
       this->FreeInertiaTensorMoments(inertiaTensor, inertiaMoments);
@@ -371,7 +349,7 @@ void Molecule::CalcPrincipalAxes(){
    
 }
 
-void Molecule::CalcInertiaTensor(double** inertiaTensor){
+void Molecule::CalcInertiaTensor(double** inertiaTensor, double* inertiaTensorOrigin){
 
    Atom* atom;
    double x;
@@ -381,9 +359,9 @@ void Molecule::CalcInertiaTensor(double** inertiaTensor){
    for(int a=0; a<this->atomVect->size(); a++){
       atom = (*this->atomVect)[a];
       atomicMass = atom->GetAtomicMass();
-      x = atom->GetXyz()[0] - this->inertiaTensorOrigin[0];
-      y = atom->GetXyz()[1] - this->inertiaTensorOrigin[1];
-      z = atom->GetXyz()[2] - this->inertiaTensorOrigin[2];
+      x = atom->GetXyz()[0] - inertiaTensorOrigin[0];
+      y = atom->GetXyz()[1] - inertiaTensorOrigin[1];
+      z = atom->GetXyz()[2] - inertiaTensorOrigin[2];
 
       inertiaTensor[0][0] += atomicMass*(y*y + z*z);
       inertiaTensor[0][1] -= atomicMass*x*y;

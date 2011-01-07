@@ -8,13 +8,13 @@ THEORY
    //indo
    //zindo/s
    //none 
-   //principal_axes
-   translate
+   principal_axes
+   //translate
    //rotate
 THEORY_END
 
 INERTIA
-   //origin 1.0 2.0 3.0
+   origin 1.0 2.0 3.0
 INERTIA_END
 
 ROTATE

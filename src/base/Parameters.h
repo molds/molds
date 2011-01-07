@@ -29,6 +29,8 @@ public:
    void SetCurrentTheory(TheoryType theory);
    void SetTranslatingDifference(double x, double y, double z);
    double* GetTranslatingDifference();
+   void SetInertiaTensorOrigin(double x, double y, double z);
+   double* GetInertiaTensorOrigin();
 
 private:
    static Parameters* parameters;
@@ -48,6 +50,7 @@ private:
    double bondingAdjustParameterK; //see (3.79) in J. A. Pople book
    TheoryType currentTheory;
    double translatingDifference[3];
+   double* inertiaTensorOrigin;
 
 };
 Parameters* Parameters::parameters = NULL;
@@ -57,6 +60,12 @@ Parameters::Parameters(){
 }
 
 Parameters::~Parameters(){
+   if(this->inertiaTensorOrigin != NULL){
+      MallocerFreer::GetInstance()->FreeDoubleMatrix1d(this->inertiaTensorOrigin);
+      this->inertiaTensorOrigin = NULL;
+      //cout << "inertiaTensorOrigin deleted\n";
+   }
+
 }
 
 Parameters* Parameters::GetInstance(){
@@ -85,6 +94,7 @@ void Parameters::SetDefaultValues(){
    this->translatingDifference[0] = 0.0;
    this->translatingDifference[1] = 0.0;
    this->translatingDifference[2] = 0.0;
+   this->inertiaTensorOrigin = NULL;
 }
 
 double Parameters::GetThresholdSCF(){
@@ -143,6 +153,22 @@ void Parameters::SetTranslatingDifference(double x, double y, double z){
 
 double* Parameters::GetTranslatingDifference(){
    return this->translatingDifference;
+}
+
+void Parameters::SetInertiaTensorOrigin(double x, double y, double z){
+   if(this->inertiaTensorOrigin == NULL){
+      this->inertiaTensorOrigin = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(3);
+   }
+
+   this->inertiaTensorOrigin[0] = x;
+   this->inertiaTensorOrigin[1] = y;
+   this->inertiaTensorOrigin[2] = z;
+
+}
+
+   
+double* Parameters::GetInertiaTensorOrigin(){
+   return this->inertiaTensorOrigin;
 }
 
 
