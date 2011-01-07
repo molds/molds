@@ -318,6 +318,9 @@ void Molecule::CalcPrincipalAxes(){
 
    cout << this->messageStartPrincipalAxes;
 
+   if(!this->wasCalculatedXyzCOM){
+      this->CalcXyzCOM();
+   }
    double inertiaTensorOrigin[3] = {this->xyzCOM[0], this->xyzCOM[1], this->xyzCOM[2]};
    if(Parameters::GetInstance()->GetInertiaTensorOrigin() != NULL){
       inertiaTensorOrigin[0] = Parameters::GetInstance()->GetInertiaTensorOrigin()[0];
