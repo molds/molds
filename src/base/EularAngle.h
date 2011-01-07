@@ -10,7 +10,7 @@ class EularAngle{
 public:
    EularAngle();
    EularAngle(double x, double y, double z);
-   EularAngle(double angles[3]);
+   EularAngle(double* angles);
    double GetAlpha();
    double GetBeta();
    double GetGamma();
@@ -60,7 +60,7 @@ EularAngle::EularAngle(double x, double y, double z){
    
 }
 
-EularAngle::EularAngle(double angles[3]){
+EularAngle::EularAngle(double* angles){
    this->SetMessage();
    this->alpha = angles[0];
    this->beta = angles[1];
