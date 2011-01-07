@@ -258,7 +258,7 @@ void InputParser::Parse(Molecule* molecule){
                double x = atof(inputTerms[j+1].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
                double y = atof(inputTerms[j+2].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
                double z = atof(inputTerms[j+3].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
-               molecule->SetTranslatingDifference(x, y, z);
+               Parameters::GetInstance()->SetTranslatingDifference(x, y, z);
                j+=3;
             }
             j++;   

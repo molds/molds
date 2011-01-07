@@ -36,7 +36,6 @@ public:
    void SetRotatingAngle(double angle);
    void SetRotatingEularAngles(double alpha, double beta, double gamma);
    void SetRotatingType(RotatingType rotatingType);
-   void SetTranslatingDifference(double x, double y, double z);
    void Translate();
 private:
    vector<Atom*>* atomVect;
@@ -45,7 +44,6 @@ private:
    double* rotatingOrigin;
    double* rotatingAxis;
    double  rotatingAngle;
-   double* translatingDifference;
    EularAngle* rotatingEularAngles;
    RotatingType rotatingType;
    bool wasCalculatedCOMXyz;
@@ -56,7 +54,7 @@ private:
    void OutputPrincipalAxes(double** inertiaTensor, double* inertiaMoments);
    void OutputInertiaTensorOrigin();
    void OutputRotatingConditions();
-   void OutputTranslatingConditions();
+   void OutputTranslatingConditions(double* translatingDifference);
    string messageTotalNumberAOs;
    string messageTotalNumberAtoms;
    string messageTotalNumberValenceElectrons;
@@ -173,11 +171,6 @@ Molecule::~Molecule(){
       delete this->rotatingEularAngles;
       this->rotatingEularAngles = NULL;
       //cout << "rotatingEularAngles deleted\n";
-   }
-   if(this->translatingDifference != NULL){
-      MallocerFreer::GetInstance()->FreeDoubleMatrix1d(this->translatingDifference);
-      this->translatingDifference = NULL;
-      //cout << "translatingDifference deleted\n";
    }
 }
 
@@ -558,37 +551,23 @@ void Molecule::OutputRotatingConditions(){
 
 }
 
-void Molecule::SetTranslatingDifference(double x, double y, double z){
-   if(this->translatingDifference == NULL){
-      this->translatingDifference = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(3);
-   }
 
-   this->translatingDifference[0] = x;
-   this->translatingDifference[1] = y;
-   this->translatingDifference[2] = z;
-
-}
-
-/****
- * Call this->SetTranslatingDifference before calling this-function. 
- ***/
 void Molecule::Translate(){
 
    cout << this->messageStartTranslate;
 
-   if(this->translatingDifference == NULL){
-      this->SetTranslatingDifference(0.0, 0.0, 0.0);
-   }
+   double x = Parameters::GetInstance()->GetTranslatingDifference()[0];
+   double y = Parameters::GetInstance()->GetTranslatingDifference()[1];
+   double z = Parameters::GetInstance()->GetTranslatingDifference()[2];
 
-
-   this->OutputTranslatingConditions(); 
+   this->OutputTranslatingConditions(Parameters::GetInstance()->GetTranslatingDifference()); 
 
    Atom* atom;
    for(int i=0; i<this->atomVect->size(); i++){
          atom = (*this->atomVect)[i]; 
-         atom->GetXyz()[0] += this->translatingDifference[0];
-         atom->GetXyz()[1] += this->translatingDifference[1];
-         atom->GetXyz()[2] += this->translatingDifference[2];
+         atom->GetXyz()[0] += x;
+         atom->GetXyz()[1] += y;
+         atom->GetXyz()[2] += z;
    }
    
    this->wasCalculatedCOMXyz = false;
@@ -600,21 +579,20 @@ void Molecule::Translate(){
    cout << this->messageDoneTranslate;
 }
 
-void Molecule::OutputTranslatingConditions(){
+void Molecule::OutputTranslatingConditions(double* translatingDifference){
 
    double angst2AU = Parameters::GetInstance()->GetAngstrom2AU();
 
-   // rotating origin
    cout << this->messageTranslatingDifference;
    cout << this->messageTranslatingDifferenceTitleAng;
-   printf("\t\t%e\t%e\t%e\n\n",this->translatingDifference[0]/angst2AU,
-                               this->translatingDifference[1]/angst2AU,
-                               this->translatingDifference[2]/angst2AU);
+   printf("\t\t%e\t%e\t%e\n\n",translatingDifference[0]/angst2AU,
+                               translatingDifference[1]/angst2AU,
+                               translatingDifference[2]/angst2AU);
 
    cout << this->messageTranslatingDifferenceTitleAU;
-   printf("\t\t%e\t%e\t%e\n\n",this->translatingDifference[0],
-                               this->translatingDifference[1],
-                               this->translatingDifference[2]);
+   printf("\t\t%e\t%e\t%e\n\n",translatingDifference[0],
+                               translatingDifference[1],
+                               translatingDifference[2]);
 
 }
 

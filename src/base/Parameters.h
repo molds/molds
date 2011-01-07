@@ -27,6 +27,8 @@ public:
    double GetBondingAdjustParameterK();
    TheoryType GetCurrentTheory();
    void SetCurrentTheory(TheoryType theory);
+   void SetTranslatingDifference(double x, double y, double z);
+   double* GetTranslatingDifference();
 
 private:
    static Parameters* parameters;
@@ -45,6 +47,7 @@ private:
    double degree2Radian;
    double bondingAdjustParameterK; //see (3.79) in J. A. Pople book
    TheoryType currentTheory;
+   double translatingDifference[3];
 
 };
 Parameters* Parameters::parameters = NULL;
@@ -79,6 +82,9 @@ void Parameters::SetDefaultValues(){
    this->currentTheory = CNDO2;
    this->gMolin2AU = pow(10.0,5.0)/(6.0221415*9.1095);
    this->degree2Radian = M_PI / 180.0;
+   this->translatingDifference[0] = 0.0;
+   this->translatingDifference[1] = 0.0;
+   this->translatingDifference[2] = 0.0;
 }
 
 double Parameters::GetThresholdSCF(){
@@ -128,6 +134,17 @@ TheoryType Parameters::GetCurrentTheory(){
 void Parameters::SetCurrentTheory(TheoryType theory){
    this->currentTheory = theory;
 }
+
+void Parameters::SetTranslatingDifference(double x, double y, double z){
+   this->translatingDifference[0] = x;
+   this->translatingDifference[1] = y;
+   this->translatingDifference[2] = z;
+}
+
+double* Parameters::GetTranslatingDifference(){
+   return this->translatingDifference;
+}
+
 
 }
 #endif
