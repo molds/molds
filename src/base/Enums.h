@@ -18,11 +18,16 @@ RENUMSTR_BEGIN( TheoryType, TheoryTypeStr )
    RENUMSTR( TheoryType_end,  "TheoryType_end" )
 RENUMSTR_END()
 
-
 RENUMSTR_BEGIN( RotatingType, RotatingTypeStr )
    RENUMSTR( Axis,  "Axis" )
    RENUMSTR( Eular,  "EularAngle" )
    RENUMSTR( RotatingType_end,  "RotatingType_end" )
+RENUMSTR_END()
+
+RENUMSTR_BEGIN( RotatedObjectType, RotatedObjectTypeStr )
+   RENUMSTR( System,  "System" )
+   RENUMSTR( Frame,  "Frame" )
+   RENUMSTR( RotatedObjectType_end,  "RotatedObjectType_end" )
 RENUMSTR_END()
 
 RENUMSTR_BEGIN( ShellType, ShellTypeStr )
@@ -30,6 +35,13 @@ RENUMSTR_BEGIN( ShellType, ShellTypeStr )
    RENUMSTR( l,  "l" )
    RENUMSTR( m,  "m" )
    RENUMSTR( ShellType_end,  "ShellType_end" )
+RENUMSTR_END()
+
+RENUMSTR_BEGIN( CartesianType, CartesianTypeStr )
+   RENUMSTR( XAxis,  "XAxis" )
+   RENUMSTR( YAxis,  "YAxis" )
+   RENUMSTR( ZAxis,  "ZAxis" )
+   RENUMSTR( CartesianType_end,  "CartesianType_end" )
 RENUMSTR_END()
 
 RENUMSTR_BEGIN( OrbitalType, OrbitalTypeStr )

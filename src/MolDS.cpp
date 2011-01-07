@@ -13,6 +13,7 @@
 #undef INCLUDED_ENUMS
 #define RENUMSTR_BODY 1  
 #include"base/Enums.h"
+#include"base/MathUtilities.h"
 #include"base/EularAngle.h"
 #include"base/Molecule.h"
 #include"base/atoms/Atom.h"

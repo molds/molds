@@ -68,6 +68,57 @@ template <typename T> T min(T a, T b){
    }
 }
 
+void CalcRotatingMatrix(double matrix[][3], double sita, CartesianType cartesianType){
+   if(cartesianType == XAxis){
+      matrix[0][0] = 1.0;
+      matrix[0][1] = 0.0;
+      matrix[0][2] = 0.0;
+
+      matrix[1][0] = 0.0;
+      matrix[1][1] = cos(sita);
+      matrix[1][2] = sin(sita);
+
+      matrix[2][0] = 0.0;
+      matrix[2][1] = -sin(sita);
+      matrix[2][2] = cos(sita);
+   }
+   else if(cartesianType == YAxis){
+      matrix[0][0] = cos(sita);
+      matrix[0][1] = 0.0;
+      matrix[0][2] = -sin(sita);
+
+      matrix[1][0] = 0.0;
+      matrix[1][1] = 1.0;
+      matrix[1][2] = 0.0;
+
+      matrix[2][0] = sin(sita);
+      matrix[2][1] = 0.0;
+      matrix[2][2] = cos(sita);
+   }
+   else if(cartesianType == ZAxis){
+      matrix[0][0] = cos(sita);
+      matrix[0][1] = sin(sita);
+      matrix[0][2] = 0.0;
+
+      matrix[1][0] = -sin(sita);
+      matrix[1][1] = cos(sita);
+      matrix[1][2] = 0.0;
+
+      matrix[2][0] = 0.0;
+      matrix[2][1] = 0.0;
+      matrix[2][2] = 1.0;
+   }
+   else{
+      stringstream ss;
+      ss << "Error in base::MathUtility::CalcRotatingMatrix: invalid cartesianType \n";
+      throw MolDSException(ss.str());
+   }
+}
+
+
+
+
+
 
 }
 #endif

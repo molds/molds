@@ -14,22 +14,27 @@ THEORY
 THEORY_END
 
 INERTIA
-   origin 1.0 2.0 3.0
+   origin 1.0 2.0 30.0
 INERTIA_END
 
 ROTATE
    type axis
    //type eular_angle
-   origin 1.0 2.0 3.0
-   axis 3.0 4.0 5.0
+   //origin 1.0 2.0 3.0
+   origin 0.0 0.0 0.0
+   axis 10.0 0.0 0.0
    angle 30
-   angles 15 25 35
+   //angles 15 25 35
 ROTATE_END
 
 TRANSLATE
    //difference 100.0 200.0 300.0
 TRANSLATE_END
 
+// s
+GEOMETRY
+     S       0.0  0.0  1.0  
+GEOMETRY_END
 
 
 //metane
@@ -61,11 +66,11 @@ TRANSLATE_END
 //GEOMETRY_END
 
 // sh2
-GEOMETRY
-     S       -0.559299    0.471698    0.000000
-     H        0.750701    0.471698    0.000000
-     H       -0.996586    1.706558    0.000000
-GEOMETRY_END
+//GEOMETRY
+//     S       -0.559299    0.471698    0.000000
+//     H        0.750701    0.471698    0.000000
+//     H       -0.996586    1.706558    0.000000
+//GEOMETRY_END
 
 // benzene
 //GEOMETRY

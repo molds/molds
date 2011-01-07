@@ -29,7 +29,6 @@ public:
    void OutputConfiguration();
    void CalcPrincipalAxes();
    void Rotate();
-   void Rotate(EularAngle eularAngle);
    void Translate();
 private:
    vector<Atom*>* atomVect;
@@ -39,6 +38,7 @@ private:
    int totalNumberValenceElectrons;
    void CalcInertiaTensor(double** inertiaTensor, double* inertiaTensorOrigin);
    void FreeInertiaTensorMoments(double** inertiaTensor, double* inertiaMoments);
+   void Rotate(EularAngle eularAngle, double* rotatingOrigin, RotatedObjectType rotatedObj);
    void OutputPrincipalAxes(double** inertiaTensor, double* inertiaMoments);
    void OutputInertiaTensorOrigin(double* inertiaTensorOrigin);
    void OutputRotatingConditions(RotatingType rotatingType, double* rotatingOrigin, 
@@ -380,9 +380,9 @@ void Molecule::Rotate(){
    }
    double rotatingOrigin[3] = {this->xyzCOM[0], this->xyzCOM[1], this->xyzCOM[2]};
    if(Parameters::GetInstance()->GetRotatingOrigin() != NULL){
-      rotatingOrigin[0] = Parameters::GetInstance()->GetInertiaTensorOrigin()[0];
-      rotatingOrigin[1] = Parameters::GetInstance()->GetInertiaTensorOrigin()[1];
-      rotatingOrigin[2] = Parameters::GetInstance()->GetInertiaTensorOrigin()[2];
+      rotatingOrigin[0] = Parameters::GetInstance()->GetRotatingOrigin()[0];
+      rotatingOrigin[1] = Parameters::GetInstance()->GetRotatingOrigin()[1];
+      rotatingOrigin[2] = Parameters::GetInstance()->GetRotatingOrigin()[2];
    }
 
    RotatingType rotatingType = Parameters::GetInstance()->GetRotatingType();
@@ -396,16 +396,84 @@ void Molecule::Rotate(){
 
    // rotate
    if(rotatingType == Axis){
+      EularAngle setZAxisEularAngles(rotatingAxis[0], rotatingAxis[1], rotatingAxis[2]);
+      EularAngle angleAroundAxis;
+      angleAroundAxis.SetAlpha(rotatingAngle);
+
+      this->Rotate(setZAxisEularAngles, rotatingOrigin, Frame);
+      this->Rotate(angleAroundAxis, rotatingOrigin, System);
+      this->Rotate(setZAxisEularAngles, rotatingOrigin, System);
    }
    else if(rotatingType == Eular){
-      this->Rotate(rotatingEularAngles);
+      this->Rotate(rotatingEularAngles, rotatingOrigin, System);
    }
-
+   
+   this->OutputConfiguration();
    cout << this->messageDoneRotate;
 }
 
-void Molecule::Rotate(EularAngle eularAngle){
-   // ToDo: rotate
+/***
+ * rotatedObj == System: Molecule is rotated.
+ * rotatedObj == Frame: De Cartesian is rotated.
+ */
+void Molecule::Rotate(EularAngle eularAngle, double* rotatingOrigin, RotatedObjectType rotatedObj){
+
+   double rotatingMatrixAlpha[3][3];
+   double rotatingMatrixBeta[3][3];
+   double rotatingMatrixGamma[3][3];
+   double inv = 1.0;
+   if(rotatedObj == System){
+      inv = -1.0;
+   }
+
+   CalcRotatingMatrix(rotatingMatrixAlpha, inv*eularAngle.GetAlpha(), ZAxis);
+   CalcRotatingMatrix(rotatingMatrixBeta, inv*eularAngle.GetBeta(), YAxis);
+   CalcRotatingMatrix(rotatingMatrixGamma, inv*eularAngle.GetGamma(), ZAxis);
+
+   double temp1[3][3];
+   for(int i=0; i<3; i++){
+      for(int j=0; j<3; j++){
+         temp1[i][j] = 0.0;
+         for(int k=0; k<3; k++){
+            if(rotatedObj == System){
+               temp1[i][j] += rotatingMatrixBeta[i][k] * rotatingMatrixGamma[k][j];
+            }
+            else if(rotatedObj == Frame){
+               temp1[i][j] += rotatingMatrixBeta[i][k] * rotatingMatrixAlpha[k][j];
+            }
+         }
+      }
+   }
+
+   double temp2[3][3];
+   for(int i=0; i<3; i++){
+      for(int j=0; j<3; j++){
+         temp2[i][j] = 0.0;
+         for(int k=0; k<3; k++){
+            if(rotatedObj == System){
+               temp2[i][j] += rotatingMatrixAlpha[i][k] * temp1[k][j];
+            }
+            else if(rotatedObj == Frame){
+               temp2[i][j] += rotatingMatrixGamma[i][k] * temp1[k][j];
+            }
+         }
+      }
+   }
+
+   double rotatedXyz[3];
+   Atom* atom;
+   for(int i=0; i<this->atomVect->size(); i++){
+         atom = (*this->atomVect)[i]; 
+         for(int j=0; j<3; j++){
+            rotatedXyz[j] = 0.0;
+            for(int k=0; k<3; k++){
+               rotatedXyz[j] += temp2[j][k] * (atom->GetXyz()[k] - rotatingOrigin[k]);
+            }
+         }
+         for(int j=0; j<3; j++){
+            atom->GetXyz()[j] = rotatedXyz[j] + rotatingOrigin[j];
+         }
+   }
 }
 
 void Molecule::OutputRotatingConditions(RotatingType rotatingType, double* rotatingOrigin, 
