@@ -466,9 +466,13 @@ void Molecule::SetRotatingType(RotatingType rotatingType){
 }
 
 /****
- * Call this->SetRotatingOrigin and this->SetRotatingAxis for this->rotatingType=Axis or
- * this->SetRotatingEularAngles for this->rotatingType=Eular before calling this-function. 
- * In addition, this->SetRotatingType bay be needed to be called.
+ * this->SetRotatingType bay be needed to be called.
+ *
+ * For this->rotatingType=Axis, call this->SetRotatingOrigin, this->SetRotatingAngle, 
+ * and this->SetRotatingAxis before calling this-function.
+ * 
+ * For this->rotatingType=Eular, call this->SetRotatingOrigin 
+ * and this->SetRotatingEularAngle before calling this-function. 
  ***/
 void Molecule::Rotate(){
 
