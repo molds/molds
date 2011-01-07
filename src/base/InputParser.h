@@ -275,7 +275,7 @@ void InputParser::Parse(Molecule* molecule){
                double x = atof(inputTerms[j+1].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
                double y = atof(inputTerms[j+2].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
                double z = atof(inputTerms[j+3].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
-               molecule->SetRotatingOrigin(x, y, z);
+               Parameters::GetInstance()->SetRotatingOrigin(x, y, z);
                j+=3;
             }
             // axis
@@ -283,13 +283,13 @@ void InputParser::Parse(Molecule* molecule){
                double x = atof(inputTerms[j+1].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
                double y = atof(inputTerms[j+2].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
                double z = atof(inputTerms[j+3].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
-               molecule->SetRotatingAxis(x, y, z);
+               Parameters::GetInstance()->SetRotatingAxis(x, y, z);
                j+=3;
             }
             // angle 
             else if(inputTerms[j].compare(this->stringRotatingAngle) == 0){
                double angle = atof(inputTerms[j+1].c_str()) * Parameters::GetInstance()->GetDegree2Radian();
-               molecule->SetRotatingAngle(angle);
+               Parameters::GetInstance()->SetRotatingAngle(angle);
                j++;
             }
             // angles (EularAngle)
@@ -297,16 +297,16 @@ void InputParser::Parse(Molecule* molecule){
                double alpha = atof(inputTerms[j+1].c_str()) * Parameters::GetInstance()->GetDegree2Radian();
                double beta  = atof(inputTerms[j+2].c_str()) * Parameters::GetInstance()->GetDegree2Radian();
                double gamma = atof(inputTerms[j+3].c_str()) * Parameters::GetInstance()->GetDegree2Radian();
-               molecule->SetRotatingEularAngles(alpha, beta, gamma);
+               Parameters::GetInstance()->SetRotatingEularAngles(alpha, beta, gamma);
                j += 3;
             }
             // type
             else if(inputTerms[j].compare(this->stringRotatingType) == 0){
                if(inputTerms[j+1].compare(this->stringRotatingTypeAxis) == 0){
-                  molecule->SetRotatingType(Axis);
+                  Parameters::GetInstance()->SetRotatingType(Axis);
                }
                else if(inputTerms[j+1].compare(this->stringRotatingTypeEularAngle) == 0){
-                  molecule->SetRotatingType(Eular);
+                  Parameters::GetInstance()->SetRotatingType(Eular);
                }
                j++;
             }

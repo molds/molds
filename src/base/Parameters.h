@@ -31,6 +31,16 @@ public:
    double* GetTranslatingDifference();
    void SetInertiaTensorOrigin(double x, double y, double z);
    double* GetInertiaTensorOrigin();
+   void SetRotatingOrigin(double x, double y, double z);
+   double* GetRotatingOrigin();
+   void SetRotatingType(RotatingType rotatingType);
+   RotatingType GetRotatingType();
+   void SetRotatingAxis(double x, double y, double z);
+   double* GetRotatingAxis();
+   void SetRotatingAngle(double rotatingAngle);
+   double GetRotatingAngle();
+   void SetRotatingEularAngles(double alpha, double beta, double gamma);
+   EularAngle GetRotatingEularAngles();
 
 private:
    static Parameters* parameters;
@@ -51,6 +61,11 @@ private:
    TheoryType currentTheory;
    double translatingDifference[3];
    double* inertiaTensorOrigin;
+   double* rotatingOrigin;
+   double rotatingAxis[3];
+   double rotatingAngle;
+   RotatingType rotatingType;
+   EularAngle rotatingEularAngles;
 
 };
 Parameters* Parameters::parameters = NULL;
@@ -64,6 +79,11 @@ Parameters::~Parameters(){
       MallocerFreer::GetInstance()->FreeDoubleMatrix1d(this->inertiaTensorOrigin);
       this->inertiaTensorOrigin = NULL;
       //cout << "inertiaTensorOrigin deleted\n";
+   }
+   if(this->rotatingOrigin != NULL){
+      MallocerFreer::GetInstance()->FreeDoubleMatrix1d(this->rotatingOrigin);
+      this->rotatingOrigin = NULL;
+      //cout << "rotatingOrigin deleted\n";
    }
 
 }
@@ -95,6 +115,14 @@ void Parameters::SetDefaultValues(){
    this->translatingDifference[1] = 0.0;
    this->translatingDifference[2] = 0.0;
    this->inertiaTensorOrigin = NULL;
+   this->rotatingOrigin = NULL;
+   this->rotatingAxis[0] = 0.0;
+   this->rotatingAxis[1] = 0.0;
+   this->rotatingAxis[2] = 1.0;
+   this->rotatingType = Axis;
+   this->rotatingEularAngles.SetAlpha(0.0);
+   this->rotatingEularAngles.SetBeta(0.0);
+   this->rotatingEularAngles.SetGamma(0.0);
 }
 
 double Parameters::GetThresholdSCF(){
@@ -166,10 +194,63 @@ void Parameters::SetInertiaTensorOrigin(double x, double y, double z){
 
 }
 
-   
 double* Parameters::GetInertiaTensorOrigin(){
    return this->inertiaTensorOrigin;
 }
+
+void Parameters::SetRotatingOrigin(double x, double y, double z){
+   if(this->rotatingOrigin == NULL){
+      this->rotatingOrigin = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(3);
+   }
+
+   this->rotatingOrigin[0] = x;
+   this->rotatingOrigin[1] = y;
+   this->rotatingOrigin[2] = z;
+
+}
+
+double* Parameters::GetRotatingOrigin(){
+   return this->rotatingOrigin;
+}
+
+void Parameters::SetRotatingType(RotatingType rotatingType){
+   this->rotatingType = rotatingType;
+}
+
+RotatingType Parameters::GetRotatingType(){
+   return this->rotatingType;
+}
+
+void Parameters::SetRotatingAxis(double x, double y, double z){
+   this->rotatingAxis[0] = x;
+   this->rotatingAxis[1] = y;
+   this->rotatingAxis[2] = z;
+
+}
+
+double* Parameters::GetRotatingAxis(){
+   return this->rotatingAxis;
+}
+
+void Parameters::SetRotatingAngle(double rotatingAngle){
+   this->rotatingAngle = rotatingAngle;
+}
+
+double Parameters::GetRotatingAngle(){
+   return this->rotatingAngle;
+}
+
+void Parameters::SetRotatingEularAngles(double alpha, double beta, double gamma){
+   this->rotatingEularAngles.SetAlpha(alpha);
+   this->rotatingEularAngles.SetBeta(beta);
+   this->rotatingEularAngles.SetGamma(gamma);
+}
+
+EularAngle Parameters::GetRotatingEularAngles(){
+   return this->rotatingEularAngles;
+}
+
+
 
 
 }

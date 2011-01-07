@@ -30,20 +30,10 @@ public:
    void CalcPrincipalAxes();
    void Rotate();
    void Rotate(EularAngle eularAngle);
-   void SetRotatingOrigin(double x, double y, double z);
-   void SetRotatingAxis(double x, double y, double z);
-   void SetRotatingAngle(double angle);
-   void SetRotatingEularAngles(double alpha, double beta, double gamma);
-   void SetRotatingType(RotatingType rotatingType);
    void Translate();
 private:
    vector<Atom*>* atomVect;
    double* xyzCOM;
-   double* rotatingOrigin;
-   double* rotatingAxis;
-   double  rotatingAngle;
-   EularAngle* rotatingEularAngles;
-   RotatingType rotatingType;
    bool wasCalculatedXyzCOM;
    int totalNumberAOs;
    int totalNumberValenceElectrons;
@@ -51,7 +41,9 @@ private:
    void FreeInertiaTensorMoments(double** inertiaTensor, double* inertiaMoments);
    void OutputPrincipalAxes(double** inertiaTensor, double* inertiaMoments);
    void OutputInertiaTensorOrigin(double* inertiaTensorOrigin);
-   void OutputRotatingConditions();
+   void OutputRotatingConditions(RotatingType rotatingType, double* rotatingOrigin, 
+                                 double* rotatingAxis, double rotatingAngle, 
+                                 EularAngle rotatingEularAngles);
    void OutputTranslatingConditions(double* translatingDifference);
    string messageTotalNumberAOs;
    string messageTotalNumberAtoms;
@@ -92,11 +84,6 @@ private:
 Molecule::Molecule(){
    this->atomVect = new vector<Atom*>;
    this->xyzCOM = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(3);
-   this->rotatingOrigin = NULL;
-   this->rotatingAxis = NULL;
-   this->rotatingAngle = 0.0;
-   this->rotatingType = Axis;
-   this->rotatingEularAngles = NULL;
    this->wasCalculatedXyzCOM = false;
    this->messageTotalNumberAOs = "\tTotal number of valence AOs: ";
    this->messageTotalNumberAtoms = "\tTotal number of atoms: ";
@@ -123,9 +110,9 @@ Molecule::Molecule(){
    this->messageRotatingAxis = "\tRotating Axis:\n";
    this->messageRotatingAxisTitleAU = "\t\t| x [a.u.] | y[a.u.] | z[a.u.] |\n";
    this->messageRotatingAxisTitleAng = "\t\t| x [angst.] | y[angst.] | z[angst.] |\n";
-   this->messageRotatingAngle = "\tAngle [degree]: ";
-   this->messageRotatingType = "\tType: ";
-   this->messageRotatingEularAngles = "\tEular Angles:\n";
+   this->messageRotatingAngle = "\tRotating Angle [degree]: ";
+   this->messageRotatingType = "\tRotating Type: ";
+   this->messageRotatingEularAngles = "\tRotating Eular Angles:\n";
    this->messageRotatingEularAnglesTitle = "\t\t| alpha[degree] | beta[degree] | gamma[degree] |\n";
    this->messageStartTranslate = "**********  START: Translate molecule  **********\n";
    this->messageDoneTranslate =  "**********  DONE: Translate molecule  ***********\n\n\n";
@@ -148,21 +135,6 @@ Molecule::~Molecule(){
       MallocerFreer::GetInstance()->FreeDoubleMatrix1d(this->xyzCOM);
       this->xyzCOM = NULL;
       //cout << "xyzCOM deleted\n";
-   }
-   if(this->rotatingOrigin != NULL){
-      MallocerFreer::GetInstance()->FreeDoubleMatrix1d(this->rotatingOrigin);
-      this->rotatingOrigin = NULL;
-      //cout << "rotatingOrigin deleted\n";
-   }
-   if(this->rotatingAxis != NULL){
-      MallocerFreer::GetInstance()->FreeDoubleMatrix1d(this->rotatingAxis);
-      this->rotatingAxis = NULL;
-      //cout << "rotatingAxis deleted\n";
-   }
-   if(this->rotatingEularAngles != NULL){
-      delete this->rotatingEularAngles;
-      this->rotatingEularAngles = NULL;
-      //cout << "rotatingEularAngles deleted\n";
    }
 }
 
@@ -398,84 +370,35 @@ void Molecule::FreeInertiaTensorMoments(double** inertiaTensor, double* inertiaM
 
 }
 
-void Molecule::SetRotatingOrigin(double x, double y, double z){
-   if(this->rotatingOrigin == NULL){
-      this->rotatingOrigin = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(3);
-   }
-
-   this->rotatingOrigin[0] = x;
-   this->rotatingOrigin[1] = y;
-   this->rotatingOrigin[2] = z;
-
-}
-
-void Molecule::SetRotatingAxis(double x, double y, double z){
-   if(this->rotatingAxis == NULL){
-      this->rotatingAxis = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(3);
-   }
-
-   this->rotatingAxis[0] = x;
-   this->rotatingAxis[1] = y;
-   this->rotatingAxis[2] = z;
-
-}
-
-void Molecule::SetRotatingAngle(double angle){
-   this->rotatingAngle = angle;
-}
-
-void Molecule::SetRotatingEularAngles(double alpha, double beta, double gamma){
- 
-   if(this->rotatingEularAngles == NULL){
-      this->rotatingEularAngles =  new EularAngle();
-   }
-
-   this->rotatingEularAngles->SetAlpha(alpha);
-   this->rotatingEularAngles->SetBeta(beta);
-   this->rotatingEularAngles->SetGamma(gamma);
-
-}
-
-void Molecule::SetRotatingType(RotatingType rotatingType){
-   this->rotatingType = rotatingType;
-}
-
-/****
- * this->SetRotatingType bay be needed to be called.
- *
- * For this->rotatingType=Axis, call this->SetRotatingOrigin, this->SetRotatingAngle, 
- * and this->SetRotatingAxis before calling this-function.
- * 
- * For this->rotatingType=Eular, call this->SetRotatingOrigin 
- * and this->SetRotatingEularAngle before calling this-function. 
- ***/
 void Molecule::Rotate(){
 
    cout << this->messageStartRotate;
 
    // Default values are set if some conditions are not specified.
-   if(this->rotatingOrigin == NULL){
-      if(!this->wasCalculatedXyzCOM){
-         this->CalcXyzCOM();
-      }
-      this->SetRotatingOrigin(this->xyzCOM[0], this->xyzCOM[1], this->xyzCOM[2]);
+   if(!this->wasCalculatedXyzCOM){
+      this->CalcXyzCOM();
+   }
+   double rotatingOrigin[3] = {this->xyzCOM[0], this->xyzCOM[1], this->xyzCOM[2]};
+   if(Parameters::GetInstance()->GetRotatingOrigin() != NULL){
+      rotatingOrigin[0] = Parameters::GetInstance()->GetInertiaTensorOrigin()[0];
+      rotatingOrigin[1] = Parameters::GetInstance()->GetInertiaTensorOrigin()[1];
+      rotatingOrigin[2] = Parameters::GetInstance()->GetInertiaTensorOrigin()[2];
    }
 
-   if(this->rotatingType == Axis && this->rotatingAxis == NULL){
-      this->SetRotatingAxis(0.0, 0.0, 1.0);
-   }
+   RotatingType rotatingType = Parameters::GetInstance()->GetRotatingType();
+   double* rotatingAxis = Parameters::GetInstance()->GetRotatingAxis();
+   EularAngle rotatingEularAngles = Parameters::GetInstance()->GetRotatingEularAngles();
+   double rotatingAngle = Parameters::GetInstance()->GetRotatingAngle();
 
-   if(this->rotatingType == Eular && this->rotatingEularAngles == NULL){
-      this->SetRotatingEularAngles(0.0, 0.0, 0.0);
-   }
-
-   this->OutputRotatingConditions(); 
+   this->OutputRotatingConditions(rotatingType, rotatingOrigin, 
+                                  rotatingAxis, rotatingAngle, 
+                                  rotatingEularAngles);
 
    // rotate
-   if(this->rotatingType == Axis){
+   if(rotatingType == Axis){
    }
-   else if(this->rotatingType == Eular){
-      this->Rotate(*this->rotatingEularAngles);
+   else if(rotatingType == Eular){
+      this->Rotate(rotatingEularAngles);
    }
 
    cout << this->messageDoneRotate;
@@ -485,49 +408,51 @@ void Molecule::Rotate(EularAngle eularAngle){
    // ToDo: rotate
 }
 
-void Molecule::OutputRotatingConditions(){
+void Molecule::OutputRotatingConditions(RotatingType rotatingType, double* rotatingOrigin, 
+                                        double* rotatingAxis, double rotatingAngle, 
+                                        EularAngle rotatingEularAngles){
 
    double angst2AU = Parameters::GetInstance()->GetAngstrom2AU();
    double degree2Radian = Parameters::GetInstance()->GetDegree2Radian();
 
    // type
-   printf("%s%s\n\n",this->messageRotatingType.c_str(),RotatingTypeStr(this->rotatingType));
+   printf("%s%s\n\n",this->messageRotatingType.c_str(),RotatingTypeStr(rotatingType));
 
    // rotating origin
    cout << this->messageRotatingOrigin;
    cout << this->messageRotatingOriginTitleAng;
-   printf("\t\t%e\t%e\t%e\n\n",this->rotatingOrigin[0]/angst2AU,
-                               this->rotatingOrigin[1]/angst2AU,
-                               this->rotatingOrigin[2]/angst2AU);
+   printf("\t\t%e\t%e\t%e\n\n",rotatingOrigin[0]/angst2AU,
+                               rotatingOrigin[1]/angst2AU,
+                               rotatingOrigin[2]/angst2AU);
 
    cout << this->messageRotatingOriginTitleAU;
-   printf("\t\t%e\t%e\t%e\n\n",this->rotatingOrigin[0],
-                               this->rotatingOrigin[1],
-                               this->rotatingOrigin[2]);
+   printf("\t\t%e\t%e\t%e\n\n",rotatingOrigin[0],
+                               rotatingOrigin[1],
+                               rotatingOrigin[2]);
 
-   if(this->rotatingType == Axis){
+   if(rotatingType == Axis){
       // rotating axis
       cout << this->messageRotatingAxis;
       cout << this->messageRotatingAxisTitleAng;
-      printf("\t\t%e\t%e\t%e\n\n",this->rotatingAxis[0]/angst2AU,
-                                  this->rotatingAxis[1]/angst2AU,
-                                  this->rotatingAxis[2]/angst2AU);
+      printf("\t\t%e\t%e\t%e\n\n",rotatingAxis[0]/angst2AU,
+                                  rotatingAxis[1]/angst2AU,
+                                  rotatingAxis[2]/angst2AU);
 
       cout << this->messageRotatingAxisTitleAU;
-      printf("\t\t%e\t%e\t%e\n\n",this->rotatingAxis[0],
-                                  this->rotatingAxis[1],
-                                  this->rotatingAxis[2]);
+      printf("\t\t%e\t%e\t%e\n\n",rotatingAxis[0],
+                                  rotatingAxis[1],
+                                  rotatingAxis[2]);
 
       // angle
-      printf("%s%e\n\n",this->messageRotatingAngle.c_str(),this->rotatingAngle/degree2Radian);
+      printf("%s%e\n\n",this->messageRotatingAngle.c_str(),rotatingAngle/degree2Radian);
    }
-   else if (this->rotatingType == Eular){
+   else if (rotatingType == Eular){
       // Eular angles
       cout << this->messageRotatingEularAngles;
       cout << this->messageRotatingEularAnglesTitle;
-      printf("\t\t%e\t%e\t%e\t\n\n",this->rotatingEularAngles->GetAlpha()/degree2Radian, 
-                                    this->rotatingEularAngles->GetBeta()/degree2Radian,
-                                    this->rotatingEularAngles->GetGamma()/degree2Radian);
+      printf("\t\t%e\t%e\t%e\t\n\n",rotatingEularAngles.GetAlpha()/degree2Radian, 
+                                    rotatingEularAngles.GetBeta()/degree2Radian,
+                                    rotatingEularAngles.GetGamma()/degree2Radian);
    }
 
 }
