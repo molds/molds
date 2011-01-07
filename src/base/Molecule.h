@@ -339,6 +339,9 @@ void Molecule::SetInertiaTensorOrigin(double x, double y, double z){
 
 }
 
+/****
+ * Call this->SetInertiaTensorOrigin before calling this-function.
+ ***/
 void Molecule::CalcPrincipalAxes(){
 
    cout << this->messageStartPrincipalAxes;
@@ -462,6 +465,11 @@ void Molecule::SetRotatingType(RotatingType rotatingType){
    this->rotatingType = rotatingType;
 }
 
+/****
+ * Call this->SetRotatingOrigin and this->SetRotatingAxis for this->rotatingType=Axis or
+ * this->SetRotatingEularAngles for this->rotatingType=Eular before calling this-function. 
+ * In addition, this->SetRotatingType bay be needed to be called.
+ ***/
 void Molecule::Rotate(){
 
    cout << this->messageStartRotate;
@@ -546,6 +554,9 @@ void Molecule::SetTranslatingDifference(double x, double y, double z){
 
 }
 
+/****
+ * Call this->SetTranslatingDifference before calling this-function. 
+ ***/
 void Molecule::Translate(){
 
    cout << this->messageStartTranslate;
