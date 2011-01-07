@@ -30,6 +30,7 @@ public:
    void SetInertiaTensorOrigin(double x, double y, double z);
    void CalcPrincipalAxes();
    void Rotate();
+   void Rotate(EularAngle eularAngle);
    void SetRotatingOrigin(double x, double y, double z);
    void SetRotatingAxis(double x, double y, double z);
    void SetRotatingAngle(double angle);
@@ -478,6 +479,7 @@ void Molecule::Rotate(){
 
    cout << this->messageStartRotate;
 
+   // Default values are set if some conditions are not specified.
    if(this->rotatingOrigin == NULL){
       if(!this->wasCalculatedCOMXyz){
          this->CalcCOMXyz();
@@ -485,19 +487,28 @@ void Molecule::Rotate(){
       this->SetRotatingOrigin(this->COMXyz[0], this->COMXyz[1], this->COMXyz[2]);
    }
 
-   if(this->rotatingAxis == NULL){
+   if(this->rotatingType == Axis && this->rotatingAxis == NULL){
       this->SetRotatingAxis(0.0, 0.0, 1.0);
    }
 
-   if(this->rotatingEularAngles == NULL){
+   if(this->rotatingType == Eular && this->rotatingEularAngles == NULL){
       this->SetRotatingEularAngles(0.0, 0.0, 0.0);
    }
 
    this->OutputRotatingConditions(); 
 
-   // ToDo: rotate
+   // rotate
+   if(this->rotatingType == Axis){
+   }
+   else if(this->rotatingType == Eular){
+      this->Rotate(*this->rotatingEularAngles);
+   }
 
    cout << this->messageDoneRotate;
+}
+
+void Molecule::Rotate(EularAngle eularAngle){
+   // ToDo: rotate
 }
 
 void Molecule::OutputRotatingConditions(){
