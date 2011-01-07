@@ -18,13 +18,13 @@ public:
    Molecule();
    ~Molecule();
    vector<Atom*>* GetAtomVect(); 
-   double* GetCOMXyz();
-   void CalcCOMXyz();
+   double* GetXyzCOM();
+   void CalcXyzCOM();
    int GetTotalNumberAOs();
    void CalcTotalNumberAOs();
    int GetTotalNumberValenceElectrons();
    void CalcTotalNumberValenceElectrons();
-   void OutputCOMXyz();
+   void OutputXyzCOM();
    void OutputTotalNumberAtomsAOsValenceelectrons();
    void OutputConfiguration();
    void CalcPrincipalAxes();
@@ -38,13 +38,13 @@ public:
    void Translate();
 private:
    vector<Atom*>* atomVect;
-   double* COMXyz;
+   double* xyzCOM;
    double* rotatingOrigin;
    double* rotatingAxis;
    double  rotatingAngle;
    EularAngle* rotatingEularAngles;
    RotatingType rotatingType;
-   bool wasCalculatedCOMXyz;
+   bool wasCalculatedXyzCOM;
    int totalNumberAOs;
    int totalNumberValenceElectrons;
    void CalcInertiaTensor(double** inertiaTensor, double* inertiaTensorOrigin);
@@ -91,13 +91,13 @@ private:
 
 Molecule::Molecule(){
    this->atomVect = new vector<Atom*>;
-   this->COMXyz = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(3);
+   this->xyzCOM = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(3);
    this->rotatingOrigin = NULL;
    this->rotatingAxis = NULL;
    this->rotatingAngle = 0.0;
    this->rotatingType = Axis;
    this->rotatingEularAngles = NULL;
-   this->wasCalculatedCOMXyz = false;
+   this->wasCalculatedXyzCOM = false;
    this->messageTotalNumberAOs = "\tTotal number of valence AOs: ";
    this->messageTotalNumberAtoms = "\tTotal number of atoms: ";
    this->messageTotalNumberValenceElectrons = "\tTotal number of valence electrons: ";
@@ -144,10 +144,10 @@ Molecule::~Molecule(){
       this->atomVect = NULL;
       //cout << "atomVect deleted\n";
    }
-   if(this->COMXyz != NULL){
-      MallocerFreer::GetInstance()->FreeDoubleMatrix1d(this->COMXyz);
-      this->COMXyz = NULL;
-      //cout << "COMXyz deleted\n";
+   if(this->xyzCOM != NULL){
+      MallocerFreer::GetInstance()->FreeDoubleMatrix1d(this->xyzCOM);
+      this->xyzCOM = NULL;
+      //cout << "xyzCOM deleted\n";
    }
    if(this->rotatingOrigin != NULL){
       MallocerFreer::GetInstance()->FreeDoubleMatrix1d(this->rotatingOrigin);
@@ -170,22 +170,22 @@ vector<Atom*>* Molecule::GetAtomVect(){
    return this->atomVect;
 }
 
-double* Molecule::GetCOMXyz(){
-   if(!this->wasCalculatedCOMXyz){
-      this->CalcCOMXyz();
+double* Molecule::GetXyzCOM(){
+   if(!this->wasCalculatedXyzCOM){
+      this->CalcXyzCOM();
    }
-   return this->COMXyz;
+   return this->xyzCOM;
 }
 
-void Molecule::CalcCOMXyz(){
-   if(!this->wasCalculatedCOMXyz){
+void Molecule::CalcXyzCOM(){
+   if(!this->wasCalculatedXyzCOM){
       double totalAtomicMass;
       Atom* atom;
       double* atomicXyz;
       double atomicMass;
 
       for(int j=0; j<3; j++){
-         this->COMXyz[j] = 0.0;
+         this->xyzCOM[j] = 0.0;
       }
       
       for(int i=0; i<this->atomVect->size(); i++){
@@ -194,14 +194,14 @@ void Molecule::CalcCOMXyz(){
          atomicMass = atom->GetAtomicMass();
          totalAtomicMass += atomicMass;
          for(int j=0; j<3; j++){
-            this->COMXyz[j] += atomicXyz[j] * atomicMass;
+            this->xyzCOM[j] += atomicXyz[j] * atomicMass;
          }
       }
       for(int i=0; i<3; i++){
-         this->COMXyz[i]/=totalAtomicMass;
+         this->xyzCOM[i]/=totalAtomicMass;
       }
    }
-   this->wasCalculatedCOMXyz = true;
+   this->wasCalculatedXyzCOM = true;
 }
 
 int Molecule::GetTotalNumberAOs(){
@@ -248,19 +248,19 @@ void Molecule::OutputConfiguration(){
 
 }
 
-void Molecule::OutputCOMXyz(){
+void Molecule::OutputXyzCOM(){
    double ang2AU = Parameters::GetInstance()->GetAngstrom2AU();
    cout << this->messageCOM;
    cout << this->messageCOMTitleAng;
-   printf("\t\t%e\t%e\t%e\n",this->COMXyz[0]/ang2AU,
-                             this->COMXyz[1]/ang2AU,
-                             this->COMXyz[2]/ang2AU);
+   printf("\t\t%e\t%e\t%e\n",this->xyzCOM[0]/ang2AU,
+                             this->xyzCOM[1]/ang2AU,
+                             this->xyzCOM[2]/ang2AU);
    cout << "\n";
 
    cout << this->messageCOMTitleAU;
-   printf("\t\t%e\t%e\t%e\n",this->COMXyz[0],
-                             this->COMXyz[1],
-                             this->COMXyz[2]);
+   printf("\t\t%e\t%e\t%e\n",this->xyzCOM[0],
+                             this->xyzCOM[1],
+                             this->xyzCOM[2]);
    cout << "\n";
 
 }
@@ -318,7 +318,7 @@ void Molecule::CalcPrincipalAxes(){
 
    cout << this->messageStartPrincipalAxes;
 
-   double inertiaTensorOrigin[3] = {this->COMXyz[0], this->COMXyz[1], this->COMXyz[2]};
+   double inertiaTensorOrigin[3] = {this->xyzCOM[0], this->xyzCOM[1], this->xyzCOM[2]};
    if(Parameters::GetInstance()->GetInertiaTensorOrigin() != NULL){
       inertiaTensorOrigin[0] = Parameters::GetInstance()->GetInertiaTensorOrigin()[0];
       inertiaTensorOrigin[1] = Parameters::GetInstance()->GetInertiaTensorOrigin()[1];
@@ -452,10 +452,10 @@ void Molecule::Rotate(){
 
    // Default values are set if some conditions are not specified.
    if(this->rotatingOrigin == NULL){
-      if(!this->wasCalculatedCOMXyz){
-         this->CalcCOMXyz();
+      if(!this->wasCalculatedXyzCOM){
+         this->CalcXyzCOM();
       }
-      this->SetRotatingOrigin(this->COMXyz[0], this->COMXyz[1], this->COMXyz[2]);
+      this->SetRotatingOrigin(this->xyzCOM[0], this->xyzCOM[1], this->xyzCOM[2]);
    }
 
    if(this->rotatingType == Axis && this->rotatingAxis == NULL){
@@ -548,11 +548,11 @@ void Molecule::Translate(){
          atom->GetXyz()[2] += z;
    }
    
-   this->wasCalculatedCOMXyz = false;
-   this->CalcCOMXyz();
+   this->wasCalculatedXyzCOM = false;
+   this->CalcXyzCOM();
 
    this->OutputConfiguration();
-   this->OutputCOMXyz();
+   this->OutputXyzCOM();
 
    cout << this->messageDoneTranslate;
 }
