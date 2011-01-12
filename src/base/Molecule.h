@@ -24,9 +24,11 @@ public:
    void CalcTotalNumberAOs();
    int GetTotalNumberValenceElectrons();
    void CalcTotalNumberValenceElectrons();
+   void CalcTotalCoreRepulsionEnergy();
    void OutputXyzCOM();
    void OutputTotalNumberAtomsAOsValenceelectrons();
    void OutputConfiguration();
+   void OutputTotalCoreRepulsionEnergy();
    void CalcPrincipalAxes();
    void Rotate();
    void Translate();
@@ -38,6 +40,8 @@ private:
    bool wasCalculatedXyzCOM;
    int totalNumberAOs;
    int totalNumberValenceElectrons;
+   double totalCoreRepulsionEnergy;
+   bool wasCalculatedTotalCoreRepulsionEnergy;
    void CalcInertiaTensor(double** inertiaTensor, double* inertiaTensorOrigin);
    void FreeInertiaTensorMoments(double** inertiaTensor, double* inertiaMoments);
    void Rotate(EularAngle eularAngle, double* rotatingOrigin, RotatedObjectType rotatedObj);
@@ -53,6 +57,8 @@ private:
    string messageConfiguration;
    string messageConfigurationTitleAU;
    string messageConfigurationTitleAng;
+   string messageCoreRepulsion;
+   string messageCoreRepulsionTitle;
    string messageCOM;
    string messageCOMTitleAU;
    string messageCOMTitleAng;
@@ -87,12 +93,15 @@ Molecule::Molecule(){
    this->atomVect = new vector<Atom*>;
    this->xyzCOM = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(3);
    this->wasCalculatedXyzCOM = false;
+   this->wasCalculatedTotalCoreRepulsionEnergy = false;
    this->messageTotalNumberAOs = "\tTotal number of valence AOs: ";
    this->messageTotalNumberAtoms = "\tTotal number of atoms: ";
    this->messageTotalNumberValenceElectrons = "\tTotal number of valence electrons: ";
    this->messageConfiguration = "\tMolecular configration:\n";
    this->messageConfigurationTitleAU = "\t\t| i-th | atom type | x [a.u.] | y[a.u.] | z[a.u.] |\n";
    this->messageConfigurationTitleAng = "\t\t| i-th | atom type | x [angst.] | y[angst.] | z[angst.] |\n";
+   this->messageCoreRepulsion = "\tTotal core repulsion energy:\n";
+   this->messageCoreRepulsionTitle = "\t\t| [a.u.] | [eV] |\n";
    this->messageCOM = "\tCenter of Mass:\n";
    this->messageCOMTitleAU = "\t\t| x [a.u.] | y[a.u.] | z[a.u.] |\n";
    this->messageCOMTitleAng = "\t\t| x [angst.] | y[angst.] | z[angst.] |\n";
@@ -194,6 +203,35 @@ int Molecule::GetTotalNumberValenceElectrons(){
    return this->totalNumberValenceElectrons;
 }
 
+void Molecule::CalcTotalCoreRepulsionEnergy(){
+   double energy = 0.0;
+   double distance = 0.0;
+   Atom* atomA = NULL;
+   Atom* atomB = NULL;
+   for(int i=0; i<this->atomVect->size(); i++){
+      atomA = (*this->atomVect)[i];
+      for(int j=i+1; j<this->atomVect->size(); j++){
+         atomB = (*this->atomVect)[j];
+         distance = this->GetDistanceAtoms(i, j);
+         energy += atomA->GetCoreCharge()*atomB->GetCoreCharge()/distance; 
+      }
+   }
+   this->totalCoreRepulsionEnergy = energy;
+   this->wasCalculatedTotalCoreRepulsionEnergy = true;
+}
+
+void Molecule::OutputTotalCoreRepulsionEnergy(){
+   if(!this->wasCalculatedTotalCoreRepulsionEnergy){
+      this->CalcTotalCoreRepulsionEnergy();
+   }
+
+   double eV2AU = Parameters::GetInstance()->GetEV2AU();
+   cout << this->messageCoreRepulsion;
+   cout << this->messageCoreRepulsionTitle;
+   printf("\t\t%e\t%e\n\n",this->totalCoreRepulsionEnergy, this->totalCoreRepulsionEnergy/eV2AU);
+
+}
+   
 void Molecule::CalcTotalNumberValenceElectrons(){
    this->totalNumberValenceElectrons = 0; 
    for(int i=0; i<this->atomVect->size(); i++){

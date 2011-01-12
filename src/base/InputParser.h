@@ -375,6 +375,7 @@ void InputParser::CalcMolecularBasics(Molecule* molecule){
    molecule->CalcTotalNumberAOs();
    molecule->CalcTotalNumberValenceElectrons();
    molecule->CalcXyzCOM();
+   molecule->CalcTotalCoreRepulsionEnergy();
 
 }
 
@@ -383,6 +384,7 @@ void InputParser::OutputMolecularBasics(Molecule* molecule){
    molecule->OutputTotalNumberAtomsAOsValenceelectrons();
    molecule->OutputConfiguration();
    molecule->OutputXyzCOM();
+   molecule->OutputTotalCoreRepulsionEnergy();
 }
 
 void InputParser::OutputScfConditions(){
