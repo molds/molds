@@ -178,13 +178,13 @@ void Cndo2::SetMessages(){
    this->messageStartSCF = "**********  START: CNDO/2-SCF  **********\n";
    this->messageDoneSCF = "**********  DONE: CNDO/2-SCF  **********\n\n\n";
    this->messageEnergiesMOs = "\tEnergies of MOs:\n";
-   this->messageEnergiesMOsTitle = "\t| i-th | occ/unocc | e[a.u.] | e[eV] | \n";
+   this->messageEnergiesMOsTitle = "\t\t| i-th | occ/unocc | e[a.u.] | e[eV] | \n";
    this->messageOcc = "occ";
    this->messageUnOcc = "unocc";
    this->messageMullikenAtoms = "\tMulliken charge on each Atom:\n";
-   this->messageMullikenAtomsTitle = "\t| i-th | atom type | core charge | Mulliken charge | \n";
+   this->messageMullikenAtomsTitle = "\t\t| i-th | atom type | core charge | Mulliken charge | \n";
    this->messageTotalEnergy = "\tTotal energy:\n";
-   this->messageTotalEnergyTitle = "\t| [a.u.] | [eV] | \n";
+   this->messageTotalEnergyTitle = "\t\t| [a.u.] | [eV] | \n";
 
 }
 
@@ -366,11 +366,11 @@ void Cndo2::OutputResults(double** fockMatrix, double* energiesMO, double* atomi
    double eV2AU = Parameters::GetInstance()->GetEV2AU();
    for(int mo=0; mo<molecule->GetTotalNumberAOs(); mo++){
       if(mo < molecule->GetTotalNumberValenceElectrons()/2){
-         printf("\t %d\t%s\t%e\t%e \n",
+         printf("\t\t %d\t%s\t%e\t%e \n",
          mo, this->messageOcc.c_str(), energiesMO[mo], energiesMO[mo]/eV2AU);
       }
       else{
-         printf("\t %d\t%s\t%e\t%e \n",
+         printf("\t\t %d\t%s\t%e\t%e \n",
          mo, this->messageUnOcc.c_str(), energiesMO[mo], energiesMO[mo]/eV2AU);
       }
    }
@@ -380,7 +380,7 @@ void Cndo2::OutputResults(double** fockMatrix, double* energiesMO, double* atomi
    cout << this->messageTotalEnergy;
    cout << this->messageTotalEnergyTitle;
    double totalEnergy = this->GetTotalEnergy(molecule, energiesMO, fockMatrix, this->gammaAB);
-   printf("\t%e\t%e\n\n",totalEnergy, totalEnergy / Parameters::GetInstance()->GetEV2AU());
+   printf("\t\t%e\t%e\n\n",totalEnergy, totalEnergy / Parameters::GetInstance()->GetEV2AU());
 
    // ToDo: output eigen-vectors
   
@@ -389,7 +389,7 @@ void Cndo2::OutputResults(double** fockMatrix, double* energiesMO, double* atomi
    cout << messageMullikenAtomsTitle;
    for(int a=0; a<molecule->GetAtomVect()->size(); a++){
       Atom* atom = (*molecule->GetAtomVect())[a];
-      printf("\t%d\t%s\t%e\t%e\n",a,AtomTypeStr(atom->GetAtomType()),atom->GetCoreCharge(),atom->GetCoreCharge()-atomicElectronPopulation[a]);
+      printf("\t\t%d\t%s\t%e\t%e\n",a,AtomTypeStr(atom->GetAtomType()),atom->GetCoreCharge(),atom->GetCoreCharge()-atomicElectronPopulation[a]);
    }
    cout << endl << endl;
 
