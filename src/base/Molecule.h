@@ -25,6 +25,7 @@ public:
    int GetTotalNumberValenceElectrons();
    void CalcTotalNumberValenceElectrons();
    void CalcTotalCoreRepulsionEnergy();
+   double GetTotalCoreRepulsionEnergy();
    void OutputXyzCOM();
    void OutputTotalNumberAtomsAOsValenceelectrons();
    void OutputConfiguration();
@@ -218,6 +219,13 @@ void Molecule::CalcTotalCoreRepulsionEnergy(){
    }
    this->totalCoreRepulsionEnergy = energy;
    this->wasCalculatedTotalCoreRepulsionEnergy = true;
+}
+
+double Molecule::GetTotalCoreRepulsionEnergy(){
+   if(!this->wasCalculatedTotalCoreRepulsionEnergy){
+      this->CalcTotalCoreRepulsionEnergy();
+   }
+   return this->totalCoreRepulsionEnergy;
 }
 
 void Molecule::OutputTotalCoreRepulsionEnergy(){

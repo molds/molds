@@ -55,6 +55,8 @@ protected:
                                 int mu, int nu, Molecule* molecule, double** gammaAB, double** overlap,
                                 double** orbitalElectronPopulation, bool isGuess);
    virtual void CalcDiatomicOverlapInDiatomicFrame(double** diatomicOverlap, Atom* atomA, Atom* atomB);
+   virtual double GetMolecularIntegralElement(int moI, int moJ, int moK, int moL, 
+                                              Molecule* molecule, double** fockMatrix, double** gammaAB);
    TheoryType theory;
    Molecule* molecule;
 private:
@@ -62,6 +64,8 @@ private:
    string messageEnergiesMOsTitle;
    string messageMullikenAtoms;
    string messageMullikenAtomsTitle;
+   string messageTotalEnergy;
+   string messageTotalEnergyTitle;
    string messageOcc;
    string messageUnOcc;
    double** gammaAB;
@@ -101,6 +105,7 @@ private:
    void CheckEnableAtomType(Molecule* molecule);
    void CheckNumberValenceElectrons(Molecule* molecule);
    void FreeDiatomicOverlapAndRotatingMatrix(double** diatomicOverlap, double** rotatingMatrix);
+   double GetTotalEnergy(Molecule* molecule, double* energiesMO, double** fockMatrix, double** gammaAB);
 
 };
 
@@ -178,6 +183,8 @@ void Cndo2::SetMessages(){
    this->messageUnOcc = "unocc";
    this->messageMullikenAtoms = "\tMulliken charge on each Atom:\n";
    this->messageMullikenAtomsTitle = "\t| i-th | atom type | core charge | Mulliken charge | \n";
+   this->messageTotalEnergy = "\tTotal energy:\n";
+   this->messageTotalEnergyTitle = "\t| [a.u.] | [eV] | \n";
 
 }
 
@@ -369,6 +376,12 @@ void Cndo2::OutputResults(double** fockMatrix, double* energiesMO, double* atomi
    }
    cout << endl << endl;
 
+   // output total energy
+   cout << this->messageTotalEnergy;
+   cout << this->messageTotalEnergyTitle;
+   double totalEnergy = this->GetTotalEnergy(molecule, energiesMO, fockMatrix, this->gammaAB);
+   printf("\t%e\t%e\n\n",totalEnergy, totalEnergy / Parameters::GetInstance()->GetEV2AU());
+
    // ToDo: output eigen-vectors
   
    // output Mulliken charge
@@ -381,6 +394,55 @@ void Cndo2::OutputResults(double** fockMatrix, double* energiesMO, double* atomi
    cout << endl << endl;
 
 
+}
+
+double Cndo2::GetTotalEnergy(Molecule* molecule, double* energiesMO, double** fockMatrix, double** gammaAB){
+   double totalEnergy = molecule->GetTotalCoreRepulsionEnergy();
+   for(int mo=0; mo<molecule->GetTotalNumberValenceElectrons()/2; mo++){
+      totalEnergy += 2.0*energiesMO[mo];
+   }
+
+   for(int moA=0; moA<molecule->GetTotalNumberValenceElectrons()/2; moA++){
+      for(int moB=0; moB<molecule->GetTotalNumberValenceElectrons()/2; moB++){
+
+         totalEnergy -= 2.0*this->GetMolecularIntegralElement(moA, moA, moB, moB, 
+                                                              molecule, fockMatrix, gammaAB);
+         totalEnergy += 1.0*this->GetMolecularIntegralElement(moA, moB, moB, moA, 
+                                                              molecule, fockMatrix, gammaAB);
+      }
+   }
+
+   return totalEnergy;
+}
+
+double Cndo2::GetMolecularIntegralElement(int moI, int moJ, int moK, int moL, 
+                                          Molecule* molecule, double** fockMatrix, double** gammaAB){
+   double value = 0.0;
+   for(int A=0; A<molecule->GetAtomVect()->size(); A++){
+      Atom* atomA = (*molecule->GetAtomVect())[A];
+      int firstAOIndexA = atomA->GetFirstAOIndex();
+      int numberAOsA = atomA->GetValence().size();
+
+      for(int B=0; B<molecule->GetAtomVect()->size(); B++){
+         Atom* atomB = (*molecule->GetAtomVect())[B];
+         int firstAOIndexB = atomB->GetFirstAOIndex();
+         int numberAOsB = atomB->GetValence().size();
+         double gamma = gammaAB[A][B];
+
+         for(int mu=firstAOIndexA; mu<firstAOIndexA+numberAOsA; mu++){
+            for(int nu=firstAOIndexB; nu<firstAOIndexB+numberAOsB; nu++){
+
+               value += gamma*fockMatrix[moI][mu]
+                             *fockMatrix[moJ][mu]
+                             *fockMatrix[moK][nu]
+                             *fockMatrix[moL][nu];
+            }
+         }
+
+      }
+   }
+
+   return value;
 }
 
 void Cndo2::UpdateOldOrbitalElectronPopulation(double** oldOrbitalElectronPopulation, 
