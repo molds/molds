@@ -97,7 +97,7 @@ private:
    double GetAuxiliaryA(int k, double rho);
    double GetAuxiliaryB(int k, double rho);
    double GetAuxiliaryD(int la, int lb, int m);
-   void OutputMOs(double** fockMatrix, double* energiesMO, double* atomicElectronPopulation, Molecule* molecule);
+   void OutputResults(double** fockMatrix, double* energiesMO, double* atomicElectronPopulation, Molecule* molecule);
    void CheckEnableAtomType(Molecule* molecule);
    void CheckNumberValenceElectrons(Molecule* molecule);
    void FreeDiatomicOverlapAndRotatingMatrix(double** diatomicOverlap, double** rotatingMatrix);
@@ -321,7 +321,7 @@ void Cndo2::DoesSCF(){
                                            this->molecule->GetTotalNumberAOs(), i)){
 
          cout << this->messageSCFMetConvergence;
-         this->OutputMOs(this->fockMatrix, 
+         this->OutputResults(this->fockMatrix, 
                          this->energiesMO, 
                          this->atomicElectronPopulation, 
                          this->molecule);
@@ -351,7 +351,7 @@ void Cndo2::DoesSCF(){
 
 }
 
-void Cndo2::OutputMOs(double** fockMatrix, double* energiesMO, double* atomicElectronPopulation, Molecule* molecule){
+void Cndo2::OutputResults(double** fockMatrix, double* energiesMO, double* atomicElectronPopulation, Molecule* molecule){
 
    // output MO energy
    cout << this->messageEnergiesMOs;
