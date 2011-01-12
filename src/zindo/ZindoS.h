@@ -185,6 +185,8 @@ double ZindoS::GetCoulombInt(OrbitalType orbital1, OrbitalType orbital2, Atom* a
       value = atom->GetZindoF0ssLower()
              -atom->GetZindoF2ppLower()*2.0;
    }   
+   // ToDo: There are bugs for d-orbitals.
+   /*
    else if( orbital1 == s && ( orbital2 == dxy || 
                                orbital2 == dyz || 
                                orbital2 == dzz || 
@@ -287,6 +289,7 @@ double ZindoS::GetCoulombInt(OrbitalType orbital1, OrbitalType orbital2, Atom* a
              -atom->GetZindoF2ddLower()*2.0
              -atom->GetZindoF4ddLower()*4.0;
    }
+   */
    else{
       stringstream ss;
       ss << this->errorMessageCoulombInt;
@@ -315,6 +318,13 @@ double ZindoS::GetExchangeInt(OrbitalType orbital1, OrbitalType orbital2, Atom* 
    else if( orbital2 == s && (orbital1 == px || orbital1 == py || orbital1 == pz ) ){
       value = atom->GetZindoG1spLower();
    }   
+   else if( (orbital1 != orbital2) 
+         && ( orbital1 == px || orbital1 == py || orbital1 == pz )
+         && ( orbital2 == px || orbital2 == py || orbital2 == pz ) ){
+      value = atom->GetZindoF2ppLower()*3.0;
+   }
+   // ToDo: There are bugs for d-orbitals.
+   /*
    else if( (orbital1 == s) && (orbital2 == dxy || 
                                 orbital2 == dyz || 
                                 orbital2 == dzz || 
@@ -329,11 +339,6 @@ double ZindoS::GetExchangeInt(OrbitalType orbital1, OrbitalType orbital2, Atom* 
                                 orbital1 == dxxyy ) ){
       value = atom->GetZindoG2sdLower();
    }   
-   else if( (orbital1 != orbital2) 
-         && ( orbital1 == px || orbital1 == py || orbital1 == pz )
-         && ( orbital2 == px || orbital2 == py || orbital2 == pz ) ){
-      value = atom->GetZindoF2ppLower()*3.0;
-   }
    else if( (orbital1 == px && orbital2 == dzz) ||
             (orbital2 == px && orbital1 == dzz) ||
             (orbital1 == py && orbital2 == dzz) ||
@@ -406,6 +411,7 @@ double ZindoS::GetExchangeInt(OrbitalType orbital1, OrbitalType orbital2, Atom* 
       value = atom->GetZindoF2ddLower()*3.0
              +atom->GetZindoF4ddLower()*20.0;
    }
+   */
    else{
       stringstream ss;
       ss << this->errorMessageExchangeInt;
@@ -414,7 +420,6 @@ double ZindoS::GetExchangeInt(OrbitalType orbital1, OrbitalType orbital2, Atom* 
       ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbital2) << "\n";
       throw MolDSException(ss.str());
    }   
-   
 
    return value;
 }

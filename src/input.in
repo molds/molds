@@ -1,49 +1,60 @@
+THEORY
+   //cndo/2
+   //indo
+   zindo/s
+   //none 
+   //principal_axes
+   //translate
+   //rotate
+THEORY_END
+
 SCF
    max_iter 200
    rms_density 0.00000001
 SCF_END
 
-THEORY
-   //cndo/2
-   //indo
-   //zindo/s
-   //none 
-   //principal_axes
-   //translate
-   rotate
-THEORY_END
+//INERTIA
+//   origin 1.0 2.0 30.0
+//INERTIA_END
 
-INERTIA
-   origin 1.0 2.0 30.0
-INERTIA_END
-
-ROTATE
-   type axis
+//ROTATE
+   //type axis
    //type eular_angle
    //origin 1.0 2.0 3.0
-   origin 0.0 0.0 0.0
-   axis 10.0 0.0 0.0
-   angle 30
+   //origin 0.0 0.0 0.0
+   //axis 10.0 0.0 0.0
+   //angle 30
    //angles 15 25 35
-ROTATE_END
+//ROTATE_END
 
 TRANSLATE
    //difference 100.0 200.0 300.0
 TRANSLATE_END
 
-// s
+// S2
 GEOMETRY
-     S       0.0  0.0  1.0  
+   S  0.424528    0.741240    0.000000
+   S  -1.353072    0.741240    0.000000
 GEOMETRY_END
 
+// s
+//GEOMETRY
+//     S       0.0  0.0  1.0  
+//GEOMETRY_END
+
+// H2
+//GEOMETRY
+//   H  0.242857     0.417790      0.000000
+//   H  -0.357143     0.417790      0.000000
+//GEOMETRY_END
 
 //metane
 //GEOMETRY
-//   C  -0.37687006  0.95490165  0.00000000
-//   H  -0.02021563  -0.05390835  0.00000000
-//   H  -0.02019722  1.45929984  0.87365150
-//   H  -0.02019722  1.45929984  -0.87365150
-//   H  -1.44687006  0.95491483  0.00000000
+//   C  0.647389    0.820131    0.000000
+//   H  1.004043   -0.188679    0.000000
+//   H  1.004062    1.324529    0.873652
+//   H  1.004062    1.324529   -0.873652
+//   H  -0.422611    0.820144    0.000000
 //GEOMETRY_END
 
 
@@ -134,11 +145,7 @@ GEOMETRY_END
 //   Li  1.994960      0.485175      0.000000
 //GEOMETRY_END
 
-// H2
-//GEOMETRY
-//   H  0.242857     0.417790      0.000000
-//   H  -0.357143     0.417790      0.000000
-//GEOMETRY_END
+
 
 // Li2
 //GEOMETRY
