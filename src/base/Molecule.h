@@ -30,6 +30,8 @@ public:
    void CalcPrincipalAxes();
    void Rotate();
    void Translate();
+   double GetDistanceAtoms(int atomAIndex, int atomBIndex);
+   double GetDistanceAtoms(Atom* atomA, Atom* atomB);
 private:
    vector<Atom*>* atomVect;
    double* xyzCOM;
@@ -569,6 +571,25 @@ void Molecule::OutputTranslatingConditions(double* translatingDifference){
                                translatingDifference[2]);
 
 }
+
+double Molecule::GetDistanceAtoms(int atomAIndex, int atomBIndex){
+   Atom* atomA = (*this->atomVect)[atomAIndex];
+   Atom* atomB = (*this->atomVect)[atomBIndex];
+   return this->GetDistanceAtoms(atomA, atomB);
+}
+
+double Molecule::GetDistanceAtoms(Atom* atomA, Atom* atomB){
+
+   double distance=0.0;
+   distance = sqrt( pow(atomA->GetXyz()[0] - atomB->GetXyz()[0], 2.0)
+                   +pow(atomA->GetXyz()[1] - atomB->GetXyz()[1], 2.0)
+                   +pow(atomA->GetXyz()[2] - atomB->GetXyz()[2], 2.0) );
+   return distance;
+
+}
+
+
+
 
 
 }

@@ -56,6 +56,7 @@ protected:
                                 double** orbitalElectronPopulation, bool isGuess);
    virtual void CalcDiatomicOverlapInDiatomicFrame(double** diatomicOverlap, Atom* atomA, Atom* atomB);
    TheoryType theory;
+   Molecule* molecule;
 private:
    string messageEnergiesMOs;
    string messageEnergiesMOsTitle;
@@ -69,7 +70,6 @@ private:
    double*   atomicElectronPopulation; //P_{AB} of (3.21) in J. A. Pople book.
    double** fockMatrix;
    double* energiesMO;
-   Molecule* molecule;
 
    // use Y[na][nb][la][lb][m][i][j] 
    // as Y_{ij\lammda} in (B.20) in Pople book for give na, nb, la, lb, m, i, and j.
