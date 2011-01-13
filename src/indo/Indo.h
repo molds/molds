@@ -150,6 +150,7 @@ double Indo::GetFockOffDiagElement(Atom* atomA, Atom* atomB, int atomAIndex, int
    return value;
 }
 
+// The order of mol, moJ, moK, moL is consistent with Eq. (9) in [RZ_1973]
 double Indo::GetMolecularIntegralElement(int moI, int moJ, int moK, int moL, 
                                           Molecule* molecule, double** fockMatrix, double** gammaAB){
    double value = 0.0;

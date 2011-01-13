@@ -504,6 +504,7 @@ void ZindoS::CalcDiatomicOverlapInDiatomicFrame(double** diatomicOverlap, Atom* 
 
 }
 
+// The order of mol, moJ, moK, moL is consistent with Eq. (9) in [RZ_1973]
 double ZindoS::GetMolecularIntegralElement(int moI, int moJ, int moK, int moL, 
                                           Molecule* molecule, double** fockMatrix, double** gammaAB){
    double value = 0.0;
