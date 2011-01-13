@@ -421,24 +421,29 @@ double Cndo2::GetTotalEnergy(Molecule* molecule, double* energiesMO, double** fo
 double Cndo2::GetMolecularIntegralElement(int moI, int moJ, int moK, int moL, 
                                           Molecule* molecule, double** fockMatrix, double** gammaAB){
    double value = 0.0;
+   Atom* atomA;
+   Atom* atomB;
+   int firstAOIndexA;
+   int firstAOIndexB;
+   int numberAOsA;
+   int numberAOsB;
+   double gamma;
+
    for(int A=0; A<molecule->GetAtomVect()->size(); A++){
-      Atom* atomA = (*molecule->GetAtomVect())[A];
-      int firstAOIndexA = atomA->GetFirstAOIndex();
-      int numberAOsA = atomA->GetValence().size();
+      atomA = (*molecule->GetAtomVect())[A];
+      firstAOIndexA = atomA->GetFirstAOIndex();
+      numberAOsA = atomA->GetValence().size();
 
       for(int B=0; B<molecule->GetAtomVect()->size(); B++){
-         Atom* atomB = (*molecule->GetAtomVect())[B];
-         int firstAOIndexB = atomB->GetFirstAOIndex();
-         int numberAOsB = atomB->GetValence().size();
-         double gamma = gammaAB[A][B];
+         atomB = (*molecule->GetAtomVect())[B];
+         firstAOIndexB = atomB->GetFirstAOIndex();
+         numberAOsB = atomB->GetValence().size();
+         gamma = gammaAB[A][B];
 
          for(int mu=firstAOIndexA; mu<firstAOIndexA+numberAOsA; mu++){
             for(int nu=firstAOIndexB; nu<firstAOIndexB+numberAOsB; nu++){
 
-               value += gamma*fockMatrix[moI][mu]
-                             *fockMatrix[moJ][mu]
-                             *fockMatrix[moK][nu]
-                             *fockMatrix[moL][nu];
+               value += gamma*fockMatrix[moI][mu]*fockMatrix[moJ][mu]*fockMatrix[moK][nu]*fockMatrix[moL][nu];
             }
          }
 
