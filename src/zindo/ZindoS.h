@@ -33,6 +33,8 @@ protected:
                                         int mu, int nu, Molecule* molecule, double** gammaAB, double** overelap,
                                         double** orbitalElectronPopulation, bool isGuess);
    virtual void CalcDiatomicOverlapInDiatomicFrame(double** diatomicOverlap, Atom* atomA, Atom* atomB);
+   virtual double GetMolecularIntegralElement(int moI, int moJ, int moK, int moL, 
+                                              Molecule* molecule, double** fockMatrix, double** gammaAB);
 private:
    double GetCoulombInt(OrbitalType orbital1, 
                         OrbitalType orbital2, 
@@ -68,6 +70,8 @@ void ZindoS::SetMessages(){
    this->errorMessageCoulombInt = "Error in base_zindo::ZindoS::GetCoulombInt: Invalid orbitalType.\n";
    this->errorMessageExchangeInt = "Error in base_zindo::ZindoS::GetExchangeInt: Invalid orbitalType.\n";
    this->errorMessageNishimotoMataga = "Error in base_zindo::ZindoS::GetNishimotoMatagaTwoEleInt: Invalid orbitalType.\n";
+   this->errorMessageMolecularIntegralElement
+      = "Error in zindo::ZindoS::GetMolecularIntegralElement: Non available orbital is contained.\n";
    this->messageSCFMetConvergence = "\n\n\n\t\tZINDO/S-SCF met convergence criterion(^^b\n\n\n";
    this->messageStartSCF = "**********  START: ZINDO/S-SCF  **********\n";
    this->messageDoneSCF = "**********  DONE: ZINDO/S-SCF  **********\n\n\n";
@@ -435,6 +439,7 @@ double ZindoS::GetNishimotoMatagaTwoEleInt(Atom* atomA, OrbitalType orbitalA,
       orbitalA == pz ){
       gammaAA = atomA->GetZindoF0ss();
    }
+   /*
    else if(orbitalA == dxy ||
            orbitalA == dyz ||
            orbitalA == dzz ||
@@ -442,6 +447,7 @@ double ZindoS::GetNishimotoMatagaTwoEleInt(Atom* atomA, OrbitalType orbitalA,
            orbitalA == dxxyy ){
       gammaAA = atomA->GetZindoF0dd();
    }
+   */
    else{
       stringstream ss;
       ss << this->errorMessageNishimotoMataga;
@@ -457,6 +463,7 @@ double ZindoS::GetNishimotoMatagaTwoEleInt(Atom* atomA, OrbitalType orbitalA,
       orbitalB == pz ){
       gammaBB = atomB->GetZindoF0ss();
    }
+   /*
    else if(orbitalB == dxy ||
            orbitalB == dyz ||
            orbitalB == dzz ||
@@ -464,6 +471,7 @@ double ZindoS::GetNishimotoMatagaTwoEleInt(Atom* atomA, OrbitalType orbitalA,
            orbitalB == dxxyy ){
       gammaBB = atomB->GetZindoF0dd();
    }
+   */
    else{
       stringstream ss;
       ss << this->errorMessageNishimotoMataga;
@@ -475,7 +483,6 @@ double ZindoS::GetNishimotoMatagaTwoEleInt(Atom* atomA, OrbitalType orbitalA,
    return 1.2/( r+2.4/(gammaAA+gammaBB) );
 
 }
-
 
 void ZindoS::CalcDiatomicOverlapInDiatomicFrame(double** diatomicOverlap, Atom* atomA, Atom* atomB){
 
@@ -495,6 +502,84 @@ void ZindoS::CalcDiatomicOverlapInDiatomicFrame(double** diatomicOverlap, Atom* 
    */
 
 
+}
+
+double ZindoS::GetMolecularIntegralElement(int moI, int moJ, int moK, int moL, 
+                                          Molecule* molecule, double** fockMatrix, double** gammaAB){
+   double value = 0.0;
+   Atom* atomA = NULL;
+   Atom* atomB = NULL;
+   int firstAOIndexA;
+   int firstAOIndexB;
+   int numberAOsA;
+   int numberAOsB;
+   double gamma;
+   double exchange;
+   double coulomb;
+   OrbitalType orbitalMu;
+   OrbitalType orbitalNu;
+
+   for(int A=0; A<molecule->GetAtomVect()->size(); A++){
+      atomA = (*molecule->GetAtomVect())[A];
+      firstAOIndexA = atomA->GetFirstAOIndex();
+      numberAOsA = atomA->GetValence().size();
+
+      for(int mu=firstAOIndexA; mu<firstAOIndexA+numberAOsA; mu++){
+         orbitalMu = atomA->GetValence()[mu-firstAOIndexA];
+
+         // CNDO term
+         for(int B=0; B<molecule->GetAtomVect()->size(); B++){
+            atomB = (*molecule->GetAtomVect())[B];
+            firstAOIndexB = atomB->GetFirstAOIndex();
+            numberAOsB = atomB->GetValence().size();
+
+            for(int nu=firstAOIndexB; nu<firstAOIndexB+numberAOsB; nu++){
+               orbitalNu = atomB->GetValence()[nu-firstAOIndexB];
+
+               if(A==B){
+                  gamma = atomA->GetZindoF0ss();
+               }
+               else{
+                  gamma = this->GetNishimotoMatagaTwoEleInt(atomA, orbitalMu, atomB, orbitalNu);
+               }  
+
+               value += gamma*fockMatrix[moI][mu]*fockMatrix[moJ][mu]*fockMatrix[moK][nu]*fockMatrix[moL][nu];
+            }
+         }
+
+         // Aditional term for INDO or ZIND/S, see Eq. (10) in [RZ_1973]
+         for(int nu=firstAOIndexA; nu<firstAOIndexA+numberAOsA; nu++){
+            orbitalNu = atomA->GetValence()[nu-firstAOIndexA];
+
+            if(mu!=nu){
+               exchange = this->GetExchangeInt(orbitalMu, orbitalNu, atomA);
+
+               value += exchange*fockMatrix[moI][mu]*fockMatrix[moJ][nu]*fockMatrix[moK][nu]*fockMatrix[moL][mu];
+            }
+
+            coulomb = this->GetCoulombInt(orbitalMu, orbitalNu, atomA);
+
+            if( (orbitalMu == s || orbitalMu == px || orbitalMu == py || pz) &&
+                (orbitalNu == s || orbitalNu == px || orbitalNu == py || pz) ){
+                  gamma = atomA->GetZindoF0ss();
+            }
+            else{
+               stringstream ss;
+               ss << this->errorMessageMolecularIntegralElement;
+               ss << this->errorMessageAtomType << AtomTypeStr(atomA->GetAtomType()) << "\n";
+               ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbitalMu) << "\n";
+               ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbitalNu) << "\n";
+               throw MolDSException(ss.str());
+            }   
+
+            value += (coulomb-gamma)*fockMatrix[moI][mu]*fockMatrix[moJ][mu]*fockMatrix[moK][nu]*fockMatrix[moL][nu];
+
+         }
+
+      }
+   }
+
+   return value;
 }
 
 

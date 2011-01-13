@@ -38,6 +38,7 @@ protected:
    string errorMessageNotEnebleAtomType;
    string errorMessageCoulombInt;
    string errorMessageExchangeInt;
+   string errorMessageMolecularIntegralElement;
    string messageSCFMetConvergence;
    string messageStartSCF;
    string messageDoneSCF;
@@ -174,6 +175,8 @@ void Cndo2::SetMessages(){
       = "Error in cndo::Cndo2::ChecEnableAtomType: Non available atom is contained.\n";
    this->errorMessageAtomType = "\tatom type = ";
    this->errorMessageOrbitalType = "\torbital type = ";
+   this->errorMessageMolecularIntegralElement
+      = "Error in cndo::Cndo2::GetMolecularIntegralElement: Non available orbital is contained.\n";
    this->messageSCFMetConvergence = "\n\n\n\t\tCNDO/2-SCF met convergence criterion(^^b\n\n\n";
    this->messageStartSCF = "**********  START: CNDO/2-SCF  **********\n";
    this->messageDoneSCF = "**********  DONE: CNDO/2-SCF  **********\n\n\n";

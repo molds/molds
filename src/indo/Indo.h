@@ -60,6 +60,8 @@ void Indo::SetMessages(){
       = "Error in indo::Indo::CheckEnableAtomType: Non available atom is contained.\n";
    this->errorMessageCoulombInt = "Error in base_indo::Indo::GetCoulombInt: Invalid orbitalType.\n";
    this->errorMessageExchangeInt = "Error in base_indo::Indo::GetExchangeInt: Invalid orbitalType.\n";
+   this->errorMessageMolecularIntegralElement
+      = "Error in indo::Indo::GetMolecularIntegralElement: Non available orbital is contained.\n";
    this->messageSCFMetConvergence = "\n\n\n\t\tINDO-SCF met convergence criterion(^^b\n\n\n";
    this->messageStartSCF = "**********  START: INDO-SCF  **********\n";
    this->messageDoneSCF = "**********  DONE: INDO-SCF  **********\n\n\n";
