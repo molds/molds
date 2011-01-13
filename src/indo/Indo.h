@@ -153,35 +153,44 @@ double Indo::GetFockOffDiagElement(Atom* atomA, Atom* atomB, int atomAIndex, int
 double Indo::GetMolecularIntegralElement(int moI, int moJ, int moK, int moL, 
                                           Molecule* molecule, double** fockMatrix, double** gammaAB){
    double value = 0.0;
+   Atom* atomA;
+   Atom* atomB;;
+   int firstAOIndexA;
+   int numberAOsA;
+   double exchange;
+   double coulomb;
+   OrbitalType orbitalMu;
+   OrbitalType orbitalNu;
+
+   // CNDO terms
    value = Cndo2::GetMolecularIntegralElement(moI, moJ, moK, moL, molecule, fockMatrix, gammaAB);
 
-   // see Eq. (10) in [RZ_1973]
+   // Aditional terms for INDO, see Eq. (10) in [RZ_1973]
    for(int A=0; A<molecule->GetAtomVect()->size(); A++){
       Atom* atomA = (*molecule->GetAtomVect())[A];
-      int firstAOIndexA = atomA->GetFirstAOIndex();
-      int numberAOsA = atomA->GetValence().size();
+      firstAOIndexA = atomA->GetFirstAOIndex();
+      numberAOsA = atomA->GetValence().size();
 
       for(int mu=firstAOIndexA; mu<firstAOIndexA+numberAOsA; mu++){
+         orbitalMu = atomA->GetValence()[mu-firstAOIndexA];
          for(int nu=firstAOIndexA; nu<firstAOIndexA+numberAOsA; nu++){
+            orbitalNu = atomA->GetValence()[nu-firstAOIndexA];
 
             if(mu!=nu){
-               double exc = this->GetExchangeInt(atomA->GetValence()[mu-firstAOIndexA], 
-                              atomA->GetValence()[nu-firstAOIndexA], gammaAB[A][A], atomA);
-
-               value += exc*fockMatrix[moI][mu]
-                           *fockMatrix[moJ][nu]
-                           *fockMatrix[moK][nu]
-                           *fockMatrix[moL][mu];
+               exchange = this->GetExchangeInt(orbitalMu, orbitalNu, gammaAB[A][A], atomA);
+               value += exchange
+                       *fockMatrix[moI][mu]
+                       *fockMatrix[moJ][nu]
+                       *fockMatrix[moK][nu]
+                       *fockMatrix[moL][mu];
             }
 
-            double cou = this->GetCoulombInt(atomA->GetValence()[mu-firstAOIndexA], 
-                              atomA->GetValence()[nu-firstAOIndexA], gammaAB[A][A], atomA);
-
-            value += (cou-gammaAB[A][A])*fockMatrix[moI][mu]
-                           *fockMatrix[moJ][mu]
-                           *fockMatrix[moK][nu]
-                           *fockMatrix[moL][nu];
-
+            coulomb = this->GetCoulombInt(orbitalMu, orbitalNu, gammaAB[A][A], atomA);
+            value += (coulomb-gammaAB[A][A])
+                     *fockMatrix[moI][mu]
+                     *fockMatrix[moJ][mu]
+                     *fockMatrix[moK][nu]
+                     *fockMatrix[moL][nu];
          }
       }
    }
