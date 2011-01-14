@@ -41,7 +41,12 @@ public:
    double GetRotatingAngle();
    void SetRotatingEularAngles(double alpha, double beta, double gamma);
    EularAngle GetRotatingEularAngles();
-
+   int GetActiveOccCIS();
+   void SetActiveOccCIS(int activeOccCIS);
+   int GetActiveVirCIS();
+   void SetActiveVirCIS(int activeOccCIS);
+   int GetNumberExcitedStatesCIS();
+   void SetNumberExcitedStatesCIS(int nStates);
 private:
    static Parameters* parameters;
    Parameters();
@@ -66,7 +71,9 @@ private:
    double rotatingAngle;
    RotatingType rotatingType;
    EularAngle rotatingEularAngles;
-
+   int activeOccCIS;
+   int activeVirCIS;
+   int numberExcitedStatesCIS;
 };
 Parameters* Parameters::parameters = NULL;
 
@@ -123,6 +130,9 @@ void Parameters::SetDefaultValues(){
    this->rotatingEularAngles.SetAlpha(0.0);
    this->rotatingEularAngles.SetBeta(0.0);
    this->rotatingEularAngles.SetGamma(0.0);
+   this->activeOccCIS = 10;
+   this->activeVirCIS = 10;
+   this->numberExcitedStatesCIS = 5;
 }
 
 double Parameters::GetThresholdSCF(){
@@ -250,7 +260,29 @@ EularAngle Parameters::GetRotatingEularAngles(){
    return this->rotatingEularAngles;
 }
 
+int Parameters::GetActiveOccCIS(){
+   return this->activeOccCIS;
+}
+   
+void Parameters::SetActiveOccCIS(int activeOccCIS){
+   this->activeOccCIS = activeOccCIS;
+}
 
+int Parameters::GetActiveVirCIS(){
+   return this->activeVirCIS;
+}
+
+void Parameters::SetActiveVirCIS(int activeVirCIS){
+   this->activeVirCIS = activeVirCIS;
+}
+
+int Parameters::GetNumberExcitedStatesCIS(){
+   return this->numberExcitedStatesCIS;
+}
+
+void Parameters::SetNumberExcitedStatesCIS(int nStates){
+   this->numberExcitedStatesCIS = nStates;
+}
 
 
 }

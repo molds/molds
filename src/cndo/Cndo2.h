@@ -60,6 +60,8 @@ protected:
                                               Molecule* molecule, double** fockMatrix, double** gammaAB);
    TheoryType theory;
    Molecule* molecule;
+   double** fockMatrix;
+   double* energiesMO;
 private:
    string messageEnergiesMOs;
    string messageEnergiesMOsTitle;
@@ -73,8 +75,6 @@ private:
    double** overlap;
    double** orbitalElectronPopulation; //P_{\mu\nu} of (2.50) in J. A. Pople book.
    double*   atomicElectronPopulation; //P_{AB} of (3.21) in J. A. Pople book.
-   double** fockMatrix;
-   double* energiesMO;
 
    // use Y[na][nb][la][lb][m][i][j] 
    // as Y_{ij\lammda} in (B.20) in Pople book for give na, nb, la, lb, m, i, and j.

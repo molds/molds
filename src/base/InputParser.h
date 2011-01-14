@@ -70,6 +70,11 @@ private:
    string stringTranslate;
    string stringTranslateEnd;
    string stringTranslatingDifference;
+   string stringCIS;
+   string stringCISEnd;
+   string stringCISActiveOcc;
+   string stringCISActiveVir;
+   string stringCISNStates;
    void CalcMolecularBasics(Molecule* molecule);
    void OutputMolecularBasics(Molecule* molecule);
    void OutputScfConditions();
@@ -121,6 +126,11 @@ InputParser::InputParser(){
    this->stringTranslate = "translate";
    this->stringTranslateEnd = "translate_end";
    this->stringTranslatingDifference = "difference";
+   this->stringCIS = "cis";
+   this->stringCISEnd = "cis_end";
+   this->stringCISActiveOcc = "activeocc";
+   this->stringCISActiveVir = "activevir";
+   this->stringCISNStates = "nstates";
 }
 
 InputParser::~InputParser(){
@@ -315,6 +325,34 @@ void InputParser::Parse(Molecule* molecule){
          i = j;
       }
       
+      // cis condition
+      if(inputTerms[i].compare(this->stringCIS) == 0){
+         int j=i+1;
+         while(inputTerms[j].compare(this->stringCISEnd) != 0){
+            // number of active occupied orbitals
+            if(inputTerms[j].compare(this->stringCISActiveOcc) == 0){
+               int activeOccCIS = atoi(inputTerms[j+1].c_str());
+               Parameters::GetInstance()->SetActiveOccCIS(activeOccCIS);
+               j++;
+            }
+            // number of active virtual orbitals
+            if(inputTerms[j].compare(this->stringCISActiveVir) == 0){
+               int activeVirCIS = atoi(inputTerms[j+1].c_str());
+               Parameters::GetInstance()->SetActiveVirCIS(activeVirCIS);
+               j++;
+            }
+            // number of excited states
+            if(inputTerms[j].compare(this->stringCISNStates) == 0){
+               int nStates = atoi(inputTerms[j+1].c_str());
+               Parameters::GetInstance()->SetNumberExcitedStatesCIS(nStates);
+               j++;
+            }
+            j++;   
+         }
+         i = j;
+      }
+
+
       // theory
       if(inputTerms[i].compare(this->stringTheory) == 0){
          int j=i+1;

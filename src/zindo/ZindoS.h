@@ -21,6 +21,7 @@ class ZindoS : public MolDS_cndo::Cndo2{
 public:
    ZindoS();
    ~ZindoS();
+   void DoesCIS();
 protected:
    virtual void CalcGammaAB(double** gammaAB, Molecule* molecule);
    virtual void SetMessages();
@@ -45,6 +46,8 @@ private:
    double GetNishimotoMatagaTwoEleInt(Atom* atomA, OrbitalType orbitalA, 
                                            Atom* atomB, OrbitalType orbitalB); // ref. [MN_1957] and (5a) in [AEZ_1986]
    string errorMessageNishimotoMataga;
+   string messageStartCIS;
+   string messageDoneCIS;
 };
 
 ZindoS::ZindoS() : MolDS_cndo::Cndo2(){
@@ -75,6 +78,8 @@ void ZindoS::SetMessages(){
    this->messageSCFMetConvergence = "\n\n\n\t\tZINDO/S-SCF met convergence criterion(^^b\n\n\n";
    this->messageStartSCF = "**********  START: ZINDO/S-SCF  **********\n";
    this->messageDoneSCF = "**********  DONE: ZINDO/S-SCF  **********\n\n\n";
+   this->messageStartCIS = "**********  START: ZINDO/S-CIS  **********\n";
+   this->messageDoneCIS = "**********  DONE: ZINDO/S-CIS  **********\n\n\n";
 }
 
 void ZindoS::SetEnableAtomTypes(){
@@ -554,14 +559,14 @@ double ZindoS::GetMolecularIntegralElement(int moI, int moJ, int moK, int moL,
 
             if(mu!=nu){
                exchange = this->GetExchangeInt(orbitalMu, orbitalNu, atomA);
-
                value += exchange*fockMatrix[moI][mu]*fockMatrix[moJ][nu]*fockMatrix[moK][nu]*fockMatrix[moL][mu];
+               value += exchange*fockMatrix[moI][mu]*fockMatrix[moJ][nu]*fockMatrix[moK][mu]*fockMatrix[moL][nu];
             }
 
             coulomb = this->GetCoulombInt(orbitalMu, orbitalNu, atomA);
 
-            if( (orbitalMu == s || orbitalMu == px || orbitalMu == py || pz) &&
-                (orbitalNu == s || orbitalNu == px || orbitalNu == py || pz) ){
+            if( (orbitalMu == s || orbitalMu == px || orbitalMu == py || orbitalMu == pz) &&
+                (orbitalNu == s || orbitalNu == px || orbitalNu == py || orbitalNu == pz) ){
                   gamma = atomA->GetZindoF0ss();
             }
             else{
@@ -584,6 +589,114 @@ double ZindoS::GetMolecularIntegralElement(int moI, int moJ, int moK, int moL,
 }
 
 
+void ZindoS::DoesCIS(){
+   cout << this->messageStartCIS;
+
+   int numberOcc = this->molecule->GetTotalNumberValenceElectrons()/2;
+   int numberVir = this->molecule->GetTotalNumberAOs() - numberOcc;
+
+   // check the number of active occupied orbitals.
+   if(numberOcc < Parameters::GetInstance()->GetActiveOccCIS()){
+      Parameters::GetInstance()->SetActiveOccCIS(numberOcc);
+   }
+   else{
+      numberOcc = Parameters::GetInstance()->GetActiveOccCIS();
+   }
+
+   // check the number of active virtual orbitals.
+   if(numberVir < Parameters::GetInstance()->GetActiveVirCIS()){
+      Parameters::GetInstance()->SetActiveVirCIS(numberOcc);
+   }
+   else{
+      numberVir = Parameters::GetInstance()->GetActiveVirCIS();
+   }
+
+   // check the number of calculated excited states.
+   int numberExcitedStates = numberOcc * numberVir;
+   /*
+   if(numberExcitedStates < Parameters::GetInstance()->GetNumberExcitedStatesCIS()){
+      Parameters::GetInstance()->SetNumberExcitedStatesCIS(numberOcc);
+   }
+   else{
+      numberExcitedStates = Parameters::GetInstance()->GetNumberExcitedStatesCIS();
+   }
+   */
+
+printf("\n\nnumber of occ orbitals: %d\n",numberOcc);
+printf("number of vir orbitals: %d\n",numberVir);
+printf("number of excited states: %d\n\n\n",numberExcitedStates);
+
+   double** matrixCIS = MallocerFreer::GetInstance()->MallocDoubleMatrix2d(numberExcitedStates, numberExcitedStates);
+   double* excitedEnergies = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(numberExcitedStates);
+
+   double value=0.0;
+   int moI;
+   int moA;
+   int moJ;
+   int moB;
+   int k=0;
+   int l=0;
+   for(int i=0; i<numberOcc; i++){
+      moI = this->molecule->GetTotalNumberValenceElectrons()/2 - i -1;      
+      for(int a=0; a<numberVir; a++){
+         moA = this->molecule->GetTotalNumberValenceElectrons()/2 + a;
+
+         l=0;
+         for(int j=0; j<numberOcc; j++){
+            moJ = this->molecule->GetTotalNumberValenceElectrons()/2 - j -1;      
+            for(int b=0; b<numberVir; b++){
+               moB = this->molecule->GetTotalNumberValenceElectrons()/2 + b;
+
+               // diagonal term
+               if(k==l){
+                  value = this->energiesMO[moA] - this->energiesMO[moI] 
+                         +2.0*this->GetMolecularIntegralElement(moI, moA, moA, moI, 
+                                                this->molecule, this->fockMatrix, NULL)
+                         -    this->GetMolecularIntegralElement(moI, moI, moA, moA, 
+                                                this->molecule, this->fockMatrix, NULL);
+
+               }
+               // off diagonal term (right upper)
+               else if(k<l){
+                  value = 2.0*this->GetMolecularIntegralElement(moA, moI, moJ, moB, 
+                                                this->molecule, this->fockMatrix, NULL)
+                         -    this->GetMolecularIntegralElement(moA, moB, moI, moJ, 
+                                                this->molecule, this->fockMatrix, NULL);
+               }
+            
+               matrixCIS[k][l] = value;
+               l++;
+            }
+         }
+         k++;
+      }
+   }
+
+   bool calcEigenVectors = true;
+   MolDS_mkl_wrapper::LapackWrapper::GetInstance()->Dsyevd(matrixCIS,
+                                                           excitedEnergies, 
+                                                           numberExcitedStates, 
+                                                           calcEigenVectors);
+
+   // output eigen energies
+   for(int k=0; k<numberExcitedStates; k++){
+      printf("%d-th excited energy: %e\n",k+1, excitedEnergies[k]);
+   }
+   cout << endl;
+
+   if(matrixCIS != NULL){
+      MallocerFreer::GetInstance()->FreeDoubleMatrix2d(matrixCIS, numberExcitedStates);
+      matrixCIS = NULL;
+      //cout << "matrixCIS deleted\n";
+   }
+   if(excitedEnergies != NULL){
+      MallocerFreer::GetInstance()->FreeDoubleMatrix1d(excitedEnergies);
+      excitedEnergies = NULL;
+      //cout << "exceitedEnergies deleted\n";
+   }
+
+   cout << this->messageDoneCIS;
+}
 
 
 }

@@ -101,6 +101,7 @@ int main(){
          try{
             zindoS->SetMolecule(molecule);
             zindoS->DoesSCF();
+            zindoS->DoesCIS();
          }
          catch(MolDSException ex){
             cout << ex.what() << endl;
