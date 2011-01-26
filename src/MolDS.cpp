@@ -19,6 +19,8 @@
 #include"base/atoms/Atom.h"
 #include"base/atoms/Hatom.h"
 #include"base/atoms/Catom.h"
+#include"base/atoms/Natom.h"
+#include"base/atoms/Oatom.h"
 #include"base/atoms/Liatom.h"
 #include"base/atoms/Satom.h"
 #include"base/MallocerFreer.h"

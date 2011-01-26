@@ -81,8 +81,8 @@ protected:
    double effectiveNuclearChargeMsp;    // Table 1.5 in J. A. Pople book
    double effectiveNuclearChargeMd;     // Table 1.5 in J. A. Pople book
    int GetEffectivePrincipalQuantumNumber(ShellType shellType); // Table 1.4 in J. A. Pople book
-   double indoF2;                   // (3.89) in J. A. Pople book
-   double indoG1;                   // (3.88) in J. A. Pople book
+   double indoF2;                   // Table 3.6 in J. A. Pople book
+   double indoG1;                   // Table 3.6 in J. A. Pople book
    double zindoF0ss;                // Table 1 in ref. [RZ_1976], Table 1 in [AEZ_1986], or Table 1 in [GD_1972]
    double zindoF0sd;                  // Table 1 in [AEZ_1986]
    double zindoF0dd;                  // Table 1 in [AEZ_1986]

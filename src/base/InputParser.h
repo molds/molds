@@ -215,6 +215,12 @@ void InputParser::Parse(Molecule* molecule){
             else if(inputTerms[j] == "c"){
                molecule->GetAtomVect()->push_back(new Catom(x, y, z));
             }
+            else if(inputTerms[j] == "n"){
+               molecule->GetAtomVect()->push_back(new Natom(x, y, z));
+            }
+            else if(inputTerms[j] == "o"){
+               molecule->GetAtomVect()->push_back(new Oatom(x, y, z));
+            }
             else if(inputTerms[j] == "s"){
                molecule->GetAtomVect()->push_back(new Satom(x, y, z));
             }
