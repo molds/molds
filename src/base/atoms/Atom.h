@@ -57,9 +57,11 @@ public:
    double GetZindoG3pdLower();                 // Apendix in ref. [BZ_1979]
    double GetZindoF2ddLower();                 // Apendix in ref. [BZ_1979]
    double GetZindoF4ddLower();                 // Apendix in ref. [BZ_1979]
+   double GetIonPot(OrbitalType orbital);
 protected:
    string errorMessageIndoCoreIntegral;
    string errorMessageZindoSCoreIntegral;
+   string errorMessageIonPot;
    string errorMessageAtomType;
    string errorMessageOrbitalType;
    double* xyz;
@@ -139,6 +141,7 @@ void Atom::SetMessages(){
    this->errorMessageOrbitalExponent = "Error in base_atoms::Atom::GetOrbitalExponent: Invalid shelltype or orbitalType.\n";
    this->errorMessageIndoCoreIntegral = "Error in base_atoms::Atom::GetCoreIntegral: Invalid orbitalType for INDO.\n";
    this->errorMessageZindoSCoreIntegral = "Error in base_atoms::Atom::GetCoreIntegral: Invalid orbitalType for ZINDO/S.\n";
+   this->errorMessageIonPot = "Error in base_atoms::Atom::GetIonPot: Invalid orbitalType.\n";
    this->errorMessageAtomType = "\tatom type = ";
    this->errorMessageOrbitalType = "\torbital type = ";
    this->errorMessageShellType = "\tshell type = ";
@@ -485,6 +488,28 @@ double Atom::GetCoreIntegral(OrbitalType orbital, bool isGuess, TheoryType theor
    return this->GetCoreIntegral(orbital, 0.0, isGuess, theory);
 }
 
+double Atom::GetIonPot(OrbitalType orbital){
+   double value=0.0;
+
+   if(orbital == s){
+      value = -1.0*this->ionPotS;
+   }
+   else if(orbital == px || orbital == py || orbital == pz){
+      value = -1.0*this->ionPotP;
+   }
+   else if(orbital == dxy || orbital == dyz || orbital == dzz || orbital == dzx || orbital == dxxyy ){
+      value = -1.0*this->ionPotD;
+   }
+   else{
+      stringstream ss;
+      ss << this->errorMessageIonPot;
+      ss << this->errorMessageAtomType << AtomTypeStr(this->atomType) << endl;
+      ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbital) << endl;
+      throw MolDSException(ss.str());
+   }
+
+   return value;
+}
 
 
 }
