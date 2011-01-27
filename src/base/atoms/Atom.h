@@ -94,9 +94,9 @@ protected:
    double zindoG3pd;                 // Table 3 in ref. [BZ_1979]
    double zindoF2dd;                 // Table 3 in ref. [BZ_1979]
    double zindoF4dd;                 // Table 3 in ref. [BZ_1979]
-   double IonPotS;   // Ionization potential, Table 4 in [BZ_1979]
-   double IonPotP;   // Ionization potential, Table 4 in [BZ_1979]
-   double IonPotD;   // Ionization potential, Table 4 in [BZ_1979]
+   double ionPotS;   // Ionization potential, Table 4 in [BZ_1979]
+   double ionPotP;   // Ionization potential, Table 4 in [BZ_1979]
+   double ionPotD;   // Ionization potential, Table 4 in [BZ_1979]
    double GetZindoCoreIntegral(OrbitalType orbital, int l, int m, int n); // Eq. (13) in [BZ_1979]
 private:
    void SetMessages();
@@ -332,19 +332,19 @@ double Atom::GetZindoCoreIntegral(OrbitalType orbital, int l, int m, int n){
    double value=0.0;
 
    if(orbital == s){
-      value = -1.0*this->IonPotS 
+      value = -1.0*this->ionPotS 
               - this->GetJss()*(double)(l-1) 
               - this->GetJsp()*(double)m 
               - this->GetJsd()*(double)n;
    }
    else if(orbital == px || orbital == py || orbital == pz){
-      value = -1.0*this->IonPotP
+      value = -1.0*this->ionPotP
               - this->GetJpp()*(double)(m-1) 
               - this->GetJsp()*(double)l
               - this->GetJpd()*(double)n;
    }
    else if(orbital == dxy || orbital == dyz || orbital == dzz || orbital == dzx || orbital == dxxyy ){
-      value = -1.0*this->IonPotD
+      value = -1.0*this->ionPotD
               - this->GetJdd()*(double)(n-1) 
               - this->GetJsd()*(double)l
               - this->GetJpd()*(double)m;
