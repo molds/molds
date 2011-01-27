@@ -47,9 +47,9 @@ Oatom::Oatom(double x, double y, double z) : Atom(x, y, z){
    this->zindoG3pd = 0.0;                 
    this->zindoF2dd = 0.0;                 
    this->zindoF4dd = 0.0;                 
-   this->IonPotS = 32.90 * Parameters::GetInstance()->GetEV2AU();
-   this->IonPotP = 17.28 * Parameters::GetInstance()->GetEV2AU();
-   this->IonPotD = 0.0 * Parameters::GetInstance()->GetEV2AU();
+   this->ionPotS = 32.90 * Parameters::GetInstance()->GetEV2AU();
+   this->ionPotP = 17.28 * Parameters::GetInstance()->GetEV2AU();
+   this->ionPotD = 0.0 * Parameters::GetInstance()->GetEV2AU();
 }
 
 double Oatom::GetCoreIntegral(OrbitalType orbital, double gamma, bool isGuess, TheoryType theory){

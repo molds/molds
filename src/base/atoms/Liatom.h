@@ -48,9 +48,9 @@ Liatom::Liatom(double x, double y, double z) : Atom(x, y, z){
    this->zindoG3pd = 0.0;             
    this->zindoF2dd = 0.0;             
    this->zindoF4dd = 0.0;       
-   this->IonPotS = 5.39 * Parameters::GetInstance()->GetEV2AU();
-   this->IonPotP = 3.54 * Parameters::GetInstance()->GetEV2AU();
-   this->IonPotD = 0.0 * Parameters::GetInstance()->GetEV2AU();
+   this->ionPotS = 5.39 * Parameters::GetInstance()->GetEV2AU();
+   this->ionPotP = 3.54 * Parameters::GetInstance()->GetEV2AU();
+   this->ionPotD = 0.0 * Parameters::GetInstance()->GetEV2AU();
 }
 
 double Liatom::GetCoreIntegral(OrbitalType orbital, double gamma, bool isGuess, TheoryType theory){

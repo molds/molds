@@ -55,9 +55,9 @@ Satom::Satom(double x, double y, double z) : Atom(x, y, z){
    this->zindoG3pd = 20587*Parameters::GetInstance()->GetKayser2AU();           
    this->zindoF2dd = 28411*Parameters::GetInstance()->GetKayser2AU();           
    this->zindoF4dd = 18529*Parameters::GetInstance()->GetKayser2AU();           
-   this->IonPotS = 21.11 * Parameters::GetInstance()->GetEV2AU();
-   this->IonPotP = 12.39 * Parameters::GetInstance()->GetEV2AU();
-   this->IonPotD = 4.11 * Parameters::GetInstance()->GetEV2AU();
+   this->ionPotS = 21.11 * Parameters::GetInstance()->GetEV2AU();
+   this->ionPotP = 12.39 * Parameters::GetInstance()->GetEV2AU();
+   this->ionPotD = 4.11 * Parameters::GetInstance()->GetEV2AU();
 }
 
 double Satom::GetCoreIntegral(OrbitalType orbital, double gamma, bool isGuess, TheoryType theory){

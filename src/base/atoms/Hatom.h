@@ -45,9 +45,9 @@ Hatom::Hatom(double x, double y, double z) : Atom(x, y, z){
    this->zindoG3pd = 0.0;                 
    this->zindoF2dd = 0.0;                 
    this->zindoF4dd = 0.0;                 
-   this->IonPotS = 13.06 * Parameters::GetInstance()->GetEV2AU();
-   this->IonPotP = 0.0 * Parameters::GetInstance()->GetEV2AU();
-   this->IonPotD = 0.0 * Parameters::GetInstance()->GetEV2AU();
+   this->ionPotS = 13.06 * Parameters::GetInstance()->GetEV2AU();
+   this->ionPotP = 0.0 * Parameters::GetInstance()->GetEV2AU();
+   this->ionPotD = 0.0 * Parameters::GetInstance()->GetEV2AU();
 }
 
 double Hatom::GetCoreIntegral(OrbitalType orbital, double gamma, bool isGuess, TheoryType theory){

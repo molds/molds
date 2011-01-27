@@ -47,9 +47,9 @@ Catom::Catom(double x, double y, double z) : Atom(x, y, z){
    this->zindoG3pd = 0.0;                 
    this->zindoF2dd = 0.0;                 
    this->zindoF4dd = 0.0;                 
-   this->IonPotS = 19.84 * Parameters::GetInstance()->GetEV2AU();
-   this->IonPotP = 10.93 * Parameters::GetInstance()->GetEV2AU();
-   this->IonPotD = 0.0 * Parameters::GetInstance()->GetEV2AU();
+   this->ionPotS = 19.84 * Parameters::GetInstance()->GetEV2AU();
+   this->ionPotP = 10.93 * Parameters::GetInstance()->GetEV2AU();
+   this->ionPotD = 0.0 * Parameters::GetInstance()->GetEV2AU();
 }
 
 double Catom::GetCoreIntegral(OrbitalType orbital, double gamma, bool isGuess, TheoryType theory){
