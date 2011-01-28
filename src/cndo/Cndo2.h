@@ -291,69 +291,74 @@ void Cndo2::DoesSCF(){
 
    double** oldOrbitalElectronPopulation = MallocerFreer::GetInstance()->MallocDoubleMatrix2d
             (this->molecule->GetTotalNumberAOs(), this->molecule->GetTotalNumberAOs());
+   try{
+      // calculate electron integral
+      this->CalcGammaAB(this->gammaAB, this->molecule);
+      this->CalcOverlap(this->overlap, this->molecule);
 
-   // calculate electron integral
-   this->CalcGammaAB(this->gammaAB, this->molecule);
-   this->CalcOverlap(this->overlap, this->molecule);
+      // SCF
+      int maxIterationsSCF = Parameters::GetInstance()->GetMaxIterationsSCF();
+      bool isGuess=true;
+      for(int i=0; i<maxIterationsSCF; i++){
 
-   // SCF
-   int maxIterationsSCF = Parameters::GetInstance()->GetMaxIterationsSCF();
-   bool isGuess=true;
-   for(int i=0; i<maxIterationsSCF; i++){
+         i==0 ? isGuess = true : isGuess = false;
+         this->CalcFockMatrix(this->fockMatrix, 
+                              this->molecule, 
+                              this->overlap, 
+                              this->gammaAB,
+                              this->orbitalElectronPopulation, 
+                              this->atomicElectronPopulation,
+                              isGuess);
+   
+         // diagonalization
+         bool calcEigenVectors = true;
+         MolDS_mkl_wrapper::LapackWrapper::GetInstance()->Dsyevd(this->fockMatrix, 
+                                                                 this->energiesMO, 
+                                                                 this->molecule->GetTotalNumberAOs(), 
+                                                                 calcEigenVectors);
 
-      i==0 ? isGuess = true : isGuess = false;
-      this->CalcFockMatrix(this->fockMatrix, 
-                           this->molecule, 
-                           this->overlap, 
-                           this->gammaAB,
-                           this->orbitalElectronPopulation, 
-                           this->atomicElectronPopulation,
-                           isGuess);
+         // calc. electron population
+         this->CalcOrbitalElectronPopulation(this->orbitalElectronPopulation, 
+                                             this->molecule, 
+                                             this->fockMatrix);
 
+         this->CalcAtomicElectronPopulation(this->atomicElectronPopulation, 
+                                            this->orbitalElectronPopulation, 
+                                            this->molecule);
 
-      // diagonalization
-      bool calcEigenVectors = true;
-      MolDS_mkl_wrapper::LapackWrapper::GetInstance()->Dsyevd(this->fockMatrix, 
-                                                              this->energiesMO, 
-                                                              this->molecule->GetTotalNumberAOs(), 
-                                                              calcEigenVectors);
+         // check convergence or update oldpopulation
+         if(this->SatisfyConvergenceCriterion(oldOrbitalElectronPopulation, 
+                                              this->orbitalElectronPopulation,
+                                              this->molecule->GetTotalNumberAOs(), i)){
 
+            cout << this->messageSCFMetConvergence;
+            this->OutputResults(this->fockMatrix, 
+                            this->energiesMO, 
+                            this->atomicElectronPopulation, 
+                            this->molecule);
 
-      // calc. electron population
-      this->CalcOrbitalElectronPopulation(this->orbitalElectronPopulation, 
-                                          this->molecule, 
-                                          this->fockMatrix);
+            break;
+         }
 
+         // SCF fails
+         if(i==maxIterationsSCF-1){
+            stringstream ss;
+            ss << this->errorMessageSCFNotConverged << maxIterationsSCF << "\n";
+            throw MolDSException(ss.str());
+         }
 
-      this->CalcAtomicElectronPopulation(this->atomicElectronPopulation, 
-                                         this->orbitalElectronPopulation, 
-                                         this->molecule);
-
-      // check convergence or update oldpopulation
-      if(this->SatisfyConvergenceCriterion(oldOrbitalElectronPopulation, 
-                                           this->orbitalElectronPopulation,
-                                           this->molecule->GetTotalNumberAOs(), i)){
-
-         cout << this->messageSCFMetConvergence;
-         this->OutputResults(this->fockMatrix, 
-                         this->energiesMO, 
-                         this->atomicElectronPopulation, 
-                         this->molecule);
-
-
-         break;
       }
-
-      // SCF fails
-      if(i==maxIterationsSCF-1){
-         stringstream ss;
-         ss << this->errorMessageSCFNotConverged << maxIterationsSCF << "\n";
-         throw MolDSException(ss.str());
-      }
-
-
    }
-
+   catch(MolDSException ex){
+      if(oldOrbitalElectronPopulation != NULL){
+         MallocerFreer::GetInstance()->FreeDoubleMatrix2d
+         (oldOrbitalElectronPopulation, this->molecule->GetTotalNumberAOs());
+         oldOrbitalElectronPopulation = NULL;
+         //cout << "oldOrbitalElectronPopulation deleted\n";
+      }
+      throw ex;
+   }
+   
    if(oldOrbitalElectronPopulation != NULL){
       MallocerFreer::GetInstance()->FreeDoubleMatrix2d
       (oldOrbitalElectronPopulation, this->molecule->GetTotalNumberAOs());
