@@ -184,6 +184,11 @@ double Indo::GetMolecularIntegralElement(int moI, int moJ, int moK, int moL,
                        *fockMatrix[moJ][nu]
                        *fockMatrix[moK][nu]
                        *fockMatrix[moL][mu];
+               value += exchange
+                       *fockMatrix[moI][mu]
+                       *fockMatrix[moJ][nu]
+                       *fockMatrix[moK][mu]
+                       *fockMatrix[moL][nu];
             }
 
             coulomb = this->GetCoulombInt(orbitalMu, orbitalNu, gammaAB[A][A], atomA);

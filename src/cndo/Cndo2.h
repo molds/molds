@@ -107,6 +107,10 @@ private:
    void CheckNumberValenceElectrons(Molecule* molecule);
    void FreeDiatomicOverlapAndRotatingMatrix(double** diatomicOverlap, double** rotatingMatrix);
    double GetTotalEnergy(Molecule* molecule, double* energiesMO, double** fockMatrix, double** gammaAB);
+   void FreeTotalEnergyMatrices(double** fMatrix, 
+                                double** hMatrix, 
+                                double** dammyOrbitalElectronPopulation, 
+                                double*  dammyAtomicElectronPopulation );
 
 };
 
@@ -400,22 +404,112 @@ void Cndo2::OutputResults(double** fockMatrix, double* energiesMO, double* atomi
 }
 
 double Cndo2::GetTotalEnergy(Molecule* molecule, double* energiesMO, double** fockMatrix, double** gammaAB){
-   double totalEnergy = molecule->GetTotalCoreRepulsionEnergy();
+   double electronicEnergy = 0.0;
+
+   // use density matrix for electronic energy
+   int totalNumberAOs = this->molecule->GetTotalNumberAOs();
+   double** fMatrix = MallocerFreer::GetInstance()->MallocDoubleMatrix2d
+                       (totalNumberAOs, totalNumberAOs);
+   double** hMatrix = MallocerFreer::GetInstance()->MallocDoubleMatrix2d
+                       (totalNumberAOs, totalNumberAOs);
+   double** dammyOrbitalElectronPopulation  = MallocerFreer::GetInstance()->MallocDoubleMatrix2d
+                       (totalNumberAOs, totalNumberAOs);
+   double* dammyAtomicElectronPopulation  = MallocerFreer::GetInstance()->MallocDoubleMatrix1d
+                       (molecule->GetAtomVect()->size());
+
+   try{
+      bool isGuess = false;
+      this->CalcFockMatrix(fMatrix, 
+                           this->molecule, 
+                           this->overlap, 
+                           this->gammaAB,
+                           this->orbitalElectronPopulation, 
+                           this->atomicElectronPopulation,
+                           isGuess);
+      this->CalcFockMatrix(hMatrix, 
+                           this->molecule, 
+                           this->overlap, 
+                           this->gammaAB,
+                           dammyOrbitalElectronPopulation, 
+                           dammyAtomicElectronPopulation,
+                           isGuess);
+
+      for(int i=0; i<totalNumberAOs; i++){
+         for(int j=i+1; j<totalNumberAOs; j++){
+            fMatrix[j][i] = fMatrix[i][j];
+            hMatrix[j][i] = hMatrix[i][j];
+         }
+      }
+
+      for(int i=0; i<totalNumberAOs; i++){
+         for(int j=0; j<totalNumberAOs; j++){
+            electronicEnergy += this->orbitalElectronPopulation[j][i]*
+                                 (fMatrix[i][j] + hMatrix[i][j]);
+         }
+      }
+      electronicEnergy *= 0.5;
+   }
+   catch(MolDSException ex){
+      this->FreeTotalEnergyMatrices(fMatrix, 
+                                    hMatrix, 
+                                    dammyOrbitalElectronPopulation, 
+                                    dammyAtomicElectronPopulation );
+      throw ex;
+   }
+   this->FreeTotalEnergyMatrices(fMatrix, 
+                                 hMatrix, 
+                                 dammyOrbitalElectronPopulation, 
+                                 dammyAtomicElectronPopulation );
+
+
+   // use two electrons integrals for electronic energy
+   /*
    for(int mo=0; mo<molecule->GetTotalNumberValenceElectrons()/2; mo++){
-      totalEnergy += 2.0*energiesMO[mo];
+      electronicEnergy += 2.0*energiesMO[mo];
    }
 
    for(int moA=0; moA<molecule->GetTotalNumberValenceElectrons()/2; moA++){
       for(int moB=0; moB<molecule->GetTotalNumberValenceElectrons()/2; moB++){
 
-         totalEnergy -= 2.0*this->GetMolecularIntegralElement(moA, moA, moB, moB, 
+         electronicEnergy -= 2.0*this->GetMolecularIntegralElement(moA, moA, moB, moB, 
                                                               molecule, fockMatrix, gammaAB);
-         totalEnergy += 1.0*this->GetMolecularIntegralElement(moA, moB, moB, moA, 
+         electronicEnergy += 1.0*this->GetMolecularIntegralElement(moA, moB, moB, moA, 
                                                               molecule, fockMatrix, gammaAB);
       }
    }
+   */
 
-   return totalEnergy;
+   return electronicEnergy + molecule->GetTotalCoreRepulsionEnergy();
+}
+
+void Cndo2::FreeTotalEnergyMatrices(double** fMatrix, 
+                                    double** hMatrix, 
+                                    double** dammyOrbitalElectronPopulation, 
+                                    double*  dammyAtomicElectronPopulation ){
+   
+   int totalNumberAOs = this->molecule->GetTotalNumberAOs();
+   if(fMatrix != NULL){
+      MallocerFreer::GetInstance()->FreeDoubleMatrix2d(fMatrix, totalNumberAOs);
+      fMatrix = NULL;
+      //cout << "fMatrix deleted\n";
+   }
+   if(hMatrix != NULL){
+      MallocerFreer::GetInstance()->FreeDoubleMatrix2d(hMatrix, totalNumberAOs);
+      hMatrix = NULL;
+      //cout << "hMatrix deleted\n";
+   }
+   if(dammyOrbitalElectronPopulation != NULL){
+      MallocerFreer::GetInstance()->FreeDoubleMatrix2d(dammyOrbitalElectronPopulation, 
+                                                       totalNumberAOs);
+      dammyOrbitalElectronPopulation = NULL;
+      //cout << "dammyOrbitalElectronPopulation deleted\n";
+   }
+   if(dammyAtomicElectronPopulation != NULL){
+      MallocerFreer::GetInstance()->FreeDoubleMatrix1d(dammyAtomicElectronPopulation);
+      dammyAtomicElectronPopulation = NULL;
+      //cout << "dammyAtomicElectronPopulation deleted\n";
+   }
+
 }
 
 // The order of mol, moJ, moK, moL is consistent with Eq. (9) in [RZ_1973]
