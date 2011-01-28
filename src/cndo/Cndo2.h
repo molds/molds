@@ -84,7 +84,7 @@ private:
 
    bool SatisfyConvergenceCriterion(double** oldOrbitalElectronPopulation, 
                                     double** orbitalElectronPopulation,
-                                    int numberAOs, int times);
+                                    int numberAOs, double* rmsDensity, int times);
    void UpdateOldOrbitalElectronPopulation(double** oldOrbitalElectronPopulation, 
                                            double** orbitalElectronPopulation,
                                            int numberAOs);
@@ -297,6 +297,9 @@ void Cndo2::DoesSCF(){
       this->CalcOverlap(this->overlap, this->molecule);
 
       // SCF
+      double rmsDensity;
+      double dampingWeight = Parameters::GetInstance()->GetDampingWeightSCF();
+      double dampingThresh = Parameters::GetInstance()->GetDampingThreshSCF();
       int maxIterationsSCF = Parameters::GetInstance()->GetMaxIterationsSCF();
       bool isGuess=true;
       for(int i=0; i<maxIterationsSCF; i++){
@@ -322,6 +325,17 @@ void Cndo2::DoesSCF(){
                                              this->molecule, 
                                              this->fockMatrix);
 
+         // damping
+         if(dampingThresh < rmsDensity){
+            for(int j=0; j<this->molecule->GetTotalNumberAOs(); j++){
+               for(int k=0; k<this->molecule->GetTotalNumberAOs(); k++){
+                  this->orbitalElectronPopulation[j][k] *= (1.0-dampingWeight);
+                  this->orbitalElectronPopulation[j][k] += dampingWeight*oldOrbitalElectronPopulation[j][k];
+                                       
+               }
+            }
+         }
+
          this->CalcAtomicElectronPopulation(this->atomicElectronPopulation, 
                                             this->orbitalElectronPopulation, 
                                             this->molecule);
@@ -329,7 +343,7 @@ void Cndo2::DoesSCF(){
          // check convergence or update oldpopulation
          if(this->SatisfyConvergenceCriterion(oldOrbitalElectronPopulation, 
                                               this->orbitalElectronPopulation,
-                                              this->molecule->GetTotalNumberAOs(), i)){
+                                              this->molecule->GetTotalNumberAOs(), &rmsDensity, i)){
 
             cout << this->messageSCFMetConvergence;
             this->OutputResults(this->fockMatrix, 
@@ -566,7 +580,7 @@ void Cndo2::UpdateOldOrbitalElectronPopulation(double** oldOrbitalElectronPopula
 
 bool Cndo2::SatisfyConvergenceCriterion(double** oldOrbitalElectronPopulation, 
                                         double** orbitalElectronPopulation,
-                                        int numberAOs, int times){
+                                        int numberAOs, double* rmsDensity, int times){
    bool satisfy = false;
 
    double change = 0.0;
@@ -575,10 +589,10 @@ bool Cndo2::SatisfyConvergenceCriterion(double** oldOrbitalElectronPopulation,
          change += pow(oldOrbitalElectronPopulation[i][j] - orbitalElectronPopulation[i][j], 2.0);
       }
    }
-   double changeRMS = sqrt(change);
+   *rmsDensity = sqrt(change);
   
-   printf("SCF iter=%d: RMS density=%.15lf \n",times,changeRMS);
-   if(changeRMS < Parameters::GetInstance()->GetThresholdSCF()){
+   printf("SCF iter=%d: RMS density=%.15lf \n",times,*rmsDensity);
+   if(*rmsDensity < Parameters::GetInstance()->GetThresholdSCF()){
       satisfy = true;
    }
    else{

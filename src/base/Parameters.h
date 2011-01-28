@@ -19,6 +19,10 @@ public:
    void SetThresholdSCF(double thresholdSCF);
    int GetMaxIterationsSCF();
    void SetMaxIterationsSCF(int maxIterationsSCF);
+   double GetDampingThreshSCF();
+   void SetDampingThreshSCF(double dampingThreshSCF);
+   double GetDampingWeightSCF();
+   void SetDampingWeightSCF(double dampingWeightSCF);
    double GetEV2AU();
    double GetAngstrom2AU();
    double GetKayser2AU();
@@ -56,6 +60,8 @@ private:
 
    double thresholdSCF;
    int maxIterationsSCF;
+   double dampingThreshSCF;
+   double dampingWeightSCF;
    void SetDefaultValues();
    double eV2AU;
    double angstrom2AU;
@@ -115,6 +121,8 @@ void Parameters::SetDefaultValues(){
    this->kayser2AU = 4.556336*pow(10.0,-6.0);
    this->thresholdSCF = pow(10.0, -8.0);
    this->maxIterationsSCF = 100;
+   this->dampingThreshSCF = 1.0;
+   this->dampingWeightSCF = 0.8;
    this->currentTheory = CNDO2;
    this->gMolin2AU = pow(10.0,5.0)/(6.0221415*9.1095);
    this->degree2Radian = M_PI / 180.0;
@@ -149,6 +157,22 @@ int Parameters::GetMaxIterationsSCF(){
 
 void Parameters::SetMaxIterationsSCF(int maxIterationsSCF){
    this->maxIterationsSCF = maxIterationsSCF;
+}
+
+double Parameters::GetDampingThreshSCF(){
+   return this->dampingThreshSCF;
+}
+
+void Parameters::SetDampingThreshSCF(double dampingThreshSCF){
+   this->dampingThreshSCF = dampingThreshSCF;
+}
+
+double Parameters::GetDampingWeightSCF(){
+   return this->dampingWeightSCF;
+}
+
+void Parameters::SetDampingWeightSCF(double dampingWeightSCF){
+   this->dampingWeightSCF = dampingWeightSCF;
 }
 
 double Parameters::GetEV2AU(){

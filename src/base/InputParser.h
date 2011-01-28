@@ -38,6 +38,8 @@ private:
    string messageScfConditions;
    string messageScfMaxIterations;
    string messageScfRmsDensity;
+   string messageScfDampingThresh;
+   string messageScfDampingWeight;
    string stringSpace;
    string stringCommentOut;
    string stringTheory;
@@ -55,6 +57,8 @@ private:
    string stringScfEnd;
    string stringScfMaxIter;
    string stringScfRmsDensity;
+   string stringScfDampingThresh;
+   string stringScfDampingWeight;
    string stringInertiaTensor;
    string stringInertiaTensorEnd;
    string stringInertiaTensorOrigin;
@@ -94,6 +98,8 @@ InputParser::InputParser(){
    this->messageScfConditions = "\tSCF conditions:\n";
    this->messageScfMaxIterations = "\t\tMax iterations: ";
    this->messageScfRmsDensity = "\t\tRMS density: ";
+   this->messageScfDampingThresh = "\t\tDamping threshold: ";
+   this->messageScfDampingWeight = "\t\tDamping weight: ";
    this->stringSpace = " ";
    this->stringCommentOut = "//";
    this->stringTheoryCNDO2 = "cndo/2";
@@ -111,6 +117,8 @@ InputParser::InputParser(){
    this->stringScfEnd = "scf_end";
    this->stringScfMaxIter = "max_iter";
    this->stringScfRmsDensity = "rms_density";
+   this->stringScfDampingThresh = "damping_thresh";
+   this->stringScfDampingWeight = "damping_weight";
    this->stringInertiaTensor = "inertia";
    this->stringInertiaTensorEnd = "inertia_end";
    this->stringInertiaTensorOrigin = "origin";
@@ -241,6 +249,16 @@ void InputParser::Parse(Molecule* molecule){
             // RMS density 
             if(inputTerms[j].compare(this->stringScfRmsDensity) == 0){
                Parameters::GetInstance()->SetThresholdSCF(atof(inputTerms[j+1].c_str()));
+               j++;
+            }
+            // Damping Threshold 
+            if(inputTerms[j].compare(this->stringScfDampingThresh) == 0){
+               Parameters::GetInstance()->SetDampingThreshSCF(atof(inputTerms[j+1].c_str()));
+               j++;
+            }
+            // Damping Weight
+            if(inputTerms[j].compare(this->stringScfDampingWeight) == 0){
+               Parameters::GetInstance()->SetDampingWeightSCF(atof(inputTerms[j+1].c_str()));
                j++;
             }
             j++;   
@@ -436,6 +454,8 @@ void InputParser::OutputScfConditions(){
    cout << this->messageScfConditions;
    printf("%s%d\n",this->messageScfMaxIterations.c_str(),Parameters::GetInstance()->GetMaxIterationsSCF());
    printf("%s%e\n",this->messageScfRmsDensity.c_str(),Parameters::GetInstance()->GetThresholdSCF());
+   printf("%s%e\n",this->messageScfDampingThresh.c_str(),Parameters::GetInstance()->GetDampingThreshSCF());
+   printf("%s%e\n",this->messageScfDampingWeight.c_str(),Parameters::GetInstance()->GetDampingWeightSCF());
    cout << "\n";
 
 }

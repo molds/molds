@@ -11,6 +11,8 @@ THEORY_END
 SCF
    max_iter 200
    rms_density 0.00000001
+   damping_thresh 1.0 
+   damping_weight 0.7
 SCF_END
 
 CIS
