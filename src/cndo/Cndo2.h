@@ -320,7 +320,7 @@ void Cndo2::DoesSCF(){
                                                                  this->molecule->GetTotalNumberAOs(), 
                                                                  calcEigenVectors);
 
-         // calc. electron population
+         // calc. electron population in each orbital
          this->CalcOrbitalElectronPopulation(this->orbitalElectronPopulation, 
                                              this->molecule, 
                                              this->fockMatrix);
@@ -336,6 +336,7 @@ void Cndo2::DoesSCF(){
             }
          }
 
+         // calc. electron population in each atom.
          this->CalcAtomicElectronPopulation(this->atomicElectronPopulation, 
                                             this->orbitalElectronPopulation, 
                                             this->molecule);
