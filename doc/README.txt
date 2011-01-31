@@ -11,6 +11,33 @@ Carring Out:
    $./a.out < input.in
 
 
+SCF:
+   Write "cndo/2", "indo", or "zindo/s" in theory-directive.
+
+   E.g. 
+         THEORY
+            indo 
+         THEORY_END
+   
+   -options
+    "max_iter", "rms_density", "damping_thresh", and "damping_weight" are prepared as options.
+    option is "origin" only for setting the origin of the inertia tensor.
+    options are written in inertia-directive in angstrom unit.
+    Center of mass is used as origin when the "origin" is not set.
+
+    Default value of "max_iter" is 100.
+    Default value of "rms_density" is 10**(-8.0).
+    Default value of "dampingThresh" is 1.
+    Default value of "dampingWeight" is 0.8.
+
+    E.g.
+         INERTIA
+            max_iter 200
+            rms_density 0.00000001
+            damping_thresh 0.1
+            damping_weight 0.7
+         INERTIA_END
+
 Principal Axes (Diagonalizing the inertia tensor):
    Write "principal_axes" in theory-directive.
 
