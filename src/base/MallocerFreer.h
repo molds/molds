@@ -31,6 +31,10 @@ public:
    double** MallocDoubleMatrix2d(int size1, int size2);
    void InitializeDoubleMatrix2d(double** matrix, int size1, int size2);
    void FreeDoubleMatrix2d(double** matrix, int size1);
+   // 3d
+   double*** MallocDoubleMatrix3d(int size1, int size2, int size3);
+   void InitializeDoubleMatrix3d(double*** matrix, int size1, int size2, int size3);
+   void FreeDoubleMatrix3d(double*** matrix, int size1, int size2);
    // 4d
    double**** MallocDoubleMatrix4d(int size1, int size2, int size3, int size4);
    void InitializeDoubleMatrix4d(double**** matrix, int size1, int size2, int size3, int size4);
@@ -143,6 +147,56 @@ void MallocerFreer::FreeDoubleMatrix2d(double** matrix, int size1){
       delete [] matrix[i];
    }
    delete [] matrix;
+}
+
+double*** MallocerFreer::MallocDoubleMatrix3d(int size1, int size2, int size3){
+   
+   double*** matrix;  
+
+   matrix = new double**[size1];
+   if(matrix==NULL){
+      throw MolDSException(this->errorMessageMallocFailure);
+   }
+   for(int i=0;i<size1;i++) {
+      matrix[i] = new double*[size2];
+      if(matrix[i]==NULL){
+         throw MolDSException(this->errorMessageMallocFailure);
+      }
+      for(int j=0;j<size2;j++){
+         matrix[i][j] = new double[size3];
+         if(matrix[i][j]==NULL){
+            throw MolDSException(this->errorMessageMallocFailure);
+         }
+      }
+   }
+
+   this->InitializeDoubleMatrix3d(matrix, size1, size2, size3);
+
+   return(matrix); 
+}
+
+void MallocerFreer::InitializeDoubleMatrix3d(double*** matrix, int size1, int size2, int size3){
+   for(int i=0;i<size1;i++) {
+      for(int j=0;j<size2;j++){
+         for(int k=0;k<size3;k++){
+            matrix[i][j][k] = 0.0;
+         }
+      }
+   }
+}
+
+void MallocerFreer::FreeDoubleMatrix3d(double*** matrix, int size1, int size2){
+
+   int i=0, j=0;
+
+   for (i=0;i<size1;i++) {
+      for (j=0;j<size2;j++) {
+         delete [] matrix[i][j];
+      }
+      delete [] matrix[i];
+   }
+   delete [] matrix;
+
 }
 
 double**** MallocerFreer::MallocDoubleMatrix4d(int size1, int size2, int size3, int size4){
