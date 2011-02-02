@@ -102,6 +102,20 @@ private:
    double GetAuxiliaryA(int k, double rho);
    double GetAuxiliaryB(int k, double rho);
    double GetAuxiliaryD(int la, int lb, int m);
+   void DoesDamp(double rmsDensity, 
+                 double** orbitalElectronPopulation, 
+                 double** oldOrbitalElectronPopulation, 
+                 Molecule* molecule);
+   void DoesDIIS(double** orbitalElectronPopulation,
+                 double** oldOrbitalElectronPopulation,
+                 double* atomicElectronPopulation,
+                 double*** diisStoredDensityMatrix,
+                 double*** diisStoredErrorVect,
+                 double** diisErrorProducts,
+                 double* diisErrorCoefficients,
+                 int diisNumErrorVect,
+                 Molecule* molecule, 
+                 int step);
    void OutputResults(double** fockMatrix, double* energiesMO, double* atomicElectronPopulation, Molecule* molecule);
    void CheckEnableAtomType(Molecule* molecule);
    void CheckNumberValenceElectrons(Molecule* molecule);
@@ -111,6 +125,11 @@ private:
                                 double** hMatrix, 
                                 double** dammyOrbitalElectronPopulation, 
                                 double*  dammyAtomicElectronPopulation );
+   void FreeSCFTemporaryMatrices(double** oldOrbitalElectronPopulation,
+                                 double*** diisStoredDensityMatrix,
+                                 double*** diisStoredErrorVect,
+                                 double** diisErrorProducts,
+                                 double* diisErrorCoefficients);
 
 };
 
@@ -289,8 +308,28 @@ void Cndo2::DoesSCF(){
       throw MolDSException(ss.str());
    }
 
+   // diis parameters
+   int diisNumErrorVect = Parameters::GetInstance()->GetDiisNumErrorVectSCF();
+
+
+   // malloc temporary matrices for scf
    double** oldOrbitalElectronPopulation = MallocerFreer::GetInstance()->MallocDoubleMatrix2d
             (this->molecule->GetTotalNumberAOs(), this->molecule->GetTotalNumberAOs());
+
+   // malloc temporary matrices for diis
+   double*** diisStoredDensityMatrix = NULL;
+   double*** diisStoredErrorVect = NULL;
+   double** diisErrorProducts = NULL;
+   double* diisErrorCoefficients = NULL;
+   if(0<diisNumErrorVect){
+      diisStoredDensityMatrix = MallocerFreer::GetInstance()->MallocDoubleMatrix3d
+                (diisNumErrorVect, this->molecule->GetTotalNumberAOs(), this->molecule->GetTotalNumberAOs());
+      diisStoredErrorVect = MallocerFreer::GetInstance()->MallocDoubleMatrix3d
+                (diisNumErrorVect, this->molecule->GetTotalNumberAOs(), this->molecule->GetTotalNumberAOs());
+      diisErrorProducts = MallocerFreer::GetInstance()->MallocDoubleMatrix2d(diisNumErrorVect+1, diisNumErrorVect+1);
+      diisErrorCoefficients = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(diisNumErrorVect+1);
+   }
+
    try{
       // calculate electron integral
       this->CalcGammaAB(this->gammaAB, this->molecule);
@@ -298,8 +337,6 @@ void Cndo2::DoesSCF(){
 
       // SCF
       double rmsDensity;
-      double dampingWeight = Parameters::GetInstance()->GetDampingWeightSCF();
-      double dampingThresh = Parameters::GetInstance()->GetDampingThreshSCF();
       int maxIterationsSCF = Parameters::GetInstance()->GetMaxIterationsSCF();
       bool isGuess=true;
       for(int i=0; i<maxIterationsSCF; i++){
@@ -312,7 +349,7 @@ void Cndo2::DoesSCF(){
                               this->orbitalElectronPopulation, 
                               this->atomicElectronPopulation,
                               isGuess);
-   
+
          // diagonalization
          bool calcEigenVectors = true;
          MolDS_mkl_wrapper::LapackWrapper::GetInstance()->Dsyevd(this->fockMatrix, 
@@ -325,17 +362,6 @@ void Cndo2::DoesSCF(){
                                              this->molecule, 
                                              this->fockMatrix);
 
-         // damping
-         if(dampingThresh < rmsDensity){
-            for(int j=0; j<this->molecule->GetTotalNumberAOs(); j++){
-               for(int k=0; k<this->molecule->GetTotalNumberAOs(); k++){
-                  this->orbitalElectronPopulation[j][k] *= (1.0-dampingWeight);
-                  this->orbitalElectronPopulation[j][k] += dampingWeight*oldOrbitalElectronPopulation[j][k];
-                                       
-               }
-            }
-         }
-
          // calc. electron population in each atom.
          this->CalcAtomicElectronPopulation(this->atomicElectronPopulation, 
                                             this->orbitalElectronPopulation, 
@@ -347,12 +373,30 @@ void Cndo2::DoesSCF(){
                                               this->molecule->GetTotalNumberAOs(), &rmsDensity, i)){
 
             cout << this->messageSCFMetConvergence;
-            this->OutputResults(this->fockMatrix, 
-                            this->energiesMO, 
-                            this->atomicElectronPopulation, 
-                            this->molecule);
-
+            this->OutputResults(this->fockMatrix, this->energiesMO, this->atomicElectronPopulation, this->molecule);
             break;
+         }
+         else{
+           
+            // damping
+            this->DoesDamp(rmsDensity, this->orbitalElectronPopulation, oldOrbitalElectronPopulation, this->molecule);
+           
+            // diis 
+            this->DoesDIIS(this->orbitalElectronPopulation,
+                           oldOrbitalElectronPopulation,
+                           this->atomicElectronPopulation,
+                           diisStoredDensityMatrix,
+                           diisStoredErrorVect,
+                           diisErrorProducts,
+                           diisErrorCoefficients,
+                           diisNumErrorVect,
+                           this->molecule,
+                           i);
+
+            this->UpdateOldOrbitalElectronPopulation(oldOrbitalElectronPopulation, 
+                                                     this->orbitalElectronPopulation, 
+                                                     this->molecule->GetTotalNumberAOs());
+
          }
 
          // SCF fails
@@ -361,27 +405,169 @@ void Cndo2::DoesSCF(){
             ss << this->errorMessageSCFNotConverged << maxIterationsSCF << "\n";
             throw MolDSException(ss.str());
          }
-
       }
    }
    catch(MolDSException ex){
-      if(oldOrbitalElectronPopulation != NULL){
-         MallocerFreer::GetInstance()->FreeDoubleMatrix2d
-         (oldOrbitalElectronPopulation, this->molecule->GetTotalNumberAOs());
-         oldOrbitalElectronPopulation = NULL;
-         //cout << "oldOrbitalElectronPopulation deleted\n";
-      }
+      this->FreeSCFTemporaryMatrices(oldOrbitalElectronPopulation,
+                                     diisStoredDensityMatrix,
+                                     diisStoredErrorVect,
+                                     diisErrorProducts,
+                                     diisErrorCoefficients);
+
       throw ex;
    }
-   
+   this->FreeSCFTemporaryMatrices(oldOrbitalElectronPopulation,
+                                  diisStoredDensityMatrix,
+                                  diisStoredErrorVect,
+                                  diisErrorProducts,
+                                  diisErrorCoefficients);
+
+
+   cout << this->messageDoneSCF;
+
+}
+
+void Cndo2::FreeSCFTemporaryMatrices(double** oldOrbitalElectronPopulation,
+                                     double*** diisStoredDensityMatrix,
+                                     double*** diisStoredErrorVect,
+                                     double** diisErrorProducts,
+                                     double* diisErrorCoefficients){
+
+   int diisNumErrorVect = Parameters::GetInstance()->GetDiisNumErrorVectSCF();
    if(oldOrbitalElectronPopulation != NULL){
       MallocerFreer::GetInstance()->FreeDoubleMatrix2d
       (oldOrbitalElectronPopulation, this->molecule->GetTotalNumberAOs());
       oldOrbitalElectronPopulation = NULL;
       //cout << "oldOrbitalElectronPopulation deleted\n";
    }
+   if(diisStoredDensityMatrix != NULL){
+      MallocerFreer::GetInstance()->FreeDoubleMatrix3d
+      (diisStoredDensityMatrix, diisNumErrorVect, this->molecule->GetTotalNumberAOs());
+      diisStoredDensityMatrix = NULL;
+      //cout << "diisStoredDensityMatrix deleted\n";
+   } 
+   if(diisStoredErrorVect != NULL){
+      MallocerFreer::GetInstance()->FreeDoubleMatrix3d
+      (diisStoredErrorVect, diisNumErrorVect, this->molecule->GetTotalNumberAOs());
+      diisStoredErrorVect = NULL;
+      //cout << "diisStoredErrorVect deleted\n";
+   } 
+   if(diisErrorProducts != NULL){
+      MallocerFreer::GetInstance()->FreeDoubleMatrix2d
+      (diisErrorProducts, diisNumErrorVect+1);
+      diisErrorProducts = NULL;
+      //cout << "diisErrorProducts deleted\n";
+   } 
+   if(diisErrorCoefficients != NULL){
+      MallocerFreer::GetInstance()->FreeDoubleMatrix1d
+      (diisErrorCoefficients);
+      diisErrorCoefficients = NULL;
+      //cout << "diisErrorCoefficients deleted\n";
+   } 
 
-   cout << this->messageDoneSCF;
+}
+
+/***
+ *
+ *  see ref. [P_1980] for diis methods.
+ *
+ */
+void Cndo2::DoesDIIS(double** orbitalElectronPopulation,
+                     double** oldOrbitalElectronPopulation,
+                     double* atomicElectronPopulation,
+                     double*** diisStoredDensityMatrix,
+                     double*** diisStoredErrorVect,
+                     double** diisErrorProducts,
+                     double* diisErrorCoefficients,
+                     int diisNumErrorVect,
+                     Molecule* molecule,
+                     int step){
+
+   int totalNumberAOs = molecule->GetTotalNumberAOs();
+   double diisStartError = Parameters::GetInstance()->GetDiisStartErrorSCF();
+   double diisEndError = Parameters::GetInstance()->GetDiisEndErrorSCF();
+
+   if( 0 < diisNumErrorVect){
+      for(int m=0; m<diisNumErrorVect-1; m++){
+         for(int j=0; j<totalNumberAOs; j++){
+            for(int k=0; k<totalNumberAOs; k++){
+               diisStoredDensityMatrix[m][j][k] = diisStoredDensityMatrix[m+1][j][k];
+               diisStoredErrorVect[m][j][k] = diisStoredErrorVect[m+1][j][k];
+            }
+         }
+      }
+
+      for(int j=0; j<totalNumberAOs; j++){
+         for(int k=0; k<totalNumberAOs; k++){
+            diisStoredDensityMatrix[diisNumErrorVect-1][j][k] = orbitalElectronPopulation[j][k];
+            diisStoredErrorVect[diisNumErrorVect-1][j][k] = orbitalElectronPopulation[j][k] 
+                                                           -oldOrbitalElectronPopulation[j][k];
+                     
+         }
+      }
+
+      for(int mi=0; mi<diisNumErrorVect-1; mi++){
+         for(int mj=0; mj<diisNumErrorVect-1; mj++){
+            diisErrorProducts[mi][mj] = diisErrorProducts[mi+1][mj+1];
+         }
+      }
+               
+      double tempErrorProduct=0.0;
+      for(int mi=0; mi<diisNumErrorVect; mi++){
+         tempErrorProduct = 0.0;
+         for(int j=0; j<totalNumberAOs; j++){
+            for(int k=0; k<totalNumberAOs; k++){
+               tempErrorProduct += diisStoredErrorVect[mi][j][k]*diisStoredErrorVect[diisNumErrorVect-1][j][k];
+            }
+         }
+         diisErrorProducts[mi][diisNumErrorVect-1] = tempErrorProduct;
+         diisErrorProducts[diisNumErrorVect-1][mi] = tempErrorProduct;
+         diisErrorProducts[mi][diisNumErrorVect] = -1.0;
+         diisErrorProducts[diisNumErrorVect][mi] = -1.0;
+         diisErrorCoefficients[mi] = 0.0;
+      }
+      diisErrorProducts[diisNumErrorVect][diisNumErrorVect] = 0.0;
+      diisErrorCoefficients[diisNumErrorVect] = -1.0;
+
+      double eMax = 0;
+      for(int j=0; j<totalNumberAOs; j++){
+         for(int k=0; k<totalNumberAOs; k++){
+            eMax = max(eMax, fabs(diisStoredErrorVect[diisNumErrorVect-1][j][k]));
+         }
+      }
+
+      if(diisNumErrorVect <= step && diisEndError<eMax && eMax<diisStartError){
+         MolDS_mkl_wrapper::LapackWrapper::GetInstance()->Dsysv(diisErrorProducts, 
+                                                                diisErrorCoefficients, 
+                                                                diisNumErrorVect+1);
+         for(int j=0; j<totalNumberAOs; j++){
+            for(int k=0; k<totalNumberAOs; k++){
+               orbitalElectronPopulation[j][k] = 0.0;
+               for(int m=0; m<diisNumErrorVect; m++){
+                  orbitalElectronPopulation[j][k] += diisErrorCoefficients[m]*diisStoredDensityMatrix[m][j][k];
+               }
+            }
+         }
+
+         // calc. electron population in each atom.
+         this->CalcAtomicElectronPopulation(atomicElectronPopulation, orbitalElectronPopulation, molecule);
+      }
+   }
+}
+
+void Cndo2::DoesDamp(double rmsDensity, double** orbitalElectronPopulation, 
+                     double** oldOrbitalElectronPopulation, Molecule* molecule){
+
+   double dampingThresh = Parameters::GetInstance()->GetDampingThreshSCF();
+   double dampingWeight = Parameters::GetInstance()->GetDampingWeightSCF();
+   if(0.0 < dampingWeight && dampingThresh < rmsDensity){
+      for(int j=0; j<molecule->GetTotalNumberAOs(); j++){
+         for(int k=0; k<molecule->GetTotalNumberAOs(); k++){
+            orbitalElectronPopulation[j][k] *= (1.0 - dampingWeight);
+            orbitalElectronPopulation[j][k] += dampingWeight*oldOrbitalElectronPopulation[j][k];
+         }
+      }
+   } 
 
 }
 
@@ -595,11 +781,6 @@ bool Cndo2::SatisfyConvergenceCriterion(double** oldOrbitalElectronPopulation,
    printf("SCF iter=%d: RMS density=%.15lf \n",times,*rmsDensity);
    if(*rmsDensity < Parameters::GetInstance()->GetThresholdSCF()){
       satisfy = true;
-   }
-   else{
-      this->UpdateOldOrbitalElectronPopulation(oldOrbitalElectronPopulation, 
-                                               orbitalElectronPopulation, 
-                                               numberAOs);
    }
 
    return satisfy; 

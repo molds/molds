@@ -20,23 +20,27 @@ SCF:
          THEORY_END
    
    -options
-    "max_iter", "rms_density", "damping_thresh", and "damping_weight" are prepared as options.
-    option is "origin" only for setting the origin of the inertia tensor.
-    options are written in inertia-directive in angstrom unit.
-    Center of mass is used as origin when the "origin" is not set.
+    "max_iter", "rms_density", "damping_thresh", "damping_weight", 
+    "diis_num_error_vect", "diis_start_error", and "diis_end_error" are prepared as options.
 
     Default value of "max_iter" is 100.
     Default value of "rms_density" is 10**(-8.0).
-    Default value of "dampingThresh" is 1.
-    Default value of "dampingWeight" is 0.8.
+    Default value of "damping_thresh" is 1.
+    Default value of "damping_weight" is 0.8.
+    Default value of "diis_num_error_vect" is 5.
+    Default value of "diis_start_error" is 0.01.
+    Default value of "diis_end_error" is 10**(-8.0).
 
     E.g.
-         INERTIA
+         SCF
             max_iter 200
             rms_density 0.00000001
             damping_thresh 0.1
             damping_weight 0.7
-         INERTIA_END
+            diis_num_error_vect 6
+            diis_start_error 0.01
+            diis_end_error 0.00000001
+         SCF_END
 
 Principal Axes (Diagonalizing the inertia tensor):
    Write "principal_axes" in theory-directive.

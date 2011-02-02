@@ -7,6 +7,7 @@
 [RZ_1973] J. Ridley and M. C. Zerner, Theort. Chim. Acta (Berl.) 32, 111 (1973)
 [RZ_1976] J. E. Ridley and M. C. Zerner, Theort. Chim. Acta (Berl.) 42, 223 (1976)
 [BZ_1979] A. D. Bacon and M. C. Zerner, Theort. Chim. Acta (Berl.) 53, 21 (1979)
+[P_1980] P. Pulay, Chem. Phys. Lett. 73, 393 (1980)
 [HKLWNZ_1982] Z. S. Herman, R. F. Kirachner, G. H. Loew, U. T. M.-WesterHoff, A. Nazzal, and M. C. Zerner, Inorg. Chem., 21, 46 (1982)
 [AEZ_1986] W. P. Anderson, W. D. Edwards, and M. C. Zerner, Inorg. Chem. 25, 2728 (1986)
 [BFB_1997] M. A. Blanco, M. Fl{\'o}rez, and M. Bermejo, J. Mol. Struct. 419, 19 (1997)

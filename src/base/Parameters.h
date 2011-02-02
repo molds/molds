@@ -23,6 +23,12 @@ public:
    void SetDampingThreshSCF(double dampingThreshSCF);
    double GetDampingWeightSCF();
    void SetDampingWeightSCF(double dampingWeightSCF);
+   int GetDiisNumErrorVectSCF();
+   void SetDiisNumErrorVectSCF(int diisNumErrorVectSCF);
+   double GetDiisStartErrorSCF();
+   void SetDiisStartErrorSCF(double diisStartErrorSCF);
+   double GetDiisEndErrorSCF();
+   void SetDiisEndErrorSCF(double diisEndErrorSCF);
    double GetEV2AU();
    double GetAngstrom2AU();
    double GetKayser2AU();
@@ -62,6 +68,9 @@ private:
    int maxIterationsSCF;
    double dampingThreshSCF;
    double dampingWeightSCF;
+   int diisNumErrorVectSCF;
+   double diisStartErrorSCF;
+   double diisEndErrorSCF;
    void SetDefaultValues();
    double eV2AU;
    double angstrom2AU;
@@ -123,6 +132,9 @@ void Parameters::SetDefaultValues(){
    this->maxIterationsSCF = 100;
    this->dampingThreshSCF = 1.0;
    this->dampingWeightSCF = 0.8;
+   this->diisNumErrorVectSCF = 5;
+   this->diisStartErrorSCF = pow(10.0, -2.0);
+   this->diisEndErrorSCF = pow(10.0, -8.0);
    this->currentTheory = CNDO2;
    this->gMolin2AU = pow(10.0,5.0)/(6.0221415*9.1095);
    this->degree2Radian = M_PI / 180.0;
@@ -173,6 +185,30 @@ double Parameters::GetDampingWeightSCF(){
 
 void Parameters::SetDampingWeightSCF(double dampingWeightSCF){
    this->dampingWeightSCF = dampingWeightSCF;
+}
+
+int Parameters::GetDiisNumErrorVectSCF(){
+   return this->diisNumErrorVectSCF;
+}
+
+void Parameters::SetDiisNumErrorVectSCF(int diisNumErrorVectSCF){
+   this->diisNumErrorVectSCF = diisNumErrorVectSCF;
+}
+
+double Parameters::GetDiisStartErrorSCF(){
+   return this->diisStartErrorSCF;
+}
+
+void Parameters::SetDiisStartErrorSCF(double diisStartErrorSCF){
+   this->diisStartErrorSCF = diisStartErrorSCF;
+}
+
+double Parameters::GetDiisEndErrorSCF(){
+   return this->diisEndErrorSCF;
+}
+
+void Parameters::SetDiisEndErrorSCF(double diisEndErrorSCF){
+   this->diisEndErrorSCF = diisEndErrorSCF;
 }
 
 double Parameters::GetEV2AU(){

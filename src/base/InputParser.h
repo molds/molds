@@ -40,6 +40,9 @@ private:
    string messageScfRmsDensity;
    string messageScfDampingThresh;
    string messageScfDampingWeight;
+   string messageScfDiisNumErrorVect;
+   string messageScfDiisStartError;
+   string messageScfDiisEndError;
    string stringSpace;
    string stringCommentOut;
    string stringTheory;
@@ -59,6 +62,9 @@ private:
    string stringScfRmsDensity;
    string stringScfDampingThresh;
    string stringScfDampingWeight;
+   string stringScfDiisNumErrorVect;
+   string stringScfDiisStartError;
+   string stringScfDiisEndError;
    string stringInertiaTensor;
    string stringInertiaTensorEnd;
    string stringInertiaTensorOrigin;
@@ -100,6 +106,9 @@ InputParser::InputParser(){
    this->messageScfRmsDensity = "\t\tRMS density: ";
    this->messageScfDampingThresh = "\t\tDamping threshold: ";
    this->messageScfDampingWeight = "\t\tDamping weight: ";
+   this->messageScfDiisNumErrorVect = "\t\tDIIS number of error vectors: ";
+   this->messageScfDiisStartError = "\t\tDIIS starting error: ";
+   this->messageScfDiisEndError = "\t\tDIIS ending error: ";
    this->stringSpace = " ";
    this->stringCommentOut = "//";
    this->stringTheoryCNDO2 = "cndo/2";
@@ -119,6 +128,9 @@ InputParser::InputParser(){
    this->stringScfRmsDensity = "rms_density";
    this->stringScfDampingThresh = "damping_thresh";
    this->stringScfDampingWeight = "damping_weight";
+   this->stringScfDiisNumErrorVect = "diis_num_error_vect";
+   this->stringScfDiisStartError = "diis_start_error";
+   this->stringScfDiisEndError = "diis_end_error";
    this->stringInertiaTensor = "inertia";
    this->stringInertiaTensorEnd = "inertia_end";
    this->stringInertiaTensorOrigin = "origin";
@@ -259,6 +271,21 @@ void InputParser::Parse(Molecule* molecule){
             // Damping Weight
             if(inputTerms[j].compare(this->stringScfDampingWeight) == 0){
                Parameters::GetInstance()->SetDampingWeightSCF(atof(inputTerms[j+1].c_str()));
+               j++;
+            }
+            // DIIS number of stored error vectors
+            if(inputTerms[j].compare(this->stringScfDiisNumErrorVect) == 0){
+               Parameters::GetInstance()->SetDiisNumErrorVectSCF(atoi(inputTerms[j+1].c_str()));
+               j++;
+            }
+            // DIIS starting error
+            if(inputTerms[j].compare(this->stringScfDiisStartError) == 0){
+               Parameters::GetInstance()->SetDiisStartErrorSCF(atof(inputTerms[j+1].c_str()));
+               j++;
+            }
+            // DIIS ending error
+            if(inputTerms[j].compare(this->stringScfDiisEndError) == 0){
+               Parameters::GetInstance()->SetDiisEndErrorSCF(atof(inputTerms[j+1].c_str()));
                j++;
             }
             j++;   
@@ -456,6 +483,9 @@ void InputParser::OutputScfConditions(){
    printf("%s%e\n",this->messageScfRmsDensity.c_str(),Parameters::GetInstance()->GetThresholdSCF());
    printf("%s%e\n",this->messageScfDampingThresh.c_str(),Parameters::GetInstance()->GetDampingThreshSCF());
    printf("%s%e\n",this->messageScfDampingWeight.c_str(),Parameters::GetInstance()->GetDampingWeightSCF());
+   printf("%s%d\n",this->messageScfDiisNumErrorVect.c_str(),Parameters::GetInstance()->GetDiisNumErrorVectSCF());
+   printf("%s%e\n",this->messageScfDiisStartError.c_str(),Parameters::GetInstance()->GetDiisStartErrorSCF());
+   printf("%s%e\n",this->messageScfDiisEndError.c_str(),Parameters::GetInstance()->GetDiisEndErrorSCF());
    cout << "\n";
 
 }

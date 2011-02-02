@@ -1,6 +1,6 @@
 THEORY
-   //cndo/2
-   indo
+   cndo/2
+   //indo
    //zindo/s
    //none 
    //principal_axes
@@ -9,15 +9,18 @@ THEORY
 THEORY_END
 
 SCF
-   max_iter 200
-   rms_density 0.00000001
+   max_iter 50
+   rms_density 0.000001
    damping_thresh 1.0 
-   damping_weight 0.7
+   damping_weight 0.0
+   diis_num_error_vect 5
+   diis_start_error 0.002
+   diis_end_error 0.00000002
 SCF_END
 
 CIS
-   activeOcc 100
-   activeVir 100
+   activeOcc 2 
+   activeVir 2
    nstates 1000
 CIS_END
 

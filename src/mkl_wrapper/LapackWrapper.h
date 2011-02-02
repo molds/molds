@@ -18,24 +18,32 @@ public:
    static LapackWrapper* GetInstance();
    static void DeleteInstance();
    int Dsyevd(double** matrix, double* eigenValues, int size, bool calcEigenVectors);
+   int Dsysv(double** matrix, double* b, int size);
 private:
    LapackWrapper();
    LapackWrapper(LapackWrapper&);
    void operator = (LapackWrapper&);
    ~LapackWrapper();
    static LapackWrapper* lapackWrapper;
-
+   bool calculatedDsysvWorkSize;
+   int dsysvWorkSize;
    string errorMessageDsyevdInfo;
    string errorMessageDsyevdSize;
+   string errorMessageDsysvInfo;
+   string errorMessageDsysvSize;
 };
 LapackWrapper* LapackWrapper::lapackWrapper = NULL;
 
 LapackWrapper::LapackWrapper(){
    this->errorMessageDsyevdInfo = "Error in mkl_wrapper::LapackWrapper::Dsyevd: info != 0\n";
    this->errorMessageDsyevdSize = "Error in mkl_wrapper::LapackWrapper::Dsyevd: size of matirx < 1\n";
+   this->errorMessageDsysvInfo = "Error in mkl_wrapper::LapackWrapper::Dsysv: info != 0\n";
+   this->errorMessageDsysvSize = "Error in mkl_wrapper::LapackWrapper::Dsysv: size of matirx < 1\n";
 }
 
 LapackWrapper::~LapackWrapper(){
+   this->calculatedDsysvWorkSize = false;
+   this->dsysvWorkSize = 64;
 }
 
 LapackWrapper* LapackWrapper::GetInstance(){
@@ -149,6 +157,72 @@ int LapackWrapper::Dsyevd(double** matrix, double* eigenValues, int size, bool c
    if(info != 0){
       stringstream ss;
       ss << errorMessageDsyevdInfo;
+      throw MolDSException(ss.str());
+   }
+   return info;
+}
+
+/***
+ *
+ * Slove matrix*X=b, then we get X by this method.
+ * The X is stored in b.
+ *
+ */
+int LapackWrapper::Dsysv(double** matrix, double* b, int size){
+   int info = 0;
+   int lwork;
+   char uplo = 'U';
+   int lda = size;
+   int ldb = size;
+   int nrhs = 1;
+   double* convertedMatrix;
+   double* work;
+   int* ipiv;
+
+   if(size < 1 ){
+      stringstream ss;
+      ss << errorMessageDsysvSize;
+      throw MolDSException(ss.str());
+   }
+
+   // malloc
+   ipiv = MallocerFreer::GetInstance()->MallocIntMatrix1d(2*size);
+   convertedMatrix = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(size*size);
+
+   for(int i = 0; i < size; i++){
+      for(int j = i; j < size; j++){
+         convertedMatrix[i+j*size] = matrix[i][j];
+      }
+   }
+
+   // calc. lwork
+   if(!this->calculatedDsysvWorkSize){
+      lwork = -1;
+      double tempWork[3]={0.0, 0.0, 0.0};
+      dsysv(&uplo, &size, &nrhs, convertedMatrix, &lda, ipiv, b, &ldb, tempWork, &lwork, &info);
+      this->calculatedDsysvWorkSize = true;
+      this->dsysvWorkSize = tempWork[0];
+   }
+
+   info = 0;
+   lwork = this->dsysvWorkSize;
+   work = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(lwork);
+
+   // call Lapack
+   dsysv(&uplo, &size, &nrhs, convertedMatrix, &lda, ipiv, b, &ldb, work, &lwork, &info);
+
+   // free
+   MallocerFreer::GetInstance()->FreeDoubleMatrix1d(convertedMatrix);
+   convertedMatrix = NULL;
+   MallocerFreer::GetInstance()->FreeIntMatrix1d(ipiv);
+   ipiv = NULL;
+   MallocerFreer::GetInstance()->FreeDoubleMatrix1d(work);
+   work = NULL;
+  
+   if(info != 0){
+      cout << "info=" << info << endl;
+      stringstream ss;
+      ss << errorMessageDsysvInfo;
       throw MolDSException(ss.str());
    }
    return info;
