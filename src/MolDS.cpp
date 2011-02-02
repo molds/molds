@@ -157,6 +157,8 @@ int main(){
 
 
       // Farewell Messages
+      time_t endTime;
+      time(&endTime);
       clock_t endTick = clock();
       double consumedTime = (double)(endTick - startTick)/(double)CLOCKS_PER_SEC;
       if(runingNormally){
@@ -165,7 +167,8 @@ int main(){
       else{
          cout << "\n\n     >>>>>  The MolDS finished abnormally..............  <<<<<\n";
       }
-      cout <<     "     >>>>>  Consumed time (CPU time): " << consumedTime << "[s].  <<<<<\n";
+      cout <<     "     >>>>>  CPU time: " << consumedTime << "[s].  <<<<<\n";
+      cout <<     "     >>>>>  Elapsed time: " << endTime - startTime << "[s].  <<<<<\n";
       cout <<     "     >>>>>  See you.  <<<<<\n\n\n";
 
    }
