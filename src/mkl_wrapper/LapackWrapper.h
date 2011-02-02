@@ -147,12 +147,9 @@ int LapackWrapper::Dsyevd(double** matrix, double* eigenValues, int size, bool c
    //printf("size=%d lwork=%d liwork=%d k=%d info=%d\n",size,lwork,liwork,k,info);
 
    // free
-   MallocerFreer::GetInstance()->FreeDoubleMatrix1d(convertedMatrix);
-   convertedMatrix = NULL;
-   MallocerFreer::GetInstance()->FreeDoubleMatrix1d(work);
-   work = NULL;
-   MallocerFreer::GetInstance()->FreeIntMatrix1d(iwork);
-   iwork = NULL;
+   MallocerFreer::GetInstance()->FreeDoubleMatrix1d(&convertedMatrix);
+   MallocerFreer::GetInstance()->FreeDoubleMatrix1d(&work);
+   MallocerFreer::GetInstance()->FreeIntMatrix1d(&iwork);
   
    if(info != 0){
       stringstream ss;
@@ -212,12 +209,9 @@ int LapackWrapper::Dsysv(double** matrix, double* b, int size){
    dsysv(&uplo, &size, &nrhs, convertedMatrix, &lda, ipiv, b, &ldb, work, &lwork, &info);
 
    // free
-   MallocerFreer::GetInstance()->FreeDoubleMatrix1d(convertedMatrix);
-   convertedMatrix = NULL;
-   MallocerFreer::GetInstance()->FreeIntMatrix1d(ipiv);
-   ipiv = NULL;
-   MallocerFreer::GetInstance()->FreeDoubleMatrix1d(work);
-   work = NULL;
+   MallocerFreer::GetInstance()->FreeDoubleMatrix1d(&convertedMatrix);
+   MallocerFreer::GetInstance()->FreeIntMatrix1d(&ipiv);
+   MallocerFreer::GetInstance()->FreeDoubleMatrix1d(&work);
   
    if(info != 0){
       cout << "info=" << info << endl;

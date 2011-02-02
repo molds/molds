@@ -20,25 +20,25 @@ public:
    // 1d
    int* MallocIntMatrix1d(int size1);
    void InitializeIntMatrix1d(int* matirx, int size1);
-   void FreeIntMatrix1d(int* matrix);
+   void FreeIntMatrix1d(int** matrix);
 
    // real number matrix
    // 1d
    double* MallocDoubleMatrix1d(int size1);
    void InitializeDoubleMatrix1d(double* matrix, int size1);
-   void FreeDoubleMatrix1d(double* matrix);
+   void FreeDoubleMatrix1d(double** matrix);
    // 2d
    double** MallocDoubleMatrix2d(int size1, int size2);
    void InitializeDoubleMatrix2d(double** matrix, int size1, int size2);
-   void FreeDoubleMatrix2d(double** matrix, int size1);
+   void FreeDoubleMatrix2d(double*** matrix, int size1);
    // 3d
    double*** MallocDoubleMatrix3d(int size1, int size2, int size3);
    void InitializeDoubleMatrix3d(double*** matrix, int size1, int size2, int size3);
-   void FreeDoubleMatrix3d(double*** matrix, int size1, int size2);
+   void FreeDoubleMatrix3d(double**** matrix, int size1, int size2);
    // 4d
    double**** MallocDoubleMatrix4d(int size1, int size2, int size3, int size4);
    void InitializeDoubleMatrix4d(double**** matrix, int size1, int size2, int size3, int size4);
-   void FreeDoubleMatrix4d(double**** matrix, int size1, int size2, int size3);
+   void FreeDoubleMatrix4d(double***** matrix, int size1, int size2, int size3);
 private:
    MallocerFreer();
    MallocerFreer(MallocerFreer&);
@@ -87,8 +87,9 @@ void MallocerFreer::InitializeIntMatrix1d(int* matrix, int size1){
    }
 }
 
-void MallocerFreer::FreeIntMatrix1d(int* matrix){
-   delete [] matrix;
+void MallocerFreer::FreeIntMatrix1d(int** matrix){
+   delete [] *matrix;
+   *matrix = NULL;
 }
 
 double* MallocerFreer::MallocDoubleMatrix1d(int size1){
@@ -107,8 +108,9 @@ void MallocerFreer::InitializeDoubleMatrix1d(double* matrix, int size1){
    }
 }
 
-void MallocerFreer::FreeDoubleMatrix1d(double* matrix){
-   delete [] matrix;
+void MallocerFreer::FreeDoubleMatrix1d(double** matrix){
+   delete [] *matrix;
+   *matrix = NULL;
 }
 
 double** MallocerFreer::MallocDoubleMatrix2d(int size1, int size2){
@@ -140,13 +142,14 @@ void MallocerFreer::InitializeDoubleMatrix2d(double** matrix, int size1, int siz
    }
 }
 
-void MallocerFreer::FreeDoubleMatrix2d(double** matrix, int size1){
+void MallocerFreer::FreeDoubleMatrix2d(double*** matrix, int size1){
 
    int i=0;
    for(i=0;i<size1;i++){
-      delete [] matrix[i];
+      delete [] (*matrix)[i];
    }
-   delete [] matrix;
+   delete [] *matrix;
+   *matrix = NULL;
 }
 
 double*** MallocerFreer::MallocDoubleMatrix3d(int size1, int size2, int size3){
@@ -185,17 +188,18 @@ void MallocerFreer::InitializeDoubleMatrix3d(double*** matrix, int size1, int si
    }
 }
 
-void MallocerFreer::FreeDoubleMatrix3d(double*** matrix, int size1, int size2){
+void MallocerFreer::FreeDoubleMatrix3d(double**** matrix, int size1, int size2){
 
    int i=0, j=0;
 
    for (i=0;i<size1;i++) {
       for (j=0;j<size2;j++) {
-         delete [] matrix[i][j];
+         delete [] (*matrix)[i][j];
       }
-      delete [] matrix[i];
+      delete [] (*matrix)[i];
    }
-   delete [] matrix;
+   delete [] *matrix;
+   *matrix = NULL;
 
 }
 
@@ -243,20 +247,21 @@ void MallocerFreer::InitializeDoubleMatrix4d(double**** matrix, int size1, int s
    }
 }
 
-void MallocerFreer::FreeDoubleMatrix4d(double**** matrix, int size1, int size2, int size3){
+void MallocerFreer::FreeDoubleMatrix4d(double***** matrix, int size1, int size2, int size3){
 
    int i=0, j=0, k=0;
 
    for (i=0;i<size1;i++) {
       for (j=0;j<size2;j++) {
          for (k=0;k<size3;k++) {
-            delete [] matrix[i][j][k];
+            delete [] (*matrix)[i][j][k];
          }
-         delete [] matrix[i][j];
+         delete [] (*matrix)[i][j];
       }
-      delete [] matrix[i];
+      delete [] (*matrix)[i];
    }
-   delete [] matrix;
+   delete [] *matrix;
+   *matrix = NULL;
 
 }
 

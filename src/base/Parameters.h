@@ -98,13 +98,11 @@ Parameters::Parameters(){
 
 Parameters::~Parameters(){
    if(this->inertiaTensorOrigin != NULL){
-      MallocerFreer::GetInstance()->FreeDoubleMatrix1d(this->inertiaTensorOrigin);
-      this->inertiaTensorOrigin = NULL;
+      MallocerFreer::GetInstance()->FreeDoubleMatrix1d(&this->inertiaTensorOrigin);
       //cout << "inertiaTensorOrigin deleted\n";
    }
    if(this->rotatingOrigin != NULL){
-      MallocerFreer::GetInstance()->FreeDoubleMatrix1d(this->rotatingOrigin);
-      this->rotatingOrigin = NULL;
+      MallocerFreer::GetInstance()->FreeDoubleMatrix1d(&this->rotatingOrigin);
       //cout << "rotatingOrigin deleted\n";
    }
 

@@ -44,7 +44,7 @@ private:
    double totalCoreRepulsionEnergy;
    bool wasCalculatedTotalCoreRepulsionEnergy;
    void CalcInertiaTensor(double** inertiaTensor, double* inertiaTensorOrigin);
-   void FreeInertiaTensorMoments(double** inertiaTensor, double* inertiaMoments);
+   void FreeInertiaTensorMoments(double*** inertiaTensor, double** inertiaMoments);
    void Rotate(EularAngle eularAngle, double* rotatingOrigin, RotatedObjectType rotatedObj);
    void OutputPrincipalAxes(double** inertiaTensor, double* inertiaMoments);
    void OutputInertiaTensorOrigin(double* inertiaTensorOrigin);
@@ -144,8 +144,7 @@ Molecule::~Molecule(){
       //cout << "atomVect deleted\n";
    }
    if(this->xyzCOM != NULL){
-      MallocerFreer::GetInstance()->FreeDoubleMatrix1d(this->xyzCOM);
-      this->xyzCOM = NULL;
+      MallocerFreer::GetInstance()->FreeDoubleMatrix1d(&this->xyzCOM);
       //cout << "xyzCOM deleted\n";
    }
 }
@@ -363,10 +362,10 @@ void Molecule::CalcPrincipalAxes(){
       this->OutputInertiaTensorOrigin(inertiaTensorOrigin);
    }
    catch(MolDSException ex){
-      this->FreeInertiaTensorMoments(inertiaTensor, inertiaMoments);
+      this->FreeInertiaTensorMoments(&inertiaTensor, &inertiaMoments);
       throw ex;
    }
-   this->FreeInertiaTensorMoments(inertiaTensor, inertiaMoments);
+   this->FreeInertiaTensorMoments(&inertiaTensor, &inertiaMoments);
 
    cout << this->messageDonePrincipalAxes;
    
@@ -402,17 +401,15 @@ void Molecule::CalcInertiaTensor(double** inertiaTensor, double* inertiaTensorOr
    
 }
 
-void Molecule::FreeInertiaTensorMoments(double** inertiaTensor, double* inertiaMoments){
+void Molecule::FreeInertiaTensorMoments(double*** inertiaTensor, double** inertiaMoments){
 
-   if(inertiaTensor != NULL){
+   if(*inertiaTensor != NULL){
       MallocerFreer::GetInstance()->FreeDoubleMatrix2d(inertiaTensor, 3);
-      inertiaTensor = NULL;
       //cout << "inertiaTensor deleted\n";
    }
 
-   if(inertiaMoments != NULL){
+   if(*inertiaMoments != NULL){
       MallocerFreer::GetInstance()->FreeDoubleMatrix1d(inertiaMoments);
-      inertiaMoments = NULL;
       //cout << "inertiaMoments deleted\n";
    }
 

@@ -128,9 +128,8 @@ Atom::Atom(double x, double y, double z){
 }
 
 Atom::~Atom(){
-   if(xyz != NULL){
-      MallocerFreer::GetInstance()->FreeDoubleMatrix1d(xyz);
-      xyz = NULL;
+   if(this->xyz != NULL){
+      MallocerFreer::GetInstance()->FreeDoubleMatrix1d(&this->xyz);
       //cout << "xyz deleted\n";
    }
    //cout << "atom deleted\n";

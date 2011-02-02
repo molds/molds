@@ -685,13 +685,11 @@ printf("number of excited states: %d\n\n\n",numberExcitedStates);
    cout << endl;
 
    if(matrixCIS != NULL){
-      MallocerFreer::GetInstance()->FreeDoubleMatrix2d(matrixCIS, numberExcitedStates);
-      matrixCIS = NULL;
+      MallocerFreer::GetInstance()->FreeDoubleMatrix2d(&matrixCIS, numberExcitedStates);
       //cout << "matrixCIS deleted\n";
    }
    if(excitedEnergies != NULL){
-      MallocerFreer::GetInstance()->FreeDoubleMatrix1d(excitedEnergies);
-      excitedEnergies = NULL;
+      MallocerFreer::GetInstance()->FreeDoubleMatrix1d(&excitedEnergies);
       //cout << "exceitedEnergies deleted\n";
    }
 
