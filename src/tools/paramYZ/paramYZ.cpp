@@ -1,14 +1,16 @@
 #include<stdio.h>
 #include<stdlib.h>
+#include<sstream>
 #include<iostream>
 #include<math.h>
 #include<string>
 #include<time.h>
-#include"../../base/MathUtilities.h"
+#include"../../base/MolDSException.h"
 #include"../../base/Enums.h"
 #undef INCLUDED_ENUMS
 #define RENUMSTR_BODY 1
 #include"../../base/Enums.h"
+#include"../../base/MathUtilities.h"
 
 using namespace std;
 using namespace MolDS_base;
@@ -24,6 +26,7 @@ Y[na][nb][la][lb][m][i][j] corresponds Y_{ij\lammda}
 for given n_{a}, n_{b}, l_{a}, l_{b}, and m in (B.20) in Pople book.
 *********************************************************************/
 int main(){
+   try{
    int I = 2*ShellType_end+1;
    int J = 2*ShellType_end+1;
    double C[ShellType_end][ShellType_end][ShellType_end];
@@ -205,7 +208,10 @@ int main(){
       }
    }
    */
-
+   }
+   catch(MolDSException ex){
+      cout << ex.what();
+   }
    return 0;
 }
 
