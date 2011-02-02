@@ -898,17 +898,30 @@ void Cndo2::CalcOrbitalElectronPopulation(double** orbitalElectronPopulation,
    MallocerFreer::GetInstance()->InitializeDoubleMatrix2d
                                  (orbitalElectronPopulation, totalNumberAOs, totalNumberAOs);
 
+   double transposedFockMatrix[totalNumberAOs][totalNumberAOs];
+   for(int mu=0; mu<totalNumberAOs; mu++){
+      for(int nu=0; nu<totalNumberAOs; nu++){
+         transposedFockMatrix[mu][nu] = fockMatrix[nu][mu];
+      }
+   }
+   
    double value=0.0;
    int numberTotalValenceElectrons = molecule->GetTotalNumberValenceElectrons();
    for(int mu=0; mu<totalNumberAOs; mu++){
-      for(int nu=0; nu<totalNumberAOs; nu++){
+      for(int nu=mu; nu<totalNumberAOs; nu++){
 
          value = 0.0;
          for(int mo=0; mo<numberTotalValenceElectrons/2; mo++){
-            value += fockMatrix[mo][mu]*fockMatrix[mo][nu];
+            value += transposedFockMatrix[mu][mo]*transposedFockMatrix[nu][mo];
          }
 
          orbitalElectronPopulation[mu][nu] = 2.0*value;
+      }
+   }
+   
+   for(int mu=0; mu<totalNumberAOs; mu++){
+      for(int nu=mu+1; nu<totalNumberAOs; nu++){
+         orbitalElectronPopulation[nu][mu] = orbitalElectronPopulation[mu][nu];
       }
    }
 
