@@ -104,24 +104,37 @@ double ZindoS::GetFockDiagElement(Atom* atomA, int atomAIndex, int mu,
       double coulomb = 0.0;
       double exchange = 0.0;
       int lammda = 0;
+      int totalNumberAOs = this->molecule->GetTotalNumberAOs();
+      double orbitalElectronPopulationDiagPart[totalNumberAOs];
+
+      for(int i=0; i<totalNumberAOs; i++){
+         orbitalElectronPopulationDiagPart[i] = orbitalElectronPopulation[i][i];
+      }
+
       OrbitalType orbitalMu = atomA->GetValence()[mu-firstAOIndexA];
-      for(int v=0; v<atomA->GetValence().size(); v++){
-         OrbitalType orbitalLam = atomA->GetValence()[v];
+      OrbitalType orbitalLam;
+      int atomANumberValence = atomA->GetValence().size();
+      for(int v=0; v<atomANumberValence; v++){
+         orbitalLam = atomA->GetValence()[v];
          coulomb  = this->GetCoulombInt(orbitalMu, orbitalLam, atomA);
          exchange = this->GetExchangeInt(orbitalMu, orbitalLam, atomA);
          lammda = v + firstAOIndexA;
-         temp += orbitalElectronPopulation[lammda][lammda]*(coulomb - 0.5*exchange);
+         temp += orbitalElectronPopulationDiagPart[lammda]*(coulomb - 0.5*exchange);
       }
       value += temp;
    
       temp = 0.0;
-      for(int B=0; B<molecule->GetAtomVect()->size(); B++){
+      int totalNumberAtoms = molecule->GetAtomVect()->size();
+      for(int B=0; B<totalNumberAtoms; B++){
          if(B != atomAIndex){
             Atom* atomB = (*molecule->GetAtomVect())[B];
-            for(int i=0; i<atomB->GetValence().size(); i++){
-               int sigma = i + atomB->GetFirstAOIndex();
-               OrbitalType orbitalSigma = atomB->GetValence()[i];
-               temp += orbitalElectronPopulation[sigma][sigma]
+            OrbitalType orbitalSigma;
+            int sigma;
+            int atomBNumberValence = atomB->GetValence().size();
+            for(int i=0; i<atomBNumberValence; i++){
+               sigma = i + atomB->GetFirstAOIndex();
+               orbitalSigma = atomB->GetValence()[i];
+               temp += orbitalElectronPopulationDiagPart[sigma]
                       *this->GetNishimotoMatagaTwoEleInt(atomA, orbitalMu, atomB, orbitalSigma);
             }
             temp -= atomB->GetCoreCharge() 
