@@ -1,9 +1,10 @@
 
 Compile: 
    for 32 bit
-   $icc MolDS.cpp -lmkl_intel -lmkl_intel_thread -lmkl_core -liomp5 -lpthread
-   or
-   $icc MolDS.cpp -lmkl_intel -lmkl_intel_thread -lmkl_core -openmp -lpthread
+   $icc MolDS.cpp -lmkl_intel -lmkl_intel_thread -lmkl_core -liomp5 -lpthread -O3
+   $icc MolDS.cpp -lmkl_intel -lmkl_intel_thread -lmkl_core -liomp5 -lguide -lpthread -O3
+   $icc MolDS.cpp -lmkl_intel -lmkl_intel_thread -lmkl_core -openmp -lpthread -O3
+   $icc MolDS.cpp -lmkl_intel -lmkl_intel_thread -lmkl_core -openmp -lguide -lpthread -O3
 
    for 64 bit
    $icc MolDS.cpp -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread
