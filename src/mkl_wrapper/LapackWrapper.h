@@ -25,8 +25,8 @@ private:
    void operator = (LapackWrapper&);
    ~LapackWrapper();
    static LapackWrapper* lapackWrapper;
-   bool calculatedDsysvWorkSize;
-   int dsysvWorkSize;
+   bool calculatedDsysvBlockSize;
+   int dsysvBlockSize;
    string errorMessageDsyevdInfo;
    string errorMessageDsyevdSize;
    string errorMessageDsysvInfo;
@@ -42,8 +42,8 @@ LapackWrapper::LapackWrapper(){
 }
 
 LapackWrapper::~LapackWrapper(){
-   this->calculatedDsysvWorkSize = false;
-   this->dsysvWorkSize = 64;
+   this->calculatedDsysvBlockSize = false;
+   this->dsysvBlockSize = 64;
 }
 
 LapackWrapper* LapackWrapper::GetInstance(){
@@ -193,16 +193,16 @@ int LapackWrapper::Dsysv(double** matrix, double* b, int size){
    }
 
    // calc. lwork
-   if(!this->calculatedDsysvWorkSize){
+   if(!this->calculatedDsysvBlockSize){
       lwork = -1;
       double tempWork[3]={0.0, 0.0, 0.0};
       dsysv(&uplo, &size, &nrhs, convertedMatrix, &lda, ipiv, b, &ldb, tempWork, &lwork, &info);
-      this->calculatedDsysvWorkSize = true;
-      this->dsysvWorkSize = tempWork[0];
+      this->calculatedDsysvBlockSize = true;
+      this->dsysvBlockSize = tempWork[0]/size;
    }
 
    info = 0;
-   lwork = this->dsysvWorkSize;
+   lwork = this->dsysvBlockSize*size;
    work = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(lwork);
 
    // call Lapack
