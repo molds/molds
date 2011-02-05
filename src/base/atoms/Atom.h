@@ -78,8 +78,8 @@ protected:
    double bondingParameterSZindo;        // Table 1 in [RZ_1976], table 1 in [HKLWNZ_1982], or table 3 in [AEZ_1986]
    double bondingParameterDZindo;        // Table 1 in [RZ_1976], table 1 in [HKLWNZ_1982], or table 3 in [AEZ_1986]
    double coreCharge;                   // = Z_A in J. A. Pople book.
-   double effectiveNuclearChargeK;      // Table 1.5 in J. A. Pople book
-   double effectiveNuclearChargeL;      // Table 1.5 in J. A. Pople book
+   double effectiveNuclearChargeK;      // Table 1.5 in J. A. Pople book or table 1 in [HKLWNZ_1982]
+   double effectiveNuclearChargeL;      // Table 1.5 in J. A. Pople book or table 1 in [HKLWNZ_1982]
    double effectiveNuclearChargeMsp;    // Table 1.5 in J. A. Pople book
    double effectiveNuclearChargeMd;     // Table 1.5 in J. A. Pople book
    int GetEffectivePrincipalQuantumNumber(ShellType shellType); // Table 1.4 in J. A. Pople book
@@ -88,14 +88,14 @@ protected:
    double zindoF0ss;                // Table 1 in ref. [RZ_1976], Table 1 in [AEZ_1986], or Table 1 in [GD_1972]
    double zindoF0sd;                  // Table 1 in [AEZ_1986]
    double zindoF0dd;                  // Table 1 in [AEZ_1986]
-   double zindoG1sp;                 // Table 3 in ref. [BZ_1979]
-   double zindoF2pp;                 // Table 3 in ref. [BZ_1979]
-   double zindoG2sd;                 // Table 3 in ref. [BZ_1979]
-   double zindoG1pd;                 // Table 3 in ref. [BZ_1979]
-   double zindoF2pd;                 // Table 3 in ref. [BZ_1979]
-   double zindoG3pd;                 // Table 3 in ref. [BZ_1979]
-   double zindoF2dd;                 // Table 3 in ref. [BZ_1979]
-   double zindoF4dd;                 // Table 3 in ref. [BZ_1979]
+   double zindoG1sp;                 // Table 3 in ref. [BZ_1979] or table 1 in [HKLWNZ_1982]
+   double zindoF2pp;                 // Table 3 in ref. [BZ_1979] or table 1 in [HKLWNZ_1982]
+   double zindoG2sd;                 // Table 3 in ref. [BZ_1979] or table 1 in [HKLWNZ_1982]
+   double zindoG1pd;                 // Table 3 in ref. [BZ_1979] or table 1 in [HKLWNZ_1982]
+   double zindoF2pd;                 // Table 3 in ref. [BZ_1979] or table 1 in [HKLWNZ_1982]
+   double zindoG3pd;                 // Table 3 in ref. [BZ_1979] or table 1 in [HKLWNZ_1982]
+   double zindoF2dd;                 // Table 3 in ref. [BZ_1979] or table 1 in [HKLWNZ_1982]
+   double zindoF4dd;                 // Table 3 in ref. [BZ_1979] or table 1 in [HKLWNZ_1982]
    double ionPotS;   // Ionization potential, Table 4 in [BZ_1979]
    double ionPotP;   // Ionization potential, Table 4 in [BZ_1979]
    double ionPotD;   // Ionization potential, Table 4 in [BZ_1979]

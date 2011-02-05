@@ -39,22 +39,39 @@ Satom::Satom(double x, double y, double z) : Atom(x, y, z){
    this->valenceShellType = m;
    this->effectiveNuclearChargeK = 15.70;
    this->effectiveNuclearChargeL = 11.85;
-   this->effectiveNuclearChargeMsp = 5.45;
-   this->effectiveNuclearChargeMd = 5.45;
+   if(Parameters::GetInstance()->GetCurrentTheory() == ZINDOS){
+      this->effectiveNuclearChargeMsp = 1.925*3.0;
+      this->effectiveNuclearChargeMd = 1.731*3.0;
+   }
+   else{
+      this->effectiveNuclearChargeMsp = 5.45;
+      this->effectiveNuclearChargeMd = 5.45;
+   }
    this->numberValenceElectrons = 6;
    this->indoG1 = 0.267708;
    this->indoF2 = 0.17372;
-   this->zindoF0ss = 8.96 * Parameters::GetInstance()->GetEV2AU();                  
+   // the zindoF0ss for sulfer atoms are set to be equal 
+   // to the one (10.09eV) in "ORCA 2.8"( http://www.thch.uni-bonn.de/tc/orca/ ).
+   this->zindoF0ss = 10.09 * Parameters::GetInstance()->GetEV2AU(); 
+   //this->zindoF0ss = 8.96 * Parameters::GetInstance()->GetEV2AU();                  
    this->zindoF0sd = 0.0;                   
    this->zindoF0dd = 0.0;                 
-   this->zindoG1sp = 24807*Parameters::GetInstance()->GetKayser2AU();                 
-   this->zindoF2pp = 36600*Parameters::GetInstance()->GetKayser2AU();                 
-   this->zindoG2sd = 25972*Parameters::GetInstance()->GetKayser2AU();     
-   this->zindoG1pd = 34486*Parameters::GetInstance()->GetKayser2AU();        
-   this->zindoF2pd = 29173*Parameters::GetInstance()->GetKayser2AU();           
-   this->zindoG3pd = 20587*Parameters::GetInstance()->GetKayser2AU();           
-   this->zindoF2dd = 28411*Parameters::GetInstance()->GetKayser2AU();           
-   this->zindoF4dd = 18529*Parameters::GetInstance()->GetKayser2AU();           
+   this->zindoG1sp = 3.10 * Parameters::GetInstance()->GetEV2AU();                 
+   this->zindoF2pp = 4.57 * Parameters::GetInstance()->GetEV2AU();
+   this->zindoG2sd = 3.25 * Parameters::GetInstance()->GetEV2AU();
+   this->zindoG1pd = 4.31 * Parameters::GetInstance()->GetEV2AU();        
+   this->zindoF2pd = 3.45 * Parameters::GetInstance()->GetEV2AU();
+   this->zindoG3pd = 2.57 * Parameters::GetInstance()->GetEV2AU();
+   this->zindoF2dd = 3.55 * Parameters::GetInstance()->GetEV2AU();
+   this->zindoF4dd = 2.31 * Parameters::GetInstance()->GetEV2AU();
+   //this->zindoG1sp = 24807*Parameters::GetInstance()->GetKayser2AU();                 
+   //this->zindoF2pp = 36600*Parameters::GetInstance()->GetKayser2AU();                 
+   //this->zindoG2sd = 25972*Parameters::GetInstance()->GetKayser2AU();     
+   //this->zindoG1pd = 34486*Parameters::GetInstance()->GetKayser2AU();        
+   //this->zindoF2pd = 29173*Parameters::GetInstance()->GetKayser2AU();           
+   //this->zindoG3pd = 20587*Parameters::GetInstance()->GetKayser2AU();           
+   //this->zindoF2dd = 28411*Parameters::GetInstance()->GetKayser2AU();           
+   //this->zindoF4dd = 18529*Parameters::GetInstance()->GetKayser2AU();           
    this->ionPotS = 21.11 * Parameters::GetInstance()->GetEV2AU();
    this->ionPotP = 12.39 * Parameters::GetInstance()->GetEV2AU();
    this->ionPotD = 4.11 * Parameters::GetInstance()->GetEV2AU();
