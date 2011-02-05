@@ -35,6 +35,8 @@ private:
 LapackWrapper* LapackWrapper::lapackWrapper = NULL;
 
 LapackWrapper::LapackWrapper(){
+   this->calculatedDsysvBlockSize = false;
+   this->dsysvBlockSize = 64;
    this->errorMessageDsyevdInfo = "Error in mkl_wrapper::LapackWrapper::Dsyevd: info != 0\n";
    this->errorMessageDsyevdSize = "Error in mkl_wrapper::LapackWrapper::Dsyevd: size of matirx < 1\n";
    this->errorMessageDsysvInfo = "Error in mkl_wrapper::LapackWrapper::Dsysv: info != 0\n";
@@ -42,8 +44,6 @@ LapackWrapper::LapackWrapper(){
 }
 
 LapackWrapper::~LapackWrapper(){
-   this->calculatedDsysvBlockSize = false;
-   this->dsysvBlockSize = 64;
 }
 
 LapackWrapper* LapackWrapper::GetInstance(){
