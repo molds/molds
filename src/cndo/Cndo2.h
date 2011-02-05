@@ -964,7 +964,9 @@ void Cndo2::CalcAtomicElectronPopulation(double* atomicElectronPopulation,
 void Cndo2::CalcGammaAB(double** gammaAB, Molecule* molecule){
 
    int totalAtomNumber = molecule->GetAtomVect()->size();
-   for(int A=0; A<totalAtomNumber; A++){
+   int A=0;
+   #pragma omp parallel for private(A) schedule(auto)
+   for(A=0; A<totalAtomNumber; A++){
       Atom* atomA = (*(molecule->GetAtomVect()))[A];
       int na = atomA->GetValenceShellType() + 1;
       double orbitalExponentA = atomA->GetOrbitalExponent
@@ -1026,9 +1028,8 @@ void Cndo2::CalcGammaAB(double** gammaAB, Molecule* molecule){
       }
    }
 
-
-   
-   for(int A=0; A<totalAtomNumber; A++){
+   #pragma omp parallel for private(A) schedule(auto)
+   for(A=0; A<totalAtomNumber; A++){
       for(int B=0; B<A; B++){
          gammaAB[A][B] = gammaAB[B][A];
       }
