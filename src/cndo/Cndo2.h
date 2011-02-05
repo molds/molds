@@ -371,21 +371,21 @@ void Cndo2::DoesSCF(){
             break;
          }
          else{
+            if(!isGuess){ 
+               // damping
+               this->DoesDamp(rmsDensity, this->orbitalElectronPopulation, oldOrbitalElectronPopulation, this->molecule);
            
-            // damping
-            this->DoesDamp(rmsDensity, this->orbitalElectronPopulation, oldOrbitalElectronPopulation, this->molecule);
-           
-            // diis 
-            this->DoesDIIS(this->orbitalElectronPopulation,
-                           oldOrbitalElectronPopulation,
-                           diisStoredDensityMatrix,
-                           diisStoredErrorVect,
-                           diisErrorProducts,
-                           diisErrorCoefficients,
-                           diisNumErrorVect,
-                           this->molecule,
-                           i);
-            
+               // diis 
+               this->DoesDIIS(this->orbitalElectronPopulation,
+                              oldOrbitalElectronPopulation,
+                              diisStoredDensityMatrix,
+                              diisStoredErrorVect,
+                              diisErrorProducts,
+                              diisErrorCoefficients,
+                              diisNumErrorVect,
+                              this->molecule,
+                              i);
+            }
             // calc. electron population in each atom.
             this->CalcAtomicElectronPopulation(this->atomicElectronPopulation, 
                                                this->orbitalElectronPopulation, 
