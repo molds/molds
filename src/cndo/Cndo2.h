@@ -108,7 +108,6 @@ private:
                  Molecule* molecule);
    void DoesDIIS(double** orbitalElectronPopulation,
                  double** oldOrbitalElectronPopulation,
-                 double* atomicElectronPopulation,
                  double*** diisStoredDensityMatrix,
                  double*** diisStoredErrorVect,
                  double** diisErrorProducts,
@@ -356,15 +355,16 @@ void Cndo2::DoesSCF(){
                                              this->molecule, 
                                              this->fockMatrix);
 
-         // calc. electron population in each atom.
-         this->CalcAtomicElectronPopulation(this->atomicElectronPopulation, 
-                                            this->orbitalElectronPopulation, 
-                                            this->molecule);
 
          // check convergence or update oldpopulation
          if(this->SatisfyConvergenceCriterion(oldOrbitalElectronPopulation, 
                                               this->orbitalElectronPopulation,
                                               this->molecule->GetTotalNumberAOs(), &rmsDensity, i)){
+
+            // calc. electron population in each atom.
+            this->CalcAtomicElectronPopulation(this->atomicElectronPopulation, 
+                                               this->orbitalElectronPopulation, 
+                                               this->molecule);
 
             cout << this->messageSCFMetConvergence;
             this->OutputResults(this->fockMatrix, this->energiesMO, this->atomicElectronPopulation, this->molecule);
@@ -378,7 +378,6 @@ void Cndo2::DoesSCF(){
             // diis 
             this->DoesDIIS(this->orbitalElectronPopulation,
                            oldOrbitalElectronPopulation,
-                           this->atomicElectronPopulation,
                            diisStoredDensityMatrix,
                            diisStoredErrorVect,
                            diisErrorProducts,
@@ -386,6 +385,11 @@ void Cndo2::DoesSCF(){
                            diisNumErrorVect,
                            this->molecule,
                            i);
+            
+            // calc. electron population in each atom.
+            this->CalcAtomicElectronPopulation(this->atomicElectronPopulation, 
+                                               this->orbitalElectronPopulation, 
+                                               this->molecule);
 
             this->UpdateOldOrbitalElectronPopulation(oldOrbitalElectronPopulation, 
                                                      this->orbitalElectronPopulation, 
@@ -463,7 +467,6 @@ void Cndo2::FreeSCFTemporaryMatrices(double*** oldOrbitalElectronPopulation,
  */
 void Cndo2::DoesDIIS(double** orbitalElectronPopulation,
                      double** oldOrbitalElectronPopulation,
-                     double* atomicElectronPopulation,
                      double*** diisStoredDensityMatrix,
                      double*** diisStoredErrorVect,
                      double** diisErrorProducts,
@@ -538,8 +541,6 @@ void Cndo2::DoesDIIS(double** orbitalElectronPopulation,
             }
          }
 
-         // calc. electron population in each atom.
-         this->CalcAtomicElectronPopulation(atomicElectronPopulation, orbitalElectronPopulation, molecule);
       }
    }
 }
