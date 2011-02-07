@@ -783,10 +783,10 @@ void Cndo2::CalcFockMatrix(double** fockMatrix, Molecule* molecule, double** ove
                            double** orbitalElectronPopulation, double* atomicElectronPopulation,
                            bool isGuess){
 
-
    MallocerFreer::GetInstance()->InitializeDoubleMatrix2d
                                  (fockMatrix, molecule->GetTotalNumberAOs(), molecule->GetTotalNumberAOs());
 
+   #pragma omp parallel for schedule(auto)
    for(int A=0; A<molecule->GetAtomVect()->size(); A++){
       Atom* atomA = (*molecule->GetAtomVect())[A];
       int firstAOIndexA = atomA->GetFirstAOIndex();
@@ -833,7 +833,6 @@ void Cndo2::CalcFockMatrix(double** fockMatrix, Molecule* molecule, double** ove
                         
       }
    }
-
    /*  
    printf("fock matrix\n"); 
    for(int o=0; o<this->molecule->GetTotalNumberAOs(); o++){
