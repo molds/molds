@@ -1065,42 +1065,41 @@ void Cndo2::FreeDiatomicOverlapAndRotatingMatrix(double*** diatomicOverlap, doub
 void Cndo2::CalcOverlap(double** overlap, Molecule* molecule){
    int totalAONumber = molecule->GetTotalNumberAOs();
    int totalAtomNumber = molecule->GetAtomVect()->size();
-   double** diatomicOverlap;
-   double** rotatingMatrix;
-   Atom* atomA;
-   Atom* atomB;
 
-   // malloc
-   diatomicOverlap =  MallocerFreer::GetInstance()->MallocDoubleMatrix2d
-                      (OrbitalType_end, OrbitalType_end);
-   rotatingMatrix = MallocerFreer::GetInstance()->MallocDoubleMatrix2d
-                      (OrbitalType_end, OrbitalType_end);
+   #pragma omp parallel
+   {
+      // malloc
+      double** diatomicOverlap =  MallocerFreer::GetInstance()->MallocDoubleMatrix2d
+                                   (OrbitalType_end, OrbitalType_end);
+      double** rotatingMatrix = MallocerFreer::GetInstance()->MallocDoubleMatrix2d
+                                   (OrbitalType_end, OrbitalType_end);
 
-   try{
-      // calculation overlap matrix
-      for(int mu=0; mu<totalAONumber; mu++){
-         overlap[mu][mu] = 1.0;
-      }
+      try{
+         // calculation overlap matrix
+         for(int mu=0; mu<totalAONumber; mu++){
+            overlap[mu][mu] = 1.0;
+         }
 
-      for(int A=0; A<totalAtomNumber; A++){
-         atomA = (*(molecule->GetAtomVect()))[A];
-         for(int B=A+1; B<totalAtomNumber; B++){
-            atomB = (*(molecule->GetAtomVect()))[B];
+         #pragma omp for schedule(auto)
+         for(int A=0; A<totalAtomNumber; A++){
+            Atom* atomA = (*(molecule->GetAtomVect()))[A];
+            for(int B=A+1; B<totalAtomNumber; B++){
+               Atom* atomB = (*(molecule->GetAtomVect()))[B];
 
-            this->CalcDiatomicOverlapInDiatomicFrame(diatomicOverlap, atomA, atomB);
-            this->CalcRotatingMatrix(rotatingMatrix, atomA, atomB);
-            this->RotateDiatmicOverlapToSpaceFrame(diatomicOverlap, rotatingMatrix);
-            this->SetOverlapElement(overlap, diatomicOverlap, atomA, atomB);
+               this->CalcDiatomicOverlapInDiatomicFrame(diatomicOverlap, atomA, atomB);
+               this->CalcRotatingMatrix(rotatingMatrix, atomA, atomB);
+               this->RotateDiatmicOverlapToSpaceFrame(diatomicOverlap, rotatingMatrix);
+               this->SetOverlapElement(overlap, diatomicOverlap, atomA, atomB);
 
+            }
          }
       }
-   }
-   catch(MolDSException ex){
+      catch(MolDSException ex){
+         this->FreeDiatomicOverlapAndRotatingMatrix(&diatomicOverlap, &rotatingMatrix);
+         throw ex;
+      }
       this->FreeDiatomicOverlapAndRotatingMatrix(&diatomicOverlap, &rotatingMatrix);
-      throw ex;
    }
-   this->FreeDiatomicOverlapAndRotatingMatrix(&diatomicOverlap, &rotatingMatrix);
-
    /* 
    printf("overlap matrix\n"); 
    for(int o=0; o<this->molecule->GetTotalNumberAOs(); o++){
