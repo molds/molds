@@ -7,6 +7,7 @@
 #include<time.h>
 #include<list>
 #include<vector>
+#include<omp.h>
 #include"base/Utilities.h"
 #include"base/MolDSException.h"
 #include"base/Enums.h"
