@@ -77,6 +77,7 @@ int LapackWrapper::Dsyevd(double** matrix, double* eigenValues, int size, bool c
    char uplo = 'U';
    int lda = size;
    double* convertedMatrix;
+   double* tempEigenValues;
    double* work;
    int* iwork;
 
@@ -115,11 +116,11 @@ int LapackWrapper::Dsyevd(double** matrix, double* eigenValues, int size, bool c
       liwork = 5*size + 3;
    }
 
-
    // malloc
-   work = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(lwork);
-   iwork = MallocerFreer::GetInstance()->MallocIntMatrix1d(liwork);
-   convertedMatrix = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(size*size);
+   work = (double*)mkl_malloc( sizeof(double)*lwork, 16 );
+   iwork = (int*)mkl_malloc( sizeof(int)*liwork, 16 );
+   convertedMatrix = (double*)mkl_malloc( sizeof(double)*size*size, 16 );
+   tempEigenValues = (double*)mkl_malloc( sizeof(double)*size, 16 );
 
    for(int i = 0; i < size; i++){
       for(int j = i; j < size; j++){
@@ -128,7 +129,7 @@ int LapackWrapper::Dsyevd(double** matrix, double* eigenValues, int size, bool c
    }
 
    // call Lapack
-   dsyevd(&job, &uplo, &size, convertedMatrix, &lda, eigenValues, work, &lwork, iwork, &liwork, &info);
+   dsyevd(&job, &uplo, &size, convertedMatrix, &lda, tempEigenValues, work, &lwork, iwork, &liwork, &info);
 
    for(int i = 0; i < size; i++){
       for(int j = 0; j < size; j++){
@@ -144,12 +145,17 @@ int LapackWrapper::Dsyevd(double** matrix, double* eigenValues, int size, bool c
          }
       }
    }   
+
+   for(int i = 0; i < size; i++){
+      eigenValues[i] = tempEigenValues[i];
+   }
    //printf("size=%d lwork=%d liwork=%d k=%d info=%d\n",size,lwork,liwork,k,info);
 
    // free
-   MallocerFreer::GetInstance()->FreeDoubleMatrix1d(&convertedMatrix);
-   MallocerFreer::GetInstance()->FreeDoubleMatrix1d(&work);
-   MallocerFreer::GetInstance()->FreeIntMatrix1d(&iwork);
+   mkl_free(work);
+   mkl_free(iwork);
+   mkl_free(convertedMatrix);
+   mkl_free(tempEigenValues);
   
    if(info != 0){
       stringstream ss;
@@ -174,6 +180,7 @@ int LapackWrapper::Dsysv(double** matrix, double* b, int size){
    int nrhs = 1;
    double* convertedMatrix;
    double* work;
+   double* tempB;
    int* ipiv;
 
    if(size < 1 ){
@@ -183,35 +190,43 @@ int LapackWrapper::Dsysv(double** matrix, double* b, int size){
    }
 
    // malloc
-   ipiv = MallocerFreer::GetInstance()->MallocIntMatrix1d(2*size);
-   convertedMatrix = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(size*size);
+   ipiv = (int*)mkl_malloc( sizeof(int)*2*size, 16 );
+   convertedMatrix = (double*)mkl_malloc( sizeof(double)*size*size, 16 );
+   tempB = (double*)mkl_malloc( sizeof(double)*size, 16 );
 
    for(int i = 0; i < size; i++){
       for(int j = i; j < size; j++){
          convertedMatrix[i+j*size] = matrix[i][j];
       }
    }
+   for(int i = 0; i < size; i++){
+      tempB[i] = b[i];
+   }
 
    // calc. lwork
    if(!this->calculatedDsysvBlockSize){
       lwork = -1;
       double tempWork[3]={0.0, 0.0, 0.0};
-      dsysv(&uplo, &size, &nrhs, convertedMatrix, &lda, ipiv, b, &ldb, tempWork, &lwork, &info);
+      dsysv(&uplo, &size, &nrhs, convertedMatrix, &lda, ipiv, tempB, &ldb, tempWork, &lwork, &info);
       this->calculatedDsysvBlockSize = true;
       this->dsysvBlockSize = tempWork[0]/size;
    }
 
    info = 0;
    lwork = this->dsysvBlockSize*size;
-   work = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(lwork);
+   work = (double*)mkl_malloc( sizeof(double)*lwork, 16 );
 
    // call Lapack
-   dsysv(&uplo, &size, &nrhs, convertedMatrix, &lda, ipiv, b, &ldb, work, &lwork, &info);
+   dsysv(&uplo, &size, &nrhs, convertedMatrix, &lda, ipiv, tempB, &ldb, work, &lwork, &info);
+   for(int i = 0; i < size; i++){
+      b[i] = tempB[i];
+   }
 
    // free
-   MallocerFreer::GetInstance()->FreeDoubleMatrix1d(&convertedMatrix);
-   MallocerFreer::GetInstance()->FreeIntMatrix1d(&ipiv);
-   MallocerFreer::GetInstance()->FreeDoubleMatrix1d(&work);
+   mkl_free(convertedMatrix);
+   mkl_free(ipiv);
+   mkl_free(work);
+   mkl_free(tempB);
   
    if(info != 0){
       cout << "info=" << info << endl;
