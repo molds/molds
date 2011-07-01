@@ -1,7 +1,7 @@
 THEORY
-   cndo/2
+   //cndo/2
    //indo
-   //zindo/s
+   zindo/s
    //none 
    //principal_axes
    //translate
@@ -19,7 +19,7 @@ SCF
 SCF_END
 
 CIS
-   activeOcc 2 
+   activeOcc 2
    activeVir 2
    nstates 1000
 CIS_END
@@ -41,18 +41,18 @@ CIS_END
    //angles 15 25 35
 //ROTATE_END
 
-TRANSLATE
+//TRANSLATE
    //difference 100.0 200.0 300.0
-TRANSLATE_END
+//TRANSLATE_END
 
 
 // NH3
-//GEOMETRY
-//   N  0.950135    0.471698    0.000000
-//   H  1.283457   -0.471115    0.000000
-//   H  1.283474    0.943098    0.816497
-//   H  1.283474    0.943098   -0.816497
-//GEOMETRY_END
+GEOMETRY
+   N  0.950135    0.471698    0.000000
+   H  1.283457   -0.471115    0.000000
+   H  1.283474    0.943098    0.816497
+   H  1.283474    0.943098   -0.816497
+GEOMETRY_END
 
 // H2O
 //GEOMETRY

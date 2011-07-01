@@ -605,39 +605,9 @@ double ZindoS::GetMolecularIntegralElement(int moI, int moJ, int moK, int moL,
 void ZindoS::DoesCIS(){
    cout << this->messageStartCIS;
 
-   int numberOcc = this->molecule->GetTotalNumberValenceElectrons()/2;
-   int numberVir = this->molecule->GetTotalNumberAOs() - numberOcc;
-
-   // check the number of active occupied orbitals.
-   if(numberOcc < Parameters::GetInstance()->GetActiveOccCIS()){
-      Parameters::GetInstance()->SetActiveOccCIS(numberOcc);
-   }
-   else{
-      numberOcc = Parameters::GetInstance()->GetActiveOccCIS();
-   }
-
-   // check the number of active virtual orbitals.
-   if(numberVir < Parameters::GetInstance()->GetActiveVirCIS()){
-      Parameters::GetInstance()->SetActiveVirCIS(numberOcc);
-   }
-   else{
-      numberVir = Parameters::GetInstance()->GetActiveVirCIS();
-   }
-
-   // check the number of calculated excited states.
-   int numberExcitedStates = numberOcc * numberVir;
-   /*
-   if(numberExcitedStates < Parameters::GetInstance()->GetNumberExcitedStatesCIS()){
-      Parameters::GetInstance()->SetNumberExcitedStatesCIS(numberOcc);
-   }
-   else{
-      numberExcitedStates = Parameters::GetInstance()->GetNumberExcitedStatesCIS();
-   }
-   */
-
-printf("\n\nnumber of occ orbitals: %d\n",numberOcc);
-printf("number of vir orbitals: %d\n",numberVir);
-printf("number of excited states: %d\n\n\n",numberExcitedStates);
+   int numberOcc = Parameters::GetInstance()->GetActiveOccCIS();
+   int numberVir = Parameters::GetInstance()->GetActiveVirCIS();
+   int numberExcitedStates = Parameters::GetInstance()->GetNumberExcitedStatesCIS();
 
    double** matrixCIS = MallocerFreer::GetInstance()->MallocDoubleMatrix2d(numberExcitedStates, numberExcitedStates);
    double* excitedEnergies = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(numberExcitedStates);

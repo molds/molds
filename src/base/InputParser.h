@@ -43,6 +43,10 @@ private:
    string messageScfDiisNumErrorVect;
    string messageScfDiisStartError;
    string messageScfDiisEndError;
+   string messageCisConditions;
+   string messageCisNumberActiveOcc;
+   string messageCisNumberActiveVir;
+   string messageCisNumberExcitedStates;
    string stringSpace;
    string stringCommentOut;
    string stringTheory;
@@ -86,8 +90,10 @@ private:
    string stringCISActiveVir;
    string stringCISNStates;
    void CalcMolecularBasics(Molecule* molecule);
+   void CalcCisCondition(Molecule* molecule);
    void OutputMolecularBasics(Molecule* molecule);
    void OutputScfConditions();
+   void OutputCisConditions();
    void OutputInputTerms(vector<string> inputTerms);
    bool IsCommentOut(string str);
    vector<string> GetInputTerms();
@@ -109,6 +115,10 @@ InputParser::InputParser(){
    this->messageScfDiisNumErrorVect = "\t\tDIIS number of error vectors: ";
    this->messageScfDiisStartError = "\t\tDIIS starting error: ";
    this->messageScfDiisEndError = "\t\tDIIS ending error: ";
+   this->messageCisConditions = "\tCIS conditions:\n";
+   this->messageCisNumberActiveOcc = "\t\tNumber of active Occ.: ";
+   this->messageCisNumberActiveVir = "\t\tNumber of active Vir.: ";
+   this->messageCisNumberExcitedStates = "\t\tNumber of excited states: ";
    this->stringSpace = " ";
    this->stringCommentOut = "//";
    this->stringTheoryCNDO2 = "cndo/2";
@@ -451,9 +461,20 @@ void InputParser::Parse(Molecule* molecule){
 
    }
 
+   // calculate basics and conditions
    this->CalcMolecularBasics(molecule);
+   if(Parameters::GetInstance()->GetCurrentTheory() == ZINDOS){
+      this->CalcCisCondition(molecule);
+   }
+
+   // output conditions
    this->OutputMolecularBasics(molecule);
    this->OutputScfConditions();
+   if(Parameters::GetInstance()->GetCurrentTheory() == ZINDOS){
+      this->OutputCisConditions();
+   }
+
+   // output inputs
    this->OutputInputTerms(inputTerms);
    cout << messageDoneParseInput;
 
@@ -465,6 +486,30 @@ void InputParser::CalcMolecularBasics(Molecule* molecule){
    molecule->CalcTotalNumberValenceElectrons();
    molecule->CalcXyzCOM();
    molecule->CalcTotalCoreRepulsionEnergy();
+
+}
+
+void InputParser::CalcCisCondition(Molecule* molecule){
+
+   int numberOcc = molecule->GetTotalNumberValenceElectrons()/2;
+   int numberVir = molecule->GetTotalNumberAOs() - numberOcc;
+
+   // check the number of active occupied orbitals.
+   if(numberOcc < Parameters::GetInstance()->GetActiveOccCIS()){
+      Parameters::GetInstance()->SetActiveOccCIS(numberOcc);
+   }   
+
+   // check the number of active virtual orbitals.
+   if(numberVir < Parameters::GetInstance()->GetActiveVirCIS()){
+      Parameters::GetInstance()->SetActiveVirCIS(numberVir);
+   }   
+
+   // check the number of calculated excited states.
+   int numberExcitedStates = Parameters::GetInstance()->GetActiveOccCIS() 
+                            *Parameters::GetInstance()->GetActiveVirCIS();
+   if(numberExcitedStates < Parameters::GetInstance()->GetNumberExcitedStatesCIS()){
+      Parameters::GetInstance()->SetNumberExcitedStatesCIS(numberExcitedStates);
+   }   
 
 }
 
@@ -489,6 +534,16 @@ void InputParser::OutputScfConditions(){
    cout << "\n";
 
 }
+
+void InputParser::OutputCisConditions(){
+   cout << this->messageCisConditions;
+
+   printf("%s%d\n",this->messageCisNumberActiveOcc.c_str(),Parameters::GetInstance()->GetActiveOccCIS());
+   printf("%s%d\n",this->messageCisNumberActiveVir.c_str(),Parameters::GetInstance()->GetActiveVirCIS());
+   printf("%s%d\n",this->messageCisNumberExcitedStates.c_str(),Parameters::GetInstance()->GetNumberExcitedStatesCIS());
+   cout << "\n";
+}
+
 void InputParser::OutputInputTerms(vector<string> inputTerms){
    
    // output input terms
