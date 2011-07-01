@@ -12,27 +12,33 @@ Carring Out:
    $./a.out < input.in
 
 
-SCF:
-   Write "cndo/2", "indo", or "zindo/s" in theory-directive.
+How to Write Input-files:
+
+   Comment Out:
+      Sentences starting with "//" or "#" in input-files are treated as comments.
+
+
+   SCF:
+      Write "cndo/2", "indo", or "zindo/s" in theory-directive.
 
    E.g. 
          THEORY
             indo 
          THEORY_END
    
-   -options
-    "max_iter", "rms_density", "damping_thresh", "damping_weight", 
-    "diis_num_error_vect", "diis_start_error", and "diis_end_error" are prepared as options.
+      -options
+       "max_iter", "rms_density", "damping_thresh", "damping_weight", 
+       "diis_num_error_vect", "diis_start_error", and "diis_end_error" are prepared as options.
 
-    Default value of "max_iter" is 100.
-    Default value of "rms_density" is 10**(-8.0).
-    Default value of "damping_thresh" is 1.
-    Default value of "damping_weight" is 0.8.
-    Default value of "diis_num_error_vect" is 5.
-    Default value of "diis_start_error" is 0.01.
-    Default value of "diis_end_error" is 10**(-8.0).
+       Default value of "max_iter" is 100.
+       Default value of "rms_density" is 10**(-8.0).
+       Default value of "damping_thresh" is 1.
+       Default value of "damping_weight" is 0.8.
+       Default value of "diis_num_error_vect" is 5.
+       Default value of "diis_start_error" is 0.01.
+       Default value of "diis_end_error" is 10**(-8.0).
 
-    E.g.
+       E.g.
          SCF
             max_iter 200
             rms_density 0.00000001
@@ -43,56 +49,56 @@ SCF:
             diis_end_error 0.00000001
          SCF_END
 
-Principal Axes (Diagonalizing the inertia tensor):
-   Write "principal_axes" in theory-directive.
+   Principal Axes (Diagonalizing the inertia tensor):
+      Write "principal_axes" in theory-directive.
 
-   E.g. 
+      E.g. 
          THEORY
             principal-axes
          THEORY_END
    
-   -options
-    option is "origin" only for setting the origin of the inertia tensor.
-    options are written in inertia-directive in angstrom unit.
-    Center of mass is used as origin when the "origin" is not set.
+      -options
+       option is "origin" only for setting the origin of the inertia tensor.
+       options are written in inertia-directive in angstrom unit.
+       Center of mass is used as origin when the "origin" is not set.
 
-    E.g.
+       E.g.
          INERTIA
             origin 1.2 2.3 3.4
          INERTIA_END
 
-Rotate Molecule:
-   Write "rotate" in theory-directive.
+   Rotate Molecule:
+      Write "rotate" in theory-directive.
 
-   E.g. 
+      E.g. 
          THEORY
             rotate
          THEORY_END
 
-   -options
-    "type", "origin", "axis", "angle" and "angles" are prepared as options.
-    These options are written in rotate-directive. Examples are shown below.
+      -options
+       "type", "origin", "axis", "angle" and "angles" are prepared as options.
+       These options are written in rotate-directive. Examples are shown below.
 
-    "type" indicates whether the rotating is carring out around a axis or acording to Euler angles.
-    Default value of "type" is axis.
+       "type" indicates whether the rotating is carring out around a axis or acording to Euler angles.
+       Default value of "type" is axis.
 
-    "origin" indicates the origin of the rotation in angstrom unit.
-    Default value of "origin" is center of mass.
+       "origin" indicates the origin of the rotation in angstrom unit.
+       Default value of "origin" is center of mass.
 
-    "axis" indicates a axis around which the rotation is carried out in angstrom unit.
-    Default value of "axis" is z-axis.
-    This option is valid only for "type" set as axis.
+       "axis" indicates a axis around which the rotation is carried out in angstrom unit.
+       Default value of "axis" is z-axis.
+       This option is valid only for "type" set as axis.
 
-    "angle" indicates angle for the rotation around the "axis" in degree unit.
-    Default value of "angle" is 0.
-    This option is valid only for "type" set as axis.
+       "angle" indicates angle for the rotation around the "axis" in degree unit.
+       Default value of "angle" is 0.
+       This option is valid only for "type" set as axis.
 
-    "angles" indicates Euler angles for the rotation in degree unit.
-    Default values of "angles" are 0, 0, and 0.
-    This option is valid only for "type" set as Euler angles.
+       "angles" indicates Euler angles for the rotation in degree unit.
+       Default values of "angles" are 0, 0, and 0.
+       This option is valid only for "type" set as Euler angles.
    
 
-   E.g. for "type" set as axis
+       E.g. for "type" set as axis
          ROTATE
             type axis
             origin 1.0 2.0 3.0 
@@ -100,27 +106,27 @@ Rotate Molecule:
             angle 30
          ROTATE_END
 
-   E.g. for "type" set as Euler angles
+       E.g. for "type" set as Euler angles
          ROTATE
             type eular_angle
             angles 15 25 35
          ROTATE_END
 
 
-Translate Molecule:
-   Write "translate" in theory-directive.
+   Translate Molecule:
+      Write "translate" in theory-directive.
 
-   E.g. 
+      E.g. 
          THEORY
             translate 
          THEORY_END
 
-   -options
-    "difference" indicates difference for the translation in angstrom unit.
-    This option is written in translate-directive.
-    Default values are 0, 0, and 0.
+      -options
+       "difference" indicates difference for the translation in angstrom unit.
+       This option is written in translate-directive.
+       Default values are 0, 0, and 0.
 
-   E.g. 
+       E.g. 
          TRANSLATE
             difference 12 30 45
          TRANSLATE_END
