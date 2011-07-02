@@ -29,8 +29,6 @@ private:
    InputParser(InputParser&);
    void operator = (InputParser&);
    ~InputParser();
-   string messageYES;
-   string messageNO;
    string messageStartParseInput;
    string messageDoneParseInput;
    string messageTotalNumberAOs;
@@ -50,6 +48,8 @@ private:
    string messageCisNumberActiveVir;
    string messageCisNumberExcitedStates;
    string messageCisDavidson;
+   string stringYES;
+   string stringNO;
    string stringSpace;
    string stringCommentOut;
    string stringTheory;
@@ -105,8 +105,6 @@ private:
 InputParser* InputParser::inputParser = NULL;
 
 InputParser::InputParser(){
-   this->messageYES = "YES";
-   this->messageNO = "NO";
    this->messageStartParseInput = "**********  START: Parse input  **********\n";
    this->messageDoneParseInput =  "**********  DONE: Parse input  ***********\n\n\n";
    this->messageTotalNumberAOs = "\tTotal number of valence AOs: ";
@@ -126,6 +124,8 @@ InputParser::InputParser(){
    this->messageCisNumberActiveVir = "\t\tNumber of active Vir.: ";
    this->messageCisNumberExcitedStates = "\t\tNumber of excited states: ";
    this->messageCisDavidson = "\t\tCIS-Davidson: ";
+   this->stringYES = "yes";
+   this->stringNO = "no";
    this->stringSpace = " ";
    this->stringCommentOut = "//";
    this->stringTheoryCNDO2 = "cndo/2";
@@ -418,7 +418,7 @@ void InputParser::Parse(Molecule* molecule){
             }
             // Davidson is used or not
             if(inputTerms[j].compare(this->stringCISDavidson) == 0){
-               if(inputTerms[j+1].compare(this->messageYES) == 0){
+               if(inputTerms[j+1].compare(this->stringYES) == 0){
                   Parameters::GetInstance()->SetIsDavidsonCIS(true);
                }
                else{
@@ -509,25 +509,35 @@ void InputParser::CalcMolecularBasics(Molecule* molecule){
 
 void InputParser::CalcCisCondition(Molecule* molecule){
 
-   int numberOcc = molecule->GetTotalNumberValenceElectrons()/2;
-   int numberVir = molecule->GetTotalNumberAOs() - numberOcc;
+   if(Parameters::GetInstance()->GetIsDavidsonCIS()){
+      // Davidson CIS
+      // ToDo: calc condition for CIS-Davidson
+      stringstream ss;
+      ss << "Condition check for CIS-Davidson in InputParser::CalcCisCondition is not implemented yet.\n\n";
+      throw MolDSException(ss.str());
+   }
+   else{
+      // direct CIS
+      int numberOcc = molecule->GetTotalNumberValenceElectrons()/2;
+      int numberVir = molecule->GetTotalNumberAOs() - numberOcc;
 
-   // check the number of active occupied orbitals.
-   if(numberOcc < Parameters::GetInstance()->GetActiveOccCIS()){
-      Parameters::GetInstance()->SetActiveOccCIS(numberOcc);
-   }   
+      // check the number of active occupied orbitals.
+      if(numberOcc < Parameters::GetInstance()->GetActiveOccCIS()){
+         Parameters::GetInstance()->SetActiveOccCIS(numberOcc);
+      }   
 
-   // check the number of active virtual orbitals.
-   if(numberVir < Parameters::GetInstance()->GetActiveVirCIS()){
-      Parameters::GetInstance()->SetActiveVirCIS(numberVir);
-   }   
+      // check the number of active virtual orbitals.
+      if(numberVir < Parameters::GetInstance()->GetActiveVirCIS()){
+         Parameters::GetInstance()->SetActiveVirCIS(numberVir);
+      }   
 
-   // check the number of calculated excited states.
-   int numberExcitedStates = Parameters::GetInstance()->GetActiveOccCIS() 
-                            *Parameters::GetInstance()->GetActiveVirCIS();
-   if(numberExcitedStates < Parameters::GetInstance()->GetNumberExcitedStatesCIS()){
-      Parameters::GetInstance()->SetNumberExcitedStatesCIS(numberExcitedStates);
-   }   
+      // check the number of calculated excited states.
+      int numberExcitedStates = Parameters::GetInstance()->GetActiveOccCIS() 
+                               *Parameters::GetInstance()->GetActiveVirCIS();
+      if(numberExcitedStates < Parameters::GetInstance()->GetNumberExcitedStatesCIS()){
+         Parameters::GetInstance()->SetNumberExcitedStatesCIS(numberExcitedStates);
+      }   
+   }
 
 }
 
@@ -561,10 +571,10 @@ void InputParser::OutputCisConditions(){
    printf("%s%d\n",this->messageCisNumberExcitedStates.c_str(),Parameters::GetInstance()->GetNumberExcitedStatesCIS());
    printf("%s",this->messageCisDavidson.c_str());
    if(Parameters::GetInstance()->GetIsDavidsonCIS()){
-      printf("%s\n",this->messageYES.c_str());
+      printf("%s\n",this->stringYES.c_str());
    }
    else{
-      printf("%s\n",this->messageNO.c_str());
+      printf("%s\n",this->stringNO.c_str());
    }
 
    cout << "\n";

@@ -37,6 +37,9 @@ protected:
    virtual double GetMolecularIntegralElement(int moI, int moJ, int moK, int moL, 
                                               Molecule* molecule, double** fockMatrix, double** gammaAB);
 private:
+   double** matrixCIS;
+   double* excitedEnergies;
+   int matrixCISdimension;
    double GetCoulombInt(OrbitalType orbital1, 
                         OrbitalType orbital2, 
                         Atom* atom); // Apendix in [BZ_1979]
@@ -45,6 +48,8 @@ private:
                          Atom* atom); // Apendix in [BZ_1979]
    double GetNishimotoMatagaTwoEleInt(Atom* atomA, OrbitalType orbitalA, 
                                            Atom* atomB, OrbitalType orbitalB); // ref. [MN_1957] and (5a) in [AEZ_1986]
+   void DoesCISDirect();
+   void DoesCISDavidson();
    string errorMessageNishimotoMataga;
    string messageStartCIS;
    string messageDoneCIS;
@@ -54,10 +59,21 @@ ZindoS::ZindoS() : MolDS_cndo::Cndo2(){
    this->theory = ZINDOS;
    this->SetMessages();
    this->SetEnableAtomTypes();
+   this->matrixCIS = NULL;
+   this->excitedEnergies = NULL;
+   this->matrixCISdimension = 0;
    //cout << "ZindoS created\n";
 }
 
 ZindoS::~ZindoS(){
+   if(this->matrixCIS != NULL){
+      MallocerFreer::GetInstance()->FreeDoubleMatrix2d(&this->matrixCIS, this->matrixCISdimension);
+      //cout << "matrixCIS deleted\n";
+   }
+   if(this->excitedEnergies != NULL){
+      MallocerFreer::GetInstance()->FreeDoubleMatrix1d(&this->excitedEnergies);
+      //cout << "exceitedEnergies deleted\n";
+   }
    //cout << "ZindoS deleted\n";
 }
 
@@ -601,16 +617,56 @@ double ZindoS::GetMolecularIntegralElement(int moI, int moJ, int moK, int moL,
    return value;
 }
 
-
 void ZindoS::DoesCIS(){
    cout << this->messageStartCIS;
+
+   if(Parameters::GetInstance()->GetIsDavidsonCIS()){
+      this->DoesCISDavidson();
+   }
+   else{
+      this->DoesCISDirect();
+   }
+
+   // output eigen energies
+   for(int k=0; k<Parameters::GetInstance()->GetNumberExcitedStatesCIS(); k++){
+      printf("%d-th excited energy: %e\n",k+1, this->excitedEnergies[k]);
+   }
+   cout << endl;
+   cout << this->messageDoneCIS;
+}
+
+void ZindoS::DoesCISDavidson(){
+   // ToDo: CIS-Davidson
+   stringstream ss;
+   ss << "CIS-Davidson (ZindoS::DoesCISDavidson()) is not implemented yet.\n\n";
+   throw MolDSException(ss.str());
+}
+
+void ZindoS::DoesCISDirect(){
 
    int numberOcc = Parameters::GetInstance()->GetActiveOccCIS();
    int numberVir = Parameters::GetInstance()->GetActiveVirCIS();
    int numberExcitedStates = Parameters::GetInstance()->GetNumberExcitedStatesCIS();
 
-   double** matrixCIS = MallocerFreer::GetInstance()->MallocDoubleMatrix2d(numberExcitedStates, numberExcitedStates);
-   double* excitedEnergies = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(numberExcitedStates);
+   // malloc CIS matrix
+   if(this->matrixCIS == NULL){
+      this->matrixCISdimension = numberExcitedStates;
+      this->matrixCIS = MallocerFreer::GetInstance()->MallocDoubleMatrix2d(this->matrixCISdimension, 
+                                                                           this->matrixCISdimension);
+   }
+   else{
+      MallocerFreer::GetInstance()->InitializeDoubleMatrix2d(this->matrixCIS, 
+                                                             this->matrixCISdimension, 
+                                                             this->matrixCISdimension);
+   }
+
+   // malloc CIS eigen vector
+   if(this->excitedEnergies == NULL){
+      this->excitedEnergies = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(this->matrixCISdimension);
+   }
+   else{
+      MallocerFreer::GetInstance()->InitializeDoubleMatrix1d(this->excitedEnergies, this->matrixCISdimension);
+   }
 
    double value=0.0;
    int moI;
@@ -647,7 +703,7 @@ void ZindoS::DoesCIS(){
                                                 this->molecule, this->fockMatrix, NULL);
                }
             
-               matrixCIS[k][l] = value;
+               this->matrixCIS[k][l] = value;
                l++;
             }
          }
@@ -656,27 +712,11 @@ void ZindoS::DoesCIS(){
    }
 
    bool calcEigenVectors = true;
-   MolDS_mkl_wrapper::LapackWrapper::GetInstance()->Dsyevd(matrixCIS,
-                                                           excitedEnergies, 
-                                                           numberExcitedStates, 
+   MolDS_mkl_wrapper::LapackWrapper::GetInstance()->Dsyevd(this->matrixCIS,
+                                                           this->excitedEnergies, 
+                                                           this->matrixCISdimension, 
                                                            calcEigenVectors);
 
-   // output eigen energies
-   for(int k=0; k<numberExcitedStates; k++){
-      printf("%d-th excited energy: %e\n",k+1, excitedEnergies[k]);
-   }
-   cout << endl;
-
-   if(matrixCIS != NULL){
-      MallocerFreer::GetInstance()->FreeDoubleMatrix2d(&matrixCIS, numberExcitedStates);
-      //cout << "matrixCIS deleted\n";
-   }
-   if(excitedEnergies != NULL){
-      MallocerFreer::GetInstance()->FreeDoubleMatrix1d(&excitedEnergies);
-      //cout << "exceitedEnergies deleted\n";
-   }
-
-   cout << this->messageDoneCIS;
 }
 
 
