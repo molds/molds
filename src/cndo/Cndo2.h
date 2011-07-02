@@ -585,7 +585,7 @@ void Cndo2::OutputResults(double** fockMatrix, double* energiesMO, double* atomi
    double totalEnergy = this->GetTotalEnergy(molecule, energiesMO, fockMatrix, this->gammaAB);
    printf("\t\t%e\t%e\n\n",totalEnergy, totalEnergy / Parameters::GetInstance()->GetEV2AU());
 
-   // ToDo: output eigen-vectors
+   // ToDo: output eigen-vectors of the Hartree Fock matrix
   
    // output Mulliken charge
    cout << messageMullikenAtoms;
