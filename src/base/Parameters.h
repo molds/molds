@@ -57,6 +57,8 @@ public:
    void SetActiveVirCIS(int activeOccCIS);
    int GetNumberExcitedStatesCIS();
    void SetNumberExcitedStatesCIS(int nStates);
+   bool GetIsDavidsonCIS();
+   void SetIsDavidsonCIS(bool isDavidsonCIS);
 private:
    static Parameters* parameters;
    Parameters();
@@ -89,6 +91,7 @@ private:
    int activeOccCIS;
    int activeVirCIS;
    int numberExcitedStatesCIS;
+   bool isDavidsonCIS;
 };
 Parameters* Parameters::parameters = NULL;
 
@@ -151,6 +154,7 @@ void Parameters::SetDefaultValues(){
    this->activeOccCIS = 10;
    this->activeVirCIS = 10;
    this->numberExcitedStatesCIS = 5;
+   this->isDavidsonCIS = true;
 }
 
 double Parameters::GetThresholdSCF(){
@@ -342,6 +346,13 @@ void Parameters::SetNumberExcitedStatesCIS(int nStates){
    this->numberExcitedStatesCIS = nStates;
 }
 
+bool Parameters::GetIsDavidsonCIS(){
+   return this->isDavidsonCIS;
+}
+
+void Parameters::SetIsDavidsonCIS(bool isDavidsonCIS){
+   this->isDavidsonCIS = isDavidsonCIS;
+}
 
 }
 #endif

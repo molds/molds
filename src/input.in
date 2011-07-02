@@ -19,6 +19,7 @@ SCF
 SCF_END
 
 CIS
+   davidson no
    activeOcc 2
    activeVir 2
    nstates 1000
