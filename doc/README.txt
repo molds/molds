@@ -15,7 +15,7 @@ Carring Out:
 How to Write Input-files:
 
    Comment Out:
-      Sentences starting with "//" or "#" in input-files are treated as comments.
+      Lines starting with "//" or "#" in input-files are treated as comments.
 
 
    SCF:
