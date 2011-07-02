@@ -20,8 +20,9 @@ How to Write Input-files:
 
    SCF:
       Write "cndo/2", "indo", or "zindo/s" in theory-directive.
+      For "zindo/s", CIS are also carried out (see also CIS).
 
-   E.g. 
+      E.g. 
          THEORY
             indo 
          THEORY_END
@@ -48,6 +49,32 @@ How to Write Input-files:
             diis_start_error 0.01
             diis_end_error 0.00000001
          SCF_END
+
+
+   CIS:
+      Write "zindo/s" in theory-directive.
+
+      E.g. 
+         THEORY
+            zindo/s
+         THEORY_END
+   
+      -options
+       "davidson", "activeOcc", "activeVir", and "nstates" are prepared as options.
+
+       Default value of "davidson" is "yes".(One can select "yes" or "no" for option "davidson".)
+       Default value of "activeOcc" is 10.
+       Default value of "activeVir" is 10.
+       Default value of "nstates" is 5.
+
+       E.g.
+         CIS
+            davidson no
+            activeOcc 2
+            activeVir 2
+            nstates 1000
+         CIS_END
+
 
    Principal Axes (Diagonalizing the inertia tensor):
       Write "principal_axes" in theory-directive.
