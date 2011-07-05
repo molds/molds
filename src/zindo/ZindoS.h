@@ -50,6 +50,7 @@ private:
                                            Atom* atomB, OrbitalType orbitalB); // ref. [MN_1957] and (5a) in [AEZ_1986]
    void DoesCISDirect();
    void DoesCISDavidson();
+   void CalcCISMatrix(double** matrixCIS, int numberOcc, int numberVir);
    string errorMessageNishimotoMataga;
    string messageStartCIS;
    string messageDoneCIS;
@@ -668,6 +669,19 @@ void ZindoS::DoesCISDirect(){
       MallocerFreer::GetInstance()->InitializeDoubleMatrix1d(this->excitedEnergies, this->matrixCISdimension);
    }
 
+   // calc CIS matrix
+   this->CalcCISMatrix(matrixCIS, numberOcc, numberVir);
+
+   bool calcEigenVectors = true;
+   MolDS_mkl_wrapper::LapackWrapper::GetInstance()->Dsyevd(this->matrixCIS,
+                                                           this->excitedEnergies, 
+                                                           this->matrixCISdimension, 
+                                                           calcEigenVectors);
+
+}
+
+void ZindoS::CalcCISMatrix(double** matrixCIS, int numberOcc, int numberVir){
+
    double value=0.0;
    int moI;
    int moA;
@@ -675,6 +689,7 @@ void ZindoS::DoesCISDirect(){
    int moB;
    int k=0;
    int l=0;
+
    for(int i=0; i<numberOcc; i++){
       moI = this->molecule->GetTotalNumberValenceElectrons()/2 - i -1;      
       for(int a=0; a<numberVir; a++){
@@ -703,7 +718,7 @@ void ZindoS::DoesCISDirect(){
                                                 this->molecule, this->fockMatrix, NULL);
                }
             
-               this->matrixCIS[k][l] = value;
+               matrixCIS[k][l] = value;
                l++;
             }
          }
@@ -711,14 +726,8 @@ void ZindoS::DoesCISDirect(){
       }
    }
 
-   bool calcEigenVectors = true;
-   MolDS_mkl_wrapper::LapackWrapper::GetInstance()->Dsyevd(this->matrixCIS,
-                                                           this->excitedEnergies, 
-                                                           this->matrixCISdimension, 
-                                                           calcEigenVectors);
 
 }
-
 
 }
 #endif

@@ -20,8 +20,8 @@ SCF_END
 
 CIS
    davidson no
-   activeOcc 2
-   activeVir 2
+   activeOcc 5
+   activeVir 5
    nstates 1000
 CIS_END
 
@@ -108,11 +108,11 @@ GEOMETRY_END
 //GEOMETRY_END
 
 // h2s
-GEOMETRY
-     S       -0.559299    0.471698    0.000000
-     H        0.750701    0.471698    0.000000
-     H       -0.996586    1.706558    0.000000
-GEOMETRY_END
+//GEOMETRY
+//     S       -0.559299    0.471698    0.000000
+//     H        0.750701    0.471698    0.000000
+//     H       -0.996586    1.706558    0.000000
+//GEOMETRY_END
 
 // benzene
 //GEOMETRY
