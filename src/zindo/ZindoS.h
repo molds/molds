@@ -682,51 +682,37 @@ void ZindoS::DoesCISDirect(){
 
 void ZindoS::CalcCISMatrix(double** matrixCIS, int numberOcc, int numberVir){
 
-   double value=0.0;
-   int moI;
-   int moA;
-   int moJ;
-   int moB;
-   int k=0;
-   int l=0;
+   for(int k=0; k<numberOcc*numberVir; k++){
+      // single excitation from I-th (occupied)MO to A-th (virtual)MO
+      int moI = this->molecule->GetTotalNumberValenceElectrons()/2 - (k/numberVir) -1;
+      int moA = this->molecule->GetTotalNumberValenceElectrons()/2 + (k%numberVir);
 
-   for(int i=0; i<numberOcc; i++){
-      moI = this->molecule->GetTotalNumberValenceElectrons()/2 - i -1;      
-      for(int a=0; a<numberVir; a++){
-         moA = this->molecule->GetTotalNumberValenceElectrons()/2 + a;
+      for(int l=0; l<numberOcc*numberVir; l++){
+         // single excitation from J-th (occupied)MO to B-th (virtual)MO
+         int moJ = this->molecule->GetTotalNumberValenceElectrons()/2 - (l/numberVir) -1;
+         int moB = this->molecule->GetTotalNumberValenceElectrons()/2 + (l%numberVir);
 
-         l=0;
-         for(int j=0; j<numberOcc; j++){
-            moJ = this->molecule->GetTotalNumberValenceElectrons()/2 - j -1;      
-            for(int b=0; b<numberVir; b++){
-               moB = this->molecule->GetTotalNumberValenceElectrons()/2 + b;
+         double value=0.0;
+         // diagonal term
+         if(k==l){
+            value = this->energiesMO[moA] - this->energiesMO[moI] 
+                     +2.0*this->GetMolecularIntegralElement(moI, moA, moA, moI, 
+                                          this->molecule, this->fockMatrix, NULL)
+                     -    this->GetMolecularIntegralElement(moI, moI, moA, moA, 
+                                          this->molecule, this->fockMatrix, NULL);
 
-               // diagonal term
-               if(k==l){
-                  value = this->energiesMO[moA] - this->energiesMO[moI] 
-                         +2.0*this->GetMolecularIntegralElement(moI, moA, moA, moI, 
-                                                this->molecule, this->fockMatrix, NULL)
-                         -    this->GetMolecularIntegralElement(moI, moI, moA, moA, 
-                                                this->molecule, this->fockMatrix, NULL);
-
-               }
-               // off diagonal term (right upper)
-               else if(k<l){
-                  value = 2.0*this->GetMolecularIntegralElement(moA, moI, moJ, moB, 
-                                                this->molecule, this->fockMatrix, NULL)
-                         -    this->GetMolecularIntegralElement(moA, moB, moI, moJ, 
-                                                this->molecule, this->fockMatrix, NULL);
-               }
-            
-               matrixCIS[k][l] = value;
-               l++;
-            }
          }
-         k++;
+         // off diagonal term (right upper)
+         else if(k<l){
+            value = 2.0*this->GetMolecularIntegralElement(moA, moI, moJ, moB, 
+                                          this->molecule, this->fockMatrix, NULL)
+                     -    this->GetMolecularIntegralElement(moA, moB, moI, moJ, 
+                                          this->molecule, this->fockMatrix, NULL);
+         }
+            
+         matrixCIS[k][l] = value;
       }
    }
-
-
 }
 
 }
