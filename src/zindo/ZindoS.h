@@ -682,6 +682,7 @@ void ZindoS::DoesCISDirect(){
 
 void ZindoS::CalcCISMatrix(double** matrixCIS, int numberOcc, int numberVir){
 
+   #pragma omp parallel for schedule(auto)
    for(int k=0; k<numberOcc*numberVir; k++){
       // single excitation from I-th (occupied)MO to A-th (virtual)MO
       int moI = this->molecule->GetTotalNumberValenceElectrons()/2 - (k/numberVir) -1;
