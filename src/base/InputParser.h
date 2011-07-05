@@ -509,35 +509,27 @@ void InputParser::CalcMolecularBasics(Molecule* molecule){
 
 void InputParser::CalcCisCondition(Molecule* molecule){
 
-   if(Parameters::GetInstance()->GetIsDavidsonCIS()){
-      // Davidson CIS
-      // ToDo: calc condition for CIS-Davidson
-      stringstream ss;
-      ss << "Condition check for CIS-Davidson in InputParser::CalcCisCondition is not implemented yet.\n\n";
-      throw MolDSException(ss.str());
-   }
-   else{
-      // direct CIS
-      int numberOcc = molecule->GetTotalNumberValenceElectrons()/2;
-      int numberVir = molecule->GetTotalNumberAOs() - numberOcc;
+   // direct CIS
+   int numberOcc = molecule->GetTotalNumberValenceElectrons()/2;
+   int numberVir = molecule->GetTotalNumberAOs() - numberOcc;
 
-      // check the number of active occupied orbitals.
-      if(numberOcc < Parameters::GetInstance()->GetActiveOccCIS()){
-         Parameters::GetInstance()->SetActiveOccCIS(numberOcc);
-      }   
+   // check the number of active occupied orbitals.
+   if(numberOcc < Parameters::GetInstance()->GetActiveOccCIS()){
+      Parameters::GetInstance()->SetActiveOccCIS(numberOcc);
+   }   
 
-      // check the number of active virtual orbitals.
-      if(numberVir < Parameters::GetInstance()->GetActiveVirCIS()){
-         Parameters::GetInstance()->SetActiveVirCIS(numberVir);
-      }   
+   // check the number of active virtual orbitals.
+   if(numberVir < Parameters::GetInstance()->GetActiveVirCIS()){
+      Parameters::GetInstance()->SetActiveVirCIS(numberVir);
+   }   
 
-      // check the number of calculated excited states.
-      int numberExcitedStates = Parameters::GetInstance()->GetActiveOccCIS() 
-                               *Parameters::GetInstance()->GetActiveVirCIS();
-      if(numberExcitedStates < Parameters::GetInstance()->GetNumberExcitedStatesCIS()){
-         Parameters::GetInstance()->SetNumberExcitedStatesCIS(numberExcitedStates);
-      }   
-   }
+   // check the number of calculated excited states.
+   int numberExcitedStates = Parameters::GetInstance()->GetActiveOccCIS() 
+                            *Parameters::GetInstance()->GetActiveVirCIS();
+   if(numberExcitedStates < Parameters::GetInstance()->GetNumberExcitedStatesCIS()){
+      Parameters::GetInstance()->SetNumberExcitedStatesCIS(numberExcitedStates);
+   }   
+   
 
 }
 
