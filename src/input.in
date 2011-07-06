@@ -20,8 +20,8 @@ SCF_END
 
 CIS
    davidson no
-   activeOcc 100
-   activeVir 100
+   active_occ 3
+   active_vir 2
    nstates 1000
 CIS_END
 

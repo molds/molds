@@ -60,18 +60,18 @@ How to Write Input-files:
          THEORY_END
    
       -options
-       "davidson", "activeOcc", "activeVir", and "nstates" are prepared as options.
+       "davidson", "active_occ", "active_vir", and "nstates" are prepared as options.
 
        Default value of "davidson" is "yes".(One can select "yes" or "no" for option "davidson".)
-       Default value of "activeOcc" is 10.
-       Default value of "activeVir" is 10.
+       Default value of "active_occ" is 10.
+       Default value of "active_vir" is 10.
        Default value of "nstates" is 5.
 
        E.g.
          CIS
             davidson no
-            activeOcc 2
-            activeVir 2
+            active_occ 2
+            active_vir 2
             nstates 1000
          CIS_END
 

@@ -165,8 +165,8 @@ InputParser::InputParser(){
    this->stringTranslatingDifference = "difference";
    this->stringCIS = "cis";
    this->stringCISEnd = "cis_end";
-   this->stringCISActiveOcc = "activeocc";
-   this->stringCISActiveVir = "activevir";
+   this->stringCISActiveOcc = "active_occ";
+   this->stringCISActiveVir = "active_vir";
    this->stringCISNStates = "nstates";
    this->stringCISDavidson = "davidson";
 }
