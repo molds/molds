@@ -526,11 +526,15 @@ void InputParser::CalcCisCondition(Molecule* molecule){
    // check the number of calculated excited states.
    int numberExcitedStates = Parameters::GetInstance()->GetActiveOccCIS() 
                             *Parameters::GetInstance()->GetActiveVirCIS();
-   if(numberExcitedStates < Parameters::GetInstance()->GetNumberExcitedStatesCIS()){
+   if(!Parameters::GetInstance()->GetIsDavidsonCIS()){
       Parameters::GetInstance()->SetNumberExcitedStatesCIS(numberExcitedStates);
-   }   
+   }
+   else{
+      if(numberExcitedStates < Parameters::GetInstance()->GetNumberExcitedStatesCIS()){
+         Parameters::GetInstance()->SetNumberExcitedStatesCIS(numberExcitedStates);
+      }
+   }
    
-
 }
 
 void InputParser::OutputMolecularBasics(Molecule* molecule){
