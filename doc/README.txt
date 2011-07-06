@@ -62,15 +62,16 @@ How to Write Input-files:
       -options
        "davidson", "active_occ", "active_vir", and "nstates" are prepared as options.
 
+       "davidson" should be set as "yes" or "no". 
+       Default value is "yes".
+
        "active_occ" ("active_vir") is set to the number of occupied (virtual) orbitals
        if user set "active_occ" ("active_vir") to be greater than the number of occupied (virtual) orbitals. 
-       "nstates" is valid for the Davidson algorithm only, hence "nstates" is set to "active_occ*active_vir" 
-       without the Davidson algorithem.
+       Default value of "active_occ" is 10. Default value of "active_vir" is 10.
 
-       Default value of "davidson" is "yes".(One can select "yes" or "no" for option "davidson".)
-       Default value of "active_occ" is 10.
-       Default value of "active_vir" is 10.
-       Default value of "nstates" is 5.
+       "nstates" is valid for the Davidson algorithm only, hence "nstates" is set to "active_occ*active_vir" 
+       in direct CIS algorithm (without the Davidson algorithem). 
+       Default value of "nstates" is 5 for the Davidson algorithem.
 
        E.g.
          CIS
