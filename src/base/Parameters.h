@@ -59,6 +59,12 @@ public:
    void SetNumberExcitedStatesCIS(int nStates);
    bool GetIsDavidsonCIS();
    void SetIsDavidsonCIS(bool isDavidsonCIS);
+   int GetMaxIterationsCIS();
+   void SetMaxIterationsCIS(int maxIterationsCIS);
+   int GetMaxDimensionsCIS();
+   void SetMaxDimensionsCIS(int maxDimensionsCIS);
+   double GetNormToleranceCIS();
+   void SetNormToleranceCIS(double normToleranceCIS);
 private:
    static Parameters* parameters;
    Parameters();
@@ -91,6 +97,9 @@ private:
    int activeOccCIS;
    int activeVirCIS;
    int numberExcitedStatesCIS;
+   int maxIterationsCIS;
+   int maxDimensionsCIS;
+   double normToleranceCIS;
    bool isDavidsonCIS;
 };
 Parameters* Parameters::parameters = NULL;
@@ -155,6 +164,9 @@ void Parameters::SetDefaultValues(){
    this->activeVirCIS = 10;
    this->numberExcitedStatesCIS = 5;
    this->isDavidsonCIS = true;
+   this->maxIterationsCIS = 100;
+   this->maxDimensionsCIS = 100;
+   this->normToleranceCIS = pow(10.0, -6.0);
 }
 
 double Parameters::GetThresholdSCF(){
@@ -352,6 +364,30 @@ bool Parameters::GetIsDavidsonCIS(){
 
 void Parameters::SetIsDavidsonCIS(bool isDavidsonCIS){
    this->isDavidsonCIS = isDavidsonCIS;
+}
+
+int Parameters::GetMaxIterationsCIS(){
+   return this->maxIterationsCIS;
+}
+
+void Parameters::SetMaxIterationsCIS(int maxIterationsCIS){
+   this->maxIterationsCIS = maxIterationsCIS;
+}
+
+int Parameters::GetMaxDimensionsCIS(){
+   return this->maxDimensionsCIS;
+}
+
+void Parameters::SetMaxDimensionsCIS(int maxDimensionsCIS){
+   this->maxDimensionsCIS = maxDimensionsCIS;
+}
+
+double Parameters::GetNormToleranceCIS(){
+   return this->normToleranceCIS;
+}
+
+void Parameters::SetNormToleranceCIS(double normToleranceCIS){
+   this->normToleranceCIS = normToleranceCIS;
 }
 
 }

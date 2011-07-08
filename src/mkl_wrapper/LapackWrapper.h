@@ -37,7 +37,7 @@ LapackWrapper* LapackWrapper::lapackWrapper = NULL;
 LapackWrapper::LapackWrapper(){
    this->calculatedDsysvBlockSize = false;
    this->dsysvBlockSize = 64;
-   this->errorMessageDsyevdInfo = "Error in mkl_wrapper::LapackWrapper::Dsyevd: info != 0\n";
+   this->errorMessageDsyevdInfo = "Error in mkl_wrapper::LapackWrapper::Dsyevd: info != 0: info = ";
    this->errorMessageDsyevdSize = "Error in mkl_wrapper::LapackWrapper::Dsyevd: size of matirx < 1\n";
    this->errorMessageDsysvInfo = "Error in mkl_wrapper::LapackWrapper::Dsysv: info != 0\n";
    this->errorMessageDsysvSize = "Error in mkl_wrapper::LapackWrapper::Dsysv: size of matirx < 1\n";
@@ -160,6 +160,7 @@ int LapackWrapper::Dsyevd(double** matrix, double* eigenValues, int size, bool c
    if(info != 0){
       stringstream ss;
       ss << errorMessageDsyevdInfo;
+      ss << info << endl;
       throw MolDSException(ss.str());
    }
    return info;

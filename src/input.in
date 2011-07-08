@@ -22,7 +22,10 @@ CIS
    davidson yes
    active_occ 100
    active_vir 100
-   nstates 10
+   nstates 11
+   max_iter 200
+   max_dim 100
+   norm_tol 0.000001
 CIS_END
 
 
@@ -80,13 +83,13 @@ CIS_END
 //GEOMETRY_END
 
 //metane
-GEOMETRY
-   C  0.647389    0.820131    0.000000
-   H  1.004043   -0.188679    0.000000
-   H  1.004062    1.324529    0.873652
-   H  1.004062    1.324529   -0.873652
-   H  -0.422611    0.820144    0.000000
-GEOMETRY_END
+//GEOMETRY
+//   C  0.647389    0.820131    0.000000
+//   H  1.004043   -0.188679    0.000000
+//   H  1.004062    1.324529    0.873652
+//   H  1.004062    1.324529   -0.873652
+//   H  -0.422611    0.820144    0.000000
+//GEOMETRY_END
 
 
 // c2
@@ -131,12 +134,12 @@ GEOMETRY_END
 //GEOMETRY_END
 
 // acetylene
-//GEOMETRY
-// C                     0.24933   0.0   0.0 
-// C                     1.45053   0.0   0.0 
-// H                    -0.82067   0.0   0.0 
-// H                     2.52053   0.0   0.0 
-//GEOMETRY_END
+GEOMETRY
+ C                     0.24933   0.0   0.0 
+ C                     1.45053   0.0   0.0 
+ H                    -0.82067   0.0   0.0 
+ H                     2.52053   0.0   0.0 
+GEOMETRY_END
 
 // acetylene2
 //GEOMETRY

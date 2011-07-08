@@ -48,12 +48,46 @@ private:
                          Atom* atom); // Apendix in [BZ_1979]
    double GetNishimotoMatagaTwoEleInt(Atom* atomA, OrbitalType orbitalA, 
                                            Atom* atomB, OrbitalType orbitalB); // ref. [MN_1957] and (5a) in [AEZ_1986]
+   struct MoEnergy{
+      double energy;
+      int occIndex;
+      int virIndex;
+      int slaterIndex;
+   };
+   struct LessMoEnergy { bool operator()(const MoEnergy& rLeft, const MoEnergy& rRight) 
+      const { return rLeft.energy < rRight.energy; } };
    void DoesCISDirect();
    void DoesCISDavidson();
+   void CalcRitzVector(double* ritzVector, double** expansionVectors, double** interactionMatrix, 
+                       int interactionMatrixDimension, int ritzVectorIndex);
+   void CalcResidualVectorAndNorm(double* residualVector, double* norm, double* ritzVector, 
+                                    double* interactionEigenEnergies, int residualVectorIndex);
+   void SortSingleExcitationSlaterDeterminants(vector<MoEnergy>* moEnergies);
+   void UpdateExpansionVectors(double** expansionVectors, double* interactionEigenEnergies, double* residualVector,
+                               int interactionMatrixDimension, int* notConvergedStates, int residualVectorIndex);
+   void CalcInteractionMatrix(double** interactionMatrix, double** expansionVectors, int interactionMatrixDimension);
+   void FreeDavidsonCISTemporaryMtrices(double*** expansionVectors, double** residualVector, double** ritzVector);
+   void FreeDavidsonRoopCISTemporaryMtrices(double*** interactionMatrix, 
+                                        double interactionMatrixDimension, 
+                                        double** interactionEigenEnergies);
    void CalcCISMatrix(double** matrixCIS, int numberOcc, int numberVir);
    string errorMessageNishimotoMataga;
+   string errorMessageDavidsonNotConverged;
+   string errorMessageDavidsonMaxIter;
+   string errorMessageDavidsonMaxDim;
    string messageStartCIS;
    string messageDoneCIS;
+   string messageStartDirectCIS;
+   string messageDoneDirectCIS;
+   string messageStartDavidsonCIS;
+   string messageDoneDavidsonCIS;
+   string messageNumIterCIS;
+   string messageResidualNorm;
+   string messageDavidsonConverge;
+   string messageDavidsonReachCISMatrix;
+   string messageDavidsonGoToDirect;
+   string messageExcitedStatesEnergies;
+   string messageExcitedStatesEnergiesTitle;
 };
 
 ZindoS::ZindoS() : MolDS_cndo::Cndo2(){
@@ -92,11 +126,25 @@ void ZindoS::SetMessages(){
    this->errorMessageNishimotoMataga = "Error in base_zindo::ZindoS::GetNishimotoMatagaTwoEleInt: Invalid orbitalType.\n";
    this->errorMessageMolecularIntegralElement
       = "Error in zindo::ZindoS::GetMolecularIntegralElement: Non available orbital is contained.\n";
+   this->errorMessageDavidsonNotConverged =  "Error in zindo::ZindoS::DoesCISDavidson: Davidson did not met convergence criterion. \n";
+   this->errorMessageDavidsonMaxIter = "Davidson roop reaches max_iter=";
+   this->errorMessageDavidsonMaxDim = "Dimension of the expansion vectors reaches max_dim=";
    this->messageSCFMetConvergence = "\n\n\n\t\tZINDO/S-SCF met convergence criterion(^^b\n\n\n";
    this->messageStartSCF = "**********  START: ZINDO/S-SCF  **********\n";
    this->messageDoneSCF = "**********  DONE: ZINDO/S-SCF  **********\n\n\n";
    this->messageStartCIS = "**********  START: ZINDO/S-CIS  **********\n";
    this->messageDoneCIS = "**********  DONE: ZINDO/S-CIS  **********\n\n\n";
+   this->messageStartDirectCIS = "\t======  START: Direct-CIS  =====\n\n";
+   this->messageDoneDirectCIS =  "\t======  DONE: Direct-CIS  =====\n\n\n";
+   this->messageStartDavidsonCIS = "\t======  START: Davidson-CIS  =====\n";
+   this->messageDoneDavidsonCIS =  "\t======  DONE: Davidson-CIS  =====\n\n\n";
+   this->messageNumIterCIS = "\tDavidson iter=";
+   this->messageResidualNorm = "-th excited: norm of the residual = ";
+   this->messageDavidsonConverge = "\n\n\t\tDavidson for ZINDO/S-CIS met convergence criterion(^^b\n\n\n";
+   this->messageDavidsonReachCISMatrix = "\n\t\tDimension of the expansion vectors reaches to the dimension of the CIS-matrix.\n";
+   this->messageDavidsonGoToDirect = "\t\tHence, we go to the Direct-CIS.\n\n";
+   this->messageExcitedStatesEnergies = "\tExcitation energies:\n";
+   this->messageExcitedStatesEnergiesTitle = "\t\t| i-th | e[a.u.] | e[eV] | \n";
 }
 
 void ZindoS::SetEnableAtomTypes(){
@@ -621,37 +669,12 @@ double ZindoS::GetMolecularIntegralElement(int moI, int moJ, int moK, int moL,
 void ZindoS::DoesCIS(){
    cout << this->messageStartCIS;
 
-   if(Parameters::GetInstance()->GetIsDavidsonCIS()){
-      this->DoesCISDavidson();
-   }
-   else{
-      this->DoesCISDirect();
-   }
-
-   // output eigen energies
-   for(int k=0; k<Parameters::GetInstance()->GetNumberExcitedStatesCIS(); k++){
-      printf("%d-th excited energy: %e\n",k+1, this->excitedEnergies[k]);
-   }
-   cout << endl;
-   cout << this->messageDoneCIS;
-}
-
-void ZindoS::DoesCISDavidson(){
-   // ToDo: CIS-Davidson
-   stringstream ss;
-   ss << "CIS-Davidson (ZindoS::DoesCISDavidson()) is not implemented yet.\n\n";
-   throw MolDSException(ss.str());
-}
-
-void ZindoS::DoesCISDirect(){
-
    int numberOcc = Parameters::GetInstance()->GetActiveOccCIS();
    int numberVir = Parameters::GetInstance()->GetActiveVirCIS();
-   int numberExcitedStates = Parameters::GetInstance()->GetNumberExcitedStatesCIS();
 
-   // malloc CIS matrix
+   // malloc or initialize  CIS matrix
    if(this->matrixCIS == NULL){
-      this->matrixCISdimension = numberExcitedStates;
+      this->matrixCISdimension = numberOcc*numberVir;
       this->matrixCIS = MallocerFreer::GetInstance()->MallocDoubleMatrix2d(this->matrixCISdimension, 
                                                                            this->matrixCISdimension);
    }
@@ -661,7 +684,7 @@ void ZindoS::DoesCISDirect(){
                                                              this->matrixCISdimension);
    }
 
-   // malloc CIS eigen vector
+   // malloc or initialize CIS eigen vector
    if(this->excitedEnergies == NULL){
       this->excitedEnergies = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(this->matrixCISdimension);
    }
@@ -669,15 +692,337 @@ void ZindoS::DoesCISDirect(){
       MallocerFreer::GetInstance()->InitializeDoubleMatrix1d(this->excitedEnergies, this->matrixCISdimension);
    }
 
-   // calc CIS matrix
+   // calculate CIS matrix
    this->CalcCISMatrix(matrixCIS, numberOcc, numberVir);
 
+   // calculate excited energies
+   if(Parameters::GetInstance()->GetIsDavidsonCIS()){
+      this->DoesCISDavidson();
+   }
+   else{
+      this->DoesCISDirect();
+   }
+
+   // output eigen energies
+   cout << this->messageExcitedStatesEnergies;
+   cout << this->messageExcitedStatesEnergiesTitle;
+   double eV2AU = Parameters::GetInstance()->GetEV2AU();
+   for(int k=0; k<Parameters::GetInstance()->GetNumberExcitedStatesCIS(); k++){
+      printf("\t\t %d\t%e\t%e\n",k+1, this->excitedEnergies[k], this->excitedEnergies[k]/eV2AU);
+   }
+   cout << endl;
+   cout << this->messageDoneCIS;
+}
+
+void ZindoS::SortSingleExcitationSlaterDeterminants(vector<MoEnergy>* moEnergies){
+
+   int numberOcc = Parameters::GetInstance()->GetActiveOccCIS();
+   int numberVir = Parameters::GetInstance()->GetActiveVirCIS();
+   for(int k=0; k<numberOcc*numberVir; k++){
+      // single excitation from I-th (occupied)MO to A-th (virtual)MO
+      int moI = this->molecule->GetTotalNumberValenceElectrons()/2 - (k/numberVir) -1;
+      int moA = this->molecule->GetTotalNumberValenceElectrons()/2 + (k%numberVir);
+
+      MoEnergy moEnergy = {this->energiesMO[moA] - this->energiesMO[moI], moI, moA, k};
+      moEnergies->push_back(moEnergy);
+   }
+   sort(moEnergies->begin(), moEnergies->end(), LessMoEnergy());
+}
+
+// This method is used for Davidson
+void ZindoS::CalcRitzVector(double* ritzVector, double** expansionVectors, double** interactionMatrix, 
+                            int interactionMatrixDimension, int ritzVectorIndex){
+
+   for(int j=0; j<this->matrixCISdimension; j++){
+      ritzVector[j] = 0.0;
+      for(int k=0; k<interactionMatrixDimension; k++){
+         ritzVector[j] += expansionVectors[j][k]*interactionMatrix[ritzVectorIndex][k];
+      }
+   }
+}
+
+// This method is used for Davidson
+void ZindoS::CalcResidualVectorAndNorm(double* residualVector, double* norm, double* ritzVector, 
+                                       double* interactionEigenEnergies, int residualVectorIndex){
+
+   double sqNorm = 0.0;
+   for(int j=0; j<this->matrixCISdimension; j++){
+      residualVector[j] = interactionEigenEnergies[residualVectorIndex] * ritzVector[j];
+      for(int k=0; k<this->matrixCISdimension; k++){
+         double value = j<=k ? this->matrixCIS[j][k] : this->matrixCIS[k][j];
+         residualVector[j] -= value*ritzVector[k];
+      }
+      sqNorm += pow(residualVector[j],2.0);
+   }
+   *norm = sqrt(sqNorm);
+}
+
+// This method is used for Davidson
+void ZindoS::UpdateExpansionVectors(double** expansionVectors, double* interactionEigenEnergies, double* residualVector,
+                                    int interactionMatrixDimension, int* notConvergedStates, int residualVectorIndex){
+
+   double newExpansionVector[this->matrixCISdimension];
+
+   // calculate new expansion vector from residual vector
+   for(int j=0; j<this->matrixCISdimension; j++){
+      double temp = interactionEigenEnergies[residualVectorIndex]-this->matrixCIS[j][j];
+      if(temp == 0.0){
+         // prevent dividing by 0.
+         temp = pow(10,-100);
+      }
+      newExpansionVector[j]=pow(temp, -1.0)*residualVector[j];
+   }
+
+   // orthonormalize old expansion vectors and new expansion vector
+   for(int k=0; k<interactionMatrixDimension+*notConvergedStates; k++){
+      double overlap=0.0;
+      for(int j=0; j<this->matrixCISdimension; j++){
+         overlap += expansionVectors[j][k] * newExpansionVector[j];
+      }
+      for(int j=0; j<this->matrixCISdimension; j++){
+         newExpansionVector[j] -= overlap*expansionVectors[j][k];
+      }
+   }
+
+   // add new expansion vector to old expansion vectors
+   double sqNormNewExpVect = 0.0;
+   for(int j=0; j<this->matrixCISdimension; j++){
+      sqNormNewExpVect += pow(newExpansionVector[j],2.0);
+   }
+   double normNewExpVect = sqrt(sqNormNewExpVect);
+   for(int j=0; j<this->matrixCISdimension; j++){
+      expansionVectors[j][interactionMatrixDimension+*notConvergedStates] 
+            = pow(normNewExpVect,-1.0)*newExpansionVector[j];
+   }
+   *notConvergedStates += 1;
+}
+
+// This method is used for Davidson
+void ZindoS::CalcInteractionMatrix(double** interactionMatrix, double** expansionVectors, int interactionMatrixDimension){
+
+   for(int i=0; i<interactionMatrixDimension; i++){
+      for(int j=i; j<interactionMatrixDimension; j++){
+         for(int a=0; a<this->matrixCISdimension; a++){
+            for(int b=0; b<this->matrixCISdimension; b++){
+               double value = a<=b ? this->matrixCIS[a][b] : this->matrixCIS[b][a];
+               interactionMatrix[i][j] += expansionVectors[a][i] 
+                                          *value
+                                          *expansionVectors[b][j];
+            }
+         }
+      }
+   }
+}
+
+void ZindoS::DoesCISDavidson(){
+   cout << this->messageStartDavidsonCIS;
+
+   int numberOcc = Parameters::GetInstance()->GetActiveOccCIS();
+   int numberVir = Parameters::GetInstance()->GetActiveVirCIS();
+   int numberExcitedStates = Parameters::GetInstance()->GetNumberExcitedStatesCIS();
+   int maxIter = Parameters::GetInstance()->GetMaxIterationsCIS();
+   int maxDim  = Parameters::GetInstance()->GetMaxDimensionsCIS();
+   double normTol = Parameters::GetInstance()->GetNormToleranceCIS();
+   bool convergeExcitedStates[numberExcitedStates];
+   int interactionMatrixDimension;
+   bool reachMaxDim;
+   bool allConverged;
+   int notConvergedStates;
+   bool goToDirectCIS;
+   double** expansionVectors = NULL;
+   double*  ritzVector = NULL;
+   double*  residualVector = NULL;
+
+   // malloc
+   expansionVectors = MallocerFreer::GetInstance()->MallocDoubleMatrix2d(this->matrixCISdimension, maxDim);
+   ritzVector = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(this->matrixCISdimension);
+   residualVector = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(this->matrixCISdimension);
+
+   try{
+      // sort single excitation slater determinants
+      vector<MoEnergy> moEnergies;
+      this->SortSingleExcitationSlaterDeterminants(&moEnergies);
+
+      // set initial expansion vectors and initial conveged vectors
+      for(int k=0; k<numberExcitedStates; k++){
+         expansionVectors[moEnergies[k].slaterIndex][k] = 1.0;
+         convergeExcitedStates[k] = false;
+      }
+
+      interactionMatrixDimension = 0;
+      reachMaxDim = false;
+      goToDirectCIS = false;
+      // Davidson roop
+      for(int k=0; k<maxIter; k++){
+         cout << messageNumIterCIS << k << endl;
+
+         // calculate dimension of the interaction matrix (= number of the expansion vectors).
+         for(int i=0; i<numberExcitedStates; i++){
+            if(!convergeExcitedStates[i]){
+               interactionMatrixDimension += 1;
+            }
+         }
+
+         // malloc interaction matrix and etc.
+         double** interactionMatrix = NULL;
+         double* interactionEigenEnergies = NULL;
+         interactionMatrix = MallocerFreer::GetInstance()->MallocDoubleMatrix2d
+                              (interactionMatrixDimension, interactionMatrixDimension);
+         interactionEigenEnergies = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(interactionMatrixDimension);
+
+         try{
+
+            // calculate interaction matrix
+            this->CalcInteractionMatrix(interactionMatrix, expansionVectors, interactionMatrixDimension);
+
+            // diagonalize interaction matrix
+            bool calcEigenVectors = true;
+            MolDS_mkl_wrapper::LapackWrapper::GetInstance()->Dsyevd(interactionMatrix,
+                                                                    interactionEigenEnergies, 
+                                                                    interactionMatrixDimension, 
+                                                                    calcEigenVectors);
+
+            // check convergence of all excited states
+            notConvergedStates=0;
+            allConverged = true;
+            for(int i=0; i<numberExcitedStates; i++){
+       
+               // calculate i-th ritz vector
+               this->CalcRitzVector(ritzVector, expansionVectors, interactionMatrix, interactionMatrixDimension, i);
+
+               // calculate i-th residual vector and the norm of the residual vector
+               double norm = 0.0;
+               this->CalcResidualVectorAndNorm(residualVector, &norm, ritzVector, interactionEigenEnergies, i);
+
+               // output norm of residual vector
+               cout << "\t  " << i+1 << this->messageResidualNorm << norm << endl;
+               if(i == numberExcitedStates-1){
+                  cout << endl;
+               }
+        
+               // check tolerance for the norm of the residual vector.
+               if(norm < normTol){
+                  convergeExcitedStates[i] = true;
+               }
+               else{
+                  convergeExcitedStates[i] = false;
+                  allConverged = false;
+                  if(interactionMatrixDimension+notConvergedStates == maxDim && maxDim !=this->matrixCISdimension){
+                     reachMaxDim = true;
+                     break;
+                  }
+                  else if(interactionMatrixDimension+notConvergedStates == this->matrixCISdimension){
+                     goToDirectCIS = true;
+                     break;
+                  }
+            
+                  // update expansion vectors
+                  this->UpdateExpansionVectors(expansionVectors, interactionEigenEnergies, residualVector,
+                                                interactionMatrixDimension, &notConvergedStates, i);
+
+               }
+            } 
+
+            if(allConverged){
+               // copy to cis eigen vector and value
+               for(int i=0; i<numberExcitedStates; i++){
+                  this->excitedEnergies[i] = interactionEigenEnergies[i];
+                  this->CalcRitzVector(ritzVector, expansionVectors, interactionMatrix, interactionMatrixDimension, i);
+                  for(int j=0; j<this->matrixCISdimension; j++){
+                     this->matrixCIS[i][j] = ritzVector[j];
+                  }
+               }
+            }
+         }
+         catch(MolDSException ex){
+            this->FreeDavidsonRoopCISTemporaryMtrices(&interactionMatrix, 
+                                                      interactionMatrixDimension, 
+                                                      &interactionEigenEnergies);
+            throw ex;
+         }
+         this->FreeDavidsonRoopCISTemporaryMtrices(&interactionMatrix, 
+                                                   interactionMatrixDimension, 
+                                                   &interactionEigenEnergies);
+
+         // stop the Davidson roop
+         if(allConverged){
+            cout << this->messageDavidsonConverge;
+            break;
+         }
+         else if(!allConverged && goToDirectCIS){
+            cout << this->messageDavidsonReachCISMatrix;
+            cout << this->messageDavidsonGoToDirect;
+            break;
+         }
+         else if(!allConverged && reachMaxDim){
+            stringstream ss;
+            ss << endl;
+            ss << this->errorMessageDavidsonNotConverged;
+            ss << this->errorMessageDavidsonMaxDim << maxDim << endl;
+            throw MolDSException(ss.str());
+         }
+         else if(!allConverged && k==maxIter-1){
+            stringstream ss;
+            ss << this->errorMessageDavidsonNotConverged;
+            ss << this->errorMessageDavidsonMaxIter << maxIter << endl;
+            throw MolDSException(ss.str());
+         }
+
+      }// end Davidson roop
+   }
+   catch(MolDSException ex){
+      this->FreeDavidsonCISTemporaryMtrices(&expansionVectors, &residualVector, &ritzVector);
+      throw ex;
+   }
+   this->FreeDavidsonCISTemporaryMtrices(&expansionVectors, &residualVector, &ritzVector);
+
+   cout << this->messageDoneDavidsonCIS;
+   // change algorithm from Davidso to direct
+   if(goToDirectCIS){
+      this->DoesCISDirect();
+   }
+
+}
+
+void ZindoS::FreeDavidsonCISTemporaryMtrices(double*** expansionVectors, double** residualVector, double** ritzVector){
+
+   if(*expansionVectors != NULL){
+      MallocerFreer::GetInstance()->FreeDoubleMatrix2d(expansionVectors, this->matrixCISdimension);
+      //cout << "expansion vectors deleted\n";
+   }
+   if(*residualVector != NULL){
+      MallocerFreer::GetInstance()->FreeDoubleMatrix1d(residualVector);
+      //cout << "residual vector deleted\n";
+   }
+   if(*ritzVector != NULL){
+      MallocerFreer::GetInstance()->FreeDoubleMatrix1d(ritzVector);
+      //cout << "ritz vector deleted\n";
+   }
+
+}
+
+void ZindoS::FreeDavidsonRoopCISTemporaryMtrices(double*** interactionMatrix, 
+                                             double interactionMatrixDimension, 
+                                             double** interactionEigenEnergies){
+   if(*interactionMatrix != NULL){
+      MallocerFreer::GetInstance()->FreeDoubleMatrix2d(interactionMatrix, interactionMatrixDimension);
+      //cout << "interactionMatrix deleted\n";
+   }
+   if(*interactionEigenEnergies != NULL){
+      MallocerFreer::GetInstance()->FreeDoubleMatrix1d(interactionEigenEnergies);
+      //cout << "interactionEigenEnergies deleted\n";
+   }
+
+}
+void ZindoS::DoesCISDirect(){
+
+   cout << this->messageStartDirectCIS;
    bool calcEigenVectors = true;
    MolDS_mkl_wrapper::LapackWrapper::GetInstance()->Dsyevd(this->matrixCIS,
                                                            this->excitedEnergies, 
                                                            this->matrixCISdimension, 
                                                            calcEigenVectors);
-
+   cout << this->messageDoneDirectCIS;
 }
 
 void ZindoS::CalcCISMatrix(double** matrixCIS, int numberOcc, int numberVir){

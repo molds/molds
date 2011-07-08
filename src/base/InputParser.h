@@ -48,6 +48,9 @@ private:
    string messageCisNumberActiveVir;
    string messageCisNumberExcitedStates;
    string messageCisDavidson;
+   string messageCisNormTolerance;
+   string messageCisMaxIterations;
+   string messageCisMaxDimensions;
    string stringYES;
    string stringNO;
    string stringSpace;
@@ -93,6 +96,9 @@ private:
    string stringCISActiveVir;
    string stringCISNStates;
    string stringCISDavidson;
+   string stringCISMaxIter;
+   string stringCISMaxDimensions;
+   string stringCISNormTolerance;
    void CalcMolecularBasics(Molecule* molecule);
    void CalcCisCondition(Molecule* molecule);
    void OutputMolecularBasics(Molecule* molecule);
@@ -124,6 +130,9 @@ InputParser::InputParser(){
    this->messageCisNumberActiveVir = "\t\tNumber of active Vir.: ";
    this->messageCisNumberExcitedStates = "\t\tNumber of excited states: ";
    this->messageCisDavidson = "\t\tCIS-Davidson: ";
+   this->messageCisNormTolerance = "\t\tNorm tolerance for the residual of the Davidson: ";
+   this->messageCisMaxIterations = "\t\tMax iterations for the Davidson: ";
+   this->messageCisMaxDimensions = "\t\tMax dimensions for the Davidson: ";
    this->stringYES = "yes";
    this->stringNO = "no";
    this->stringSpace = " ";
@@ -169,6 +178,9 @@ InputParser::InputParser(){
    this->stringCISActiveVir = "active_vir";
    this->stringCISNStates = "nstates";
    this->stringCISDavidson = "davidson";
+   this->stringCISMaxIter = "max_iter";
+   this->stringCISMaxDimensions = "max_dim";
+   this->stringCISNormTolerance = "norm_tol";
 }
 
 InputParser::~InputParser(){
@@ -426,11 +438,28 @@ void InputParser::Parse(Molecule* molecule){
                }
                j++;
             }
+            // max iterations for the Davidson roop
+            if(inputTerms[j].compare(this->stringCISMaxIter) == 0){
+               int maxIter = atoi(inputTerms[j+1].c_str());
+               Parameters::GetInstance()->SetMaxIterationsCIS(maxIter);
+               j++;
+            }
+            // max dimensions for the Davidson expansion
+            if(inputTerms[j].compare(this->stringCISMaxDimensions) == 0){
+               int maxDim = atoi(inputTerms[j+1].c_str());
+               Parameters::GetInstance()->SetMaxDimensionsCIS(maxDim);
+               j++;
+            }
+            // nolm tolerance for the norm of the resiudal vectors of the Davidson.
+            if(inputTerms[j].compare(this->stringCISNormTolerance) == 0){
+               double normTol = atof(inputTerms[j+1].c_str());
+               Parameters::GetInstance()->SetNormToleranceCIS(normTol);
+               j++;
+            }
             j++;   
          }
          i = j;
       }
-
 
       // theory
       if(inputTerms[i].compare(this->stringTheory) == 0){
@@ -524,14 +553,17 @@ void InputParser::CalcCisCondition(Molecule* molecule){
    }   
 
    // check the number of calculated excited states.
-   int numberExcitedStates = Parameters::GetInstance()->GetActiveOccCIS() 
-                            *Parameters::GetInstance()->GetActiveVirCIS();
+   int numberSlaterDeterminants = Parameters::GetInstance()->GetActiveOccCIS() 
+                                 *Parameters::GetInstance()->GetActiveVirCIS();
    if(!Parameters::GetInstance()->GetIsDavidsonCIS()){
-      Parameters::GetInstance()->SetNumberExcitedStatesCIS(numberExcitedStates);
+      Parameters::GetInstance()->SetNumberExcitedStatesCIS(numberSlaterDeterminants);
    }
    else{
-      if(numberExcitedStates < Parameters::GetInstance()->GetNumberExcitedStatesCIS()){
-         Parameters::GetInstance()->SetNumberExcitedStatesCIS(numberExcitedStates);
+      if(numberSlaterDeterminants < Parameters::GetInstance()->GetNumberExcitedStatesCIS()){
+         Parameters::GetInstance()->SetNumberExcitedStatesCIS(numberSlaterDeterminants);
+      }
+      if(numberSlaterDeterminants < Parameters::GetInstance()->GetMaxDimensionsCIS()){
+         Parameters::GetInstance()->SetMaxDimensionsCIS(numberSlaterDeterminants);
       }
    }
    
@@ -568,6 +600,9 @@ void InputParser::OutputCisConditions(){
    printf("%s",this->messageCisDavidson.c_str());
    if(Parameters::GetInstance()->GetIsDavidsonCIS()){
       printf("%s\n",this->stringYES.c_str());
+      printf("%s%d\n",this->messageCisMaxIterations.c_str(),Parameters::GetInstance()->GetMaxIterationsCIS());
+      printf("%s%d\n",this->messageCisMaxDimensions.c_str(),Parameters::GetInstance()->GetMaxDimensionsCIS());
+      printf("%s%e\n",this->messageCisNormTolerance.c_str(),Parameters::GetInstance()->GetNormToleranceCIS());
    }
    else{
       printf("%s\n",this->stringNO.c_str());
