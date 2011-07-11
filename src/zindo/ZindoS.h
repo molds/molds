@@ -800,8 +800,11 @@ void ZindoS::UpdateExpansionVectors(double** expansionVectors, double* interacti
 // This method is used for Davidson
 void ZindoS::CalcInteractionMatrix(double** interactionMatrix, double** expansionVectors, int interactionMatrixDimension){
 
-   for(int i=0; i<interactionMatrixDimension; i++){
-      for(int j=i; j<interactionMatrixDimension; j++){
+   #pragma omp parallel for schedule(auto)
+   for(int k=0; k<interactionMatrixDimension*interactionMatrixDimension; k++){
+      int i = k/interactionMatrixDimension;
+      int j = k%interactionMatrixDimension;
+      if(i<=j){
          for(int a=0; a<this->matrixCISdimension; a++){
             for(int b=0; b<this->matrixCISdimension; b++){
                double value = a<=b ? this->matrixCIS[a][b] : this->matrixCIS[b][a];
