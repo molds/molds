@@ -75,6 +75,9 @@ private:
    string errorMessageDavidsonNotConverged;
    string errorMessageDavidsonMaxIter;
    string errorMessageDavidsonMaxDim;
+   string messageStartCalcCISMatrix;
+   string messageConsumedCalcCISMatrix;
+   string messageDoneCalcCISMatrix;
    string messageStartCIS;
    string messageDoneCIS;
    string messageStartDirectCIS;
@@ -134,6 +137,9 @@ void ZindoS::SetMessages(){
    this->messageDoneSCF = "**********  DONE: ZINDO/S-SCF  **********\n\n\n";
    this->messageStartCIS = "**********  START: ZINDO/S-CIS  **********\n";
    this->messageDoneCIS = "**********  DONE: ZINDO/S-CIS  **********\n\n\n";
+   this->messageConsumedCalcCISMatrix = "\tElapsed time(omp) of the calc. of the CIS matrix = ";
+   this->messageStartCalcCISMatrix = "----------- START: Calculation of the CIS matrix -----------\n";
+   this->messageDoneCalcCISMatrix  = "----------- DONE: Calculation of the CIS matrix -----------\n\n";
    this->messageStartDirectCIS = "\t======  START: Direct-CIS  =====\n\n";
    this->messageDoneDirectCIS =  "\t======  DONE: Direct-CIS  =====\n\n\n";
    this->messageStartDavidsonCIS = "\t======  START: Davidson-CIS  =====\n";
@@ -1029,6 +1035,8 @@ void ZindoS::DoesCISDirect(){
 }
 
 void ZindoS::CalcCISMatrix(double** matrixCIS, int numberOcc, int numberVir){
+   cout << this->messageStartCalcCISMatrix;
+   double ompStartTime = omp_get_wtime();
 
    #pragma omp parallel for schedule(auto)
    for(int k=0; k<numberOcc*numberVir; k++){
@@ -1062,6 +1070,9 @@ void ZindoS::CalcCISMatrix(double** matrixCIS, int numberOcc, int numberVir){
          matrixCIS[k][l] = value;
       }
    }
+   double ompEndTime = omp_get_wtime();
+   cout << this->messageConsumedCalcCISMatrix << ompEndTime - ompStartTime << "[s]." << endl;
+   cout << this->messageDoneCalcCISMatrix;
 }
 
 }
