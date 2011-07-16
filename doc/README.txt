@@ -60,18 +60,34 @@ How to Write Input-files:
          THEORY_END
    
       -options
-       "davidson", "active_occ", "active_vir", and "nstates" are prepared as options.
+       "davidson", "active_occ", "active_vir", "max_iter", "max_dim", "norm_tol", 
+       and "nstates" are prepared as options.
 
        "davidson" should be set as "yes" or "no". 
-       Default value is "yes".
+       Default value of "davidson" is "yes".
 
        "active_occ" ("active_vir") is set to the number of occupied (virtual) orbitals
-       if user set "active_occ" ("active_vir") to be greater than the number of occupied (virtual) orbitals. 
+       if user set "active_occ" ("active_vir") to be greater than 
+       the number of occupied (virtual) orbitals. 
        Default value of "active_occ" is 10. Default value of "active_vir" is 10.
 
-       "nstates" is valid for the Davidson algorithm only, hence "nstates" is set to "active_occ*active_vir" 
+       "nstates" is valid for the Davidson algorithm only, 
+       hence "nstates" is set to "active_occ*active_vir" 
        in direct CIS algorithm (without the Davidson algorithem). 
        Default value of "nstates" is 5 for the Davidson algorithem.
+
+       "max_iter" is valid for the Davidson algorithm only. 
+       This option means the number of times of Davidson roop. 
+       Default value of "max_iter" is 100.
+
+       "max_dim" is valid for the Davidson algorithm only. 
+       This option means the number of slater determinans used by expansion of the excited states. 
+       Note that Hartree-Fock state (groudn state) is not included in the "max_dim".
+       Default value of "max_dim" is 100.
+
+       "norm_tol" is valid for the Davidson algorithm only. 
+       This option means the max tolerance for the norm of the residual vectors.
+       Default value of "norm_tol" is 10**(-6.0).
 
        E.g.
          CIS
@@ -79,6 +95,9 @@ How to Write Input-files:
             active_occ 2
             active_vir 2
             nstates 1000
+            max_iter 100
+            max_dim 100
+            norm_tol 0.000001
          CIS_END
 
 
