@@ -1,4 +1,3 @@
-
 THEORY
    //cndo/2
    //indo
@@ -13,7 +12,10 @@ SCF
    max_iter 100
    rms_density 0.000001
    damping_thresh 10
-   damping_weight 0.90
+   damping_weight 0.98
+   diis_start_error 0.010
+   diis_end_error   0.0
+   diis_num_error_vect 5 
 SCF_END
 
 CIS
@@ -25,7 +27,6 @@ CIS
    norm_tol 0.000001
    nstates 10
 CIS_END
-
 
 GEOMETRY
 C        -23.68849        1.68954       -0.60930
