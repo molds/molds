@@ -15,7 +15,7 @@ using namespace MolDS_base_atoms;
 namespace MolDS_zindo{
 
 /***
- *  Refferences for 
+ *  Main Refference for Zindo is [RZ_1973]
  */
 class ZindoS : public MolDS_cndo::Cndo2{
 public:
