@@ -12,6 +12,20 @@ Compile:
 Carring Out:
    $./a.out < input.in
 
+Capabilities:
+
+            | HF  | CIS | MD(gs) | MD(es) |
+   ---------|-----|-----|--------|--------|
+   CNDO2    | OK  | --  | --     | --     |
+   ---------|-----|-----|--------|--------|
+   INDO     | OK  | --  | --     | --     |
+   ---------|-----|-----|--------|--------|
+   ZINDO/S  | OK  | OK  | Sch    | --     |
+   ---------|-----|-----|--------|--------|
+   MNDO     | Sch | Sch | Sch    | Sch    |
+
+      "OK", "Sch", and "--" mean available, shceduled, and non-scheduled methods, respectively.
+      MD(gs) and MD(es) mean Molecular Dynamics on ground and excited states, respectively.
 
 How to Write Input-files:
 
