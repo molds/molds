@@ -3,6 +3,7 @@
 [PS_1965] J. A. Pople and G. A. Segal, J. Chem. Phys., 43, S136 (1965)
 [PS_1966] J. A. Pople and G. A. Segal, J. Chem. Phys., 44, 3289 (1966)
 [PB_1970] J. A. Pople and D. L. Beveridge, "Approximate Molecular Orbital Theory", ISBN-13:978-0070505124 (1970)
+[S_1970] R. F. Stewart, J. Chme. Phys., 52, 431 (1970)
 [GD_1972] G. P.-Guillouzo and D. G. ET J. Deschamps, J. Mol. Strct., 14, 81 (1972)
 [RZ_1973] J. Ridley and M. C. Zerner, Theort. Chim. Acta (Berl.) 32, 111 (1973)
 [RZ_1976] J. E. Ridley and M. C. Zerner, Theort. Chim. Acta (Berl.) 42, 223 (1976)
