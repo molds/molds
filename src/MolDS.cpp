@@ -27,6 +27,7 @@
 #include"base/MallocerFreer.h"
 #include"base/InputParser.h"
 #include"base/Parameters.h"
+#include"base/GTOexpansionSTO.h"
 #include"cndo/Cndo2.h"
 #include"indo/Indo.h"
 #include"zindo/ZindoS.h"
@@ -60,6 +61,7 @@ int main(){
       MallocerFreer::GetInstance();
       Parameters::GetInstance();
       LapackWrapper::GetInstance();
+      GTOexpansionSTO::GetInstance();
 
 
       // Parse input
@@ -151,6 +153,7 @@ int main(){
       }
 
       //Free 
+      GTOexpansionSTO::DeleteInstance();
       LapackWrapper::DeleteInstance(); 
       Parameters::DeleteInstance();
       MallocerFreer::DeleteInstance();
