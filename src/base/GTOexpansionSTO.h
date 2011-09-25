@@ -74,7 +74,7 @@ void GTOexpansionSTO::SetCoefficientsExponents(){
    //STO-1G, m-shell
    {
       // 3s
-      exponents[STO1G][m][sAzimuthal][0] = 5.296881757*pow(10.0,-1.0);   coefficients[STO1G][m][sAzimuthal][0] = 1.0000;
+      exponents[STO1G][m][sAzimuthal][0] = 5.296881757*pow(10.0,-2.0);   coefficients[STO1G][m][sAzimuthal][0] = 1.0000;
       // 3p
       exponents[STO1G][m][pAzimuthal][0] = 9.113614253*pow(10.0,-2.0);   coefficients[STO1G][m][pAzimuthal][0] = 1.0000;
       // 3d
@@ -167,7 +167,7 @@ void GTOexpansionSTO::SetCoefficientsExponents(){
       exponents[STO4G][l][pAzimuthal][0] = 1.798260992;                  coefficients[STO4G][l][pAzimuthal][0] = 5.713170255*pow(10,-2.0); 
       exponents[STO4G][l][pAzimuthal][1] = 4.662622228*pow(10.0,-1.0);   coefficients[STO4G][l][pAzimuthal][1] = 2.857455515*pow(10,-1.0); 
       exponents[STO4G][l][pAzimuthal][2] = 1.643718620*pow(10.0,-1.0);   coefficients[STO4G][l][pAzimuthal][2] = 5.517873105*pow(10,-1.0); 
-      exponents[STO4G][l][pAzimuthal][3] = 6.543927065*pow(10.0,-2.0);   coefficients[STO4G][l][pAzimuthal][3] = 2.632311924*pow(10,-1.0); 
+      exponents[STO4G][l][pAzimuthal][3] = 6.543927065*pow(10.0,-2.0);   coefficients[STO4G][l][pAzimuthal][3] = 2.632314924*pow(10,-1.0); 
    }   
 
    //STO-4G, m-shell
@@ -184,7 +184,7 @@ void GTOexpansionSTO::SetCoefficientsExponents(){
       exponents[STO4G][m][pAzimuthal][3] = 4.184253862*pow(10.0,-2.0);   coefficients[STO4G][m][pAzimuthal][3] = 2.144986514*pow(10,-1.0); 
       // 3d
       exponents[STO4G][m][dAzimuthal][0] = 9.185846715*pow(10.0,-1.0);   coefficients[STO4G][m][dAzimuthal][0] = 5.799057705*pow(10,-2.0); 
-      exponents[STO4G][m][dAzimuthal][1] = 2.920461109*pow(10.0,-1.0);   coefficients[STO4G][m][dAzimuthal][1] = 5.045581349*pow(10,-1.0); 
+      exponents[STO4G][m][dAzimuthal][1] = 2.920461109*pow(10.0,-1.0);   coefficients[STO4G][m][dAzimuthal][1] = 3.045581349*pow(10,-1.0); 
       exponents[STO4G][m][dAzimuthal][2] = 1.187568890*pow(10.0,-1.0);   coefficients[STO4G][m][dAzimuthal][2] = 5.601358038*pow(10,-1.0); 
       exponents[STO4G][m][dAzimuthal][3] = 5.286755896*pow(10.0,-2.0);   coefficients[STO4G][m][dAzimuthal][3] = 2.432423313*pow(10,-1.0); 
    }
@@ -272,7 +272,7 @@ void GTOexpansionSTO::SetCoefficientsExponents(){
       exponents[STO6G][m][sAzimuthal][0] = 3.273031938;                  coefficients[STO6G][m][sAzimuthal][0] =-6.775596947*pow(10,-3.0); 
       exponents[STO6G][m][sAzimuthal][1] = 9.200611311*pow(10.0,-1.0);   coefficients[STO6G][m][sAzimuthal][1] =-5.639325779*pow(10,-2.0); 
       exponents[STO6G][m][sAzimuthal][2] = 3.593349765*pow(10.0,-1.0);   coefficients[STO6G][m][sAzimuthal][2] =-1.587656086*pow(10,-1.0); 
-      exponents[STO6G][m][sAzimuthal][3] = 6.636686991*pow(10.0,-2.0);   coefficients[STO6G][m][sAzimuthal][3] = 5.534527651*pow(10,-1.0); 
+      exponents[STO6G][m][sAzimuthal][3] = 8.636686991*pow(10.0,-2.0);   coefficients[STO6G][m][sAzimuthal][3] = 5.534527651*pow(10,-1.0); 
       exponents[STO6G][m][sAzimuthal][4] = 4.797373812*pow(10.0,-2.0);   coefficients[STO6G][m][sAzimuthal][4] = 5.015351020*pow(10,-1.0); 
       exponents[STO6G][m][sAzimuthal][5] = 2.724741144*pow(10.0,-2.0);   coefficients[STO6G][m][sAzimuthal][5] = 7.223633674*pow(10,-2.0); 
       // 3p
@@ -287,7 +287,7 @@ void GTOexpansionSTO::SetCoefficientsExponents(){
       exponents[STO6G][m][dAzimuthal][1] = 7.981487853*pow(10.0,-1.0);   coefficients[STO6G][m][dAzimuthal][1] = 5.386799363*pow(10,-2.0); 
       exponents[STO6G][m][dAzimuthal][2] = 3.311327490*pow(10.0,-1.0);   coefficients[STO6G][m][dAzimuthal][2] = 2.072139149*pow(10,-1.0); 
       exponents[STO6G][m][dAzimuthal][3] = 1.559114463*pow(10.0,-1.0);   coefficients[STO6G][m][dAzimuthal][3] = 4.266269092*pow(10,-1.0); 
-      exponents[STO6G][m][dAzimuthal][4] = 7.817734732*pow(10.0,-2.0);   coefficients[STO6G][m][dAzimuthal][4] = 3.843100204*pow(10,-1.0); 
+      exponents[STO6G][m][dAzimuthal][4] = 7.877734732*pow(10.0,-2.0);   coefficients[STO6G][m][dAzimuthal][4] = 3.843100204*pow(10,-1.0); 
       exponents[STO6G][m][dAzimuthal][5] = 4.058484363*pow(10.0,-2.0);   coefficients[STO6G][m][dAzimuthal][5] = 8.902827546*pow(10,-2.0); 
    }
 
