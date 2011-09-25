@@ -14,6 +14,9 @@ class GTOexpansionSTO{
 public:
    static GTOexpansionSTO* GetInstance();
    static void DeleteInstance();
+   double GetExponent(int STOnG, ShellType shellType, OrbitalType orbitalType, int index);
+   double GetCoefficient(int STOnG, ShellType shellType, OrbitalType orbitalType, int index);
+
 
 private:
    static GTOexpansionSTO* gTOexpansionSTO;
@@ -52,6 +55,38 @@ void GTOexpansionSTO::DeleteInstance(){
       delete gTOexpansionSTO; 
    }
    gTOexpansionSTO = NULL;
+}
+
+double GTOexpansionSTO::GetExponent(int STOnG, ShellType shellType, OrbitalType orbitalType, int index){
+
+   AzimuthalType azimuthalType;
+   if(orbitalType == s){
+      azimuthalType = sAzimuthal;
+   }
+   else if(orbitalType == px || orbitalType == py ||orbitalType == py ){
+      azimuthalType = pAzimuthal;
+   }
+   else if(orbitalType == dxy || orbitalType == dyz ||orbitalType == dzz || orbitalType == dzx ||orbitalType == dxxyy ){
+      azimuthalType = dAzimuthal;
+   }
+
+   return this->exponents[STOnG][shellType][azimuthalType][index];
+}
+
+double GTOexpansionSTO::GetCoefficient(int STOnG, ShellType shellType, OrbitalType orbitalType, int index){
+
+   AzimuthalType azimuthalType;
+   if(orbitalType == s){
+      azimuthalType = sAzimuthal;
+   }
+   else if(orbitalType == px || orbitalType == py ||orbitalType == py ){
+      azimuthalType = pAzimuthal;
+   }
+   else if(orbitalType == dxy || orbitalType == dyz ||orbitalType == dzz || orbitalType == dzx ||orbitalType == dxxyy ){
+      azimuthalType = dAzimuthal;
+   }
+
+   return this->coefficients[STOnG][shellType][azimuthalType][index];
 }
 
 //  see Table I and II in [S_1970]
