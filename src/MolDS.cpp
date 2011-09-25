@@ -27,7 +27,7 @@
 #include"base/MallocerFreer.h"
 #include"base/InputParser.h"
 #include"base/Parameters.h"
-#include"base/GTOexpansionSTO.h"
+#include"base/GTOExpansionSTO.h"
 #include"cndo/Cndo2.h"
 #include"indo/Indo.h"
 #include"zindo/ZindoS.h"
