@@ -61,7 +61,7 @@ int main(){
       MallocerFreer::GetInstance();
       Parameters::GetInstance();
       LapackWrapper::GetInstance();
-      GTOexpansionSTO::GetInstance();
+      GTOExpansionSTO::GetInstance();
 
 
       // Parse input
@@ -153,7 +153,7 @@ int main(){
       }
 
       //Free 
-      GTOexpansionSTO::DeleteInstance();
+      GTOExpansionSTO::DeleteInstance();
       LapackWrapper::DeleteInstance(); 
       Parameters::DeleteInstance();
       MallocerFreer::DeleteInstance();

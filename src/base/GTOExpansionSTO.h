@@ -9,21 +9,21 @@
 using namespace std;
 namespace MolDS_base{
 
-// GTOexpansionSTO is singleton
-class GTOexpansionSTO{
+// GTOExpansionSTO is singleton
+class GTOExpansionSTO{
 public:
-   static GTOexpansionSTO* GetInstance();
+   static GTOExpansionSTO* GetInstance();
    static void DeleteInstance();
    double GetExponent(int STOnG, ShellType shellType, OrbitalType orbitalType, int index);
    double GetCoefficient(int STOnG, ShellType shellType, OrbitalType orbitalType, int index);
 
 
 private:
-   static GTOexpansionSTO* gTOexpansionSTO;
-   GTOexpansionSTO();
-   GTOexpansionSTO(GTOexpansionSTO&);
-   void operator = (GTOexpansionSTO&);
-   ~GTOexpansionSTO();
+   static GTOExpansionSTO* gTOExpansionSTO;
+   GTOExpansionSTO();
+   GTOExpansionSTO(GTOExpansionSTO&);
+   void operator = (GTOExpansionSTO&);
+   ~GTOExpansionSTO();
 
    void SetCoefficientsExponents();
    double exponents[STOnGType_end][ShellType_end][AzimuthalType_end][6];    
@@ -34,30 +34,30 @@ private:
       //This is d in (3) of [S_1970]. See Table I and II in [S_1970]
 
 };
-GTOexpansionSTO* GTOexpansionSTO::gTOexpansionSTO = NULL;
+GTOExpansionSTO* GTOExpansionSTO::gTOExpansionSTO = NULL;
 
-GTOexpansionSTO::GTOexpansionSTO(){
+GTOExpansionSTO::GTOExpansionSTO(){
    this->SetCoefficientsExponents();
 }
 
-GTOexpansionSTO::~GTOexpansionSTO(){
+GTOExpansionSTO::~GTOExpansionSTO(){
 }
 
-GTOexpansionSTO* GTOexpansionSTO::GetInstance(){
-   if(gTOexpansionSTO == NULL){
-      gTOexpansionSTO = new GTOexpansionSTO();
+GTOExpansionSTO* GTOExpansionSTO::GetInstance(){
+   if(gTOExpansionSTO == NULL){
+      gTOExpansionSTO = new GTOExpansionSTO();
    }
-   return gTOexpansionSTO;
+   return gTOExpansionSTO;
 }
 
-void GTOexpansionSTO::DeleteInstance(){
-   if(gTOexpansionSTO != NULL){
-      delete gTOexpansionSTO; 
+void GTOExpansionSTO::DeleteInstance(){
+   if(gTOExpansionSTO != NULL){
+      delete gTOExpansionSTO; 
    }
-   gTOexpansionSTO = NULL;
+   gTOExpansionSTO = NULL;
 }
 
-double GTOexpansionSTO::GetExponent(int STOnG, ShellType shellType, OrbitalType orbitalType, int index){
+double GTOExpansionSTO::GetExponent(int STOnG, ShellType shellType, OrbitalType orbitalType, int index){
 
    AzimuthalType azimuthalType;
    if(orbitalType == s){
@@ -73,7 +73,7 @@ double GTOexpansionSTO::GetExponent(int STOnG, ShellType shellType, OrbitalType 
    return this->exponents[STOnG][shellType][azimuthalType][index];
 }
 
-double GTOexpansionSTO::GetCoefficient(int STOnG, ShellType shellType, OrbitalType orbitalType, int index){
+double GTOExpansionSTO::GetCoefficient(int STOnG, ShellType shellType, OrbitalType orbitalType, int index){
 
    AzimuthalType azimuthalType;
    if(orbitalType == s){
@@ -90,7 +90,7 @@ double GTOexpansionSTO::GetCoefficient(int STOnG, ShellType shellType, OrbitalTy
 }
 
 //  see Table I and II in [S_1970]
-void GTOexpansionSTO::SetCoefficientsExponents(){
+void GTOExpansionSTO::SetCoefficientsExponents(){
 
    //STO-1G, k-shell
    {   
