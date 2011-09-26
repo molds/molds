@@ -14,8 +14,8 @@ class GTOExpansionSTO{
 public:
    static GTOExpansionSTO* GetInstance();
    static void DeleteInstance();
-   double GetExponent(STOnGType STOnG, ShellType shellType, OrbitalType orbitalType, int index);
-   double GetCoefficient(STOnGType STOnG, ShellType shellType, OrbitalType orbitalType, int index);
+   double GetExponent(STOnGType stonG, ShellType shellType, OrbitalType orbitalType, int index);
+   double GetCoefficient(STOnGType stonG, ShellType shellType, OrbitalType orbitalType, int index);
 
 
 private:
@@ -67,7 +67,7 @@ void GTOExpansionSTO::DeleteInstance(){
    gTOExpansionSTO = NULL;
 }
 
-double GTOExpansionSTO::GetExponent(STOnGType STOnG, ShellType shellType, OrbitalType orbitalType, int index){
+double GTOExpansionSTO::GetExponent(STOnGType stonG, ShellType shellType, OrbitalType orbitalType, int index){
 
    AzimuthalType azimuthalType;
    if(orbitalType == s){
@@ -83,14 +83,14 @@ double GTOExpansionSTO::GetExponent(STOnGType STOnG, ShellType shellType, Orbita
       stringstream ss;
       ss << this->errorMessageGetExponentNonValidOrbital;
       ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbitalType) << endl;
-      ss << this->errorMessageSTOnGType << STOnGTypeStr(STOnG) << endl;
+      ss << this->errorMessageSTOnGType << STOnGTypeStr(stonG) << endl;
       throw MolDSException(ss.str());
    }
 
-   return this->exponents[STOnG][shellType][azimuthalType][index];
+   return this->exponents[stonG][shellType][azimuthalType][index];
 }
 
-double GTOExpansionSTO::GetCoefficient(STOnGType STOnG, ShellType shellType, OrbitalType orbitalType, int index){
+double GTOExpansionSTO::GetCoefficient(STOnGType stonG, ShellType shellType, OrbitalType orbitalType, int index){
 
    AzimuthalType azimuthalType;
    if(orbitalType == s){
@@ -106,11 +106,11 @@ double GTOExpansionSTO::GetCoefficient(STOnGType STOnG, ShellType shellType, Orb
       stringstream ss;
       ss << this->errorMessageGetCoefficientNonValidOrbital;
       ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbitalType) << endl;
-      ss << this->errorMessageSTOnGType << STOnGTypeStr(STOnG) << endl;
+      ss << this->errorMessageSTOnGType << STOnGTypeStr(stonG) << endl;
       throw MolDSException(ss.str());
    }
 
-   return this->coefficients[STOnG][shellType][azimuthalType][index];
+   return this->coefficients[stonG][shellType][azimuthalType][index];
 }
 
 //  see Table I and II in [S_1970]
