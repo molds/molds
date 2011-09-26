@@ -30,6 +30,8 @@ public:
    void SetMolecule(Molecule* molecule);
    void DoesSCF();
 protected:
+   string errorMessageAtomA;
+   string errorMessageAtomB;
    string errorMessageAtomType;
    string errorMessageOrbitalType;
    string errorMessageSCFNotConverged;
@@ -39,6 +41,7 @@ protected:
    string errorMessageCoulombInt;
    string errorMessageExchangeInt;
    string errorMessageMolecularIntegralElement;
+   string errorMessageGetGaussianOverlapOrbitalD;
    string messageSCFMetConvergence;
    string messageStartSCF;
    string messageDoneSCF;
@@ -93,6 +96,17 @@ private:
    void CalcAtomicElectronPopulation(double* atomicElectronPopulation,
                                      double** orbitalElectronPopulation, Molecule* molecule);
    void CalcOverlap(double** overlap, Molecule* molecule);
+   void CalcOverlapByGTOExpansion(double** overlap, Molecule* molecule, STOnGType stonG);
+   double GetOverlapElementByGTOExpansion(Atom* atomA, int valenceIndexA, 
+                                          Atom* atomB, int valenceIndexB,
+                                          STOnGType stonG);
+   double GetGaussianOverlap(AtomType atomTypeA, 
+                             OrbitalType valenceOrbitalA, 
+                             double gaussianExponentA, 
+                             AtomType atomTypeB, 
+                             OrbitalType valenceOrbitalB, 
+                             double gaussianExponentB, 
+                             double dx, double dy, double dz, double Rab);
    void CalcRotatingMatrix(double** rotatingMatrix, Atom* atomA, Atom* atomB);
    void CalcFockMatrix(double** fockMatrix, Molecule* molecule, double** overlap, double** gammaAB,
                        double** orbitalElectronPopulation, double* atomicElectronPopulation,
@@ -189,10 +203,14 @@ void Cndo2::SetMessages(){
       = "Error in cndo::Cndo2::SetMolecule: Total number of valence electrons is odd. totalNumberValenceElectrons=";
    this->errorMessageNotEnebleAtomType  
       = "Error in cndo::Cndo2::ChecEnableAtomType: Non available atom is contained.\n";
+   this->errorMessageAtomA = "Atom A is:\n";
+   this->errorMessageAtomB = "Atom B is:\n";
    this->errorMessageAtomType = "\tatom type = ";
    this->errorMessageOrbitalType = "\torbital type = ";
    this->errorMessageMolecularIntegralElement
       = "Error in cndo::Cndo2::GetMolecularIntegralElement: Non available orbital is contained.\n";
+   this->errorMessageGetGaussianOverlapOrbitalD 
+      = "Error in cndo::Cndo2::GetGaussiangOverlap: d-orbital is not treatable. The d-orbital is contained in atom A or B.\n";
    this->messageSCFMetConvergence = "\n\n\n\t\tCNDO/2-SCF met convergence criterion(^^b\n\n\n";
    this->messageStartSCF = "**********  START: CNDO/2-SCF  **********\n";
    this->messageDoneSCF = "**********  DONE: CNDO/2-SCF  **********\n\n\n";
@@ -1110,6 +1128,208 @@ void Cndo2::CalcOverlap(double** overlap, Molecule* molecule){
    printf("\n");
    */
 
+}
+
+// calculate Overlap matrix. E.g. S_{\mu\nu} in (3.74) in J. A. Pople book by GTO expansion.
+// See Eqs. (28) - (32) in [DY_1977]
+void Cndo2::CalcOverlapByGTOExpansion(double** overlap, Molecule* molecule, STOnGType stonG){
+   int totalAONumber = molecule->GetTotalNumberAOs();
+   int totalAtomNumber = molecule->GetAtomVect()->size();
+
+   // calculation overlap matrix
+   for(int mu=0; mu<totalAONumber; mu++){
+      overlap[mu][mu] = 1.0;
+   }
+
+   //#pragma omp for schedule(auto)
+   for(int A=0; A<totalAtomNumber; A++){
+      Atom* atomA = (*(molecule->GetAtomVect()))[A];
+      int firstAOIndexAtomA = atomA->GetFirstAOIndex();
+      for(int B=A+1; B<totalAtomNumber; B++){
+         Atom* atomB = (*(molecule->GetAtomVect()))[B];
+         int firstAOIndexAtomB = atomB->GetFirstAOIndex();
+
+         for(int a=0; a<atomA->GetValence().size(); a++){
+            for(int b=0; b<atomB->GetValence().size(); b++){
+         
+               int mu = firstAOIndexAtomA + a;      
+               int nu = firstAOIndexAtomB + b;      
+               double value = this->GetOverlapElementByGTOExpansion(atomA, a, atomB, b, stonG);
+               overlap[mu][nu] = value;
+               overlap[nu][mu] = value;
+            }
+         }
+      }
+   }
+   /* 
+   printf("overlap matrix\n"); 
+   for(int o=0; o<this->molecule->GetTotalNumberAOs(); o++){
+      for(int p=0; p<this->molecule->GetTotalNumberAOs(); p++){
+         printf("%lf\t",overlap[o][p]);
+      }
+      printf("\n");
+   }
+   printf("\n");
+   */
+
+}
+
+// calculate elements of overlap matrix. 
+// E.g. S_{\mu\nu} in (3.74) in J. A. Pople book by GTO expansion.
+// See Eqs. (28) - (32) in [DY_1977]
+double Cndo2::GetOverlapElementByGTOExpansion(Atom* atomA, int valenceIndexA, 
+                                              Atom* atomB, int valenceIndexB,
+                                              STOnGType stonG){
+   double value = 0.0;
+   double dx = atomA->GetXyz()[XAxis] - atomB->GetXyz()[XAxis];
+   double dy = atomA->GetXyz()[YAxis] - atomB->GetXyz()[YAxis];
+   double dz = atomA->GetXyz()[ZAxis] - atomB->GetXyz()[ZAxis];
+   double Rab = sqrt( pow(dx, 2.0) + pow(dy, 2.0) + pow(dz,2.0) );
+   ShellType shellTypeA = atomA->GetValenceShellType();
+   ShellType shellTypeB = atomB->GetValenceShellType();
+   OrbitalType valenceOrbitalA = atomA->GetValence()[valenceIndexA];
+   OrbitalType valenceOrbitalB = atomB->GetValence()[valenceIndexB];
+   double orbitalExponentA = atomA->GetOrbitalExponent(atomA->GetValenceShellType(), 
+                                                       valenceOrbitalA);
+   double orbitalExponentB = atomB->GetOrbitalExponent(atomB->GetValenceShellType(), 
+                                                       valenceOrbitalB);
+   double gaussianExponentA = 0.0;
+   double gaussianExponentB = 0.0;
+
+   double temp = 0.0;
+   for(int i=0; i<stonG; i++){
+      for(int j=0; j<stonG; j++){
+         temp = GTOExpansionSTO::GetInstance()->GetCoefficient
+                  (stonG, shellTypeA, valenceOrbitalA, i); 
+         temp *= GTOExpansionSTO::GetInstance()->GetCoefficient
+                  (stonG, shellTypeB, valenceOrbitalB, j); 
+         gaussianExponentA = pow(orbitalExponentA, 2.0) *
+                             GTOExpansionSTO::GetInstance()->GetExponent
+                              (stonG, shellTypeA, valenceOrbitalA, i);
+         gaussianExponentB = pow(orbitalExponentB, 2.0) *
+                             GTOExpansionSTO::GetInstance()->GetExponent
+                              (stonG, shellTypeB, valenceOrbitalB, j);
+         temp *= this->GetGaussianOverlap(atomA->GetAtomType(), valenceOrbitalA, gaussianExponentA, 
+                                          atomB->GetAtomType(), valenceOrbitalB, gaussianExponentB,
+                                          dx, dy, dz, Rab);
+         value += temp;
+      }
+   }
+   return value;
+}
+
+// calculate gaussian overlap integrals. 
+// See Eqs. (28) - (32) in [DY_1977]
+double Cndo2::GetGaussianOverlap(AtomType atomTypeA, 
+                                 OrbitalType valenceOrbitalA, 
+                                 double gaussianExponentA, 
+                                 AtomType atomTypeB, 
+                                 OrbitalType valenceOrbitalB, 
+                                 double gaussianExponentB,
+                                 double dx, double dy, double dz, double Rab){
+   double value = 0.0;
+   double temp1 = 0.0;
+   double temp2 = 0.0;
+   double temp3 = 0.0;
+
+   // calculate (S_A|S_B). See Eq. (28) in [DY_1977]
+   temp1 = 2.0*pow(gaussianExponentA*gaussianExponentB, 0.5)/(gaussianExponentA+gaussianExponentB);
+   temp2 = -1.0* gaussianExponentA*gaussianExponentB/(gaussianExponentA+gaussianExponentB);
+   value = pow(temp1, 1.5)*exp(temp2*pow(Rab, 2.0));
+
+   if(valenceOrbitalA == s && valenceOrbitalB == s){
+   }
+   else if(valenceOrbitalA == s && valenceOrbitalB == px){
+      value *= 2.0*gaussianExponentA*pow(gaussianExponentB, 0.5)*dx;
+      value /= (gaussianExponentA+gaussianExponentB);
+   }
+   else if(valenceOrbitalA == s && valenceOrbitalB == py){
+      value *= 2.0*gaussianExponentA*pow(gaussianExponentB, 0.5)*dy;
+      value /= (gaussianExponentA+gaussianExponentB);
+   }
+   else if(valenceOrbitalA == s && valenceOrbitalB == pz){
+      value *= 2.0*gaussianExponentA*pow(gaussianExponentB, 0.5)*dz;
+      value /= (gaussianExponentA+gaussianExponentB);
+   }
+   else if(valenceOrbitalA == px && valenceOrbitalB == s){
+      value *= -2.0*pow(gaussianExponentA, 0.5)*gaussianExponentB*dx;
+      value /= (gaussianExponentA+gaussianExponentB);
+   }
+   else if(valenceOrbitalA == py && valenceOrbitalB == s){
+      value *= -2.0*pow(gaussianExponentA, 0.5)*gaussianExponentB*dy;
+      value /= (gaussianExponentA+gaussianExponentB);
+   }
+   else if(valenceOrbitalA == pz && valenceOrbitalB == s){
+      value *= -2.0*pow(gaussianExponentA, 0.5)*gaussianExponentB*dz;
+      value /= (gaussianExponentA+gaussianExponentB);
+   }
+   else if(valenceOrbitalA == px && valenceOrbitalB == px){
+      temp3 = -1.0*pow(dx,2.0)*gaussianExponentA*gaussianExponentB;
+      temp3 /= (gaussianExponentA+gaussianExponentB);
+      temp3 += 0.5;
+      value *= 4.0*pow(gaussianExponentA*gaussianExponentB, 0.5);
+      value /= (gaussianExponentA+gaussianExponentB);
+      value *= temp3;
+   }
+   else if(valenceOrbitalA == px && valenceOrbitalB == py){
+      value *= -4.0*pow(gaussianExponentA*gaussianExponentB, 1.5);
+      value *= pow(gaussianExponentA+gaussianExponentB, -2.0);
+      value *= dx*dy;
+   }
+   else if(valenceOrbitalA == px && valenceOrbitalB == pz){
+      value *= -4.0*pow(gaussianExponentA*gaussianExponentB, 1.5);
+      value *= pow(gaussianExponentA+gaussianExponentB, -2.0);
+      value *= dx*dz;
+   }
+   else if(valenceOrbitalA == py && valenceOrbitalB == px){
+      value *= -4.0*pow(gaussianExponentA*gaussianExponentB, 1.5);
+      value *= pow(gaussianExponentA+gaussianExponentB, -2.0);
+      value *= dy*dx;
+   }
+   else if(valenceOrbitalA == py && valenceOrbitalB == py){
+      temp3 = -1.0*pow(dy,2.0)*gaussianExponentA*gaussianExponentB;
+      temp3 /= (gaussianExponentA+gaussianExponentB);
+      temp3 += 0.5;
+      value *= 4.0*pow(gaussianExponentA*gaussianExponentB, 0.5);
+      value /= (gaussianExponentA+gaussianExponentB);
+      value *= temp3;
+   }
+   else if(valenceOrbitalA == py && valenceOrbitalB == pz){
+      value *= -4.0*pow(gaussianExponentA*gaussianExponentB, 1.5);
+      value *= pow(gaussianExponentA+gaussianExponentB, -2.0);
+      value *= dy*dz;
+   }
+   else if(valenceOrbitalA == pz && valenceOrbitalB == px){
+      value *= -4.0*pow(gaussianExponentA*gaussianExponentB, 1.5);
+      value *= pow(gaussianExponentA+gaussianExponentB, -2.0);
+      value *= dz*dx;
+   }
+   else if(valenceOrbitalA == pz && valenceOrbitalB == py){
+      value *= -4.0*pow(gaussianExponentA*gaussianExponentB, 1.5);
+      value *= pow(gaussianExponentA+gaussianExponentB, -2.0);
+      value *= dz*dy;
+   }
+   else if(valenceOrbitalA == pz && valenceOrbitalB == pz){
+      temp3 = -1.0*pow(dz,2.0)*gaussianExponentA*gaussianExponentB;
+      temp3 /= (gaussianExponentA+gaussianExponentB);
+      temp3 += 0.5;
+      value *= 4.0*pow(gaussianExponentA*gaussianExponentB, 0.5);
+      value /= (gaussianExponentA+gaussianExponentB);
+      value *= temp3;
+   }
+   else{
+      stringstream ss;
+      ss << this->errorMessageGetGaussianOverlapOrbitalD;
+      ss << this->errorMessageAtomA;
+      ss << this->errorMessageAtomType << AtomTypeStr(atomTypeA) << endl;
+      ss << this->errorMessageOrbitalType << OrbitalTypeStr(valenceOrbitalA) << endl;
+      ss << this->errorMessageAtomB;
+      ss << this->errorMessageAtomType << AtomTypeStr(atomTypeB) << endl;
+      ss << this->errorMessageOrbitalType << OrbitalTypeStr(valenceOrbitalB) << endl;
+      throw MolDSException(ss.str());
+   }
+
+   return value;
 }
 
 // see J. Mol. Struc. (Theochem), 419, 19 (1997) (ref. [BFB_1997])
