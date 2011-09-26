@@ -1197,8 +1197,8 @@ double Cndo2::GetOverlapElementByGTOExpansion(Atom* atomA, int valenceIndexA,
    double gaussianExponentB = 0.0;
 
    double temp = 0.0;
-   for(int i=0; i<stonG; i++){
-      for(int j=0; j<stonG; j++){
+   for(int i=0; i<=stonG; i++){
+      for(int j=0; j<=stonG; j++){
          temp = GTOExpansionSTO::GetInstance()->GetCoefficient
                   (stonG, shellTypeA, valenceOrbitalA, i); 
          temp *= GTOExpansionSTO::GetInstance()->GetCoefficient
