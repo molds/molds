@@ -73,7 +73,7 @@ double GTOExpansionSTO::GetExponent(STOnGType stonG, ShellType shellType, Orbita
    if(orbitalType == s){
       azimuthalType = sAzimuthal;
    }
-   else if(orbitalType == px || orbitalType == py ||orbitalType == py ){
+   else if(orbitalType == px || orbitalType == py ||orbitalType == pz ){
       azimuthalType = pAzimuthal;
    }
    else if(orbitalType == dxy || orbitalType == dyz ||orbitalType == dzz || orbitalType == dzx ||orbitalType == dxxyy ){
@@ -96,7 +96,7 @@ double GTOExpansionSTO::GetCoefficient(STOnGType stonG, ShellType shellType, Orb
    if(orbitalType == s){
       azimuthalType = sAzimuthal;
    }
-   else if(orbitalType == px || orbitalType == py ||orbitalType == py ){
+   else if(orbitalType == px || orbitalType == py ||orbitalType == pz ){
       azimuthalType = pAzimuthal;
    }
    else if(orbitalType == dxy || orbitalType == dyz ||orbitalType == dzz || orbitalType == dzx ||orbitalType == dxxyy ){
