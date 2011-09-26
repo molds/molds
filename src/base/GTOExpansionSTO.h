@@ -14,8 +14,8 @@ class GTOExpansionSTO{
 public:
    static GTOExpansionSTO* GetInstance();
    static void DeleteInstance();
-   double GetExponent(int STOnG, ShellType shellType, OrbitalType orbitalType, int index);
-   double GetCoefficient(int STOnG, ShellType shellType, OrbitalType orbitalType, int index);
+   double GetExponent(STOnGType STOnG, ShellType shellType, OrbitalType orbitalType, int index);
+   double GetCoefficient(STOnGType STOnG, ShellType shellType, OrbitalType orbitalType, int index);
 
 
 private:
@@ -25,6 +25,10 @@ private:
    void operator = (GTOExpansionSTO&);
    ~GTOExpansionSTO();
 
+   string errorMessageGetCoefficientNonValidOrbital;
+   string errorMessageGetExponentNonValidOrbital;
+   string errorMessageOrbitalType;
+   string errorMessageSTOnGType;
    void SetCoefficientsExponents();
    double exponents[STOnGType_end][ShellType_end][AzimuthalType_end][6];    
       //[N:expansion number][Shelltype][quasi orbital type:s, p, or d][expansion index]. 
@@ -38,6 +42,12 @@ GTOExpansionSTO* GTOExpansionSTO::gTOExpansionSTO = NULL;
 
 GTOExpansionSTO::GTOExpansionSTO(){
    this->SetCoefficientsExponents();
+   this->errorMessageGetCoefficientNonValidOrbital 
+      = "Error in base::GTOExpansionSTO::GetCoefficient: Non available orbital is contained.\n";
+   this->errorMessageGetExponentNonValidOrbital 
+      = "Error in base::GTOExpansionSTO::GetExponent: Non available orbital is contained.\n";
+   this->errorMessageOrbitalType = "\torbital type = ";
+   this->errorMessageSTOnGType = "\tSTOnG type = ";
 }
 
 GTOExpansionSTO::~GTOExpansionSTO(){
@@ -57,7 +67,7 @@ void GTOExpansionSTO::DeleteInstance(){
    gTOExpansionSTO = NULL;
 }
 
-double GTOExpansionSTO::GetExponent(int STOnG, ShellType shellType, OrbitalType orbitalType, int index){
+double GTOExpansionSTO::GetExponent(STOnGType STOnG, ShellType shellType, OrbitalType orbitalType, int index){
 
    AzimuthalType azimuthalType;
    if(orbitalType == s){
@@ -68,12 +78,19 @@ double GTOExpansionSTO::GetExponent(int STOnG, ShellType shellType, OrbitalType 
    }
    else if(orbitalType == dxy || orbitalType == dyz ||orbitalType == dzz || orbitalType == dzx ||orbitalType == dxxyy ){
       azimuthalType = dAzimuthal;
+   }
+   else{
+      stringstream ss;
+      ss << this->errorMessageGetExponentNonValidOrbital;
+      ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbitalType) << endl;
+      ss << this->errorMessageSTOnGType << STOnGTypeStr(STOnG) << endl;
+      throw MolDSException(ss.str());
    }
 
    return this->exponents[STOnG][shellType][azimuthalType][index];
 }
 
-double GTOExpansionSTO::GetCoefficient(int STOnG, ShellType shellType, OrbitalType orbitalType, int index){
+double GTOExpansionSTO::GetCoefficient(STOnGType STOnG, ShellType shellType, OrbitalType orbitalType, int index){
 
    AzimuthalType azimuthalType;
    if(orbitalType == s){
@@ -84,6 +101,13 @@ double GTOExpansionSTO::GetCoefficient(int STOnG, ShellType shellType, OrbitalTy
    }
    else if(orbitalType == dxy || orbitalType == dyz ||orbitalType == dzz || orbitalType == dzx ||orbitalType == dxxyy ){
       azimuthalType = dAzimuthal;
+   }
+   else{
+      stringstream ss;
+      ss << this->errorMessageGetCoefficientNonValidOrbital;
+      ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbitalType) << endl;
+      ss << this->errorMessageSTOnGType << STOnGTypeStr(STOnG) << endl;
+      throw MolDSException(ss.str());
    }
 
    return this->coefficients[STOnG][shellType][azimuthalType][index];
