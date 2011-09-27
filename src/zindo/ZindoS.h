@@ -53,6 +53,8 @@ private:
                                                      CartesianType axisA);
    double nishimotoMatagaParamA;
    double nishimotoMatagaParamB;
+   double** matrixForce;
+   void CalcForce(int eigenIndex);
    struct MoEnergy{
       double energy;
       int occIndex;
@@ -108,6 +110,7 @@ ZindoS::ZindoS() : MolDS_cndo::Cndo2(){
    this->matrixCISdimension = 0;
    this->nishimotoMatagaParamA = 1.2;
    this->nishimotoMatagaParamB = 2.4;
+   this->matrixForce = NULL;
    //cout << "ZindoS created\n";
 }
 
@@ -119,6 +122,10 @@ ZindoS::~ZindoS(){
    if(this->excitedEnergies != NULL){
       MallocerFreer::GetInstance()->FreeDoubleMatrix1d(&this->excitedEnergies);
       //cout << "exceitedEnergies deleted\n";
+   }
+   if(this->matrixForce != NULL){
+      MallocerFreer::GetInstance()->FreeDoubleMatrix2d(&this->matrixForce, this->molecule->GetAtomVect()->size());
+      //cout << "matrixForce deleted\n";
    }
    //cout << "ZindoS deleted\n";
 }
@@ -1098,6 +1105,7 @@ void ZindoS::FreeDavidsonRoopCISTemporaryMtrices(double*** interactionMatrix,
    }
 
 }
+
 void ZindoS::DoesCISDirect(){
 
    cout << this->messageStartDirectCIS;
@@ -1373,6 +1381,58 @@ void ZindoS::CalcCISMatrix(double** matrixCIS, int numberOcc, int numberVir){
    double ompEndTime = omp_get_wtime();
    cout << this->messageConsumedCalcCISMatrix << ompEndTime - ompStartTime << "[s]." << endl;
    cout << this->messageDoneCalcCISMatrix;
+}
+
+// eigenIndex is index of the electroinc eigen state.
+// "eigenIndex = 0" means electronic ground state. 
+void ZindoS::CalcForce(int eigenIndex){
+
+   // malloc or initialize Force matrix
+   if(this->matrixForce == NULL){
+      this->matrixForce = MallocerFreer::GetInstance()->
+                          MallocDoubleMatrix2d(this->molecule->GetAtomVect()->size(), 
+                          CartesianType_end);
+   }
+   else{
+      MallocerFreer::GetInstance()->
+      InitializeDoubleMatrix2d(this->matrixForce,
+                               this->molecule->GetAtomVect()->size(),
+                               CartesianType_end);
+   }
+
+   double coreRepulsion=0.0;
+   for(int a=0; a<this->molecule->GetAtomVect()->size(); a++){
+      for(int i=0; i<CartesianType_end; i++){
+
+         // Calculation of core repusion
+         coreRepulsion = 0.0;
+         for(int b=0; b<this->molecule->GetAtomVect()->size(); b++){
+            if(a != b){
+               coreRepulsion += this->molecule->GetCoreRepulsionFirstDerivative
+                                                (a, b, (CartesianType)i);
+            }
+         }
+
+         this->matrixForce[a][i] = coreRepulsion;
+      }
+   }
+
+   // ToDo: Implement force arise from electronic part.
+
+   // ToDo: Delete or comment out below checking of force.
+   // checking of calculated force
+   double checkSumForce[3] = {0.0, 0.0, 0.0};
+   for(int a=0; a<this->molecule->GetAtomVect()->size(); a++){
+      for(int i=0; i<CartesianType_end; i++){
+         cout << this->matrixForce[a][i] << " ";
+         checkSumForce[i] += this->matrixForce[a][i];
+      }
+      cout << endl;
+   }
+   cout << endl << endl;
+   for(int i=0; i<CartesianType_end; i++){
+      cout << i << " "  << checkSumForce[i] << endl;
+   }
 }
 
 }
