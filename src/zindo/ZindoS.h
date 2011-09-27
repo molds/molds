@@ -47,7 +47,10 @@ private:
                          OrbitalType orbital2, 
                          Atom* atom); // Apendix in [BZ_1979]
    double GetNishimotoMatagaTwoEleInt(Atom* atomA, OrbitalType orbitalA, 
-                                           Atom* atomB, OrbitalType orbitalB); // ref. [MN_1957] and (5a) in [AEZ_1986]
+                                      Atom* atomB, OrbitalType orbitalB); // ref. [MN_1957] and (5a) in [AEZ_1986]
+   double GetNishimotoMatagaTwoEleIntFirstDerivative(Atom* atomA, OrbitalType orbitalA, 
+                                                     Atom* atomB, OrbitalType orbitalB,
+                                                     CartesianType axisA);
    double nishimotoMatagaParamA;
    double nishimotoMatagaParamB;
    struct MoEnergy{
@@ -577,6 +580,69 @@ double ZindoS::GetNishimotoMatagaTwoEleInt(Atom* atomA, OrbitalType orbitalA,
    }  
 
    return this->nishimotoMatagaParamA/( r+this->nishimotoMatagaParamB/(gammaAA+gammaBB) );
+
+}
+
+// First derivative of Nishimoto-Mataga related to the coordinate of atom A.
+// For Nishimoto-Mataga, See ZindoS::GetNishimotoMatagaTwoEleInt 
+// or ref. [MN_1957] and (5a) in [AEZ_1986]
+double ZindoS::GetNishimotoMatagaTwoEleIntFirstDerivative(Atom* atomA, OrbitalType orbitalA, 
+                                                          Atom* atomB, OrbitalType orbitalB,
+                                                          CartesianType axisA){
+   double gammaAA;
+   if(orbitalA == s || 
+      orbitalA == px ||
+      orbitalA == py ||
+      orbitalA == pz ){
+      gammaAA = atomA->GetZindoF0ss();
+   }
+   /*
+   else if(orbitalA == dxy ||
+           orbitalA == dyz ||
+           orbitalA == dzz ||
+           orbitalA == dzx ||
+           orbitalA == dxxyy ){
+      gammaAA = atomA->GetZindoF0dd();
+   }
+   */
+   else{
+      stringstream ss;
+      ss << this->errorMessageNishimotoMataga;
+      ss << this->errorMessageAtomType << AtomTypeStr(atomA->GetAtomType()) << "\n";
+      ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbitalA) << "\n";
+      throw MolDSException(ss.str());
+   }   
+
+   double gammaBB;
+   if(orbitalB == s || 
+      orbitalB == px ||
+      orbitalB == py ||
+      orbitalB == pz ){
+      gammaBB = atomB->GetZindoF0ss();
+   }
+   /*
+   else if(orbitalB == dxy ||
+           orbitalB == dyz ||
+           orbitalB == dzz ||
+           orbitalB == dzx ||
+           orbitalB == dxxyy ){
+      gammaBB = atomB->GetZindoF0dd();
+   }
+   */
+   else{
+      stringstream ss;
+      ss << this->errorMessageNishimotoMataga;
+      ss << this->errorMessageAtomType << AtomTypeStr(atomB->GetAtomType()) << "\n";
+      ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbitalB) << "\n";
+      throw MolDSException(ss.str());
+   }  
+
+   double r = this->molecule->GetDistanceAtoms(atomA, atomB);
+   double dCartesian = atomA->GetXyz()[axisA] - atomB->GetXyz()[axisA];
+   double value = -1.0*dCartesian/r;
+   value *= this->nishimotoMatagaParamA;
+   value *= pow( r+this->nishimotoMatagaParamB/(gammaAA+gammaBB) ,-2.0);
+   return value;
 
 }
 
