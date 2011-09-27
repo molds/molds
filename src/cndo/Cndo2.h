@@ -1141,7 +1141,7 @@ void Cndo2::CalcOverlapByGTOExpansion(double** overlap, Molecule* molecule, STOn
       overlap[mu][mu] = 1.0;
    }
 
-   //#pragma omp for schedule(auto)
+   #pragma omp for schedule(auto)
    for(int A=0; A<totalAtomNumber; A++){
       Atom* atomA = (*(molecule->GetAtomVect()))[A];
       int firstAOIndexAtomA = atomA->GetFirstAOIndex();
