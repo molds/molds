@@ -48,6 +48,8 @@ private:
                          Atom* atom); // Apendix in [BZ_1979]
    double GetNishimotoMatagaTwoEleInt(Atom* atomA, OrbitalType orbitalA, 
                                            Atom* atomB, OrbitalType orbitalB); // ref. [MN_1957] and (5a) in [AEZ_1986]
+   double nishimotoMatagaParamA;
+   double nishimotoMatagaParamB;
    struct MoEnergy{
       double energy;
       int occIndex;
@@ -101,6 +103,8 @@ ZindoS::ZindoS() : MolDS_cndo::Cndo2(){
    this->matrixCIS = NULL;
    this->excitedEnergies = NULL;
    this->matrixCISdimension = 0;
+   this->nishimotoMatagaParamA = 1.2;
+   this->nishimotoMatagaParamB = 2.4;
    //cout << "ZindoS created\n";
 }
 
@@ -572,7 +576,7 @@ double ZindoS::GetNishimotoMatagaTwoEleInt(Atom* atomA, OrbitalType orbitalA,
       throw MolDSException(ss.str());
    }  
 
-   return 1.2/( r+2.4/(gammaAA+gammaBB) );
+   return this->nishimotoMatagaParamA/( r+this->nishimotoMatagaParamB/(gammaAA+gammaBB) );
 
 }
 
