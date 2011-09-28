@@ -26,16 +26,24 @@ protected:
    virtual void SetEnableAtomTypes();
    virtual double GetFockDiagElement(Atom* atomA, int atomAIndex, 
                                      int mu, Molecule* molecule, double** gammaAB,
-                                     double** orbitalElectronPopulation, double* atomicElectronPopulation,
+                                     double** orbitalElectronPopulation, 
+                                     double* atomicElectronPopulation,
                                      bool isGuess);
-   virtual double GetFockOffDiagElement(Atom* atomA, Atom* atomB, int atomAIndex, int atomBIndex, 
-                                int mu, int nu, Molecule* molecule, double** gammaAB, double** overelap,
-                                double** orbitalElectronPopulation, bool isGuess);
+   virtual double GetFockOffDiagElement(Atom* atomA, Atom* atomB, 
+                                        int atomAIndex, int atomBIndex, 
+                                        int mu, int nu, Molecule* molecule, 
+                                        double** gammaAB, double** overelap,
+                                        double** orbitalElectronPopulation, bool isGuess);
    virtual double GetMolecularIntegralElement(int moI, int moJ, int moK, int moL, 
-                                              Molecule* molecule, double** fockMatrix, double** gammaAB);
+                                              Molecule* molecule, double** fockMatrix, 
+                                              double** gammaAB);
 private:
-   double GetCoulombInt(OrbitalType orbital1, OrbitalType orbital2, double gamma, Atom* atom); // Indo Coulomb Interaction, (3.87) - (3.91) in J. A. Pople book.
-   double GetExchangeInt(OrbitalType orbital1, OrbitalType orbital2, double gamma, Atom* atom); // Indo Exchange Interaction, (3.87) - (3.91) in J. A. Pople book.
+   double GetCoulombInt(OrbitalType orbital1, 
+                        OrbitalType orbital2, 
+                        double gamma, Atom* atom); // Indo Coulomb Interaction, (3.87) - (3.91) in J. A. Pople book.
+   double GetExchangeInt(OrbitalType orbital1, 
+                         OrbitalType orbital2, 
+                         double gamma, Atom* atom); // Indo Exchange Interaction, (3.87) - (3.91) in J. A. Pople book.
 };
 
 Indo::Indo() : MolDS_cndo::Cndo2(){
