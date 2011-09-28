@@ -47,11 +47,13 @@ protected:
    string messageStartSCF;
    string messageDoneSCF;
    vector<AtomType> enableAtomTypes;
+   double** orbitalElectronPopulation; //P_{\mu\nu} of (2.50) in J. A. Pople book.
+   double*   atomicElectronPopulation; //P_{AB} of (3.21) in J. A. Pople book.
    double GetReducedOverlap(int na, int la, int m, int nb, int lb, double alpha, double beta);
    double GetReducedOverlap(int na, int nb, double alpha, double beta);
    double GetOverlapElementFirstDerivativeByGTOExpansion
               (Atom* atomA, int valenceIndexA, Atom* atomB, int valenceIndexB,
-               STOnGType stonG, CartesianType axisA);
+               STOnGType stonG, CartesianType axisA); // See [DY_1977].
    virtual void CalcGammaAB(double** gammaAB, Molecule* molecule);
    virtual void SetMessages();
    virtual void SetEnableAtomTypes();
@@ -80,8 +82,6 @@ private:
    string messageUnOcc;
    double** gammaAB;
    double** overlap;
-   double** orbitalElectronPopulation; //P_{\mu\nu} of (2.50) in J. A. Pople book.
-   double*   atomicElectronPopulation; //P_{AB} of (3.21) in J. A. Pople book.
 
    // use Y[na][nb][la][lb][m][i][j] 
    // as Y_{ij\lammda} in (B.20) in Pople book for give na, nb, la, lb, m, i, and j.
@@ -98,35 +98,43 @@ private:
    void CalcOrbitalElectronPopulation(double** orbitalElectronPopulation, 
                                       Molecule* molecule, double** fockMatrix);
    void CalcAtomicElectronPopulation(double* atomicElectronPopulation,
-                                     double** orbitalElectronPopulation, Molecule* molecule);
+                                     double** orbitalElectronPopulation, 
+                                     Molecule* molecule);
    void CalcOverlap(double** overlap, Molecule* molecule);
-   void CalcOverlapByGTOExpansion(double** overlap, Molecule* molecule, STOnGType stonG);
+   void CalcOverlapByGTOExpansion(double** overlap, 
+                                  Molecule* molecule, 
+                                  STOnGType stonG); //See [DY_1977]
    double GetOverlapElementByGTOExpansion(Atom* atomA, int valenceIndexA, 
                                           Atom* atomB, int valenceIndexB,
-                                          STOnGType stonG);
+                                          STOnGType stonG); // see [DY_1977]
    double GetGaussianOverlap(AtomType atomTypeA, 
                              OrbitalType valenceOrbitalA, 
                              double gaussianExponentA, 
                              AtomType atomTypeB, 
                              OrbitalType valenceOrbitalB, 
                              double gaussianExponentB, 
-                             double dx, double dy, double dz, double Rab);
+                             double dx, double dy, double dz, double Rab); // see [DY_1977]
    double GetGaussianOverlapSaSb(double gaussianExponentA, 
                                  double gaussianExponentB, 
-                                 double Rab);
+                                 double Rab); // see [DY_1977]
    double GetGaussianOverlapFirstDerivative(AtomType atomTypeA, 
                              OrbitalType valenceOrbitalA, 
                              double gaussianExponentA, 
                              AtomType atomTypeB, 
                              OrbitalType valenceOrbitalB, 
                              double gaussianExponentB, 
-                             double dx, double dy, double dz, double Rab, CartesianType axisA);
+                             double dx, double dy, double dz, 
+                             double Rab, CartesianType axisA);// see [DY_1977]
    void CalcRotatingMatrix(double** rotatingMatrix, Atom* atomA, Atom* atomB);
-   void CalcFockMatrix(double** fockMatrix, Molecule* molecule, double** overlap, double** gammaAB,
-                       double** orbitalElectronPopulation, double* atomicElectronPopulation,
+   void CalcFockMatrix(double** fockMatrix, Molecule* molecule, 
+                       double** overlap, double** gammaAB,
+                       double** orbitalElectronPopulation, 
+                       double* atomicElectronPopulation,
                        bool isGuess);
-   void RotateDiatmicOverlapToSpaceFrame(double** diatomicOverlap, double** rotatingMatrix);
-   void SetOverlapElement(double** overlap, double** diatomicOverlap, Atom* atomA, Atom* atomB);
+   void RotateDiatmicOverlapToSpaceFrame(double** diatomicOverlap, 
+                                         double** rotatingMatrix);
+   void SetOverlapElement(double** overlap, double** diatomicOverlap, 
+                          Atom* atomA, Atom* atomB);
    double GetAuxiliaryA(int k, double rho);
    double GetAuxiliaryB(int k, double rho);
    double GetAuxiliaryD(int la, int lb, int m);

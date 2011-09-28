@@ -22,6 +22,7 @@ public:
    ZindoS();
    ~ZindoS();
    void DoesCIS();
+   virtual void CalcForce(int electronicEigenIndex);
 protected:
    virtual void CalcGammaAB(double** gammaAB, Molecule* molecule);
    virtual void SetMessages();
@@ -50,11 +51,10 @@ private:
                                       Atom* atomB, OrbitalType orbitalB); // ref. [MN_1957] and (5a) in [AEZ_1986]
    double GetNishimotoMatagaTwoEleIntFirstDerivative(Atom* atomA, OrbitalType orbitalA, 
                                                      Atom* atomB, OrbitalType orbitalB,
-                                                     CartesianType axisA);
+                                                     CartesianType axisA);// ref. [MN_1957] and (5a) in [AEZ_1986]
    double nishimotoMatagaParamA;
    double nishimotoMatagaParamB;
    double** matrixForce;
-   void CalcForce(int eigenIndex);
    struct MoEnergy{
       double energy;
       int occIndex;
@@ -800,6 +800,7 @@ void ZindoS::DoesCIS(){
    }
    cout << endl;
    cout << this->messageDoneCIS;
+   this->CalcForce(0);
 }
 
 void ZindoS::SortSingleExcitationSlaterDeterminants(vector<MoEnergy>* moEnergies){
@@ -1385,7 +1386,7 @@ void ZindoS::CalcCISMatrix(double** matrixCIS, int numberOcc, int numberVir){
 
 // eigenIndex is index of the electroinc eigen state.
 // "eigenIndex = 0" means electronic ground state. 
-void ZindoS::CalcForce(int eigenIndex){
+void ZindoS::CalcForce(int electronicEigenIndex){
 
    // malloc or initialize Force matrix
    if(this->matrixForce == NULL){
@@ -1400,26 +1401,69 @@ void ZindoS::CalcForce(int eigenIndex){
                                CartesianType_end);
    }
 
-   double coreRepulsion=0.0;
+   #pragma omp parallel for schedule(auto)
    for(int a=0; a<this->molecule->GetAtomVect()->size(); a++){
+      Atom* atomA = (*molecule->GetAtomVect())[a];
+      int firstAOIndexA = atomA->GetFirstAOIndex();
+      int numberAOsA = atomA->GetValence().size();
       for(int i=0; i<CartesianType_end; i++){
 
-         // Calculation of core repusion
-         coreRepulsion = 0.0;
+         double coreRepulsion = 0.0;
+         double electronicForce1 = 0.0;
+         double electronicForce2 = 0.0;
+         double electronicForce3 = 0.0;
          for(int b=0; b<this->molecule->GetAtomVect()->size(); b++){
             if(a != b){
+               Atom* atomB = (*molecule->GetAtomVect())[b];
+               int firstAOIndexB = atomB->GetFirstAOIndex();
+               int numberAOsB = atomB->GetValence().size();
+
+               // Calculation of core repusion force
                coreRepulsion += this->molecule->GetCoreRepulsionFirstDerivative
                                                 (a, b, (CartesianType)i);
+
+               // Calculate force arise from electronic part.
+               electronicForce1 += atomA->GetCoreCharge()*atomicElectronPopulation[b]
+                                 * atomB->GetCoreCharge()*atomicElectronPopulation[a]
+                                 * this->GetNishimotoMatagaTwoEleIntFirstDerivative
+                                          (atomA, s, atomB, s, (CartesianType)i);
+
+               for(int mu=firstAOIndexA; mu<firstAOIndexA+numberAOsA; mu++){
+                  OrbitalType orbitalMu = atomA->GetValence()[mu-firstAOIndexA];
+                  for(int nu=firstAOIndexB; nu<firstAOIndexB+numberAOsB; nu++){
+                     OrbitalType orbitalNu = atomB->GetValence()[nu-firstAOIndexB];
+
+                     double bondParameter = 0.5*(atomA->GetBondingParameter
+                                                   (this->theory, orbitalMu) 
+                                                +atomB->GetBondingParameter
+                                                   (this->theory, orbitalNu)); 
+
+                     electronicForce2 += 2.0*this->orbitalElectronPopulation[mu][nu]
+                                       * bondParameter
+                                       * this->GetOverlapElementFirstDerivativeByGTOExpansion
+                                                (atomA, mu-firstAOIndexA, 
+                                                 atomB, nu-firstAOIndexB,
+                                                 STO6G, (CartesianType)i);
+
+                     electronicForce3 += (this->orbitalElectronPopulation[mu][mu]
+                                       * this->orbitalElectronPopulation[nu][nu]
+                                       - 0.5*pow(this->orbitalElectronPopulation[mu][nu],2.0))
+                                       * this->GetNishimotoMatagaTwoEleIntFirstDerivative
+                                               (atomA, orbitalMu, atomB, orbitalNu,
+                                                (CartesianType)i);
+                  }
+               }
             }
          }
 
-         this->matrixForce[a][i] = coreRepulsion;
+         this->matrixForce[a][i] = coreRepulsion 
+                                 - electronicForce1 
+                                 + electronicForce2
+                                 + electronicForce3;
       }
    }
 
-   // ToDo: Implement force arise from electronic part.
-
-   // ToDo: Delete or comment out below checking of force.
+   /*
    // checking of calculated force
    double checkSumForce[3] = {0.0, 0.0, 0.0};
    for(int a=0; a<this->molecule->GetAtomVect()->size(); a++){
@@ -1433,6 +1477,8 @@ void ZindoS::CalcForce(int eigenIndex){
    for(int i=0; i<CartesianType_end; i++){
       cout << i << " "  << checkSumForce[i] << endl;
    }
+   */
+   
 }
 
 }

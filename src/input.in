@@ -1,8 +1,8 @@
 // example of the input file
 THEORY
-   cndo/2
+   //cndo/2
    //indo
-   //zindo/s
+   zindo/s
    //none 
    //principal_axes
    //translate
