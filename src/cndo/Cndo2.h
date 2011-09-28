@@ -1242,8 +1242,10 @@ double Cndo2::GetGaussianOverlapSaSb(double gaussianExponentA,
    double value;
    double temp1 = 0.0;
    double temp2 = 0.0;
-   temp1 = 2.0*pow(gaussianExponentA*gaussianExponentB, 0.5)/(gaussianExponentA+gaussianExponentB);
-   temp2 = -1.0* gaussianExponentA*gaussianExponentB/(gaussianExponentA+gaussianExponentB);
+   temp1 = 2.0*pow(gaussianExponentA*gaussianExponentB, 0.5)
+            /(gaussianExponentA+gaussianExponentB);
+   temp2 = -1.0* gaussianExponentA*gaussianExponentB
+            /(gaussianExponentA+gaussianExponentB);
    value = pow(temp1, 1.5)*exp(temp2*pow(Rab, 2.0));
    return value;
 }
@@ -1258,32 +1260,32 @@ double Cndo2::GetGaussianOverlap(AtomType atomTypeA,
                                  double gaussianExponentB,
                                  double dx, double dy, double dz, double Rab){
 
-   double value = this->GetGaussianOverlapSaSb(gaussianExponentA,
-                                               gaussianExponentB, Rab);
+   double value = 0.0;
    if(valenceOrbitalA == s && valenceOrbitalB == s){
+      value = 1.0;
    }
    else if(valenceOrbitalA == s && valenceOrbitalB == px){
-      value *= 2.0*gaussianExponentA*pow(gaussianExponentB, 0.5)*dx;
+      value = 2.0*gaussianExponentA*pow(gaussianExponentB, 0.5)*dx;
       value /= (gaussianExponentA+gaussianExponentB);
    }
    else if(valenceOrbitalA == s && valenceOrbitalB == py){
-      value *= 2.0*gaussianExponentA*pow(gaussianExponentB, 0.5)*dy;
+      value = 2.0*gaussianExponentA*pow(gaussianExponentB, 0.5)*dy;
       value /= (gaussianExponentA+gaussianExponentB);
    }
    else if(valenceOrbitalA == s && valenceOrbitalB == pz){
-      value *= 2.0*gaussianExponentA*pow(gaussianExponentB, 0.5)*dz;
+      value = 2.0*gaussianExponentA*pow(gaussianExponentB, 0.5)*dz;
       value /= (gaussianExponentA+gaussianExponentB);
    }
    else if(valenceOrbitalA == px && valenceOrbitalB == s){
-      value *= -2.0*pow(gaussianExponentA, 0.5)*gaussianExponentB*dx;
+      value = -2.0*pow(gaussianExponentA, 0.5)*gaussianExponentB*dx;
       value /= (gaussianExponentA+gaussianExponentB);
    }
    else if(valenceOrbitalA == py && valenceOrbitalB == s){
-      value *= -2.0*pow(gaussianExponentA, 0.5)*gaussianExponentB*dy;
+      value = -2.0*pow(gaussianExponentA, 0.5)*gaussianExponentB*dy;
       value /= (gaussianExponentA+gaussianExponentB);
    }
    else if(valenceOrbitalA == pz && valenceOrbitalB == s){
-      value *= -2.0*pow(gaussianExponentA, 0.5)*gaussianExponentB*dz;
+      value = -2.0*pow(gaussianExponentA, 0.5)*gaussianExponentB*dz;
       value /= (gaussianExponentA+gaussianExponentB);
    }
    else if(valenceOrbitalA == px && valenceOrbitalB == px){
@@ -1291,22 +1293,22 @@ double Cndo2::GetGaussianOverlap(AtomType atomTypeA,
       temp = -1.0*pow(dx,2.0)*gaussianExponentA*gaussianExponentB;
       temp /= (gaussianExponentA+gaussianExponentB);
       temp += 0.5;
-      value *= 4.0*pow(gaussianExponentA*gaussianExponentB, 0.5);
+      value = 4.0*pow(gaussianExponentA*gaussianExponentB, 0.5);
       value /= (gaussianExponentA+gaussianExponentB);
       value *= temp;
    }
    else if(valenceOrbitalA == px && valenceOrbitalB == py){
-      value *= -4.0*pow(gaussianExponentA*gaussianExponentB, 1.5);
+      value = -4.0*pow(gaussianExponentA*gaussianExponentB, 1.5);
       value *= pow(gaussianExponentA+gaussianExponentB, -2.0);
       value *= dx*dy;
    }
    else if(valenceOrbitalA == px && valenceOrbitalB == pz){
-      value *= -4.0*pow(gaussianExponentA*gaussianExponentB, 1.5);
+      value = -4.0*pow(gaussianExponentA*gaussianExponentB, 1.5);
       value *= pow(gaussianExponentA+gaussianExponentB, -2.0);
       value *= dx*dz;
    }
    else if(valenceOrbitalA == py && valenceOrbitalB == px){
-      value *= -4.0*pow(gaussianExponentA*gaussianExponentB, 1.5);
+      value = -4.0*pow(gaussianExponentA*gaussianExponentB, 1.5);
       value *= pow(gaussianExponentA+gaussianExponentB, -2.0);
       value *= dy*dx;
    }
@@ -1315,22 +1317,22 @@ double Cndo2::GetGaussianOverlap(AtomType atomTypeA,
       temp = -1.0*pow(dy,2.0)*gaussianExponentA*gaussianExponentB;
       temp /= (gaussianExponentA+gaussianExponentB);
       temp += 0.5;
-      value *= 4.0*pow(gaussianExponentA*gaussianExponentB, 0.5);
+      value = 4.0*pow(gaussianExponentA*gaussianExponentB, 0.5);
       value /= (gaussianExponentA+gaussianExponentB);
       value *= temp;
    }
    else if(valenceOrbitalA == py && valenceOrbitalB == pz){
-      value *= -4.0*pow(gaussianExponentA*gaussianExponentB, 1.5);
+      value = -4.0*pow(gaussianExponentA*gaussianExponentB, 1.5);
       value *= pow(gaussianExponentA+gaussianExponentB, -2.0);
       value *= dy*dz;
    }
    else if(valenceOrbitalA == pz && valenceOrbitalB == px){
-      value *= -4.0*pow(gaussianExponentA*gaussianExponentB, 1.5);
+      value = -4.0*pow(gaussianExponentA*gaussianExponentB, 1.5);
       value *= pow(gaussianExponentA+gaussianExponentB, -2.0);
       value *= dz*dx;
    }
    else if(valenceOrbitalA == pz && valenceOrbitalB == py){
-      value *= -4.0*pow(gaussianExponentA*gaussianExponentB, 1.5);
+      value = -4.0*pow(gaussianExponentA*gaussianExponentB, 1.5);
       value *= pow(gaussianExponentA+gaussianExponentB, -2.0);
       value *= dz*dy;
    }
@@ -1339,7 +1341,7 @@ double Cndo2::GetGaussianOverlap(AtomType atomTypeA,
       temp = -1.0*pow(dz,2.0)*gaussianExponentA*gaussianExponentB;
       temp /= (gaussianExponentA+gaussianExponentB);
       temp += 0.5;
-      value *= 4.0*pow(gaussianExponentA*gaussianExponentB, 0.5);
+      value = 4.0*pow(gaussianExponentA*gaussianExponentB, 0.5);
       value /= (gaussianExponentA+gaussianExponentB);
       value *= temp;
    }
@@ -1354,6 +1356,9 @@ double Cndo2::GetGaussianOverlap(AtomType atomTypeA,
       ss << this->errorMessageOrbitalType << OrbitalTypeStr(valenceOrbitalB) << endl;
       throw MolDSException(ss.str());
    }
+   double sasb = this->GetGaussianOverlapSaSb(gaussianExponentA,
+                                              gaussianExponentB, Rab);
+   value *= sasb;
 
    return value;
 }
