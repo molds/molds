@@ -816,7 +816,7 @@ void ZindoS::DoesCIS(){
    this->CalcCISMatrix(matrixCIS, numberOcc, numberVir);
 
    // calculate excited energies
-   if(Parameters::GetInstance()->GetIsDavidsonCIS()){
+   if(Parameters::GetInstance()->IsDavidsonCIS()){
       this->DoesCISDavidson();
    }
    else{

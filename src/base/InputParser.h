@@ -555,7 +555,7 @@ void InputParser::CalcCisCondition(Molecule* molecule){
    // check the number of calculated excited states.
    int numberSlaterDeterminants = Parameters::GetInstance()->GetActiveOccCIS() 
                                  *Parameters::GetInstance()->GetActiveVirCIS();
-   if(!Parameters::GetInstance()->GetIsDavidsonCIS()){
+   if(!Parameters::GetInstance()->IsDavidsonCIS()){
       Parameters::GetInstance()->SetNumberExcitedStatesCIS(numberSlaterDeterminants);
    }
    else{
@@ -598,7 +598,7 @@ void InputParser::OutputCisConditions(){
    printf("%s%d\n",this->messageCisNumberActiveVir.c_str(),Parameters::GetInstance()->GetActiveVirCIS());
    printf("%s%d\n",this->messageCisNumberExcitedStates.c_str(),Parameters::GetInstance()->GetNumberExcitedStatesCIS());
    printf("%s",this->messageCisDavidson.c_str());
-   if(Parameters::GetInstance()->GetIsDavidsonCIS()){
+   if(Parameters::GetInstance()->IsDavidsonCIS()){
       printf("%s\n",this->stringYES.c_str());
       printf("%s%d\n",this->messageCisMaxIterations.c_str(),Parameters::GetInstance()->GetMaxIterationsCIS());
       printf("%s%d\n",this->messageCisMaxDimensions.c_str(),Parameters::GetInstance()->GetMaxDimensionsCIS());

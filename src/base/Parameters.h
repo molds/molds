@@ -57,7 +57,7 @@ public:
    void SetActiveVirCIS(int activeOccCIS);
    int GetNumberExcitedStatesCIS();
    void SetNumberExcitedStatesCIS(int nStates);
-   bool GetIsDavidsonCIS();
+   bool IsDavidsonCIS();
    void SetIsDavidsonCIS(bool isDavidsonCIS);
    int GetMaxIterationsCIS();
    void SetMaxIterationsCIS(int maxIterationsCIS);
@@ -358,7 +358,7 @@ void Parameters::SetNumberExcitedStatesCIS(int nStates){
    this->numberExcitedStatesCIS = nStates;
 }
 
-bool Parameters::GetIsDavidsonCIS(){
+bool Parameters::IsDavidsonCIS(){
    return this->isDavidsonCIS;
 }
 
