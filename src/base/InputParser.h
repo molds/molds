@@ -408,6 +408,7 @@ void InputParser::Parse(Molecule* molecule){
       
       // cis condition
       if(inputTerms[i].compare(this->stringCIS) == 0){
+         Parameters::GetInstance()->SetRequiresCIS(true);
          int j=i+1;
          while(inputTerms[j].compare(this->stringCISEnd) != 0){
             // number of active occupied orbitals

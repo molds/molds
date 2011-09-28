@@ -35,7 +35,6 @@ How to Write Input-files:
 
    SCF:
       Write "cndo/2", "indo", or "zindo/s" in theory-directive.
-      For "zindo/s", CIS are also carried out (see also CIS).
 
       E.g. 
          THEORY
@@ -67,12 +66,12 @@ How to Write Input-files:
 
 
    CIS:
-      Write "zindo/s" in theory-directive.
+      Write CIS-directive.
 
-      E.g. 
-         THEORY
-            zindo/s
-         THEORY_END
+      E.g.
+         CIS
+            (options)
+         CIS_END
    
       -options
        "davidson", "active_occ", "active_vir", "max_iter", "max_dim", "norm_tol", 

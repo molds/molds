@@ -57,6 +57,8 @@ public:
    void SetActiveVirCIS(int activeOccCIS);
    int GetNumberExcitedStatesCIS();
    void SetNumberExcitedStatesCIS(int nStates);
+   bool RequiresCIS();
+   void SetRequiresCIS(bool requiresCIS);
    bool IsDavidsonCIS();
    void SetIsDavidsonCIS(bool isDavidsonCIS);
    int GetMaxIterationsCIS();
@@ -100,6 +102,7 @@ private:
    int maxIterationsCIS;
    int maxDimensionsCIS;
    double normToleranceCIS;
+   bool requiresCIS;
    bool isDavidsonCIS;
 };
 Parameters* Parameters::parameters = NULL;
@@ -163,6 +166,7 @@ void Parameters::SetDefaultValues(){
    this->activeOccCIS = 10;
    this->activeVirCIS = 10;
    this->numberExcitedStatesCIS = 5;
+   this->requiresCIS = false;
    this->isDavidsonCIS = true;
    this->maxIterationsCIS = 100;
    this->maxDimensionsCIS = 100;
@@ -356,6 +360,14 @@ int Parameters::GetNumberExcitedStatesCIS(){
 
 void Parameters::SetNumberExcitedStatesCIS(int nStates){
    this->numberExcitedStatesCIS = nStates;
+}
+
+bool Parameters::RequiresCIS(){
+   return this->requiresCIS;
+}
+
+void Parameters::SetRequiresCIS(bool requiresCIS){
+   this->requiresCIS = requiresCIS;
 }
 
 bool Parameters::IsDavidsonCIS(){
