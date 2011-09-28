@@ -27,16 +27,34 @@ protected:
    virtual void CalcGammaAB(double** gammaAB, Molecule* molecule);
    virtual void SetMessages();
    virtual void SetEnableAtomTypes();
-   virtual double GetFockDiagElement(Atom* atomA, int atomAIndex, 
-                                     int mu, Molecule* molecule, double** gammaAB,
-                                     double** orbitalElectronPopulation, double* atomicElectronPopulation,
+   virtual double GetFockDiagElement(Atom* atomA, 
+                                     int atomAIndex, 
+                                     int mu, 
+                                     Molecule* molecule, 
+                                     double** gammaAB,
+                                     double** orbitalElectronPopulation, 
+                                     double* atomicElectronPopulation,
                                      bool isGuess);
-   virtual double GetFockOffDiagElement(Atom* atomA, Atom* atomB, int atomAIndex, int atomBIndex, 
-                                        int mu, int nu, Molecule* molecule, double** gammaAB, double** overelap,
-                                        double** orbitalElectronPopulation, bool isGuess);
-   virtual void CalcDiatomicOverlapInDiatomicFrame(double** diatomicOverlap, Atom* atomA, Atom* atomB);
-   virtual double GetMolecularIntegralElement(int moI, int moJ, int moK, int moL, 
-                                              Molecule* molecule, double** fockMatrix, double** gammaAB);
+   virtual double GetFockOffDiagElement(Atom* atomA, 
+                                        Atom* atomB, 
+                                        int atomAIndex, 
+                                        int atomBIndex, 
+                                        int mu, int nu, 
+                                        Molecule* molecule, 
+                                        double** gammaAB, 
+                                        double** overelap,
+                                        double** orbitalElectronPopulation, 
+                                        bool isGuess);
+   virtual void CalcDiatomicOverlapInDiatomicFrame(double** diatomicOverlap, 
+                                                   Atom* atomA, 
+                                                   Atom* atomB);
+   virtual double GetMolecularIntegralElement(int moI, 
+                                              int moJ, 
+                                              int moK, 
+                                              int moL, 
+                                              Molecule* molecule, 
+                                              double** fockMatrix, 
+                                              double** gammaAB);
 private:
    double** matrixCIS;
    double* excitedEnergies;
@@ -65,18 +83,32 @@ private:
       const { return rLeft.energy < rRight.energy; } };
    void DoesCISDirect();
    void DoesCISDavidson();
-   void CalcRitzVector(double* ritzVector, double** expansionVectors, double** interactionMatrix, 
-                       int interactionMatrixDimension, int ritzVectorIndex);
-   void CalcResidualVectorAndNorm(double* residualVector, double* norm, double* ritzVector, 
-                                    double* interactionEigenEnergies, int residualVectorIndex);
+   void CalcRitzVector(double* ritzVector, 
+                       double** expansionVectors, 
+                       double** interactionMatrix, 
+                       int interactionMatrixDimension, 
+                       int ritzVectorIndex);
+   void CalcResidualVectorAndNorm(double* residualVector, 
+                                  double* norm, 
+                                  double* ritzVector, 
+                                  double* interactionEigenEnergies, 
+                                  int residualVectorIndex);
    void SortSingleExcitationSlaterDeterminants(vector<MoEnergy>* moEnergies);
-   void UpdateExpansionVectors(double** expansionVectors, double* interactionEigenEnergies, double* residualVector,
-                               int interactionMatrixDimension, int* notConvergedStates, int residualVectorIndex);
-   void CalcInteractionMatrix(double** interactionMatrix, double** expansionVectors, int interactionMatrixDimension);
-   void FreeDavidsonCISTemporaryMtrices(double*** expansionVectors, double** residualVector, double** ritzVector);
+   void UpdateExpansionVectors(double** expansionVectors, 
+                               double* interactionEigenEnergies, 
+                               double* residualVector,
+                               int interactionMatrixDimension, 
+                               int* notConvergedStates, 
+                               int residualVectorIndex);
+   void CalcInteractionMatrix(double** interactionMatrix, 
+                              double** expansionVectors, 
+                              int interactionMatrixDimension);
+   void FreeDavidsonCISTemporaryMtrices(double*** expansionVectors, 
+                                        double** residualVector, 
+                                        double** ritzVector);
    void FreeDavidsonRoopCISTemporaryMtrices(double*** interactionMatrix, 
-                                        double interactionMatrixDimension, 
-                                        double** interactionEigenEnergies);
+                                            double interactionMatrixDimension, 
+                                            double** interactionEigenEnergies);
    void CalcCISMatrix(double** matrixCIS, int numberOcc, int numberVir);
    string errorMessageNishimotoMataga;
    string errorMessageDavidsonNotConverged;
