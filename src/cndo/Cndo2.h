@@ -151,11 +151,14 @@ private:
                  int diisNumErrorVect,
                  Molecule* molecule, 
                  int step);
-   void OutputResults(double** fockMatrix, double* energiesMO, double* atomicElectronPopulation, Molecule* molecule);
+   void OutputResults(double** fockMatrix, double* energiesMO, 
+                      double* atomicElectronPopulation, Molecule* molecule);
    void CheckEnableAtomType(Molecule* molecule);
    void CheckNumberValenceElectrons(Molecule* molecule);
-   void FreeDiatomicOverlapAndRotatingMatrix(double*** diatomicOverlap, double*** rotatingMatrix);
-   double GetTotalEnergy(Molecule* molecule, double* energiesMO, double** fockMatrix, double** gammaAB);
+   void FreeDiatomicOverlapAndRotatingMatrix(double*** diatomicOverlap, 
+                                             double*** rotatingMatrix);
+   double GetTotalEnergy(Molecule* molecule, double* energiesMO, 
+                         double** fockMatrix, double** gammaAB);
    void FreeTotalEnergyMatrices(double*** fMatrix, 
                                 double*** hMatrix, 
                                 double*** dammyOrbitalElectronPopulation, 
