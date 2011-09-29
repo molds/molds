@@ -47,6 +47,8 @@ protected:
    string messageSCFMetConvergence;
    string messageStartSCF;
    string messageDoneSCF;
+   string messageOmpElapsedTimeSCF;
+   string messageUnitSec; 
    vector<AtomType> enableAtomTypes;
    double** orbitalElectronPopulation; //P_{\mu\nu} of (2.50) in J. A. Pople book.
    double*   atomicElectronPopulation; //P_{AB} of (3.21) in J. A. Pople book.
@@ -242,6 +244,7 @@ void Cndo2::SetMessages(){
    this->messageSCFMetConvergence = "\n\n\n\t\tCNDO/2-SCF met convergence criterion(^^b\n\n\n";
    this->messageStartSCF = "**********  START: CNDO/2-SCF  **********\n";
    this->messageDoneSCF = "**********  DONE: CNDO/2-SCF  **********\n\n\n";
+   this->messageOmpElapsedTimeSCF = "\tElapsed time(omp) for the SCF = ";
    this->messageEnergiesMOs = "\tEnergies of MOs:\n";
    this->messageEnergiesMOsTitle = "\t\t| i-th | occ/unocc | e[a.u.] | e[eV] | \n";
    this->messageOcc = "occ";
@@ -250,6 +253,7 @@ void Cndo2::SetMessages(){
    this->messageMullikenAtomsTitle = "\t\t| i-th | atom type | core charge | Mulliken charge | \n";
    this->messageTotalEnergy = "\tTotal energy:\n";
    this->messageTotalEnergyTitle = "\t\t| [a.u.] | [eV] | \n";
+   this->messageUnitSec = "[s].";
 
 }
 
@@ -340,6 +344,7 @@ void Cndo2::CheckEnableAtomType(Molecule* molecule){
 void Cndo2::DoesSCF(bool requiresGuess){
 
    cout << this->messageStartSCF;
+   double ompStartTime = omp_get_wtime();
 
    if(this->molecule == NULL){
       stringstream ss;
@@ -466,6 +471,10 @@ void Cndo2::DoesSCF(bool requiresGuess){
                                   &diisErrorProducts,
                                   &diisErrorCoefficients);
 
+   double ompEndTime = omp_get_wtime();
+   cout << this->messageOmpElapsedTimeSCF;
+   cout << ompEndTime - ompStartTime;
+   cout << this->messageUnitSec << endl;
    cout << this->messageDoneSCF;
 
 }

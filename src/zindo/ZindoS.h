@@ -116,7 +116,8 @@ private:
    string errorMessageDavidsonMaxDim;
    string errorMessageCalcCISMatrix;
    string messageStartCalcCISMatrix;
-   string messageConsumedCalcCISMatrix;
+   string messageOmpElapsedTimeCalcCISMarix;
+   string messageOmpElapsedTimeCIS;
    string messageDoneCalcCISMatrix;
    string messageStartCIS;
    string messageDoneCIS;
@@ -186,7 +187,8 @@ void ZindoS::SetMessages(){
    this->messageDoneSCF = "**********  DONE: ZINDO/S-SCF  **********\n\n\n";
    this->messageStartCIS = "**********  START: ZINDO/S-CIS  **********\n";
    this->messageDoneCIS = "**********  DONE: ZINDO/S-CIS  **********\n\n\n";
-   this->messageConsumedCalcCISMatrix = "\tElapsed time(omp) for the calc. of the CIS matrix = ";
+   this->messageOmpElapsedTimeCalcCISMarix = "\tElapsed time(omp) for the calc. of the CIS matrix = ";
+   this->messageOmpElapsedTimeCIS = "\tElapsed time(omp) for the CIS = ";
    this->messageStartCalcCISMatrix = "----------- START: Calculation of the CIS matrix -----------\n";
    this->messageDoneCalcCISMatrix  = "----------- DONE: Calculation of the CIS matrix -----------\n\n";
    this->messageStartDirectCIS = "\t======  START: Direct-CIS  =====\n\n";
@@ -788,6 +790,7 @@ double ZindoS::GetMolecularIntegralElement(int moI, int moJ, int moK, int moL,
 
 void ZindoS::DoesCIS(){
    cout << this->messageStartCIS;
+   double ompStartTime = omp_get_wtime();
 
    int numberOcc = Parameters::GetInstance()->GetActiveOccCIS();
    int numberVir = Parameters::GetInstance()->GetActiveVirCIS();
@@ -831,6 +834,10 @@ void ZindoS::DoesCIS(){
       printf("\t\t %d\t%e\t%e\n",k+1, this->excitedEnergies[k], this->excitedEnergies[k]/eV2AU);
    }
    cout << endl;
+   double ompEndTime = omp_get_wtime();
+   cout << this->messageOmpElapsedTimeCIS;
+   cout << ompEndTime - ompStartTime;
+   cout << this->messageUnitSec << endl;
    cout << this->messageDoneCIS;
    this->CalcForce(0);
 }
@@ -1412,7 +1419,9 @@ void ZindoS::CalcCISMatrix(double** matrixCIS, int numberOcc, int numberVir){
       }
    }
    double ompEndTime = omp_get_wtime();
-   cout << this->messageConsumedCalcCISMatrix << ompEndTime - ompStartTime << "[s]." << endl;
+   cout << this->messageOmpElapsedTimeCalcCISMarix;
+   cout << ompEndTime - ompStartTime;
+   cout << this->messageUnitSec << endl;
    cout << this->messageDoneCalcCISMatrix;
 }
 
