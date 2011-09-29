@@ -559,9 +559,9 @@ void InputParser::Parse(Molecule* molecule){
 
    }
 
-   // calculate basics and conditions
+   // calculate basics and check conditions
    this->CalcMolecularBasics(molecule);
-   if(Parameters::GetInstance()->GetCurrentTheory() == ZINDOS){
+   if(Parameters::GetInstance()->RequiresCIS()){
       this->CheckCisConditions(molecule);
    }
    if(Parameters::GetInstance()->RequiresMD()){
@@ -571,7 +571,7 @@ void InputParser::Parse(Molecule* molecule){
    // output conditions
    this->OutputMolecularBasics(molecule);
    this->OutputScfConditions();
-   if(Parameters::GetInstance()->GetCurrentTheory() == ZINDOS){
+   if(Parameters::GetInstance()->RequiresCIS()){
       this->OutputCisConditions();
    }
    if(Parameters::GetInstance()->RequiresMD()){
