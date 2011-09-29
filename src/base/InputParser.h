@@ -110,7 +110,7 @@ private:
    string stringMDElecState;
    string stringMDTimeWidth;
    void CalcMolecularBasics(Molecule* molecule);
-   void CalcCisCondition(Molecule* molecule);
+   void CheckCisConditions(Molecule* molecule);
    void CheckMdConditions();
    void OutputMolecularBasics(Molecule* molecule);
    void OutputScfConditions();
@@ -562,7 +562,7 @@ void InputParser::Parse(Molecule* molecule){
    // calculate basics and conditions
    this->CalcMolecularBasics(molecule);
    if(Parameters::GetInstance()->GetCurrentTheory() == ZINDOS){
-      this->CalcCisCondition(molecule);
+      this->CheckCisConditions(molecule);
    }
    this->CheckMdConditions();
 
@@ -591,7 +591,7 @@ void InputParser::CalcMolecularBasics(Molecule* molecule){
 
 }
 
-void InputParser::CalcCisCondition(Molecule* molecule){
+void InputParser::CheckCisConditions(Molecule* molecule){
 
    // direct CIS
    int numberOcc = molecule->GetTotalNumberValenceElectrons()/2;
