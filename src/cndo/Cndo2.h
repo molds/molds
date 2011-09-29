@@ -1002,6 +1002,7 @@ void Cndo2::CalcAtomicElectronPopulation(double* atomicElectronPopulation,
       firstAOIndex = (*molecule->GetAtomVect())[A]->GetFirstAOIndex();
       numberAOs = (*molecule->GetAtomVect())[A]->GetValence().size();
 
+      atomicElectronPopulation[A] = 0.0;
       for(int i=firstAOIndex; i<firstAOIndex+numberAOs; i++){
          atomicElectronPopulation[A] += orbitalElectronPopulation[i][i];
       }
