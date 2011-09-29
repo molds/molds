@@ -564,7 +564,9 @@ void InputParser::Parse(Molecule* molecule){
    if(Parameters::GetInstance()->GetCurrentTheory() == ZINDOS){
       this->CheckCisConditions(molecule);
    }
-   this->CheckMdConditions();
+   if(Parameters::GetInstance()->RequiresMD()){
+      this->CheckMdConditions();
+   }
 
    // output conditions
    this->OutputMolecularBasics(molecule);
