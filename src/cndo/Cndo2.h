@@ -29,6 +29,7 @@ public:
    ~Cndo2();
    void SetMolecule(Molecule* molecule);
    void DoesSCF();
+   void DoesSCF(bool requiresGuess);
 protected:
    string errorMessageAtomA;
    string errorMessageAtomB;
@@ -336,7 +337,7 @@ void Cndo2::CheckEnableAtomType(Molecule* molecule){
  * before this function is called.
  *
  *****/
-void Cndo2::DoesSCF(){
+void Cndo2::DoesSCF(bool requiresGuess){
 
    cout << this->messageStartSCF;
 
@@ -379,7 +380,7 @@ void Cndo2::DoesSCF(){
       bool isGuess=true;
       for(int i=0; i<maxIterationsSCF; i++){
 
-         i==0 ? isGuess = true : isGuess = false;
+         (i==0 && requiresGuess) ? isGuess = true : isGuess = false;
          this->CalcFockMatrix(this->fockMatrix, 
                               this->molecule, 
                               this->overlap, 
@@ -467,6 +468,11 @@ void Cndo2::DoesSCF(){
 
    cout << this->messageDoneSCF;
 
+}
+
+void Cndo2::DoesSCF(){
+   bool requiresGuess = true;
+   this->DoesSCF(requiresGuess);
 }
 
 void Cndo2::FreeSCFTemporaryMatrices(double*** oldOrbitalElectronPopulation,
