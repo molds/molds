@@ -360,6 +360,13 @@ void Cndo2::DoesSCF(bool requiresGuess){
    double** oldOrbitalElectronPopulation = MallocerFreer::GetInstance()->MallocDoubleMatrix2d
             (this->molecule->GetTotalNumberAOs(), this->molecule->GetTotalNumberAOs());
 
+   // Following copy is necessary for repeating SCF-procedure for such as MD and MC!
+   for(int i=0; i<this->molecule->GetTotalNumberAOs(); i++){
+      for(int j=0; j<this->molecule->GetTotalNumberAOs(); j++){
+         oldOrbitalElectronPopulation[i][j] = this->orbitalElectronPopulation[i][j];
+      }
+   }
+
    // malloc temporary matrices for diis
    double*** diisStoredDensityMatrix = NULL;
    double*** diisStoredErrorVect = NULL;
