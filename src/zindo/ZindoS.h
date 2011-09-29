@@ -186,7 +186,7 @@ void ZindoS::SetMessages(){
    this->messageDoneSCF = "**********  DONE: ZINDO/S-SCF  **********\n\n\n";
    this->messageStartCIS = "**********  START: ZINDO/S-CIS  **********\n";
    this->messageDoneCIS = "**********  DONE: ZINDO/S-CIS  **********\n\n\n";
-   this->messageConsumedCalcCISMatrix = "\tElapsed time(omp) of the calc. of the CIS matrix = ";
+   this->messageConsumedCalcCISMatrix = "\tElapsed time(omp) for the calc. of the CIS matrix = ";
    this->messageStartCalcCISMatrix = "----------- START: Calculation of the CIS matrix -----------\n";
    this->messageDoneCalcCISMatrix  = "----------- DONE: Calculation of the CIS matrix -----------\n\n";
    this->messageStartDirectCIS = "\t======  START: Direct-CIS  =====\n\n";
