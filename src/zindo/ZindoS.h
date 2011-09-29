@@ -22,7 +22,7 @@ public:
    ZindoS();
    ~ZindoS();
    void DoesCIS();
-   virtual void CalcForce(int electronicEigenIndex);
+   virtual void CalcForce(int electronicStateIndex);
 protected:
    virtual void CalcGammaAB(double** gammaAB, Molecule* molecule);
    virtual void SetMessages();
@@ -1424,9 +1424,9 @@ void ZindoS::CalcCISMatrix(double** matrixCIS, int numberOcc, int numberVir){
    cout << this->messageDoneCalcCISMatrix;
 }
 
-// eigenIndex is index of the electroinc eigen state.
-// "eigenIndex = 0" means electronic ground state. 
-void ZindoS::CalcForce(int electronicEigenIndex){
+// electronicStateIndex is index of the electroinc eigen state.
+// "electronicStateIndex = 0" means electronic ground state. 
+void ZindoS::CalcForce(int electronicStateIndex){
 
    // malloc or initialize Force matrix
    if(this->matrixForce == NULL){

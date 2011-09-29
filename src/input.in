@@ -1,8 +1,8 @@
 // example of the input file
 THEORY
    //cndo/2
-   //indo
-   zindo/s
+   indo
+   //zindo/s
    //none 
    //principal_axes
    //translate
@@ -19,18 +19,21 @@ SCF
    diis_end_error 0.00000002
 SCF_END
 
-CIS
-   davidson yes
-   active_occ 100
-   active_vir 100
-   nstates 11
-   max_iter 200
-   max_dim 100
-   norm_tol 0.000001
-CIS_END
+//CIS
+//   davidson yes
+//   active_occ 100
+//   active_vir 100
+//   nstates 11
+//   max_iter 200
+//   max_dim 100
+//   norm_tol 0.000001
+//CIS_END
 
-
-
+MD
+//   total_steps 20
+//   electronic_state 2
+//   dt 0.2
+MD_END
 
 //INERTIA
 //   origin 1.0 2.0 30.0
@@ -49,7 +52,6 @@ CIS_END
 //TRANSLATE
    //difference 100.0 200.0 300.0
 //TRANSLATE_END
-
 
 // NH3
 //GEOMETRY
@@ -91,7 +93,6 @@ CIS_END
 //   H  1.004062    1.324529   -0.873652
 //   H  -0.422611    0.820144    0.000000
 //GEOMETRY_END
-
 
 // c2
 //GEOMETRY
@@ -188,8 +189,6 @@ GEOMETRY_END
 //   Li  1.994960      0.485175      0.000000
 //GEOMETRY_END
 
-
-
 // Li2
 //GEOMETRY
 //   Li  0.0   0.0   1.230000
@@ -201,7 +200,6 @@ GEOMETRY_END
 //   Li  -1.570081   0.094340   0.0
 //   Li  -4.030081   0.094340   0.0
 //GEOMETRY_END
-//
 
 //GEOMETRY
 //  C         -3.402965    0.646900    0.000000

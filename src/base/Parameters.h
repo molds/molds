@@ -34,6 +34,7 @@ public:
    double GetKayser2AU();
    double GetGMolin2AU();
    double GetDegree2Radian();
+   double GetFs2AU();
    double GetBondingAdjustParameterK();
    TheoryType GetCurrentTheory();
    void SetCurrentTheory(TheoryType theory);
@@ -67,6 +68,14 @@ public:
    void SetMaxDimensionsCIS(int maxDimensionsCIS);
    double GetNormToleranceCIS();
    void SetNormToleranceCIS(double normToleranceCIS);
+   bool RequiresMD();
+   void SetRequiresMD(bool requiresMD);
+   int GetElectronicStateIndexMD();
+   void SetElectronicStateIndexMD(int electronicStateIndex);
+   int GetTotalStepsMD();
+   void SetTotalStepsMD(int totalSteps);
+   double GetTimeWidthMD();
+   void SetTimeWidthMD(double timeWidth);
 private:
    static Parameters* parameters;
    Parameters();
@@ -87,6 +96,7 @@ private:
    double kayser2AU;
    double gMolin2AU;
    double degree2Radian;
+   double fs2AU;
    double bondingAdjustParameterK; //see (3.79) in J. A. Pople book
    TheoryType currentTheory;
    double translatingDifference[3];
@@ -104,6 +114,10 @@ private:
    double normToleranceCIS;
    bool requiresCIS;
    bool isDavidsonCIS;
+   bool requiresMD;
+   int electronicStateIndexMD;
+   int totalStepsMD;
+   double timeWidthMD;
 };
 Parameters* Parameters::parameters = NULL;
 
@@ -141,6 +155,7 @@ void Parameters::SetDefaultValues(){
    this->eV2AU = 0.03674903;
    this->angstrom2AU = 1.0/0.5291772;
    this->kayser2AU = 4.556336*pow(10.0,-6.0);
+   this->fs2AU = 1.0/(2.418884326505*pow(10.0,-2.0));
    this->thresholdSCF = pow(10.0, -8.0);
    this->maxIterationsSCF = 100;
    this->dampingThreshSCF = 1.0;
@@ -171,6 +186,9 @@ void Parameters::SetDefaultValues(){
    this->maxIterationsCIS = 100;
    this->maxDimensionsCIS = 100;
    this->normToleranceCIS = pow(10.0, -6.0);
+   this->electronicStateIndexMD = 0;
+   this->totalStepsMD = 10;
+   this->timeWidthMD = 0.1*this->fs2AU;
 }
 
 double Parameters::GetThresholdSCF(){
@@ -247,6 +265,10 @@ double Parameters::GetGMolin2AU(){
 
 double Parameters::GetDegree2Radian(){
    return this->degree2Radian;
+}
+
+double Parameters::GetFs2AU(){
+   return this->fs2AU;
 }
 
 double Parameters::GetBondingAdjustParameterK(){
@@ -400,6 +422,38 @@ double Parameters::GetNormToleranceCIS(){
 
 void Parameters::SetNormToleranceCIS(double normToleranceCIS){
    this->normToleranceCIS = normToleranceCIS;
+}
+
+bool Parameters::RequiresMD(){
+   return this->requiresMD;
+}
+
+void Parameters::SetRequiresMD(bool requiresMD){
+   this->requiresMD = requiresMD;
+}
+
+int Parameters::GetElectronicStateIndexMD(){
+   return this->electronicStateIndexMD;
+}
+
+void Parameters::SetElectronicStateIndexMD(int electronicStateIndex){
+   this->electronicStateIndexMD = electronicStateIndex;
+}
+
+int Parameters::GetTotalStepsMD(){
+   return this->totalStepsMD;
+}
+
+void Parameters::SetTotalStepsMD(int totalSteps){
+   this->totalStepsMD = totalSteps;
+}
+
+double Parameters::GetTimeWidthMD(){
+   return this->timeWidthMD;
+}
+
+void Parameters::SetTimeWidthMD(double timeWidth){
+   this->timeWidthMD = timeWidth;
 }
 
 }

@@ -51,6 +51,11 @@ private:
    string messageCisNormTolerance;
    string messageCisMaxIterations;
    string messageCisMaxDimensions;
+   string messageMdConditions;
+   string messageMdTotalSteps;
+   string messageMdElecState;
+   string messageMdTimeWidth;
+   string messageFs;
    string stringYES;
    string stringNO;
    string stringSpace;
@@ -99,11 +104,18 @@ private:
    string stringCISMaxIter;
    string stringCISMaxDimensions;
    string stringCISNormTolerance;
+   string stringMD;
+   string stringMDEnd;
+   string stringMDTotalSteps;
+   string stringMDElecState;
+   string stringMDTimeWidth;
    void CalcMolecularBasics(Molecule* molecule);
    void CalcCisCondition(Molecule* molecule);
+   void CheckMdConditions();
    void OutputMolecularBasics(Molecule* molecule);
    void OutputScfConditions();
    void OutputCisConditions();
+   void OutputMdConditions();
    void OutputInputTerms(vector<string> inputTerms);
    bool IsCommentOut(string str);
    vector<string> GetInputTerms();
@@ -133,6 +145,11 @@ InputParser::InputParser(){
    this->messageCisNormTolerance = "\t\tNorm tolerance for the residual of the Davidson: ";
    this->messageCisMaxIterations = "\t\tMax iterations for the Davidson: ";
    this->messageCisMaxDimensions = "\t\tMax dimensions for the Davidson: ";
+   this->messageMdConditions = "\tMD conditions:\n";
+   this->messageMdTotalSteps = "\t\tTotal steps: ";
+   this->messageMdElecState = "\t\tElectronic eigen state: ";
+   this->messageMdTimeWidth = "\t\tTime width(dt): ";
+   this->messageFs = "[fs]";
    this->stringYES = "yes";
    this->stringNO = "no";
    this->stringSpace = " ";
@@ -181,6 +198,11 @@ InputParser::InputParser(){
    this->stringCISMaxIter = "max_iter";
    this->stringCISMaxDimensions = "max_dim";
    this->stringCISNormTolerance = "norm_tol";
+   this->stringMD = "md";
+   this->stringMDEnd = "md_end";
+   this->stringMDTotalSteps = "total_steps";
+   this->stringMDElecState = "electronic_state";
+   this->stringMDTimeWidth = "dt";
 }
 
 InputParser::~InputParser(){
@@ -462,6 +484,34 @@ void InputParser::Parse(Molecule* molecule){
          i = j;
       }
 
+      // MD condition
+      if(inputTerms[i].compare(this->stringMD) == 0){
+         Parameters::GetInstance()->SetRequiresMD(true);
+         int j=i+1;
+         while(inputTerms[j].compare(this->stringMDEnd) != 0){
+            // number of total steps 
+            if(inputTerms[j].compare(this->stringMDTotalSteps) == 0){
+               int totalSteps = atoi(inputTerms[j+1].c_str());
+               Parameters::GetInstance()->SetTotalStepsMD(totalSteps);
+               j++;
+            }
+            // index of electronic eigen state on whichi MD runs. 
+            if(inputTerms[j].compare(this->stringMDElecState) == 0){
+               int elecStateIndex = atoi(inputTerms[j+1].c_str());
+               Parameters::GetInstance()->SetElectronicStateIndexMD(elecStateIndex);
+               j++;
+            }
+            // time width for MD.
+            if(inputTerms[j].compare(this->stringMDTimeWidth) == 0){
+               double dt = atof(inputTerms[j+1].c_str()) * Parameters::GetInstance()->GetFs2AU();
+               Parameters::GetInstance()->SetTimeWidthMD(dt);
+               j++;
+            }
+            j++;   
+         }
+         i = j;
+      }
+
       // theory
       if(inputTerms[i].compare(this->stringTheory) == 0){
          int j=i+1;
@@ -514,12 +564,16 @@ void InputParser::Parse(Molecule* molecule){
    if(Parameters::GetInstance()->GetCurrentTheory() == ZINDOS){
       this->CalcCisCondition(molecule);
    }
+   this->CheckMdConditions();
 
    // output conditions
    this->OutputMolecularBasics(molecule);
    this->OutputScfConditions();
    if(Parameters::GetInstance()->GetCurrentTheory() == ZINDOS){
       this->OutputCisConditions();
+   }
+   if(Parameters::GetInstance()->RequiresMD()){
+      this->OutputMdConditions();
    }
 
    // output inputs
@@ -570,6 +624,13 @@ void InputParser::CalcCisCondition(Molecule* molecule){
    
 }
 
+void InputParser::CheckMdConditions(){
+   if(Parameters::GetInstance()->GetCurrentTheory() == ZINDOS){
+      int groundStateIndex = 0;
+      Parameters::GetInstance()->SetElectronicStateIndexMD(groundStateIndex);
+   }
+}
+
 void InputParser::OutputMolecularBasics(Molecule* molecule){
 
    molecule->OutputTotalNumberAtomsAOsValenceelectrons();
@@ -608,6 +669,16 @@ void InputParser::OutputCisConditions(){
    else{
       printf("%s\n",this->stringNO.c_str());
    }
+
+   cout << "\n";
+}
+
+void InputParser::OutputMdConditions(){
+   cout << this->messageMdConditions;
+
+   printf("%s%d\n",this->messageMdElecState.c_str(),Parameters::GetInstance()->GetElectronicStateIndexMD());
+   printf("%s%d\n",this->messageMdTotalSteps.c_str(),Parameters::GetInstance()->GetTotalStepsMD());
+   printf("%s%lf%s\n",this->messageMdTimeWidth.c_str(),Parameters::GetInstance()->GetTimeWidthMD()/Parameters::GetInstance()->GetFs2AU(),this->messageFs.c_str());
 
    cout << "\n";
 }
