@@ -839,7 +839,6 @@ void ZindoS::DoesCIS(){
    cout << ompEndTime - ompStartTime;
    cout << this->messageUnitSec << endl;
    cout << this->messageDoneCIS;
-   this->CalcForce(0);
 }
 
 void ZindoS::SortSingleExcitationSlaterDeterminants(vector<MoEnergy>* moEnergies){
