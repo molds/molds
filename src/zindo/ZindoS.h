@@ -14,11 +14,8 @@ class ZindoS : public MolDS_cndo::Cndo2{
 public:
    ZindoS();
    ~ZindoS();
-   void DoesCIS();
-   virtual void CalcForce(int electronicStateIndex);
-   double** GetForce();
+   virtual void DoesCIS();
 protected:
-   string errorMessageGetForceNULL;
    virtual void CalcGammaAB(double** gammaAB, Molecule* molecule);
    virtual void SetMessages();
    virtual void SetEnableAtomTypes();
@@ -50,6 +47,7 @@ protected:
                                               Molecule* molecule, 
                                               double** fockMatrix, 
                                               double** gammaAB);
+   virtual void CalcForce(int electronicStateIndex);
 private:
    double** matrixCIS;
    double* excitedEnergies;
@@ -67,7 +65,6 @@ private:
                                                      CartesianType axisA);// ref. [MN_1957] and (5a) in [AEZ_1986]
    double nishimotoMatagaParamA;
    double nishimotoMatagaParamB;
-   double** matrixForce;
    struct MoEnergy{
       double energy;
       int occIndex;
@@ -177,7 +174,6 @@ void ZindoS::SetMessages(){
    this->errorMessageDavidsonNotConverged =  "Error in zindo::ZindoS::DoesCISDavidson: Davidson did not met convergence criterion. \n";
    this->errorMessageDavidsonMaxIter = "Davidson roop reaches max_iter=";
    this->errorMessageDavidsonMaxDim = "Dimension of the expansion vectors reaches max_dim=";
-   this->errorMessageGetForceNULL = "Error in zindo:ZindoS::GetForce: Matrix for Force is NULL.\n";
    this->messageSCFMetConvergence = "\n\n\n\t\tZINDO/S-SCF met convergence criterion(^^b\n\n\n";
    this->messageStartSCF = "**********  START: ZINDO/S-SCF  **********\n";
    this->messageDoneSCF = "**********  DONE: ZINDO/S-SCF  **********\n\n\n";
@@ -1420,15 +1416,6 @@ void ZindoS::CalcCISMatrix(double** matrixCIS, int numberOcc, int numberVir){
    cout << this->messageDoneCalcCISMatrix;
 }
 
-double** ZindoS::GetForce(){
-   if(this->matrixForce == NULL){
-      stringstream ss;
-      ss << this->errorMessageGetForceNULL;
-      throw MolDSException(ss.str());
-   }
-   return this->matrixForce;
-}
-
 // electronicStateIndex is index of the electroinc eigen state.
 // "electronicStateIndex = 0" means electronic ground state. 
 void ZindoS::CalcForce(int electronicStateIndex){
@@ -1508,7 +1495,7 @@ void ZindoS::CalcForce(int electronicStateIndex){
       }
    }
 
-   /*
+   /*   
    // checking of calculated force
    double checkSumForce[3] = {0.0, 0.0, 0.0};
    for(int a=0; a<this->molecule->GetAtomVect()->size(); a++){

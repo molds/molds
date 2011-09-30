@@ -64,7 +64,9 @@ void Indo::SetMessages(){
    this->errorMessageMolecularIntegralElement
       = "Error in indo::Indo::GetMolecularIntegralElement: Non available orbital is contained.\n";
    this->errorMessageCISNotImplemented 
-      = "Error in indo::Indo::DoesCIS: CIS is not implemented for INDO. Use ZINDO/S.";
+      = "Error in indo::Indo::DoesCIS: CIS is not implemented for INDO.\n";
+   this->errorMessageCalcForceNotImplemented
+      = "Error in indo::Indo::CalcForce: Force is not available in INDO.\n";
    this->messageSCFMetConvergence = "\n\n\n\t\tINDO-SCF met convergence criterion(^^b\n\n\n";
    this->messageStartSCF = "**********  START: INDO-SCF  **********\n";
    this->messageDoneSCF = "**********  DONE: INDO-SCF  **********\n\n\n";

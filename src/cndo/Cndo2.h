@@ -19,6 +19,7 @@ public:
    void DoesSCF();
    void DoesSCF(bool requiresGuess);
    virtual void DoesCIS();
+   double** GetForce(int electronicStateIndex);
 protected:
    string errorMessageAtomA;
    string errorMessageAtomB;
@@ -34,6 +35,7 @@ protected:
    string errorMessageGetGaussianOverlapOrbitalD;
    string errorMessageGetGaussianOverlapFirstDerivativeOrbitalD;
    string errorMessageCISNotImplemented;
+   string errorMessageCalcForceNotImplemented;
    string messageSCFMetConvergence;
    string messageStartSCF;
    string messageDoneSCF;
@@ -60,10 +62,12 @@ protected:
    virtual void CalcDiatomicOverlapInDiatomicFrame(double** diatomicOverlap, Atom* atomA, Atom* atomB);
    virtual double GetMolecularIntegralElement(int moI, int moJ, int moK, int moL, 
                                               Molecule* molecule, double** fockMatrix, double** gammaAB);
+   virtual void CalcForce(int electronicStateIndex);
    TheoryType theory;
    Molecule* molecule;
    double** fockMatrix;
    double* energiesMO;
+   double** matrixForce;
 private:
    string messageEnergiesMOs;
    string messageEnergiesMOsTitle;
@@ -232,7 +236,9 @@ void Cndo2::SetMessages(){
    this->errorMessageGetGaussianOverlapFirstDerivativeOrbitalD 
       = "Error in cndo::Cndo2::GetGaussiangOverlapFirstDerivative: d-orbital is not treatable. The d-orbital is contained in atom A or B.\n";
    this->errorMessageCISNotImplemented 
-      = "Error in cndo::Cndo2::DoesCIS: CIS is not implemented for CNDO2. Use ZINDO/S.";
+      = "Error in cndo::Cndo2::DoesCIS: CIS is not implemented for CNDO2.\n";
+   this->errorMessageCalcForceNotImplemented
+      = "Error in cndo::Cndo2::CalcForce: Force is not available in CNDO2.\n";
    this->messageSCFMetConvergence = "\n\n\n\t\tCNDO/2-SCF met convergence criterion(^^b\n\n\n";
    this->messageStartSCF = "**********  START: CNDO/2-SCF  **********\n";
    this->messageDoneSCF = "**********  DONE: CNDO/2-SCF  **********\n\n\n";
@@ -490,6 +496,17 @@ void Cndo2::DoesSCF(){
 void Cndo2::DoesCIS(){
    stringstream ss;
    ss << this->errorMessageCISNotImplemented;
+   throw MolDSException(ss.str());
+}
+
+double** Cndo2::GetForce(int electronicStateIndex){
+   this->CalcForce(electronicStateIndex);
+   return this->matrixForce;
+}
+
+void Cndo2::CalcForce(int electronicStateIndex){
+   stringstream ss;
+   ss << this->errorMessageCalcForceNotImplemented;
    throw MolDSException(ss.str());
 }
 

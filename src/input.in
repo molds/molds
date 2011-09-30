@@ -19,7 +19,7 @@ SCF
    diis_end_error 0.00000002
 SCF_END
 
-CIS
+//CIS
 //   davidson yes
 //   active_occ 100
 //   active_vir 100
@@ -27,11 +27,11 @@ CIS
 //   max_iter 200
 //   max_dim 100
 //   norm_tol 0.000001
-CIS_END
+//CIS_END
 
 MD
 //   total_steps 20
-//   electronic_state 2
+   electronic_state 2
 //   dt 0.2
 MD_END
 

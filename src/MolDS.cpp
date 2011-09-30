@@ -86,6 +86,11 @@ int main(){
             if(Parameters::GetInstance()->RequiresCIS()){
                cndo2->DoesCIS();
             }
+            if(Parameters::GetInstance()->RequiresMD()){
+               MolDS_md::MD* md = new MolDS_md::MD();
+               md->SetTheory(cndo2);
+               delete md;
+            }
          }
          catch(MolDSException ex){
             cout << ex.what() << endl;
@@ -102,6 +107,11 @@ int main(){
             indo->DoesSCF();
             if(Parameters::GetInstance()->RequiresCIS()){
                indo->DoesCIS();
+            }
+            if(Parameters::GetInstance()->RequiresMD()){
+               MolDS_md::MD* md = new MolDS_md::MD();
+               md->SetTheory(indo);
+               delete md;
             }
          }
          catch(MolDSException ex){
