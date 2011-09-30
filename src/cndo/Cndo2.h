@@ -1,24 +1,11 @@
 #ifndef INCLUDED_CNDO
 #define INCLUDED_CNDO
 
-#include<stdio.h>
-#include<stdlib.h>
-#include<math.h>
-#include<iostream>
-#include<sstream>
-#include<vector>
-#include"../base/Molecule.h"
-#include"../base/atoms/Atom.h"
-#include"../base/MathUtilities.h"
-#include"../base/RealSphericalHarmonicsIndex.h"
-#include"../mkl_wrapper/LapackWrapper.h"
-
 using namespace std;
 using namespace MolDS_base;
 using namespace MolDS_base_atoms;
 
 namespace MolDS_cndo{
-
 
 /***
  *  Refferences for Cndo2 are [PB_1970], [PSS_1965], and [PS_1965].

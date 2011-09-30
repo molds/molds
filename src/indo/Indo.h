@@ -1,13 +1,6 @@
 #ifndef INCLUDED_INDO
 #define INCLUDED_INDO
 
-#include<stdio.h>
-#include<stdlib.h>
-#include<math.h>
-#include<iostream>
-#include<vector>
-#include"../cndo/Cndo2.h"
-
 using namespace std;
 using namespace MolDS_base;
 using namespace MolDS_base_atoms;
