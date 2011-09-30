@@ -14,7 +14,7 @@ class ZindoS : public MolDS_cndo::Cndo2{
 public:
    ZindoS();
    ~ZindoS();
-   virtual void DoesCIS();
+   void DoesCIS();
    virtual void CalcForce(int electronicStateIndex);
    double** GetForce();
 protected:
