@@ -23,7 +23,9 @@ public:
    ~ZindoS();
    void DoesCIS();
    virtual void CalcForce(int electronicStateIndex);
+   double** GetForce();
 protected:
+   string errorMessageGetForceNULL;
    virtual void CalcGammaAB(double** gammaAB, Molecule* molecule);
    virtual void SetMessages();
    virtual void SetEnableAtomTypes();
@@ -182,6 +184,7 @@ void ZindoS::SetMessages(){
    this->errorMessageDavidsonNotConverged =  "Error in zindo::ZindoS::DoesCISDavidson: Davidson did not met convergence criterion. \n";
    this->errorMessageDavidsonMaxIter = "Davidson roop reaches max_iter=";
    this->errorMessageDavidsonMaxDim = "Dimension of the expansion vectors reaches max_dim=";
+   this->errorMessageGetForceNULL = "Error in zindo:ZindoS::GetForce: Matrix for Force is NULL.\n";
    this->messageSCFMetConvergence = "\n\n\n\t\tZINDO/S-SCF met convergence criterion(^^b\n\n\n";
    this->messageStartSCF = "**********  START: ZINDO/S-SCF  **********\n";
    this->messageDoneSCF = "**********  DONE: ZINDO/S-SCF  **********\n\n\n";
@@ -1422,6 +1425,15 @@ void ZindoS::CalcCISMatrix(double** matrixCIS, int numberOcc, int numberVir){
    cout << ompEndTime - ompStartTime;
    cout << this->messageUnitSec << endl;
    cout << this->messageDoneCalcCISMatrix;
+}
+
+double** ZindoS::GetForce(){
+   if(this->matrixForce == NULL){
+      stringstream ss;
+      ss << this->errorMessageGetForceNULL;
+      throw MolDSException(ss.str());
+   }
+   return this->matrixForce;
 }
 
 // electronicStateIndex is index of the electroinc eigen state.
