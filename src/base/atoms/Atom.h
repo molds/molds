@@ -21,6 +21,8 @@ public:
    double GetAtomicMass();
    double* GetXyz();
    void SetXyz(double x, double y, double z);
+   double* GetPxyz();
+   void SetPxyz(double px, double py, double pz);
    vector<OrbitalType> GetValence();
    double GetBondingParameter();
    double GetBondingParameter(TheoryType theory, OrbitalType orbital);
@@ -64,7 +66,8 @@ protected:
    string errorMessageIonPot;
    string errorMessageAtomType;
    string errorMessageOrbitalType;
-   double* xyz;
+   double* xyz; // coordinates
+   double* pxyz; // momentum. Note that this is not velocity!! 
    AtomType atomType;
    double atomicMass;  // Appendix 1 in [I_1998]
    vector<OrbitalType> valence;
@@ -118,11 +121,13 @@ private:
 
 Atom::Atom(){
    this->xyz = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(3);
+   this->pxyz = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(3);
    this->SetMessages();
 }
 
 Atom::Atom(double x, double y, double z){
    this->xyz = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(3);
+   this->pxyz = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(3);
    this->SetMessages();
    this->SetXyz(x, y, z);
 }
@@ -131,6 +136,10 @@ Atom::~Atom(){
    if(this->xyz != NULL){
       MallocerFreer::GetInstance()->FreeDoubleMatrix1d(&this->xyz);
       //cout << "xyz deleted\n";
+   }
+   if(this->pxyz != NULL){
+      MallocerFreer::GetInstance()->FreeDoubleMatrix1d(&this->pxyz);
+      //cout << "pxyz (momenta) deleted\n";
    }
    //cout << "atom deleted\n";
 }
@@ -161,10 +170,20 @@ double* Atom::GetXyz(){
    return this->xyz;
 }
 
+double* Atom::GetPxyz(){
+   return this->pxyz;
+}
+
 void Atom::SetXyz(double x, double y, double z){
    xyz[0]= x;
    xyz[1]= y;
    xyz[2]= z;
+}
+
+void Atom::SetPxyz(double px, double py, double pz){
+   pxyz[0]= px;
+   pxyz[1]= py;
+   pxyz[2]= pz;
 }
 
 vector<OrbitalType> Atom::GetValence(){
