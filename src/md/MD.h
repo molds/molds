@@ -10,10 +10,11 @@ namespace MolDS_md{
 /***
  *  Refferences for Indo are [PB_1970] and [PS_1966].
  */
-class Md : public MolDS_cndo::Cndo2{
+class MD : public MolDS_cndo::Cndo2{
 public:
-   Md();
-   ~Md();
+   MD();
+   MD(MolDS_zindo::ZindoS* zindoS);
+   ~MD();
 private:
    MolDS_zindo::ZindoS* zindoS;
    vector<TheoryType> enableTheoryTypes;
@@ -21,18 +22,23 @@ private:
    void SetEnableTheoryTypes();
 };
 
-Md::Md(){
-   //cout << "Md created\n";
+MD::MD(){
+   cout << "MD created 1\n";
 }
 
-Md::~Md(){
-   //cout << "Md\n";
+MD::MD(MolDS_zindo::ZindoS* zindoS){
+   this->zindoS = zindoS;
+   cout << "MD created 2\n";
 }
 
-void Md::SetMessages(){
+MD::~MD(){
+   //cout << "MD\n";
 }
 
-void Md::SetEnableTheoryTypes(){
+void MD::SetMessages(){
+}
+
+void MD::SetEnableTheoryTypes(){
    this->enableTheoryTypes.clear();
    this->enableTheoryTypes.push_back(ZINDOS);
 }

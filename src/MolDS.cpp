@@ -35,7 +35,7 @@
 #include"cndo/Cndo2.h"
 #include"indo/Indo.h"
 #include"zindo/ZindoS.h"
-#include"md/Md.h"
+#include"md/MD.h"
 
 
 
@@ -113,6 +113,9 @@ int main(){
             zindoS->DoesSCF();
             if(Parameters::GetInstance()->RequiresCIS()){
                zindoS->DoesCIS();
+            }
+            if(Parameters::GetInstance()->RequiresMD()){
+               MolDS_md::MD* md = new MolDS_md::MD();
             }
          }
          catch(MolDSException ex){
