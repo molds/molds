@@ -18,6 +18,7 @@ public:
    void SetMolecule(Molecule* molecule);
    void DoesSCF();
    void DoesSCF(bool requiresGuess);
+   virtual void DoesCIS();
 protected:
    string errorMessageAtomA;
    string errorMessageAtomB;
@@ -32,6 +33,7 @@ protected:
    string errorMessageMolecularIntegralElement;
    string errorMessageGetGaussianOverlapOrbitalD;
    string errorMessageGetGaussianOverlapFirstDerivativeOrbitalD;
+   string errorMessageCISNotImplemented;
    string messageSCFMetConvergence;
    string messageStartSCF;
    string messageDoneSCF;
@@ -229,6 +231,8 @@ void Cndo2::SetMessages(){
       = "Error in cndo::Cndo2::GetGaussiangOverlap: d-orbital is not treatable. The d-orbital is contained in atom A or B.\n";
    this->errorMessageGetGaussianOverlapFirstDerivativeOrbitalD 
       = "Error in cndo::Cndo2::GetGaussiangOverlapFirstDerivative: d-orbital is not treatable. The d-orbital is contained in atom A or B.\n";
+   this->errorMessageCISNotImplemented 
+      = "Error in cndo::Cndo2::DoesCIS: CIS is not implemented for CNDO2. Use ZINDO/S.";
    this->messageSCFMetConvergence = "\n\n\n\t\tCNDO/2-SCF met convergence criterion(^^b\n\n\n";
    this->messageStartSCF = "**********  START: CNDO/2-SCF  **********\n";
    this->messageDoneSCF = "**********  DONE: CNDO/2-SCF  **********\n\n\n";
@@ -481,6 +485,12 @@ void Cndo2::DoesSCF(bool requiresGuess){
 void Cndo2::DoesSCF(){
    bool requiresGuess = true;
    this->DoesSCF(requiresGuess);
+}
+
+void Cndo2::DoesCIS(){
+   stringstream ss;
+   ss << this->errorMessageCISNotImplemented;
+   throw MolDSException(ss.str());
 }
 
 void Cndo2::FreeSCFTemporaryMatrices(double*** oldOrbitalElectronPopulation,

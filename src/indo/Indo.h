@@ -63,6 +63,8 @@ void Indo::SetMessages(){
    this->errorMessageExchangeInt = "Error in base_indo::Indo::GetExchangeInt: Invalid orbitalType.\n";
    this->errorMessageMolecularIntegralElement
       = "Error in indo::Indo::GetMolecularIntegralElement: Non available orbital is contained.\n";
+   this->errorMessageCISNotImplemented 
+      = "Error in indo::Indo::DoesCIS: CIS is not implemented for INDO. Use ZINDO/S.";
    this->messageSCFMetConvergence = "\n\n\n\t\tINDO-SCF met convergence criterion(^^b\n\n\n";
    this->messageStartSCF = "**********  START: INDO-SCF  **********\n";
    this->messageDoneSCF = "**********  DONE: INDO-SCF  **********\n\n\n";

@@ -83,6 +83,9 @@ int main(){
          try{
             cndo2->SetMolecule(molecule);
             cndo2->DoesSCF();
+            if(Parameters::GetInstance()->RequiresCIS()){
+               cndo2->DoesCIS();
+            }
          }
          catch(MolDSException ex){
             cout << ex.what() << endl;
@@ -97,6 +100,9 @@ int main(){
          try{
             indo->SetMolecule(molecule);
             indo->DoesSCF();
+            if(Parameters::GetInstance()->RequiresCIS()){
+               indo->DoesCIS();
+            }
          }
          catch(MolDSException ex){
             cout << ex.what() << endl;
