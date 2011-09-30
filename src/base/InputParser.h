@@ -1,17 +1,6 @@
 #ifndef INCLUDED_INPUT_PARSER
 #define INCLUDED_INPUT_PARSER
 
-#include<stdio.h>
-#include<stdlib.h>
-#include<iostream>
-#include<string>
-#include"Molecule.h"
-#include"Parameters.h"
-#include"atoms/Atom.h"
-#include"atoms/Hatom.h"
-#include"atoms/Liatom.h"
-#include"atoms/Catom.h"
-
 using namespace std;
 using namespace MolDS_base_atoms;
 

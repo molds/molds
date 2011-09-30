@@ -1,11 +1,6 @@
 #ifndef INCLUDED_MALLOCERFREER
 #define INCLUDED_MALLOCERFREER
 
-#include<stdio.h>
-#include<iostream>
-#include<math.h>
-#include <stdlib.h>
-
 using namespace std;
 
 namespace MolDS_base{

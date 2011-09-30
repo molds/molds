@@ -1,6 +1,5 @@
 #ifndef INCLUDED_CATOM
 #define INCLUDED_CATOM
-#include"Atom.h"
 
 using namespace std;
 using namespace MolDS_base;

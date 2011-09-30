@@ -1,11 +1,6 @@
 #ifndef INCLUDED_GTOEXPANSIONSTO
 #define INCLUDED_GTOEXPANSIONSTO
 
-#include<stdio.h>
-#include<stdlib.h>
-#include<iostream>
-#include<string>
-
 using namespace std;
 namespace MolDS_base{
 

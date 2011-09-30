@@ -1,6 +1,5 @@
 #ifndef INCLUDED_REAL_SHPERICAL_HARMONICS_INDEX
 #define INCLUDED_REAL_SHPERICAL_HARMONICS_INDEX
-#include<string>
 
 using namespace std;
 namespace MolDS_base{

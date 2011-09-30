@@ -1,13 +1,6 @@
 #ifndef INCLUDED_MOLECULE
 #define INCLUDED_MOLECULE
 
-#include<stdio.h>
-#include<stdlib.h>
-#include<iostream>
-#include<vector>
-#include"atoms/Atom.h"
-#include"../mkl_wrapper/LapackWrapper.h"
-
 using namespace std;
 using namespace MolDS_base_atoms;
 

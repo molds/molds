@@ -1,11 +1,6 @@
 #ifndef INCLUDED_PARAMETERS
 #define INCLUDED_PARAMETERS
 
-#include<stdio.h>
-#include<stdlib.h>
-#include<iostream>
-#include<string>
-
 using namespace std;
 namespace MolDS_base{
 

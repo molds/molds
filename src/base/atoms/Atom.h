@@ -4,8 +4,6 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<iostream>
-#include"../MallocerFreer.h"
-#include"../Parameters.h"
 
 using namespace std;
 using namespace MolDS_base;

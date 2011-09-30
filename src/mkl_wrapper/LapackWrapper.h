@@ -1,11 +1,5 @@
 #ifndef INCLUDED_LAPACKWRAPPER
 #define INCLUDED_LAPACKWRAPPER
-#include<stdio.h>
-#include<iostream>
-#include<math.h>
-#include<string>
-#include<stdlib.h>
-#include"mkl.h"
 
 using namespace std;
 using namespace MolDS_base;

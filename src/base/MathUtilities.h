@@ -1,9 +1,6 @@
 #ifndef INCLUDED_MATHUTILITIES
 #define INCLUDED_MATHUTILITIES
 
-#include <stdio.h> 
-#include <stdlib.h> 
-
 using namespace std;
 
 namespace MolDS_base{

@@ -1,7 +1,5 @@
 #ifndef INCLUDED_HATOM
 #define INCLUDED_HATOM
-#include"Atom.h"
-#include<string>
 
 using namespace std;
 using namespace MolDS_base;

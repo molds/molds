@@ -1,7 +1,5 @@
 #ifndef INCLUDED_LIATOM
 #define INCLUDED_LIATOM
-#include<string>
-#include"Atom.h"
 
 using namespace std;
 using namespace MolDS_base;

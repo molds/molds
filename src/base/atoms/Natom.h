@@ -1,6 +1,5 @@
 #ifndef INCLUDED_NATOM
 #define INCLUDED_NATOM
-#include"Atom.h"
 
 using namespace std;
 using namespace MolDS_base;
