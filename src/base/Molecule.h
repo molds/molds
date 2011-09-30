@@ -162,28 +162,26 @@ double* Molecule::GetXyzCOM(){
 }
 
 void Molecule::CalcXyzCOM(){
-   if(!this->wasCalculatedXyzCOM){
-      double totalAtomicMass;
-      Atom* atom;
-      double* atomicXyz;
-      double atomicMass;
+   double totalAtomicMass;
+   Atom* atom;
+   double* atomicXyz;
+   double atomicMass;
 
-      for(int j=0; j<3; j++){
-         this->xyzCOM[j] = 0.0;
-      }
+   for(int j=0; j<3; j++){
+      this->xyzCOM[j] = 0.0;
+   }
       
-      for(int i=0; i<this->atomVect->size(); i++){
-         atom = (*this->atomVect)[i]; 
-         atomicXyz = atom->GetXyz();
-         atomicMass = atom->GetAtomicMass();
-         totalAtomicMass += atomicMass;
-         for(int j=0; j<3; j++){
-            this->xyzCOM[j] += atomicXyz[j] * atomicMass;
-         }
+   for(int i=0; i<this->atomVect->size(); i++){
+      atom = (*this->atomVect)[i]; 
+      atomicXyz = atom->GetXyz();
+      atomicMass = atom->GetAtomicMass();
+      totalAtomicMass += atomicMass;
+      for(int j=0; j<3; j++){
+         this->xyzCOM[j] += atomicXyz[j] * atomicMass;
       }
-      for(int i=0; i<3; i++){
-         this->xyzCOM[i]/=totalAtomicMass;
-      }
+   }
+   for(int i=0; i<3; i++){
+      this->xyzCOM[i]/=totalAtomicMass;
    }
    this->wasCalculatedXyzCOM = true;
 }
