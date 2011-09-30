@@ -189,6 +189,13 @@ GEOMETRY_END
 //   Li  1.994960      0.485175      0.000000
 //GEOMETRY_END
 
+// LiH 3
+//GEOMETRY
+//   H   -1.14750   0.0      0.0
+//   Li  0.382500   0.0      0.0
+//GEOMETRY_END
+
+
 // Li2
 //GEOMETRY
 //   Li  0.0   0.0   1.230000

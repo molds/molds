@@ -19,7 +19,9 @@ public:
    ~Molecule();
    vector<Atom*>* GetAtomVect(); 
    double* GetXyzCOM();
+   double* GetXyzCOC();
    void CalcXyzCOM();
+   void CalcXyzCOC();
    int GetTotalNumberAOs();
    void CalcTotalNumberAOs();
    int GetTotalNumberValenceElectrons();
@@ -28,6 +30,7 @@ public:
    void CalcTotalCoreRepulsionEnergy();
    double GetTotalCoreRepulsionEnergy();
    void OutputXyzCOM();
+   void OutputXyzCOC();
    void OutputTotalNumberAtomsAOsValenceelectrons();
    void OutputConfiguration();
    void OutputTotalCoreRepulsionEnergy();
@@ -38,8 +41,10 @@ public:
    double GetDistanceAtoms(Atom* atomA, Atom* atomB);
 private:
    vector<Atom*>* atomVect;
-   double* xyzCOM;
+   double* xyzCOM; // x, y, z coordinates of Center of Mass;
+   double* xyzCOC; // x, y, z coordinates of Center of Core;
    bool wasCalculatedXyzCOM;
+   bool wasCalculatedXyzCOC;
    int totalNumberAOs;
    int totalNumberValenceElectrons;
    double totalCoreRepulsionEnergy;
@@ -62,6 +67,7 @@ private:
    string messageCoreRepulsion;
    string messageCoreRepulsionTitle;
    string messageCOM;
+   string messageCOC;
    string messageCOMTitleAU;
    string messageCOMTitleAng;
    string messageStartPrincipalAxes;
@@ -94,7 +100,9 @@ private:
 Molecule::Molecule(){
    this->atomVect = new vector<Atom*>;
    this->xyzCOM = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(3);
+   this->xyzCOC = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(3);
    this->wasCalculatedXyzCOM = false;
+   this->wasCalculatedXyzCOC = false;
    this->wasCalculatedTotalCoreRepulsionEnergy = false;
    this->messageTotalNumberAOs = "\tTotal number of valence AOs: ";
    this->messageTotalNumberAtoms = "\tTotal number of atoms: ";
@@ -105,6 +113,7 @@ Molecule::Molecule(){
    this->messageCoreRepulsion = "\tTotal core repulsion energy:\n";
    this->messageCoreRepulsionTitle = "\t\t| [a.u.] | [eV] |\n";
    this->messageCOM = "\tCenter of Mass:\n";
+   this->messageCOC = "\tCenter of Core:\n";
    this->messageCOMTitleAU = "\t\t| x [a.u.] | y[a.u.] | z[a.u.] |\n";
    this->messageCOMTitleAng = "\t\t| x [angst.] | y[angst.] | z[angst.] |\n";
    this->messageStartPrincipalAxes = "**********  START: Principal Axes of Inertia  **********\n";
@@ -148,6 +157,10 @@ Molecule::~Molecule(){
       MallocerFreer::GetInstance()->FreeDoubleMatrix1d(&this->xyzCOM);
       //cout << "xyzCOM deleted\n";
    }
+   if(this->xyzCOC != NULL){
+      MallocerFreer::GetInstance()->FreeDoubleMatrix1d(&this->xyzCOC);
+      //cout << "xyzCOC deleted\n";
+   }
 }
 
 vector<Atom*>* Molecule::GetAtomVect(){
@@ -161,11 +174,18 @@ double* Molecule::GetXyzCOM(){
    return this->xyzCOM;
 }
 
+double* Molecule::GetXyzCOC(){
+   if(!this->wasCalculatedXyzCOC){
+      this->CalcXyzCOC();
+   }
+   return this->xyzCOC;
+}
+
 void Molecule::CalcXyzCOM(){
-   double totalAtomicMass;
+   double totalAtomicMass = 0.0;
    Atom* atom;
    double* atomicXyz;
-   double atomicMass;
+   double atomicMass = 0.0;
 
    for(int j=0; j<3; j++){
       this->xyzCOM[j] = 0.0;
@@ -184,6 +204,31 @@ void Molecule::CalcXyzCOM(){
       this->xyzCOM[i]/=totalAtomicMass;
    }
    this->wasCalculatedXyzCOM = true;
+}
+
+void Molecule::CalcXyzCOC(){
+   double totalCoreMass = 0.0;
+   Atom* atom;
+   double* atomicXyz;
+   double coreMass = 0.0;
+
+   for(int j=0; j<3; j++){
+      this->xyzCOC[j] = 0.0;
+   }
+      
+   for(int i=0; i<this->atomVect->size(); i++){
+      atom = (*this->atomVect)[i]; 
+      atomicXyz = atom->GetXyz();
+      coreMass = atom->GetAtomicMass() - (double)atom->GetNumberValenceElectrons();
+      totalCoreMass += coreMass;
+      for(int j=0; j<3; j++){
+         this->xyzCOC[j] += atomicXyz[j] * coreMass;
+      }
+   }
+   for(int i=0; i<3; i++){
+      this->xyzCOC[i]/=totalCoreMass;
+   }
+   this->wasCalculatedXyzCOC = true;
 }
 
 int Molecule::GetTotalNumberAOs(){
@@ -292,6 +337,23 @@ void Molecule::OutputXyzCOM(){
    printf("\t\t%e\t%e\t%e\n",this->xyzCOM[0],
                              this->xyzCOM[1],
                              this->xyzCOM[2]);
+   cout << "\n";
+
+}
+
+void Molecule::OutputXyzCOC(){
+   double ang2AU = Parameters::GetInstance()->GetAngstrom2AU();
+   cout << this->messageCOC;
+   cout << this->messageCOMTitleAng;
+   printf("\t\t%e\t%e\t%e\n",this->xyzCOC[0]/ang2AU,
+                             this->xyzCOC[1]/ang2AU,
+                             this->xyzCOC[2]/ang2AU);
+   cout << "\n";
+
+   cout << this->messageCOMTitleAU;
+   printf("\t\t%e\t%e\t%e\n",this->xyzCOC[0],
+                             this->xyzCOC[1],
+                             this->xyzCOC[2]);
    cout << "\n";
 
 }
@@ -603,9 +665,12 @@ void Molecule::Translate(){
    
    this->wasCalculatedXyzCOM = false;
    this->CalcXyzCOM();
+   this->wasCalculatedXyzCOC = false;
+   this->CalcXyzCOC();
 
    this->OutputConfiguration();
    this->OutputXyzCOM();
+   this->OutputXyzCOC();
 
    cout << this->messageDoneTranslate;
 }
