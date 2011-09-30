@@ -14,6 +14,7 @@ class Cndo2{
 public:
    Cndo2();
    ~Cndo2();
+   TheoryType GetTheoryType();
    void SetMolecule(Molecule* molecule);
    void DoesSCF();
    void DoesSCF(bool requiresGuess);
@@ -261,6 +262,10 @@ void Cndo2::SetEnableAtomTypes(){
    this->enableAtomTypes.push_back(P);
    this->enableAtomTypes.push_back(S);
    this->enableAtomTypes.push_back(Cl);
+}
+
+TheoryType Cndo2::GetTheoryType(){
+   return this->theory;
 }
 
 void Cndo2::SetMolecule(Molecule* molecule){

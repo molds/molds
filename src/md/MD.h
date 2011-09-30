@@ -10,32 +10,42 @@ namespace MolDS_md{
 /***
  *  Refferences for Indo are [PB_1970] and [PS_1966].
  */
-class MD : public MolDS_cndo::Cndo2{
+class MD{
 public:
    MD();
-   MD(MolDS_zindo::ZindoS* zindoS);
    ~MD();
+   void SetTheory(MolDS_cndo::Cndo2* cndo);
 private:
-   MolDS_zindo::ZindoS* zindoS;
+   MolDS_cndo::Cndo2* cndo;
    vector<TheoryType> enableTheoryTypes;
+   string errorMessageNotEnebleTheoryType;
+   string errorMessageTheoryType;
+   void CheckEnableTheoryType(TheoryType theoryType);
    void SetMessages();
    void SetEnableTheoryTypes();
 };
 
 MD::MD(){
-   cout << "MD created 1\n";
-}
-
-MD::MD(MolDS_zindo::ZindoS* zindoS){
-   this->zindoS = zindoS;
-   cout << "MD created 2\n";
+   this->cndo = NULL;
+   this->SetEnableTheoryTypes();
+   this->SetMessages();
+   //cout << "MD created \n";
 }
 
 MD::~MD(){
-   //cout << "MD\n";
+   //cout << "MD deleted\n";
 }
 
 void MD::SetMessages(){
+   this->errorMessageTheoryType = "\ttheory type = ";
+   this->errorMessageNotEnebleTheoryType  
+      = "Error in md::MD::CheckEnableTheoryType: Non available theory is set.\n";
+}
+
+void MD::SetTheory(MolDS_cndo::Cndo2* cndo){
+   // check enable electonic theory
+   this->CheckEnableTheoryType(cndo->GetTheoryType());
+   this->cndo = cndo;
 }
 
 void MD::SetEnableTheoryTypes(){
@@ -43,6 +53,21 @@ void MD::SetEnableTheoryTypes(){
    this->enableTheoryTypes.push_back(ZINDOS);
 }
 
+void MD::CheckEnableTheoryType(TheoryType theoryType){
+   bool isEnable = false;
+   for(int i=0; i<this->enableTheoryTypes.size();i++){
+      if(theoryType == this->enableTheoryTypes[i]){
+         isEnable = true;
+         break;
+      }
+   }
+   if(!isEnable){
+      stringstream ss;
+      ss << this->errorMessageNotEnebleTheoryType;
+      ss << this->errorMessageTheoryType << TheoryTypeStr(theoryType) << endl;
+      throw MolDSException(ss.str());
+   }
+}
 
 }
 #endif

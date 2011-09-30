@@ -116,6 +116,8 @@ int main(){
             }
             if(Parameters::GetInstance()->RequiresMD()){
                MolDS_md::MD* md = new MolDS_md::MD();
+               md->SetTheory(zindoS);
+               delete md;
             }
          }
          catch(MolDSException ex){
