@@ -82,14 +82,16 @@ int main(){
          MolDS_cndo::Cndo2* cndo2 = new MolDS_cndo::Cndo2();
          try{
             cndo2->SetMolecule(molecule);
-            cndo2->DoesSCF();
-            if(Parameters::GetInstance()->RequiresCIS()){
-               cndo2->DoesCIS();
-            }
             if(Parameters::GetInstance()->RequiresMD()){
                MolDS_md::MD* md = new MolDS_md::MD();
                md->SetTheory(cndo2);
                delete md;
+            }
+            else{
+               cndo2->DoesSCF();
+               if(Parameters::GetInstance()->RequiresCIS()){
+                  cndo2->DoesCIS();
+               }
             }
          }
          catch(MolDSException ex){
@@ -104,14 +106,16 @@ int main(){
          MolDS_indo::Indo* indo = new MolDS_indo::Indo();
          try{
             indo->SetMolecule(molecule);
-            indo->DoesSCF();
-            if(Parameters::GetInstance()->RequiresCIS()){
-               indo->DoesCIS();
-            }
             if(Parameters::GetInstance()->RequiresMD()){
                MolDS_md::MD* md = new MolDS_md::MD();
                md->SetTheory(indo);
                delete md;
+            }
+            else{
+               indo->DoesSCF();
+               if(Parameters::GetInstance()->RequiresCIS()){
+                  indo->DoesCIS();
+               }
             }
          }
          catch(MolDSException ex){
@@ -126,14 +130,16 @@ int main(){
          MolDS_zindo::ZindoS* zindoS = new MolDS_zindo::ZindoS();
          try{
             zindoS->SetMolecule(molecule);
-            zindoS->DoesSCF();
-            if(Parameters::GetInstance()->RequiresCIS()){
-               zindoS->DoesCIS();
-            }
             if(Parameters::GetInstance()->RequiresMD()){
                MolDS_md::MD* md = new MolDS_md::MD();
                md->SetTheory(zindoS);
                delete md;
+            }
+            else{
+               zindoS->DoesSCF();
+               if(Parameters::GetInstance()->RequiresCIS()){
+                  zindoS->DoesCIS();
+               }
             }
          }
          catch(MolDSException ex){
