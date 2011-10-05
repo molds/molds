@@ -75,11 +75,11 @@ private:
    string messageEnergiesMOsTitle;
    string messageMullikenAtoms;
    string messageMullikenAtomsTitle;
-   string messageTotalEnergy;
-   string messageTotalEnergyTitle;
+   string messageElecEnergy;
+   string messageElecEnergyTitle;
    string messageOcc;
    string messageUnOcc;
-   double totalEnergy;
+   double elecEnergy;
    double** gammaAB;
    double** overlap;
 
@@ -157,9 +157,9 @@ private:
    void CheckNumberValenceElectrons(Molecule* molecule);
    void FreeDiatomicOverlapAndRotatingMatrix(double*** diatomicOverlap, 
                                              double*** rotatingMatrix);
-   double GetTotalEnergy(Molecule* molecule, double* energiesMO, 
+   double GetElecEnergy(Molecule* molecule, double* energiesMO, 
                          double** fockMatrix, double** gammaAB);
-   void FreeTotalEnergyMatrices(double*** fMatrix, 
+   void FreeElecEnergyMatrices(double*** fMatrix, 
                                 double*** hMatrix, 
                                 double*** dammyOrbitalElectronPopulation, 
                                 double**  dammyAtomicElectronPopulation );
@@ -182,7 +182,7 @@ Cndo2::Cndo2(){
    this->fockMatrix = NULL;
    this->energiesMO = NULL;
    this->molecule = NULL;
-   this->totalEnergy = 0.0;
+   this->elecEnergy = 0.0;
    //cout << "Cndo created\n";
 }
 
@@ -253,8 +253,8 @@ void Cndo2::SetMessages(){
    this->messageUnOcc = "unocc";
    this->messageMullikenAtoms = "\tMulliken charge on each Atom:\n";
    this->messageMullikenAtomsTitle = "\t\t| i-th | atom type | core charge | Mulliken charge | \n";
-   this->messageTotalEnergy = "\tTotal energy:\n";
-   this->messageTotalEnergyTitle = "\t\t| [a.u.] | [eV] | \n";
+   this->messageElecEnergy = "\tElectronic energy(including core-repulsions):\n";
+   this->messageElecEnergyTitle = "\t\t| [a.u.] | [eV] | \n";
    this->messageUnitSec = "[s].";
 
 }
@@ -508,7 +508,7 @@ void Cndo2::DoesCIS(){
 }
 
 double Cndo2::GetElectronicEnergy(){
-   return this->totalEnergy;
+   return this->elecEnergy;
 }
 
 double** Cndo2::GetForce(int electronicStateIndex){
@@ -678,11 +678,11 @@ void Cndo2::OutputResults(double** fockMatrix, double* energiesMO, double* atomi
    cout << endl << endl;
 
    // output total energy
-   cout << this->messageTotalEnergy;
-   cout << this->messageTotalEnergyTitle;
-   this->totalEnergy = this->GetTotalEnergy(molecule, energiesMO, fockMatrix, this->gammaAB);
-   printf("\t\t%e\t%e\n\n",this->totalEnergy, 
-                           this->totalEnergy / Parameters::GetInstance()->GetEV2AU());
+   cout << this->messageElecEnergy;
+   cout << this->messageElecEnergyTitle;
+   this->elecEnergy = this->GetElecEnergy(molecule, energiesMO, fockMatrix, this->gammaAB);
+   printf("\t\t%e\t%e\n\n",this->elecEnergy, 
+                           this->elecEnergy / Parameters::GetInstance()->GetEV2AU());
 
    // ToDo: output eigen-vectors of the Hartree Fock matrix
   
@@ -698,7 +698,7 @@ void Cndo2::OutputResults(double** fockMatrix, double* energiesMO, double* atomi
 
 }
 
-double Cndo2::GetTotalEnergy(Molecule* molecule, double* energiesMO, double** fockMatrix, double** gammaAB){
+double Cndo2::GetElecEnergy(Molecule* molecule, double* energiesMO, double** fockMatrix, double** gammaAB){
    double electronicEnergy = 0.0;
 
    // use density matrix for electronic energy
@@ -745,13 +745,13 @@ double Cndo2::GetTotalEnergy(Molecule* molecule, double* energiesMO, double** fo
       electronicEnergy *= 0.5;
    }
    catch(MolDSException ex){
-      this->FreeTotalEnergyMatrices(&fMatrix, 
+      this->FreeElecEnergyMatrices(&fMatrix, 
                                     &hMatrix, 
                                     &dammyOrbitalElectronPopulation, 
                                     &dammyAtomicElectronPopulation );
       throw ex;
    }
-   this->FreeTotalEnergyMatrices(&fMatrix, 
+   this->FreeElecEnergyMatrices(&fMatrix, 
                                  &hMatrix, 
                                  &dammyOrbitalElectronPopulation, 
                                  &dammyAtomicElectronPopulation );
@@ -779,7 +779,7 @@ double Cndo2::GetTotalEnergy(Molecule* molecule, double* energiesMO, double** fo
    //return /*electronicEnergy +*/ molecule->GetTotalCoreRepulsionEnergy();
 }
 
-void Cndo2::FreeTotalEnergyMatrices(double*** fMatrix, 
+void Cndo2::FreeElecEnergyMatrices(double*** fMatrix, 
                                     double*** hMatrix, 
                                     double*** dammyOrbitalElectronPopulation, 
                                     double**  dammyAtomicElectronPopulation ){
