@@ -157,7 +157,7 @@ private:
    void CheckNumberValenceElectrons(Molecule* molecule);
    void FreeDiatomicOverlapAndRotatingMatrix(double*** diatomicOverlap, 
                                              double*** rotatingMatrix);
-   double GetElecEnergy(Molecule* molecule, double* energiesMO, 
+   void CalcElecEnergy(double* elecEnergy, Molecule* molecule, double* energiesMO, 
                          double** fockMatrix, double** gammaAB);
    void FreeElecEnergyMatrices(double*** fMatrix, 
                                 double*** hMatrix, 
@@ -680,7 +680,7 @@ void Cndo2::OutputResults(double** fockMatrix, double* energiesMO, double* atomi
    // output total energy
    cout << this->messageElecEnergy;
    cout << this->messageElecEnergyTitle;
-   this->elecEnergy = this->GetElecEnergy(molecule, energiesMO, fockMatrix, this->gammaAB);
+   this->CalcElecEnergy(&this->elecEnergy, molecule, energiesMO, fockMatrix, this->gammaAB);
    printf("\t\t%e\t%e\n\n",this->elecEnergy, 
                            this->elecEnergy / Parameters::GetInstance()->GetEV2AU());
 
@@ -698,7 +698,7 @@ void Cndo2::OutputResults(double** fockMatrix, double* energiesMO, double* atomi
 
 }
 
-double Cndo2::GetElecEnergy(Molecule* molecule, double* energiesMO, double** fockMatrix, double** gammaAB){
+void Cndo2::CalcElecEnergy(double* elecEnergy, Molecule* molecule, double* energiesMO, double** fockMatrix, double** gammaAB){
    double electronicEnergy = 0.0;
 
    // use density matrix for electronic energy
@@ -774,9 +774,7 @@ double Cndo2::GetElecEnergy(Molecule* molecule, double* energiesMO, double** foc
    }
    */
 
-   return electronicEnergy + molecule->GetTotalCoreRepulsionEnergy();
-   //return electronicEnergy /*+ molecule->GetTotalCoreRepulsionEnergy()*/;
-   //return /*electronicEnergy +*/ molecule->GetTotalCoreRepulsionEnergy();
+   *elecEnergy = electronicEnergy + molecule->GetTotalCoreRepulsionEnergy();
 }
 
 void Cndo2::FreeElecEnergyMatrices(double*** fMatrix, 
