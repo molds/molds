@@ -106,7 +106,6 @@ void MD::DoesMD(){
 
       // calc electronic structure and force
       this->cndo->DoesSCF(requireGuess);
-      //this->cndo->DoesSCF();
       if(elecState > 0){
          this->cndo->DoesCIS();
       }
