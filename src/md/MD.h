@@ -17,6 +17,11 @@ public:
    void SetTheory(MolDS_cndo::Cndo2* cndo);
    void DoesMD();
 private:
+   string messageStartMD;
+   string messageEndMD;
+   string messageStartStepMD;
+   string messageEndStepMD;
+   string messageZindoSMD;
    MolDS_cndo::Cndo2* cndo;
    vector<TheoryType> enableTheoryTypes;
    string errorMessageNotEnebleTheoryType;
@@ -44,6 +49,8 @@ void MD::SetTheory(MolDS_cndo::Cndo2* cndo){
 }
 
 void MD::DoesMD(){
+   cout << this->messageStartMD;
+
    int totalSteps = Parameters::GetInstance()->GetTotalStepsMD();
    int elecState = Parameters::GetInstance()->GetElectronicStateIndexMD();
    double dt = Parameters::GetInstance()->GetTimeWidthMD();
@@ -63,13 +70,12 @@ void MD::DoesMD(){
          kineticEnergy += 0.5*pow(atom->GetPxyz()[i],2.0)/coreMass;
       }
    }
-   cout << "dt = " << dt << endl;
    cout << "initial kinetic Energy = " << kineticEnergy << endl; 
    cout << "initial electronic energy = " << cndo->GetElectronicEnergy() << endl;
    cout << "initial total energy = " << kineticEnergy + cndo->GetElectronicEnergy() << endl;
    double iniEne =kineticEnergy + cndo->GetElectronicEnergy(); 
    for(int s=0; s<totalSteps; s++){
-      cout << "Starting MD step: " << s << endl;
+      cout << this->messageStartStepMD << s << endl;
 
       // update momenta
       for(int a=0; a<molecule->GetAtomVect()->size(); a++){
@@ -87,12 +93,20 @@ void MD::DoesMD(){
             atom->GetXyz()[i] += dt*atom->GetPxyz()[i]/coreMass;
          }
       }
+
+      // update molecular basics
       molecule->CalcXyzCOM();
       molecule->CalcXyzCOC();
       molecule->CalcTotalCoreRepulsionEnergy();
 
+      molecule->OutputConfiguration();
+      molecule->OutputXyzCOM();
+      molecule->OutputXyzCOC();
+      molecule->OutputTotalCoreRepulsionEnergy();
+
       // calc electronic structure and force
       this->cndo->DoesSCF(requireGuess);
+      //this->cndo->DoesSCF();
       if(elecState > 0){
          this->cndo->DoesCIS();
       }
@@ -123,17 +137,23 @@ void MD::DoesMD(){
       cout << "gosa energy [au] = " << kineticEnergy + cndo->GetElectronicEnergy() - iniEne << endl;
       //printf("total energy = %.10lf\n",kineticEnergy + cndo->GetElectronicEnergy());
       time = dt*((double)s+1)/Parameters::GetInstance()->GetFs2AU();
-      cout << "Time: " << time << endl << endl << endl;
+      cout << "Time: " << time << "[fs.]" << endl << endl << endl;
+      cout << this->messageEndStepMD << s << endl;
    }
 
 
-
+   cout << this->messageEndMD;
 }
 
 void MD::SetMessages(){
    this->errorMessageTheoryType = "\ttheory type = ";
    this->errorMessageNotEnebleTheoryType  
       = "Error in md::MD::CheckEnableTheoryType: Non available theory is set.\n";
+   this->messageStartMD = "**********  START: Molecular dynamics  **********\n";
+   this->messageEndMD = "**********  DONE: Molecular dynamics  **********\n";
+   this->messageStartStepMD = "\n\t========== START: MD step ";
+   this->messageEndStepMD =     "\t========== DONE: MD step ";
+   this->messageZindoSMD = "\n\n\n!!!!!!!!!!!!!!!!!!!!!!!!! A L A R T !!!!!!!!!!!!!!!!!!!!!!!!!\n\tNote that this MD algorythm can not work correctly with ZINDO/S. In this MD algorythm, the overlap matrix between AO can not calculated correctry. The reason is the using of the GTO expansion techniques for the first derivative of the overlap integrals. If you are one of the developpers, see ZndoS::CalcDiatomicOverlapInDiatomicFrame and comments in there. \n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n\n";
 }
 
 void MD::SetEnableTheoryTypes(){
@@ -142,6 +162,11 @@ void MD::SetEnableTheoryTypes(){
 }
 
 void MD::CheckEnableTheoryType(TheoryType theoryType){
+
+   if(theoryType == ZINDOS){
+      cout << this->messageZindoSMD;
+   }
+
    bool isEnable = false;
    for(int i=0; i<this->enableTheoryTypes.size();i++){
       if(theoryType == this->enableTheoryTypes[i]){
