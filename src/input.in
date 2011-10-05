@@ -14,8 +14,8 @@ SCF
    rms_density 0.000001
    damping_thresh 1.0 
    damping_weight 0.0
-   diis_num_error_vect 5
-   diis_start_error 0.002
+   diis_num_error_vect 5 
+   diis_start_error 0.02
    diis_end_error 0.00000002
 SCF_END
 
@@ -30,9 +30,9 @@ SCF_END
 //CIS_END
 
 MD
-//   total_steps 20
+   total_steps 100000
    electronic_state 2
-//   dt 0.2
+   dt 0.05
 MD_END
 
 //INERTIA
@@ -69,10 +69,10 @@ MD_END
 //GEOMETRY_END
 
 // S2
-//GEOMETRY
-//   S  0.424528    0.741240    0.000000
-//   S  -1.353072    0.741240    0.000000
-//GEOMETRY_END
+GEOMETRY
+   S  0.424528    0.741240    0.000000
+   S  -1.353072    0.741240    0.000000
+GEOMETRY_END
 
 // s
 //GEOMETRY
@@ -152,12 +152,12 @@ MD_END
 //GEOMETRY_END
 
 // acetylene3
-GEOMETRY
- C                     0.24933   0.01  -0.01 
- C                     1.45053   0.0    0.20 
- H                    -0.82067   0.02  -0.050 
- H                     2.52053  -0.10   0.0 
-GEOMETRY_END
+//GEOMETRY
+// C                     0.24933   0.01  -0.01 
+// C                     1.45053   0.0    0.20 
+// H                    -0.82067   0.02  -0.050 
+// H                     2.52053  -0.10   0.0 
+//GEOMETRY_END
 
 // C2Li2
 //GEOMETRY
