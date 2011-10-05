@@ -370,13 +370,6 @@ void Cndo2::DoesSCF(bool requiresGuess){
    double** oldOrbitalElectronPopulation = MallocerFreer::GetInstance()->MallocDoubleMatrix2d
             (this->molecule->GetTotalNumberAOs(), this->molecule->GetTotalNumberAOs());
 
-   // Following copy is necessary for repeating SCF-procedure for such as MD and MC!
-   for(int i=0; i<this->molecule->GetTotalNumberAOs(); i++){
-      for(int j=0; j<this->molecule->GetTotalNumberAOs(); j++){
-         oldOrbitalElectronPopulation[i][j] = this->orbitalElectronPopulation[i][j];
-      }
-   }
-
    // malloc temporary matrices for diis
    double*** diisStoredDensityMatrix = NULL;
    double*** diisStoredErrorVect = NULL;
@@ -401,6 +394,15 @@ void Cndo2::DoesSCF(bool requiresGuess){
       int maxIterationsSCF = Parameters::GetInstance()->GetMaxIterationsSCF();
       bool isGuess=true;
       for(int i=0; i<maxIterationsSCF; i++){
+
+         // calc. electron population in each atom.
+         this->CalcAtomicElectronPopulation(this->atomicElectronPopulation, 
+                                            this->orbitalElectronPopulation, 
+                                            this->molecule);
+
+         this->UpdateOldOrbitalElectronPopulation(oldOrbitalElectronPopulation, 
+                                                  this->orbitalElectronPopulation, 
+                                                  this->molecule->GetTotalNumberAOs());
 
          (i==0 && requiresGuess) ? isGuess = true : isGuess = false;
          this->CalcFockMatrix(this->fockMatrix, 
@@ -454,15 +456,6 @@ void Cndo2::DoesSCF(bool requiresGuess){
                               this->molecule,
                               i);
             }
-            // calc. electron population in each atom.
-            this->CalcAtomicElectronPopulation(this->atomicElectronPopulation, 
-                                               this->orbitalElectronPopulation, 
-                                               this->molecule);
-
-            this->UpdateOldOrbitalElectronPopulation(oldOrbitalElectronPopulation, 
-                                                     this->orbitalElectronPopulation, 
-                                                     this->molecule->GetTotalNumberAOs());
-
          }
 
          // SCF fails

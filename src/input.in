@@ -1,7 +1,7 @@
 // example of the input file
 THEORY
-   cndo/2
-   //indo
+   //cndo/2
+   indo
    //zindo/s
    //none 
    //principal_axes
@@ -13,8 +13,8 @@ SCF
    max_iter 50
    rms_density 0.000001
    damping_thresh 1.0 
-   damping_weight 0.0
-   diis_num_error_vect 5 
+   damping_weight 0.5
+   diis_num_error_vect 5
    diis_start_error 0.02
    diis_end_error 0.00000002
 SCF_END
@@ -30,7 +30,7 @@ SCF_END
 //CIS_END
 
 //MD
-//   total_steps 100000
+//   total_steps 10000
 //   electronic_state 2
 //   dt 0.05
 //MD_END
@@ -72,6 +72,12 @@ SCF_END
 //GEOMETRY
 //   S  0.424528    0.741240    0.000000
 //   S  -1.353072    0.741240    0.000000
+//GEOMETRY_END
+
+// S2-2
+//GEOMETRY
+//   S  2.0    0.741240    0.000000
+//   S  -3.0    0.741240    0.000000
 //GEOMETRY_END
 
 // s
