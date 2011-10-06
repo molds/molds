@@ -25,7 +25,9 @@ Capabilities:
    MNDO     | Sch | Sch | Sch    | Sch    |
 
       "OK", "Sch", and "--" mean available, shceduled, and non-scheduled methods, respectively.
-      MD(gs) and MD(es) mean Molecular Dynamics on ground and excited states, respectively.
+      MD(gs) and MD(es) mean Molecular Dynamics on ground and excited states, respectively. 
+      However, MD with ZINDO/S can not treat correct SCF calculation. 
+      Of course, standalone ZINDO/S can treat correct SCF calculations.
 
 How to Write Input-files:
 
@@ -113,6 +115,29 @@ How to Write Input-files:
             max_dim 100
             norm_tol 0.000001
          CIS_END
+
+
+   MD (Molecular dynamics):
+      Write MD-directive.
+
+      E.g.
+         MD 
+            (options)
+         MD_END
+  
+      -options
+       "total_steps", "electronic_state", 
+       and "dt" are prepared as options.
+
+       "electronic_state" means the electronic eigen state 
+       on which the system runs.
+       Default value of "electronic_state" is 0. That is, 
+       electronic ground state.
+
+       Default value of "total_steps" is 10. 
+
+       "dt" should be set in femto-second.
+       Default value of "dt" is 0.1[fs].
 
 
    Principal Axes (Diagonalizing the inertia tensor):
