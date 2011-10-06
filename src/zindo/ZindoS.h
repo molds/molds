@@ -1457,7 +1457,7 @@ void ZindoS::CalcForce(int electronicStateIndex){
                int numberAOsB = atomB->GetValence().size();
 
                // Calculation of core repusion force
-               coreRepulsion += this->molecule->GetCoreRepulsionFirstDerivative
+               coreRepulsion += this->GetDiatomCoreRepulsionFirstDerivative
                                                 (a, b, (CartesianType)i);
 
                // Calculate force arise from electronic part.

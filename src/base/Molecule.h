@@ -19,7 +19,6 @@ public:
    void CalcTotalNumberAOs();
    int GetTotalNumberValenceElectrons();
    void CalcTotalNumberValenceElectrons();
-   double GetCoreRepulsionFirstDerivative(int indexAtomA, int indexAtomB, CartesianType axisA);
    void OutputXyzCOM();
    void OutputXyzCOC();
    void OutputTotalNumberAtomsAOsValenceelectrons();
@@ -235,19 +234,6 @@ void Molecule::CalcTotalNumberAOs(){
 
 int Molecule::GetTotalNumberValenceElectrons(){
    return this->totalNumberValenceElectrons;
-}
-
-// First derivative of the core repulsion related to the coordinate of atom A.
-double Molecule::GetCoreRepulsionFirstDerivative(int indexAtomA, int indexAtomB, 
-                                                 CartesianType axisA){
-   double value=0.0;
-   Atom* atomA = (*this->atomVect)[indexAtomA];
-   Atom* atomB = (*this->atomVect)[indexAtomB];
-   double distance = this->GetDistanceAtoms(indexAtomA, indexAtomB);
-   value = atomA->GetCoreCharge()*atomB->GetCoreCharge();
-   value *= (atomA->GetXyz()[axisA] - atomB->GetXyz()[axisA])/distance;
-   value *= -1.0/pow(distance,2.0);
-   return value;
 }
 
 void Molecule::CalcTotalNumberValenceElectrons(){

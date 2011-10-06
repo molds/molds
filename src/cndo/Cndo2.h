@@ -47,6 +47,9 @@ protected:
    vector<AtomType> enableAtomTypes;
    double coreRepulsionEnergy;
    virtual void CalcCoreRepulsionEnergy();
+   virtual double GetDiatomCoreRepulsionFirstDerivative(int indexAtomA, 
+                                                        int indexAtomB, 
+                                                        CartesianType axisA);
    double** orbitalElectronPopulation; //P_{\mu\nu} of (2.50) in J. A. Pople book.
    double*   atomicElectronPopulation; //P_{AB} of (3.21) in J. A. Pople book.
    double GetReducedOverlap(int na, int la, int m, int nb, int lb, double alpha, double beta);
@@ -364,6 +367,19 @@ void Cndo2::CalcCoreRepulsionEnergy(){
       }
    }
    this->coreRepulsionEnergy = energy;
+}
+
+// First derivative of the core repulsion related to the coordinate of atom A.
+double Cndo2::GetDiatomCoreRepulsionFirstDerivative(int indexAtomA, int indexAtomB, 
+                                                    CartesianType axisA){
+   double value=0.0;
+   Atom* atomA = (*this->molecule->GetAtomVect())[indexAtomA];
+   Atom* atomB = (*this->molecule->GetAtomVect())[indexAtomB];
+   double distance = this->molecule->GetDistanceAtoms(indexAtomA, indexAtomB);
+   value = atomA->GetCoreCharge()*atomB->GetCoreCharge();
+   value *= (atomA->GetXyz()[axisA] - atomB->GetXyz()[axisA])/distance;
+   value *= -1.0/pow(distance,2.0);
+   return value;
 }
 
 /*******
