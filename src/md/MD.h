@@ -8,7 +8,7 @@ using namespace MolDS_base_atoms;
 namespace MolDS_md{
 
 /***
- *  Refferences for Indo are [PB_1970] and [PS_1966].
+ *  Velocty Verlet is used here.
  */
 class MD{
 public:
@@ -17,18 +17,29 @@ public:
    void SetTheory(MolDS_cndo::Cndo2* cndo);
    void DoesMD();
 private:
+   string messageinitialConditionMD;
    string messageStartMD;
    string messageEndMD;
    string messageStartStepMD;
    string messageEndStepMD;
    string messageZindoSMD;
-   MolDS_cndo::Cndo2* cndo;
-   vector<TheoryType> enableTheoryTypes;
+   string messageEnergies;
+   string messageEnergiesTitle;
+   string messageCoreKineticEnergy;
+   string messageCoreRepulsionEnergy;
+   string messageElectronicEnergy;
+   string messageTotalEnergy;
+   string messageErrorEnergy;
+   string messageTime;
    string errorMessageNotEnebleTheoryType;
    string errorMessageTheoryType;
+   MolDS_cndo::Cndo2* cndo;
+   vector<TheoryType> enableTheoryTypes;
    void CheckEnableTheoryType(TheoryType theoryType);
    void SetMessages();
    void SetEnableTheoryTypes();
+   void OutputEnergies(double initialEnergy);
+   double OutputEnergies();
 };
 
 MD::MD(){
@@ -55,27 +66,22 @@ void MD::DoesMD(){
    int elecState = Parameters::GetInstance()->GetElectronicStateIndexMD();
    double dt = Parameters::GetInstance()->GetTimeWidthMD();
    double time = 0.0;
-   double** matrixForce;
    bool requireGuess = false;
    Molecule* molecule = this->cndo->GetMolecule();
+   double** matrixForce = this->cndo->GetForce(elecState);
+   double initialEnergy;
 
-   matrixForce = this->cndo->GetForce(elecState);
+   // output initial conditions
+   cout << this->messageinitialConditionMD;
+   initialEnergy = this->OutputEnergies();
+   cout << endl;
+   molecule->OutputConfiguration();
+   molecule->OutputXyzCOM();
+   molecule->OutputXyzCOC();
+   molecule->OutputMomenta();
 
-   // calc initial kinetic energy 
-   double kineticEnergy = 0.0;
-   for(int a=0; a<molecule->GetAtomVect()->size(); a++){
-      Atom* atom = (*molecule->GetAtomVect())[a];
-      double coreMass = atom->GetAtomicMass() - (double)atom->GetNumberValenceElectrons();
-      for(int i=0; i<CartesianType_end; i++){
-         kineticEnergy += 0.5*pow(atom->GetPxyz()[i],2.0)/coreMass;
-      }
-   }
-   cout << "initial kinetic Energy = " << kineticEnergy << endl; 
-   cout << "initial electronic energy = " << cndo->GetElectronicEnergy() << endl;
-   cout << "initial total energy = " << kineticEnergy + cndo->GetElectronicEnergy() << endl;
-   double iniEne =kineticEnergy + cndo->GetElectronicEnergy(); 
    for(int s=0; s<totalSteps; s++){
-      cout << this->messageStartStepMD << s << endl;
+      cout << this->messageStartStepMD << s+1 << endl;
 
       // update momenta
       for(int a=0; a<molecule->GetAtomVect()->size(); a++){
@@ -99,12 +105,7 @@ void MD::DoesMD(){
       molecule->CalcXyzCOC();
       molecule->CalcTotalCoreRepulsionEnergy();
 
-      molecule->OutputConfiguration();
-      molecule->OutputXyzCOM();
-      molecule->OutputXyzCOC();
-      molecule->OutputTotalCoreRepulsionEnergy();
-
-      // calc electronic structure and force
+      // update electronic structure
       this->cndo->DoesSCF(requireGuess);
       if(elecState > 0){
          this->cndo->DoesCIS();
@@ -112,6 +113,8 @@ void MD::DoesMD(){
       else if(elecState < 0){
          // ToDo: Error
       }
+
+      // update force
       matrixForce = this->cndo->GetForce(elecState);
 
       // update momenta
@@ -122,24 +125,15 @@ void MD::DoesMD(){
          }
       }
 
-      kineticEnergy = 0.0;
-      for(int a=0; a<molecule->GetAtomVect()->size(); a++){
-         Atom* atom = (*molecule->GetAtomVect())[a];
-         double coreMass = atom->GetAtomicMass() - (double)atom->GetNumberValenceElectrons();
-         for(int i=0; i<CartesianType_end; i++){
-            kineticEnergy += 0.5*pow(atom->GetPxyz()[i],2.0)/coreMass;
-         }
-      }  
-      cout << "kinetic Energy = " << kineticEnergy << endl; 
-      cout << "electronic energy = " << cndo->GetElectronicEnergy() << endl;
-      cout << "total energy = " << kineticEnergy + cndo->GetElectronicEnergy() << endl;
-      cout << "gosa energy [au] = " << kineticEnergy + cndo->GetElectronicEnergy() - iniEne << endl;
-      //printf("total energy = %.10lf\n",kineticEnergy + cndo->GetElectronicEnergy());
-      time = dt*((double)s+1)/Parameters::GetInstance()->GetFs2AU();
-      cout << "Time: " << time << "[fs.]" << endl << endl << endl;
-      cout << this->messageEndStepMD << s << endl;
+      // output results
+      this->OutputEnergies(initialEnergy);
+      molecule->OutputConfiguration();
+      molecule->OutputXyzCOM();
+      molecule->OutputXyzCOC();
+      molecule->OutputMomenta();
+      cout << this->messageTime << dt*((double)s+1)/Parameters::GetInstance()->GetFs2AU() << endl;
+      cout << this->messageEndStepMD << s+1 << endl;
    }
-
 
    cout << this->messageEndMD;
 }
@@ -150,9 +144,58 @@ void MD::SetMessages(){
       = "Error in md::MD::CheckEnableTheoryType: Non available theory is set.\n";
    this->messageStartMD = "**********  START: Molecular dynamics  **********\n";
    this->messageEndMD = "**********  DONE: Molecular dynamics  **********\n";
+   this->messageinitialConditionMD = "\n\t========= Initial conditions \n";
    this->messageStartStepMD = "\n\t========== START: MD step ";
    this->messageEndStepMD =     "\t========== DONE: MD step ";
-   this->messageZindoSMD = "\n\n\n!!!!!!!!!!!!!!!!!!!!!!!!! A L A R T !!!!!!!!!!!!!!!!!!!!!!!!!\n\tNote that this MD algorythm can not work correctly with ZINDO/S. In this MD algorythm, the overlap matrix between AO can not calculated correctry. The reason is the using of the GTO expansion techniques for the first derivative of the overlap integrals. If you are one of the developpers, see ZndoS::CalcDiatomicOverlapInDiatomicFrame and comments in there. \n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n\n";
+   this->messageEnergies = "\tEnergies:\n";
+   this->messageEnergiesTitle = "\t\t|\tkind\t\t\t| [a.u.] | [eV] | \n";
+   this->messageCoreKineticEnergy =   "Core kinetic     ";
+   this->messageCoreRepulsionEnergy = "Core repulsion   ";
+   this->messageElectronicEnergy = "Electronic\n\t\t(inc. core rep.)";
+   this->messageTotalEnergy =         "Total            ";
+   this->messageErrorEnergy =         "Error            ";
+   this->messageTime = "\tTime in [fs]: ";
+   this->messageZindoSMD = "\n\n\n!!!!!!!!!!!!!!!!!!!!!!!!! A L A R T !!!!!!!!!!!!!!!!!!!!!!!!!\n\tNote that this MD algorythm can not work correctly with ZINDO/S. In this MD algorythm, because the overlap matrix between AO can not calculated correctry. The reason is the using of the GTO expansion techniques for the first derivative of the overlap integrals. If you are one of the developpers, see ZndoS::CalcDiatomicOverlapInDiatomicFrame and comments in there. In addition, MF encourages you to implement correct algorythm.\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n\n";
+}
+
+double MD::OutputEnergies(){
+   Molecule* molecule = this->cndo->GetMolecule();
+   double coreKineticEnergy = 0.0;
+   for(int a=0; a<molecule->GetAtomVect()->size(); a++){
+      Atom* atom = (*molecule->GetAtomVect())[a];
+      double coreMass = atom->GetAtomicMass() - (double)atom->GetNumberValenceElectrons();
+      for(int i=0; i<CartesianType_end; i++){
+         coreKineticEnergy += 0.5*pow(atom->GetPxyz()[i],2.0)/coreMass;
+      }
+   }  
+   // output energies:
+   cout << this->messageEnergies;
+   cout << this->messageEnergiesTitle;
+   printf("\t\t%s\t%e\t%e\n",this->messageCoreKineticEnergy.c_str(), 
+                             coreKineticEnergy,
+                             coreKineticEnergy/Parameters::GetInstance()->GetEV2AU());
+   printf("\t\t%s\t%e\t%e\n",this->messageCoreRepulsionEnergy.c_str(), 
+                             this->cndo->GetMolecule()->GetTotalCoreRepulsionEnergy(),
+                             this->cndo->GetMolecule()->GetTotalCoreRepulsionEnergy()
+                             /Parameters::GetInstance()->GetEV2AU());
+   printf("\t\t%s\t%e\t%e\n",this->messageElectronicEnergy.c_str(), 
+                             this->cndo->GetElectronicEnergy(),
+                             this->cndo->GetElectronicEnergy()
+                             /Parameters::GetInstance()->GetEV2AU());
+   printf("\t\t%s\t%e\t%e\n",this->messageTotalEnergy.c_str(), 
+                             (coreKineticEnergy + this->cndo->GetElectronicEnergy()),
+                             (coreKineticEnergy + this->cndo->GetElectronicEnergy())
+                             /Parameters::GetInstance()->GetEV2AU());
+
+   return (coreKineticEnergy + this->cndo->GetElectronicEnergy());
+}
+
+void MD::OutputEnergies(double initialEnergy){
+   double energy = this->OutputEnergies();
+   printf("\t\t%s\t%e\t%e\n\n",this->messageErrorEnergy.c_str(), 
+                             (initialEnergy - energy),
+                             (initialEnergy - energy)
+                             /Parameters::GetInstance()->GetEV2AU());
 }
 
 void MD::SetEnableTheoryTypes(){

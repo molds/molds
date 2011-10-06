@@ -26,6 +26,7 @@ public:
    void OutputXyzCOC();
    void OutputTotalNumberAtomsAOsValenceelectrons();
    void OutputConfiguration();
+   void OutputMomenta();
    void OutputTotalCoreRepulsionEnergy();
    void CalcPrincipalAxes();
    void Rotate();
@@ -57,6 +58,9 @@ private:
    string messageConfiguration;
    string messageConfigurationTitleAU;
    string messageConfigurationTitleAng;
+   string messageMomenta;
+   string messageMomentaTitleAU;
+   string messageMomentaTitleGAngMolinFsin;
    string messageCoreRepulsion;
    string messageCoreRepulsionTitle;
    string messageCOM;
@@ -101,30 +105,33 @@ Molecule::Molecule(){
    this->messageTotalNumberAtoms = "\tTotal number of atoms: ";
    this->messageTotalNumberValenceElectrons = "\tTotal number of valence electrons: ";
    this->messageConfiguration = "\tMolecular configration:\n";
-   this->messageConfigurationTitleAU = "\t\t| i-th | atom type | x [a.u.] | y[a.u.] | z[a.u.] |\n";
-   this->messageConfigurationTitleAng = "\t\t| i-th | atom type | x [angst.] | y[angst.] | z[angst.] |\n";
+   this->messageConfigurationTitleAU = "\t\t| i-th | atom type | x[a.u.] | y[a.u.] | z[a.u.] |\n";
+   this->messageConfigurationTitleAng = "\t\t| i-th | atom type | x[angst.] | y[angst.] | z[angst.] |\n";
+   this->messageMomenta = "\tMomenta of each atom:\n";
+   this->messageMomentaTitleAU = "\t\t| i-th | atom type | px[a.u.] | py[a.u.] | pz[a.u.] |\n ";
+   this->messageMomentaTitleGAngMolinFsin = "\t\t| i-th | atom type | px | py | pz | [(g/Mol)*(angst/fs)]\n ";
    this->messageCoreRepulsion = "\tTotal core repulsion energy:\n";
    this->messageCoreRepulsionTitle = "\t\t| [a.u.] | [eV] |\n";
    this->messageCOM = "\tCenter of Mass:\n";
    this->messageCOC = "\tCenter of Core:\n";
-   this->messageCOMTitleAU = "\t\t| x [a.u.] | y[a.u.] | z[a.u.] |\n";
-   this->messageCOMTitleAng = "\t\t| x [angst.] | y[angst.] | z[angst.] |\n";
+   this->messageCOMTitleAU = "\t\t| x[a.u.] | y[a.u.] | z[a.u.] |\n";
+   this->messageCOMTitleAng = "\t\t| x[angst.] | y[angst.] | z[angst.] |\n";
    this->messageStartPrincipalAxes = "**********  START: Principal Axes of Inertia  **********\n";
    this->messageDonePrincipalAxes =  "**********  DONE: Principal Axes of Inertia  ***********\n\n\n";
    this->messagePrincipalAxes = "\tPrincipal Axes:\n";
-   this->messagePrincipalAxesTitleAU = "\t\t| inertia moments [a.u.] | x [a.u.] | y[a.u.] | z[a.u.] | (normalized)\n";
-   this->messagePrincipalAxesTitleAng = "\t\t| inertia moments [g*angust**2/mol] | x [angst.] | y[angst.] | z[angst.] | (not normalized)\n";
+   this->messagePrincipalAxesTitleAU = "\t\t| inertia moments [a.u.] | x[a.u.] | y[a.u.] | z[a.u.] | (normalized)\n";
+   this->messagePrincipalAxesTitleAng = "\t\t| inertia moments [g*angust**2/mol] | x[angst.] | y[angst.] | z[angst.] | (not normalized)\n";
    this->messageInertiaTensorOrigin = "\tInertia Tensor Origin:\n";
-   this->messageInertiaTensorOriginTitleAU = "\t\t| x [a.u.] | y[a.u.] | z[a.u.] |\n";
-   this->messageInertiaTensorOriginTitleAng = "\t\t| x [angst.] | y[angst.] | z[angst.] |\n";
+   this->messageInertiaTensorOriginTitleAU = "\t\t| x[a.u.] | y[a.u.] | z[a.u.] |\n";
+   this->messageInertiaTensorOriginTitleAng = "\t\t| x[angst.] | y[angst.] | z[angst.] |\n";
    this->messageStartRotate = "**********  START: Rotate molecule  **********\n";
    this->messageDoneRotate =  "**********  DONE: Rotate molecule  ***********\n\n\n";
    this->messageRotatingOrigin = "\tRotating Origin:\n";
-   this->messageRotatingOriginTitleAU = "\t\t| x [a.u.] | y[a.u.] | z[a.u.] |\n";
-   this->messageRotatingOriginTitleAng = "\t\t| x [angst.] | y[angst.] | z[angst.] |\n";
+   this->messageRotatingOriginTitleAU = "\t\t| x[a.u.] | y[a.u.] | z[a.u.] |\n";
+   this->messageRotatingOriginTitleAng = "\t\t| x[angst.] | y[angst.] | z[angst.] |\n";
    this->messageRotatingAxis = "\tRotating Axis:\n";
-   this->messageRotatingAxisTitleAU = "\t\t| x [a.u.] | y[a.u.] | z[a.u.] |\n";
-   this->messageRotatingAxisTitleAng = "\t\t| x [angst.] | y[angst.] | z[angst.] |\n";
+   this->messageRotatingAxisTitleAU = "\t\t| x[a.u.] | y[a.u.] | z[a.u.] |\n";
+   this->messageRotatingAxisTitleAng = "\t\t| x[angst.] | y[angst.] | z[angst.] |\n";
    this->messageRotatingAngle = "\tRotating Angle [degree]: ";
    this->messageRotatingType = "\tRotating Type: ";
    this->messageRotatingEularAngles = "\tRotating Eular Angles:\n";
@@ -132,8 +139,8 @@ Molecule::Molecule(){
    this->messageStartTranslate = "**********  START: Translate molecule  **********\n";
    this->messageDoneTranslate =  "**********  DONE: Translate molecule  ***********\n\n\n";
    this->messageTranslatingDifference = "\tTranslating Difference:\n";
-   this->messageTranslatingDifferenceTitleAU = "\t\t| x [a.u.] | y[a.u.] | z[a.u.] |\n";
-   this->messageTranslatingDifferenceTitleAng = "\t\t| x [angst.] | y[angst.] | z[angst.] |\n";
+   this->messageTranslatingDifferenceTitleAU = "\t\t| x[a.u.] | y[a.u.] | z[a.u.] |\n";
+   this->messageTranslatingDifferenceTitleAng = "\t\t| x[angst.] | y[angst.] | z[angst.] |\n";
 }
 
 Molecule::~Molecule(){
@@ -312,6 +319,32 @@ void Molecule::OutputConfiguration(){
       Atom* atom = (*this->atomVect)[a];
       printf("\t\t%d\t%s\t%e\t%e\t%e\n",a,AtomTypeStr(atom->GetAtomType()),
             atom->GetXyz()[0], atom->GetXyz()[1], atom->GetXyz()[2]);
+   }
+   cout << "\n";
+
+}
+
+void Molecule::OutputMomenta(){
+   double ang2AU = Parameters::GetInstance()->GetAngstrom2AU();
+   double fs2AU = Parameters::GetInstance()->GetFs2AU();
+   double gMolin2AU = Parameters::GetInstance()->GetGMolin2AU();
+   double momentumUnit2AU = ang2AU*gMolin2AU/fs2AU;
+   cout << this->messageMomenta;
+   cout << this-> messageMomentaTitleGAngMolinFsin;
+   for(int a=0; a<this->atomVect->size(); a++){
+      Atom* atom = (*this->atomVect)[a];
+      printf("\t\t%d\t%s\t%e\t%e\t%e\n",a,AtomTypeStr(atom->GetAtomType()),
+            atom->GetPxyz()[0]/momentumUnit2AU, 
+            atom->GetPxyz()[1]/momentumUnit2AU, 
+            atom->GetPxyz()[2]/momentumUnit2AU);
+   }
+   cout << "\n";
+
+   cout << this->messageMomentaTitleAU;
+   for(int a=0; a<this->atomVect->size(); a++){
+      Atom* atom = (*this->atomVect)[a];
+      printf("\t\t%d\t%s\t%e\t%e\t%e\n",a,AtomTypeStr(atom->GetAtomType()),
+            atom->GetPxyz()[0], atom->GetPxyz()[1], atom->GetPxyz()[2]);
    }
    cout << "\n";
 

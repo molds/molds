@@ -1,8 +1,8 @@
 // example of the input file
 THEORY
    //cndo/2
-   indo
-   //zindo/s
+   //indo
+   zindo/s
    //none 
    //principal_axes
    //translate
@@ -29,11 +29,11 @@ SCF_END
 //   norm_tol 0.000001
 //CIS_END
 
-//MD
-//   total_steps 10000
-//   electronic_state 2
-//   dt 0.05
-//MD_END
+MD
+   total_steps 10
+   electronic_state 2
+   dt 0.05
+MD_END
 
 //INERTIA
 //   origin 1.0 2.0 30.0
