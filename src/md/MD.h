@@ -103,7 +103,6 @@ void MD::DoesMD(){
       // update molecular basics
       molecule->CalcXyzCOM();
       molecule->CalcXyzCOC();
-      molecule->CalcTotalCoreRepulsionEnergy();
 
       // update electronic structure
       this->cndo->DoesSCF(requireGuess);
@@ -175,8 +174,8 @@ double MD::OutputEnergies(){
                              coreKineticEnergy,
                              coreKineticEnergy/Parameters::GetInstance()->GetEV2AU());
    printf("\t\t%s\t%e\t%e\n",this->messageCoreRepulsionEnergy.c_str(), 
-                             this->cndo->GetMolecule()->GetTotalCoreRepulsionEnergy(),
-                             this->cndo->GetMolecule()->GetTotalCoreRepulsionEnergy()
+                             this->cndo->GetCoreRepulsionEnergy(),
+                             this->cndo->GetCoreRepulsionEnergy()
                              /Parameters::GetInstance()->GetEV2AU());
    printf("\t\t%s\t%e\t%e\n",this->messageElectronicEnergy.c_str(), 
                              this->cndo->GetElectronicEnergy(),
