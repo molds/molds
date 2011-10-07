@@ -54,6 +54,10 @@ protected:
    double*   atomicElectronPopulation; //P_{AB} of (3.21) in J. A. Pople book.
    double GetReducedOverlap(int na, int la, int m, int nb, int lb, double alpha, double beta);
    double GetReducedOverlap(int na, int nb, double alpha, double beta);
+   double GetReducedOverlapFirstDerivativeAlpha
+              (int na, int la, int m, int nb, int lb, double alpha, double beta);
+   double GetReducedOverlapFirstDerivativeBeta
+              (int na, int la, int m, int nb, int lb, double alpha, double beta);
    double GetOverlapElementFirstDerivativeByGTOExpansion
               (Atom* atomA, int valenceIndexA, Atom* atomB, int valenceIndexB,
                STOnGType stonG, CartesianType axisA); // See [DY_1977].
@@ -68,6 +72,15 @@ protected:
                                 int mu, int nu, Molecule* molecule, double** gammaAB, double** overlap,
                                 double** orbitalElectronPopulation, bool isGuess);
    virtual void CalcDiatomicOverlapInDiatomicFrame(double** diatomicOverlap, Atom* atomA, Atom* atomB);
+   virtual void CalcDiatomicOverlapFirstDerivativeInDiatomicFrame(
+                                                double** diatomicOverlapDeri, 
+                                                Atom* atomA, Atom* atomB);
+   void CalcDiatomicOverlapFirstDerivative(double*** overlapFirstDeri, 
+                                               Atom* atomA, Atom* atomB);
+   void FreeDiatomicOverlapDeriTemps(double*** diatomicOverlap, 
+                                     double*** rotatingMatrix,
+                                     double*** diaOverlapDeriR,
+                                     double**** rMatDeri);
    virtual double GetMolecularIntegralElement(int moI, int moJ, int moK, int moL, 
                                               Molecule* molecule, double** fockMatrix, double** gammaAB);
    virtual void CalcForce(int electronicStateIndex);
@@ -136,8 +149,7 @@ private:
    void CalcRotatingMatrix(double** rotatingMatrix, Atom* atomA, Atom* atomB);
    void CalcRotatingMatrixFirstDerivative(double*** rMatFirstDeri, 
                                           Atom* atomA,
-                                          Atom* atomB,
-                                          CartesianType axisA);
+                                          Atom* atomB);
    void CalcFockMatrix(double** fockMatrix, Molecule* molecule, 
                        double** overlap, double** gammaAB,
                        double** orbitalElectronPopulation, 
@@ -150,6 +162,8 @@ private:
    double GetAuxiliaryA(int k, double rho);
    double GetAuxiliaryB(int k, double rho);
    double GetAuxiliaryD(int la, int lb, int m);
+   double GetAuxiliaryAFirstDerivative(int k, double rho);
+   double GetAuxiliaryBFirstDerivative(int k, double rho);
    void DoesDamp(double rmsDensity, 
                  double** orbitalElectronPopulation, 
                  double** oldOrbitalElectronPopulation, 
@@ -1265,6 +1279,104 @@ void Cndo2::CalcOverlap(double** overlap, Molecule* molecule){
 
 }
 
+void Cndo2::CalcDiatomicOverlapFirstDerivative(double*** overlapFirstDeri, 
+                                               Atom* atomA, Atom* atomB){
+
+   double Cartesian[CartesianType_end] = {atomA->GetXyz()[XAxis] - atomB->GetXyz()[XAxis], 
+                                          atomA->GetXyz()[YAxis] - atomB->GetXyz()[YAxis],
+                                          atomA->GetXyz()[ZAxis] - atomB->GetXyz()[ZAxis]};
+   double R = sqrt( pow(Cartesian[XAxis],2.0) + 
+                    pow(Cartesian[XAxis],2.0) + 
+                    pow(Cartesian[XAxis],2.0) );
+
+   // malloc
+   double** diatomicOverlap =  MallocerFreer::GetInstance()->MallocDoubleMatrix2d
+                                   (OrbitalType_end, OrbitalType_end);
+   double** rotatingMatrix = MallocerFreer::GetInstance()->MallocDoubleMatrix2d
+                                   (OrbitalType_end, OrbitalType_end);
+   double** diaOverlapDeriR =  MallocerFreer::GetInstance()->MallocDoubleMatrix2d
+                                       (OrbitalType_end, OrbitalType_end);
+   double*** rMatDeri = MallocerFreer::GetInstance()->MallocDoubleMatrix3d
+                                   (OrbitalType_end, OrbitalType_end, CartesianType_end);
+
+   try{
+      this->CalcDiatomicOverlapInDiatomicFrame(diatomicOverlap, atomA, atomB);
+      this->CalcRotatingMatrix(rotatingMatrix, atomA, atomB);
+      this->CalcDiatomicOverlapFirstDerivativeInDiatomicFrame
+                     (diaOverlapDeriR, atomA, atomB);
+      this->CalcRotatingMatrixFirstDerivative(rMatDeri, atomA, atomB);
+
+      // rotate
+      for(int i=0; i<OrbitalType_end; i++){
+         for(int j=0; j<OrbitalType_end; j++){
+            for(int c=0; c<CartesianType_end; c++){
+               overlapFirstDeri[i][j][c] = 0.0;
+
+               double temp1 = 0.0;
+               double temp2 = 0.0;
+               double temp3 = 0.0;
+               for(int k=0; k<OrbitalType_end; k++){
+                  for(int l=0; l<OrbitalType_end; l++){
+                     temp1 += rotatingMatrix[i][k] 
+                             *rotatingMatrix[j][l]
+                             *(Cartesian[c]/R)
+                             *diaOverlapDeriR[k][l];
+                     temp2 += rMatDeri[i][k][c] 
+                             *rotatingMatrix[j][l]
+                             *diatomicOverlap[k][l];
+                     temp3 += rotatingMatrix[i][k] 
+                             *rMatDeri[j][l][c]
+                             *diatomicOverlap[k][l];
+                  }
+               }
+               overlapFirstDeri[i][j][c] = temp1 + temp2 + temp3;
+
+            }
+         }
+      }
+   }
+   catch(MolDSException ex){
+      cout << "hoge";
+      this->FreeDiatomicOverlapDeriTemps(&diatomicOverlap,
+                                         &rotatingMatrix,
+                                         &diaOverlapDeriR,
+                                         &rMatDeri);
+      throw ex;
+   }
+   // free
+   this->FreeDiatomicOverlapDeriTemps(&diatomicOverlap,
+                                      &rotatingMatrix,
+                                      &diaOverlapDeriR,
+                                      &rMatDeri);
+}
+
+void Cndo2::FreeDiatomicOverlapDeriTemps(double*** diatomicOverlap, 
+                                         double*** rotatingMatrix,
+                                         double*** diaOverlapDeriR,
+                                         double**** rMatDeri){
+
+   // free
+   if(*diatomicOverlap != NULL){
+      MallocerFreer::GetInstance()->FreeDoubleMatrix2d(diatomicOverlap, OrbitalType_end);
+      //cout << "diatomicOverlap deleted\n";
+   }
+   if(*rotatingMatrix != NULL){
+      MallocerFreer::GetInstance()->FreeDoubleMatrix2d(rotatingMatrix, OrbitalType_end);
+      //cout << "rotatingMatrix deleted\n";
+   }
+   if(*diaOverlapDeriR != NULL){
+      MallocerFreer::GetInstance()->FreeDoubleMatrix2d(rotatingMatrix, OrbitalType_end);
+      //cout << "diaOverlapDeriR deleted\n";
+   }
+   if(*rMatDeri != NULL){
+      MallocerFreer::GetInstance()->FreeDoubleMatrix3d(rMatDeri, 
+                                                       OrbitalType_end,
+                                                       OrbitalType_end);
+      //cout << "rMatDeri deleted\n";
+   }
+
+}
+
 // calculate Overlap matrix. E.g. S_{\mu\nu} in (3.74) in J. A. Pople book by GTO expansion.
 // See Eqs. (28) - (32) in [DY_1977]
 void Cndo2::CalcOverlapByGTOExpansion(double** overlap, Molecule* molecule, STOnGType stonG){
@@ -1890,8 +2002,7 @@ void Cndo2::CalcRotatingMatrix(double** rotatingMatrix, Atom* atomA, Atom* atomB
 void Cndo2::CalcRotatingMatrixFirstDerivative(
             double*** rMatFirstDeri, 
             Atom* atomA, 
-            Atom* atomB,
-            CartesianType axisA){
+            Atom* atomB){
 
    MallocerFreer::GetInstance()->InitializeDoubleMatrix3d(
                                  rMatFirstDeri,  
@@ -2017,6 +2128,87 @@ void Cndo2::CalcDiatomicOverlapInDiatomicFrame(double** diatomicOverlap, Atom* a
       }
    }
    */
+}
+
+// First derivative of (B.40) in J. A. Pople book.
+void Cndo2::CalcDiatomicOverlapFirstDerivativeInDiatomicFrame(
+                                                double** diatomicOverlapDeri, 
+                                                Atom* atomA, Atom* atomB){
+
+   int na = atomA->GetValenceShellType() + 1;
+   int nb = atomB->GetValenceShellType() + 1;
+   int m = 0;
+   double alpha = 0.0;
+   double beta = 0.0;
+   double pre = 0.0;
+   double reducedOverlap = 0.0;
+   double reducedOverlapFirstDerivAlpha = 0.0;
+   double reducedOverlapFirstDerivBeta = 0.0;
+   double orbitalExponentA = 0.0;
+   double orbitalExponentB = 0.0;
+   double R = 0.0; // Inter nuclear distance between aton A and B.
+   double temp1=0.0;
+   double temp2=0.0;
+
+
+   MallocerFreer::GetInstance()->InitializeDoubleMatrix2d
+                                 (diatomicOverlapDeri, OrbitalType_end, OrbitalType_end);
+   R = sqrt( 
+            pow( atomA->GetXyz()[0] - atomB->GetXyz()[0], 2.0)
+           +pow( atomA->GetXyz()[1] - atomB->GetXyz()[1], 2.0)
+           +pow( atomA->GetXyz()[2] - atomB->GetXyz()[2], 2.0)
+           );
+
+   for(int a=0; a<atomA->GetValence().size(); a++){
+      OrbitalType valenceOrbitalA = atomA->GetValence()[a];
+      RealSphericalHarmonicsIndex realShpericalHarmonicsA(valenceOrbitalA);
+      orbitalExponentA = atomA->GetOrbitalExponent
+                                (atomA->GetValenceShellType(), valenceOrbitalA);
+
+      for(int b=0; b<atomB->GetValence().size(); b++){
+         OrbitalType valenceOrbitalB = atomB->GetValence()[b];
+         RealSphericalHarmonicsIndex realShpericalHarmonicsB(valenceOrbitalB);
+         orbitalExponentB = atomB->GetOrbitalExponent
+                                   (atomB->GetValenceShellType(), valenceOrbitalB);
+
+         if(realShpericalHarmonicsA.GetM() == realShpericalHarmonicsB.GetM()){
+            m = abs(realShpericalHarmonicsA.GetM());
+            alpha = orbitalExponentA * R;
+            beta =  orbitalExponentB * R;
+
+            reducedOverlap = this->GetReducedOverlap
+                                   (na, realShpericalHarmonicsA.GetL(), m,
+                                    nb, realShpericalHarmonicsB.GetL(), alpha, beta);
+            reducedOverlapFirstDerivAlpha = this->GetReducedOverlapFirstDerivativeAlpha
+                                             (na, realShpericalHarmonicsA.GetL(), m,
+                                              nb, realShpericalHarmonicsB.GetL(), alpha, beta);
+            reducedOverlapFirstDerivBeta  = this->GetReducedOverlapFirstDerivativeBeta
+                                             (na, realShpericalHarmonicsA.GetL(), m,
+                                              nb, realShpericalHarmonicsB.GetL(), alpha, beta);
+
+            temp1 = ((double)(na+nb+1))*pow(R,na+nb)*reducedOverlap;
+            temp2 = pow(R,na+nb+1)*(orbitalExponentA*reducedOverlapFirstDerivAlpha
+                                   +orbitalExponentB*reducedOverlapFirstDerivBeta);
+
+            pre =  pow(2.0*orbitalExponentA, na+0.5);
+            pre *= pow(2.0*orbitalExponentB, nb+0.5);
+            double factorials = Factorial(2*na)*Factorial(2*nb);
+            pre /= sqrt(factorials);
+            pre /= pow(2.0, na+nb+1.0);
+
+            diatomicOverlapDeri[valenceOrbitalA][valenceOrbitalB] = pre*(temp1+temp2);
+         }
+         
+      }
+   }
+
+   /*
+   for(int i=0;i<OrbitalType_end;i++){
+      for(int j=0;j<OrbitalType_end;j++){
+         printf("diatomicOverlap[%d][%d]=%lf\n",i,j,diatomicOverlap[i][j]);
+      }
+   }
+   */
 
 
 }
@@ -2121,6 +2313,54 @@ double Cndo2::GetReducedOverlap(int na, int nb, double alpha, double beta){
    return value;
 }
 
+// First derivative of (B.24) in J. A. Pople book.
+// This derivative is carried out by alpha.
+double Cndo2::GetReducedOverlapFirstDerivativeAlpha
+              (int na, int la, int m, int nb, int lb, double alpha, double beta){
+   double value = 0.0;
+   double temp1 = 0.0;
+   double temp2 = 0.0;
+   int I = 2*ShellType_end+1;
+   int J = 2*ShellType_end+1;
+
+   for(int i=0; i<I; i++){
+      for(int j=0; j<J; j++){
+         temp1 = this->GetAuxiliaryAFirstDerivative(i, 0.5*(alpha+beta))
+                +this->GetAuxiliaryB(j, 0.5*(alpha-beta));
+         temp2 = this->GetAuxiliaryA(i, 0.5*(alpha+beta))
+                +this->GetAuxiliaryBFirstDerivative(j, 0.5*(alpha-beta));
+         value += this->Y[na][nb][la][lb][m][i][j]*(temp1 + temp2);
+      }
+   }
+   value *= 0.5*this->GetAuxiliaryD(la, lb, m);
+
+   return value;
+}
+
+// First derivative of (B.24) in J. A. Pople book.
+// This derivative is carried out by Beta.
+double Cndo2::GetReducedOverlapFirstDerivativeBeta
+              (int na, int la, int m, int nb, int lb, double alpha, double beta){
+   double value = 0.0;
+   double temp1 = 0.0;
+   double temp2 = 0.0;
+   int I = 2*ShellType_end+1;
+   int J = 2*ShellType_end+1;
+
+   for(int i=0; i<I; i++){
+      for(int j=0; j<J; j++){
+         temp1 = this->GetAuxiliaryAFirstDerivative(i, 0.5*(alpha+beta))
+                +this->GetAuxiliaryB(j, 0.5*(alpha-beta));
+         temp2 = this->GetAuxiliaryA(i, 0.5*(alpha+beta))
+                +this->GetAuxiliaryBFirstDerivative(j, 0.5*(alpha-beta));
+         value += this->Y[na][nb][la][lb][m][i][j]*(temp1 - temp2);
+      }
+   }
+   value *= 0.5*this->GetAuxiliaryD(la, lb, m);
+
+   return value;
+}
+
 // see (B.22) in J. A. Pople book.
 double Cndo2::GetAuxiliaryA(int k, double rho){
    double value = 0.0;
@@ -2133,6 +2373,11 @@ double Cndo2::GetAuxiliaryA(int k, double rho){
    value *= temp;
 
    return value;
+}
+
+// First derivative of (B.22) in J. A. Pople book.
+double Cndo2::GetAuxiliaryAFirstDerivative(int k, double rho){
+   return -1.0*this->GetAuxiliaryA(k+1, rho);
 }
 
 // see (B.23) in J. A. Pople book.
@@ -2163,6 +2408,11 @@ double Cndo2::GetAuxiliaryB(int k, double rho){
    }
 
    return value;
+}
+
+// First derivative of (B.23) in J. A. Pople book.
+double Cndo2::GetAuxiliaryBFirstDerivative(int k, double rho){
+   return -1.0*this->GetAuxiliaryB(k+1, rho);
 }
 
 // see (B.16) in J. A. Pople book.
