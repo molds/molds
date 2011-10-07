@@ -134,6 +134,10 @@ private:
                              double dx, double dy, double dz, 
                              double Rab, CartesianType axisA);// see [DY_1977]
    void CalcRotatingMatrix(double** rotatingMatrix, Atom* atomA, Atom* atomB);
+   void CalcRotatingMatrixFirstDerivative(double*** rMatFirstDeri, 
+                                          Atom* atomA,
+                                          Atom* atomB,
+                                          CartesianType axisA);
    void CalcFockMatrix(double** fockMatrix, Molecule* molecule, 
                        double** overlap, double** gammaAB,
                        double** orbitalElectronPopulation, 
@@ -1875,6 +1879,78 @@ void Cndo2::CalcRotatingMatrix(double** rotatingMatrix, Atom* atomA, Atom* atomB
       MallocerFreer::GetInstance()->FreeDoubleMatrix2d(&dMatrix, OrbitalType_end);
       //cout << "dMatrix deleted\n";
    }
+
+}
+
+// First derivative of rotating matirx. 
+// This derivative is related to a coordinate of atom A.
+// This method can not calculate d-orbital yet.
+// For rotating matirxi, see J. Mol. Struc. (Theochem), 419, 19 (1997) (ref. [BFB_1997])
+// we set gamma=0 always.
+void Cndo2::CalcRotatingMatrixFirstDerivative(
+            double*** rMatFirstDeri, 
+            Atom* atomA, 
+            Atom* atomB,
+            CartesianType axisA){
+
+   MallocerFreer::GetInstance()->InitializeDoubleMatrix3d(
+                                 rMatFirstDeri,  
+                                 OrbitalType_end, 
+                                 OrbitalType_end,
+                                 CartesianType_end);
+
+   double x = atomB->GetXyz()[0] - atomA->GetXyz()[0];
+   double y = atomB->GetXyz()[1] - atomA->GetXyz()[1];
+   double z = atomB->GetXyz()[2] - atomA->GetXyz()[2];
+   double r = sqrt( pow(x,2.0) + pow(y,2.0) );
+   double R = sqrt( pow(x,2.0) + pow(y,2.0) + pow(z,2.0) );
+
+   // for s-function
+   rMatFirstDeri[s][s][XAxis] = 0.0;
+   rMatFirstDeri[s][s][YAxis] = 0.0;
+   rMatFirstDeri[s][s][ZAxis] = 0.0;
+
+   // for p-function
+   rMatFirstDeri[py][py][XAxis] = -1.0/r + pow(x,2.0)/pow(R,3.0);
+   rMatFirstDeri[py][pz][XAxis] = x*y/pow(R,3.0);
+   rMatFirstDeri[py][px][XAxis] = (1.0/(pow(r,3.0)*R) + 1.0/(pow(R,3.0)*r))*x*y*z;
+
+   rMatFirstDeri[pz][py][XAxis] = 0.0;
+   rMatFirstDeri[pz][pz][XAxis] = x*z/pow(R,2.0);
+   rMatFirstDeri[pz][px][XAxis] = x/(r*R) - x*r/pow(R,3.0);
+
+   rMatFirstDeri[px][py][XAxis] = -1.0*x*y/pow(r,3.0);
+   rMatFirstDeri[px][pz][XAxis] = -1.0/R + x*x/pow(R,3.0); 
+   rMatFirstDeri[px][px][XAxis] = -1.0*z/(r*R) + 
+                                  (1.0/(pow(r,3.0)*R) + 1.0/(pow(R,3.0)*r))*x*x*z;
+
+   rMatFirstDeri[py][py][YAxis] = x*y/pow(r,3.0);
+   rMatFirstDeri[py][pz][YAxis] = -1.0/R + y*y/pow(R,3.0);
+   rMatFirstDeri[py][px][YAxis] = -1.0*z/(r*R) +
+                                  (1.0/(pow(r,3.0)*R) + 1.0/(pow(R,3.0)*r))*y*y*z;
+
+   rMatFirstDeri[pz][py][YAxis] = 0.0;
+   rMatFirstDeri[pz][pz][YAxis] = y*z/pow(R,3.0); 
+   rMatFirstDeri[pz][px][YAxis] = y/(r*R) - y*r/pow(R,3.0);
+
+   rMatFirstDeri[px][py][YAxis] = 1.0/r - y*y/pow(r,3.0);
+   rMatFirstDeri[px][pz][YAxis] = x*y/pow(R,3.0);
+   rMatFirstDeri[px][px][YAxis] = (1.0/(pow(r,3.0)*R) + 1.0/(pow(R,3.0)*r))*x*y*z;
+
+   rMatFirstDeri[py][py][ZAxis] = 0.0;
+   rMatFirstDeri[py][pz][ZAxis] = y*z/pow(R,3.0);
+   rMatFirstDeri[py][px][ZAxis] = -1.0*y/(r*R) + y*z*z/(r*pow(R,3.0));
+
+   rMatFirstDeri[pz][py][ZAxis] = 0.0;
+   rMatFirstDeri[pz][pz][ZAxis] = -1.0/R + z*z/pow(R,3.0); 
+   rMatFirstDeri[pz][px][ZAxis] = -1.0*z*r/pow(R,3.0);
+
+   rMatFirstDeri[px][py][ZAxis] = 0.0;
+   rMatFirstDeri[px][pz][ZAxis] = x*z/pow(R,3.0);
+   rMatFirstDeri[px][px][ZAxis] = -1.0*x/(r*R) + x*z*z/(r*pow(R,3.0));
+
+   // for d-function
+   // ToDo: First derivative of rotating matrix for d-orbital...
 
 }
 
