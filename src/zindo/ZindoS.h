@@ -1425,23 +1425,7 @@ void ZindoS::CalcCISMatrix(double** matrixCIS, int numberOcc, int numberVir){
 // electronicStateIndex is index of the electroinc eigen state.
 // "electronicStateIndex = 0" means electronic ground state. 
 void ZindoS::CalcForce(int electronicStateIndex){
-   Atom* atomA = (*molecule->GetAtomVect())[0];
-   Atom* atomB = (*molecule->GetAtomVect())[1];
-   int axis = 0;
 
-   double*** matrix  = MallocerFreer::GetInstance()->MallocDoubleMatrix3d
-                        (OrbitalType_end, OrbitalType_end, CartesianType_end);
-
-   this->CalcDiatomicOverlapFirstDerivative(matrix, atomA, atomB);
-   cout << "without GTO\n";
-   for(int a=0; a<4; a++){
-      for(int b=0; b<4; b++){
-         cout << matrix[a][b][axis] << " ";
-      }
-      cout << endl;
-   }
-
-/*
    // malloc or initialize Force matrix
    if(this->matrixForce == NULL){
       this->matrixForce = MallocerFreer::GetInstance()->
@@ -1514,7 +1498,7 @@ void ZindoS::CalcForce(int electronicStateIndex){
                                           + electronicForce3);
       }
    }
-*/
+
    /* 
    // checking of calculated force
    double checkSumForce[3] = {0.0, 0.0, 0.0};

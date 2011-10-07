@@ -1365,7 +1365,7 @@ void Cndo2::FreeDiatomicOverlapDeriTemps(double*** diatomicOverlap,
       //cout << "rotatingMatrix deleted\n";
    }
    if(*diaOverlapDeriR != NULL){
-      MallocerFreer::GetInstance()->FreeDoubleMatrix2d(diaOverlapDeriR, OrbitalType_end);
+      MallocerFreer::GetInstance()->FreeDoubleMatrix2d(rotatingMatrix, OrbitalType_end);
       //cout << "diaOverlapDeriR deleted\n";
    }
    if(*rMatDeri != NULL){
