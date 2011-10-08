@@ -1336,7 +1336,6 @@ void Cndo2::CalcDiatomicOverlapFirstDerivative(double*** overlapFirstDeri,
       }
    }
    catch(MolDSException ex){
-      cout << "hoge";
       this->FreeDiatomicOverlapDeriTemps(&diatomicOverlap,
                                          &rotatingMatrix,
                                          &diaOverlapDeriR,
