@@ -1286,8 +1286,8 @@ void Cndo2::CalcDiatomicOverlapFirstDerivative(double*** overlapFirstDeri,
                                           atomA->GetXyz()[YAxis] - atomB->GetXyz()[YAxis],
                                           atomA->GetXyz()[ZAxis] - atomB->GetXyz()[ZAxis]};
    double R = sqrt( pow(Cartesian[XAxis],2.0) + 
-                    pow(Cartesian[XAxis],2.0) + 
-                    pow(Cartesian[XAxis],2.0) );
+                    pow(Cartesian[YAxis],2.0) + 
+                    pow(Cartesian[ZAxis],2.0) );
 
    // malloc
    double** diatomicOverlap =  MallocerFreer::GetInstance()->MallocDoubleMatrix2d
@@ -2326,9 +2326,9 @@ double Cndo2::GetReducedOverlapFirstDerivativeAlpha
    for(int i=0; i<I; i++){
       for(int j=0; j<J; j++){
          temp1 = this->GetAuxiliaryAFirstDerivative(i, 0.5*(alpha+beta))
-                +this->GetAuxiliaryB(j, 0.5*(alpha-beta));
+                *this->GetAuxiliaryB(j, 0.5*(alpha-beta));
          temp2 = this->GetAuxiliaryA(i, 0.5*(alpha+beta))
-                +this->GetAuxiliaryBFirstDerivative(j, 0.5*(alpha-beta));
+                *this->GetAuxiliaryBFirstDerivative(j, 0.5*(alpha-beta));
          value += this->Y[na][nb][la][lb][m][i][j]*(temp1 + temp2);
       }
    }
@@ -2350,9 +2350,9 @@ double Cndo2::GetReducedOverlapFirstDerivativeBeta
    for(int i=0; i<I; i++){
       for(int j=0; j<J; j++){
          temp1 = this->GetAuxiliaryAFirstDerivative(i, 0.5*(alpha+beta))
-                +this->GetAuxiliaryB(j, 0.5*(alpha-beta));
+                *this->GetAuxiliaryB(j, 0.5*(alpha-beta));
          temp2 = this->GetAuxiliaryA(i, 0.5*(alpha+beta))
-                +this->GetAuxiliaryBFirstDerivative(j, 0.5*(alpha-beta));
+                *this->GetAuxiliaryBFirstDerivative(j, 0.5*(alpha-beta));
          value += this->Y[na][nb][la][lb][m][i][j]*(temp1 - temp2);
       }
    }
