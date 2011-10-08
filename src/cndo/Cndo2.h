@@ -2025,7 +2025,7 @@ void Cndo2::CalcRotatingMatrixFirstDerivative(
    rMatFirstDeri[s][s][ZAxis] = 0.0;
 
    // for p-function
-   rMatFirstDeri[py][py][XAxis] = -1.0/r + pow(x,2.0)/pow(R,3.0);
+   rMatFirstDeri[py][py][XAxis] = -1.0/r + pow(x,2.0)/pow(r,3.0);
    rMatFirstDeri[py][pz][XAxis] = x*y/pow(R,3.0);
    rMatFirstDeri[py][px][XAxis] = (1.0/(pow(r,3.0)*R) + 1.0/(pow(R,3.0)*r))*x*y*z;
 
