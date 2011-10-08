@@ -26,8 +26,6 @@ Capabilities:
 
       "OK", "Sch", and "--" mean available, shceduled, and non-scheduled methods, respectively.
       MD(gs) and MD(es) mean Molecular Dynamics on ground and excited states, respectively. 
-      However, MD with ZINDO/S can not treat correct SCF calculation. 
-      Of course, standalone ZINDO/S can treat correct SCF calculations.
 
 How to Write Input-files:
 

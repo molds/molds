@@ -40,6 +40,9 @@ protected:
    virtual void CalcDiatomicOverlapInDiatomicFrame(double** diatomicOverlap, 
                                                    Atom* atomA, 
                                                    Atom* atomB);
+   virtual void CalcDiatomicOverlapFirstDerivativeInDiatomicFrame(
+                                                double** diatomicOverlapDeri, 
+                                                Atom* atomA, Atom* atomB);
    virtual double GetMolecularIntegralElement(int moI, 
                                               int moJ, 
                                               int moK, 
@@ -65,6 +68,8 @@ private:
                                                      CartesianType axisA);// ref. [MN_1957] and (5a) in [AEZ_1986]
    double nishimotoMatagaParamA;
    double nishimotoMatagaParamB;
+   double overlapCorrectionSigma;
+   double overlapCorrectionPi;
    struct MoEnergy{
       double energy;
       int occIndex;
@@ -136,6 +141,8 @@ ZindoS::ZindoS() : MolDS_cndo::Cndo2(){
    this->nishimotoMatagaParamA = 1.2;
    this->nishimotoMatagaParamB = 2.4;
    this->matrixForce = NULL;
+   this->overlapCorrectionSigma = 1.267;
+   this->overlapCorrectionPi = 0.585;
    //cout << "ZindoS created\n";
 }
 
@@ -683,18 +690,11 @@ void ZindoS::CalcDiatomicOverlapInDiatomicFrame(double** diatomicOverlap, Atom* 
 
    MolDS_cndo::Cndo2::CalcDiatomicOverlapInDiatomicFrame(diatomicOverlap, atomA, atomB);
 
-   // These corrections for overlap-matrix is ommited for MD.
-   // This treatment is wrong!
-   // In the algorythm for the MD, the analytic first derivative of the overlap matrix
-   // is calculated by GTO expansion technique. So, we can not treat below corrections
-   // for the MD module.
-   if(!Parameters::GetInstance()->RequiresMD()){
-      // see (4f) in [AEZ_1986]
-      diatomicOverlap[pz][pz] *= 1.267;
-      diatomicOverlap[py][py] *= 0.585;
-      diatomicOverlap[px][px] *= 0.585;
-   }
-
+   // see (4f) in [AEZ_1986]
+   diatomicOverlap[pz][pz] *= this->overlapCorrectionSigma;
+   diatomicOverlap[py][py] *= this->overlapCorrectionPi;
+   diatomicOverlap[px][px] *= this->overlapCorrectionPi;
+   
    /*
    for(int i=0;i<OrbitalType_end;i++){
       for(int j=0;j<OrbitalType_end;j++){
@@ -705,6 +705,19 @@ void ZindoS::CalcDiatomicOverlapInDiatomicFrame(double** diatomicOverlap, Atom* 
 
 }
 
+void ZindoS::CalcDiatomicOverlapFirstDerivativeInDiatomicFrame(
+                                                double** diatomicOverlapDeri, 
+                                                Atom* atomA, Atom* atomB){
+
+   MolDS_cndo::Cndo2::CalcDiatomicOverlapFirstDerivativeInDiatomicFrame(
+                        diatomicOverlapDeri,atomA, atomB);
+
+   // see (4f) in [AEZ_1986] like as overlap integlral
+   diatomicOverlapDeri[pz][pz] *= this->overlapCorrectionSigma;
+   diatomicOverlapDeri[py][py] *= this->overlapCorrectionPi;
+   diatomicOverlapDeri[px][px] *= this->overlapCorrectionPi;
+
+}
 // The order of mol, moJ, moK, moL is consistent with Eq. (9) in [RZ_1973]
 double ZindoS::GetMolecularIntegralElement(int moI, int moJ, int moK, int moL, 
                                           Molecule* molecule, double** fockMatrix, double** gammaAB){

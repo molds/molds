@@ -22,7 +22,6 @@ private:
    string messageEndMD;
    string messageStartStepMD;
    string messageEndStepMD;
-   string messageZindoSMD;
    string messageEnergies;
    string messageEnergiesTitle;
    string messageCoreKineticEnergy;
@@ -154,7 +153,6 @@ void MD::SetMessages(){
    this->messageTotalEnergy =         "Total            ";
    this->messageErrorEnergy =         "Error            ";
    this->messageTime = "\tTime in [fs]: ";
-   this->messageZindoSMD = "\n\n\n!!!!!!!!!!!!!!!!!!!!!!!!! A L A R T !!!!!!!!!!!!!!!!!!!!!!!!!\n\tNote that this MD algorythm can not work correctly with ZINDO/S. In this MD algorythm, because the overlap matrix between AO can not calculated correctry. The reason is the using of the GTO expansion techniques for the first derivative of the overlap integrals. If you are one of the developpers, see ZndoS::CalcDiatomicOverlapInDiatomicFrame and comments in there. In addition, MF encourages you to implement correct algorythm.\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n\n";
 }
 
 double MD::OutputEnergies(){
@@ -203,10 +201,6 @@ void MD::SetEnableTheoryTypes(){
 }
 
 void MD::CheckEnableTheoryType(TheoryType theoryType){
-
-   if(theoryType == ZINDOS){
-      cout << this->messageZindoSMD;
-   }
 
    bool isEnable = false;
    for(int i=0; i<this->enableTheoryTypes.size();i++){
