@@ -1444,6 +1444,77 @@ void ZindoS::CalcForce(int electronicStateIndex){
       Atom* atomA = (*molecule->GetAtomVect())[a];
       int firstAOIndexA = atomA->GetFirstAOIndex();
       int numberAOsA = atomA->GetValence().size();
+      double coreRepulsion[CartesianType_end] = {0.0,0.0,0.0};
+      double electronicForce1[CartesianType_end] = {0.0,0.0,0.0};
+      double electronicForce2[CartesianType_end] = {0.0,0.0,0.0};
+      double electronicForce3[CartesianType_end] = {0.0,0.0,0.0};
+      double*** overlapDer = MallocerFreer::GetInstance()->MallocDoubleMatrix3d
+                                      (OrbitalType_end, OrbitalType_end, CartesianType_end);
+      for(int b=0; b<this->molecule->GetAtomVect()->size(); b++){
+         if(a != b){
+            Atom* atomB = (*molecule->GetAtomVect())[b];
+            int firstAOIndexB = atomB->GetFirstAOIndex();
+            int numberAOsB = atomB->GetValence().size();
+
+            // calc. first derivative of overlap.
+            this->CalcDiatomicOverlapFirstDerivative(overlapDer, atomA, atomB);
+
+            for(int i=0; i<CartesianType_end; i++){
+               coreRepulsion[i] += this->GetDiatomCoreRepulsionFirstDerivative
+                                                (a, b, (CartesianType)i);
+               electronicForce1[i] += ( atomA->GetCoreCharge()*atomicElectronPopulation[b]
+                                       +atomB->GetCoreCharge()*atomicElectronPopulation[a])
+                                       *this->GetNishimotoMatagaTwoEleIntFirstDerivative
+                                          (atomA, s, atomB, s, (CartesianType)i);
+            }
+
+            for(int mu=firstAOIndexA; mu<firstAOIndexA+numberAOsA; mu++){
+               OrbitalType orbitalMu = atomA->GetValence()[mu-firstAOIndexA];
+               for(int nu=firstAOIndexB; nu<firstAOIndexB+numberAOsB; nu++){
+                  OrbitalType orbitalNu = atomB->GetValence()[nu-firstAOIndexB];
+                  double bondParameter = 0.5*(atomA->GetBondingParameter(
+                                                      this->theory, orbitalMu) 
+                                             +atomB->GetBondingParameter(
+                                                      this->theory, orbitalNu)); 
+                  for(int i=0; i<CartesianType_end; i++){
+                     electronicForce2[i] += 2.0*this->orbitalElectronPopulation[mu][nu]
+                                           *bondParameter
+                                           *overlapDer[mu-firstAOIndexA][nu-firstAOIndexB][i];
+                     electronicForce3[i] += (this->orbitalElectronPopulation[mu][mu]
+                                            *this->orbitalElectronPopulation[nu][nu]
+                                            -0.5*pow(this->orbitalElectronPopulation[mu][nu],2.0))
+                                            *this->GetNishimotoMatagaTwoEleIntFirstDerivative
+                                                (atomA, orbitalMu, atomB, orbitalNu,
+                                                (CartesianType)i);
+                     }
+                  }
+               }
+
+            for(int i=0; i<CartesianType_end; i++){
+               this->matrixForce[a][i] = -1.0*(coreRepulsion[i]
+                                          - electronicForce1[i] 
+                                          + electronicForce2[i]
+                                          + electronicForce3[i]);
+            }
+
+         }
+      }
+      if(overlapDer != NULL){
+         MallocerFreer::GetInstance()->FreeDoubleMatrix3d(&overlapDer, 
+                                                                OrbitalType_end,
+                                                                OrbitalType_end);
+      }
+   }
+   
+  
+   /*
+   // Calculate force. First derivative of overlap integral is
+   // calculated with GTO expansion technique.
+   //#pragma omp parallel for schedule(auto)
+   for(int a=0; a<this->molecule->GetAtomVect()->size(); a++){
+      Atom* atomA = (*molecule->GetAtomVect())[a];
+      int firstAOIndexA = atomA->GetFirstAOIndex();
+      int numberAOsA = atomA->GetValence().size();
       for(int i=0; i<CartesianType_end; i++){
 
          double coreRepulsion = 0.0;
@@ -1498,9 +1569,11 @@ void ZindoS::CalcForce(int electronicStateIndex){
                                           + electronicForce3);
       }
    }
+   */
 
-   /* 
+   /*  
    // checking of calculated force
+   cout << "chek the force\n";
    double checkSumForce[3] = {0.0, 0.0, 0.0};
    for(int a=0; a<this->molecule->GetAtomVect()->size(); a++){
       for(int i=0; i<CartesianType_end; i++){
@@ -1514,7 +1587,6 @@ void ZindoS::CalcForce(int electronicStateIndex){
       cout << "force: " << i << " "  << checkSumForce[i] << endl;
    }
    */
-   
 }
 
 }
