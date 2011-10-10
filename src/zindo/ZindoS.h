@@ -163,9 +163,9 @@ void ZindoS::SetMessages(){
       = "Error in zindo::ZindoS::SetMolecule: Total number of valence electrons is odd. totalNumberValenceElectrons=";
    this->errorMessageNotEnebleAtomType  
       = "Error in zindo::ZindoS::CheckEnableAtomType: Non available atom is contained.\n";
-   this->errorMessageCoulombInt = "Error in base_zindo::ZindoS::GetCoulombInt: Invalid orbitalType.\n";
-   this->errorMessageExchangeInt = "Error in base_zindo::ZindoS::GetExchangeInt: Invalid orbitalType.\n";
-   this->errorMessageNishimotoMataga = "Error in base_zindo::ZindoS::GetNishimotoMatagaTwoEleInt: Invalid orbitalType.\n";
+   this->errorMessageCoulombInt = "Error in zindo::ZindoS::GetCoulombInt: Invalid orbitalType.\n";
+   this->errorMessageExchangeInt = "Error in zindo::ZindoS::GetExchangeInt: Invalid orbitalType.\n";
+   this->errorMessageNishimotoMataga = "Error in zindo::ZindoS::GetNishimotoMatagaTwoEleInt: Invalid orbitalType.\n";
    this->errorMessageMolecularIntegralElement
       = "Error in zindo::ZindoS::GetMolecularIntegralElement: Non available orbital is contained.\n";
    this->errorMessageCalcCISMatrix

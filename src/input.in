@@ -29,11 +29,11 @@ CIS
    norm_tol 0.000001
 CIS_END
 
-MD
-   total_steps 100
-   electronic_state 2
-   dt 0.05
-MD_END
+//MD
+//   total_steps 100
+//   electronic_state 2
+//   dt 0.05
+//MD_END
 
 //INERTIA
 //   origin 1.0 2.0 30.0
