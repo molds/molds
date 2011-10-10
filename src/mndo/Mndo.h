@@ -57,6 +57,16 @@ protected:
    virtual void CalcCISMatrix(double** matrixCIS, int numberOcc, int numberVir);
    virtual void CalcForce(int electronicStateIndex);
 private:
+   string errorMessageGetSemiEmpiricalMultipoleInteractionBadMultipoles;
+   string errorMessageMultipoleA;
+   string errorMessageMultipoleB;
+   double GetSemiEmpiricalMultipoleInteraction(MultipoleType multipoleA,
+                                               MultipoleType multipoleB,
+                                               double rhoA,
+                                               double rhoB,
+                                               double DA,
+                                               double DB,
+                                               double Rab);
 };
 
 Mndo::Mndo() : MolDS_zindo::ZindoS(){
@@ -84,6 +94,10 @@ void Mndo::SetMessages(){
    this->errorMessageCalcCISMatrix
       = "Error in mndo::Mndo::CalcCISMatrix: Non available orbital is contained.\n";
    this->errorMessageDavidsonNotConverged =  "Error in mndo::Mndo::DoesCISDavidson: Davidson did not met convergence criterion. \n";
+      this->errorMessageGetSemiEmpiricalMultipoleInteractionBadMultipoles
+      = "Error in mndo:: Mndo::GetSemiEmpiricalMultipoleInteraction: Bad multipole combintaion is set\n";
+      this->errorMessageMultipoleA = "Multipole A is: ";
+      this->errorMessageMultipoleB = "Multipole B is: ";
    this->messageSCFMetConvergence = "\n\n\n\t\tMNDO/S-SCF met convergence criterion(^^b\n\n\n";
    this->messageStartSCF = "**********  START: MNDO/S-SCF  **********\n";
    this->messageDoneSCF = "**********  DONE: MNDO/S-SCF  **********\n\n\n";
@@ -457,6 +471,238 @@ double Mndo::GetExchangeInt(OrbitalType orbital1, OrbitalType orbital2, Atom* at
    return value;
 }
 
+double Mndo::GetSemiEmpiricalMultipoleInteraction(MultipoleType multipoleA,
+                                                  MultipoleType multipoleB,
+                                                  double rhoA,
+                                                  double rhoB,
+                                                  double DA,
+                                                  double DB,
+                                                  double Rab){
+   double value = 0.0;
+   double a = rhoA + rhoB;
+
+   if(multipoleA == sQ && multipoleB == sQ){
+      value = pow(pow(Rab,2.0) + pow(a,2.0), -0.5);
+   }
+   else if(multipoleA == sQ && multipoleB == muz){
+      double temp1 = pow(Rab+DB,2.0) + pow(a,2.0);
+      double temp2 = pow(Rab-DB,2.0) + pow(a,2.0);
+      value = pow(temp1,-0.5)/2.0 - pow(temp2,-0.5)/2.0;
+   }
+   else if(multipoleA == muz && multipoleB == sQ){
+      value = this->GetSemiEmpiricalMultipoleInteraction(multipoleB, multipoleA,
+                                                         rhoB, rhoA, DB, DA, Rab);
+      value *= pow(-1.0,1.0);
+   }
+   else if(multipoleA == sQ && multipoleB == Qxx){
+      double temp1 = pow(Rab,2.0) + pow(2.0*DB,2.0) + pow(a,2.0);
+      double temp2 = pow(Rab,2.0) + pow(a,2.0);
+      value = pow(temp1,-0.5)/2.0 - pow(temp2,-0.5)/2.0;
+   }
+   else if(multipoleA == Qxx && multipoleB == sQ){
+      value = this->GetSemiEmpiricalMultipoleInteraction(multipoleB, multipoleA,
+                                                         rhoB, rhoA, DB, DA, Rab);
+      value *= pow(-1.0,2.0);
+   }
+   else if(multipoleA == sQ && multipoleB == Qyy){
+      value = this->GetSemiEmpiricalMultipoleInteraction(multipoleA, Qxx,
+                                                         rhoA, rhoB, DA, DB, Rab);
+   }
+   else if(multipoleA == Qyy && multipoleB == sQ){
+      value = this->GetSemiEmpiricalMultipoleInteraction(multipoleB, multipoleA,
+                                                         rhoB, rhoA, DB, DA, Rab);
+      value *= pow(-1.0,2.0);
+   }
+   else if(multipoleA == sQ && multipoleB == Qzz){
+      double temp1 = pow(Rab+2.0*DB,2.0) + pow(a,2.0);
+      double temp2 = pow(Rab,2.0) + pow(a,2.0);
+      double temp3 = pow(Rab-2.0*DB,2.0) + pow(a,2.0);
+      value = pow(temp1,-0.5)/4.0 - pow(temp2,-0.5)/2.0 + pow(temp3,-0.5)/4.0;
+   }
+   else if(multipoleA == Qzz && multipoleB == sQ){
+      value = this->GetSemiEmpiricalMultipoleInteraction(multipoleB, multipoleA,
+                                                         rhoB, rhoA, DB, DA, Rab);
+      value *= pow(-1.0,2.0);
+   }
+   else if(multipoleA == mux && multipoleB == mux){
+      double temp1 = pow(Rab,2.0) + pow(DA-DB,2.0) + pow(a,2.0);
+      double temp2 = pow(Rab,2.0) + pow(DA+DB,2.0) + pow(a,2.0);
+      value = pow(temp1,-0.5)/2.0 - pow(temp2,-0.5)/2.0;
+   }
+   else if(multipoleA == muy && multipoleB == muy){
+      value = this->GetSemiEmpiricalMultipoleInteraction(mux, mux, 
+                                                         rhoA, rhoB, DA, DB, Rab);
+   }
+   else if(multipoleA == muz && multipoleB == muz){
+      double temp1 = pow(Rab+DA-DB,2.0) + pow(a,2.0);
+      double temp2 = pow(Rab+DA+DB,2.0) + pow(a,2.0);
+      double temp3 = pow(Rab-DA-DB,2.0) + pow(a,2.0);
+      double temp4 = pow(Rab-DA+DB,2.0) + pow(a,2.0);
+      value = pow(temp1,-0.5)/4.0 - pow(temp2,-0.5)/4.0 
+             -pow(temp3,-0.5)/4.0 + pow(temp4,-0.5)/4.0;
+   }
+   else if(multipoleA == mux && multipoleB == Qxz){
+      double temp1 = pow(Rab-DB,2.0) + pow(DA-DB,2.0) + pow(a,2.0);
+      double temp2 = pow(Rab-DB,2.0) + pow(DA+DB,2.0) + pow(a,2.0);
+      double temp3 = pow(Rab+DB,2.0) + pow(DA-DB,2.0) + pow(a,2.0);
+      double temp4 = pow(Rab+DB,2.0) + pow(DA+DB,2.0) + pow(a,2.0);
+      value =-pow(temp1,-0.5)/4.0 + pow(temp2,-0.5)/4.0 
+             +pow(temp3,-0.5)/4.0 - pow(temp4,-0.5)/4.0;
+   }
+   else if(multipoleA == Qxz && multipoleB == mux){
+      value = this->GetSemiEmpiricalMultipoleInteraction(multipoleB, multipoleA,
+                                                         rhoB, rhoA, DB, DA, Rab);
+      value *= pow(-1.0,3.0);
+   }
+   else if(multipoleA == muy && multipoleB == Qyz){
+      value = this->GetSemiEmpiricalMultipoleInteraction(mux, Qxz, 
+                                                         rhoA, rhoB, DA, DB, Rab);
+   }
+   else if(multipoleA == Qyz && multipoleB == muy){
+      value = this->GetSemiEmpiricalMultipoleInteraction(multipoleB, multipoleA,
+                                                         rhoB, rhoA, DB, DA, Rab);
+      value *= pow(-1.0,3.0);
+   }
+   else if(multipoleA == muz && multipoleB == Qxx){
+      double temp1 = pow(Rab+DA,2.0) + pow(2.0*DB,2.0) + pow(a,2.0);
+      double temp2 = pow(Rab-DA,2.0) + pow(2.0*DB,2.0) + pow(a,2.0);
+      double temp3 = pow(Rab+DA,2.0) + pow(a,2.0);
+      double temp4 = pow(Rab-DA,2.0) + pow(a,2.0);
+      value =-pow(temp1,-0.5)/4.0 + pow(temp2,-0.5)/4.0 
+             +pow(temp3,-0.5)/4.0 - pow(temp4,-0.5)/4.0;
+   }
+   else if(multipoleA == Qxx && multipoleB == muz){
+      value = this->GetSemiEmpiricalMultipoleInteraction(multipoleB, multipoleA,
+                                                         rhoB, rhoA, DB, DA, Rab);
+      value *= pow(-1.0,3.0);
+   }
+   else if(multipoleA == muz && multipoleB == Qyy){
+      value = this->GetSemiEmpiricalMultipoleInteraction(muz, Qxx, 
+                                                         rhoA, rhoB, DA, DB, Rab);
+   }
+   else if(multipoleA == Qyy && multipoleB == muz){
+      value = this->GetSemiEmpiricalMultipoleInteraction(multipoleB, multipoleA,
+                                                         rhoB, rhoA, DB, DA, Rab);
+      value *= pow(-1.0,3.0);
+   }
+   else if(multipoleA == muz && multipoleB == Qzz){
+      double temp1 = pow(Rab+DA-2.0*DB,2.0) + pow(a,2.0);
+      double temp2 = pow(Rab-DA-2.0*DB,2.0) + pow(a,2.0);
+      double temp3 = pow(Rab+DA+2.0*DB,2.0) + pow(a,2.0);
+      double temp4 = pow(Rab-DA+2.0*DB,2.0) + pow(a,2.0);
+      double temp5 = pow(Rab+DA,2.0) + pow(a,2.0);
+      double temp6 = pow(Rab-DA,2.0) + pow(a,2.0);
+      value =-pow(temp1,-0.5)/8.0 + pow(temp2,-0.5)/8.0 
+             -pow(temp3,-0.5)/8.0 + pow(temp4,-0.5)/8.0
+             +pow(temp5,-0.5)/4.0 - pow(temp6,-0.5)/4.0;
+   }
+   else if(multipoleA == Qzz && multipoleB == muz){
+      value = this->GetSemiEmpiricalMultipoleInteraction(multipoleB, multipoleA,
+                                                         rhoB, rhoA, DB, DA, Rab);
+      value *= pow(-1.0,3.0);
+   }
+   else if(multipoleA == Qxx && multipoleB == Qxx){
+      double temp1 = pow(Rab,2.0) + 4.0*pow(DA-DB,2.0) + pow(a,2.0);
+      double temp2 = pow(Rab,2.0) + 4.0*pow(DA+DB,2.0) + pow(a,2.0);
+      double temp3 = pow(Rab,2.0) + pow(2.0*DA,2.0) + pow(a,2.0);
+      double temp4 = pow(Rab,2.0) + pow(2.0*DB,2.0) + pow(a,2.0);
+      double temp5 = pow(Rab,2.0) + pow(a,2.0);
+      value = pow(temp1,-0.5)/8.0 + pow(temp2,-0.5)/8.0 
+             -pow(temp3,-0.5)/4.0 - pow(temp4,-0.5)/4.0
+             +pow(temp5,-0.5)/4.0;
+   }
+   else if(multipoleA == Qyy && multipoleB == Qyy){
+      value = this->GetSemiEmpiricalMultipoleInteraction(Qxx, Qxx, 
+                                                         rhoA, rhoB, DA, DB, Rab);
+   }
+   else if(multipoleA == Qxx && multipoleB == Qyy){
+      double temp1 = pow(Rab,2.0) + pow(2.0*DA,2.0) + pow(2.0*DB,2.0)+ pow(a,2.0);
+      double temp2 = pow(Rab,2.0) + pow(2.0*DA,2.0) + pow(a,2.0);
+      double temp3 = pow(Rab,2.0) + pow(2.0*DB,2.0) + pow(a,2.0);
+      double temp4 = pow(Rab,2.0) + pow(a,2.0);
+      value = pow(temp1,-0.5)/4.0 - pow(temp2,-0.5)/4.0 
+             -pow(temp3,-0.5)/4.0 + pow(temp4,-0.5)/4.0;
+   }
+   else if(multipoleA == Qyy && multipoleB == Qxx){
+      value = this->GetSemiEmpiricalMultipoleInteraction(multipoleB, multipoleA,
+                                                         rhoB, rhoA, DB, DA, Rab);
+      value *= pow(-1.0,4.0);
+   }
+   else if(multipoleA == Qxx && multipoleB == Qzz){
+      double temp1 = pow(Rab-2.0*DB,2.0) + pow(2.0*DA,2.0) + pow(a,2.0);
+      double temp2 = pow(Rab+2.0*DB,2.0) + pow(2.0*DA,2.0) + pow(a,2.0);
+      double temp3 = pow(Rab-2.0*DB,2.0) + pow(a,2.0);
+      double temp4 = pow(Rab+2.0*DB,2.0) + pow(a,2.0);
+      double temp5 = pow(Rab,2.0) + pow(2.0*DA,2.0) + pow(a,2.0);
+      double temp6 = pow(Rab,2.0) + pow(a,2.0);
+      value = pow(temp1,-0.5)/8.0 + pow(temp2,-0.5)/8.0 
+             -pow(temp3,-0.5)/8.0 - pow(temp4,-0.5)/8.0
+             -pow(temp5,-0.5)/4.0 + pow(temp6,-0.5)/4.0;
+   }
+   else if(multipoleA == Qzz && multipoleB == Qxx){
+      value = this->GetSemiEmpiricalMultipoleInteraction(multipoleB, multipoleA,
+                                                         rhoB, rhoA, DB, DA, Rab);
+      value *= pow(-1.0,4.0);
+   }
+   else if(multipoleA == Qyy && multipoleB == Qzz){
+      value = this->GetSemiEmpiricalMultipoleInteraction(Qxx, multipoleB, 
+                                                         rhoA, rhoB, DA, DB, Rab);
+   }
+   else if(multipoleA == Qzz && multipoleB == Qyy){
+      value = this->GetSemiEmpiricalMultipoleInteraction(multipoleB, multipoleA,
+                                                         rhoB, rhoA, DB, DA, Rab);
+      value *= pow(-1.0,4.0);
+   }
+   else if(multipoleA == Qzz && multipoleB == Qzz){
+      double temp1 = pow(Rab+2.0*DA-2.0*DB,2.0) + pow(a,2.0);
+      double temp2 = pow(Rab+2.0*DA+2.0*DB,2.0) + pow(a,2.0);
+      double temp3 = pow(Rab-2.0*DA-2.0*DB,2.0) + pow(a,2.0);
+      double temp4 = pow(Rab-2.0*DA+2.0*DB,2.0) + pow(a,2.0);
+      double temp5 = pow(Rab+2.0*DA,2.0) + pow(a,2.0);
+      double temp6 = pow(Rab-2.0*DA,2.0) + pow(a,2.0);
+      double temp7 = pow(Rab+2.0*DB,2.0) + pow(a,2.0);
+      double temp8 = pow(Rab-2.0*DB,2.0) + pow(a,2.0);
+      double temp9 = pow(Rab,2.0) + pow(a,2.0);
+      value = pow(temp1,-0.5)/16.0 + pow(temp2,-0.5)/16.0 
+             +pow(temp3,-0.5)/16.0 + pow(temp4,-0.5)/16.0
+             -pow(temp5,-0.5)/8.0 - pow(temp6,-0.5)/8.0
+             -pow(temp7,-0.5)/8.0 - pow(temp8,-0.5)/8.0;
+             +pow(temp9,-0.5)/4.0;
+   }
+   else if(multipoleA == Qxz && multipoleB == Qxz){
+      double temp1 = pow(Rab+DA-DB,2.0) + pow(DA-DB,2.0) + pow(a,2.0);
+      double temp2 = pow(Rab+DA-DB,2.0) + pow(DA+DB,2.0) + pow(a,2.0);
+      double temp3 = pow(Rab+DA+DB,2.0) + pow(DA-DB,2.0) + pow(a,2.0);
+      double temp4 = pow(Rab+DA+DB,2.0) + pow(DA+DB,2.0) + pow(a,2.0);
+      double temp5 = pow(Rab-DA-DB,2.0) + pow(DA-DB,2.0) + pow(a,2.0);
+      double temp6 = pow(Rab-DA-DB,2.0) + pow(DA+DB,2.0) + pow(a,2.0);
+      double temp7 = pow(Rab-DA+DB,2.0) + pow(DA-DB,2.0) + pow(a,2.0);
+      double temp8 = pow(Rab-DA+DB,2.0) + pow(DA+DB,2.0) + pow(a,2.0);
+      value = pow(temp1,-0.5)/8.0 - pow(temp2,-0.5)/8.0 
+             -pow(temp3,-0.5)/8.0 + pow(temp4,-0.5)/8.0
+             -pow(temp5,-0.5)/8.0 + pow(temp6,-0.5)/8.0
+             +pow(temp7,-0.5)/8.0 - pow(temp8,-0.5)/8.0;
+   }
+   else if(multipoleA == Qyz && multipoleB == Qyz){
+      value = this->GetSemiEmpiricalMultipoleInteraction(Qxz, Qxz, 
+                                                         rhoA, rhoB, DA, DB, Rab);
+   }
+   else if(multipoleA == Qxy && multipoleB == Qxy){
+      double temp1 = pow(Rab,2.0) + 2.0*pow(DA-DB,2.0) + pow(a,2.0);
+      double temp2 = pow(Rab,2.0) + 2.0*pow(DA+DB,2.0) + pow(a,2.0);
+      double temp3 = pow(Rab,2.0) + 2.0*pow(DA,2.0) + 2.0*pow(DB,2.0) + pow(a,2.0);
+      value = pow(temp1,-0.5)/4.0 + pow(temp2,-0.5)/4.0 
+             -pow(temp3,-0.5)/2.0;
+   }
+   else{
+      stringstream ss;
+      ss << this->errorMessageGetSemiEmpiricalMultipoleInteractionBadMultipoles;
+      ss << this->errorMessageMultipoleA << MultipoleTypeStr(multipoleA) << endl;
+      ss << this->errorMessageMultipoleB << MultipoleTypeStr(multipoleB) << endl;
+      throw MolDSException(ss.str());
+   }
+   return value;
+}
 
 void Mndo::CalcDiatomicOverlapInDiatomicFrame(double** diatomicOverlap, Atom* atomA, Atom* atomB){
 

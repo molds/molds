@@ -97,6 +97,21 @@ RENUMSTR_BEGIN( STOnGType, STOnGTypeStr )
    RENUMSTR( STOnGType_end,  "STOnGType_end" )
 RENUMSTR_END()
 
+// For the definition of the MultipopleType, see appendix in [DT_1977].
+RENUMSTR_BEGIN( MultipoleType, MultipoleTypeStr )
+   RENUMSTR( sQ,  "q(small Q)" )
+   RENUMSTR( Qxx, "Qxx" )
+   RENUMSTR( Qyy, "Qyy" )
+   RENUMSTR( Qzz, "Qzz" )
+   RENUMSTR( Qxz, "Qxz" )
+   RENUMSTR( Qyz, "Qyz" )
+   RENUMSTR( Qxy, "Qxy" )
+   RENUMSTR( mux, "mux" )
+   RENUMSTR( muy, "muy" )
+   RENUMSTR( muz, "muz" )
+   RENUMSTR( MultipoleType_end,  "MultipoleType_end" )
+RENUMSTR_END()
+
 }
 #endif
 

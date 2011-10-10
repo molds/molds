@@ -2,8 +2,8 @@
 THEORY
    //cndo/2
    //indo
-   //zindo/s
-   mndo
+   zindo/s
+   //mndo
    //none 
    //principal_axes
    //translate
@@ -24,7 +24,7 @@ CIS
    davidson yes
    active_occ 100
    active_vir 100
-   nstates 11
+   nstates 5
    max_iter 200
    max_dim 100
    norm_tol 0.000001
