@@ -89,6 +89,14 @@ protected:
    double** fockMatrix;
    double* energiesMO;
    double** matrixForce;
+   struct MoEnergy{
+      double energy;
+      int occIndex;
+      int virIndex;
+      int slaterIndex;
+   };
+   struct LessMoEnergy { bool operator()(const MoEnergy& rLeft, const MoEnergy& rRight) 
+      const { return rLeft.energy < rRight.energy; } };
 private:
    string messageEnergiesMOs;
    string messageEnergiesMOsTitle;

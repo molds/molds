@@ -50,6 +50,7 @@ protected:
                                               Molecule* molecule, 
                                               double** fockMatrix, 
                                               double** gammaAB);
+   virtual void CalcCISMatrix(double** matrixCIS, int numberOcc, int numberVir);
    virtual void CalcForce(int electronicStateIndex);
 private:
    double** matrixCIS;
@@ -70,14 +71,6 @@ private:
    double nishimotoMatagaParamB;
    double overlapCorrectionSigma;
    double overlapCorrectionPi;
-   struct MoEnergy{
-      double energy;
-      int occIndex;
-      int virIndex;
-      int slaterIndex;
-   };
-   struct LessMoEnergy { bool operator()(const MoEnergy& rLeft, const MoEnergy& rRight) 
-      const { return rLeft.energy < rRight.energy; } };
    void DoesCISDirect();
    void DoesCISDavidson();
    void CalcRitzVector(double* ritzVector, 
@@ -106,7 +99,6 @@ private:
    void FreeDavidsonRoopCISTemporaryMtrices(double*** interactionMatrix, 
                                             double interactionMatrixDimension, 
                                             double** interactionEigenEnergies);
-   void CalcCISMatrix(double** matrixCIS, int numberOcc, int numberVir);
    string errorMessageNishimotoMataga;
    string errorMessageDavidsonNotConverged;
    string errorMessageDavidsonMaxIter;
