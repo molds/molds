@@ -16,6 +16,11 @@ public:
    ~ZindoS();
    virtual void DoesCIS();
 protected:
+   string errorMessageDavidsonNotConverged;
+   string errorMessageCalcCISMatrix;
+   string messageStartCIS;
+   string messageDoneCIS;
+   string messageDavidsonConverge;
    virtual void CalcGammaAB(double** gammaAB, Molecule* molecule);
    virtual void SetMessages();
    virtual void SetEnableAtomTypes();
@@ -43,6 +48,12 @@ protected:
    virtual void CalcDiatomicOverlapFirstDerivativeInDiatomicFrame(
                                                 double** diatomicOverlapDeri, 
                                                 Atom* atomA, Atom* atomB);
+   virtual double GetCoulombInt(OrbitalType orbital1, 
+                                OrbitalType orbital2, 
+                                Atom* atom); // Apendix in [BZ_1979]
+   virtual double GetExchangeInt(OrbitalType orbital1, 
+                                 OrbitalType orbital2, 
+                                 Atom* atom); // Apendix in [BZ_1979]
    virtual double GetMolecularIntegralElement(int moI, 
                                               int moJ, 
                                               int moK, 
@@ -56,12 +67,6 @@ private:
    double** matrixCIS;
    double* excitedEnergies;
    int matrixCISdimension;
-   double GetCoulombInt(OrbitalType orbital1, 
-                        OrbitalType orbital2, 
-                        Atom* atom); // Apendix in [BZ_1979]
-   double GetExchangeInt(OrbitalType orbital1, 
-                         OrbitalType orbital2, 
-                         Atom* atom); // Apendix in [BZ_1979]
    double GetNishimotoMatagaTwoEleInt(Atom* atomA, OrbitalType orbitalA, 
                                       Atom* atomB, OrbitalType orbitalB); // ref. [MN_1957] and (5a) in [AEZ_1986]
    double GetNishimotoMatagaTwoEleIntFirstDerivative(Atom* atomA, OrbitalType orbitalA, 
@@ -100,23 +105,18 @@ private:
                                             double interactionMatrixDimension, 
                                             double** interactionEigenEnergies);
    string errorMessageNishimotoMataga;
-   string errorMessageDavidsonNotConverged;
    string errorMessageDavidsonMaxIter;
    string errorMessageDavidsonMaxDim;
-   string errorMessageCalcCISMatrix;
    string messageStartCalcCISMatrix;
    string messageOmpElapsedTimeCalcCISMarix;
    string messageOmpElapsedTimeCIS;
    string messageDoneCalcCISMatrix;
-   string messageStartCIS;
-   string messageDoneCIS;
    string messageStartDirectCIS;
    string messageDoneDirectCIS;
    string messageStartDavidsonCIS;
    string messageDoneDavidsonCIS;
    string messageNumIterCIS;
    string messageResidualNorm;
-   string messageDavidsonConverge;
    string messageDavidsonReachCISMatrix;
    string messageDavidsonGoToDirect;
    string messageExcitedStatesEnergies;

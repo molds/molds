@@ -35,6 +35,7 @@
 #include"cndo/Cndo2.h"
 #include"indo/Indo.h"
 #include"zindo/ZindoS.h"
+#include"mndo/Mndo.h"
 #include"md/MD.h"
 
 
@@ -142,6 +143,29 @@ int main(){
             runingNormally = false;
          }
          delete zindoS;
+      }
+
+      // MNDO
+      else if(Parameters::GetInstance()->GetCurrentTheory() == MNDO && runingNormally){
+         MolDS_mndo::Mndo* mndo = new MolDS_mndo::Mndo();
+         try{
+            //mndo->SetMolecule(molecule);
+            //mndo->DoesSCF();
+            if(Parameters::GetInstance()->RequiresCIS()){
+               //mndo->DoesCIS();
+            }
+            if(Parameters::GetInstance()->RequiresMD()){
+               //MolDS_md::MD* md = new MolDS_md::MD();
+               //md->SetTheory(mndo);
+               //md->DoesMD();
+               //delete md;
+            }
+         }
+         catch(MolDSException ex){
+            cout << ex.what() << endl;
+            runingNormally = false;
+         }
+         delete mndo;
       }
 
       // Diagonalize Inertia Tensor
