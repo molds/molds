@@ -60,6 +60,8 @@ private:
    string errorMessageGetSemiEmpiricalMultipoleInteractionBadMultipoles;
    string errorMessageMultipoleA;
    string errorMessageMultipoleB;
+   double GetNddoRepulsionIntegral(Atom* atomA, OrbitalType Mu, OrbitalType Nu,
+                                   Atom* atomB, OrbitalType Lambda, OrbitalType Sigma);
    double GetSemiEmpiricalMultipoleInteraction(MultipoleType multipoleA,
                                                MultipoleType multipoleB,
                                                double rhoA,
@@ -471,6 +473,238 @@ double Mndo::GetExchangeInt(OrbitalType orbital1, OrbitalType orbital2, Atom* at
    return value;
 }
 
+// See Apendix in [DT_1977]
+// Orbital Mu and Nu belong atom A, 
+// orbital Lambda and Sigma belong atomB.
+double Mndo::GetNddoRepulsionIntegral(Atom* atomA, OrbitalType Mu, OrbitalType Nu,
+                                      Atom* atomB, OrbitalType Lambda, OrbitalType Sigma){
+   double value = 0.0;
+   double DA=0.0;
+   double DB=0.0;
+   double rhoA = 0.0;
+   double rhoB = 0.0;
+   double Rab = this->molecule->GetDistanceAtoms(atomA, atomB);
+   int lA = 0;
+   int lB = 0;
+   // (28) in [DT_1977]
+   if(Mu == s && Nu == s && Lambda == s && Sigma == s){
+   }
+   // (29) in [DT_1977]
+   else if(Mu == s && Nu == s && Lambda == px && Sigma == px){
+   }
+   else if(Mu == s && Nu == s && Lambda == py && Sigma == py){
+   }
+   // (30) in [DT_1977]
+   else if(Mu == s && Nu == s && Lambda == pz && Sigma == pz){
+   }
+   // (31) in [DT_1977]
+   else if(Mu == px && Nu == px && Lambda == s && Sigma == s){
+   }
+   else if(Mu == py && Nu == py && Lambda == s && Sigma == s){
+   }
+   // (32) in [DT_1977]
+   else if(Mu == pz && Nu == pz && Lambda == s && Sigma == s){
+   }
+   // (33) in [DT_1977]
+   else if(Mu == px && Nu == px && Lambda == px && Sigma == px){
+   }
+   else if(Mu == py && Nu == py && Lambda == py && Sigma == py){
+   }
+   // (34) in [DT_1977]
+   else if(Mu == px && Nu == px && Lambda == py && Sigma == py){
+   }
+   else if(Mu == py && Nu == py && Lambda == px && Sigma == px){
+   }
+   // (35) in [DT_1977]
+   else if(Mu == px && Nu == px && Lambda == pz && Sigma == pz){
+   }
+   else if(Mu == py && Nu == py && Lambda == pz && Sigma == pz){
+   }
+   // (36) in [DT_1977]
+   else if(Mu == pz && Nu == pz && Lambda == px && Sigma == px){
+   }
+   else if(Mu == pz && Nu == pz && Lambda == py && Sigma == py){
+   }
+   // (37) in [DT_1977]
+   else if(Mu == pz && Nu == pz && Lambda == pz && Sigma == pz){
+   }
+   // (38) in [DT_1977]
+   else if(Mu == s && Nu == pz && Lambda == s && Sigma == s){
+   }
+   else if(Mu == pz && Nu == s && Lambda == s && Sigma == s){
+      value = this->GetNddoRepulsionIntegral(atomA, Nu, Mu, atomB, Lambda, Sigma);
+   }
+   // (39) in [DT_1977]
+   else if(Mu == s && Nu == pz && Lambda == px && Sigma == px){
+   }
+   else if(Mu == pz && Nu == s && Lambda == px && Sigma == px){
+      value = this->GetNddoRepulsionIntegral(atomA, Nu, Mu, atomB, Lambda, Sigma);
+   }
+   else if(Mu == s && Nu == pz && Lambda == py && Sigma == py){
+   }
+   else if(Mu == pz && Nu == s && Lambda == py && Sigma == py){
+      value = this->GetNddoRepulsionIntegral(atomA, Nu, Mu, atomB, Lambda, Sigma);
+   }
+   // (40) in [DT_1977]
+   else if(Mu == s && Nu == pz && Lambda == pz && Sigma == pz){
+   }
+   else if(Mu == pz && Nu == s && Lambda == pz && Sigma == pz){
+      value = this->GetNddoRepulsionIntegral(atomA, Nu, Mu, atomB, Lambda, Sigma);
+   }
+   // (41) in [DT_1977]
+   else if(Mu == s && Nu == s && Lambda == s && Sigma == pz){
+   }
+   else if(Mu == s && Nu == s && Lambda == pz && Sigma == s){
+      value = this->GetNddoRepulsionIntegral(atomA, Mu, Nu, atomB, Sigma, Lambda);
+   }
+   // (42) in [DT_1977]
+   else if(Mu == px && Nu == px && Lambda == s && Sigma == pz){
+   }
+   else if(Mu == px && Nu == px && Lambda == pz && Sigma == s){
+      value = this->GetNddoRepulsionIntegral(atomA, Mu, Nu, atomB, Sigma, Lambda);
+   }
+   else if(Mu == py && Nu == py && Lambda == s && Sigma == pz){
+   }
+   else if(Mu == py && Nu == py && Lambda == pz && Sigma == s){
+      value = this->GetNddoRepulsionIntegral(atomA, Mu, Nu, atomB, Sigma, Lambda);
+   }
+   // (43) in [DT_1977]
+   else if(Mu == pz && Nu == pz && Lambda == s && Sigma == pz){
+   }
+   else if(Mu == pz && Nu == pz && Lambda == pz && Sigma == s){
+      value = this->GetNddoRepulsionIntegral(atomA, Mu, Nu, atomB, Sigma, Lambda);
+   }
+   // (44) in [DT_1977]
+   else if(Mu == s && Nu == px && Lambda == s && Sigma == px){
+   }
+   else if(Mu == px && Nu == s && Lambda == s && Sigma == px){
+      value = this->GetNddoRepulsionIntegral(atomA, Nu, Mu, atomB, Lambda, Sigma);
+   }
+   else if(Mu == s && Nu == px && Lambda == px && Sigma == s){
+      value = this->GetNddoRepulsionIntegral(atomA, Mu, Nu, atomB, Sigma, Lambda);
+   }
+   else if(Mu == px && Nu == s && Lambda == px && Sigma == s){
+      value = this->GetNddoRepulsionIntegral(atomA, Nu, Mu, atomB, Sigma, Lambda);
+   }
+   else if(Mu == s && Nu == py && Lambda == s && Sigma == py){
+   }
+   else if(Mu == py && Nu == s && Lambda == s && Sigma == py){
+      value = this->GetNddoRepulsionIntegral(atomA, Nu, Mu, atomB, Lambda, Sigma);
+   }
+   else if(Mu == s && Nu == py && Lambda == py && Sigma == s){
+      value = this->GetNddoRepulsionIntegral(atomA, Mu, Nu, atomB, Sigma, Lambda);
+   }
+   else if(Mu == py && Nu == s && Lambda == py && Sigma == s){
+      value = this->GetNddoRepulsionIntegral(atomA, Nu, Mu, atomB, Sigma, Lambda);
+   }
+   // (45) in [DT_1977]
+   else if(Mu == s && Nu == pz && Lambda == s && Sigma == pz){
+   }
+   else if(Mu == pz && Nu == s && Lambda == s && Sigma == pz){
+      value = this->GetNddoRepulsionIntegral(atomA, Nu, Mu, atomB, Lambda, Sigma);
+   }
+   else if(Mu == s && Nu == pz && Lambda == pz && Sigma == s){
+      value = this->GetNddoRepulsionIntegral(atomA, Mu, Nu, atomB, Sigma, Lambda);
+   }
+   else if(Mu == pz && Nu == s && Lambda == pz && Sigma == s){
+      value = this->GetNddoRepulsionIntegral(atomA, Nu, Mu, atomB, Sigma, Lambda);
+   }
+   // (46) in [DT_1977]
+   else if(Mu == s && Nu == px && Lambda == px && Sigma == pz){
+   }
+   else if(Mu == px && Nu == s && Lambda == px && Sigma == pz){
+      value = this->GetNddoRepulsionIntegral(atomA, Nu, Mu, atomB, Lambda, Sigma);
+   }
+   else if(Mu == s && Nu == px && Lambda == pz && Sigma == px){
+      value = this->GetNddoRepulsionIntegral(atomA, Mu, Nu, atomB, Sigma, Lambda);
+   }
+   else if(Mu == px && Nu == s && Lambda == pz && Sigma == px){
+      value = this->GetNddoRepulsionIntegral(atomA, Nu, Mu, atomB, Sigma, Lambda);
+   }
+   else if(Mu == s && Nu == py && Lambda == py && Sigma == pz){
+   }
+   else if(Mu == py && Nu == s && Lambda == py && Sigma == pz){
+      value = this->GetNddoRepulsionIntegral(atomA, Nu, Mu, atomB, Lambda, Sigma);
+   }
+   else if(Mu == s && Nu == py && Lambda == pz && Sigma == py){
+      value = this->GetNddoRepulsionIntegral(atomA, Mu, Nu, atomB, Sigma, Lambda);
+   }
+   else if(Mu == py && Nu == s && Lambda == pz && Sigma == py){
+      value = this->GetNddoRepulsionIntegral(atomA, Nu, Mu, atomB, Sigma, Lambda);
+   }
+   // (47) in [DT_1977]
+   else if(Mu == px && Nu == pz && Lambda == s && Sigma == px){
+   }
+   else if(Mu == pz && Nu == px && Lambda == s && Sigma == px){
+      value = this->GetNddoRepulsionIntegral(atomA, Nu, Mu, atomB, Lambda, Sigma);
+   }
+   else if(Mu == px && Nu == pz && Lambda == px && Sigma == s){
+      value = this->GetNddoRepulsionIntegral(atomA, Mu, Nu, atomB, Sigma, Lambda);
+   }
+   else if(Mu == pz && Nu == px && Lambda == px && Sigma == s){
+      value = this->GetNddoRepulsionIntegral(atomA, Nu, Mu, atomB, Sigma, Lambda);
+   }
+   else if(Mu == py && Nu == pz && Lambda == s && Sigma == py){
+   }
+   else if(Mu == pz && Nu == py && Lambda == s && Sigma == py){
+      value = this->GetNddoRepulsionIntegral(atomA, Nu, Mu, atomB, Lambda, Sigma);
+   }
+   else if(Mu == py && Nu == pz && Lambda == py && Sigma == s){
+      value = this->GetNddoRepulsionIntegral(atomA, Mu, Nu, atomB, Sigma, Lambda);
+   }
+   else if(Mu == pz && Nu == py && Lambda == py && Sigma == s){
+      value = this->GetNddoRepulsionIntegral(atomA, Nu, Mu, atomB, Sigma, Lambda);
+   }
+   // (48) in [DT_1977]
+   else if(Mu == px && Nu == pz && Lambda == px && Sigma == pz){
+   }
+   else if(Mu == pz && Nu == px && Lambda == px && Sigma == pz){
+      value = this->GetNddoRepulsionIntegral(atomA, Nu, Mu, atomB, Lambda, Sigma);
+   }
+   else if(Mu == px && Nu == pz && Lambda == pz && Sigma == px){
+      value = this->GetNddoRepulsionIntegral(atomA, Mu, Nu, atomB, Sigma, Lambda);
+   }
+   else if(Mu == pz && Nu == px && Lambda == pz && Sigma == px){
+      value = this->GetNddoRepulsionIntegral(atomA, Nu, Mu, atomB, Sigma, Lambda);
+   }
+   else if(Mu == py && Nu == pz && Lambda == py && Sigma == pz){
+   }
+   else if(Mu == pz && Nu == py && Lambda == py && Sigma == pz){
+      value = this->GetNddoRepulsionIntegral(atomA, Nu, Mu, atomB, Lambda, Sigma);
+   }
+   else if(Mu == py && Nu == pz && Lambda == pz && Sigma == py){
+      value = this->GetNddoRepulsionIntegral(atomA, Mu, Nu, atomB, Sigma, Lambda);
+   }
+   else if(Mu == pz && Nu == py && Lambda == pz && Sigma == py){
+      value = this->GetNddoRepulsionIntegral(atomA, Nu, Mu, atomB, Sigma, Lambda);
+   }
+   // (49) in [DT_1977]
+   else if(Mu == px && Nu == py && Lambda == px && Sigma == py){
+   }
+   else if(Mu == py && Nu == px && Lambda == px && Sigma == py){
+      value = this->GetNddoRepulsionIntegral(atomA, Nu, Mu, atomB, Lambda, Sigma);
+   }
+   else if(Mu == px && Nu == py && Lambda == py && Sigma == px){
+      value = this->GetNddoRepulsionIntegral(atomA, Mu, Nu, atomB, Sigma, Lambda);
+   }
+   else if(Mu == py && Nu == px && Lambda == py && Sigma == px){
+      value = this->GetNddoRepulsionIntegral(atomA, Nu, Mu, atomB, Sigma, Lambda);
+   }
+   // d-orbitals
+   else if(Mu == dxy || Mu == dyz || Mu == dzz || Mu == dzx || Mu == dxxyy ||
+           Nu == dxy || Nu == dyz || Nu == dzz || Nu == dzx || Nu == dxxyy ||
+           Lambda == dxy || Lambda == dyz || Lambda == dzz || Lambda  == dzx || Lambda == dxxyy ||
+           Sigma == dxy || Sigma == dyz || Sigma == dzz || Sigma  == dzx || Sigma == dxxyy){
+
+      // ToDo: error log.
+   }
+   else{
+      value = 0.0;
+   }
+   return value;
+}
+
+// See Apendix in [DT_1977]
 double Mndo::GetSemiEmpiricalMultipoleInteraction(MultipoleType multipoleA,
                                                   MultipoleType multipoleB,
                                                   double rhoA,
