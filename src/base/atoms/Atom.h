@@ -30,7 +30,7 @@ public:
    ShellType GetValenceShellType();
    int GetNumberValenceElectrons();
    double GetImuAmu(OrbitalType orbitalType);  // return 0.5*(I_mu + A_mu)
-   double GetOrbitalExponent(ShellType shellType, OrbitalType orbitalType);  // (1.73) in J. A. Pople book.
+   double GetOrbitalExponent(ShellType shellType, OrbitalType orbitalType, TheoryType theory);  // See (1.73) in J. A. Pople book for CNDO, INDO, and ZINDOS. See [BT_1977] for MNDO.
    virtual double GetCoreIntegral(OrbitalType orbital, double gamma, bool isGuess, TheoryType theory) = 0; // P82 - 83 in J. A. Pople book for INDO or Eq. (13) in [BZ_1979] for ZINDO/S
    double GetCoreIntegral(OrbitalType orbital, bool isGuess, TheoryType theory);
    double GetIndoF2();
@@ -282,34 +282,51 @@ double Atom::GetImuAmu(OrbitalType orbitalType){
 
 
 // (1.73) in J. A. Pople book
-double Atom::GetOrbitalExponent(ShellType shellType, OrbitalType orbitalType){
-   if(shellType == k && orbitalType == s){ 
-      return this->effectiveNuclearChargeK/this->GetEffectivePrincipalQuantumNumber(shellType);
-   }   
-   else if(shellType == l && (orbitalType == s || orbitalType == px || orbitalType == py || orbitalType == pz)){
-      return this->effectiveNuclearChargeL/this->GetEffectivePrincipalQuantumNumber(shellType);
-   }   
-   else if(shellType == m && (orbitalType == s  || 
-                              orbitalType == px || 
-                              orbitalType == py || 
-                              orbitalType == pz )){
-      return this->effectiveNuclearChargeMsp/this->GetEffectivePrincipalQuantumNumber(shellType);
-   }   
-   else if(shellType == m && (orbitalType == dxy  || 
-                              orbitalType == dyz ||
-                              orbitalType == dzz ||
-                              orbitalType == dzx ||
-                              orbitalType == dxxyy)){
-      return this->effectiveNuclearChargeMd/this->GetEffectivePrincipalQuantumNumber(shellType);
-   }   
+double Atom::GetOrbitalExponent(ShellType shellType, OrbitalType orbitalType, TheoryType theory){
+   if(theory == CNDO2 || theory == INDO || theory == ZINDOS){
+      if(shellType == k && orbitalType == s){ 
+         return this->effectiveNuclearChargeK
+               /this->GetEffectivePrincipalQuantumNumber(shellType);
+      }   
+      else if(shellType == l && (orbitalType == s  || 
+                                 orbitalType == px || 
+                                 orbitalType == py || 
+                                 orbitalType == pz)){
+         return this->effectiveNuclearChargeL
+               /this->GetEffectivePrincipalQuantumNumber(shellType);
+      }   
+      else if(shellType == m && (orbitalType == s  || 
+                                 orbitalType == px || 
+                                 orbitalType == py || 
+                                 orbitalType == pz )){
+         return this->effectiveNuclearChargeMsp
+               /this->GetEffectivePrincipalQuantumNumber(shellType);
+      }   
+      else if(shellType == m && (orbitalType == dxy  || 
+                                 orbitalType == dyz ||
+                                 orbitalType == dzz ||
+                                 orbitalType == dzx ||
+                                 orbitalType == dxxyy)){
+         return this->effectiveNuclearChargeMd
+               /this->GetEffectivePrincipalQuantumNumber(shellType);
+      }   
+      else{
+         stringstream ss;
+         ss << this->errorMessageOrbitalExponent;
+         ss << this->errorMessageAtomType << AtomTypeStr(this->atomType) << "\n";
+         ss << this->errorMessageShellType << ShellTypeStr(shellType) << "\n";
+         ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbitalType) << "\n";
+         throw MolDSException(ss.str());
+      }   
+   }
+   else if(theory == MNDO){
+      // ToDo: MNDO's orbital exponent should be implemented.
+      return 0.0;
+   }
    else{
-      stringstream ss;
-      ss << this->errorMessageOrbitalExponent;
-      ss << this->errorMessageAtomType << AtomTypeStr(this->atomType) << "\n";
-      ss << this->errorMessageShellType << ShellTypeStr(shellType) << "\n";
-      ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbitalType) << "\n";
-      throw MolDSException(ss.str());
-   }   
+      // ToDo: Error logs should be implemented.
+      return 0.0;
+   }
 }
 
 

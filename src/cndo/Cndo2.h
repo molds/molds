@@ -1142,13 +1142,13 @@ void Cndo2::CalcGammaAB(double** gammaAB, Molecule* molecule){
    for(int A=0; A<totalAtomNumber; A++){
       Atom* atomA = (*(molecule->GetAtomVect()))[A];
       int na = atomA->GetValenceShellType() + 1;
-      double orbitalExponentA = atomA->GetOrbitalExponent
-                                (atomA->GetValenceShellType(), s);
+      double orbitalExponentA = atomA->GetOrbitalExponent(
+                                       atomA->GetValenceShellType(), s, this->theory);
       for(int B=A; B<totalAtomNumber; B++){
          Atom* atomB = (*(molecule->GetAtomVect()))[B];
          int nb = atomB->GetValenceShellType() + 1;
-         double orbitalExponentB = atomB->GetOrbitalExponent
-                                   (atomB->GetValenceShellType(), s);
+         double orbitalExponentB = atomB->GetOrbitalExponent(
+                                          atomB->GetValenceShellType(), s, this->theory);
 
          // inter nuclear distance
          double R = sqrt( 
@@ -1448,9 +1448,9 @@ double Cndo2::GetOverlapElementByGTOExpansion(Atom* atomA, int valenceIndexA,
    OrbitalType valenceOrbitalA = atomA->GetValence()[valenceIndexA];
    OrbitalType valenceOrbitalB = atomB->GetValence()[valenceIndexB];
    double orbitalExponentA = atomA->GetOrbitalExponent(atomA->GetValenceShellType(), 
-                                                       valenceOrbitalA);
+                                                       valenceOrbitalA, this->theory);
    double orbitalExponentB = atomB->GetOrbitalExponent(atomB->GetValenceShellType(), 
-                                                       valenceOrbitalB);
+                                                       valenceOrbitalB, this->theory);
    double gaussianExponentA = 0.0;
    double gaussianExponentB = 0.0;
 
@@ -1622,9 +1622,9 @@ double Cndo2::GetOverlapElementFirstDerivativeByGTOExpansion
    OrbitalType valenceOrbitalA = atomA->GetValence()[valenceIndexA];
    OrbitalType valenceOrbitalB = atomB->GetValence()[valenceIndexB];
    double orbitalExponentA = atomA->GetOrbitalExponent(atomA->GetValenceShellType(), 
-                                                       valenceOrbitalA);
+                                                       valenceOrbitalA, this->theory);
    double orbitalExponentB = atomB->GetOrbitalExponent(atomB->GetValenceShellType(), 
-                                                       valenceOrbitalB);
+                                                       valenceOrbitalB, this->theory);
    double gaussianExponentA = 0.0;
    double gaussianExponentB = 0.0;
 
@@ -2101,14 +2101,18 @@ void Cndo2::CalcDiatomicOverlapInDiatomicFrame(double** diatomicOverlap, Atom* a
    for(int a=0; a<atomA->GetValence().size(); a++){
       OrbitalType valenceOrbitalA = atomA->GetValence()[a];
       RealSphericalHarmonicsIndex realShpericalHarmonicsA(valenceOrbitalA);
-      orbitalExponentA = atomA->GetOrbitalExponent
-                                (atomA->GetValenceShellType(), valenceOrbitalA);
+      orbitalExponentA = atomA->GetOrbitalExponent(
+                                atomA->GetValenceShellType(), 
+                                valenceOrbitalA, 
+                                this->theory);
 
       for(int b=0; b<atomB->GetValence().size(); b++){
          OrbitalType valenceOrbitalB = atomB->GetValence()[b];
          RealSphericalHarmonicsIndex realShpericalHarmonicsB(valenceOrbitalB);
-         orbitalExponentB = atomB->GetOrbitalExponent
-                                   (atomB->GetValenceShellType(), valenceOrbitalB);
+         orbitalExponentB = atomB->GetOrbitalExponent(
+                                   atomB->GetValenceShellType(), 
+                                   valenceOrbitalB, 
+                                   this->theory);
 
          if(realShpericalHarmonicsA.GetM() == realShpericalHarmonicsB.GetM()){
             m = abs(realShpericalHarmonicsA.GetM());
@@ -2173,14 +2177,18 @@ void Cndo2::CalcDiatomicOverlapFirstDerivativeInDiatomicFrame(
    for(int a=0; a<atomA->GetValence().size(); a++){
       OrbitalType valenceOrbitalA = atomA->GetValence()[a];
       RealSphericalHarmonicsIndex realShpericalHarmonicsA(valenceOrbitalA);
-      orbitalExponentA = atomA->GetOrbitalExponent
-                                (atomA->GetValenceShellType(), valenceOrbitalA);
+      orbitalExponentA = atomA->GetOrbitalExponent(
+                                          atomA->GetValenceShellType(), 
+                                          valenceOrbitalA,
+                                          this->theory);
 
       for(int b=0; b<atomB->GetValence().size(); b++){
          OrbitalType valenceOrbitalB = atomB->GetValence()[b];
          RealSphericalHarmonicsIndex realShpericalHarmonicsB(valenceOrbitalB);
-         orbitalExponentB = atomB->GetOrbitalExponent
-                                   (atomB->GetValenceShellType(), valenceOrbitalB);
+         orbitalExponentB = atomB->GetOrbitalExponent(
+                                             atomB->GetValenceShellType(), 
+                                             valenceOrbitalB,
+                                             this->theory);
 
          if(realShpericalHarmonicsA.GetM() == realShpericalHarmonicsB.GetM()){
             m = abs(realShpericalHarmonicsA.GetM());
