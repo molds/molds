@@ -49,6 +49,20 @@ Natom::Natom(double x, double y, double z) : Atom(x, y, z){
    this->ionPotS = 25.69 * Parameters::GetInstance()->GetEV2AU();
    this->ionPotP = 14.05 * Parameters::GetInstance()->GetEV2AU();
    this->ionPotD = 0.0 * Parameters::GetInstance()->GetEV2AU();
+   this->mndoCoreintegralS = -71.932122 * Parameters::GetInstance()->GetEV2AU();         
+   this->mndoCoreintegralP = -57.172319 * Parameters::GetInstance()->GetEV2AU();         
+   this->mndoOrbitalExponentS = 2.255614;      
+   this->mndoOrbitalExponentP = 2.255614;      
+   this->mndoBondingParameterS = -20.495758 * Parameters::GetInstance()->GetEV2AU();     
+   this->mndoBondingParameterP = -20.495758 * Parameters::GetInstance()->GetEV2AU();     
+   this->mndoParameterAlpha = 2.861342 / Parameters::GetInstance()->GetAngstrom2AU();        
+   this->mndoDerivedParameterD1 =   0.338616 * Parameters::GetInstance()->GetAngstrom2AU();    
+   this->mndoDerivedParameterD2 =   0.287325 * Parameters::GetInstance()->GetAngstrom2AU();    
+   this->mndoDerivedParameterRho0 = 0.529751 * Parameters::GetInstance()->GetAngstrom2AU();  
+   this->mndoDerivedParameterRho1 = 0.337322 * Parameters::GetInstance()->GetAngstrom2AU();  
+   this->mndoDerivedParameterRho2 = 0.324853 * Parameters::GetInstance()->GetAngstrom2AU();  
+   this->mndoElecEnergyAtom = -202.581201 * Parameters::GetInstance()->GetEV2AU();        
+   this->mndoHeatsFormAtom = 113.00 * Parameters::GetInstance()->GetKcalMolin2AU();
 }
 
 double Natom::GetCoreIntegral(OrbitalType orbital, double gamma, bool isGuess, TheoryType theory){
@@ -91,6 +105,9 @@ double Natom::GetCoreIntegral(OrbitalType orbital, double gamma, bool isGuess, T
          ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbital) << endl;
          throw MolDSException(ss.str());
       }
+   }
+   else if(theory == MNDO){
+      value = this->GetMndoCoreIntegral(orbital);
    }
 
    return value;

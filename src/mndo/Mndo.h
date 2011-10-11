@@ -8,7 +8,7 @@ using namespace MolDS_base_atoms;
 namespace MolDS_mndo{
 
 /***
- *  Main Refference for Zindo is [RZ_1973]
+ *  Main Refferences for MNDO are [DT_1977, DT_1977-2, DT_1977-3]
  */
 class Mndo : public MolDS_zindo::ZindoS{
 public:

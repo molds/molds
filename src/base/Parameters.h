@@ -25,6 +25,7 @@ public:
    double GetDiisEndErrorSCF();
    void SetDiisEndErrorSCF(double diisEndErrorSCF);
    double GetEV2AU();
+   double GetKcalMolin2AU();
    double GetAngstrom2AU();
    double GetKayser2AU();
    double GetGMolin2AU();
@@ -87,6 +88,7 @@ private:
    double diisEndErrorSCF;
    void SetDefaultValues();
    double eV2AU;
+   double kcalMolin2AU;
    double angstrom2AU;
    double kayser2AU;
    double gMolin2AU;
@@ -148,6 +150,7 @@ void Parameters::DeleteInstance(){
 
 void Parameters::SetDefaultValues(){
    this->eV2AU = 0.03674903;
+   this->kcalMolin2AU = 0.00159360175;
    this->angstrom2AU = 1.0/0.5291772;
    this->kayser2AU = 4.556336*pow(10.0,-6.0);
    this->fs2AU = 1.0/(2.418884326505*pow(10.0,-2.0));
@@ -244,6 +247,10 @@ void Parameters::SetDiisEndErrorSCF(double diisEndErrorSCF){
 
 double Parameters::GetEV2AU(){
    return this->eV2AU;
+}
+
+double Parameters::GetKcalMolin2AU(){
+   return this->kcalMolin2AU;
 }
 
 double Parameters::GetAngstrom2AU(){

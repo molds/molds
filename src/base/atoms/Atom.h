@@ -100,7 +100,22 @@ protected:
    double ionPotS;   // Ionization potential, Table 4 in [BZ_1979]
    double ionPotP;   // Ionization potential, Table 4 in [BZ_1979]
    double ionPotD;   // Ionization potential, Table 4 in [BZ_1979]
+   double mndoCoreintegralS;         // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S.
+   double mndoCoreintegralP;         // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S. 
+   double mndoOrbitalExponentS;      // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S.
+   double mndoOrbitalExponentP;      // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S.
+   double mndoBondingParameterS;     // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S.
+   double mndoBondingParameterP;     // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S.
+   double mndoParameterAlpha;        // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S.
+   double mndoDerivedParameterD1;    // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S.
+   double mndoDerivedParameterD2;    // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S.
+   double mndoDerivedParameterRho0;  // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S.
+   double mndoDerivedParameterRho1;  // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S.
+   double mndoDerivedParameterRho2;  // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S.
+   double mndoElecEnergyAtom;        // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S.
+   double mndoHeatsFormAtom;         // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S.
    double GetZindoCoreIntegral(OrbitalType orbital, int l, int m, int n); // Eq. (13) in [BZ_1979]
+   double GetMndoCoreIntegral(OrbitalType orbital); // Eq. (13) in [BZ_1979]
 private:
    void SetMessages();
    string errorMessageImuAmu;
@@ -108,6 +123,9 @@ private:
    string errorMessageShellType;
    string errorMessageEffectivPrincipalQuantumNumber;
    string errorMessageZindoCoreIntegral;
+   string errorMessageMndoCoreIntegral;
+   string errorMessageGetOrbitalExponentBadTheory;
+   string errorMessageTheoryType;
    double GetJss();  // Part of Eq. (13) in [BZ_1979]
    double GetJsp();  // Part of Eq. (13) in [BZ_1979]
    double GetJsd();  // Part of Eq. (13) in [BZ_1979]
@@ -153,7 +171,10 @@ void Atom::SetMessages(){
    this->errorMessageShellType = "\tshell type = ";
    this->errorMessageEffectivPrincipalQuantumNumber = 
       "Error in base::Atom::GetEffectivePrincipalQuantumNumber: invalid shelltype.\n";
-   this->errorMessageZindoCoreIntegral = "Error in base_stoms::Atom::GetZindoCoreINtegral: Invalid orbitalType.\n";
+   this->errorMessageZindoCoreIntegral = "Error in base_atoms::Atom::GetZindoCoreINtegral: Invalid orbitalType.\n";
+   this->errorMessageMndoCoreIntegral = "Error in base_atoms::Atom::GetMndoCoreINtegral: Invalid orbitalType.\n";
+   this->errorMessageGetOrbitalExponentBadTheory = "Erro in base_atoms::Atom::GetOrbitalExponent: Bad theory is set.\n";
+   this->errorMessageTheoryType = "Theory = ";
 }
 
 AtomType Atom::GetAtomType(){
@@ -280,7 +301,6 @@ double Atom::GetImuAmu(OrbitalType orbitalType){
    }   
 }
 
-
 // (1.73) in J. A. Pople book
 double Atom::GetOrbitalExponent(ShellType shellType, OrbitalType orbitalType, TheoryType theory){
    if(theory == CNDO2 || theory == INDO || theory == ZINDOS){
@@ -320,12 +340,28 @@ double Atom::GetOrbitalExponent(ShellType shellType, OrbitalType orbitalType, Th
       }   
    }
    else if(theory == MNDO){
-      // ToDo: MNDO's orbital exponent should be implemented.
-      return 0.0;
+      if(orbitalType == s){ 
+         return this->mndoOrbitalExponentS;
+      }
+      else if(orbitalType == px ||
+              orbitalType == py ||
+              orbitalType == pz){
+         return this->mndoOrbitalExponentP;
+      }
+      else{
+         stringstream ss;
+         ss << this->errorMessageOrbitalExponent;
+         ss << this->errorMessageAtomType << AtomTypeStr(this->atomType) << "\n";
+         ss << this->errorMessageShellType << ShellTypeStr(shellType) << "\n";
+         ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbitalType) << "\n";
+         throw MolDSException(ss.str());
+      }
    }
    else{
-      // ToDo: Error logs should be implemented.
-      return 0.0;
+      stringstream ss;
+      ss << this->errorMessageGetOrbitalExponentBadTheory;
+      ss << this->errorMessageTheoryType << TheoryTypeStr(theory) << "\n";
+      throw MolDSException(ss.str());
    }
 }
 
@@ -388,6 +424,26 @@ double Atom::GetZindoCoreIntegral(OrbitalType orbital, int l, int m, int n){
    else{
       stringstream ss;
       ss << this->errorMessageZindoCoreIntegral;
+      ss << this->errorMessageAtomType << AtomTypeStr(this->atomType) << endl;
+      ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbital) << endl;
+      throw MolDSException(ss.str());
+   }
+
+   return value;
+}
+
+double Atom::GetMndoCoreIntegral(OrbitalType orbital){
+   double value=0.0;
+
+   if(orbital == s){
+      value = this->mndoCoreintegralS;
+   }
+   else if(orbital == px || orbital == py || orbital == pz){
+      value = this->mndoCoreintegralP;
+   }
+   else{
+      stringstream ss;
+      ss << this->errorMessageMndoCoreIntegral;
       ss << this->errorMessageAtomType << AtomTypeStr(this->atomType) << endl;
       ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbital) << endl;
       throw MolDSException(ss.str());

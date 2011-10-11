@@ -46,6 +46,20 @@ Hatom::Hatom(double x, double y, double z) : Atom(x, y, z){
    this->ionPotS = 13.06 * Parameters::GetInstance()->GetEV2AU();
    this->ionPotP = 0.0 * Parameters::GetInstance()->GetEV2AU();
    this->ionPotD = 0.0 * Parameters::GetInstance()->GetEV2AU();
+   this->mndoCoreintegralS = -11.906276 * Parameters::GetInstance()->GetEV2AU();         
+   this->mndoCoreintegralP = 0.0;         
+   this->mndoOrbitalExponentS = 1.331967;      
+   this->mndoOrbitalExponentP = 0.0;      
+   this->mndoBondingParameterS = -6.989064 * Parameters::GetInstance()->GetEV2AU();     
+   this->mndoBondingParameterP = 0.0;     
+   this->mndoParameterAlpha = 2.544134 / Parameters::GetInstance()->GetAngstrom2AU();        
+   this->mndoDerivedParameterD1 = 0.0;    
+   this->mndoDerivedParameterD2 = 0.0;    
+   this->mndoDerivedParameterRho0 = 0.560345 * Parameters::GetInstance()->GetAngstrom2AU();  
+   this->mndoDerivedParameterRho1 = 0.0;  
+   this->mndoDerivedParameterRho2 = 0.0;  
+   this->mndoElecEnergyAtom = -11.906276 * Parameters::GetInstance()->GetEV2AU();        
+   this->mndoHeatsFormAtom = 52.102 * Parameters::GetInstance()->GetKcalMolin2AU();
 }
 
 double Hatom::GetCoreIntegral(OrbitalType orbital, double gamma, bool isGuess, TheoryType theory){
@@ -77,7 +91,9 @@ double Hatom::GetCoreIntegral(OrbitalType orbital, double gamma, bool isGuess, T
          ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbital) << endl;
          throw MolDSException(ss.str());
       }
-      
+   }
+   else if(theory == MNDO){
+      value = this->GetMndoCoreIntegral(orbital);
    }
 
    return value;
