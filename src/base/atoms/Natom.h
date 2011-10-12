@@ -63,6 +63,11 @@ Natom::Natom(double x, double y, double z) : Atom(x, y, z){
    this->mndoDerivedParameterRho[2] = 0.324853 * Parameters::GetInstance()->GetAngstrom2AU();  
    this->mndoElecEnergyAtom = -202.581201 * Parameters::GetInstance()->GetEV2AU();        
    this->mndoHeatsFormAtom = 113.00 * Parameters::GetInstance()->GetKcalMolin2AU();
+   this->mndoGss =  13.59 * Parameters::GetInstance()->GetEV2AU();   
+   this->mndoGpp =  12.98 * Parameters::GetInstance()->GetEV2AU();   
+   this->mndoGsp =  12.66 * Parameters::GetInstance()->GetEV2AU();   
+   this->mndoGpp2 = 11.59 * Parameters::GetInstance()->GetEV2AU();  
+   this->mndoHsp =   3.14 * Parameters::GetInstance()->GetEV2AU();   
 }
 
 double Natom::GetCoreIntegral(OrbitalType orbital, double gamma, bool isGuess, TheoryType theory){

@@ -88,6 +88,11 @@ Satom::Satom(double x, double y, double z) : Atom(x, y, z){
    this->mndoDerivedParameterRho[2] = 0.5585244 * Parameters::GetInstance()->GetAngstrom2AU();  
    this->mndoElecEnergyAtom = -226.01239 * Parameters::GetInstance()->GetEV2AU();        
    this->mndoHeatsFormAtom = 66.40 * Parameters::GetInstance()->GetKcalMolin2AU();
+   this->mndoGss =  12.28 * Parameters::GetInstance()->GetEV2AU();   
+   this->mndoGpp =   9.90 * Parameters::GetInstance()->GetEV2AU();   
+   this->mndoGsp =  11.26 * Parameters::GetInstance()->GetEV2AU();   
+   this->mndoGpp2 =  8.83 * Parameters::GetInstance()->GetEV2AU();  
+   this->mndoHsp =   2.26 * Parameters::GetInstance()->GetEV2AU();   
 }
 
 double Satom::GetCoreIntegral(OrbitalType orbital, double gamma, bool isGuess, TheoryType theory){

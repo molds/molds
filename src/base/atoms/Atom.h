@@ -63,6 +63,12 @@ public:
    double GetMndoDerivedParameterRho(int rhoIndex);  // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S.
    double GetMndoElecEnergyAtom();        // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S.
    double GetMndoHeatsFormAtom();         // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S.
+   double GetMndoGss();
+   double GetMndoGpp();
+   double GetMndoGsp();
+   double GetMndoGpp2();
+   double GetMndoHsp();
+   double GetMndoHpp();
 protected:
    string errorMessageIndoCoreIntegral;
    string errorMessageZindoSCoreIntegral;
@@ -116,6 +122,11 @@ protected:
    double mndoDerivedParameterRho[3];  // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S.
    double mndoElecEnergyAtom;        // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S.
    double mndoHeatsFormAtom;         // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S.
+   double mndoGss;   //Table I in ref. [BDL_1975] for H, B, C, N, O, F, Si, P, S, and Cl.
+   double mndoGpp;   //Table I in ref. [BDL_1975] for H, B, C, N, O, F, Si, P, S, and Cl.
+   double mndoGsp;   //Table I in ref. [BDL_1975] for H, B, C, N, O, F, Si, P, S, and Cl.
+   double mndoGpp2;  //Table I in ref. [BDL_1975] for H, B, C, N, O, F, Si, P, S, and Cl.
+   double mndoHsp;   //Table I in ref. [BDL_1975] for H, B, C, N, O, F, Si, P, S, and Cl.
    double GetZindoCoreIntegral(OrbitalType orbital, int l, int m, int n); // Eq. (13) in [BZ_1979]
    double GetMndoCoreIntegral(OrbitalType orbital); // Eq. (13) in [BZ_1979]
 private:
@@ -521,6 +532,31 @@ double Atom::GetMndoElecEnergyAtom(){
 
 double Atom::GetMndoHeatsFormAtom(){
    return this->mndoHeatsFormAtom;
+}
+
+double Atom::GetMndoGss(){
+   return this->mndoGss;
+}
+
+double Atom::GetMndoGpp(){
+   return this->mndoGpp;
+}
+
+double Atom::GetMndoGsp(){
+   return this->mndoGsp;
+}
+
+double Atom::GetMndoGpp2(){
+   return this->mndoGpp2;
+}
+
+double Atom::GetMndoHsp(){
+   return this->mndoHsp;
+}
+
+// see p17 in [MOPAC_1990]
+double Atom::GetMndoHpp(){
+   return 0.5*(this->mndoGpp - this->mndoGpp2);
 }
 
 // Table 1 in ref. [RZ_1976], Table 1 in [AEZ_1986], or Table 1 in [GD_1972]

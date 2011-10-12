@@ -6,6 +6,7 @@
 [S_1970] R. F. Stewart, J. Chme. Phys., 52, 431 (1970)
 [GD_1972] G. P.-Guillouzo and D. G. ET J. Deschamps, J. Mol. Strct., 14, 81 (1972)
 [RZ_1973] J. Ridley and M. C. Zerner, Theort. Chim. Acta (Berl.) 32, 111 (1973)
+[BDL_1975] R. C. Bingham, M. J. S. Dewar, and W. Thiel, J. Am. Chem. Soc. 97, 1285 (1975)
 [RZ_1976] J. E. Ridley and M. C. Zerner, Theort. Chim. Acta (Berl.) 42, 223 (1976)
 [DY_1977] M. J. S. Dewar and Y. Yamaguchi, Computer & Chemistry 2, 25 (1977)
 [DT_1977] M. J. S. Dewar and W. Thiel, Theort. Chim. Acta (Berl.) 46, 89 (1977)
@@ -19,6 +20,7 @@
 [AEZ_1986] W. P. Anderson, W. D. Edwards, and M. C. Zerner, Inorg. Chem. 25, 2728 (1986)
 [BFB_1997] M. A. Blanco, M. Fl{\'o}rez, and M. Bermejo, J. Mol. Struct. 419, 19 (1997)
 [I_1998] IWANAMI-SHOTEN "IWANAMI RIKAGAKUJITEN", ISBN4-00-080090-6 (1988)
+[MOPAC_1990] J. J. P. Stewart, J. Computer-Aided Molecular Design 4, 1 (1990)
 
 
 

@@ -63,6 +63,11 @@ Oatom::Oatom(double x, double y, double z) : Atom(x, y, z){
    this->mndoDerivedParameterRho[2] = 0.278628 * Parameters::GetInstance()->GetAngstrom2AU();  
    this->mndoElecEnergyAtom = -317.868506 * Parameters::GetInstance()->GetEV2AU();        
    this->mndoHeatsFormAtom = 59.559 * Parameters::GetInstance()->GetKcalMolin2AU();
+   this->mndoGss =  15.42 * Parameters::GetInstance()->GetEV2AU();   
+   this->mndoGpp =  14.52 * Parameters::GetInstance()->GetEV2AU();   
+   this->mndoGsp =  14.48 * Parameters::GetInstance()->GetEV2AU();   
+   this->mndoGpp2 = 12.98 * Parameters::GetInstance()->GetEV2AU();  
+   this->mndoHsp =   3.94 * Parameters::GetInstance()->GetEV2AU();   
 }
 
 double Oatom::GetCoreIntegral(OrbitalType orbital, double gamma, bool isGuess, TheoryType theory){

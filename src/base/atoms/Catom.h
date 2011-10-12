@@ -63,6 +63,11 @@ Catom::Catom(double x, double y, double z) : Atom(x, y, z){
    this->mndoDerivedParameterRho[2] = 0.395734 * Parameters::GetInstance()->GetAngstrom2AU();  
    this->mndoElecEnergyAtom = -120.500606 * Parameters::GetInstance()->GetEV2AU();        
    this->mndoHeatsFormAtom = 170.89 * Parameters::GetInstance()->GetKcalMolin2AU();
+   this->mndoGss =  12.23 * Parameters::GetInstance()->GetEV2AU();   
+   this->mndoGpp =  11.08 * Parameters::GetInstance()->GetEV2AU();   
+   this->mndoGsp =  11.47 * Parameters::GetInstance()->GetEV2AU();   
+   this->mndoGpp2 =  9.84 * Parameters::GetInstance()->GetEV2AU();  
+   this->mndoHsp =   2.43 * Parameters::GetInstance()->GetEV2AU();   
 }
 
 double Catom::GetCoreIntegral(OrbitalType orbital, double gamma, bool isGuess, TheoryType theory){

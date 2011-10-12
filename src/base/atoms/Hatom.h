@@ -60,6 +60,11 @@ Hatom::Hatom(double x, double y, double z) : Atom(x, y, z){
    this->mndoDerivedParameterRho[2] = 0.0;  
    this->mndoElecEnergyAtom = -11.906276 * Parameters::GetInstance()->GetEV2AU();        
    this->mndoHeatsFormAtom = 52.102 * Parameters::GetInstance()->GetKcalMolin2AU();
+   this->mndoGss = 12.848 * Parameters::GetInstance()->GetEV2AU();   
+   this->mndoGpp = 0.0 * Parameters::GetInstance()->GetEV2AU();   
+   this->mndoGsp = 0.0 * Parameters::GetInstance()->GetEV2AU();   
+   this->mndoGpp2 = 0.0 * Parameters::GetInstance()->GetEV2AU();  
+   this->mndoHsp = 0.0 * Parameters::GetInstance()->GetEV2AU();   
 }
 
 double Hatom::GetCoreIntegral(OrbitalType orbital, double gamma, bool isGuess, TheoryType theory){
