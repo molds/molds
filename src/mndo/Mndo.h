@@ -219,7 +219,7 @@ double Mndo::GetCoulombInt(OrbitalType orbital1, OrbitalType orbital2, Atom* ato
       value = atom->GetMndoGsp();
    }   
    else if( orbital2 == s && ( orbital1 == px || orbital1 == py || orbital1 == pz )){ 
-      value = this->GetCoulombInt(orbital2, orbital2, atom);
+      value = this->GetCoulombInt(orbital2, orbital1, atom);
    }   
    else if( (orbital1 == orbital2) && ( orbital1 == px || orbital1 == py || orbital1 == pz )){ 
       value = atom->GetMndoGpp();
