@@ -52,7 +52,7 @@ Hatom::Hatom(double x, double y, double z) : Atom(x, y, z){
    this->mndoOrbitalExponentP = 0.0;      
    this->mndoBondingParameterS = -6.989064 * Parameters::GetInstance()->GetEV2AU();     
    this->mndoBondingParameterP = 0.0;     
-   this->mndoParameterAlpha = 2.544134 / Parameters::GetInstance()->GetAngstrom2AU();        
+   this->mndoAlpha = 2.544134 / Parameters::GetInstance()->GetAngstrom2AU();        
    this->mndoDerivedParameterD[0] = 0.0;    
    this->mndoDerivedParameterD[1] = 0.0;    
    this->mndoDerivedParameterRho[0] = 0.560345 * Parameters::GetInstance()->GetAngstrom2AU();  

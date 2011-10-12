@@ -55,7 +55,7 @@ Catom::Catom(double x, double y, double z) : Atom(x, y, z){
    this->mndoOrbitalExponentP = 1.787537;      
    this->mndoBondingParameterS = -18.985044 * Parameters::GetInstance()->GetEV2AU();     
    this->mndoBondingParameterP = -7.934122  * Parameters::GetInstance()->GetEV2AU();     
-   this->mndoParameterAlpha = 2.546380 / Parameters::GetInstance()->GetAngstrom2AU();        
+   this->mndoAlpha = 2.546380 / Parameters::GetInstance()->GetAngstrom2AU();        
    this->mndoDerivedParameterD[0] =   0.427284 * Parameters::GetInstance()->GetAngstrom2AU();    
    this->mndoDerivedParameterD[1] =   0.362563 * Parameters::GetInstance()->GetAngstrom2AU();    
    this->mndoDerivedParameterRho[0] = 0.588660 * Parameters::GetInstance()->GetAngstrom2AU();  
