@@ -81,8 +81,9 @@ Satom::Satom(double x, double y, double z) : Atom(x, y, z){
    this->mndoBondingParameterS = -10.761670 * Parameters::GetInstance()->GetEV2AU();     
    this->mndoBondingParameterP = -10.108433 * Parameters::GetInstance()->GetEV2AU();     
    this->mndoAlpha = 2.478026 / Parameters::GetInstance()->GetAngstrom2AU();        
-   this->mndoDerivedParameterD[0] =   0.9189935 * Parameters::GetInstance()->GetAngstrom2AU();    
-   this->mndoDerivedParameterD[1] =   0.8328514 * Parameters::GetInstance()->GetAngstrom2AU();    
+   this->mndoDerivedParameterD[0] =   0.0;
+   this->mndoDerivedParameterD[1] =   0.9189935 * Parameters::GetInstance()->GetAngstrom2AU();    
+   this->mndoDerivedParameterD[2] =   0.8328514 * Parameters::GetInstance()->GetAngstrom2AU();    
    this->mndoDerivedParameterRho[0] = 0.4733554 * Parameters::GetInstance()->GetAngstrom2AU();  
    this->mndoDerivedParameterRho[1] = 0.5544502 * Parameters::GetInstance()->GetAngstrom2AU();  
    this->mndoDerivedParameterRho[2] = 0.5585244 * Parameters::GetInstance()->GetAngstrom2AU();  

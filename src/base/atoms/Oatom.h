@@ -56,8 +56,9 @@ Oatom::Oatom(double x, double y, double z) : Atom(x, y, z){
    this->mndoBondingParameterS = -32.688082 * Parameters::GetInstance()->GetEV2AU();     
    this->mndoBondingParameterP = -32.688082 * Parameters::GetInstance()->GetEV2AU();     
    this->mndoAlpha = 3.160604 / Parameters::GetInstance()->GetAngstrom2AU();        
-   this->mndoDerivedParameterD[0] =   0.282894 * Parameters::GetInstance()->GetAngstrom2AU();    
-   this->mndoDerivedParameterD[1] =   0.240043 * Parameters::GetInstance()->GetAngstrom2AU();    
+   this->mndoDerivedParameterD[0] =   0.0;
+   this->mndoDerivedParameterD[1] =   0.282894 * Parameters::GetInstance()->GetAngstrom2AU();    
+   this->mndoDerivedParameterD[2] =   0.240043 * Parameters::GetInstance()->GetAngstrom2AU();    
    this->mndoDerivedParameterRho[0] = 0.466882 * Parameters::GetInstance()->GetAngstrom2AU();  
    this->mndoDerivedParameterRho[1] = 0.275822 * Parameters::GetInstance()->GetAngstrom2AU();  
    this->mndoDerivedParameterRho[2] = 0.278628 * Parameters::GetInstance()->GetAngstrom2AU();  

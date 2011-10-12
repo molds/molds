@@ -56,8 +56,9 @@ Natom::Natom(double x, double y, double z) : Atom(x, y, z){
    this->mndoBondingParameterS = -20.495758 * Parameters::GetInstance()->GetEV2AU();     
    this->mndoBondingParameterP = -20.495758 * Parameters::GetInstance()->GetEV2AU();     
    this->mndoAlpha = 2.861342 / Parameters::GetInstance()->GetAngstrom2AU();        
-   this->mndoDerivedParameterD[0] =   0.338616 * Parameters::GetInstance()->GetAngstrom2AU();    
-   this->mndoDerivedParameterD[1] =   0.287325 * Parameters::GetInstance()->GetAngstrom2AU();    
+   this->mndoDerivedParameterD[0] =   0.0;
+   this->mndoDerivedParameterD[1] =   0.338616 * Parameters::GetInstance()->GetAngstrom2AU();    
+   this->mndoDerivedParameterD[2] =   0.287325 * Parameters::GetInstance()->GetAngstrom2AU();    
    this->mndoDerivedParameterRho[0] = 0.529751 * Parameters::GetInstance()->GetAngstrom2AU();  
    this->mndoDerivedParameterRho[1] = 0.337322 * Parameters::GetInstance()->GetAngstrom2AU();  
    this->mndoDerivedParameterRho[2] = 0.324853 * Parameters::GetInstance()->GetAngstrom2AU();  

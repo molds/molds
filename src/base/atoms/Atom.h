@@ -118,7 +118,7 @@ protected:
    double mndoBondingParameterS;     // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S.
    double mndoBondingParameterP;     // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S.
    double mndoAlpha;        // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S.
-   double mndoDerivedParameterD[2];    // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S.
+   double mndoDerivedParameterD[3];    // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S.
    double mndoDerivedParameterRho[3];  // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S.
    double mndoElecEnergyAtom;        // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S.
    double mndoHeatsFormAtom;         // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S.
@@ -194,7 +194,7 @@ void Atom::SetMessages(){
    this->errorMessageGetOrbitalExponentBadTheory = "Erro in base_atoms::Atom::GetOrbitalExponent: Bad theory is set.\n";
    this->errorMessageTheoryType = "Theory = ";
    this->errorMessageGetBondingParameterBadTheoryBadOrbital = "Error in base_atoms::Atom::GetBondingParameter: Bad Theory of bad orbital is set.\n";
-   this->errorMessageGetDerivedParameterDBadDIndex = "Error in base_atoms::Atom::GetDerivedParameterD: Bad index for parameter D(dIndex). Only 0 and 1 are permitted.\n";
+   this->errorMessageGetDerivedParameterDBadDIndex = "Error in base_atoms::Atom::GetDerivedParameterD: Bad index for parameter D(dIndex). Only 0, 1, and 2 are permitted.\n";
    this->errorMessageDIndex  = "dIndex = ";
    this->errorMessageGetDerivedParameterRhoBadRhoIndex = "Error in base_atoms::Atom::GetDerivedParameterRho: Bad index for parameter rho(rhoIndex). Only 0, 1, and 2 are permitted.\n";
    this->errorMessageRhoIndex = "rhoIndex = ";
@@ -503,7 +503,7 @@ double Atom::GetMndoAlpha(){
 }
 
 double Atom::GetMndoDerivedParameterD(int dIndex){
-   if(dIndex == 0 || dIndex == 1){
+   if(dIndex == 0 || dIndex == 1 || dIndex == 2){
       return this->mndoDerivedParameterD[dIndex];
    }
    else{
