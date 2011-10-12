@@ -50,8 +50,6 @@ protected:
    virtual double GetElectronCoreAttraction(Atom* atomA, Atom* atomB, 
                                             OrbitalType mu, OrbitalType nu,
                                             double**** twoElecTwoCoreMatrixTwoAtoms);
-   virtual double GetCoreCoreAttraction(Atom* atomA, Atom* atomB, 
-                                        double**** twoElecTwoCoreMatrixTwoAtoms);
    virtual double GetMolecularIntegralElement(int moI, 
                                               int moJ, 
                                               int moK, 
@@ -481,14 +479,6 @@ double Mndo::GetElectronCoreAttraction(Atom* atomA, Atom* atomB,
                                           OrbitalType mu, OrbitalType nu,
                                           double**** twoElecTwoCoreMatrixTwoAtoms){
    return -1.0*atomB->GetCoreCharge()*twoElecTwoCoreMatrixTwoAtoms[mu][nu][s][s];
-}
-
-// electron in atom A (mu and nu) and core (atom B) attraction. 
-// see Eq. (16) in [DT_1977-2] with f_2 = 0.
-double Mndo::GetCoreCoreAttraction(Atom* atomA, Atom* atomB, 
-                                   double**** twoElecTwoCoreMatrixTwoAtoms){
-   return atomA->GetCoreCharge()*atomB->GetCoreCharge()
-         *twoElecTwoCoreMatrixTwoAtoms[s][s][s][s];
 }
 
 // See Apendix in [DT_1977]
