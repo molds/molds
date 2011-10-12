@@ -211,27 +211,25 @@ double Mndo::GetFockOffDiagElement(Atom* atomA, Atom* atomB, int atomAIndex, int
 double Mndo::GetCoulombInt(OrbitalType orbital1, OrbitalType orbital2, Atom* atom){
 
    double value=0.0;
-   /* 
+    
    if( orbital1 == s && orbital2 == s){ 
-      value = atom->GetZindoF0ssLower();
+      value = atom->GetMndoGss();
    }   
    else if( orbital1 == s && ( orbital2 == px || orbital2 == py || orbital2 == pz )){ 
-      value = atom->GetZindoF0ssLower();
+      value = atom->GetMndoGsp();
    }   
    else if( orbital2 == s && ( orbital1 == px || orbital1 == py || orbital1 == pz )){ 
-      value = atom->GetZindoF0ssLower();
+      value = this->GetCoulombInt(orbital2, orbital2, atom);
    }   
    else if( (orbital1 == orbital2) && ( orbital1 == px || orbital1 == py || orbital1 == pz )){ 
-      value = atom->GetZindoF0ssLower()
-             +atom->GetZindoF2ppLower()*4.0;
+      value = atom->GetMndoGpp();
    }   
    else if( (orbital1 != orbital2) 
          && ( orbital1 == px || orbital1 == py || orbital1 == pz )
          && ( orbital2 == px || orbital2 == py || orbital2 == pz ) ){
-      value = atom->GetZindoF0ssLower()
-             -atom->GetZindoF2ppLower()*2.0;
+      value = atom->GetMndoGpp2();
    }   
-   */
+   
    // ToDo: There are bugs for d-orbitals.
    /*
    else if( orbital1 == s && ( orbital2 == dxy || 
@@ -337,7 +335,6 @@ double Mndo::GetCoulombInt(OrbitalType orbital1, OrbitalType orbital2, Atom* ato
              -atom->GetZindoF4ddLower()*4.0;
    }
    */
-   /*
    else{
       stringstream ss;
       ss << this->errorMessageCoulombInt;
@@ -346,7 +343,7 @@ double Mndo::GetCoulombInt(OrbitalType orbital1, OrbitalType orbital2, Atom* ato
       ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbital2) << "\n";
       throw MolDSException(ss.str());
    }   
-   */
+   
    return value;
 
 }
