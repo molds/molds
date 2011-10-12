@@ -678,8 +678,10 @@ double Mndo::GetNddoRepulsionIntegral(Atom* atomA, OrbitalType Mu, OrbitalType N
    else if(Mu == pz && Nu == py && Lambda == pz && Sigma == py){
       value = this->GetNddoRepulsionIntegral(atomA, Nu, Mu, atomB, Sigma, Lambda);
    }
-   // (49) in [DT_1977]
+   // (49) in [DT_1977] and p19 in [MOPAC_1990]
    else if(Mu == px && Nu == py && Lambda == px && Sigma == py){
+      value = 0.5*(this->GetNddoRepulsionIntegral(atomA, Mu, Mu, atomB, Mu, Mu)
+                  -this->GetNddoRepulsionIntegral(atomA, Mu, Mu, atomB, Nu, Nu));
    }
    else if(Mu == py && Nu == px && Lambda == px && Sigma == py){
       value = this->GetNddoRepulsionIntegral(atomA, Nu, Mu, atomB, Lambda, Sigma);
