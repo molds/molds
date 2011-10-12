@@ -58,6 +58,11 @@ public:
    double GetZindoF2ddLower();                 // Apendix in ref. [BZ_1979]
    double GetZindoF4ddLower();                 // Apendix in ref. [BZ_1979]
    double GetIonPot(OrbitalType orbital);
+   double GetMndoParameterAlpha(); // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S.
+   double GetMndoDerivedParameterD(int dIndex);    // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S.
+   double GetMndoDerivedParameterRho(int rhoIndex);  // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S.
+   double GetMndoElecEnergyAtom();        // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S.
+   double GetMndoHeatsFormAtom();         // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S.
 protected:
    string errorMessageIndoCoreIntegral;
    string errorMessageZindoSCoreIntegral;
@@ -107,11 +112,8 @@ protected:
    double mndoBondingParameterS;     // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S.
    double mndoBondingParameterP;     // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S.
    double mndoParameterAlpha;        // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S.
-   double mndoDerivedParameterD1;    // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S.
-   double mndoDerivedParameterD2;    // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S.
-   double mndoDerivedParameterRho0;  // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S.
-   double mndoDerivedParameterRho1;  // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S.
-   double mndoDerivedParameterRho2;  // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S.
+   double mndoDerivedParameterD[2];    // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S.
+   double mndoDerivedParameterRho[3];  // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S.
    double mndoElecEnergyAtom;        // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S.
    double mndoHeatsFormAtom;         // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S.
    double GetZindoCoreIntegral(OrbitalType orbital, int l, int m, int n); // Eq. (13) in [BZ_1979]
@@ -126,6 +128,11 @@ private:
    string errorMessageMndoCoreIntegral;
    string errorMessageGetOrbitalExponentBadTheory;
    string errorMessageTheoryType;
+   string errorMessageGetBondingParameterBadTheoryBadOrbital;
+   string errorMessageGetDerivedParameterDBadDIndex;
+   string errorMessageDIndex;
+   string errorMessageGetDerivedParameterRhoBadRhoIndex;
+   string errorMessageRhoIndex;
    double GetJss();  // Part of Eq. (13) in [BZ_1979]
    double GetJsp();  // Part of Eq. (13) in [BZ_1979]
    double GetJsd();  // Part of Eq. (13) in [BZ_1979]
@@ -165,6 +172,7 @@ void Atom::SetMessages(){
    this->errorMessageOrbitalExponent = "Error in base_atoms::Atom::GetOrbitalExponent: Invalid shelltype or orbitalType.\n";
    this->errorMessageIndoCoreIntegral = "Error in base_atoms::Atom::GetCoreIntegral: Invalid orbitalType for INDO.\n";
    this->errorMessageZindoSCoreIntegral = "Error in base_atoms::Atom::GetCoreIntegral: Invalid orbitalType for ZINDO/S.\n";
+   this->errorMessageMndoCoreIntegral = "Error in base_atoms::Atom::GetMndoCoreINtegral: Invalid orbitalType for MNDO.\n";
    this->errorMessageIonPot = "Error in base_atoms::Atom::GetIonPot: Invalid orbitalType.\n";
    this->errorMessageAtomType = "\tatom type = ";
    this->errorMessageOrbitalType = "\torbital type = ";
@@ -172,9 +180,13 @@ void Atom::SetMessages(){
    this->errorMessageEffectivPrincipalQuantumNumber = 
       "Error in base::Atom::GetEffectivePrincipalQuantumNumber: invalid shelltype.\n";
    this->errorMessageZindoCoreIntegral = "Error in base_atoms::Atom::GetZindoCoreINtegral: Invalid orbitalType.\n";
-   this->errorMessageMndoCoreIntegral = "Error in base_atoms::Atom::GetMndoCoreINtegral: Invalid orbitalType.\n";
    this->errorMessageGetOrbitalExponentBadTheory = "Erro in base_atoms::Atom::GetOrbitalExponent: Bad theory is set.\n";
    this->errorMessageTheoryType = "Theory = ";
+   this->errorMessageGetBondingParameterBadTheoryBadOrbital = "Error in base_atoms::Atom::GetBondingParameter: Bad Theory of bad orbital is set.\n";
+   this->errorMessageGetDerivedParameterDBadDIndex = "Error in base_atoms::Atom::GetDerivedParameterD: Bad index for parameter D(dIndex). Only 0 and 1 are permitted.\n";
+   this->errorMessageDIndex  = "dIndex = ";
+   this->errorMessageGetDerivedParameterRhoBadRhoIndex = "Error in base_atoms::Atom::GetDerivedParameterRho: Bad index for parameter rho(rhoIndex). Only 0, 1, and 2 are permitted.\n";
+   this->errorMessageRhoIndex = "rhoIndex = ";
 }
 
 AtomType Atom::GetAtomType(){
@@ -227,6 +239,21 @@ double Atom::GetBondingParameter(TheoryType theory, OrbitalType orbital){
                                  orbital == dzx ||
                                  orbital == dxxyy ) ){
       value = this->bondingParameterDZindo;
+   }
+   else if(theory == MNDO && orbital == s){
+      value = this->mndoBondingParameterS;
+   }
+   else if(theory == MNDO && ( orbital == px ||
+                               orbital == py ||
+                               orbital == pz ) ){
+      value = this->mndoBondingParameterP;
+   }
+   else{
+      stringstream ss;
+      ss << this->errorMessageGetBondingParameterBadTheoryBadOrbital;
+      ss << this->errorMessageTheoryType << TheoryTypeStr(theory) << "\n";
+      ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbital) << "\n";
+      throw MolDSException(ss.str());
    }
 
    return value;
@@ -460,6 +487,41 @@ double Atom::GetIndoG1(){
    return this->indoG1;
 }
 
+double Atom::GetMndoParameterAlpha(){
+   return this->mndoParameterAlpha;
+}
+
+double Atom::GetMndoDerivedParameterD(int dIndex){
+   if(dIndex == 0 || dIndex == 1){
+      return this->mndoDerivedParameterD[dIndex];
+   }
+   else{
+      stringstream ss;
+      ss << this->errorMessageGetDerivedParameterDBadDIndex;
+      ss << this->errorMessageDIndex << dIndex << endl;
+      throw MolDSException(ss.str());
+   }
+}
+
+double Atom::GetMndoDerivedParameterRho(int rhoIndex){
+   if(rhoIndex == 0 || rhoIndex == 1 || rhoIndex == 2){
+      return this->mndoDerivedParameterRho[rhoIndex];
+   }
+   else{
+      stringstream ss;
+      ss << this->errorMessageGetDerivedParameterRhoBadRhoIndex;
+      ss << this->errorMessageRhoIndex << rhoIndex << endl;
+      throw MolDSException(ss.str());
+   }
+}
+
+double Atom::GetMndoElecEnergyAtom(){
+   return this->mndoElecEnergyAtom;
+}
+
+double Atom::GetMndoHeatsFormAtom(){
+   return this->mndoHeatsFormAtom;
+}
 
 // Table 1 in ref. [RZ_1976], Table 1 in [AEZ_1986], or Table 1 in [GD_1972]
 double Atom::GetZindoF0ss(){
