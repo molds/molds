@@ -352,22 +352,22 @@ double Mndo::GetCoulombInt(OrbitalType orbital1, OrbitalType orbital2, Atom* ato
 double Mndo::GetExchangeInt(OrbitalType orbital1, OrbitalType orbital2, Atom* atom){
 
    double value=0.0;
-   /*
+   
    if( orbital1 == orbital2){
       value = this->GetCoulombInt(orbital1, orbital2, atom);
    }   
    else if( orbital1 == s && (orbital2 == px || orbital2 == py || orbital2 == pz ) ){
-      value = atom->GetZindoG1spLower();
+      value = atom->GetMndoHsp();
    }   
    else if( orbital2 == s && (orbital1 == px || orbital1 == py || orbital1 == pz ) ){
-      value = atom->GetZindoG1spLower();
+      value = this->GetExchangeInt(orbital2, orbital1, atom);
    }   
    else if( (orbital1 != orbital2) 
          && ( orbital1 == px || orbital1 == py || orbital1 == pz )
          && ( orbital2 == px || orbital2 == py || orbital2 == pz ) ){
-      value = atom->GetZindoF2ppLower()*3.0;
+      value = atom->GetMndoHpp();
    }
-   */
+   
    // ToDo: There are bugs for d-orbitals.
    /*
    else if( (orbital1 == s) && (orbital2 == dxy || 
@@ -457,7 +457,7 @@ double Mndo::GetExchangeInt(OrbitalType orbital1, OrbitalType orbital2, Atom* at
              +atom->GetZindoF4ddLower()*20.0;
    }
    */
-   /*
+   
    else{
       stringstream ss;
       ss << this->errorMessageExchangeInt;
@@ -466,7 +466,7 @@ double Mndo::GetExchangeInt(OrbitalType orbital1, OrbitalType orbital2, Atom* at
       ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbital2) << "\n";
       throw MolDSException(ss.str());
    }   
-   */
+   
    return value;
 }
 
