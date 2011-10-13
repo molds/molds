@@ -61,6 +61,7 @@ protected:
    double GetOverlapElementFirstDerivativeByGTOExpansion
               (Atom* atomA, int valenceIndexA, Atom* atomB, int valenceIndexB,
                STOnGType stonG, CartesianType axisA); // See [DY_1977].
+   void CalcRotatingMatrix(double** rotatingMatrix, Atom* atomA, Atom* atomB);
    virtual void CalcGammaAB(double** gammaAB, Molecule* molecule);
    virtual void SetMessages();
    virtual void SetEnableAtomTypes();
@@ -154,7 +155,6 @@ private:
                              double gaussianExponentB, 
                              double dx, double dy, double dz, 
                              double Rab, CartesianType axisA);// see [DY_1977]
-   void CalcRotatingMatrix(double** rotatingMatrix, Atom* atomA, Atom* atomB);
    void CalcRotatingMatrixFirstDerivative(double*** rMatFirstDeri, 
                                           Atom* atomA,
                                           Atom* atomB);
