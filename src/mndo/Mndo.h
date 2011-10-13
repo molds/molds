@@ -25,6 +25,7 @@ protected:
                                      double** gammaAB,
                                      double** orbitalElectronPopulation, 
                                      double* atomicElectronPopulation,
+                                     double****** twoElecTwoCore,
                                      bool isGuess);
    virtual double GetFockOffDiagElement(Atom* atomA, 
                                         Atom* atomB, 
@@ -35,6 +36,7 @@ protected:
                                         double** gammaAB, 
                                         double** overelap,
                                         double** orbitalElectronPopulation, 
+                                        double****** twoElecTwoCore,
                                         bool isGuess);
    virtual void CalcDiatomicOverlapInDiatomicFrame(double** diatomicOverlap, 
                                                    Atom* atomA, 
@@ -170,7 +172,7 @@ void Mndo::CalcCoreRepulsionEnergy(){
 double Mndo::GetFockDiagElement(Atom* atomA, int atomAIndex, int mu, 
                                  Molecule* molecule, double** gammaAB,
                                  double** orbitalElectronPopulation, double* atomicElectronPopulation,
-                                 bool isGuess){
+                                 double****** twoElecTwoCore, bool isGuess){
    double value=0.0;
    /*
    int firstAOIndexA = atomA->GetFirstAOIndex();
@@ -226,7 +228,8 @@ double Mndo::GetFockDiagElement(Atom* atomA, int atomAIndex, int mu,
 
 double Mndo::GetFockOffDiagElement(Atom* atomA, Atom* atomB, int atomAIndex, int atomBIndex, 
                                     int mu, int nu, Molecule* molecule, double** gammaAB, double** overlap,
-                                    double** orbitalElectronPopulation, bool isGuess){
+                                    double** orbitalElectronPopulation, 
+                                    double****** twoElecTwoCore, bool isGuess){
    
    double value = 0.0;
    /*

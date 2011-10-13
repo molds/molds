@@ -31,6 +31,7 @@ protected:
                                      double** gammaAB,
                                      double** orbitalElectronPopulation, 
                                      double* atomicElectronPopulation,
+                                     double****** twoElecTwoCore,
                                      bool isGuess);
    virtual double GetFockOffDiagElement(Atom* atomA, 
                                         Atom* atomB, 
@@ -41,6 +42,7 @@ protected:
                                         double** gammaAB, 
                                         double** overelap,
                                         double** orbitalElectronPopulation, 
+                                        double****** twoElecTwoCore,
                                         bool isGuess);
    virtual void CalcDiatomicOverlapInDiatomicFrame(double** diatomicOverlap, 
                                                    Atom* atomA, 
@@ -207,7 +209,7 @@ void ZindoS::SetEnableAtomTypes(){
 double ZindoS::GetFockDiagElement(Atom* atomA, int atomAIndex, int mu, 
                                  Molecule* molecule, double** gammaAB,
                                  double** orbitalElectronPopulation, double* atomicElectronPopulation,
-                                 bool isGuess){
+                                 double****** twoElecTwoCore, bool isGuess){
    double value=0.0;
    int firstAOIndexA = atomA->GetFirstAOIndex();
    value = atomA->GetCoreIntegral(atomA->GetValence()[mu-firstAOIndexA], 
@@ -262,7 +264,8 @@ double ZindoS::GetFockDiagElement(Atom* atomA, int atomAIndex, int mu,
 
 double ZindoS::GetFockOffDiagElement(Atom* atomA, Atom* atomB, int atomAIndex, int atomBIndex, 
                                     int mu, int nu, Molecule* molecule, double** gammaAB, double** overlap,
-                                    double** orbitalElectronPopulation, bool isGuess){
+                                    double** orbitalElectronPopulation, 
+                                    double****** twoElecTwoCore, bool isGuess){
    double value = 0.0;
    OrbitalType orbitalMu = atomA->GetValence()[mu-atomA->GetFirstAOIndex()];
    OrbitalType orbitalNu = atomB->GetValence()[nu-atomB->GetFirstAOIndex()];

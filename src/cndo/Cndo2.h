@@ -68,10 +68,11 @@ protected:
    virtual double GetFockDiagElement(Atom* atomA, int atomAIndex, 
                              int mu, Molecule* molecule, double** gammaAB,
                              double** orbitalElectronPopulation, double* atomicElectronPopulation,
-                             bool isGuess);
+                             double****** twoElecTwoCore, bool isGuess);
    virtual double GetFockOffDiagElement(Atom* atomA, Atom* atomB, int atomAIndex, int atomBIndex, 
                                 int mu, int nu, Molecule* molecule, double** gammaAB, double** overlap,
-                                double** orbitalElectronPopulation, bool isGuess);
+                                double** orbitalElectronPopulation, 
+                                double****** twoElecTwoCore, bool isGuess);
    virtual void CalcDiatomicOverlapInDiatomicFrame(double** diatomicOverlap, Atom* atomA, Atom* atomB);
    virtual void CalcDiatomicOverlapFirstDerivativeInDiatomicFrame(
                                                 double** diatomicOverlapDeri, 
@@ -84,6 +85,7 @@ protected:
                                      double**** rMatDeri);
    virtual double GetMolecularIntegralElement(int moI, int moJ, int moK, int moL, 
                                               Molecule* molecule, double** fockMatrix, double** gammaAB);
+   virtual void CalcTwoElecTowCore(double****** twoElecTwoCore, Molecule* molecule);
    virtual void CalcForce(int electronicStateIndex);
    TheoryType theory;
    Molecule* molecule;
@@ -112,6 +114,7 @@ private:
    double elecEnergy;
    double** gammaAB;
    double** overlap;
+   double****** twoElecTwoCore;
 
    // use Y[na][nb][la][lb][m][i][j] 
    // as Y_{ij\lammda} in (B.20) in Pople book for give na, nb, la, lb, m, i, and j.
@@ -162,6 +165,7 @@ private:
                        double** overlap, double** gammaAB,
                        double** orbitalElectronPopulation, 
                        double* atomicElectronPopulation,
+                       double****** twoElecTwoCore,
                        bool isGuess);
    void RotateDiatmicOverlapToSpaceFrame(double** diatomicOverlap, 
                                          double** rotatingMatrix);
@@ -451,6 +455,7 @@ void Cndo2::DoesSCF(bool requiresGuess){
       // calculate electron integral
       this->CalcGammaAB(this->gammaAB, this->molecule);
       this->CalcOverlap(this->overlap, this->molecule);
+      this->CalcTwoElecTowCore(this->twoElecTwoCore, this->molecule);
 
       // SCF
       double rmsDensity;
@@ -474,6 +479,7 @@ void Cndo2::DoesSCF(bool requiresGuess){
                               this->gammaAB,
                               this->orbitalElectronPopulation, 
                               this->atomicElectronPopulation,
+                              this->twoElecTwoCore,
                               isGuess);
 
          // diagonalization
@@ -586,6 +592,11 @@ double Cndo2::GetCoreRepulsionEnergy(){
 double** Cndo2::GetForce(int electronicStateIndex){
    this->CalcForce(electronicStateIndex);
    return this->matrixForce;
+}
+
+void Cndo2::CalcTwoElecTowCore(double****** twoElecTwoCore, Molecule* molecule){
+   // do nothing for CNDO, INDO, and ZINDO/S.
+   // two electron two core integrals are needed for CNDO, INDO, and ZINDO/S.
 }
 
 void Cndo2::CalcForce(int electronicStateIndex){
@@ -796,6 +807,7 @@ void Cndo2::CalcElecEnergy(double* elecEnergy, Molecule* molecule, double* energ
                            this->gammaAB,
                            this->orbitalElectronPopulation, 
                            this->atomicElectronPopulation,
+                           this->twoElecTwoCore,
                            isGuess);
       this->CalcFockMatrix(hMatrix, 
                            this->molecule, 
@@ -803,6 +815,7 @@ void Cndo2::CalcElecEnergy(double* elecEnergy, Molecule* molecule, double* energ
                            this->gammaAB,
                            dammyOrbitalElectronPopulation, 
                            dammyAtomicElectronPopulation,
+                           this->twoElecTwoCore,
                            isGuess);
 
       for(int i=0; i<totalNumberAOs; i++){
@@ -955,7 +968,7 @@ bool Cndo2::SatisfyConvergenceCriterion(double** oldOrbitalElectronPopulation,
  * ******/
 void Cndo2::CalcFockMatrix(double** fockMatrix, Molecule* molecule, double** overlap, double** gammaAB,
                            double** orbitalElectronPopulation, double* atomicElectronPopulation,
-                           bool isGuess){
+                           double****** twoElecTwoCore, bool isGuess){
 
    MallocerFreer::GetInstance()->InitializeDoubleMatrix2d
                                  (fockMatrix, molecule->GetTotalNumberAOs(), molecule->GetTotalNumberAOs());
@@ -983,6 +996,7 @@ void Cndo2::CalcFockMatrix(double** fockMatrix, Molecule* molecule, double** ove
                                                                 gammaAB,
                                                                 orbitalElectronPopulation, 
                                                                 atomicElectronPopulation,
+                                                                twoElecTwoCore,
                                                                 isGuess);
                }
                else if(mu < nu){
@@ -997,6 +1011,7 @@ void Cndo2::CalcFockMatrix(double** fockMatrix, Molecule* molecule, double** ove
                                                                    gammaAB,
                                                                    overlap,
                                                                    orbitalElectronPopulation, 
+                                                                   twoElecTwoCore,
                                                                    isGuess);
                }
                else{
@@ -1023,7 +1038,7 @@ void Cndo2::CalcFockMatrix(double** fockMatrix, Molecule* molecule, double** ove
 double Cndo2::GetFockDiagElement(Atom* atomA, int atomAIndex, int mu, 
                                  Molecule* molecule, double** gammaAB,
                                  double** orbitalElectronPopulation, double* atomicElectronPopulation,
-                                 bool isGuess){
+                                 double****** twoElecTwoCore, bool isGuess){
    double value;
    int firstAOIndexA = atomA->GetFirstAOIndex();
    value = -1.0 * atomA->GetImuAmu(atomA->GetValence()[mu-firstAOIndexA]);
@@ -1048,7 +1063,8 @@ double Cndo2::GetFockDiagElement(Atom* atomA, int atomAIndex, int mu,
 
 double Cndo2::GetFockOffDiagElement(Atom* atomA, Atom* atomB, int atomAIndex, int atomBIndex, 
                                     int mu, int nu, Molecule* molecule, double** gammaAB, double** overlap,
-                                    double** orbitalElectronPopulation, bool isGuess){
+                                    double** orbitalElectronPopulation, 
+                                    double****** twoElecTwoCore, bool isGuess){
    double value;
 
    double K = 1.0;  // = 1.0 or 0.75, see Eq. (3.79) in J. A. Pople book

@@ -21,12 +21,15 @@ protected:
                                      int mu, Molecule* molecule, double** gammaAB,
                                      double** orbitalElectronPopulation, 
                                      double* atomicElectronPopulation,
+                                     double****** twoElecTwoCore,
                                      bool isGuess);
    virtual double GetFockOffDiagElement(Atom* atomA, Atom* atomB, 
                                         int atomAIndex, int atomBIndex, 
                                         int mu, int nu, Molecule* molecule, 
                                         double** gammaAB, double** overelap,
-                                        double** orbitalElectronPopulation, bool isGuess);
+                                        double** orbitalElectronPopulation,
+                                        double****** twoElecTwoCore,
+                                        bool isGuess);
    virtual double GetMolecularIntegralElement(int moI, int moJ, int moK, int moL, 
                                               Molecule* molecule, double** fockMatrix, 
                                               double** gammaAB);
@@ -87,6 +90,7 @@ void Indo::SetEnableAtomTypes(){
 double Indo::GetFockDiagElement(Atom* atomA, int atomAIndex, int mu, 
                                  Molecule* molecule, double** gammaAB,
                                  double** orbitalElectronPopulation, double* atomicElectronPopulation,
+                                 double****** twoElecTwoCore,
                                  bool isGuess){
    double value;
    int firstAOIndexA = atomA->GetFirstAOIndex();
@@ -125,7 +129,9 @@ double Indo::GetFockDiagElement(Atom* atomA, int atomAIndex, int mu,
 
 double Indo::GetFockOffDiagElement(Atom* atomA, Atom* atomB, int atomAIndex, int atomBIndex, 
                                     int mu, int nu, Molecule* molecule, double** gammaAB, double** overlap,
-                                    double** orbitalElectronPopulation, bool isGuess){
+                                    double** orbitalElectronPopulation, 
+                                    double****** twoElecTwoCore,
+                                    bool isGuess){
    double value;
    double K = 1.0;  // = 1.0 or 0.75, see Eq. (3.79) in J. A. Pople book
    if(m <= atomA->GetValenceShellType() || m <= atomB->GetValenceShellType()){
