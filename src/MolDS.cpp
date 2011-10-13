@@ -149,8 +149,8 @@ int main(){
       else if(Parameters::GetInstance()->GetCurrentTheory() == MNDO && runingNormally){
          MolDS_mndo::Mndo* mndo = new MolDS_mndo::Mndo();
          try{
-            //mndo->SetMolecule(molecule);
-            //mndo->DoesSCF();
+            mndo->SetMolecule(molecule);
+            mndo->DoesSCF();
             if(Parameters::GetInstance()->RequiresCIS()){
                //mndo->DoesCIS();
             }

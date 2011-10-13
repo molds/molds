@@ -2,8 +2,8 @@
 THEORY
    //cndo/2
    //indo
-   zindo/s
-   //mndo
+   //zindo/s
+   mndo
    //none 
    //principal_axes
    //translate
@@ -16,7 +16,7 @@ SCF
    damping_thresh 1.0 
    damping_weight 0.5
    diis_num_error_vect 5
-   diis_start_error 0.02
+   diis_start_error 0.002
    diis_end_error 0.00000002
 SCF_END
 
@@ -101,6 +101,16 @@ CIS_END
 //   H  -0.422611    0.820144    0.000000
 //GEOMETRY_END
 
+//metane 2
+GEOMETRY
+   C        0.0000     0.0000     0.0000
+   H        1.1000     0.0000     0.0000
+   H        -0.3549    1.0306     0.0000
+   H        -0.3549    -0.5153    -0.8925
+   H        -0.3549    -0.5153     0.8925
+GEOMETRY_END
+
+
 // c2
 //GEOMETRY
 //   C  0.168464    0.0    0.000000 
@@ -159,12 +169,12 @@ CIS_END
 //GEOMETRY_END
 
 // acetylene3
-GEOMETRY
- C                     0.24933   0.01  -0.01 
- C                     1.45053   0.0    0.20 
- H                    -0.82067   0.02  -0.050 
- H                     2.52053  -0.10   0.0 
-GEOMETRY_END
+//GEOMETRY
+// C                     0.24933   0.01  -0.01 
+// C                     1.45053   0.0    0.20 
+// H                    -0.82067   0.02  -0.050 
+// H                     2.52053  -0.10   0.0 
+//GEOMETRY_END
 
 // C2Li2
 //GEOMETRY

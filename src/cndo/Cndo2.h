@@ -15,7 +15,7 @@ public:
    Cndo2();
    ~Cndo2();
    TheoryType GetTheoryType();
-   void SetMolecule(Molecule* molecule);
+   virtual void SetMolecule(Molecule* molecule);
    Molecule* GetMolecule();
    void DoesSCF();
    void DoesSCF(bool requiresGuess);
@@ -92,6 +92,7 @@ protected:
    double** fockMatrix;
    double* energiesMO;
    double** matrixForce;
+   double****** twoElecTwoCore;
    struct MoEnergy{
       double energy;
       int occIndex;
@@ -114,7 +115,6 @@ private:
    double elecEnergy;
    double** gammaAB;
    double** overlap;
-   double****** twoElecTwoCore;
 
    // use Y[na][nb][la][lb][m][i][j] 
    // as Y_{ij\lammda} in (B.20) in Pople book for give na, nb, la, lb, m, i, and j.
@@ -215,6 +215,7 @@ Cndo2::Cndo2(){
    this->SetEnableAtomTypes();
    this->gammaAB = NULL;
    this->overlap = NULL;
+   this->twoElecTwoCore = NULL;
    this->orbitalElectronPopulation = NULL;
    this->atomicElectronPopulation = NULL;
    this->fockMatrix = NULL;

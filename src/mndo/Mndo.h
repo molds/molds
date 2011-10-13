@@ -14,6 +14,7 @@ class Mndo : public MolDS_zindo::ZindoS{
 public:
    Mndo();
    ~Mndo();
+   virtual void SetMolecule(Molecule* molecule);
 protected:
    virtual void SetMessages();
    virtual void SetEnableAtomTypes();
@@ -50,9 +51,7 @@ protected:
    virtual double GetExchangeInt(OrbitalType orbital1, 
                                  OrbitalType orbital2, 
                                  Atom* atom); 
-   virtual double GetElectronCoreAttraction(Atom* atomA, Atom* atomB, 
-                                            OrbitalType mu, OrbitalType nu,
-                                            double**** twoElecTwoCoreMatrixTwoAtoms);
+   virtual void CalcTwoElecTowCore(double****** twoElecTwoCore, Molecule* molecule);
    virtual double GetMolecularIntegralElement(int moI, 
                                               int moJ, 
                                               int moK, 
@@ -67,10 +66,13 @@ private:
    string errorMessageMultipoleA;
    string errorMessageMultipoleB;
    string errorMessageGetNddoRepulsionIntegral;
-   string errorMessageCalcTwoElecTwoCoreMatrixTwoAtomsNullMatrix;
-   string errorMessageCalcTwoElecTwoCoreMatrixTwoAtomsSameAtoms;
-   void CalcTwoElecTwoCoreMatrixTwoAtoms(double**** matrix, int atomAIndex, int atomBIndex);
-   void RotateTwoElecTwoCoreMatrixToSpaceFrame(double**** matrix, double** rotatingMatrix);
+   string errorMessageCalcTwoElecTwoCoreDiatomicNullMatrix;
+   string errorMessageCalcTwoElecTwoCoreNullMatrix;
+   string errorMessageCalcTwoElecTwoCoreDiatomicSameAtoms;
+   double GetElectronCoreAttraction(int atomAIndex, int atomBIndex, 
+                                    int mu, int nu, double****** twoElecTwoCore);
+   void CalcTwoElecTwoCoreDiatomic(double**** matrix, int atomAIndex, int atomBIndex);
+   void RotateTwoElecTwoCoreDiatomicToSpaceFramegc(double**** matrix, double** rotatingMatrix);
    double GetNddoRepulsionIntegral(Atom* atomA, OrbitalType mu, OrbitalType nu,
                                    Atom* atomB, OrbitalType lambda, OrbitalType sigma);
    double GetSemiEmpiricalMultipoleInteraction(MultipoleType multipoleA,
@@ -90,9 +92,26 @@ Mndo::Mndo() : MolDS_zindo::ZindoS(){
 }
 
 Mndo::~Mndo(){
+   if(this->twoElecTwoCore != NULL){
+      MallocerFreer::GetInstance()->FreeDoubleMatrix6d(
+                                    &this->twoElecTwoCore, 
+                                    this->molecule->GetAtomVect()->size(),
+                                    this->molecule->GetAtomVect()->size(),
+                                    dxy,
+                                    dxy,
+                                    dxy);
+      //cout << "twoElecTwoCore deleted\n";
+   }
    //cout << "Mndo deleted\n";
 }
 
+void Mndo::SetMolecule(Molecule* molecule){
+   Cndo2::SetMolecule(molecule);
+   this->twoElecTwoCore = MallocerFreer::GetInstance()->MallocDoubleMatrix6d(
+                                                         molecule->GetAtomVect()->size(),
+                                                         molecule->GetAtomVect()->size(),
+                                                         dxy, dxy, dxy, dxy);
+}
 void Mndo::SetMessages(){
    this->errorMessageSCFNotConverged 
       = "Error in mndo::Mndo::DoesSCF: SCF did not met convergence criterion. maxIterationsSCF=";
@@ -112,11 +131,12 @@ void Mndo::SetMessages(){
    this->errorMessageMultipoleA = "Multipole A is: ";
    this->errorMessageMultipoleB = "Multipole B is: ";
    this->errorMessageGetNddoRepulsionIntegral = "Error in mndo::Mndo::GetNddoRepulsionIntegral: Bad orbital is set.\n";
-
-   this->errorMessageCalcTwoElecTwoCoreMatrixTwoAtomsNullMatrix 
-      = "Error in mndo::Mndo::CalcTwoElecTwoCoreMatrixTwoAtoms: Atom A and B is same.\n"; 
-   this->errorMessageCalcTwoElecTwoCoreMatrixTwoAtomsSameAtoms
-      = "Error in mndo::Mndo::CalcTwoElecTwoCoreMatrixTwoAtoms: The matrix is NULL.\n"; 
+   this->errorMessageCalcTwoElecTwoCoreNullMatrix 
+      = "Error in mndo::Mndo::CalcTwoElecTwoCore: The two elec two core matrix is NULL.\n"; 
+   this->errorMessageCalcTwoElecTwoCoreDiatomicNullMatrix 
+      = "Error in mndo::Mndo::CalcTwoElecTwoCoreDiatomic: The two elec two core diatomic matrix is NULL.\n"; 
+   this->errorMessageCalcTwoElecTwoCoreDiatomicSameAtoms
+      = "Error in mndo::Mndo::CalcTwoElecTwoCoreDiatomic: Atom A and B is same.\n"; 
    this->messageSCFMetConvergence = "\n\n\n\t\tMNDO/S-SCF met convergence criterion(^^b\n\n\n";
    this->messageStartSCF = "**********  START: MNDO/S-SCF  **********\n";
    this->messageDoneSCF = "**********  DONE: MNDO/S-SCF  **********\n\n\n";
@@ -171,58 +191,42 @@ void Mndo::CalcCoreRepulsionEnergy(){
 
 double Mndo::GetFockDiagElement(Atom* atomA, int atomAIndex, int mu, 
                                  Molecule* molecule, double** gammaAB,
-                                 double** orbitalElectronPopulation, double* atomicElectronPopulation,
+                                 double** orbitalElectronPopulation, 
+                                 double* atomicElectronPopulation,
                                  double****** twoElecTwoCore, bool isGuess){
    double value=0.0;
-   /*
    int firstAOIndexA = atomA->GetFirstAOIndex();
-   value = atomA->GetCoreIntegral(atomA->GetValence()[mu-firstAOIndexA], 
-                                  isGuess, this->theory);
+   mu -= firstAOIndexA;
+   value = atomA->GetCoreIntegral(atomA->GetValence()[mu], isGuess, this->theory);
    if(!isGuess){
       double temp = 0.0;
-      double coulomb = 0.0;
-      double exchange = 0.0;
-      int lammda = 0;
       int totalNumberAOs = this->molecule->GetTotalNumberAOs();
-      double orbitalElectronPopulationDiagPart[totalNumberAOs];
-
-      for(int i=0; i<totalNumberAOs; i++){
-         orbitalElectronPopulationDiagPart[i] = orbitalElectronPopulation[i][i];
-      }
-
-      OrbitalType orbitalMu = atomA->GetValence()[mu-firstAOIndexA];
-      OrbitalType orbitalLam;
-      int atomANumberValence = atomA->GetValence().size();
-      for(int v=0; v<atomANumberValence; v++){
-         orbitalLam = atomA->GetValence()[v];
-         coulomb  = this->GetCoulombInt(orbitalMu, orbitalLam, atomA);
-         exchange = this->GetExchangeInt(orbitalMu, orbitalLam, atomA);
-         lammda = v + firstAOIndexA;
-         temp += orbitalElectronPopulationDiagPart[lammda]*(coulomb - 0.5*exchange);
+      OrbitalType orbitalMu = atomA->GetValence()[mu];
+      for(int nu=0; nu<atomA->GetValence().size(); nu++){
+         OrbitalType orbitalNu = atomA->GetValence()[nu];
+         double coulomb  = this->GetCoulombInt(orbitalMu, orbitalNu, atomA);
+         double exchange = this->GetExchangeInt(orbitalMu, orbitalNu, atomA);
+         temp += orbitalElectronPopulation[nu+firstAOIndexA][nu+firstAOIndexA]
+                *(coulomb - 0.5*exchange);
       }
       value += temp;
-   
+
       temp = 0.0;
-      int totalNumberAtoms = molecule->GetAtomVect()->size();
-      for(int B=0; B<totalNumberAtoms; B++){
+      for(int B=0; B<molecule->GetAtomVect()->size(); B++){
          if(B != atomAIndex){
             Atom* atomB = (*molecule->GetAtomVect())[B];
-            OrbitalType orbitalSigma;
-            int sigma;
-            int atomBNumberValence = atomB->GetValence().size();
-            for(int i=0; i<atomBNumberValence; i++){
-               sigma = i + atomB->GetFirstAOIndex();
-               orbitalSigma = atomB->GetValence()[i];
-               temp += orbitalElectronPopulationDiagPart[sigma]
-                      *this->GetNishimotoMatagaTwoEleInt(atomA, orbitalMu, atomB, orbitalSigma);
+            int firstAOIndexB = atomB->GetFirstAOIndex();
+            for(int lambda=0; lambda<atomB->GetValence().size(); lambda++){
+               for(int sigma=0; sigma<atomB->GetValence().size(); sigma++){
+                  temp += orbitalElectronPopulation[lambda+firstAOIndexB][sigma+firstAOIndexB]
+                         *twoElecTwoCore[atomAIndex][B][mu][mu][lambda][sigma];
+               }
             }
-            temp -= atomB->GetCoreCharge() 
-                   *this->GetNishimotoMatagaTwoEleInt(atomA, s, atomB, s);
+            temp += this->GetElectronCoreAttraction(atomAIndex, B, mu, mu, twoElecTwoCore);
          }
       }
       value += temp;
    }
-   */
    return value;
 }
 
@@ -230,41 +234,58 @@ double Mndo::GetFockOffDiagElement(Atom* atomA, Atom* atomB, int atomAIndex, int
                                     int mu, int nu, Molecule* molecule, double** gammaAB, double** overlap,
                                     double** orbitalElectronPopulation, 
                                     double****** twoElecTwoCore, bool isGuess){
-   
    double value = 0.0;
-   /*
-   OrbitalType orbitalMu = atomA->GetValence()[mu-atomA->GetFirstAOIndex()];
-   OrbitalType orbitalNu = atomB->GetValence()[nu-atomB->GetFirstAOIndex()];
-
+   int firstAOIndexA = atomA->GetFirstAOIndex();
+   int firstAOIndexB = atomB->GetFirstAOIndex();
+   mu -= firstAOIndexA;
+   nu -= firstAOIndexB;
+   OrbitalType orbitalMu = atomA->GetValence()[mu];
+   OrbitalType orbitalNu = atomB->GetValence()[nu];
    double bondParameter = 0.5*(atomA->GetBondingParameter(this->theory, orbitalMu) 
                               +atomB->GetBondingParameter(this->theory, orbitalNu)); 
-
    if(isGuess){
-      value = bondParameter*overlap[mu][nu];
+      value = bondParameter*overlap[mu+firstAOIndexA][nu+firstAOIndexB];
    }
    else{
       double coulomb = 0.0;
       double exchange = 0.0;
+      double temp = 0.0;
       if(atomAIndex == atomBIndex){
          coulomb  = this->GetCoulombInt(orbitalMu, orbitalNu, atomA); 
          exchange = this->GetExchangeInt(orbitalMu, orbitalNu, atomA); 
-         value = (1.5*exchange - 0.5*coulomb)*orbitalElectronPopulation[mu][nu];
+         temp = (1.5*exchange - 0.5*coulomb)
+               *orbitalElectronPopulation[mu+firstAOIndexA][nu+firstAOIndexB];
+         for(int BB=0; BB<molecule->GetAtomVect()->size(); BB++){
+            if(BB != atomAIndex){
+               Atom* atomBB = (*molecule->GetAtomVect())[BB];
+               int firstAOIndexBB = atomBB->GetFirstAOIndex();
+               for(int lambda=0; lambda<atomBB->GetValence().size(); lambda++){
+                  for(int sigma=0; sigma<atomBB->GetValence().size(); sigma++){
+                     temp += orbitalElectronPopulation[lambda+firstAOIndexBB][sigma+firstAOIndexBB]
+                            *twoElecTwoCore[atomAIndex][BB][mu][mu][lambda][sigma];
+                  }
+               }
+               temp += this->GetElectronCoreAttraction(atomAIndex, BB, mu, nu, twoElecTwoCore);
+            }
+         }
       }
       else{
-         value = bondParameter*overlap[mu][nu];
-         value -= 0.5*orbitalElectronPopulation[mu][nu]
-                  *this->GetNishimotoMatagaTwoEleInt(atomA, orbitalMu, atomB, orbitalNu);
+         temp = bondParameter*overlap[mu+firstAOIndexA][nu+firstAOIndexB];
+         for(int lambda=0; lambda<atomB->GetValence().size(); lambda++){
+            for(int sigma=0; sigma<atomA->GetValence().size(); sigma++){
+               temp += 0.5*orbitalElectronPopulation[lambda+firstAOIndexB][sigma+firstAOIndexB]
+                      *twoElecTwoCore[atomAIndex][atomBIndex][mu][sigma][lambda][nu];
+            }
+         }
       }
+      value += temp;
    }
-   */
    return value;
 }
 
 // MNDO Coulomb Interaction
 double Mndo::GetCoulombInt(OrbitalType orbital1, OrbitalType orbital2, Atom* atom){
-
    double value=0.0;
-    
    if( orbital1 == s && orbital2 == s){ 
       value = atom->GetMndoGss();
    }   
@@ -396,16 +417,12 @@ double Mndo::GetCoulombInt(OrbitalType orbital1, OrbitalType orbital2, Atom* ato
       ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbital2) << "\n";
       throw MolDSException(ss.str());
    }   
-   
    return value;
-
 }
 
 // MNDO Exchange Interaction
 double Mndo::GetExchangeInt(OrbitalType orbital1, OrbitalType orbital2, Atom* atom){
-
    double value=0.0;
-   
    if( orbital1 == orbital2){
       value = this->GetCoulombInt(orbital1, orbital2, atom);
    }   
@@ -519,40 +536,28 @@ double Mndo::GetExchangeInt(OrbitalType orbital1, OrbitalType orbital2, Atom* at
       ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbital2) << "\n";
       throw MolDSException(ss.str());
    }   
-   
    return value;
 }
 
 // electron in atom A (mu and nu) and core (atom B) attraction. 
 // see Eq. (16) in [DT_1977-2] with f_2 = 0.
-double Mndo::GetElectronCoreAttraction(Atom* atomA, Atom* atomB, 
-                                          OrbitalType mu, OrbitalType nu,
-                                          double**** twoElecTwoCoreMatrixTwoAtoms){
-   return -1.0*atomB->GetCoreCharge()*twoElecTwoCoreMatrixTwoAtoms[mu][nu][s][s];
+double Mndo::GetElectronCoreAttraction(int atomAIndex, int atomBIndex, 
+                                       int mu, int nu, double****** twoElecTwoCore){
+   Atom* atomB = (*this->molecule->GetAtomVect())[atomBIndex];
+   return -1.0*atomB->GetCoreCharge()*twoElecTwoCore[atomAIndex][atomBIndex][mu][nu][s][s];
 }
 
 void Mndo::CalcDiatomicOverlapInDiatomicFrame(double** diatomicOverlap, Atom* atomA, Atom* atomB){
-
    MolDS_cndo::Cndo2::CalcDiatomicOverlapInDiatomicFrame(diatomicOverlap, atomA, atomB);
-
-   /*
-   for(int i=0;i<OrbitalType_end;i++){
-      for(int j=0;j<OrbitalType_end;j++){
-         printf("diatomicOverlap[%d][%d]=%lf\n",i,j,diatomicOverlap[i][j]);
-      }
-   }
-   */
-
 }
 
 void Mndo::CalcDiatomicOverlapFirstDerivativeInDiatomicFrame(
                                                 double** diatomicOverlapDeri, 
                                                 Atom* atomA, Atom* atomB){
-
    MolDS_cndo::Cndo2::CalcDiatomicOverlapFirstDerivativeInDiatomicFrame(
                         diatomicOverlapDeri,atomA, atomB);
-
 }
+
 // The order of mol, moJ, moK, moL is consistent with Eq. (9) in [RZ_1973]
 double Mndo::GetMolecularIntegralElement(int moI, int moJ, int moK, int moL, 
                                           Molecule* molecule, double** fockMatrix, double** gammaAB){
@@ -568,18 +573,65 @@ void Mndo::CalcCISMatrix(double** matrixCIS, int numberOcc, int numberVir){
 void Mndo::CalcForce(int electronicStateIndex){
 }
 
+void Mndo::CalcTwoElecTowCore(double****** twoElecTwoCore, Molecule* molecule){
+   if(twoElecTwoCore == NULL){
+      stringstream ss;
+      ss << this->errorMessageCalcTwoElecTwoCoreNullMatrix;
+      throw MolDSException(ss.str());
+   }
+   else{
+      MallocerFreer::GetInstance()->InitializeDoubleMatrix6d(twoElecTwoCore, 
+                                                      molecule->GetAtomVect()->size(),
+                                                      molecule->GetAtomVect()->size(),
+                                                      dxy, dxy, dxy, dxy);
+   } 
+   double**** twoElecTwoCoreDiatomic = MallocerFreer::GetInstance()->MallocDoubleMatrix4d(
+                                                                     dxy, dxy, dxy, dxy);
+   try{
+      // note that terms with condition a==b are not needed to calculate. 
+      for(int a=0; a<molecule->GetAtomVect()->size(); a++){
+         for(int b=a+1; b<molecule->GetAtomVect()->size(); b++){
+            this->CalcTwoElecTwoCoreDiatomic(twoElecTwoCoreDiatomic, a, b);
+            for(int mu=0; mu<dxy; mu++){
+               for(int nu=mu; nu<dxy; nu++){
+                  for(int lambda=0; lambda<dxy; lambda++){
+                     for(int sigma=lambda; sigma<dxy; sigma++){
+                        double value = twoElecTwoCoreDiatomic[mu][nu][lambda][sigma];
+                        twoElecTwoCore[a][b][mu][nu][lambda][sigma] = value;
+                        twoElecTwoCore[a][b][mu][nu][sigma][lambda] = value;
+                        twoElecTwoCore[a][b][nu][mu][lambda][sigma] = value;
+                        twoElecTwoCore[a][b][nu][mu][sigma][lambda] = value;
+                        twoElecTwoCore[b][a][lambda][sigma][mu][nu] = value;
+                        twoElecTwoCore[b][a][lambda][sigma][nu][mu] = value;
+                        twoElecTwoCore[b][a][sigma][lambda][mu][nu] = value;
+                        twoElecTwoCore[b][a][sigma][lambda][nu][mu] = value;
+                     }
+                  }
+               }
+            }
+         }
+      }
+   }
+   catch(MolDSException ex){
+      MallocerFreer::GetInstance()->FreeDoubleMatrix4d(&twoElecTwoCoreDiatomic,
+                                                       dxy, dxy, dxy);
+      throw ex;
+   }
+   MallocerFreer::GetInstance()->FreeDoubleMatrix4d(&twoElecTwoCoreDiatomic,
+                                                    dxy, dxy, dxy);
+}
+
 // Calculation of two electrons two cores integral (mu, nu | lambda, sigma), 
 // taht is, Eq. (9) in ref. [DT_1977-2].
 // Note that atomA != atomB.
 // Note taht d-orbital cannot be treated, 
 // that is, matrix[dxy][dxy][dxy][dxy] can be treatable.
-void Mndo::CalcTwoElecTwoCoreMatrixTwoAtoms(double**** matrix, int atomAIndex, int atomBIndex){
-
+void Mndo::CalcTwoElecTwoCoreDiatomic(double**** matrix, int atomAIndex, int atomBIndex){
    Atom* atomA = NULL;
    Atom* atomB = NULL;
    if(atomAIndex == atomBIndex){
       stringstream ss;
-      ss << this->errorMessageCalcTwoElecTwoCoreMatrixTwoAtomsSameAtoms;
+      ss << this->errorMessageCalcTwoElecTwoCoreDiatomicSameAtoms;
       ss << this->errorMessageAtomA << atomAIndex 
                                     << AtomTypeStr(atomA->GetAtomType()) << endl;
       ss << this->errorMessageAtomB << atomBIndex 
@@ -593,11 +645,7 @@ void Mndo::CalcTwoElecTwoCoreMatrixTwoAtoms(double**** matrix, int atomAIndex, i
 
    if(matrix == NULL){
       stringstream ss;
-      ss << this->errorMessageCalcTwoElecTwoCoreMatrixTwoAtomsNullMatrix;
-      ss << this->errorMessageAtomA << atomAIndex 
-                                    << AtomTypeStr(atomA->GetAtomType()) << endl;
-      ss << this->errorMessageAtomB << atomBIndex 
-                                    << AtomTypeStr(atomB->GetAtomType()) << endl;
+      ss << this->errorMessageCalcTwoElecTwoCoreDiatomicNullMatrix;
       throw MolDSException(ss.str());
    }
    else{
@@ -627,7 +675,7 @@ void Mndo::CalcTwoElecTwoCoreMatrixTwoAtoms(double**** matrix, int atomAIndex, i
                                              OrbitalType_end, OrbitalType_end);
    try{
       this->CalcRotatingMatrix(rotatingMatrix, atomA, atomB);
-      this->RotateTwoElecTwoCoreMatrixToSpaceFrame(matrix, rotatingMatrix);
+      this->RotateTwoElecTwoCoreDiatomicToSpaceFramegc(matrix, rotatingMatrix);
    }
    catch(MolDSException ex){
       MallocerFreer::GetInstance()->FreeDoubleMatrix2d(&rotatingMatrix, OrbitalType_end);
@@ -648,13 +696,11 @@ void Mndo::CalcTwoElecTwoCoreMatrixTwoAtoms(double**** matrix, int atomAIndex, i
       }
    }
    */
-
 }
 
 // Rotate 4-d matrix from diatomic frame to space frame
 // Note tha in this method d-orbitals can not be treatable.
-void Mndo::RotateTwoElecTwoCoreMatrixToSpaceFrame(double**** matrix, double** rotatingMatrix){
-
+void Mndo::RotateTwoElecTwoCoreDiatomicToSpaceFramegc(double**** matrix, double** rotatingMatrix){
    double oldMatrix[dxy][dxy][dxy][dxy];
    for(int mu=0; mu<dxy; mu++){
       for(int nu=0; nu<dxy; nu++){
@@ -672,7 +718,6 @@ void Mndo::RotateTwoElecTwoCoreMatrixToSpaceFrame(double**** matrix, double** ro
          for(int lambda=0; lambda<dxy; lambda++){
             for(int sigma=0; sigma<dxy; sigma++){
                matrix[mu][nu][lambda][sigma] = 0.0;
-
                for(int i=0; i<dxy; i++){
                   for(int j=0; j<dxy; j++){
                      for(int k=0; k<dxy; k++){
