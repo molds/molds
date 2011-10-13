@@ -34,6 +34,13 @@ public:
    double**** MallocDoubleMatrix4d(int size1, int size2, int size3, int size4);
    void InitializeDoubleMatrix4d(double**** matrix, int size1, int size2, int size3, int size4);
    void FreeDoubleMatrix4d(double***** matrix, int size1, int size2, int size3);
+   // 6d
+   double****** MallocDoubleMatrix6d(int size1, int size2, int size3, 
+                                     int size4, int size5, int size6);
+   void InitializeDoubleMatrix6d(double****** matrix, int size1, int size2, int size3, 
+                                                      int size4, int size5, int size6);
+   void FreeDoubleMatrix6d(double******* matrix, int size1, int size2, int size3,
+                                                 int size4, int size5);
 private:
    MallocerFreer();
    MallocerFreer(MallocerFreer&);
@@ -249,6 +256,91 @@ void MallocerFreer::FreeDoubleMatrix4d(double***** matrix, int size1, int size2,
    for (i=0;i<size1;i++) {
       for (j=0;j<size2;j++) {
          for (k=0;k<size3;k++) {
+            delete [] (*matrix)[i][j][k];
+         }
+         delete [] (*matrix)[i][j];
+      }
+      delete [] (*matrix)[i];
+   }
+   delete [] *matrix;
+   *matrix = NULL;
+
+}
+
+double****** MallocerFreer::MallocDoubleMatrix6d(int size1, int size2, int size3, 
+                                                 int size4, int size5, int size6){
+   
+   double****** matrix;  
+
+   matrix = new double*****[size1];
+   if(matrix==NULL){
+      throw MolDSException(this->errorMessageMallocFailure);
+   }
+   for(int i=0;i<size1;i++) {
+      matrix[i] = new double****[size2];
+      if(matrix[i]==NULL){
+         throw MolDSException(this->errorMessageMallocFailure);
+      }
+      for(int j=0;j<size2;j++){
+         matrix[i][j] = new double***[size3];
+         if(matrix[i][j]==NULL){
+            throw MolDSException(this->errorMessageMallocFailure);
+         }
+         for(int k=0;k<size3;k++){
+            matrix[i][j][k] = new double**[size4];
+            if(matrix[i][j][k]==NULL){
+               throw MolDSException(this->errorMessageMallocFailure);
+            }
+            for(int l=0;l<size4;l++){
+               matrix[i][j][k][l] = new double*[size5];
+               if(matrix[i][j][k][l]==NULL){
+                  throw MolDSException(this->errorMessageMallocFailure);
+               }
+               for(int m=0;m<size5;m++){
+                  matrix[i][j][k][l][m] = new double[size6];
+                  if(matrix[i][j][k][l][m]==NULL){
+                     throw MolDSException(this->errorMessageMallocFailure);
+                  }
+               }
+            }
+         }
+      }
+   }
+
+   this->InitializeDoubleMatrix6d(matrix, size1, size2, size3, size4, size5, size6);
+
+   return(matrix); 
+}
+
+void MallocerFreer::InitializeDoubleMatrix6d(double****** matrix, int size1, int size2, int size3, 
+                                                                  int size4, int size5, int size6){
+   for(int i=0;i<size1;i++) {
+      for(int j=0;j<size2;j++){
+         for(int k=0;k<size3;k++){
+            for(int l=0;l<size4;l++){
+               for(int m=0;m<size5;m++){
+                  for(int n=0;n<size6;n++){
+                     matrix[i][j][k][l][m][n] = 0.0;
+                  }
+               }
+            }
+         }
+      }
+   }
+}
+
+void MallocerFreer::FreeDoubleMatrix6d(double******* matrix, int size1, int size2, int size3,
+                                                             int size4, int size5){
+
+   for (int i=0;i<size1;i++) {
+      for (int j=0;j<size2;j++) {
+         for (int k=0;k<size3;k++) {
+            for (int l=0;l<size4;l++) {
+               for (int m=0;m<size5;m++) {
+                  delete [] (*matrix)[i][j][k][l][m];
+               }
+               delete [] (*matrix)[i][j][k][l];
+            }
             delete [] (*matrix)[i][j][k];
          }
          delete [] (*matrix)[i][j];
