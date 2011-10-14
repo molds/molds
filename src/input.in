@@ -14,7 +14,7 @@ SCF
    max_iter 50
    rms_density 0.000001
    damping_thresh 1.0 
-   damping_weight 0.5
+   damping_weight 0.8
    diis_num_error_vect 5
    diis_start_error 0.002
    diis_end_error 0.00000002
@@ -92,6 +92,12 @@ CIS_END
 //   H  -0.357143     0.417790      0.000000
 //GEOMETRY_END
 
+// H2-2
+GEOMETRY
+   H  0.0     0.0      0.000000
+   H  0.6633     0.0      0.000000
+GEOMETRY_END
+
 //metane
 //GEOMETRY
 //   C  0.647389    0.820131    0.000000
@@ -101,14 +107,14 @@ CIS_END
 //   H  -0.422611    0.820144    0.000000
 //GEOMETRY_END
 
-//metane 2
-GEOMETRY
-   C        0.0000     0.0000     0.0000
-   H        1.1000     0.0000     0.0000
-   H        -0.3549    1.0306     0.0000
-   H        -0.3549    -0.5153    -0.8925
-   H        -0.3549    -0.5153     0.8925
-GEOMETRY_END
+//metane-2
+//GEOMETRY
+//   C        0.0000     0.0000     0.0000
+//   H        1.1000     0.0000     0.0000
+//   H        -0.3549    1.0306     0.0000
+//   H        -0.3549    -0.5153    -0.8925
+//   H        -0.3549    -0.5153     0.8925
+//GEOMETRY_END
 
 
 // c2

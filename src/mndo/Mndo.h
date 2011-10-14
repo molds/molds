@@ -271,10 +271,10 @@ double Mndo::GetFockOffDiagElement(Atom* atomA, Atom* atomB, int atomAIndex, int
       }
       else{
          temp = bondParameter*overlap[mu+firstAOIndexA][nu+firstAOIndexB];
-         for(int lambda=0; lambda<atomB->GetValence().size(); lambda++){
-            for(int sigma=0; sigma<atomA->GetValence().size(); sigma++){
-               temp += 0.5*orbitalElectronPopulation[lambda+firstAOIndexB][sigma+firstAOIndexB]
-                      *twoElecTwoCore[atomAIndex][atomBIndex][mu][sigma][lambda][nu];
+         for(int sigma=0; sigma<atomA->GetValence().size(); sigma++){
+            for(int lambda=0; lambda<atomB->GetValence().size(); lambda++){
+               temp -= 0.5*orbitalElectronPopulation[lambda+firstAOIndexB][sigma+firstAOIndexA]
+                      *twoElecTwoCore[atomAIndex][atomBIndex][mu][sigma][nu][lambda];
             }
          }
       }
