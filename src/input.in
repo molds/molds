@@ -20,15 +20,15 @@ SCF
    diis_end_error 0.00000002
 SCF_END
 
-CIS
-   davidson yes
-   active_occ 100
-   active_vir 100
-   nstates 5
-   max_iter 200
-   max_dim 100
-   norm_tol 0.000001
-CIS_END
+//CIS
+//   davidson yes
+//   active_occ 100
+//   active_vir 100
+//   nstates 5
+//   max_iter 200
+//   max_dim 100
+//   norm_tol 0.000001
+//CIS_END
 
 //MD
 //   total_steps 100
@@ -123,24 +123,24 @@ CIS_END
 //GEOMETRY_END
 
 //metane-3
-GEOMETRY
-   C        0.0000     0.0000     0.0000
-   H        1.1042     0.0000     0.0000
-   H       -0.3681     1.0411     0.0000
-   H       -0.3681    -0.5205    -0.9016
-   H       -0.3681    -0.5206     0.9016
-GEOMETRY_END
-
-// c2
 //GEOMETRY
-//   C  0.168464    0.0    0.000000 
-//   C  1.369664    0.0    0.000000
+//   C        0.0000     0.0000     0.0000
+//   H        1.1042     0.0000     0.0000
+//   H       -0.3681     1.0411     0.0000
+//   H       -0.3681    -0.5205    -0.9016
+//   H       -0.3681    -0.5206     0.9016
 //GEOMETRY_END
 
 // c2
 //GEOMETRY
-//   C  0.0 0.0 0.168464
-//   C  0.0 0.0 1.369664
+//   C  0.00000    0.0    0.000000 
+//   C  1.16914    0.0    0.000000
+//GEOMETRY_END
+
+// c2
+//GEOMETRY
+//   C  0.0 0.0 0.000
+//   C  0.0 0.0 1.38278
 //GEOMETRY_END
 
 // c2 
@@ -213,6 +213,18 @@ GEOMETRY_END
 // H                     0.33753   1.52317   0.0
 // H                     1.94069   0.59546   0.0
 //GEOMETRY_END
+
+// methylene
+GEOMETRY
+   C                   0.0000     0.0000     0.0000
+   C                   1.5209     0.0000     0.0000
+   H                  -0.4009     1.0342     0.0000
+   H                  -0.4009    -0.5171    -0.8956
+   H                  -0.4009    -0.5171     0.8956
+   H                   1.9218     0.5171    -0.8956
+   H                   1.9218     0.5171     0.8956
+   H                   1.9218    -1.0342     0.0000
+GEOMETRY_END
 
 // LiH
 //GEOMETRY

@@ -1566,7 +1566,7 @@ double Mndo::GetSemiEmpiricalMultipoleInteraction(MultipoleType multipoleA,
       value = pow(temp1,-0.5)/16.0 + pow(temp2,-0.5)/16.0 
              +pow(temp3,-0.5)/16.0 + pow(temp4,-0.5)/16.0
              -pow(temp5,-0.5)/8.0 - pow(temp6,-0.5)/8.0
-             -pow(temp7,-0.5)/8.0 - pow(temp8,-0.5)/8.0;
+             -pow(temp7,-0.5)/8.0 - pow(temp8,-0.5)/8.0
              +pow(temp9,-0.5)/4.0;
    }
    else if(multipoleA == Qxz && multipoleB == Qxz){
