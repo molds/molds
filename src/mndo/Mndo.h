@@ -200,7 +200,6 @@ double Mndo::GetFockDiagElement(Atom* atomA, int atomAIndex, int mu,
    value = atomA->GetCoreIntegral(atomA->GetValence()[mu], isGuess, this->theory);
    if(!isGuess){
       double temp = 0.0;
-      int totalNumberAOs = this->molecule->GetTotalNumberAOs();
       OrbitalType orbitalMu = atomA->GetValence()[mu];
       for(int nu=0; nu<atomA->GetValence().size(); nu++){
          OrbitalType orbitalNu = atomA->GetValence()[nu];
@@ -262,7 +261,7 @@ double Mndo::GetFockOffDiagElement(Atom* atomA, Atom* atomB, int atomAIndex, int
                for(int lambda=0; lambda<atomBB->GetValence().size(); lambda++){
                   for(int sigma=0; sigma<atomBB->GetValence().size(); sigma++){
                      temp += orbitalElectronPopulation[lambda+firstAOIndexBB][sigma+firstAOIndexBB]
-                            *twoElecTwoCore[atomAIndex][BB][mu][mu][lambda][sigma];
+                            *twoElecTwoCore[atomAIndex][BB][mu][nu][lambda][sigma];
                   }
                }
                temp += this->GetElectronCoreAttraction(atomAIndex, BB, mu, nu, twoElecTwoCore);
@@ -653,10 +652,10 @@ void Mndo::CalcTwoElecTwoCoreDiatomic(double**** matrix, int atomAIndex, int ato
    } 
 
    // calclation in diatomic frame
-   for(int mu=0; mu<dxy; mu++){
-      for(int nu=0; nu<dxy; nu++){
-         for(int lambda=0; lambda<dxy; lambda++){
-            for(int sigma=0; sigma<dxy; sigma++){
+   for(int mu=0; mu<atomA->GetValence().size(); mu++){
+      for(int nu=0; nu<atomA->GetValence().size(); nu++){
+         for(int lambda=0; lambda<atomB->GetValence().size(); lambda++){
+            for(int sigma=0; sigma<atomB->GetValence().size(); sigma++){
                matrix[mu][nu][lambda][sigma] = this->GetNddoRepulsionIntegral(
                                                atomA, 
                                                atomA->GetValence()[mu],
@@ -698,7 +697,7 @@ void Mndo::CalcTwoElecTwoCoreDiatomic(double**** matrix, int atomAIndex, int ato
    */
 }
 
-// Rotate 4-d matrix from diatomic frame to space frame
+// Rotate 4-dimensional matrix from diatomic frame to space frame
 // Note tha in this method d-orbitals can not be treatable.
 void Mndo::RotateTwoElecTwoCoreDiatomicToSpaceFramegc(double**** matrix, double** rotatingMatrix){
    double oldMatrix[dxy][dxy][dxy][dxy];
