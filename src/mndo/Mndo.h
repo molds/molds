@@ -584,40 +584,45 @@ void Mndo::CalcTwoElecTowCore(double****** twoElecTwoCore, Molecule* molecule){
                                                       molecule->GetAtomVect()->size(),
                                                       dxy, dxy, dxy, dxy);
    } 
-   double**** twoElecTwoCoreDiatomic = MallocerFreer::GetInstance()->MallocDoubleMatrix4d(
-                                                                     dxy, dxy, dxy, dxy);
-   try{
-      // note that terms with condition a==b are not needed to calculate. 
-      for(int a=0; a<molecule->GetAtomVect()->size(); a++){
-         for(int b=a+1; b<molecule->GetAtomVect()->size(); b++){
-            this->CalcTwoElecTwoCoreDiatomic(twoElecTwoCoreDiatomic, a, b);
-            for(int mu=0; mu<dxy; mu++){
-               for(int nu=mu; nu<dxy; nu++){
-                  for(int lambda=0; lambda<dxy; lambda++){
-                     for(int sigma=lambda; sigma<dxy; sigma++){
-                        double value = twoElecTwoCoreDiatomic[mu][nu][lambda][sigma];
-                        twoElecTwoCore[a][b][mu][nu][lambda][sigma] = value;
-                        twoElecTwoCore[a][b][mu][nu][sigma][lambda] = value;
-                        twoElecTwoCore[a][b][nu][mu][lambda][sigma] = value;
-                        twoElecTwoCore[a][b][nu][mu][sigma][lambda] = value;
-                        twoElecTwoCore[b][a][lambda][sigma][mu][nu] = value;
-                        twoElecTwoCore[b][a][lambda][sigma][nu][mu] = value;
-                        twoElecTwoCore[b][a][sigma][lambda][mu][nu] = value;
-                        twoElecTwoCore[b][a][sigma][lambda][nu][mu] = value;
+
+   #pragma omp parallel
+   {
+      double**** twoElecTwoCoreDiatomic = MallocerFreer::GetInstance()->MallocDoubleMatrix4d(
+                                                                        dxy, dxy, dxy, dxy);
+      try{
+         // note that terms with condition a==b are not needed to calculate. 
+         #pragma omp for schedule(auto)
+         for(int a=0; a<molecule->GetAtomVect()->size(); a++){
+            for(int b=a+1; b<molecule->GetAtomVect()->size(); b++){
+               this->CalcTwoElecTwoCoreDiatomic(twoElecTwoCoreDiatomic, a, b);
+               for(int mu=0; mu<dxy; mu++){
+                  for(int nu=mu; nu<dxy; nu++){
+                     for(int lambda=0; lambda<dxy; lambda++){
+                        for(int sigma=lambda; sigma<dxy; sigma++){
+                           double value = twoElecTwoCoreDiatomic[mu][nu][lambda][sigma];
+                           twoElecTwoCore[a][b][mu][nu][lambda][sigma] = value;
+                           twoElecTwoCore[a][b][mu][nu][sigma][lambda] = value;
+                           twoElecTwoCore[a][b][nu][mu][lambda][sigma] = value;
+                           twoElecTwoCore[a][b][nu][mu][sigma][lambda] = value;
+                           twoElecTwoCore[b][a][lambda][sigma][mu][nu] = value;
+                           twoElecTwoCore[b][a][lambda][sigma][nu][mu] = value;
+                           twoElecTwoCore[b][a][sigma][lambda][mu][nu] = value;
+                           twoElecTwoCore[b][a][sigma][lambda][nu][mu] = value;
+                        }
                      }
                   }
                }
             }
          }
       }
-   }
-   catch(MolDSException ex){
+      catch(MolDSException ex){
+         MallocerFreer::GetInstance()->FreeDoubleMatrix4d(&twoElecTwoCoreDiatomic,
+                                                          dxy, dxy, dxy);
+         throw ex;
+      }
       MallocerFreer::GetInstance()->FreeDoubleMatrix4d(&twoElecTwoCoreDiatomic,
                                                        dxy, dxy, dxy);
-      throw ex;
    }
-   MallocerFreer::GetInstance()->FreeDoubleMatrix4d(&twoElecTwoCoreDiatomic,
-                                                    dxy, dxy, dxy);
 }
 
 // Calculation of two electrons two cores integral (mu, nu | lambda, sigma), 
