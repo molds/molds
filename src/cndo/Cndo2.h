@@ -46,6 +46,7 @@ protected:
    string messageUnitSec; 
    vector<AtomType> enableAtomTypes;
    double coreRepulsionEnergy;
+   virtual void CalcHFProperties();
    virtual void CalcCoreRepulsionEnergy();
    virtual double GetDiatomCoreRepulsionFirstDerivative(int indexAtomA, 
                                                         int indexAtomB, 
@@ -87,6 +88,10 @@ protected:
                                               Molecule* molecule, double** fockMatrix, double** gammaAB);
    virtual void CalcTwoElecTowCore(double****** twoElecTwoCore, Molecule* molecule);
    virtual void CalcForce(int electronicStateIndex);
+   virtual void OutputHFResults(double** fockMatrix, 
+                                double* energiesMO, 
+                                double* atomicElectronPopulation, 
+                                Molecule* molecule);
    TheoryType theory;
    Molecule* molecule;
    double** fockMatrix;
@@ -189,8 +194,6 @@ private:
                  int diisNumErrorVect,
                  Molecule* molecule, 
                  int step);
-   void OutputResults(double** fockMatrix, double* energiesMO, 
-                      double* atomicElectronPopulation, Molecule* molecule);
    void CheckEnableAtomType(Molecule* molecule);
    void CheckNumberValenceElectrons(Molecule* molecule);
    void FreeDiatomicOverlapAndRotatingMatrix(double*** diatomicOverlap, 
@@ -505,22 +508,11 @@ void Cndo2::DoesSCF(bool requiresGuess){
 
             // calc. some properties.
             // e.g. electronic energy, electron population in each atom, and core replsion.
-            this->CalcAtomicElectronPopulation(this->atomicElectronPopulation, 
-                                               this->orbitalElectronPopulation, 
-                                               this->molecule);
-
-            this->CalcCoreRepulsionEnergy();
-            this->CalcElecEnergy(&this->elecEnergy, 
-                                 this->molecule, 
-                                 this->energiesMO, 
-                                 this->fockMatrix, 
-                                 this->gammaAB,
-                                 this->coreRepulsionEnergy);
-
-            this->OutputResults(this->fockMatrix, 
-                                this->energiesMO, 
-                                this->atomicElectronPopulation, 
-                                this->molecule);
+            this->CalcHFProperties();
+            this->OutputHFResults(this->fockMatrix, 
+                                  this->energiesMO, 
+                                  this->atomicElectronPopulation, 
+                                  this->molecule);
             break;
          }
          else{
@@ -575,6 +567,19 @@ void Cndo2::DoesSCF(bool requiresGuess){
 void Cndo2::DoesSCF(){
    bool requiresGuess = true;
    this->DoesSCF(requiresGuess);
+}
+
+void Cndo2::CalcHFProperties(){
+   this->CalcAtomicElectronPopulation(this->atomicElectronPopulation, 
+                                      this->orbitalElectronPopulation, 
+                                      this->molecule);
+   this->CalcCoreRepulsionEnergy();
+   this->CalcElecEnergy(&this->elecEnergy, 
+                        this->molecule, 
+                        this->energiesMO, 
+                        this->fockMatrix, 
+                        this->gammaAB,
+                        this->coreRepulsionEnergy);
 }
 
 void Cndo2::DoesCIS(){
@@ -743,7 +748,7 @@ void Cndo2::DoesDamp(double rmsDensity, double** orbitalElectronPopulation,
 
 }
 
-void Cndo2::OutputResults(double** fockMatrix, double* energiesMO, double* atomicElectronPopulation, Molecule* molecule){
+void Cndo2::OutputHFResults(double** fockMatrix, double* energiesMO, double* atomicElectronPopulation, Molecule* molecule){
 
    // output MO energy
    cout << this->messageEnergiesMOs;
@@ -759,7 +764,7 @@ void Cndo2::OutputResults(double** fockMatrix, double* energiesMO, double* atomi
          mo, this->messageUnOcc.c_str(), energiesMO[mo], energiesMO[mo]/eV2AU);
       }
    }
-   cout << endl << endl;
+   cout << endl;
 
    // output total energy
    cout << this->messageElecEnergy;
@@ -781,7 +786,7 @@ void Cndo2::OutputResults(double** fockMatrix, double* energiesMO, double* atomi
       Atom* atom = (*molecule->GetAtomVect())[a];
       printf("\t\t%d\t%s\t%e\t%e\n",a,AtomTypeStr(atom->GetAtomType()),atom->GetCoreCharge(),atom->GetCoreCharge()-atomicElectronPopulation[a]);
    }
-   cout << endl << endl;
+   cout << endl;
 
 
 }

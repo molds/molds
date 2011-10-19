@@ -19,6 +19,11 @@ protected:
    virtual void SetMessages();
    virtual void SetEnableAtomTypes();
    virtual void CalcCoreRepulsionEnergy();
+   virtual void CalcHFProperties();
+   virtual void OutputHFResults(double** fockMatrix, 
+                                double* energiesMO, 
+                                double* atomicElectronPopulation, 
+                                Molecule* molecule);
    virtual double GetFockDiagElement(Atom* atomA, 
                                      int atomAIndex, 
                                      int mu, 
@@ -69,6 +74,10 @@ private:
    string errorMessageCalcTwoElecTwoCoreDiatomicNullMatrix;
    string errorMessageCalcTwoElecTwoCoreNullMatrix;
    string errorMessageCalcTwoElecTwoCoreDiatomicSameAtoms;
+   string messageHeatsFormation;
+   string messageHeatsFormationTitle;
+   double heatsFormation;
+   void CalcHeatsFormation(double* heatsFormation, Molecule* molecule);
    double GetElectronCoreAttraction(int atomAIndex, int atomBIndex, 
                                     int mu, int nu, double****** twoElecTwoCore);
    void CalcTwoElecTwoCoreDiatomic(double**** matrix, int atomAIndex, int atomBIndex);
@@ -88,6 +97,7 @@ Mndo::Mndo() : MolDS_zindo::ZindoS(){
    this->theory = MNDO;
    this->SetMessages();
    this->SetEnableAtomTypes();
+   this->heatsFormation = 0.0;
    //cout << "Mndo created\n";
 }
 
@@ -140,6 +150,8 @@ void Mndo::SetMessages(){
    this->messageSCFMetConvergence = "\n\n\n\t\tMNDO/S-SCF met convergence criterion(^^b\n\n\n";
    this->messageStartSCF = "**********  START: MNDO/S-SCF  **********\n";
    this->messageDoneSCF = "**********  DONE: MNDO/S-SCF  **********\n\n\n";
+   this->messageHeatsFormation = "\tHeats of formation:\n";
+   this->messageHeatsFormationTitle = "\t\t| [a.u.] | [Kcal/mol] | \n";
    this->messageStartCIS = "**********  START: MNDO/S-CIS  **********\n";
    this->messageDoneCIS = "**********  DONE: MNDO/S-CIS  **********\n\n\n";
    this->messageDavidsonConverge = "\n\n\t\tDavidson for MNDO-CIS met convergence criterion(^^b\n\n\n";
@@ -187,6 +199,33 @@ void Mndo::CalcCoreRepulsionEnergy(){
       }
    }
    this->coreRepulsionEnergy = energy;
+}
+
+void Mndo::CalcHeatsFormation(double* heatsFormation, Molecule* molecule){
+   *heatsFormation = this->GetElectronicEnergy();
+   for(int A=0; A<molecule->GetAtomVect()->size(); A++){
+      Atom* atom = (*molecule->GetAtomVect())[A];
+      *heatsFormation -= atom->GetMndoElecEnergyAtom();
+      *heatsFormation += atom->GetMndoHeatsFormAtom();
+   }
+}
+
+void Mndo::CalcHFProperties(){
+   MolDS_cndo::Cndo2::CalcHFProperties();
+   this->CalcHeatsFormation(&this->heatsFormation, this->molecule);
+}
+
+void Mndo::OutputHFResults(double** fockMatrix, double* energiesMO, 
+                           double* atomicElectronPopulation, Molecule* molecule){
+   MolDS_cndo::Cndo2::OutputHFResults(fockMatrix, 
+                                      energiesMO, 
+                                      atomicElectronPopulation, 
+                                      molecule);
+   // output heats of formation
+   cout << this->messageHeatsFormation;
+   cout << this->messageHeatsFormationTitle;
+   printf("\t\t%e\t%e\n\n",this->heatsFormation,
+                           this->heatsFormation/Parameters::GetInstance()->GetKcalMolin2AU());
 }
 
 double Mndo::GetFockDiagElement(Atom* atomA, int atomAIndex, int mu, 
