@@ -68,9 +68,11 @@ protected:
    virtual void CalcForce(int electronicStateIndex);
 private:
    string errorMessageGetSemiEmpiricalMultipoleInteractionBadMultipoles;
+   string errorMessageGetSemiEmpiricalMultipoleInteractionFirstDeriBadMultipoles;
    string errorMessageMultipoleA;
    string errorMessageMultipoleB;
    string errorMessageGetNddoRepulsionIntegral;
+   string errorMessageGetNddoRepulsionIntegralFirstDerivative;
    string errorMessageCalcTwoElecTwoCoreDiatomicNullMatrix;
    string errorMessageCalcTwoElecTwoCoreNullMatrix;
    string errorMessageCalcTwoElecTwoCoreDiatomicSameAtoms;
@@ -84,7 +86,19 @@ private:
    void RotateTwoElecTwoCoreDiatomicToSpaceFramegc(double**** matrix, double** rotatingMatrix);
    double GetNddoRepulsionIntegral(Atom* atomA, OrbitalType mu, OrbitalType nu,
                                    Atom* atomB, OrbitalType lambda, OrbitalType sigma);
+   double GetNddoRepulsionIntegralFirstDerivative(
+                                   Atom* atomA, OrbitalType mu, OrbitalType nu,
+                                   Atom* atomB, OrbitalType lambda, OrbitalType sigma,
+                                   CartesianType axisA);
    double GetSemiEmpiricalMultipoleInteraction(MultipoleType multipoleA,
+                                               MultipoleType multipoleB,
+                                               double rhoA,
+                                               double rhoB,
+                                               double DA,
+                                               double DB,
+                                               double Rab);
+   double GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                                               MultipoleType multipoleA,
                                                MultipoleType multipoleB,
                                                double rhoA,
                                                double rhoB,
@@ -138,9 +152,14 @@ void Mndo::SetMessages(){
    this->errorMessageDavidsonNotConverged =  "Error in mndo::Mndo::DoesCISDavidson: Davidson did not met convergence criterion. \n";
    this->errorMessageGetSemiEmpiricalMultipoleInteractionBadMultipoles
       = "Error in mndo:: Mndo::GetSemiEmpiricalMultipoleInteraction: Bad multipole combintaion is set\n";
+   this->errorMessageGetSemiEmpiricalMultipoleInteractionFirstDeriBadMultipoles
+      = "Error in mndo:: Mndo::GetSemiEmpiricalMultipoleInteractionFirstDerivative: Bad multipole combintaion is set\n";
    this->errorMessageMultipoleA = "Multipole A is: ";
    this->errorMessageMultipoleB = "Multipole B is: ";
-   this->errorMessageGetNddoRepulsionIntegral = "Error in mndo::Mndo::GetNddoRepulsionIntegral: Bad orbital is set.\n";
+   this->errorMessageGetNddoRepulsionIntegral 
+      = "Error in mndo::Mndo::GetNddoRepulsionIntegral: Bad orbital is set.\n";
+   this->errorMessageGetNddoRepulsionIntegralFirstDerivative 
+      = "Error in mndo::Mndo::GetNddoRepulsionIntegralFirstDerivative: Bad orbital is set.\n";
    this->errorMessageCalcTwoElecTwoCoreNullMatrix 
       = "Error in mndo::Mndo::CalcTwoElecTwoCore: The two elec two core matrix is NULL.\n"; 
    this->errorMessageCalcTwoElecTwoCoreDiatomicNullMatrix 
@@ -1397,9 +1416,791 @@ double Mndo::GetNddoRepulsionIntegral(Atom* atomA, OrbitalType mu, OrbitalType n
            lambda == dxy || lambda == dyz || lambda == dzz || lambda  == dzx || lambda == dxxyy ||
            sigma == dxy || sigma == dyz || sigma == dzz || sigma  == dzx || sigma == dxxyy){
 
-      // ToDo: error log.
       stringstream ss;
       ss << this->errorMessageGetNddoRepulsionIntegral;
+      ss << this->errorMessageAtomA << AtomTypeStr(atomA->GetAtomType()) << endl;
+      ss << "\t" << this->errorMessageOrbitalType << OrbitalTypeStr(mu) << endl;
+      ss << "\t" << this->errorMessageOrbitalType << OrbitalTypeStr(nu) << endl;
+      ss << this->errorMessageAtomB << AtomTypeStr(atomB->GetAtomType()) << endl;
+      ss << "\t" << this->errorMessageOrbitalType << OrbitalTypeStr(lambda) << endl;
+      ss << "\t" << this->errorMessageOrbitalType << OrbitalTypeStr(sigma) << endl;
+      throw MolDSException(ss.str());
+   }
+   else{
+      value = 0.0;
+   }
+   return value;
+}
+
+// First derivative of NDDO repulsion integral.
+// This derivation is related to the coordinate of atomA
+// See Apendix in [DT_1977]
+// Orbital mu and nu belong atom A, 
+// orbital lambda and sigma belong atomB.
+double Mndo::GetNddoRepulsionIntegralFirstDerivative(
+                                       Atom* atomA, OrbitalType mu, OrbitalType nu,
+                                       Atom* atomB, OrbitalType lambda, OrbitalType sigma,
+                                       CartesianType axisA){
+   double value = 0.0;
+   double DA=0.0;
+   double DB=0.0;
+   double rhoA = 0.0;
+   double rhoB = 0.0;
+   double Rab = this->molecule->GetDistanceAtoms(atomA, atomB);
+   double dRabDa = (atomA->GetXyz()[axisA] - atomB->GetXyz()[axisA])/Rab;
+   int lA = 0;
+   int lB = 0;
+   // (28) in [DT_1977]
+   if(mu == s && nu == s && lambda == s && sigma == s){
+      DA = atomA->GetMndoDerivedParameterD(0);
+      DB = atomB->GetMndoDerivedParameterD(0);
+      rhoA = atomA->GetMndoDerivedParameterRho(0);
+      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      value = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                    sQ, sQ, rhoA, rhoB, DA, DB, Rab);
+      value *= dRabDa;
+   }
+   // (29) in [DT_1977]
+   else if(mu == s && nu == s && lambda == px && sigma == px){
+      DA = atomA->GetMndoDerivedParameterD(0);
+      DB = atomB->GetMndoDerivedParameterD(0);
+      rhoA = atomA->GetMndoDerivedParameterRho(0);
+      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      double temp1 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           sQ, sQ, rhoA, rhoB, DA, DB, Rab);
+      DA = atomA->GetMndoDerivedParameterD(0);
+      DB = atomB->GetMndoDerivedParameterD(2);
+      rhoA = atomA->GetMndoDerivedParameterRho(0);
+      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      double temp2 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           sQ, Qxx, rhoA, rhoB, DA, DB, Rab);
+      value = temp1 + temp2;
+      value *= dRabDa;
+   }
+   else if(mu == s && nu == s && lambda == py && sigma == py){
+      DA = atomA->GetMndoDerivedParameterD(0);
+      DB = atomB->GetMndoDerivedParameterD(0);
+      rhoA = atomA->GetMndoDerivedParameterRho(0);
+      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      double temp1 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           sQ, sQ, rhoA, rhoB, DA, DB, Rab);
+      DA = atomA->GetMndoDerivedParameterD(0);
+      DB = atomB->GetMndoDerivedParameterD(2);
+      rhoA = atomA->GetMndoDerivedParameterRho(0);
+      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      double temp2 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           sQ, Qyy, rhoA, rhoB, DA, DB, Rab);
+      value = temp1 + temp2;
+      value *= dRabDa;
+   }
+   // (30) in [DT_1977]
+   else if(mu == s && nu == s && lambda == pz && sigma == pz){
+      DA = atomA->GetMndoDerivedParameterD(0);
+      DB = atomB->GetMndoDerivedParameterD(0);
+      rhoA = atomA->GetMndoDerivedParameterRho(0);
+      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      double temp1 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           sQ, sQ, rhoA, rhoB, DA, DB, Rab);
+      DA = atomA->GetMndoDerivedParameterD(0);
+      DB = atomB->GetMndoDerivedParameterD(2);
+      rhoA = atomA->GetMndoDerivedParameterRho(0);
+      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      double temp2 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           sQ, Qzz, rhoA, rhoB, DA, DB, Rab);
+      value = temp1 + temp2;
+      value *= dRabDa;
+   }
+   // (31) in [DT_1977]
+   else if(mu == px && nu == px && lambda == s && sigma == s){
+      DA = atomA->GetMndoDerivedParameterD(0);
+      DB = atomB->GetMndoDerivedParameterD(0);
+      rhoA = atomA->GetMndoDerivedParameterRho(0);
+      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      double temp1 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           sQ, sQ, rhoA, rhoB, DA, DB, Rab);
+      DA = atomA->GetMndoDerivedParameterD(2);
+      DB = atomB->GetMndoDerivedParameterD(0);
+      rhoA = atomA->GetMndoDerivedParameterRho(2);
+      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      double temp2 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           Qxx, sQ, rhoA, rhoB, DA, DB, Rab);
+      value = temp1 + temp2;
+      value *= dRabDa;
+   }
+   else if(mu == py && nu == py && lambda == s && sigma == s){
+      DA = atomA->GetMndoDerivedParameterD(0);
+      DB = atomB->GetMndoDerivedParameterD(0);
+      rhoA = atomA->GetMndoDerivedParameterRho(0);
+      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      double temp1 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           sQ, sQ, rhoA, rhoB, DA, DB, Rab);
+      DA = atomA->GetMndoDerivedParameterD(2);
+      DB = atomB->GetMndoDerivedParameterD(0);
+      rhoA = atomA->GetMndoDerivedParameterRho(2);
+      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      double temp2 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           Qyy, sQ, rhoA, rhoB, DA, DB, Rab);
+      value = temp1 + temp2;
+      value *= dRabDa;
+   }
+   // (32) in [DT_1977]
+   else if(mu == pz && nu == pz && lambda == s && sigma == s){
+      DA = atomA->GetMndoDerivedParameterD(0);
+      DB = atomB->GetMndoDerivedParameterD(0);
+      rhoA = atomA->GetMndoDerivedParameterRho(0);
+      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      double temp1 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           sQ, sQ, rhoA, rhoB, DA, DB, Rab);
+      DA = atomA->GetMndoDerivedParameterD(2);
+      DB = atomB->GetMndoDerivedParameterD(0);
+      rhoA = atomA->GetMndoDerivedParameterRho(2);
+      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      double temp2 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           Qzz, sQ, rhoA, rhoB, DA, DB, Rab);
+      value = temp1 + temp2;
+      value *= dRabDa;
+   }
+   // (33) in [DT_1977]
+   else if(mu == px && nu == px && lambda == px && sigma == px){
+      DA = atomA->GetMndoDerivedParameterD(0);
+      DB = atomB->GetMndoDerivedParameterD(0);
+      rhoA = atomA->GetMndoDerivedParameterRho(0);
+      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      double temp1 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           sQ, sQ, rhoA, rhoB, DA, DB, Rab);
+      DA = atomA->GetMndoDerivedParameterD(0);
+      DB = atomB->GetMndoDerivedParameterD(2);
+      rhoA = atomA->GetMndoDerivedParameterRho(0);
+      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      double temp2 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           sQ, Qxx, rhoA, rhoB, DA, DB, Rab);
+      DA = atomA->GetMndoDerivedParameterD(2);
+      DB = atomB->GetMndoDerivedParameterD(0);
+      rhoA = atomA->GetMndoDerivedParameterRho(2);
+      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      double temp3 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           Qxx, sQ, rhoA, rhoB, DA, DB, Rab);
+      DA = atomA->GetMndoDerivedParameterD(2);
+      DB = atomB->GetMndoDerivedParameterD(2);
+      rhoA = atomA->GetMndoDerivedParameterRho(2);
+      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      double temp4 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           Qxx, Qxx, rhoA, rhoB, DA, DB, Rab);
+      value = temp1 + temp2 + temp3 + temp4;
+      value *= dRabDa;
+   }
+   else if(mu == py && nu == py && lambda == py && sigma == py){
+      DA = atomA->GetMndoDerivedParameterD(0);
+      DB = atomB->GetMndoDerivedParameterD(0);
+      rhoA = atomA->GetMndoDerivedParameterRho(0);
+      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      double temp1 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           sQ, sQ, rhoA, rhoB, DA, DB, Rab);
+      DA = atomA->GetMndoDerivedParameterD(0);
+      DB = atomB->GetMndoDerivedParameterD(2);
+      rhoA = atomA->GetMndoDerivedParameterRho(0);
+      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      double temp2 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           sQ, Qyy, rhoA, rhoB, DA, DB, Rab);
+      DA = atomA->GetMndoDerivedParameterD(2);
+      DB = atomB->GetMndoDerivedParameterD(0);
+      rhoA = atomA->GetMndoDerivedParameterRho(2);
+      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      double temp3 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           Qyy, sQ, rhoA, rhoB, DA, DB, Rab);
+      DA = atomA->GetMndoDerivedParameterD(2);
+      DB = atomB->GetMndoDerivedParameterD(2);
+      rhoA = atomA->GetMndoDerivedParameterRho(2);
+      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      double temp4 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           Qyy, Qyy, rhoA, rhoB, DA, DB, Rab);
+      value = temp1 + temp2 + temp3 + temp4;
+      value *= dRabDa;
+   }
+   // (34) in [DT_1977]
+   else if(mu == px && nu == px && lambda == py && sigma == py){
+      DA = atomA->GetMndoDerivedParameterD(0);
+      DB = atomB->GetMndoDerivedParameterD(0);
+      rhoA = atomA->GetMndoDerivedParameterRho(0);
+      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      double temp1 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           sQ, sQ, rhoA, rhoB, DA, DB, Rab);
+      DA = atomA->GetMndoDerivedParameterD(0);
+      DB = atomB->GetMndoDerivedParameterD(2);
+      rhoA = atomA->GetMndoDerivedParameterRho(0);
+      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      double temp2 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           sQ, Qyy, rhoA, rhoB, DA, DB, Rab);
+      DA = atomA->GetMndoDerivedParameterD(2);
+      DB = atomB->GetMndoDerivedParameterD(0);
+      rhoA = atomA->GetMndoDerivedParameterRho(2);
+      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      double temp3 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           Qxx, sQ, rhoA, rhoB, DA, DB, Rab);
+      DA = atomA->GetMndoDerivedParameterD(2);
+      DB = atomB->GetMndoDerivedParameterD(2);
+      rhoA = atomA->GetMndoDerivedParameterRho(2);
+      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      double temp4 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           Qxx, Qyy, rhoA, rhoB, DA, DB, Rab);
+      value = temp1 + temp2 + temp3 + temp4;
+      value *= dRabDa;
+   }
+   else if(mu == py && nu == py && lambda == px && sigma == px){
+      DA = atomA->GetMndoDerivedParameterD(0);
+      DB = atomB->GetMndoDerivedParameterD(0);
+      rhoA = atomA->GetMndoDerivedParameterRho(0);
+      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      double temp1 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           sQ, sQ, rhoA, rhoB, DA, DB, Rab);
+      DA = atomA->GetMndoDerivedParameterD(0);
+      DB = atomB->GetMndoDerivedParameterD(2);
+      rhoA = atomA->GetMndoDerivedParameterRho(0);
+      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      double temp2 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           sQ, Qxx, rhoA, rhoB, DA, DB, Rab);
+      DA = atomA->GetMndoDerivedParameterD(2);
+      DB = atomB->GetMndoDerivedParameterD(0);
+      rhoA = atomA->GetMndoDerivedParameterRho(2);
+      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      double temp3 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           Qyy, sQ, rhoA, rhoB, DA, DB, Rab);
+      DA = atomA->GetMndoDerivedParameterD(2);
+      DB = atomB->GetMndoDerivedParameterD(2);
+      rhoA = atomA->GetMndoDerivedParameterRho(2);
+      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      double temp4 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           Qyy, Qxx, rhoA, rhoB, DA, DB, Rab);
+      value = temp1 + temp2 + temp3 + temp4;
+      value *= dRabDa;
+   }
+   // (35) in [DT_1977]
+   else if(mu == px && nu == px && lambda == pz && sigma == pz){
+      DA = atomA->GetMndoDerivedParameterD(0);
+      DB = atomB->GetMndoDerivedParameterD(0);
+      rhoA = atomA->GetMndoDerivedParameterRho(0);
+      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      double temp1 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           sQ, sQ, rhoA, rhoB, DA, DB, Rab);
+      DA = atomA->GetMndoDerivedParameterD(0);
+      DB = atomB->GetMndoDerivedParameterD(2);
+      rhoA = atomA->GetMndoDerivedParameterRho(0);
+      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      double temp2 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           sQ, Qzz, rhoA, rhoB, DA, DB, Rab);
+      DA = atomA->GetMndoDerivedParameterD(2);
+      DB = atomB->GetMndoDerivedParameterD(0);
+      rhoA = atomA->GetMndoDerivedParameterRho(2);
+      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      double temp3 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           Qxx, sQ, rhoA, rhoB, DA, DB, Rab);
+      DA = atomA->GetMndoDerivedParameterD(2);
+      DB = atomB->GetMndoDerivedParameterD(2);
+      rhoA = atomA->GetMndoDerivedParameterRho(2);
+      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      double temp4 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           Qxx, Qzz, rhoA, rhoB, DA, DB, Rab);
+      value = temp1 + temp2 + temp3 + temp4;
+      value *= dRabDa;
+   }
+   else if(mu == py && nu == py && lambda == pz && sigma == pz){
+      DA = atomA->GetMndoDerivedParameterD(0);
+      DB = atomB->GetMndoDerivedParameterD(0);
+      rhoA = atomA->GetMndoDerivedParameterRho(0);
+      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      double temp1 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           sQ, sQ, rhoA, rhoB, DA, DB, Rab);
+      DA = atomA->GetMndoDerivedParameterD(0);
+      DB = atomB->GetMndoDerivedParameterD(2);
+      rhoA = atomA->GetMndoDerivedParameterRho(0);
+      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      double temp2 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           sQ, Qzz, rhoA, rhoB, DA, DB, Rab);
+      DA = atomA->GetMndoDerivedParameterD(2);
+      DB = atomB->GetMndoDerivedParameterD(0);
+      rhoA = atomA->GetMndoDerivedParameterRho(2);
+      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      double temp3 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           Qyy, sQ, rhoA, rhoB, DA, DB, Rab);
+      DA = atomA->GetMndoDerivedParameterD(2);
+      DB = atomB->GetMndoDerivedParameterD(2);
+      rhoA = atomA->GetMndoDerivedParameterRho(2);
+      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      double temp4 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           Qyy, Qzz, rhoA, rhoB, DA, DB, Rab);
+      value = temp1 + temp2 + temp3 + temp4;
+      value *= dRabDa;
+   }
+   // (36) in [DT_1977]
+   else if(mu == pz && nu == pz && lambda == px && sigma == px){
+      DA = atomA->GetMndoDerivedParameterD(0);
+      DB = atomB->GetMndoDerivedParameterD(0);
+      rhoA = atomA->GetMndoDerivedParameterRho(0);
+      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      double temp1 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           sQ, sQ, rhoA, rhoB, DA, DB, Rab);
+      DA = atomA->GetMndoDerivedParameterD(0);
+      DB = atomB->GetMndoDerivedParameterD(2);
+      rhoA = atomA->GetMndoDerivedParameterRho(0);
+      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      double temp2 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           sQ, Qxx, rhoA, rhoB, DA, DB, Rab);
+      DA = atomA->GetMndoDerivedParameterD(2);
+      DB = atomB->GetMndoDerivedParameterD(0);
+      rhoA = atomA->GetMndoDerivedParameterRho(2);
+      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      double temp3 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           Qzz, sQ, rhoA, rhoB, DA, DB, Rab);
+      DA = atomA->GetMndoDerivedParameterD(2);
+      DB = atomB->GetMndoDerivedParameterD(2);
+      rhoA = atomA->GetMndoDerivedParameterRho(2);
+      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      double temp4 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           Qzz, Qxx, rhoA, rhoB, DA, DB, Rab);
+      value = temp1 + temp2 + temp3 + temp4;
+      value *= dRabDa;
+   }
+   else if(mu == pz && nu == pz && lambda == py && sigma == py){
+      DA = atomA->GetMndoDerivedParameterD(0);
+      DB = atomB->GetMndoDerivedParameterD(0);
+      rhoA = atomA->GetMndoDerivedParameterRho(0);
+      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      double temp1 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           sQ, sQ, rhoA, rhoB, DA, DB, Rab);
+      DA = atomA->GetMndoDerivedParameterD(0);
+      DB = atomB->GetMndoDerivedParameterD(2);
+      rhoA = atomA->GetMndoDerivedParameterRho(0);
+      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      double temp2 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           sQ, Qyy, rhoA, rhoB, DA, DB, Rab);
+      DA = atomA->GetMndoDerivedParameterD(2);
+      DB = atomB->GetMndoDerivedParameterD(0);
+      rhoA = atomA->GetMndoDerivedParameterRho(2);
+      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      double temp3 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           Qzz, sQ, rhoA, rhoB, DA, DB, Rab);
+      DA = atomA->GetMndoDerivedParameterD(2);
+      DB = atomB->GetMndoDerivedParameterD(2);
+      rhoA = atomA->GetMndoDerivedParameterRho(2);
+      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      double temp4 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           Qzz, Qyy, rhoA, rhoB, DA, DB, Rab);
+      value = temp1 + temp2 + temp3 + temp4;
+      value *= dRabDa;
+   }
+   // (37) in [DT_1977]
+   else if(mu == pz && nu == pz && lambda == pz && sigma == pz){
+      DA = atomA->GetMndoDerivedParameterD(0);
+      DB = atomB->GetMndoDerivedParameterD(0);
+      rhoA = atomA->GetMndoDerivedParameterRho(0);
+      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      double temp1 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           sQ, sQ, rhoA, rhoB, DA, DB, Rab);
+      DA = atomA->GetMndoDerivedParameterD(0);
+      DB = atomB->GetMndoDerivedParameterD(2);
+      rhoA = atomA->GetMndoDerivedParameterRho(0);
+      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      double temp2 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           sQ, Qzz, rhoA, rhoB, DA, DB, Rab);
+      DA = atomA->GetMndoDerivedParameterD(2);
+      DB = atomB->GetMndoDerivedParameterD(0);
+      rhoA = atomA->GetMndoDerivedParameterRho(2);
+      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      double temp3 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           Qzz, sQ, rhoA, rhoB, DA, DB, Rab);
+      DA = atomA->GetMndoDerivedParameterD(2);
+      DB = atomB->GetMndoDerivedParameterD(2);
+      rhoA = atomA->GetMndoDerivedParameterRho(2);
+      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      double temp4 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           Qzz, Qzz, rhoA, rhoB, DA, DB, Rab);
+      value = temp1 + temp2 + temp3 + temp4;
+      value *= dRabDa;
+   }
+   // (38) in [DT_1977]
+   else if(mu == s && nu == pz && lambda == s && sigma == s){
+      DA = atomA->GetMndoDerivedParameterD(1);
+      DB = atomB->GetMndoDerivedParameterD(0);
+      rhoA = atomA->GetMndoDerivedParameterRho(1);
+      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      double temp1 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           muz, sQ, rhoA, rhoB, DA, DB, Rab);
+      value = temp1;
+      value *= dRabDa;
+   }
+   else if(mu == pz && nu == s && lambda == s && sigma == s){
+      value = this->GetNddoRepulsionIntegralFirstDerivative(
+                    atomA, nu, mu, atomB, lambda, sigma, axisA);
+   }
+   // (39) in [DT_1977]
+   else if(mu == s && nu == pz && lambda == px && sigma == px){
+      DA = atomA->GetMndoDerivedParameterD(1);
+      DB = atomB->GetMndoDerivedParameterD(0);
+      rhoA = atomA->GetMndoDerivedParameterRho(1);
+      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      double temp1 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           muz, sQ, rhoA, rhoB, DA, DB, Rab);
+      DA = atomA->GetMndoDerivedParameterD(1);
+      DB = atomB->GetMndoDerivedParameterD(2);
+      rhoA = atomA->GetMndoDerivedParameterRho(1);
+      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      double temp2 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           muz, Qxx, rhoA, rhoB, DA, DB, Rab);
+      value = temp1 + temp2;
+      value *= dRabDa;
+   }
+   else if(mu == pz && nu == s && lambda == px && sigma == px){
+      value = this->GetNddoRepulsionIntegralFirstDerivative(
+                    atomA, nu, mu, atomB, lambda, sigma, axisA);
+   }
+   else if(mu == s && nu == pz && lambda == py && sigma == py){
+      DA = atomA->GetMndoDerivedParameterD(1);
+      DB = atomB->GetMndoDerivedParameterD(0);
+      rhoA = atomA->GetMndoDerivedParameterRho(1);
+      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      double temp1 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           muz, sQ, rhoA, rhoB, DA, DB, Rab);
+      DA = atomA->GetMndoDerivedParameterD(1);
+      DB = atomB->GetMndoDerivedParameterD(2);
+      rhoA = atomA->GetMndoDerivedParameterRho(1);
+      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      double temp2 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           muz, Qyy, rhoA, rhoB, DA, DB, Rab);
+      value = temp1 + temp2;
+      value *= dRabDa;
+   }
+   else if(mu == pz && nu == s && lambda == py && sigma == py){
+      value = this->GetNddoRepulsionIntegralFirstDerivative(
+                    atomA, nu, mu, atomB, lambda, sigma, axisA);
+   }
+   // (40) in [DT_1977]
+   else if(mu == s && nu == pz && lambda == pz && sigma == pz){
+      DA = atomA->GetMndoDerivedParameterD(1);
+      DB = atomB->GetMndoDerivedParameterD(0);
+      rhoA = atomA->GetMndoDerivedParameterRho(1);
+      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      double temp1 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           muz, sQ, rhoA, rhoB, DA, DB, Rab);
+      DA = atomA->GetMndoDerivedParameterD(1);
+      DB = atomB->GetMndoDerivedParameterD(2);
+      rhoA = atomA->GetMndoDerivedParameterRho(1);
+      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      double temp2 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           muz, Qzz, rhoA, rhoB, DA, DB, Rab);
+      value = temp1 + temp2;
+      value *= dRabDa;
+   }
+   else if(mu == pz && nu == s && lambda == pz && sigma == pz){
+      value = this->GetNddoRepulsionIntegralFirstDerivative(
+                    atomA, nu, mu, atomB, lambda, sigma, axisA);
+   }
+   // (41) in [DT_1977]
+   else if(mu == s && nu == s && lambda == s && sigma == pz){
+      DA = atomA->GetMndoDerivedParameterD(0);
+      DB = atomB->GetMndoDerivedParameterD(1);
+      rhoA = atomA->GetMndoDerivedParameterRho(0);
+      rhoB = atomB->GetMndoDerivedParameterRho(1);
+      double temp1 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           sQ, muz, rhoA, rhoB, DA, DB, Rab);
+      value = temp1;
+      value *= dRabDa;
+   }
+   else if(mu == s && nu == s && lambda == pz && sigma == s){
+      value = this->GetNddoRepulsionIntegralFirstDerivative(
+                    atomA, mu, nu, atomB, sigma, lambda, axisA);
+   }
+   // (42) in [DT_1977]
+   else if(mu == px && nu == px && lambda == s && sigma == pz){
+      DA = atomA->GetMndoDerivedParameterD(0);
+      DB = atomB->GetMndoDerivedParameterD(1);
+      rhoA = atomA->GetMndoDerivedParameterRho(0);
+      rhoB = atomB->GetMndoDerivedParameterRho(1);
+      double temp1 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           sQ, muz, rhoA, rhoB, DA, DB, Rab);
+      DA = atomA->GetMndoDerivedParameterD(2);
+      DB = atomB->GetMndoDerivedParameterD(1);
+      rhoA = atomA->GetMndoDerivedParameterRho(2);
+      rhoB = atomB->GetMndoDerivedParameterRho(1);
+      double temp2 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           Qxx, muz, rhoA, rhoB, DA, DB, Rab);
+      value = temp1 + temp2;
+      value *= dRabDa;
+   }
+   else if(mu == px && nu == px && lambda == pz && sigma == s){
+      value = this->GetNddoRepulsionIntegralFirstDerivative(
+                    atomA, mu, nu, atomB, sigma, lambda, axisA);
+   }
+   else if(mu == py && nu == py && lambda == s && sigma == pz){
+      DA = atomA->GetMndoDerivedParameterD(0);
+      DB = atomB->GetMndoDerivedParameterD(1);
+      rhoA = atomA->GetMndoDerivedParameterRho(0);
+      rhoB = atomB->GetMndoDerivedParameterRho(1);
+      double temp1 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           sQ, muz, rhoA, rhoB, DA, DB, Rab);
+      DA = atomA->GetMndoDerivedParameterD(2);
+      DB = atomB->GetMndoDerivedParameterD(1);
+      rhoA = atomA->GetMndoDerivedParameterRho(2);
+      rhoB = atomB->GetMndoDerivedParameterRho(1);
+      double temp2 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           Qyy, muz, rhoA, rhoB, DA, DB, Rab);
+      value = temp1 + temp2;
+      value *= dRabDa;
+   }
+   else if(mu == py && nu == py && lambda == pz && sigma == s){
+      value = this->GetNddoRepulsionIntegralFirstDerivative(
+                    atomA, mu, nu, atomB, sigma, lambda, axisA);
+   }
+   // (43) in [DT_1977]
+   else if(mu == pz && nu == pz && lambda == s && sigma == pz){
+      DA = atomA->GetMndoDerivedParameterD(0);
+      DB = atomB->GetMndoDerivedParameterD(1);
+      rhoA = atomA->GetMndoDerivedParameterRho(0);
+      rhoB = atomB->GetMndoDerivedParameterRho(1);
+      double temp1 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           sQ, muz, rhoA, rhoB, DA, DB, Rab);
+      DA = atomA->GetMndoDerivedParameterD(2);
+      DB = atomB->GetMndoDerivedParameterD(1);
+      rhoA = atomA->GetMndoDerivedParameterRho(2);
+      rhoB = atomB->GetMndoDerivedParameterRho(1);
+      double temp2 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           Qzz, muz, rhoA, rhoB, DA, DB, Rab);
+      value = temp1 + temp2;
+      value *= dRabDa;
+   }
+   else if(mu == pz && nu == pz && lambda == pz && sigma == s){
+      value = this->GetNddoRepulsionIntegralFirstDerivative(
+                    atomA, mu, nu, atomB, sigma, lambda, axisA);
+   }
+   // (44) in [DT_1977]
+   else if(mu == s && nu == px && lambda == s && sigma == px){
+      DA = atomA->GetMndoDerivedParameterD(1);
+      DB = atomB->GetMndoDerivedParameterD(1);
+      rhoA = atomA->GetMndoDerivedParameterRho(1);
+      rhoB = atomB->GetMndoDerivedParameterRho(1);
+      double temp1 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           mux, mux, rhoA, rhoB, DA, DB, Rab);
+      value = temp1;
+      value *= dRabDa;
+   }
+   else if(mu == px && nu == s && lambda == s && sigma == px){
+      value = this->GetNddoRepulsionIntegralFirstDerivative(
+                    atomA, nu, mu, atomB, lambda, sigma, axisA);
+   }
+   else if(mu == s && nu == px && lambda == px && sigma == s){
+      value = this->GetNddoRepulsionIntegralFirstDerivative(
+                    atomA, mu, nu, atomB, sigma, lambda, axisA);
+   }
+   else if(mu == px && nu == s && lambda == px && sigma == s){
+      value = this->GetNddoRepulsionIntegralFirstDerivative(
+                    atomA, nu, mu, atomB, sigma, lambda, axisA);
+   }
+   else if(mu == s && nu == py && lambda == s && sigma == py){
+      DA = atomA->GetMndoDerivedParameterD(1);
+      DB = atomB->GetMndoDerivedParameterD(1);
+      rhoA = atomA->GetMndoDerivedParameterRho(1);
+      rhoB = atomB->GetMndoDerivedParameterRho(1);
+      double temp1 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           muy, muy, rhoA, rhoB, DA, DB, Rab);
+      value = temp1;
+      value *= dRabDa;
+   }
+   else if(mu == py && nu == s && lambda == s && sigma == py){
+      value = this->GetNddoRepulsionIntegralFirstDerivative(
+                    atomA, nu, mu, atomB, lambda, sigma, axisA);
+   }
+   else if(mu == s && nu == py && lambda == py && sigma == s){
+      value = this->GetNddoRepulsionIntegralFirstDerivative(
+                    atomA, mu, nu, atomB, sigma, lambda, axisA);
+   }
+   else if(mu == py && nu == s && lambda == py && sigma == s){
+      value = this->GetNddoRepulsionIntegralFirstDerivative(
+                    atomA, nu, mu, atomB, sigma, lambda, axisA);
+   }
+   // (45) in [DT_1977]
+   else if(mu == s && nu == pz && lambda == s && sigma == pz){
+      DA = atomA->GetMndoDerivedParameterD(1);
+      DB = atomB->GetMndoDerivedParameterD(1);
+      rhoA = atomA->GetMndoDerivedParameterRho(1);
+      rhoB = atomB->GetMndoDerivedParameterRho(1);
+      double temp1 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           muz, muz, rhoA, rhoB, DA, DB, Rab);
+      value = temp1;
+      value *= dRabDa;
+   }
+   else if(mu == pz && nu == s && lambda == s && sigma == pz){
+      value = this->GetNddoRepulsionIntegralFirstDerivative(
+                    atomA, nu, mu, atomB, lambda, sigma, axisA);
+   }
+   else if(mu == s && nu == pz && lambda == pz && sigma == s){
+      value = this->GetNddoRepulsionIntegralFirstDerivative(
+                    atomA, mu, nu, atomB, sigma, lambda, axisA);
+   }
+   else if(mu == pz && nu == s && lambda == pz && sigma == s){
+      value = this->GetNddoRepulsionIntegralFirstDerivative(
+                    atomA, nu, mu, atomB, sigma, lambda, axisA);
+   }
+   // (46) in [DT_1977]
+   else if(mu == s && nu == px && lambda == px && sigma == pz){
+      DA = atomA->GetMndoDerivedParameterD(1);
+      DB = atomB->GetMndoDerivedParameterD(2);
+      rhoA = atomA->GetMndoDerivedParameterRho(1);
+      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      double temp1 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           mux, Qxz, rhoA, rhoB, DA, DB, Rab);
+      value = temp1;
+      value *= dRabDa;
+   }
+   else if(mu == px && nu == s && lambda == px && sigma == pz){
+      value = this->GetNddoRepulsionIntegralFirstDerivative(
+                    atomA, nu, mu, atomB, lambda, sigma, axisA);
+   }
+   else if(mu == s && nu == px && lambda == pz && sigma == px){
+      value = this->GetNddoRepulsionIntegralFirstDerivative(
+                    atomA, mu, nu, atomB, sigma, lambda, axisA);
+   }
+   else if(mu == px && nu == s && lambda == pz && sigma == px){
+      value = this->GetNddoRepulsionIntegralFirstDerivative(
+                    atomA, nu, mu, atomB, sigma, lambda, axisA);
+   }
+   else if(mu == s && nu == py && lambda == py && sigma == pz){
+      DA = atomA->GetMndoDerivedParameterD(1);
+      DB = atomB->GetMndoDerivedParameterD(2);
+      rhoA = atomA->GetMndoDerivedParameterRho(1);
+      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      double temp1 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           muy, Qyz, rhoA, rhoB, DA, DB, Rab);
+      value = temp1;
+      value *= dRabDa;
+   }
+   else if(mu == py && nu == s && lambda == py && sigma == pz){
+      value = this->GetNddoRepulsionIntegralFirstDerivative(
+                    atomA, nu, mu, atomB, lambda, sigma, axisA);
+   }
+   else if(mu == s && nu == py && lambda == pz && sigma == py){
+      value = this->GetNddoRepulsionIntegralFirstDerivative(
+                    atomA, mu, nu, atomB, sigma, lambda, axisA);
+   }
+   else if(mu == py && nu == s && lambda == pz && sigma == py){
+      value = this->GetNddoRepulsionIntegralFirstDerivative(
+                    atomA, nu, mu, atomB, sigma, lambda, axisA);
+   }
+   // (47) in [DT_1977]
+   else if(mu == px && nu == pz && lambda == s && sigma == px){
+      DA = atomA->GetMndoDerivedParameterD(2);
+      DB = atomB->GetMndoDerivedParameterD(1);
+      rhoA = atomA->GetMndoDerivedParameterRho(2);
+      rhoB = atomB->GetMndoDerivedParameterRho(1);
+      double temp1 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           Qxz, mux, rhoA, rhoB, DA, DB, Rab);
+      value = temp1;
+      value *= dRabDa;
+   }
+   else if(mu == pz && nu == px && lambda == s && sigma == px){
+      value = this->GetNddoRepulsionIntegralFirstDerivative(
+                    atomA, nu, mu, atomB, lambda, sigma, axisA);
+   }
+   else if(mu == px && nu == pz && lambda == px && sigma == s){
+      value = this->GetNddoRepulsionIntegralFirstDerivative(
+                    atomA, mu, nu, atomB, sigma, lambda, axisA);
+   }
+   else if(mu == pz && nu == px && lambda == px && sigma == s){
+      value = this->GetNddoRepulsionIntegralFirstDerivative(
+                    atomA, nu, mu, atomB, sigma, lambda, axisA);
+   }
+   else if(mu == py && nu == pz && lambda == s && sigma == py){
+      DA = atomA->GetMndoDerivedParameterD(2);
+      DB = atomB->GetMndoDerivedParameterD(1);
+      rhoA = atomA->GetMndoDerivedParameterRho(2);
+      rhoB = atomB->GetMndoDerivedParameterRho(1);
+      double temp1 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           Qyz, muy, rhoA, rhoB, DA, DB, Rab);
+      value = temp1;
+      value *= dRabDa;
+   }
+   else if(mu == pz && nu == py && lambda == s && sigma == py){
+      value = this->GetNddoRepulsionIntegralFirstDerivative(
+                    atomA, nu, mu, atomB, lambda, sigma, axisA);
+   }
+   else if(mu == py && nu == pz && lambda == py && sigma == s){
+      value = this->GetNddoRepulsionIntegralFirstDerivative(
+                    atomA, mu, nu, atomB, sigma, lambda, axisA);
+   }
+   else if(mu == pz && nu == py && lambda == py && sigma == s){
+      value = this->GetNddoRepulsionIntegralFirstDerivative(
+                    atomA, nu, mu, atomB, sigma, lambda, axisA);
+   }
+   // (48) in [DT_1977]
+   else if(mu == px && nu == pz && lambda == px && sigma == pz){
+      DA = atomA->GetMndoDerivedParameterD(2);
+      DB = atomB->GetMndoDerivedParameterD(2);
+      rhoA = atomA->GetMndoDerivedParameterRho(2);
+      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      double temp1 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           Qxz, Qxz, rhoA, rhoB, DA, DB, Rab);
+      value = temp1;
+      value *= dRabDa;
+   }
+   else if(mu == pz && nu == px && lambda == px && sigma == pz){
+      value = this->GetNddoRepulsionIntegralFirstDerivative(
+                    atomA, nu, mu, atomB, lambda, sigma, axisA);
+   }
+   else if(mu == px && nu == pz && lambda == pz && sigma == px){
+      value = this->GetNddoRepulsionIntegralFirstDerivative(
+                    atomA, mu, nu, atomB, sigma, lambda, axisA);
+   }
+   else if(mu == pz && nu == px && lambda == pz && sigma == px){
+      value = this->GetNddoRepulsionIntegralFirstDerivative(
+                    atomA, nu, mu, atomB, sigma, lambda, axisA);
+   }
+   else if(mu == py && nu == pz && lambda == py && sigma == pz){
+      DA = atomA->GetMndoDerivedParameterD(2);
+      DB = atomB->GetMndoDerivedParameterD(2);
+      rhoA = atomA->GetMndoDerivedParameterRho(2);
+      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      double temp1 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                           Qyz, Qyz, rhoA, rhoB, DA, DB, Rab);
+      value = temp1;
+      value *= dRabDa;
+   }
+   else if(mu == pz && nu == py && lambda == py && sigma == pz){
+      value = this->GetNddoRepulsionIntegralFirstDerivative(
+                    atomA, nu, mu, atomB, lambda, sigma, axisA);
+   }
+   else if(mu == py && nu == pz && lambda == pz && sigma == py){
+      value = this->GetNddoRepulsionIntegralFirstDerivative(
+                    atomA, mu, nu, atomB, sigma, lambda, axisA);
+   }
+   else if(mu == pz && nu == py && lambda == pz && sigma == py){
+      value = this->GetNddoRepulsionIntegralFirstDerivative(
+                    atomA, nu, mu, atomB, sigma, lambda, axisA);
+   }
+   // (49) in [DT_1977] and p19 in [MOPAC_1990]
+   else if(mu == px && nu == py && lambda == px && sigma == py){
+      value = 0.5*(this->GetNddoRepulsionIntegralFirstDerivative(
+                         atomA, mu, mu, atomB, mu, mu, axisA)
+                  -this->GetNddoRepulsionIntegralFirstDerivative(
+                         atomA, mu, mu, atomB, nu, nu, axisA));
+   }
+   else if(mu == py && nu == px && lambda == px && sigma == py){
+      value = this->GetNddoRepulsionIntegralFirstDerivative(
+                    atomA, nu, mu, atomB, lambda, sigma, axisA);
+   }
+   else if(mu == px && nu == py && lambda == py && sigma == px){
+      value = this->GetNddoRepulsionIntegralFirstDerivative(
+                    atomA, mu, nu, atomB, sigma, lambda, axisA);
+   }
+   else if(mu == py && nu == px && lambda == py && sigma == px){
+      value = this->GetNddoRepulsionIntegralFirstDerivative(
+                    atomA, nu, mu, atomB, sigma, lambda, axisA);
+   }
+   // d-orbitals
+   else if(mu == dxy || mu == dyz || mu == dzz || mu == dzx || mu == dxxyy ||
+           nu == dxy || nu == dyz || nu == dzz || nu == dzx || nu == dxxyy ||
+           lambda == dxy || lambda == dyz || lambda == dzz || lambda  == dzx || lambda == dxxyy ||
+           sigma == dxy || sigma == dyz || sigma == dzz || sigma  == dzx || sigma == dxxyy){
+
+      stringstream ss;
+      ss << this->errorMessageGetNddoRepulsionIntegralFirstDerivative;
       ss << this->errorMessageAtomA << AtomTypeStr(atomA->GetAtomType()) << endl;
       ss << "\t" << this->errorMessageOrbitalType << OrbitalTypeStr(mu) << endl;
       ss << "\t" << this->errorMessageOrbitalType << OrbitalTypeStr(nu) << endl;
@@ -1641,6 +2442,287 @@ double Mndo::GetSemiEmpiricalMultipoleInteraction(MultipoleType multipoleA,
    else{
       stringstream ss;
       ss << this->errorMessageGetSemiEmpiricalMultipoleInteractionBadMultipoles;
+      ss << this->errorMessageMultipoleA << MultipoleTypeStr(multipoleA) << endl;
+      ss << this->errorMessageMultipoleB << MultipoleTypeStr(multipoleB) << endl;
+      throw MolDSException(ss.str());
+   }
+   return value;
+}
+
+// First derivative of semiempirical multipole-multipole interactions.
+// This derivativ is related to the nuclear distance Rab.
+// See Apendix in [DT_1977]
+double Mndo::GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                                                  MultipoleType multipoleA,
+                                                  MultipoleType multipoleB,
+                                                  double rhoA,
+                                                  double rhoB,
+                                                  double DA,
+                                                  double DB,
+                                                  double Rab){
+   double value = 0.0;
+   double a = rhoA + rhoB;
+
+   if(multipoleA == sQ && multipoleB == sQ){
+      value = -1.0*Rab*pow(pow(Rab,2.0) + pow(a,2.0), -1.5);
+   }
+   else if(multipoleA == sQ && multipoleB == muz){
+      double temp1 = pow(Rab+DB,2.0) + pow(a,2.0);
+      double temp2 = pow(Rab-DB,2.0) + pow(a,2.0);
+      value = (Rab+DB)*pow(temp1,-1.5)/2.0 
+             -(Rab-DB)*pow(temp2,-1.5)/2.0;
+      value *= -1.0;
+   }
+   else if(multipoleA == muz && multipoleB == sQ){
+      value = this->GetSemiEmpiricalMultipoleInteraction(multipoleB, multipoleA,
+                                                         rhoB, rhoA, DB, DA, Rab);
+      value *= pow(-1.0,1.0);
+   }
+   else if(multipoleA == sQ && multipoleB == Qxx){
+      double temp1 = pow(Rab,2.0) + pow(2.0*DB,2.0) + pow(a,2.0);
+      double temp2 = pow(Rab,2.0) + pow(a,2.0);
+      value = Rab*pow(temp1,-1.5)/2.0 
+             -Rab*pow(temp2,-1.5)/2.0;
+      value *= -1.0;
+   }
+   else if(multipoleA == Qxx && multipoleB == sQ){
+      value = this->GetSemiEmpiricalMultipoleInteraction(multipoleB, multipoleA,
+                                                         rhoB, rhoA, DB, DA, Rab);
+      value *= pow(-1.0,2.0);
+   }
+   else if(multipoleA == sQ && multipoleB == Qyy){
+      value = this->GetSemiEmpiricalMultipoleInteraction(multipoleA, Qxx,
+                                                         rhoA, rhoB, DA, DB, Rab);
+   }
+   else if(multipoleA == Qyy && multipoleB == sQ){
+      value = this->GetSemiEmpiricalMultipoleInteraction(multipoleB, multipoleA,
+                                                         rhoB, rhoA, DB, DA, Rab);
+      value *= pow(-1.0,2.0);
+   }
+   else if(multipoleA == sQ && multipoleB == Qzz){
+      double temp1 = pow(Rab+2.0*DB,2.0) + pow(a,2.0);
+      double temp2 = pow(Rab,2.0) + pow(a,2.0);
+      double temp3 = pow(Rab-2.0*DB,2.0) + pow(a,2.0);
+      value = (Rab+2.0*DB)*pow(temp1,-1.5)/4.0 
+             -(Rab)*pow(temp2,-1.5)/2.0 
+             +(Rab-2.0*DB)*pow(temp3,-1.5)/4.0;
+      value *= -1.0;
+   }
+   else if(multipoleA == Qzz && multipoleB == sQ){
+      value = this->GetSemiEmpiricalMultipoleInteraction(multipoleB, multipoleA,
+                                                         rhoB, rhoA, DB, DA, Rab);
+      value *= pow(-1.0,2.0);
+   }
+   else if(multipoleA == mux && multipoleB == mux){
+      double temp1 = pow(Rab,2.0) + pow(DA-DB,2.0) + pow(a,2.0);
+      double temp2 = pow(Rab,2.0) + pow(DA+DB,2.0) + pow(a,2.0);
+      value = (Rab)*pow(temp1,-1.5)/2.0 
+             -(Rab)*pow(temp2,-1.5)/2.0;
+      value *= -1.0;
+   }
+   else if(multipoleA == muy && multipoleB == muy){
+      value = this->GetSemiEmpiricalMultipoleInteraction(mux, mux, 
+                                                         rhoA, rhoB, DA, DB, Rab);
+   }
+   else if(multipoleA == muz && multipoleB == muz){
+      double temp1 = pow(Rab+DA-DB,2.0) + pow(a,2.0);
+      double temp2 = pow(Rab+DA+DB,2.0) + pow(a,2.0);
+      double temp3 = pow(Rab-DA-DB,2.0) + pow(a,2.0);
+      double temp4 = pow(Rab-DA+DB,2.0) + pow(a,2.0);
+      value = (Rab+DA-DB)*pow(temp1,-1.5)/4.0 
+             -(Rab+DA+DB)*pow(temp2,-1.5)/4.0 
+             -(Rab-DA-DB)*pow(temp3,-1.5)/4.0 
+             +(Rab-DA+DB)*pow(temp4,-1.5)/4.0;
+      value *= -1.0;
+   }
+   else if(multipoleA == mux && multipoleB == Qxz){
+      double temp1 = pow(Rab-DB,2.0) + pow(DA-DB,2.0) + pow(a,2.0);
+      double temp2 = pow(Rab-DB,2.0) + pow(DA+DB,2.0) + pow(a,2.0);
+      double temp3 = pow(Rab+DB,2.0) + pow(DA-DB,2.0) + pow(a,2.0);
+      double temp4 = pow(Rab+DB,2.0) + pow(DA+DB,2.0) + pow(a,2.0);
+      value =-(Rab-DB)*pow(temp1,-1.5)/4.0 
+             +(Rab-DB)*pow(temp2,-1.5)/4.0 
+             +(Rab+DB)*pow(temp3,-1.5)/4.0 
+             -(Rab+DB)*pow(temp4,-1.5)/4.0;
+      value *= -1.0;
+   }
+   else if(multipoleA == Qxz && multipoleB == mux){
+      value = this->GetSemiEmpiricalMultipoleInteraction(multipoleB, multipoleA,
+                                                         rhoB, rhoA, DB, DA, Rab);
+      value *= pow(-1.0,3.0);
+   }
+   else if(multipoleA == muy && multipoleB == Qyz){
+      value = this->GetSemiEmpiricalMultipoleInteraction(mux, Qxz, 
+                                                         rhoA, rhoB, DA, DB, Rab);
+   }
+   else if(multipoleA == Qyz && multipoleB == muy){
+      value = this->GetSemiEmpiricalMultipoleInteraction(multipoleB, multipoleA,
+                                                         rhoB, rhoA, DB, DA, Rab);
+      value *= pow(-1.0,3.0);
+   }
+   else if(multipoleA == muz && multipoleB == Qxx){
+      double temp1 = pow(Rab+DA,2.0) + pow(2.0*DB,2.0) + pow(a,2.0);
+      double temp2 = pow(Rab-DA,2.0) + pow(2.0*DB,2.0) + pow(a,2.0);
+      double temp3 = pow(Rab+DA,2.0) + pow(a,2.0);
+      double temp4 = pow(Rab-DA,2.0) + pow(a,2.0);
+      value =-(Rab+DA)*pow(temp1,-1.5)/4.0 
+             +(Rab-DA)*pow(temp2,-1.5)/4.0 
+             +(Rab+DA)*pow(temp3,-1.5)/4.0 
+             -(Rab-DA)*pow(temp4,-1.5)/4.0;
+      value *= -1.0;
+   }
+   else if(multipoleA == Qxx && multipoleB == muz){
+      value = this->GetSemiEmpiricalMultipoleInteraction(multipoleB, multipoleA,
+                                                         rhoB, rhoA, DB, DA, Rab);
+      value *= pow(-1.0,3.0);
+   }
+   else if(multipoleA == muz && multipoleB == Qyy){
+      value = this->GetSemiEmpiricalMultipoleInteraction(muz, Qxx, 
+                                                         rhoA, rhoB, DA, DB, Rab);
+   }
+   else if(multipoleA == Qyy && multipoleB == muz){
+      value = this->GetSemiEmpiricalMultipoleInteraction(multipoleB, multipoleA,
+                                                         rhoB, rhoA, DB, DA, Rab);
+      value *= pow(-1.0,3.0);
+   }
+   else if(multipoleA == muz && multipoleB == Qzz){
+      double temp1 = pow(Rab+DA-2.0*DB,2.0) + pow(a,2.0);
+      double temp2 = pow(Rab-DA-2.0*DB,2.0) + pow(a,2.0);
+      double temp3 = pow(Rab+DA+2.0*DB,2.0) + pow(a,2.0);
+      double temp4 = pow(Rab-DA+2.0*DB,2.0) + pow(a,2.0);
+      double temp5 = pow(Rab+DA,2.0) + pow(a,2.0);
+      double temp6 = pow(Rab-DA,2.0) + pow(a,2.0);
+      value =-(Rab+DA-2.0*DB)*pow(temp1,-1.5)/8.0 
+             +(Rab-DA-2.0*DB)*pow(temp2,-1.5)/8.0 
+             -(Rab+DA+2.0*DB)*pow(temp3,-1.5)/8.0 
+             +(Rab-DA+2.0*DB)*pow(temp4,-1.5)/8.0
+             +(Rab+DA       )*pow(temp5,-1.5)/4.0 
+             -(Rab-DA       )*pow(temp6,-1.5)/4.0;
+      value *= -1.0;
+   }
+   else if(multipoleA == Qzz && multipoleB == muz){
+      value = this->GetSemiEmpiricalMultipoleInteraction(multipoleB, multipoleA,
+                                                         rhoB, rhoA, DB, DA, Rab);
+      value *= pow(-1.0,3.0);
+   }
+   else if(multipoleA == Qxx && multipoleB == Qxx){
+      double temp1 = pow(Rab,2.0) + 4.0*pow(DA-DB,2.0) + pow(a,2.0);
+      double temp2 = pow(Rab,2.0) + 4.0*pow(DA+DB,2.0) + pow(a,2.0);
+      double temp3 = pow(Rab,2.0) + pow(2.0*DA,2.0) + pow(a,2.0);
+      double temp4 = pow(Rab,2.0) + pow(2.0*DB,2.0) + pow(a,2.0);
+      double temp5 = pow(Rab,2.0) + pow(a,2.0);
+      value = (Rab)*pow(temp1,-1.5)/8.0 
+             +(Rab)*pow(temp2,-1.5)/8.0 
+             -(Rab)*pow(temp3,-1.5)/4.0 
+             -(Rab)*pow(temp4,-1.5)/4.0
+             +(Rab)*pow(temp5,-1.5)/4.0;
+      value *= -1.0;
+   }
+   else if(multipoleA == Qyy && multipoleB == Qyy){
+      value = this->GetSemiEmpiricalMultipoleInteraction(Qxx, Qxx, 
+                                                         rhoA, rhoB, DA, DB, Rab);
+   }
+   else if(multipoleA == Qxx && multipoleB == Qyy){
+      double temp1 = pow(Rab,2.0) + pow(2.0*DA,2.0) + pow(2.0*DB,2.0)+ pow(a,2.0);
+      double temp2 = pow(Rab,2.0) + pow(2.0*DA,2.0) + pow(a,2.0);
+      double temp3 = pow(Rab,2.0) + pow(2.0*DB,2.0) + pow(a,2.0);
+      double temp4 = pow(Rab,2.0) + pow(a,2.0);
+      value = (Rab)*pow(temp1,-1.5)/4.0 
+             -(Rab)*pow(temp2,-1.5)/4.0 
+             -(Rab)*pow(temp3,-1.5)/4.0 
+             +(Rab)*pow(temp4,-1.5)/4.0;
+      value *= -1.0;
+   }
+   else if(multipoleA == Qyy && multipoleB == Qxx){
+      value = this->GetSemiEmpiricalMultipoleInteraction(multipoleB, multipoleA,
+                                                         rhoB, rhoA, DB, DA, Rab);
+      value *= pow(-1.0,4.0);
+   }
+   else if(multipoleA == Qxx && multipoleB == Qzz){
+      double temp1 = pow(Rab-2.0*DB,2.0) + pow(2.0*DA,2.0) + pow(a,2.0);
+      double temp2 = pow(Rab+2.0*DB,2.0) + pow(2.0*DA,2.0) + pow(a,2.0);
+      double temp3 = pow(Rab-2.0*DB,2.0) + pow(a,2.0);
+      double temp4 = pow(Rab+2.0*DB,2.0) + pow(a,2.0);
+      double temp5 = pow(Rab,2.0) + pow(2.0*DA,2.0) + pow(a,2.0);
+      double temp6 = pow(Rab,2.0) + pow(a,2.0);
+      value = (Rab-2.0*DB)*pow(temp1,-1.5)/8.0 
+             +(Rab+2.0*DB)*pow(temp2,-1.5)/8.0 
+             -(Rab-2.0*DB)*pow(temp3,-1.5)/8.0 
+             -(Rab+2.0*DB)*pow(temp4,-1.5)/8.0
+             -(Rab       )*pow(temp5,-1.5)/4.0 
+             +(Rab       )*pow(temp6,-1.5)/4.0;
+      value *= -1.0;
+   }
+   else if(multipoleA == Qzz && multipoleB == Qxx){
+      value = this->GetSemiEmpiricalMultipoleInteraction(multipoleB, multipoleA,
+                                                         rhoB, rhoA, DB, DA, Rab);
+      value *= pow(-1.0,4.0);
+   }
+   else if(multipoleA == Qyy && multipoleB == Qzz){
+      value = this->GetSemiEmpiricalMultipoleInteraction(Qxx, multipoleB, 
+                                                         rhoA, rhoB, DA, DB, Rab);
+   }
+   else if(multipoleA == Qzz && multipoleB == Qyy){
+      value = this->GetSemiEmpiricalMultipoleInteraction(multipoleB, multipoleA,
+                                                         rhoB, rhoA, DB, DA, Rab);
+      value *= pow(-1.0,4.0);
+   }
+   else if(multipoleA == Qzz && multipoleB == Qzz){
+      double temp1 = pow(Rab+2.0*DA-2.0*DB,2.0) + pow(a,2.0);
+      double temp2 = pow(Rab+2.0*DA+2.0*DB,2.0) + pow(a,2.0);
+      double temp3 = pow(Rab-2.0*DA-2.0*DB,2.0) + pow(a,2.0);
+      double temp4 = pow(Rab-2.0*DA+2.0*DB,2.0) + pow(a,2.0);
+      double temp5 = pow(Rab+2.0*DA,2.0) + pow(a,2.0);
+      double temp6 = pow(Rab-2.0*DA,2.0) + pow(a,2.0);
+      double temp7 = pow(Rab+2.0*DB,2.0) + pow(a,2.0);
+      double temp8 = pow(Rab-2.0*DB,2.0) + pow(a,2.0);
+      double temp9 = pow(Rab,2.0) + pow(a,2.0);
+      value = (Rab+2.0*DA-2.0*DB)*pow(temp1,-1.5)/16.0 
+             +(Rab+2.0*DA+2.0*DB)*pow(temp2,-1.5)/16.0 
+             +(Rab-2.0*DA-2.0*DB)*pow(temp3,-1.5)/16.0 
+             +(Rab-2.0*DA+2.0*DB)*pow(temp4,-1.5)/16.0
+             -(Rab+2.0*DA)*pow(temp5,-1.5)/8.0 
+             -(Rab-2.0*DA)*pow(temp6,-1.5)/8.0
+             -(Rab+2.0*DB)*pow(temp7,-1.5)/8.0 
+             -(Rab-2.0*DB)*pow(temp8,-1.5)/8.0
+             +(Rab)*pow(temp9,-1.5)/4.0;
+      value *= -1.0;
+   }
+   else if(multipoleA == Qxz && multipoleB == Qxz){
+      double temp1 = pow(Rab+DA-DB,2.0) + pow(DA-DB,2.0) + pow(a,2.0);
+      double temp2 = pow(Rab+DA-DB,2.0) + pow(DA+DB,2.0) + pow(a,2.0);
+      double temp3 = pow(Rab+DA+DB,2.0) + pow(DA-DB,2.0) + pow(a,2.0);
+      double temp4 = pow(Rab+DA+DB,2.0) + pow(DA+DB,2.0) + pow(a,2.0);
+      double temp5 = pow(Rab-DA-DB,2.0) + pow(DA-DB,2.0) + pow(a,2.0);
+      double temp6 = pow(Rab-DA-DB,2.0) + pow(DA+DB,2.0) + pow(a,2.0);
+      double temp7 = pow(Rab-DA+DB,2.0) + pow(DA-DB,2.0) + pow(a,2.0);
+      double temp8 = pow(Rab-DA+DB,2.0) + pow(DA+DB,2.0) + pow(a,2.0);
+      value = (Rab+DA-DB)*pow(temp1,-1.5)/8.0 
+             -(Rab+DA-DB)*pow(temp2,-1.5)/8.0 
+             -(Rab+DA+DB)*pow(temp3,-1.5)/8.0 
+             +(Rab+DA+DB)*pow(temp4,-1.5)/8.0
+             -(Rab-DA-DB)*pow(temp5,-1.5)/8.0 
+             +(Rab-DA-DB)*pow(temp6,-1.5)/8.0
+             +(Rab-DA+DB)*pow(temp7,-1.5)/8.0 
+             -(Rab-DA+DB)*pow(temp8,-1.5)/8.0;
+      value *= -1.0;
+   }
+   else if(multipoleA == Qyz && multipoleB == Qyz){
+      value = this->GetSemiEmpiricalMultipoleInteraction(Qxz, Qxz, 
+                                                         rhoA, rhoB, DA, DB, Rab);
+   }
+   else if(multipoleA == Qxy && multipoleB == Qxy){
+      double temp1 = pow(Rab,2.0) + 2.0*pow(DA-DB,2.0) + pow(a,2.0);
+      double temp2 = pow(Rab,2.0) + 2.0*pow(DA+DB,2.0) + pow(a,2.0);
+      double temp3 = pow(Rab,2.0) + 2.0*pow(DA,2.0) + 2.0*pow(DB,2.0) + pow(a,2.0);
+      value = (Rab)*pow(temp1,-1.5)/4.0 
+             +(Rab)*pow(temp2,-1.5)/4.0 
+             -(Rab)*pow(temp3,-1.5)/2.0;
+      value *= -1.0;
+   }
+   else{
+      stringstream ss;
+      ss << this->errorMessageGetSemiEmpiricalMultipoleInteractionFirstDeriBadMultipoles;
       ss << this->errorMessageMultipoleA << MultipoleTypeStr(multipoleA) << endl;
       ss << this->errorMessageMultipoleB << MultipoleTypeStr(multipoleB) << endl;
       throw MolDSException(ss.str());
