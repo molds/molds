@@ -56,7 +56,7 @@ protected:
    virtual double GetExchangeInt(OrbitalType orbital1, 
                                  OrbitalType orbital2, 
                                  Atom* atom); 
-   virtual void CalcTwoElecTowCore(double****** twoElecTwoCore, Molecule* molecule);
+   virtual void CalcTwoElecTwoCore(double****** twoElecTwoCore, Molecule* molecule);
    virtual double GetMolecularIntegralElement(int moI, 
                                               int moJ, 
                                               int moK, 
@@ -630,7 +630,7 @@ void Mndo::CalcCISMatrix(double** matrixCIS, int numberOcc, int numberVir){
 void Mndo::CalcForce(int electronicStateIndex){
 }
 
-void Mndo::CalcTwoElecTowCore(double****** twoElecTwoCore, Molecule* molecule){
+void Mndo::CalcTwoElecTwoCore(double****** twoElecTwoCore, Molecule* molecule){
    if(twoElecTwoCore == NULL){
       stringstream ss;
       ss << this->errorMessageCalcTwoElecTwoCoreNullMatrix;
