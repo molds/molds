@@ -130,7 +130,7 @@ How to Write Input-files:
        "electronic_state" means the electronic eigen state 
        on which the system runs.
        Default value of "electronic_state" is 0. That is, 
-       electronic ground state.
+       electronic ground state is default.
 
        Default value of "total_steps" is 10. 
 
