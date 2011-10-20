@@ -20,21 +20,21 @@ SCF
    diis_end_error 0.00000002
 SCF_END
 
-CIS
-   davidson yes
-   active_occ 100
-   active_vir 100
-   nstates 5
-   max_iter 200
-   max_dim 100
-   norm_tol 0.000001
-CIS_END
+//CIS
+//   davidson yes
+//   active_occ 100
+//   active_vir 100
+//   nstates 5
+//   max_iter 200
+//   max_dim 100
+//   norm_tol 0.000001
+//CIS_END
 
-//MD
-//   total_steps 100
-//   electronic_state 2
-//   dt 0.05
-//MD_END
+MD
+   total_steps 1
+   electronic_state 0
+   dt 0.05
+MD_END
 
 //INERTIA
 //   origin 1.0 2.0 30.0
@@ -170,11 +170,11 @@ CIS_END
 //GEOMETRY_END
 
 // h2s-2
-GEOMETRY
-   S                  0.0000     0.0000     0.0000
-   H                  1.2993     0.0000     0.0000
-   H                 -0.1814     1.2865     0.0000
-GEOMETRY_END
+//GEOMETRY
+//   S                  0.0000     0.0000     0.0000
+//   H                  1.2993     0.0000     0.0000
+//   H                 -0.1814     1.2865     0.0000
+//GEOMETRY_END
 
 // benzene
 //GEOMETRY
@@ -209,12 +209,12 @@ GEOMETRY_END
 //GEOMETRY_END
 
 // acetylene3
-//GEOMETRY
-// C                     0.24933   0.01  -0.01 
-// C                     1.45053   0.0    0.20 
-// H                    -0.82067   0.02  -0.050 
-// H                     2.52053  -0.10   0.0 
-//GEOMETRY_END
+GEOMETRY
+ C                     0.24933   0.01  -0.01 
+ C                     1.45053   0.0    0.20 
+ H                    -0.82067   0.02  -0.050 
+ H                     2.52053  -0.10   0.0 
+GEOMETRY_END
 
 // C2Li2
 //GEOMETRY

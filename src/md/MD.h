@@ -198,6 +198,7 @@ void MD::OutputEnergies(double initialEnergy){
 void MD::SetEnableTheoryTypes(){
    this->enableTheoryTypes.clear();
    this->enableTheoryTypes.push_back(ZINDOS);
+   this->enableTheoryTypes.push_back(MNDO);
 }
 
 void MD::CheckEnableTheoryType(TheoryType theoryType){

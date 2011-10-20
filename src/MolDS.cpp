@@ -155,10 +155,10 @@ int main(){
                //mndo->DoesCIS();
             }
             if(Parameters::GetInstance()->RequiresMD()){
-               //MolDS_md::MD* md = new MolDS_md::MD();
-               //md->SetTheory(mndo);
-               //md->DoesMD();
-               //delete md;
+               MolDS_md::MD* md = new MolDS_md::MD();
+               md->SetTheory(mndo);
+               md->DoesMD();
+               delete md;
             }
          }
          catch(MolDSException ex){

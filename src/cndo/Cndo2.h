@@ -98,6 +98,9 @@ protected:
    double* energiesMO;
    double** matrixForce;
    double****** twoElecTwoCore;
+   void CalcRotatingMatrixFirstDerivative(double*** rMatFirstDeri, 
+                                          Atom* atomA,
+                                          Atom* atomB);
    struct MoEnergy{
       double energy;
       int occIndex;
@@ -163,9 +166,6 @@ private:
                              double gaussianExponentB, 
                              double dx, double dy, double dz, 
                              double Rab, CartesianType axisA);// see [DY_1977]
-   void CalcRotatingMatrixFirstDerivative(double*** rMatFirstDeri, 
-                                          Atom* atomA,
-                                          Atom* atomB);
    void CalcFockMatrix(double** fockMatrix, Molecule* molecule, 
                        double** overlap, double** gammaAB,
                        double** orbitalElectronPopulation, 
