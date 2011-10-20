@@ -86,7 +86,7 @@ protected:
                                      double**** rMatDeri);
    virtual double GetMolecularIntegralElement(int moI, int moJ, int moK, int moL, 
                                               Molecule* molecule, double** fockMatrix, double** gammaAB);
-   virtual void CalcTwoElecTowCore(double****** twoElecTwoCore, Molecule* molecule);
+   virtual void CalcTwoElecTwoCore(double****** twoElecTwoCore, Molecule* molecule);
    virtual void CalcForce(int electronicStateIndex);
    virtual void OutputHFResults(double** fockMatrix, 
                                 double* energiesMO, 
@@ -459,7 +459,7 @@ void Cndo2::DoesSCF(bool requiresGuess){
       // calculate electron integral
       this->CalcGammaAB(this->gammaAB, this->molecule);
       this->CalcOverlap(this->overlap, this->molecule);
-      this->CalcTwoElecTowCore(this->twoElecTwoCore, this->molecule);
+      this->CalcTwoElecTwoCore(this->twoElecTwoCore, this->molecule);
 
       // SCF
       double rmsDensity;
@@ -600,7 +600,7 @@ double** Cndo2::GetForce(int electronicStateIndex){
    return this->matrixForce;
 }
 
-void Cndo2::CalcTwoElecTowCore(double****** twoElecTwoCore, Molecule* molecule){
+void Cndo2::CalcTwoElecTwoCore(double****** twoElecTwoCore, Molecule* molecule){
    // do nothing for CNDO, INDO, and ZINDO/S.
    // two electron two core integrals are needed for CNDO, INDO, and ZINDO/S.
 }
