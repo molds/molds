@@ -756,9 +756,9 @@ void Mndo::CalcForce(int electronicStateIndex){
                      //                       *this->GetNishimotoMatagaTwoEleIntFirstDerivative
                      //                           (atomA, orbitalMu, atomB, orbitalNu,
                      //                           (CartesianType)i);
-                     }
                   }
                }
+            }
 
             for(int i=0; i<CartesianType_end; i++){
                this->matrixForce[a][i] = -1.0*(coreRepulsion[i]
