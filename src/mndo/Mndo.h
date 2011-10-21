@@ -87,6 +87,12 @@ private:
    void CalcHeatsFormation(double* heatsFormation, Molecule* molecule);
    double GetElectronCoreAttraction(int atomAIndex, int atomBIndex, 
                                     int mu, int nu, double****** twoElecTwoCore);
+   double GetElectronCoreAttractionFirstDerivative(int atomAIndex, 
+                                                   int atomBIndex, 
+                                                   int mu, 
+                                                   int nu, 
+                                                   double***** twoElecTwoCoreFirstDerivative,
+                                                   CartesianType axisA);
    void CalcTwoElecTwoCoreDiatomic(double**** matrix, int atomAIndex, int atomBIndex);
    void CalcTwoElecTwoCoreDiatomicFirstDerivatives(double***** matrix, 
                                                    int atomAIndex, 
@@ -672,6 +678,23 @@ double Mndo::GetElectronCoreAttraction(int atomAIndex, int atomBIndex,
    return -1.0*atomB->GetCoreCharge()*twoElecTwoCore[atomAIndex][atomBIndex][mu][nu][s][s];
 }
 
+// First derivative of electron in atom A (mu and nu) and core (atom B) attraction. 
+// This derivative is related to the coordinate of atomA.
+// Note that towtwoElecTwoCoreFirstDerivative is dioatomic one.
+// see Eq. (16) in [DT_1977-2] with f_2 = 0.
+double Mndo::GetElectronCoreAttractionFirstDerivative(int atomAIndex, 
+                                                      int atomBIndex, 
+                                                      int mu, 
+                                                      int nu, 
+                                                      double***** twoElecTwoCoreFirstDerivative,
+                                                      CartesianType axisA){
+   Atom* atomB = (*this->molecule->GetAtomVect())[atomBIndex];
+   double value = -1.0*atomB->GetCoreCharge()
+                  *twoElecTwoCoreFirstDerivative[mu][nu][s][s][axisA];
+   return value;
+}
+
+
 void Mndo::CalcDiatomicOverlapInDiatomicFrame(double** diatomicOverlap, Atom* atomA, Atom* atomB){
    MolDS_cndo::Cndo2::CalcDiatomicOverlapInDiatomicFrame(diatomicOverlap, atomA, atomB);
 }
@@ -710,17 +733,21 @@ void Mndo::CalcForce(int electronicStateIndex){
                                CartesianType_end);
    }
 
+   double***** twoElecTwoCoreFirstDeriv = MallocerFreer::GetInstance()->MallocDoubleMatrix5d(
+                                                                        dxy,
+                                                                        dxy,
+                                                                        dxy,
+                                                                        dxy,
+                                                                        CartesianType_end);
+   double*** overlapDer = MallocerFreer::GetInstance()->MallocDoubleMatrix3d(
+                                                        OrbitalType_end, 
+                                                        OrbitalType_end, 
+                                                        CartesianType_end);
    //#pragma omp parallel for schedule(auto)
    for(int a=0; a<this->molecule->GetAtomVect()->size(); a++){
       Atom* atomA = (*molecule->GetAtomVect())[a];
       int firstAOIndexA = atomA->GetFirstAOIndex();
       int numberAOsA = atomA->GetValence().size();
-      double coreRepulsion[CartesianType_end] = {0.0,0.0,0.0};
-      double electronicForce1[CartesianType_end] = {0.0,0.0,0.0};
-      double electronicForce2[CartesianType_end] = {0.0,0.0,0.0};
-      double electronicForce3[CartesianType_end] = {0.0,0.0,0.0};
-      double*** overlapDer = MallocerFreer::GetInstance()->MallocDoubleMatrix3d
-                                      (OrbitalType_end, OrbitalType_end, CartesianType_end);
       for(int b=0; b<this->molecule->GetAtomVect()->size(); b++){
          if(a != b){
             Atom* atomB = (*molecule->GetAtomVect())[b];
@@ -729,54 +756,96 @@ void Mndo::CalcForce(int electronicStateIndex){
 
             // calc. first derivative of overlap.
             this->CalcDiatomicOverlapFirstDerivative(overlapDer, atomA, atomB);
+            // calc. first derivative of two elec two core interaction
+            this->CalcTwoElecTwoCoreDiatomicFirstDerivatives(twoElecTwoCoreFirstDeriv, a, b);
 
+            double coreRepulsion[CartesianType_end] = {0.0,0.0,0.0};
             for(int i=0; i<CartesianType_end; i++){
                coreRepulsion[i] += this->GetDiatomCoreRepulsionFirstDerivative(
                                          a, b, (CartesianType)i);
-               //electronicForce1[i] += ( atomA->GetCoreCharge()*atomicElectronPopulation[b]
-               //                        +atomB->GetCoreCharge()*atomicElectronPopulation[a])
-               //                        *this->GetNishimotoMatagaTwoEleIntFirstDerivative
-               //                           (atomA, s, atomB, s, (CartesianType)i);
             }
+
+            double electronicForce1[CartesianType_end] = {0.0,0.0,0.0};
             for(int mu=firstAOIndexA; mu<firstAOIndexA+numberAOsA; mu++){
-               OrbitalType orbitalMu = atomA->GetValence()[mu-firstAOIndexA];
-               for(int nu=firstAOIndexB; nu<firstAOIndexB+numberAOsB; nu++){
-                  OrbitalType orbitalNu = atomB->GetValence()[nu-firstAOIndexB];
-                  double bondParameter = 0.5*(atomA->GetBondingParameter(
-                                                      this->theory, orbitalMu) 
-                                             +atomB->GetBondingParameter(
-                                                      this->theory, orbitalNu)); 
+               for(int nu=firstAOIndexA; nu<firstAOIndexA+numberAOsA; nu++){
                   for(int i=0; i<CartesianType_end; i++){
-                     //electronicForce2[i] += 2.0*this->orbitalElectronPopulation[mu][nu]
-                     //                      *bondParameter
-                     //                      *overlapDer[mu-firstAOIndexA][nu-firstAOIndexB][i];
-                     //electronicForce3[i] += (this->orbitalElectronPopulation[mu][mu]
-                     //                       *this->orbitalElectronPopulation[nu][nu]
-                     //                       -0.5*pow(this->orbitalElectronPopulation[mu][nu],2.0))
-                     //                       *this->GetNishimotoMatagaTwoEleIntFirstDerivative
-                     //                           (atomA, orbitalMu, atomB, orbitalNu,
-                     //                           (CartesianType)i);
+                     electronicForce1[i] += this->orbitalElectronPopulation[mu][nu]
+                                           *this->GetElectronCoreAttractionFirstDerivative(
+                                                  a, b, mu-firstAOIndexA, nu-firstAOIndexA,
+                                                  twoElecTwoCoreFirstDeriv,
+                                                  (CartesianType)i);
                   }
                }
             }
 
-            for(int i=0; i<CartesianType_end; i++){
-               this->matrixForce[a][i] = -1.0*(coreRepulsion[i]
-                                              -electronicForce1[i] 
-                                              +electronicForce2[i]
-                                              +electronicForce3[i]);
+            double electronicForce2[CartesianType_end] = {0.0,0.0,0.0};
+            for(int mu=firstAOIndexA; mu<firstAOIndexA+numberAOsA; mu++){
+               for(int nu=firstAOIndexB; nu<firstAOIndexB+numberAOsB; nu++){
+                  double bondParameter = atomA->GetBondingParameter(
+                                                this->theory, 
+                                                atomA->GetValence()[mu-firstAOIndexA]) 
+                                        +atomB->GetBondingParameter(
+                                                this->theory, 
+                                                atomB->GetValence()[nu-firstAOIndexB]); 
+                  for(int i=0; i<CartesianType_end; i++){
+                     electronicForce2[i] += this->orbitalElectronPopulation[mu][nu]
+                                           *bondParameter
+                                           *overlapDer[mu-firstAOIndexA][nu-firstAOIndexB][i];
+                  }
+               }
             }
 
+            double electronicForce3[CartesianType_end] = {0.0,0.0,0.0};
+            for(int mu=firstAOIndexA; mu<firstAOIndexA+numberAOsA; mu++){
+               for(int nu=firstAOIndexA; nu<firstAOIndexA+numberAOsA; nu++){
+                  for(int lambda=firstAOIndexB; lambda<firstAOIndexB+numberAOsB; lambda++){
+                     for(int sigma=firstAOIndexB; sigma<firstAOIndexB+numberAOsB; sigma++){
+                        for(int i=0; i<CartesianType_end; i++){
+                           electronicForce3[i] += 0.5*orbitalElectronPopulation[mu][nu]
+                                                 *orbitalElectronPopulation[lambda][sigma]
+                                                 *twoElecTwoCoreFirstDeriv[mu-firstAOIndexA]
+                                                                          [nu-firstAOIndexA]
+                                                                          [lambda-firstAOIndexB]
+                                                                          [sigma-firstAOIndexB]
+                                                                          [(CartesianType)i];
+                           electronicForce3[i] -= 0.25*orbitalElectronPopulation[mu][lambda]
+                                                 *orbitalElectronPopulation[nu][sigma]
+                                                 *twoElecTwoCoreFirstDeriv[mu-firstAOIndexA]
+                                                                          [nu-firstAOIndexA]
+                                                                          [lambda-firstAOIndexB]
+                                                                          [sigma-firstAOIndexB]
+                                                                          [(CartesianType)i];
+                        }
+                     }
+                  }
+               }
+            }
+            for(int i=0; i<CartesianType_end; i++){
+               this->matrixForce[b][i] += electronicForce1[i];
+               this->matrixForce[b][i] += electronicForce3[i];
+               this->matrixForce[a][i] -= coreRepulsion[i]
+                                         +electronicForce1[i] 
+                                         +electronicForce2[i]
+                                         +electronicForce3[i];
+            }
          }
       }
-      if(overlapDer != NULL){
-         MallocerFreer::GetInstance()->FreeDoubleMatrix3d(&overlapDer, 
-                                                                OrbitalType_end,
-                                                                OrbitalType_end);
-      }
    }
-   
-     
+  
+   // Free temporal matrices
+   if(overlapDer != NULL){
+      MallocerFreer::GetInstance()->FreeDoubleMatrix3d(&overlapDer, 
+                                                       OrbitalType_end,
+                                                       OrbitalType_end);
+   }
+   if(twoElecTwoCoreFirstDeriv != NULL){
+      MallocerFreer::GetInstance()->FreeDoubleMatrix5d(&twoElecTwoCoreFirstDeriv,
+                                                       dxy,
+                                                       dxy,
+                                                       dxy,
+                                                       dxy);
+   }
+
    // checking of calculated force
    cout << "chek the force\n";
    double checkSumForce[3] = {0.0, 0.0, 0.0};
@@ -2809,8 +2878,8 @@ double Mndo::GetSemiEmpiricalMultipoleInteractionFirstDerivative(
       value *= -1.0;
    }
    else if(multipoleA == muz && multipoleB == sQ){
-      value = this->GetSemiEmpiricalMultipoleInteraction(multipoleB, multipoleA,
-                                                         rhoB, rhoA, DB, DA, Rab);
+      value = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                    multipoleB, multipoleA, rhoB, rhoA, DB, DA, Rab);
       value *= pow(-1.0,1.0);
    }
    else if(multipoleA == sQ && multipoleB == Qxx){
@@ -2821,17 +2890,17 @@ double Mndo::GetSemiEmpiricalMultipoleInteractionFirstDerivative(
       value *= -1.0;
    }
    else if(multipoleA == Qxx && multipoleB == sQ){
-      value = this->GetSemiEmpiricalMultipoleInteraction(multipoleB, multipoleA,
-                                                         rhoB, rhoA, DB, DA, Rab);
+      value = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                    multipoleB, multipoleA, rhoB, rhoA, DB, DA, Rab);
       value *= pow(-1.0,2.0);
    }
    else if(multipoleA == sQ && multipoleB == Qyy){
-      value = this->GetSemiEmpiricalMultipoleInteraction(multipoleA, Qxx,
-                                                         rhoA, rhoB, DA, DB, Rab);
+      value = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                    multipoleA, Qxx, rhoA, rhoB, DA, DB, Rab);
    }
    else if(multipoleA == Qyy && multipoleB == sQ){
-      value = this->GetSemiEmpiricalMultipoleInteraction(multipoleB, multipoleA,
-                                                         rhoB, rhoA, DB, DA, Rab);
+      value = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                    multipoleB, multipoleA, rhoB, rhoA, DB, DA, Rab);
       value *= pow(-1.0,2.0);
    }
    else if(multipoleA == sQ && multipoleB == Qzz){
@@ -2844,8 +2913,8 @@ double Mndo::GetSemiEmpiricalMultipoleInteractionFirstDerivative(
       value *= -1.0;
    }
    else if(multipoleA == Qzz && multipoleB == sQ){
-      value = this->GetSemiEmpiricalMultipoleInteraction(multipoleB, multipoleA,
-                                                         rhoB, rhoA, DB, DA, Rab);
+      value = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                    multipoleB, multipoleA, rhoB, rhoA, DB, DA, Rab);
       value *= pow(-1.0,2.0);
    }
    else if(multipoleA == mux && multipoleB == mux){
@@ -2856,8 +2925,8 @@ double Mndo::GetSemiEmpiricalMultipoleInteractionFirstDerivative(
       value *= -1.0;
    }
    else if(multipoleA == muy && multipoleB == muy){
-      value = this->GetSemiEmpiricalMultipoleInteraction(mux, mux, 
-                                                         rhoA, rhoB, DA, DB, Rab);
+      value = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                    mux, mux, rhoA, rhoB, DA, DB, Rab);
    }
    else if(multipoleA == muz && multipoleB == muz){
       double temp1 = pow(Rab+DA-DB,2.0) + pow(a,2.0);
@@ -2882,17 +2951,17 @@ double Mndo::GetSemiEmpiricalMultipoleInteractionFirstDerivative(
       value *= -1.0;
    }
    else if(multipoleA == Qxz && multipoleB == mux){
-      value = this->GetSemiEmpiricalMultipoleInteraction(multipoleB, multipoleA,
-                                                         rhoB, rhoA, DB, DA, Rab);
+      value = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                    multipoleB, multipoleA, rhoB, rhoA, DB, DA, Rab);
       value *= pow(-1.0,3.0);
    }
    else if(multipoleA == muy && multipoleB == Qyz){
-      value = this->GetSemiEmpiricalMultipoleInteraction(mux, Qxz, 
-                                                         rhoA, rhoB, DA, DB, Rab);
+      value = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                    mux, Qxz, rhoA, rhoB, DA, DB, Rab);
    }
    else if(multipoleA == Qyz && multipoleB == muy){
-      value = this->GetSemiEmpiricalMultipoleInteraction(multipoleB, multipoleA,
-                                                         rhoB, rhoA, DB, DA, Rab);
+      value = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                    multipoleB, multipoleA, rhoB, rhoA, DB, DA, Rab);
       value *= pow(-1.0,3.0);
    }
    else if(multipoleA == muz && multipoleB == Qxx){
@@ -2907,17 +2976,17 @@ double Mndo::GetSemiEmpiricalMultipoleInteractionFirstDerivative(
       value *= -1.0;
    }
    else if(multipoleA == Qxx && multipoleB == muz){
-      value = this->GetSemiEmpiricalMultipoleInteraction(multipoleB, multipoleA,
-                                                         rhoB, rhoA, DB, DA, Rab);
+      value = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                    multipoleB, multipoleA, rhoB, rhoA, DB, DA, Rab);
       value *= pow(-1.0,3.0);
    }
    else if(multipoleA == muz && multipoleB == Qyy){
-      value = this->GetSemiEmpiricalMultipoleInteraction(muz, Qxx, 
-                                                         rhoA, rhoB, DA, DB, Rab);
+      value = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                    muz, Qxx, rhoA, rhoB, DA, DB, Rab);
    }
    else if(multipoleA == Qyy && multipoleB == muz){
-      value = this->GetSemiEmpiricalMultipoleInteraction(multipoleB, multipoleA,
-                                                         rhoB, rhoA, DB, DA, Rab);
+      value = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                    multipoleB, multipoleA, rhoB, rhoA, DB, DA, Rab);
       value *= pow(-1.0,3.0);
    }
    else if(multipoleA == muz && multipoleB == Qzz){
@@ -2936,8 +3005,8 @@ double Mndo::GetSemiEmpiricalMultipoleInteractionFirstDerivative(
       value *= -1.0;
    }
    else if(multipoleA == Qzz && multipoleB == muz){
-      value = this->GetSemiEmpiricalMultipoleInteraction(multipoleB, multipoleA,
-                                                         rhoB, rhoA, DB, DA, Rab);
+      value = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                    multipoleB, multipoleA, rhoB, rhoA, DB, DA, Rab);
       value *= pow(-1.0,3.0);
    }
    else if(multipoleA == Qxx && multipoleB == Qxx){
@@ -2954,8 +3023,8 @@ double Mndo::GetSemiEmpiricalMultipoleInteractionFirstDerivative(
       value *= -1.0;
    }
    else if(multipoleA == Qyy && multipoleB == Qyy){
-      value = this->GetSemiEmpiricalMultipoleInteraction(Qxx, Qxx, 
-                                                         rhoA, rhoB, DA, DB, Rab);
+      value = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                    Qxx, Qxx, rhoA, rhoB, DA, DB, Rab);
    }
    else if(multipoleA == Qxx && multipoleB == Qyy){
       double temp1 = pow(Rab,2.0) + pow(2.0*DA,2.0) + pow(2.0*DB,2.0)+ pow(a,2.0);
@@ -2969,8 +3038,8 @@ double Mndo::GetSemiEmpiricalMultipoleInteractionFirstDerivative(
       value *= -1.0;
    }
    else if(multipoleA == Qyy && multipoleB == Qxx){
-      value = this->GetSemiEmpiricalMultipoleInteraction(multipoleB, multipoleA,
-                                                         rhoB, rhoA, DB, DA, Rab);
+      value = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                    multipoleB, multipoleA, rhoB, rhoA, DB, DA, Rab);
       value *= pow(-1.0,4.0);
    }
    else if(multipoleA == Qxx && multipoleB == Qzz){
@@ -2989,17 +3058,17 @@ double Mndo::GetSemiEmpiricalMultipoleInteractionFirstDerivative(
       value *= -1.0;
    }
    else if(multipoleA == Qzz && multipoleB == Qxx){
-      value = this->GetSemiEmpiricalMultipoleInteraction(multipoleB, multipoleA,
-                                                         rhoB, rhoA, DB, DA, Rab);
+      value = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                    multipoleB, multipoleA, rhoB, rhoA, DB, DA, Rab);
       value *= pow(-1.0,4.0);
    }
    else if(multipoleA == Qyy && multipoleB == Qzz){
-      value = this->GetSemiEmpiricalMultipoleInteraction(Qxx, multipoleB, 
-                                                         rhoA, rhoB, DA, DB, Rab);
+      value = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                    Qxx, multipoleB, rhoA, rhoB, DA, DB, Rab);
    }
    else if(multipoleA == Qzz && multipoleB == Qyy){
-      value = this->GetSemiEmpiricalMultipoleInteraction(multipoleB, multipoleA,
-                                                         rhoB, rhoA, DB, DA, Rab);
+      value = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                    multipoleB, multipoleA, rhoB, rhoA, DB, DA, Rab);
       value *= pow(-1.0,4.0);
    }
    else if(multipoleA == Qzz && multipoleB == Qzz){
@@ -3043,8 +3112,8 @@ double Mndo::GetSemiEmpiricalMultipoleInteractionFirstDerivative(
       value *= -1.0;
    }
    else if(multipoleA == Qyz && multipoleB == Qyz){
-      value = this->GetSemiEmpiricalMultipoleInteraction(Qxz, Qxz, 
-                                                         rhoA, rhoB, DA, DB, Rab);
+      value = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
+                    Qxz, Qxz, rhoA, rhoB, DA, DB, Rab);
    }
    else if(multipoleA == Qxy && multipoleB == Qxy){
       double temp1 = pow(Rab,2.0) + 2.0*pow(DA-DB,2.0) + pow(a,2.0);

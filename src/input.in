@@ -31,7 +31,7 @@ SCF_END
 //CIS_END
 
 MD
-   total_steps 1
+   total_steps 50
    electronic_state 0
    dt 0.05
 MD_END
