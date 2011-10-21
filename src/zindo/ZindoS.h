@@ -1498,14 +1498,14 @@ void ZindoS::CalcForce(int electronicStateIndex){
                   }
                }
 
-            for(int i=0; i<CartesianType_end; i++){
-               this->matrixForce[a][i] = -1.0*(coreRepulsion[i]
-                                          - electronicForce1[i] 
-                                          + electronicForce2[i]
-                                          + electronicForce3[i]);
-            }
 
          }
+      }
+      for(int i=0; i<CartesianType_end; i++){
+         this->matrixForce[a][i] = -1.0*(coreRepulsion[i]
+                                        -electronicForce1[i] 
+                                        +electronicForce2[i]
+                                        +electronicForce3[i]);
       }
       if(overlapDer != NULL){
          MallocerFreer::GetInstance()->FreeDoubleMatrix3d(&overlapDer, 
