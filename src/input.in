@@ -20,21 +20,21 @@ SCF
    diis_end_error 0.00000002
 SCF_END
 
-//CIS
-//   davidson yes
-//   active_occ 100
-//   active_vir 100
-//   nstates 5
-//   max_iter 200
-//   max_dim 100
-//   norm_tol 0.000001
-//CIS_END
+CIS
+   davidson yes
+   active_occ 100
+   active_vir 100
+   nstates 500
+   max_iter 200
+   max_dim 100
+   norm_tol 0.000001
+CIS_END
 
-MD
-   total_steps 50
-   electronic_state 0
-   dt 0.05
-MD_END
+//MD
+//   total_steps 50
+//   electronic_state 0
+//   dt 0.05
+//MD_END
 
 //INERTIA
 //   origin 1.0 2.0 30.0

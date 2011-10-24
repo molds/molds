@@ -714,7 +714,99 @@ double Mndo::GetMolecularIntegralElement(int moI, int moJ, int moK, int moL,
    return value;
 }
 
+// right-upper part is only calculated by this method.
 void Mndo::CalcCISMatrix(double** matrixCIS, int numberOcc, int numberVir){
+   cout << this->messageStartCalcCISMatrix;
+   double ompStartTime = omp_get_wtime();
+   //#pragma omp parallel for schedule(auto)
+   for(int k=0; k<numberOcc*numberVir; k++){
+      // single excitation from I-th (occupied)MO to A-th (virtual)MO
+      int moI = this->molecule->GetTotalNumberValenceElectrons()/2 - (k/numberVir) -1;
+      int moA = this->molecule->GetTotalNumberValenceElectrons()/2 + (k%numberVir);
+
+      for(int l=k; l<numberOcc*numberVir; l++){
+         // single excitation from J-th (occupied)MO to B-th (virtual)MO
+         int moJ = this->molecule->GetTotalNumberValenceElectrons()/2 - (l/numberVir) -1;
+         int moB = this->molecule->GetTotalNumberValenceElectrons()/2 + (l%numberVir);
+         double value=0.0;
+
+         for(int A=0; A<molecule->GetAtomVect()->size(); A++){
+            Atom* atomA = (*molecule->GetAtomVect())[A];
+            int firstAOIndexA = atomA->GetFirstAOIndex();
+            int numberAOsA = atomA->GetValence().size();
+
+            for(int mu=firstAOIndexA; mu<firstAOIndexA+numberAOsA; mu++){
+               for(int nu=firstAOIndexA; nu<firstAOIndexA+numberAOsA; nu++){
+
+                  for(int B=0; B<molecule->GetAtomVect()->size(); B++){
+                     Atom* atomB = (*molecule->GetAtomVect())[B];
+                     int firstAOIndexB = atomB->GetFirstAOIndex();
+                     int numberAOsB = atomB->GetValence().size();
+
+                     for(int lambda=firstAOIndexB; lambda<firstAOIndexB+numberAOsB; lambda++){
+                        for(int sigma=firstAOIndexB; sigma<firstAOIndexB+numberAOsB; sigma++){
+                           OrbitalType orbitalSigma = atomB->GetValence()[sigma-firstAOIndexB];
+                           double gamma = 0.0;
+                           if(A!=B){
+                              gamma = this->twoElecTwoCore[A]
+                                                          [B]
+                                                          [mu-firstAOIndexA]
+                                                          [nu-firstAOIndexA]
+                                                          [lambda-firstAOIndexB]
+                                                          [sigma-firstAOIndexB];
+
+                              value += 2.0*gamma*fockMatrix[moA][mu]
+                                                *fockMatrix[moI][nu]
+                                                *fockMatrix[moJ][lambda]
+                                                *fockMatrix[moB][sigma];
+                              value -=     gamma*fockMatrix[moA][mu]
+                                                *fockMatrix[moB][nu]
+                                                *fockMatrix[moI][lambda]
+                                                *fockMatrix[moJ][sigma];
+
+                           }
+                           else{
+                              if(mu==nu && lambda==sigma){
+                                 OrbitalType orbitalMu = atomA->GetValence()[mu-firstAOIndexA];
+                                 OrbitalType orbitalLambda = atomB->GetValence()[lambda-firstAOIndexB];
+                                 gamma = this->GetCoulombInt(orbitalMu, orbitalLambda, atomA);
+                              }
+                              else if((mu==lambda && nu==sigma) || (nu==lambda && mu==sigma) ){
+                                 OrbitalType orbitalMu = atomA->GetValence()[mu-firstAOIndexA];
+                                 OrbitalType orbitalNu = atomA->GetValence()[nu-firstAOIndexA];
+                                 gamma = this->GetExchangeInt(orbitalMu, orbitalNu, atomA);
+                              }
+                              else{
+                                 gamma = 0.0;
+                              }
+
+                              value += 2.0*gamma*fockMatrix[moA][mu]
+                                                *fockMatrix[moI][nu]
+                                                *fockMatrix[moJ][lambda]
+                                                *fockMatrix[moB][sigma];
+                              value -=     gamma*fockMatrix[moA][mu]
+                                                *fockMatrix[moB][nu]
+                                                *fockMatrix[moI][lambda]
+                                                *fockMatrix[moJ][sigma];
+                           }  
+                        }
+                     }
+                  }
+               }
+            }
+         }
+         // Diagonal term
+         if(k==l){
+            value += this->energiesMO[moA] - this->energiesMO[moI];
+         }
+         matrixCIS[k][l] = value;
+      }
+   }
+   double ompEndTime = omp_get_wtime();
+   cout << this->messageOmpElapsedTimeCalcCISMarix;
+   cout << ompEndTime - ompStartTime;
+   cout << this->messageUnitSec << endl;
+   cout << this->messageDoneCalcCISMatrix;
 }
 
 // electronicStateIndex is index of the electroinc eigen state.

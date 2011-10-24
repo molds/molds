@@ -152,7 +152,7 @@ int main(){
             mndo->SetMolecule(molecule);
             mndo->DoesSCF();
             if(Parameters::GetInstance()->RequiresCIS()){
-               //mndo->DoesCIS();
+               mndo->DoesCIS();
             }
             if(Parameters::GetInstance()->RequiresMD()){
                MolDS_md::MD* md = new MolDS_md::MD();

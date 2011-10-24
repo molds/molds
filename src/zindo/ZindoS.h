@@ -21,6 +21,10 @@ protected:
    string messageStartCIS;
    string messageDoneCIS;
    string messageDavidsonConverge;
+   string messageStartCalcCISMatrix;
+   string messageOmpElapsedTimeCalcCISMarix;
+   string messageOmpElapsedTimeCIS;
+   string messageDoneCalcCISMatrix;
    virtual void CalcGammaAB(double** gammaAB, Molecule* molecule);
    virtual void SetMessages();
    virtual void SetEnableAtomTypes();
@@ -109,10 +113,6 @@ private:
    string errorMessageNishimotoMataga;
    string errorMessageDavidsonMaxIter;
    string errorMessageDavidsonMaxDim;
-   string messageStartCalcCISMatrix;
-   string messageOmpElapsedTimeCalcCISMarix;
-   string messageOmpElapsedTimeCIS;
-   string messageDoneCalcCISMatrix;
    string messageStartDirectCIS;
    string messageDoneDirectCIS;
    string messageStartDavidsonCIS;
