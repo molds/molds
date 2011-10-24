@@ -78,18 +78,35 @@ int main(){
          runingNormally = false;
       }
       
-      // CNDO/2
-      if(Parameters::GetInstance()->GetCurrentTheory() == CNDO2 && runingNormally){
-         MolDS_cndo::Cndo2* cndo2 = new MolDS_cndo::Cndo2();
+      // electronic structure calculation
+      if(runingNormally && (Parameters::GetInstance()->GetCurrentTheory() == CNDO2 ||
+                            Parameters::GetInstance()->GetCurrentTheory() == INDO || 
+                            Parameters::GetInstance()->GetCurrentTheory() == ZINDOS ||
+                            Parameters::GetInstance()->GetCurrentTheory() == MNDO)){
+         MolDS_cndo::Cndo2* electronicStructure = NULL;
+         if(Parameters::GetInstance()->GetCurrentTheory() == CNDO2 ){
+            electronicStructure = new MolDS_cndo::Cndo2();
+         }
+         else if(Parameters::GetInstance()->GetCurrentTheory() == INDO ){
+            electronicStructure = new MolDS_indo::Indo();
+         }
+         else if(Parameters::GetInstance()->GetCurrentTheory() == ZINDOS ){
+            electronicStructure = new MolDS_zindo::ZindoS();
+         }
+         else if(Parameters::GetInstance()->GetCurrentTheory() == MNDO ){
+            electronicStructure = new MolDS_mndo::Mndo();
+         }
+         else{
+         }
          try{
-            cndo2->SetMolecule(molecule);
-            cndo2->DoesSCF();
+            electronicStructure->SetMolecule(molecule);
+            electronicStructure->DoesSCF();
             if(Parameters::GetInstance()->RequiresCIS()){
-               cndo2->DoesCIS();
+               electronicStructure->DoesCIS();
             }
             if(Parameters::GetInstance()->RequiresMD()){
                MolDS_md::MD* md = new MolDS_md::MD();
-               md->SetTheory(cndo2);
+               md->SetTheory(electronicStructure);
                delete md;
             }
          }
@@ -97,75 +114,7 @@ int main(){
             cout << ex.what() << endl;
             runingNormally = false;
          }
-         delete cndo2;
-      }
-
-      // INDO
-      else if(Parameters::GetInstance()->GetCurrentTheory() == INDO && runingNormally){
-         MolDS_indo::Indo* indo = new MolDS_indo::Indo();
-         try{
-            indo->SetMolecule(molecule);
-            indo->DoesSCF();
-            if(Parameters::GetInstance()->RequiresCIS()){
-               indo->DoesCIS();
-            }
-            if(Parameters::GetInstance()->RequiresMD()){
-               MolDS_md::MD* md = new MolDS_md::MD();
-               md->SetTheory(indo);
-               delete md;
-            }
-         }
-         catch(MolDSException ex){
-            cout << ex.what() << endl;
-            runingNormally = false;
-         }
-         delete indo;
-      }
-
-      // ZINDO/S
-      else if(Parameters::GetInstance()->GetCurrentTheory() == ZINDOS && runingNormally){
-         MolDS_zindo::ZindoS* zindoS = new MolDS_zindo::ZindoS();
-         try{
-            zindoS->SetMolecule(molecule);
-            zindoS->DoesSCF();
-            if(Parameters::GetInstance()->RequiresCIS()){
-               zindoS->DoesCIS();
-            }
-            if(Parameters::GetInstance()->RequiresMD()){
-               MolDS_md::MD* md = new MolDS_md::MD();
-               md->SetTheory(zindoS);
-               md->DoesMD();
-               delete md;
-            }
-         }
-         catch(MolDSException ex){
-            cout << ex.what() << endl;
-            runingNormally = false;
-         }
-         delete zindoS;
-      }
-
-      // MNDO
-      else if(Parameters::GetInstance()->GetCurrentTheory() == MNDO && runingNormally){
-         MolDS_mndo::Mndo* mndo = new MolDS_mndo::Mndo();
-         try{
-            mndo->SetMolecule(molecule);
-            mndo->DoesSCF();
-            if(Parameters::GetInstance()->RequiresCIS()){
-               mndo->DoesCIS();
-            }
-            if(Parameters::GetInstance()->RequiresMD()){
-               MolDS_md::MD* md = new MolDS_md::MD();
-               md->SetTheory(mndo);
-               md->DoesMD();
-               delete md;
-            }
-         }
-         catch(MolDSException ex){
-            cout << ex.what() << endl;
-            runingNormally = false;
-         }
-         delete mndo;
+         delete electronicStructure;
       }
 
       // Diagonalize Inertia Tensor

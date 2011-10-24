@@ -13,7 +13,7 @@ namespace MolDS_mndo{
 class Mndo : public MolDS_zindo::ZindoS{
 public:
    Mndo();
-   ~Mndo();
+   virtual ~Mndo();
    virtual void SetMolecule(Molecule* molecule);
 protected:
    virtual void SetMessages();

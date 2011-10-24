@@ -13,7 +13,7 @@ namespace MolDS_cndo{
 class Cndo2{
 public:
    Cndo2();
-   ~Cndo2();
+   virtual ~Cndo2();
    TheoryType GetTheoryType();
    virtual void SetMolecule(Molecule* molecule);
    Molecule* GetMolecule();

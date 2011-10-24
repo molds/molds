@@ -13,7 +13,7 @@ namespace MolDS_indo{
 class Indo : public MolDS_cndo::Cndo2{
 public:
    Indo();
-   ~Indo();
+   virtual ~Indo();
 protected:
    virtual void SetMessages();
    virtual void SetEnableAtomTypes();

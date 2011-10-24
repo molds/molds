@@ -13,7 +13,7 @@ namespace MolDS_zindo{
 class ZindoS : public MolDS_cndo::Cndo2{
 public:
    ZindoS();
-   ~ZindoS();
+   virtual ~ZindoS();
    virtual void DoesCIS();
 protected:
    string errorMessageDavidsonNotConverged;
