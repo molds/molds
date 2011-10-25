@@ -53,12 +53,6 @@ Hatom::Hatom(double x, double y, double z) : Atom(x, y, z){
    this->mndoBondingParameterS = -6.989064 * Parameters::GetInstance()->GetEV2AU();     
    this->mndoBondingParameterP = 0.0;     
    this->mndoAlpha = 2.544134 / Parameters::GetInstance()->GetAngstrom2AU();        
-   this->mndoDerivedParameterD[0] = 0.0;    
-   this->mndoDerivedParameterD[1] = 0.0;    
-   this->mndoDerivedParameterD[2] = 0.0;    
-   this->mndoDerivedParameterRho[0] = 0.560345 * Parameters::GetInstance()->GetAngstrom2AU();  
-   this->mndoDerivedParameterRho[1] = 0.0;  
-   this->mndoDerivedParameterRho[2] = 0.0;  
    this->mndoElecEnergyAtom = -11.906276 * Parameters::GetInstance()->GetEV2AU();        
    this->mndoHeatsFormAtom = 52.102 * Parameters::GetInstance()->GetKcalMolin2AU();
    this->mndoGss = 12.848 * Parameters::GetInstance()->GetEV2AU();   
@@ -66,6 +60,13 @@ Hatom::Hatom(double x, double y, double z) : Atom(x, y, z){
    this->mndoGsp = 0.0 * Parameters::GetInstance()->GetEV2AU();   
    this->mndoGpp2 = 0.0 * Parameters::GetInstance()->GetEV2AU();  
    this->mndoHsp = 0.0 * Parameters::GetInstance()->GetEV2AU();   
+   this->mndoDerivedParameterD[0] = 0.0;    
+   this->mndoDerivedParameterD[1] = 0.0;    
+   this->mndoDerivedParameterD[2] = 0.0;    
+   this->mndoDerivedParameterRho[0] = 0.5/0.4721515374;
+   //this->mndoDerivedParameterRho[0] = 0.560345 * Parameters::GetInstance()->GetAngstrom2AU();  
+   this->mndoDerivedParameterRho[1] = 0.0;  
+   this->mndoDerivedParameterRho[2] = 0.0;  
 }
 
 double Hatom::GetCoreIntegral(OrbitalType orbital, double gamma, bool isGuess, TheoryType theory){

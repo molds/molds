@@ -56,12 +56,6 @@ Catom::Catom(double x, double y, double z) : Atom(x, y, z){
    this->mndoBondingParameterS = -18.985044 * Parameters::GetInstance()->GetEV2AU();     
    this->mndoBondingParameterP = -7.934122  * Parameters::GetInstance()->GetEV2AU();     
    this->mndoAlpha = 2.546380 / Parameters::GetInstance()->GetAngstrom2AU();        
-   this->mndoDerivedParameterD[0] =   0.0;
-   this->mndoDerivedParameterD[1] =   0.427284 * Parameters::GetInstance()->GetAngstrom2AU();    
-   this->mndoDerivedParameterD[2] =   0.362563 * Parameters::GetInstance()->GetAngstrom2AU();    
-   this->mndoDerivedParameterRho[0] = 0.588660 * Parameters::GetInstance()->GetAngstrom2AU();  
-   this->mndoDerivedParameterRho[1] = 0.430254 * Parameters::GetInstance()->GetAngstrom2AU();  
-   this->mndoDerivedParameterRho[2] = 0.395734 * Parameters::GetInstance()->GetAngstrom2AU();  
    this->mndoElecEnergyAtom = -120.500606 * Parameters::GetInstance()->GetEV2AU();        
    this->mndoHeatsFormAtom = 170.89 * Parameters::GetInstance()->GetKcalMolin2AU();
    this->mndoGss =  12.23 * Parameters::GetInstance()->GetEV2AU();   
@@ -69,6 +63,18 @@ Catom::Catom(double x, double y, double z) : Atom(x, y, z){
    this->mndoGsp =  11.47 * Parameters::GetInstance()->GetEV2AU();   
    this->mndoGpp2 =  9.84 * Parameters::GetInstance()->GetEV2AU();  
    this->mndoHsp =   2.43 * Parameters::GetInstance()->GetEV2AU();   
+   this->mndoDerivedParameterD[0] =   0.0;
+   this->mndoDerivedParameterD[1] =   0.8074661800;
+   this->mndoDerivedParameterD[2] =   0.6851577737;    
+   this->mndoDerivedParameterRho[0] = 0.5/0.4494406369;  
+   this->mndoDerivedParameterRho[1] = 0.5/0.6149309919;
+   this->mndoDerivedParameterRho[2] = 0.5/0.6685771472;  
+   //this->mndoDerivedParameterD[0] =   0.0;
+   //this->mndoDerivedParameterD[1] =   0.427284 * Parameters::GetInstance()->GetAngstrom2AU();    
+   //this->mndoDerivedParameterD[2] =   0.362563 * Parameters::GetInstance()->GetAngstrom2AU();    
+   //this->mndoDerivedParameterRho[0] = 0.588660 * Parameters::GetInstance()->GetAngstrom2AU();  
+   //this->mndoDerivedParameterRho[1] = 0.430254 * Parameters::GetInstance()->GetAngstrom2AU();  
+   //this->mndoDerivedParameterRho[2] = 0.395734 * Parameters::GetInstance()->GetAngstrom2AU();  
 }
 
 double Catom::GetCoreIntegral(OrbitalType orbital, double gamma, bool isGuess, TheoryType theory){

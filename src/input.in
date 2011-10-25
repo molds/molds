@@ -162,6 +162,12 @@ CIS_END
 //   C 0.0  1.369664    0.673854    
 //GEOMETRY_END
 
+// n2 
+GEOMETRY
+   N 0.0  0.168464    0.673854    
+   N 0.0  1.369664    0.673854    
+GEOMETRY_END
+
 // h2s
 //GEOMETRY
 //     S       -0.559299    0.471698    0.000000
@@ -209,12 +215,12 @@ CIS_END
 //GEOMETRY_END
 
 // acetylene3
-GEOMETRY
- C                     0.24933   0.01  -0.01 
- C                     1.45053   0.0    0.20 
- H                    -0.82067   0.02  -0.050 
- H                     2.52053  -0.10   0.0 
-GEOMETRY_END
+//GEOMETRY
+// C                     0.24933   0.01  -0.01 
+// C                     1.45053   0.0    0.20 
+// H                    -0.82067   0.02  -0.050 
+// H                     2.52053  -0.10   0.0 
+//GEOMETRY_END
 
 // C2Li2
 //GEOMETRY
