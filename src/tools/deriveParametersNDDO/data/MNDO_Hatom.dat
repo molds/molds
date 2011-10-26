@@ -1,5 +1,5 @@
 =====  NDDO parameters =====
-orbital exponent S in [a.u.] = 0.0000000000
+orbital exponent S in [a.u.] = 1.3319670000
 orbital exponent P in [a.u.] = 0.0000000000
 Gss in [a.u.] = 0.4721515374
 Gpp in [a.u.] = 0.0000000000
@@ -10,7 +10,7 @@ Hpp = 0.5*(Gpp - Gpp2)
 
 
 =====  NDDO derived parameters =====
-D1 in [a.u.] = nan
+D1 in [a.u.] = 0.0000000000
 D2 in [a.u.] = inf
 AM in [a.u.] = 0.4721515374
 
