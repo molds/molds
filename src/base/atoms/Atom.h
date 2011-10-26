@@ -58,17 +58,17 @@ public:
    double GetZindoF2ddLower();                 // Apendix in ref. [BZ_1979]
    double GetZindoF4ddLower();                 // Apendix in ref. [BZ_1979]
    double GetIonPot(OrbitalType orbital);
-   double GetMndoAlpha(); // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S.
-   double GetMndoDerivedParameterD(int dIndex);    // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S. Or, calculated in tools/deriveParametersNDDO/deriveParametersNDDO.cpp.
-   double GetMndoDerivedParameterRho(int rhoIndex);  // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S. Or, calculated in tools/deriveParametersNDDO/deriveParametersNDDO.cpp.
+   double GetNddoAlpha(TheoryType theory); // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S.
+   double GetNddoDerivedParameterD(TheoryType theory, int dIndex);    // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S. Or, calculated in tools/deriveParametersNDDO/deriveParametersNDDO.cpp.
+   double GetNddoDerivedParameterRho(TheoryType theory, int rhoIndex);  // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S. Or, calculated in tools/deriveParametersNDDO/deriveParametersNDDO.cpp.
    double GetMndoElecEnergyAtom();        // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S.
    double GetMndoHeatsFormAtom();         // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S.
-   double GetMndoGss();
-   double GetMndoGpp();
-   double GetMndoGsp();
-   double GetMndoGpp2();
-   double GetMndoHsp();
-   double GetMndoHpp();
+   double GetNddoGss(TheoryType theory);
+   double GetNddoGpp(TheoryType theory);
+   double GetNddoGsp(TheoryType theory);
+   double GetNddoGpp2(TheoryType theory);
+   double GetNddoHsp(TheoryType theory);
+   double GetNddoHpp(TheoryType theory);
 protected:
    string errorMessageIndoCoreIntegral;
    string errorMessageZindoSCoreIntegral;
@@ -140,10 +140,18 @@ private:
    string errorMessageGetOrbitalExponentBadTheory;
    string errorMessageTheoryType;
    string errorMessageGetBondingParameterBadTheoryBadOrbital;
-   string errorMessageGetDerivedParameterDBadDIndex;
+   string errorMessageGetNddoDerivedParameterDBadTheory;
+   string errorMessageGetNddoDerivedParameterDBadDIndex;
    string errorMessageDIndex;
-   string errorMessageGetDerivedParameterRhoBadRhoIndex;
+   string errorMessageGetNddoDerivedParameterRhoBadRhoIndex;
+   string errorMessageGetNddoDerivedParameterRhoBadTheory;
    string errorMessageRhoIndex;
+   string errorMessageGetNddoGssBadTheory;
+   string errorMessageGetNddoGppBadTheory;
+   string errorMessageGetNddoGspBadTheory;
+   string errorMessageGetNddoGpp2BadTheory;
+   string errorMessageGetNddoHspBadTheory;
+   string errorMessageGetNddoHppBadTheory;
    double GetJss();  // Part of Eq. (13) in [BZ_1979]
    double GetJsp();  // Part of Eq. (13) in [BZ_1979]
    double GetJsd();  // Part of Eq. (13) in [BZ_1979]
@@ -188,16 +196,34 @@ void Atom::SetMessages(){
    this->errorMessageAtomType = "\tatom type = ";
    this->errorMessageOrbitalType = "\torbital type = ";
    this->errorMessageShellType = "\tshell type = ";
+   this->errorMessageTheoryType = "\tTheory = ";
    this->errorMessageEffectivPrincipalQuantumNumber = 
       "Error in base::Atom::GetEffectivePrincipalQuantumNumber: invalid shelltype.\n";
    this->errorMessageZindoCoreIntegral = "Error in base_atoms::Atom::GetZindoCoreINtegral: Invalid orbitalType.\n";
    this->errorMessageGetOrbitalExponentBadTheory = "Erro in base_atoms::Atom::GetOrbitalExponent: Bad theory is set.\n";
-   this->errorMessageTheoryType = "Theory = ";
    this->errorMessageGetBondingParameterBadTheoryBadOrbital = "Error in base_atoms::Atom::GetBondingParameter: Bad Theory of bad orbital is set.\n";
-   this->errorMessageGetDerivedParameterDBadDIndex = "Error in base_atoms::Atom::GetDerivedParameterD: Bad index for parameter D(dIndex). Only 0, 1, and 2 are permitted.\n";
+   this->errorMessageGetNddoDerivedParameterDBadDIndex 
+      = "Error in base_atoms::Atom::GetNddoDerivedParameterD: Bad index for parameter D(dIndex). Only 0, 1, and 2 are permitted.\n";
+   this->errorMessageGetNddoDerivedParameterDBadTheory
+      = "Error in base_atoms::Atom::GetNddoDerivedParameterD: Bad theory is set.\n";
    this->errorMessageDIndex  = "dIndex = ";
-   this->errorMessageGetDerivedParameterRhoBadRhoIndex = "Error in base_atoms::Atom::GetDerivedParameterRho: Bad index for parameter rho(rhoIndex). Only 0, 1, and 2 are permitted.\n";
+   this->errorMessageGetNddoDerivedParameterRhoBadRhoIndex 
+      = "Error in base_atoms::Atom::GetNddoDerivedParameterRho: Bad index for parameter rho(rhoIndex). Only 0, 1, and 2 are permitted.\n";
    this->errorMessageRhoIndex = "rhoIndex = ";
+   this->errorMessageGetNddoDerivedParameterRhoBadTheory 
+      = "Error in base_atoms::Atom::GetNddoDerivedParameterRho: Bad thory is set.\n";
+   this->errorMessageGetNddoGssBadTheory 
+      = "Error in base_atoms::Atom::GetNddoGss: Bad theory is set.\n";
+   this->errorMessageGetNddoGppBadTheory 
+      = "Error in base_atoms::Atom::GetNddoGpp Bad theory is set.\n";
+   this->errorMessageGetNddoGspBadTheory 
+      = "Error in base_atoms::Atom::GetNddoGsp: Bad theory is set.\n";
+   this->errorMessageGetNddoGpp2BadTheory 
+      = "Error in base_atoms::Atom::GetNddoGpp2: Bad theory is set.\n";
+   this->errorMessageGetNddoHspBadTheory 
+      = "Error in base_atoms::Atom::GetNddoHsp: Bad theory is set.\n";
+   this->errorMessageGetNddoHppBadTheory 
+      = "Error in base_atoms::Atom::GetNddoHp: Bad theory is set.\n";
 }
 
 AtomType Atom::GetAtomType(){
@@ -498,29 +524,49 @@ double Atom::GetIndoG1(){
    return this->indoG1;
 }
 
-double Atom::GetMndoAlpha(){
-   return this->mndoAlpha;
+double Atom::GetNddoAlpha(TheoryType theory){
+   double value = 0.0;
+   if(theory == MNDO){
+      value = this->mndoAlpha;
+   }
+   return value;
 }
 
-double Atom::GetMndoDerivedParameterD(int dIndex){
+double Atom::GetNddoDerivedParameterD(TheoryType theory, int dIndex){
    if(dIndex == 0 || dIndex == 1 || dIndex == 2){
-      return this->mndoDerivedParameterD[dIndex];
+      if(theory == MNDO){
+         return this->mndoDerivedParameterD[dIndex];
+      }
+      else{
+         stringstream ss;
+         ss << this->errorMessageGetNddoDerivedParameterDBadTheory;
+         ss << this->errorMessageTheoryType << TheoryTypeStr(theory) << "\n";
+         throw MolDSException(ss.str());
+      }
    }
    else{
       stringstream ss;
-      ss << this->errorMessageGetDerivedParameterDBadDIndex;
+      ss << this->errorMessageGetNddoDerivedParameterDBadDIndex;
       ss << this->errorMessageDIndex << dIndex << endl;
       throw MolDSException(ss.str());
    }
 }
 
-double Atom::GetMndoDerivedParameterRho(int rhoIndex){
+double Atom::GetNddoDerivedParameterRho(TheoryType theory, int rhoIndex){
    if(rhoIndex == 0 || rhoIndex == 1 || rhoIndex == 2){
-      return this->mndoDerivedParameterRho[rhoIndex];
+      if(theory == MNDO){
+         return this->mndoDerivedParameterRho[rhoIndex];
+      }
+      else{
+         stringstream ss;
+         ss << this->errorMessageGetNddoDerivedParameterDBadTheory;
+         ss << this->errorMessageTheoryType << TheoryTypeStr(theory) << "\n";
+         throw MolDSException(ss.str());
+      }
    }
    else{
       stringstream ss;
-      ss << this->errorMessageGetDerivedParameterRhoBadRhoIndex;
+      ss << this->errorMessageGetNddoDerivedParameterRhoBadRhoIndex;
       ss << this->errorMessageRhoIndex << rhoIndex << endl;
       throw MolDSException(ss.str());
    }
@@ -534,29 +580,77 @@ double Atom::GetMndoHeatsFormAtom(){
    return this->mndoHeatsFormAtom;
 }
 
-double Atom::GetMndoGss(){
-   return this->mndoGss;
+double Atom::GetNddoGss(TheoryType theory){
+   if(theory == MNDO){
+      return this->mndoGss;
+   }
+   else{
+      stringstream ss;
+      ss << this->errorMessageGetNddoGssBadTheory;
+      ss << this->errorMessageTheoryType << TheoryTypeStr(theory) << "\n";
+      throw MolDSException(ss.str());
+   }
 }
 
-double Atom::GetMndoGpp(){
-   return this->mndoGpp;
+double Atom::GetNddoGpp(TheoryType theory){
+   if(theory == MNDO){
+      return this->mndoGpp;
+   }
+   else{
+      stringstream ss;
+      ss << this->errorMessageGetNddoGppBadTheory;
+      ss << this->errorMessageTheoryType << TheoryTypeStr(theory) << "\n";
+      throw MolDSException(ss.str());
+   }
 }
 
-double Atom::GetMndoGsp(){
-   return this->mndoGsp;
+double Atom::GetNddoGsp(TheoryType theory){
+   if(theory == MNDO){
+      return this->mndoGsp;
+   }
+   else{
+      stringstream ss;
+      ss << this->errorMessageGetNddoGspBadTheory;
+      ss << this->errorMessageTheoryType << TheoryTypeStr(theory) << "\n";
+      throw MolDSException(ss.str());
+   }
 }
 
-double Atom::GetMndoGpp2(){
-   return this->mndoGpp2;
+double Atom::GetNddoGpp2(TheoryType theory){
+   if(theory == MNDO){
+      return this->mndoGpp2;
+   }
+   else{
+      stringstream ss;
+      ss << this->errorMessageGetNddoGpp2BadTheory;
+      ss << this->errorMessageTheoryType << TheoryTypeStr(theory) << "\n";
+      throw MolDSException(ss.str());
+   }
 }
 
-double Atom::GetMndoHsp(){
-   return this->mndoHsp;
+double Atom::GetNddoHsp(TheoryType theory){
+   if(theory == MNDO){
+      return this->mndoHsp;
+   }
+   else{
+      stringstream ss;
+      ss << this->errorMessageGetNddoHspBadTheory;
+      ss << this->errorMessageTheoryType << TheoryTypeStr(theory) << "\n";
+      throw MolDSException(ss.str());
+   }
 }
 
 // see p17 in [MOPAC_1990]
-double Atom::GetMndoHpp(){
-   return 0.5*(this->mndoGpp - this->mndoGpp2);
+double Atom::GetNddoHpp(TheoryType theory){
+   if(theory == MNDO){
+      return 0.5*(this->mndoGpp - this->mndoGpp2);
+   }
+   else{
+      stringstream ss;
+      ss << this->errorMessageGetNddoHppBadTheory;
+      ss << this->errorMessageTheoryType << TheoryTypeStr(theory) << "\n";
+      throw MolDSException(ss.str());
+   }
 }
 
 // Table 1 in ref. [RZ_1976], Table 1 in [AEZ_1986], or Table 1 in [GD_1972]

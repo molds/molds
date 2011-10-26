@@ -220,10 +220,10 @@ void Mndo::CalcCoreRepulsionEnergy(){
    double ang2AU = Parameters::GetInstance()->GetAngstrom2AU();
    for(int i=0; i<this->molecule->GetAtomVect()->size(); i++){
       atomA = (*this->molecule->GetAtomVect())[i];
-      alphaA = atomA->GetMndoAlpha();
+      alphaA = atomA->GetNddoAlpha(this->theory);
       for(int j=i+1; j<this->molecule->GetAtomVect()->size(); j++){
          atomB = (*this->molecule->GetAtomVect())[j];
-         alphaB = atomB->GetMndoAlpha();
+         alphaB = atomB->GetNddoAlpha(this->theory);
          distance = this->molecule->GetDistanceAtoms(i, j);
          if(atomA->GetAtomType() == H && (atomB->GetAtomType() == N || 
                                           atomB->GetAtomType() == O)  ){
@@ -252,8 +252,8 @@ double Mndo::GetDiatomCoreRepulsionFirstDerivative(int atomAIndex,
    double ang2AU = Parameters::GetInstance()->GetAngstrom2AU();
    Atom* atomA = (*this->molecule->GetAtomVect())[atomAIndex];
    Atom* atomB = (*this->molecule->GetAtomVect())[atomBIndex];
-   double alphaA = atomA->GetMndoAlpha();
-   double alphaB = atomB->GetMndoAlpha();
+   double alphaA = atomA->GetNddoAlpha(this->theory);
+   double alphaB = atomB->GetNddoAlpha(this->theory);
    double Rab = this->molecule->GetDistanceAtoms(atomAIndex, atomBIndex);
    double dRabDa = (atomA->GetXyz()[axisA] - atomB->GetXyz()[axisA])/Rab;
    double twoElecInt = this->GetNddoRepulsionIntegral(atomA, s, s, atomB, s, s);
@@ -415,25 +415,25 @@ double Mndo::GetFockOffDiagElement(Atom* atomA, Atom* atomB, int atomAIndex, int
    return value;
 }
 
-// MNDO Coulomb Interaction
+// NDDO Coulomb Interaction
 double Mndo::GetCoulombInt(OrbitalType orbital1, OrbitalType orbital2, Atom* atom){
    double value=0.0;
    if( orbital1 == s && orbital2 == s){ 
-      value = atom->GetMndoGss();
+      value = atom->GetNddoGss(this->theory);
    }   
    else if( orbital1 == s && ( orbital2 == px || orbital2 == py || orbital2 == pz )){ 
-      value = atom->GetMndoGsp();
+      value = atom->GetNddoGsp(this->theory);
    }   
    else if( orbital2 == s && ( orbital1 == px || orbital1 == py || orbital1 == pz )){ 
       value = this->GetCoulombInt(orbital2, orbital1, atom);
    }   
    else if( (orbital1 == orbital2) && ( orbital1 == px || orbital1 == py || orbital1 == pz )){ 
-      value = atom->GetMndoGpp();
+      value = atom->GetNddoGpp(this->theory);
    }   
    else if( (orbital1 != orbital2) 
          && ( orbital1 == px || orbital1 == py || orbital1 == pz )
          && ( orbital2 == px || orbital2 == py || orbital2 == pz ) ){
-      value = atom->GetMndoGpp2();
+      value = atom->GetNddoGpp2(this->theory);
    }   
    
    // ToDo: There are bugs for d-orbitals.
@@ -552,14 +552,14 @@ double Mndo::GetCoulombInt(OrbitalType orbital1, OrbitalType orbital2, Atom* ato
    return value;
 }
 
-// MNDO Exchange Interaction
+// NDDO Exchange Interaction
 double Mndo::GetExchangeInt(OrbitalType orbital1, OrbitalType orbital2, Atom* atom){
    double value=0.0;
    if( orbital1 == orbital2){
       value = this->GetCoulombInt(orbital1, orbital2, atom);
    }   
    else if( orbital1 == s && (orbital2 == px || orbital2 == py || orbital2 == pz ) ){
-      value = atom->GetMndoHsp();
+      value = atom->GetNddoHsp(this->theory);
    }   
    else if( orbital2 == s && (orbital1 == px || orbital1 == py || orbital1 == pz ) ){
       value = this->GetExchangeInt(orbital2, orbital1, atom);
@@ -567,7 +567,7 @@ double Mndo::GetExchangeInt(OrbitalType orbital1, OrbitalType orbital2, Atom* at
    else if( (orbital1 != orbital2) 
          && ( orbital1 == px || orbital1 == py || orbital1 == pz )
          && ( orbital2 == px || orbital2 == py || orbital2 == pz ) ){
-      value = atom->GetMndoHpp();
+      value = atom->GetNddoHpp(this->theory);
    }
    
    // ToDo: There are bugs for d-orbitals.
@@ -1324,312 +1324,312 @@ double Mndo::GetNddoRepulsionIntegral(Atom* atomA, OrbitalType mu, OrbitalType n
    int lB = 0;
    // (28) in [DT_1977]
    if(mu == s && nu == s && lambda == s && sigma == s){
-      DA = atomA->GetMndoDerivedParameterD(0);
-      DB = atomB->GetMndoDerivedParameterD(0);
-      rhoA = atomA->GetMndoDerivedParameterRho(0);
-      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 0);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 0);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 0);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 0);
       value = this->GetSemiEmpiricalMultipoleInteraction(sQ, sQ, rhoA, rhoB, DA, DB, Rab);
    }
    // (29) in [DT_1977]
    else if(mu == s && nu == s && lambda == px && sigma == px){
-      DA = atomA->GetMndoDerivedParameterD(0);
-      DB = atomB->GetMndoDerivedParameterD(0);
-      rhoA = atomA->GetMndoDerivedParameterRho(0);
-      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 0);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 0);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 0);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 0);
       double temp1 = this->GetSemiEmpiricalMultipoleInteraction(sQ, sQ, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(0);
-      DB = atomB->GetMndoDerivedParameterD(2);
-      rhoA = atomA->GetMndoDerivedParameterRho(0);
-      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 0);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 2);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 0);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 2);
       double temp2 = this->GetSemiEmpiricalMultipoleInteraction(sQ, Qxx, rhoA, rhoB, DA, DB, Rab);
       value = temp1 + temp2;
    }
    else if(mu == s && nu == s && lambda == py && sigma == py){
-      DA = atomA->GetMndoDerivedParameterD(0);
-      DB = atomB->GetMndoDerivedParameterD(0);
-      rhoA = atomA->GetMndoDerivedParameterRho(0);
-      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 0);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 0);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 0);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 0);
       double temp1 = this->GetSemiEmpiricalMultipoleInteraction(sQ, sQ, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(0);
-      DB = atomB->GetMndoDerivedParameterD(2);
-      rhoA = atomA->GetMndoDerivedParameterRho(0);
-      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 0);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 2);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 0);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 2);
       double temp2 = this->GetSemiEmpiricalMultipoleInteraction(sQ, Qyy, rhoA, rhoB, DA, DB, Rab);
       value = temp1 + temp2;
    }
    // (30) in [DT_1977]
    else if(mu == s && nu == s && lambda == pz && sigma == pz){
-      DA = atomA->GetMndoDerivedParameterD(0);
-      DB = atomB->GetMndoDerivedParameterD(0);
-      rhoA = atomA->GetMndoDerivedParameterRho(0);
-      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 0);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 0);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 0);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 0);
       double temp1 = this->GetSemiEmpiricalMultipoleInteraction(sQ, sQ, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(0);
-      DB = atomB->GetMndoDerivedParameterD(2);
-      rhoA = atomA->GetMndoDerivedParameterRho(0);
-      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 0);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 2);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 0);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 2);
       double temp2 = this->GetSemiEmpiricalMultipoleInteraction(sQ, Qzz, rhoA, rhoB, DA, DB, Rab);
       value = temp1 + temp2;
    }
    // (31) in [DT_1977]
    else if(mu == px && nu == px && lambda == s && sigma == s){
-      DA = atomA->GetMndoDerivedParameterD(0);
-      DB = atomB->GetMndoDerivedParameterD(0);
-      rhoA = atomA->GetMndoDerivedParameterRho(0);
-      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 0);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 0);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 0);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 0);
       double temp1 = this->GetSemiEmpiricalMultipoleInteraction(sQ, sQ, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(2);
-      DB = atomB->GetMndoDerivedParameterD(0);
-      rhoA = atomA->GetMndoDerivedParameterRho(2);
-      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 2);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 0);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 2);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 0);
       double temp2 = this->GetSemiEmpiricalMultipoleInteraction(Qxx, sQ, rhoA, rhoB, DA, DB, Rab);
       value = temp1 + temp2;
    }
    else if(mu == py && nu == py && lambda == s && sigma == s){
-      DA = atomA->GetMndoDerivedParameterD(0);
-      DB = atomB->GetMndoDerivedParameterD(0);
-      rhoA = atomA->GetMndoDerivedParameterRho(0);
-      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 0);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 0);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 0);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 0);
       double temp1 = this->GetSemiEmpiricalMultipoleInteraction(sQ, sQ, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(2);
-      DB = atomB->GetMndoDerivedParameterD(0);
-      rhoA = atomA->GetMndoDerivedParameterRho(2);
-      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 2);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 0);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 2);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 0);
       double temp2 = this->GetSemiEmpiricalMultipoleInteraction(Qyy, sQ, rhoA, rhoB, DA, DB, Rab);
       value = temp1 + temp2;
    }
    // (32) in [DT_1977]
    else if(mu == pz && nu == pz && lambda == s && sigma == s){
-      DA = atomA->GetMndoDerivedParameterD(0);
-      DB = atomB->GetMndoDerivedParameterD(0);
-      rhoA = atomA->GetMndoDerivedParameterRho(0);
-      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 0);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 0);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 0);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 0);
       double temp1 = this->GetSemiEmpiricalMultipoleInteraction(sQ, sQ, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(2);
-      DB = atomB->GetMndoDerivedParameterD(0);
-      rhoA = atomA->GetMndoDerivedParameterRho(2);
-      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 2);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 0);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 2);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 0);
       double temp2 = this->GetSemiEmpiricalMultipoleInteraction(Qzz, sQ, rhoA, rhoB, DA, DB, Rab);
       value = temp1 + temp2;
    }
    // (33) in [DT_1977]
    else if(mu == px && nu == px && lambda == px && sigma == px){
-      DA = atomA->GetMndoDerivedParameterD(0);
-      DB = atomB->GetMndoDerivedParameterD(0);
-      rhoA = atomA->GetMndoDerivedParameterRho(0);
-      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 0);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 0);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 0);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 0);
       double temp1 = this->GetSemiEmpiricalMultipoleInteraction(sQ, sQ, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(0);
-      DB = atomB->GetMndoDerivedParameterD(2);
-      rhoA = atomA->GetMndoDerivedParameterRho(0);
-      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 0);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 2);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 0);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 2);
       double temp2 = this->GetSemiEmpiricalMultipoleInteraction(sQ, Qxx, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(2);
-      DB = atomB->GetMndoDerivedParameterD(0);
-      rhoA = atomA->GetMndoDerivedParameterRho(2);
-      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 2);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 0);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 2);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 0);
       double temp3 = this->GetSemiEmpiricalMultipoleInteraction(Qxx, sQ, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(2);
-      DB = atomB->GetMndoDerivedParameterD(2);
-      rhoA = atomA->GetMndoDerivedParameterRho(2);
-      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 2);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 2);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 2);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 2);
       double temp4 = this->GetSemiEmpiricalMultipoleInteraction(Qxx, Qxx, rhoA, rhoB, DA, DB, Rab);
       value = temp1 + temp2 + temp3 + temp4;
    }
    else if(mu == py && nu == py && lambda == py && sigma == py){
-      DA = atomA->GetMndoDerivedParameterD(0);
-      DB = atomB->GetMndoDerivedParameterD(0);
-      rhoA = atomA->GetMndoDerivedParameterRho(0);
-      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 0);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 0);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 0);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 0);
       double temp1 = this->GetSemiEmpiricalMultipoleInteraction(sQ, sQ, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(0);
-      DB = atomB->GetMndoDerivedParameterD(2);
-      rhoA = atomA->GetMndoDerivedParameterRho(0);
-      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 0);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 2);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 0);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 2);
       double temp2 = this->GetSemiEmpiricalMultipoleInteraction(sQ, Qyy, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(2);
-      DB = atomB->GetMndoDerivedParameterD(0);
-      rhoA = atomA->GetMndoDerivedParameterRho(2);
-      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 2);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 0);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 2);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 0);
       double temp3 = this->GetSemiEmpiricalMultipoleInteraction(Qyy, sQ, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(2);
-      DB = atomB->GetMndoDerivedParameterD(2);
-      rhoA = atomA->GetMndoDerivedParameterRho(2);
-      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 2);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 2);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 2);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 2);
       double temp4 = this->GetSemiEmpiricalMultipoleInteraction(Qyy, Qyy, rhoA, rhoB, DA, DB, Rab);
       value = temp1 + temp2 + temp3 + temp4;
    }
    // (34) in [DT_1977]
    else if(mu == px && nu == px && lambda == py && sigma == py){
-      DA = atomA->GetMndoDerivedParameterD(0);
-      DB = atomB->GetMndoDerivedParameterD(0);
-      rhoA = atomA->GetMndoDerivedParameterRho(0);
-      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 0);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 0);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 0);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 0);
       double temp1 = this->GetSemiEmpiricalMultipoleInteraction(sQ, sQ, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(0);
-      DB = atomB->GetMndoDerivedParameterD(2);
-      rhoA = atomA->GetMndoDerivedParameterRho(0);
-      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 0);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 2);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 0);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 2);
       double temp2 = this->GetSemiEmpiricalMultipoleInteraction(sQ, Qyy, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(2);
-      DB = atomB->GetMndoDerivedParameterD(0);
-      rhoA = atomA->GetMndoDerivedParameterRho(2);
-      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 2);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 0);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 2);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 0);
       double temp3 = this->GetSemiEmpiricalMultipoleInteraction(Qxx, sQ, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(2);
-      DB = atomB->GetMndoDerivedParameterD(2);
-      rhoA = atomA->GetMndoDerivedParameterRho(2);
-      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 2);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 2);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 2);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 2);
       double temp4 = this->GetSemiEmpiricalMultipoleInteraction(Qxx, Qyy, rhoA, rhoB, DA, DB, Rab);
       value = temp1 + temp2 + temp3 + temp4;
    }
    else if(mu == py && nu == py && lambda == px && sigma == px){
-      DA = atomA->GetMndoDerivedParameterD(0);
-      DB = atomB->GetMndoDerivedParameterD(0);
-      rhoA = atomA->GetMndoDerivedParameterRho(0);
-      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 0);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 0);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 0);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 0);
       double temp1 = this->GetSemiEmpiricalMultipoleInteraction(sQ, sQ, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(0);
-      DB = atomB->GetMndoDerivedParameterD(2);
-      rhoA = atomA->GetMndoDerivedParameterRho(0);
-      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 0);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 2);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 0);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 2);
       double temp2 = this->GetSemiEmpiricalMultipoleInteraction(sQ, Qxx, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(2);
-      DB = atomB->GetMndoDerivedParameterD(0);
-      rhoA = atomA->GetMndoDerivedParameterRho(2);
-      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 2);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 0);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 2);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 0);
       double temp3 = this->GetSemiEmpiricalMultipoleInteraction(Qyy, sQ, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(2);
-      DB = atomB->GetMndoDerivedParameterD(2);
-      rhoA = atomA->GetMndoDerivedParameterRho(2);
-      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 2);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 2);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 2);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 2);
       double temp4 = this->GetSemiEmpiricalMultipoleInteraction(Qyy, Qxx, rhoA, rhoB, DA, DB, Rab);
       value = temp1 + temp2 + temp3 + temp4;
    }
    // (35) in [DT_1977]
    else if(mu == px && nu == px && lambda == pz && sigma == pz){
-      DA = atomA->GetMndoDerivedParameterD(0);
-      DB = atomB->GetMndoDerivedParameterD(0);
-      rhoA = atomA->GetMndoDerivedParameterRho(0);
-      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 0);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 0);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 0);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 0);
       double temp1 = this->GetSemiEmpiricalMultipoleInteraction(sQ, sQ, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(0);
-      DB = atomB->GetMndoDerivedParameterD(2);
-      rhoA = atomA->GetMndoDerivedParameterRho(0);
-      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 0);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 2);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 0);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 2);
       double temp2 = this->GetSemiEmpiricalMultipoleInteraction(sQ, Qzz, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(2);
-      DB = atomB->GetMndoDerivedParameterD(0);
-      rhoA = atomA->GetMndoDerivedParameterRho(2);
-      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 2);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 0);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 2);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 0);
       double temp3 = this->GetSemiEmpiricalMultipoleInteraction(Qxx, sQ, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(2);
-      DB = atomB->GetMndoDerivedParameterD(2);
-      rhoA = atomA->GetMndoDerivedParameterRho(2);
-      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 2);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 2);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 2);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 2);
       double temp4 = this->GetSemiEmpiricalMultipoleInteraction(Qxx, Qzz, rhoA, rhoB, DA, DB, Rab);
       value = temp1 + temp2 + temp3 + temp4;
    }
    else if(mu == py && nu == py && lambda == pz && sigma == pz){
-      DA = atomA->GetMndoDerivedParameterD(0);
-      DB = atomB->GetMndoDerivedParameterD(0);
-      rhoA = atomA->GetMndoDerivedParameterRho(0);
-      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 0);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 0);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 0);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 0);
       double temp1 = this->GetSemiEmpiricalMultipoleInteraction(sQ, sQ, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(0);
-      DB = atomB->GetMndoDerivedParameterD(2);
-      rhoA = atomA->GetMndoDerivedParameterRho(0);
-      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 0);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 2);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 0);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 2);
       double temp2 = this->GetSemiEmpiricalMultipoleInteraction(sQ, Qzz, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(2);
-      DB = atomB->GetMndoDerivedParameterD(0);
-      rhoA = atomA->GetMndoDerivedParameterRho(2);
-      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 2);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 0);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 2);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 0);
       double temp3 = this->GetSemiEmpiricalMultipoleInteraction(Qyy, sQ, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(2);
-      DB = atomB->GetMndoDerivedParameterD(2);
-      rhoA = atomA->GetMndoDerivedParameterRho(2);
-      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 2);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 2);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 2);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 2);
       double temp4 = this->GetSemiEmpiricalMultipoleInteraction(Qyy, Qzz, rhoA, rhoB, DA, DB, Rab);
       value = temp1 + temp2 + temp3 + temp4;
    }
    // (36) in [DT_1977]
    else if(mu == pz && nu == pz && lambda == px && sigma == px){
-      DA = atomA->GetMndoDerivedParameterD(0);
-      DB = atomB->GetMndoDerivedParameterD(0);
-      rhoA = atomA->GetMndoDerivedParameterRho(0);
-      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 0);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 0);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 0);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 0);
       double temp1 = this->GetSemiEmpiricalMultipoleInteraction(sQ, sQ, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(0);
-      DB = atomB->GetMndoDerivedParameterD(2);
-      rhoA = atomA->GetMndoDerivedParameterRho(0);
-      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 0);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 2);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 0);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 2);
       double temp2 = this->GetSemiEmpiricalMultipoleInteraction(sQ, Qxx, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(2);
-      DB = atomB->GetMndoDerivedParameterD(0);
-      rhoA = atomA->GetMndoDerivedParameterRho(2);
-      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 2);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 0);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 2);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 0);
       double temp3 = this->GetSemiEmpiricalMultipoleInteraction(Qzz, sQ, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(2);
-      DB = atomB->GetMndoDerivedParameterD(2);
-      rhoA = atomA->GetMndoDerivedParameterRho(2);
-      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 2);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 2);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 2);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 2);
       double temp4 = this->GetSemiEmpiricalMultipoleInteraction(Qzz, Qxx, rhoA, rhoB, DA, DB, Rab);
       value = temp1 + temp2 + temp3 + temp4;
    }
    else if(mu == pz && nu == pz && lambda == py && sigma == py){
-      DA = atomA->GetMndoDerivedParameterD(0);
-      DB = atomB->GetMndoDerivedParameterD(0);
-      rhoA = atomA->GetMndoDerivedParameterRho(0);
-      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 0);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 0);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 0);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 0);
       double temp1 = this->GetSemiEmpiricalMultipoleInteraction(sQ, sQ, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(0);
-      DB = atomB->GetMndoDerivedParameterD(2);
-      rhoA = atomA->GetMndoDerivedParameterRho(0);
-      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 0);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 2);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 0);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 2);
       double temp2 = this->GetSemiEmpiricalMultipoleInteraction(sQ, Qyy, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(2);
-      DB = atomB->GetMndoDerivedParameterD(0);
-      rhoA = atomA->GetMndoDerivedParameterRho(2);
-      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 2);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 0);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 2);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 0);
       double temp3 = this->GetSemiEmpiricalMultipoleInteraction(Qzz, sQ, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(2);
-      DB = atomB->GetMndoDerivedParameterD(2);
-      rhoA = atomA->GetMndoDerivedParameterRho(2);
-      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 2);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 2);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 2);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 2);
       double temp4 = this->GetSemiEmpiricalMultipoleInteraction(Qzz, Qyy, rhoA, rhoB, DA, DB, Rab);
       value = temp1 + temp2 + temp3 + temp4;
    }
    // (37) in [DT_1977]
    else if(mu == pz && nu == pz && lambda == pz && sigma == pz){
-      DA = atomA->GetMndoDerivedParameterD(0);
-      DB = atomB->GetMndoDerivedParameterD(0);
-      rhoA = atomA->GetMndoDerivedParameterRho(0);
-      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 0);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 0);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 0);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 0);
       double temp1 = this->GetSemiEmpiricalMultipoleInteraction(sQ, sQ, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(0);
-      DB = atomB->GetMndoDerivedParameterD(2);
-      rhoA = atomA->GetMndoDerivedParameterRho(0);
-      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 0);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 2);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 0);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 2);
       double temp2 = this->GetSemiEmpiricalMultipoleInteraction(sQ, Qzz, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(2);
-      DB = atomB->GetMndoDerivedParameterD(0);
-      rhoA = atomA->GetMndoDerivedParameterRho(2);
-      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 2);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 0);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 2);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 0);
       double temp3 = this->GetSemiEmpiricalMultipoleInteraction(Qzz, sQ, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(2);
-      DB = atomB->GetMndoDerivedParameterD(2);
-      rhoA = atomA->GetMndoDerivedParameterRho(2);
-      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 2);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 2);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 2);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 2);
       double temp4 = this->GetSemiEmpiricalMultipoleInteraction(Qzz, Qzz, rhoA, rhoB, DA, DB, Rab);
       value = temp1 + temp2 + temp3 + temp4;
    }
    // (38) in [DT_1977]
    else if(mu == s && nu == pz && lambda == s && sigma == s){
-      DA = atomA->GetMndoDerivedParameterD(1);
-      DB = atomB->GetMndoDerivedParameterD(0);
-      rhoA = atomA->GetMndoDerivedParameterRho(1);
-      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 1);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 0);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 1);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 0);
       double temp1 = this->GetSemiEmpiricalMultipoleInteraction(muz, sQ, rhoA, rhoB, DA, DB, Rab);
       value = temp1;
    }
@@ -1638,15 +1638,15 @@ double Mndo::GetNddoRepulsionIntegral(Atom* atomA, OrbitalType mu, OrbitalType n
    }
    // (39) in [DT_1977]
    else if(mu == s && nu == pz && lambda == px && sigma == px){
-      DA = atomA->GetMndoDerivedParameterD(1);
-      DB = atomB->GetMndoDerivedParameterD(0);
-      rhoA = atomA->GetMndoDerivedParameterRho(1);
-      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 1);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 0);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 1);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 0);
       double temp1 = this->GetSemiEmpiricalMultipoleInteraction(muz, sQ, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(1);
-      DB = atomB->GetMndoDerivedParameterD(2);
-      rhoA = atomA->GetMndoDerivedParameterRho(1);
-      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 1);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 2);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 1);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 2);
       double temp2 = this->GetSemiEmpiricalMultipoleInteraction(muz, Qxx, rhoA, rhoB, DA, DB, Rab);
       value = temp1 + temp2;
    }
@@ -1654,15 +1654,15 @@ double Mndo::GetNddoRepulsionIntegral(Atom* atomA, OrbitalType mu, OrbitalType n
       value = this->GetNddoRepulsionIntegral(atomA, nu, mu, atomB, lambda, sigma);
    }
    else if(mu == s && nu == pz && lambda == py && sigma == py){
-      DA = atomA->GetMndoDerivedParameterD(1);
-      DB = atomB->GetMndoDerivedParameterD(0);
-      rhoA = atomA->GetMndoDerivedParameterRho(1);
-      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 1);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 0);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 1);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 0);
       double temp1 = this->GetSemiEmpiricalMultipoleInteraction(muz, sQ, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(1);
-      DB = atomB->GetMndoDerivedParameterD(2);
-      rhoA = atomA->GetMndoDerivedParameterRho(1);
-      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 1);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 2);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 1);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 2);
       double temp2 = this->GetSemiEmpiricalMultipoleInteraction(muz, Qyy, rhoA, rhoB, DA, DB, Rab);
       value = temp1 + temp2;
    }
@@ -1671,15 +1671,15 @@ double Mndo::GetNddoRepulsionIntegral(Atom* atomA, OrbitalType mu, OrbitalType n
    }
    // (40) in [DT_1977]
    else if(mu == s && nu == pz && lambda == pz && sigma == pz){
-      DA = atomA->GetMndoDerivedParameterD(1);
-      DB = atomB->GetMndoDerivedParameterD(0);
-      rhoA = atomA->GetMndoDerivedParameterRho(1);
-      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 1);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 0);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 1);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 0);
       double temp1 = this->GetSemiEmpiricalMultipoleInteraction(muz, sQ, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(1);
-      DB = atomB->GetMndoDerivedParameterD(2);
-      rhoA = atomA->GetMndoDerivedParameterRho(1);
-      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 1);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 2);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 1);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 2);
       double temp2 = this->GetSemiEmpiricalMultipoleInteraction(muz, Qzz, rhoA, rhoB, DA, DB, Rab);
       value = temp1 + temp2;
    }
@@ -1688,10 +1688,10 @@ double Mndo::GetNddoRepulsionIntegral(Atom* atomA, OrbitalType mu, OrbitalType n
    }
    // (41) in [DT_1977]
    else if(mu == s && nu == s && lambda == s && sigma == pz){
-      DA = atomA->GetMndoDerivedParameterD(0);
-      DB = atomB->GetMndoDerivedParameterD(1);
-      rhoA = atomA->GetMndoDerivedParameterRho(0);
-      rhoB = atomB->GetMndoDerivedParameterRho(1);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 0);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 1);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 0);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 1);
       double temp1 = this->GetSemiEmpiricalMultipoleInteraction(sQ, muz, rhoA, rhoB, DA, DB, Rab);
       value = temp1;
    }
@@ -1700,15 +1700,15 @@ double Mndo::GetNddoRepulsionIntegral(Atom* atomA, OrbitalType mu, OrbitalType n
    }
    // (42) in [DT_1977]
    else if(mu == px && nu == px && lambda == s && sigma == pz){
-      DA = atomA->GetMndoDerivedParameterD(0);
-      DB = atomB->GetMndoDerivedParameterD(1);
-      rhoA = atomA->GetMndoDerivedParameterRho(0);
-      rhoB = atomB->GetMndoDerivedParameterRho(1);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 0);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 1);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 0);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 1);
       double temp1 = this->GetSemiEmpiricalMultipoleInteraction(sQ, muz, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(2);
-      DB = atomB->GetMndoDerivedParameterD(1);
-      rhoA = atomA->GetMndoDerivedParameterRho(2);
-      rhoB = atomB->GetMndoDerivedParameterRho(1);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 2);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 1);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 2);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 1);
       double temp2 = this->GetSemiEmpiricalMultipoleInteraction(Qxx, muz, rhoA, rhoB, DA, DB, Rab);
       value = temp1 + temp2;
    }
@@ -1716,15 +1716,15 @@ double Mndo::GetNddoRepulsionIntegral(Atom* atomA, OrbitalType mu, OrbitalType n
       value = this->GetNddoRepulsionIntegral(atomA, mu, nu, atomB, sigma, lambda);
    }
    else if(mu == py && nu == py && lambda == s && sigma == pz){
-      DA = atomA->GetMndoDerivedParameterD(0);
-      DB = atomB->GetMndoDerivedParameterD(1);
-      rhoA = atomA->GetMndoDerivedParameterRho(0);
-      rhoB = atomB->GetMndoDerivedParameterRho(1);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 0);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 1);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 0);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 1);
       double temp1 = this->GetSemiEmpiricalMultipoleInteraction(sQ, muz, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(2);
-      DB = atomB->GetMndoDerivedParameterD(1);
-      rhoA = atomA->GetMndoDerivedParameterRho(2);
-      rhoB = atomB->GetMndoDerivedParameterRho(1);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 2);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 1);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 2);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 1);
       double temp2 = this->GetSemiEmpiricalMultipoleInteraction(Qyy, muz, rhoA, rhoB, DA, DB, Rab);
       value = temp1 + temp2;
    }
@@ -1733,15 +1733,15 @@ double Mndo::GetNddoRepulsionIntegral(Atom* atomA, OrbitalType mu, OrbitalType n
    }
    // (43) in [DT_1977]
    else if(mu == pz && nu == pz && lambda == s && sigma == pz){
-      DA = atomA->GetMndoDerivedParameterD(0);
-      DB = atomB->GetMndoDerivedParameterD(1);
-      rhoA = atomA->GetMndoDerivedParameterRho(0);
-      rhoB = atomB->GetMndoDerivedParameterRho(1);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 0);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 1);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 0);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 1);
       double temp1 = this->GetSemiEmpiricalMultipoleInteraction(sQ, muz, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(2);
-      DB = atomB->GetMndoDerivedParameterD(1);
-      rhoA = atomA->GetMndoDerivedParameterRho(2);
-      rhoB = atomB->GetMndoDerivedParameterRho(1);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 2);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 1);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 2);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 1);
       double temp2 = this->GetSemiEmpiricalMultipoleInteraction(Qzz, muz, rhoA, rhoB, DA, DB, Rab);
       value = temp1 + temp2;
    }
@@ -1750,10 +1750,10 @@ double Mndo::GetNddoRepulsionIntegral(Atom* atomA, OrbitalType mu, OrbitalType n
    }
    // (44) in [DT_1977]
    else if(mu == s && nu == px && lambda == s && sigma == px){
-      DA = atomA->GetMndoDerivedParameterD(1);
-      DB = atomB->GetMndoDerivedParameterD(1);
-      rhoA = atomA->GetMndoDerivedParameterRho(1);
-      rhoB = atomB->GetMndoDerivedParameterRho(1);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 1);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 1);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 1);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 1);
       double temp1 = this->GetSemiEmpiricalMultipoleInteraction(mux, mux, rhoA, rhoB, DA, DB, Rab);
       value = temp1;
    }
@@ -1767,10 +1767,10 @@ double Mndo::GetNddoRepulsionIntegral(Atom* atomA, OrbitalType mu, OrbitalType n
       value = this->GetNddoRepulsionIntegral(atomA, nu, mu, atomB, sigma, lambda);
    }
    else if(mu == s && nu == py && lambda == s && sigma == py){
-      DA = atomA->GetMndoDerivedParameterD(1);
-      DB = atomB->GetMndoDerivedParameterD(1);
-      rhoA = atomA->GetMndoDerivedParameterRho(1);
-      rhoB = atomB->GetMndoDerivedParameterRho(1);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 1);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 1);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 1);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 1);
       double temp1 = this->GetSemiEmpiricalMultipoleInteraction(muy, muy, rhoA, rhoB, DA, DB, Rab);
       value = temp1;
    }
@@ -1785,10 +1785,10 @@ double Mndo::GetNddoRepulsionIntegral(Atom* atomA, OrbitalType mu, OrbitalType n
    }
    // (45) in [DT_1977]
    else if(mu == s && nu == pz && lambda == s && sigma == pz){
-      DA = atomA->GetMndoDerivedParameterD(1);
-      DB = atomB->GetMndoDerivedParameterD(1);
-      rhoA = atomA->GetMndoDerivedParameterRho(1);
-      rhoB = atomB->GetMndoDerivedParameterRho(1);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 1);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 1);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 1);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 1);
       double temp1 = this->GetSemiEmpiricalMultipoleInteraction(muz, muz, rhoA, rhoB, DA, DB, Rab);
       value = temp1;
    }
@@ -1803,10 +1803,10 @@ double Mndo::GetNddoRepulsionIntegral(Atom* atomA, OrbitalType mu, OrbitalType n
    }
    // (46) in [DT_1977]
    else if(mu == s && nu == px && lambda == px && sigma == pz){
-      DA = atomA->GetMndoDerivedParameterD(1);
-      DB = atomB->GetMndoDerivedParameterD(2);
-      rhoA = atomA->GetMndoDerivedParameterRho(1);
-      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 1);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 2);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 1);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 2);
       double temp1 = this->GetSemiEmpiricalMultipoleInteraction(mux, Qxz, rhoA, rhoB, DA, DB, Rab);
       value = temp1;
    }
@@ -1820,10 +1820,10 @@ double Mndo::GetNddoRepulsionIntegral(Atom* atomA, OrbitalType mu, OrbitalType n
       value = this->GetNddoRepulsionIntegral(atomA, nu, mu, atomB, sigma, lambda);
    }
    else if(mu == s && nu == py && lambda == py && sigma == pz){
-      DA = atomA->GetMndoDerivedParameterD(1);
-      DB = atomB->GetMndoDerivedParameterD(2);
-      rhoA = atomA->GetMndoDerivedParameterRho(1);
-      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 1);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 2);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 1);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 2);
       double temp1 = this->GetSemiEmpiricalMultipoleInteraction(muy, Qyz, rhoA, rhoB, DA, DB, Rab);
       value = temp1;
    }
@@ -1838,10 +1838,10 @@ double Mndo::GetNddoRepulsionIntegral(Atom* atomA, OrbitalType mu, OrbitalType n
    }
    // (47) in [DT_1977]
    else if(mu == px && nu == pz && lambda == s && sigma == px){
-      DA = atomA->GetMndoDerivedParameterD(2);
-      DB = atomB->GetMndoDerivedParameterD(1);
-      rhoA = atomA->GetMndoDerivedParameterRho(2);
-      rhoB = atomB->GetMndoDerivedParameterRho(1);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 2);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 1);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 2);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 1);
       double temp1 = this->GetSemiEmpiricalMultipoleInteraction(Qxz, mux, rhoA, rhoB, DA, DB, Rab);
       value = temp1;
    }
@@ -1855,10 +1855,10 @@ double Mndo::GetNddoRepulsionIntegral(Atom* atomA, OrbitalType mu, OrbitalType n
       value = this->GetNddoRepulsionIntegral(atomA, nu, mu, atomB, sigma, lambda);
    }
    else if(mu == py && nu == pz && lambda == s && sigma == py){
-      DA = atomA->GetMndoDerivedParameterD(2);
-      DB = atomB->GetMndoDerivedParameterD(1);
-      rhoA = atomA->GetMndoDerivedParameterRho(2);
-      rhoB = atomB->GetMndoDerivedParameterRho(1);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 2);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 1);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 2);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 1);
       double temp1 = this->GetSemiEmpiricalMultipoleInteraction(Qyz, muy, rhoA, rhoB, DA, DB, Rab);
       value = temp1;
    }
@@ -1873,10 +1873,10 @@ double Mndo::GetNddoRepulsionIntegral(Atom* atomA, OrbitalType mu, OrbitalType n
    }
    // (48) in [DT_1977]
    else if(mu == px && nu == pz && lambda == px && sigma == pz){
-      DA = atomA->GetMndoDerivedParameterD(2);
-      DB = atomB->GetMndoDerivedParameterD(2);
-      rhoA = atomA->GetMndoDerivedParameterRho(2);
-      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 2);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 2);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 2);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 2);
       double temp1 = this->GetSemiEmpiricalMultipoleInteraction(Qxz, Qxz, rhoA, rhoB, DA, DB, Rab);
       value = temp1;
    }
@@ -1890,10 +1890,10 @@ double Mndo::GetNddoRepulsionIntegral(Atom* atomA, OrbitalType mu, OrbitalType n
       value = this->GetNddoRepulsionIntegral(atomA, nu, mu, atomB, sigma, lambda);
    }
    else if(mu == py && nu == pz && lambda == py && sigma == pz){
-      DA = atomA->GetMndoDerivedParameterD(2);
-      DB = atomB->GetMndoDerivedParameterD(2);
-      rhoA = atomA->GetMndoDerivedParameterRho(2);
-      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 2);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 2);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 2);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 2);
       double temp1 = this->GetSemiEmpiricalMultipoleInteraction(Qyz, Qyz, rhoA, rhoB, DA, DB, Rab);
       value = temp1;
    }
@@ -1962,42 +1962,42 @@ double Mndo::GetNddoRepulsionIntegralFirstDerivative(
    int lB = 0;
    // (28) in [DT_1977]
    if(mu == s && nu == s && lambda == s && sigma == s){
-      DA = atomA->GetMndoDerivedParameterD(0);
-      DB = atomB->GetMndoDerivedParameterD(0);
-      rhoA = atomA->GetMndoDerivedParameterRho(0);
-      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 0);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 0);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 0);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 0);
       value = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                     sQ, sQ, rhoA, rhoB, DA, DB, Rab);
       value *= dRabDa;
    }
    // (29) in [DT_1977]
    else if(mu == s && nu == s && lambda == px && sigma == px){
-      DA = atomA->GetMndoDerivedParameterD(0);
-      DB = atomB->GetMndoDerivedParameterD(0);
-      rhoA = atomA->GetMndoDerivedParameterRho(0);
-      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 0);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 0);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 0);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 0);
       double temp1 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            sQ, sQ, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(0);
-      DB = atomB->GetMndoDerivedParameterD(2);
-      rhoA = atomA->GetMndoDerivedParameterRho(0);
-      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 0);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 2);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 0);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 2);
       double temp2 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            sQ, Qxx, rhoA, rhoB, DA, DB, Rab);
       value = temp1 + temp2;
       value *= dRabDa;
    }
    else if(mu == s && nu == s && lambda == py && sigma == py){
-      DA = atomA->GetMndoDerivedParameterD(0);
-      DB = atomB->GetMndoDerivedParameterD(0);
-      rhoA = atomA->GetMndoDerivedParameterRho(0);
-      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 0);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 0);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 0);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 0);
       double temp1 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            sQ, sQ, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(0);
-      DB = atomB->GetMndoDerivedParameterD(2);
-      rhoA = atomA->GetMndoDerivedParameterRho(0);
-      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 0);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 2);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 0);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 2);
       double temp2 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            sQ, Qyy, rhoA, rhoB, DA, DB, Rab);
       value = temp1 + temp2;
@@ -2005,16 +2005,16 @@ double Mndo::GetNddoRepulsionIntegralFirstDerivative(
    }
    // (30) in [DT_1977]
    else if(mu == s && nu == s && lambda == pz && sigma == pz){
-      DA = atomA->GetMndoDerivedParameterD(0);
-      DB = atomB->GetMndoDerivedParameterD(0);
-      rhoA = atomA->GetMndoDerivedParameterRho(0);
-      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 0);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 0);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 0);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 0);
       double temp1 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            sQ, sQ, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(0);
-      DB = atomB->GetMndoDerivedParameterD(2);
-      rhoA = atomA->GetMndoDerivedParameterRho(0);
-      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 0);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 2);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 0);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 2);
       double temp2 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            sQ, Qzz, rhoA, rhoB, DA, DB, Rab);
       value = temp1 + temp2;
@@ -2022,32 +2022,32 @@ double Mndo::GetNddoRepulsionIntegralFirstDerivative(
    }
    // (31) in [DT_1977]
    else if(mu == px && nu == px && lambda == s && sigma == s){
-      DA = atomA->GetMndoDerivedParameterD(0);
-      DB = atomB->GetMndoDerivedParameterD(0);
-      rhoA = atomA->GetMndoDerivedParameterRho(0);
-      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 0);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 0);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 0);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 0);
       double temp1 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            sQ, sQ, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(2);
-      DB = atomB->GetMndoDerivedParameterD(0);
-      rhoA = atomA->GetMndoDerivedParameterRho(2);
-      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 2);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 0);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 2);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 0);
       double temp2 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            Qxx, sQ, rhoA, rhoB, DA, DB, Rab);
       value = temp1 + temp2;
       value *= dRabDa;
    }
    else if(mu == py && nu == py && lambda == s && sigma == s){
-      DA = atomA->GetMndoDerivedParameterD(0);
-      DB = atomB->GetMndoDerivedParameterD(0);
-      rhoA = atomA->GetMndoDerivedParameterRho(0);
-      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 0);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 0);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 0);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 0);
       double temp1 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            sQ, sQ, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(2);
-      DB = atomB->GetMndoDerivedParameterD(0);
-      rhoA = atomA->GetMndoDerivedParameterRho(2);
-      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 2);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 0);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 2);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 0);
       double temp2 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            Qyy, sQ, rhoA, rhoB, DA, DB, Rab);
       value = temp1 + temp2;
@@ -2055,16 +2055,16 @@ double Mndo::GetNddoRepulsionIntegralFirstDerivative(
    }
    // (32) in [DT_1977]
    else if(mu == pz && nu == pz && lambda == s && sigma == s){
-      DA = atomA->GetMndoDerivedParameterD(0);
-      DB = atomB->GetMndoDerivedParameterD(0);
-      rhoA = atomA->GetMndoDerivedParameterRho(0);
-      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 0);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 0);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 0);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 0);
       double temp1 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            sQ, sQ, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(2);
-      DB = atomB->GetMndoDerivedParameterD(0);
-      rhoA = atomA->GetMndoDerivedParameterRho(2);
-      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 2);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 0);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 2);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 0);
       double temp2 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            Qzz, sQ, rhoA, rhoB, DA, DB, Rab);
       value = temp1 + temp2;
@@ -2072,56 +2072,56 @@ double Mndo::GetNddoRepulsionIntegralFirstDerivative(
    }
    // (33) in [DT_1977]
    else if(mu == px && nu == px && lambda == px && sigma == px){
-      DA = atomA->GetMndoDerivedParameterD(0);
-      DB = atomB->GetMndoDerivedParameterD(0);
-      rhoA = atomA->GetMndoDerivedParameterRho(0);
-      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 0);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 0);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 0);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 0);
       double temp1 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            sQ, sQ, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(0);
-      DB = atomB->GetMndoDerivedParameterD(2);
-      rhoA = atomA->GetMndoDerivedParameterRho(0);
-      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 0);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 2);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 0);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 2);
       double temp2 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            sQ, Qxx, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(2);
-      DB = atomB->GetMndoDerivedParameterD(0);
-      rhoA = atomA->GetMndoDerivedParameterRho(2);
-      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 2);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 0);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 2);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 0);
       double temp3 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            Qxx, sQ, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(2);
-      DB = atomB->GetMndoDerivedParameterD(2);
-      rhoA = atomA->GetMndoDerivedParameterRho(2);
-      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 2);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 2);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 2);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 2);
       double temp4 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            Qxx, Qxx, rhoA, rhoB, DA, DB, Rab);
       value = temp1 + temp2 + temp3 + temp4;
       value *= dRabDa;
    }
    else if(mu == py && nu == py && lambda == py && sigma == py){
-      DA = atomA->GetMndoDerivedParameterD(0);
-      DB = atomB->GetMndoDerivedParameterD(0);
-      rhoA = atomA->GetMndoDerivedParameterRho(0);
-      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 0);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 0);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 0);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 0);
       double temp1 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            sQ, sQ, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(0);
-      DB = atomB->GetMndoDerivedParameterD(2);
-      rhoA = atomA->GetMndoDerivedParameterRho(0);
-      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 0);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 2);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 0);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 2);
       double temp2 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            sQ, Qyy, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(2);
-      DB = atomB->GetMndoDerivedParameterD(0);
-      rhoA = atomA->GetMndoDerivedParameterRho(2);
-      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 2);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 0);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 2);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 0);
       double temp3 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            Qyy, sQ, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(2);
-      DB = atomB->GetMndoDerivedParameterD(2);
-      rhoA = atomA->GetMndoDerivedParameterRho(2);
-      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 2);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 2);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 2);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 2);
       double temp4 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            Qyy, Qyy, rhoA, rhoB, DA, DB, Rab);
       value = temp1 + temp2 + temp3 + temp4;
@@ -2129,56 +2129,56 @@ double Mndo::GetNddoRepulsionIntegralFirstDerivative(
    }
    // (34) in [DT_1977]
    else if(mu == px && nu == px && lambda == py && sigma == py){
-      DA = atomA->GetMndoDerivedParameterD(0);
-      DB = atomB->GetMndoDerivedParameterD(0);
-      rhoA = atomA->GetMndoDerivedParameterRho(0);
-      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 0);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 0);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 0);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 0);
       double temp1 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            sQ, sQ, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(0);
-      DB = atomB->GetMndoDerivedParameterD(2);
-      rhoA = atomA->GetMndoDerivedParameterRho(0);
-      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 0);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 2);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 0);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 2);
       double temp2 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            sQ, Qyy, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(2);
-      DB = atomB->GetMndoDerivedParameterD(0);
-      rhoA = atomA->GetMndoDerivedParameterRho(2);
-      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 2);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 0);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 2);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 0);
       double temp3 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            Qxx, sQ, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(2);
-      DB = atomB->GetMndoDerivedParameterD(2);
-      rhoA = atomA->GetMndoDerivedParameterRho(2);
-      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 2);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 2);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 2);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 2);
       double temp4 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            Qxx, Qyy, rhoA, rhoB, DA, DB, Rab);
       value = temp1 + temp2 + temp3 + temp4;
       value *= dRabDa;
    }
    else if(mu == py && nu == py && lambda == px && sigma == px){
-      DA = atomA->GetMndoDerivedParameterD(0);
-      DB = atomB->GetMndoDerivedParameterD(0);
-      rhoA = atomA->GetMndoDerivedParameterRho(0);
-      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 0);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 0);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 0);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 0);
       double temp1 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            sQ, sQ, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(0);
-      DB = atomB->GetMndoDerivedParameterD(2);
-      rhoA = atomA->GetMndoDerivedParameterRho(0);
-      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 0);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 2);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 0);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 2);
       double temp2 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            sQ, Qxx, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(2);
-      DB = atomB->GetMndoDerivedParameterD(0);
-      rhoA = atomA->GetMndoDerivedParameterRho(2);
-      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 2);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 0);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 2);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 0);
       double temp3 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            Qyy, sQ, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(2);
-      DB = atomB->GetMndoDerivedParameterD(2);
-      rhoA = atomA->GetMndoDerivedParameterRho(2);
-      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 2);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 2);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 2);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 2);
       double temp4 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            Qyy, Qxx, rhoA, rhoB, DA, DB, Rab);
       value = temp1 + temp2 + temp3 + temp4;
@@ -2186,56 +2186,56 @@ double Mndo::GetNddoRepulsionIntegralFirstDerivative(
    }
    // (35) in [DT_1977]
    else if(mu == px && nu == px && lambda == pz && sigma == pz){
-      DA = atomA->GetMndoDerivedParameterD(0);
-      DB = atomB->GetMndoDerivedParameterD(0);
-      rhoA = atomA->GetMndoDerivedParameterRho(0);
-      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 0);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 0);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 0);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 0);
       double temp1 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            sQ, sQ, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(0);
-      DB = atomB->GetMndoDerivedParameterD(2);
-      rhoA = atomA->GetMndoDerivedParameterRho(0);
-      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 0);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 2);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 0);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 2);
       double temp2 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            sQ, Qzz, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(2);
-      DB = atomB->GetMndoDerivedParameterD(0);
-      rhoA = atomA->GetMndoDerivedParameterRho(2);
-      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 2);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 0);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 2);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 0);
       double temp3 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            Qxx, sQ, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(2);
-      DB = atomB->GetMndoDerivedParameterD(2);
-      rhoA = atomA->GetMndoDerivedParameterRho(2);
-      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 2);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 2);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 2);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 2);
       double temp4 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            Qxx, Qzz, rhoA, rhoB, DA, DB, Rab);
       value = temp1 + temp2 + temp3 + temp4;
       value *= dRabDa;
    }
    else if(mu == py && nu == py && lambda == pz && sigma == pz){
-      DA = atomA->GetMndoDerivedParameterD(0);
-      DB = atomB->GetMndoDerivedParameterD(0);
-      rhoA = atomA->GetMndoDerivedParameterRho(0);
-      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 0);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 0);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 0);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 0);
       double temp1 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            sQ, sQ, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(0);
-      DB = atomB->GetMndoDerivedParameterD(2);
-      rhoA = atomA->GetMndoDerivedParameterRho(0);
-      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 0);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 2);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 0);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 2);
       double temp2 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            sQ, Qzz, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(2);
-      DB = atomB->GetMndoDerivedParameterD(0);
-      rhoA = atomA->GetMndoDerivedParameterRho(2);
-      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 2);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 0);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 2);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 0);
       double temp3 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            Qyy, sQ, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(2);
-      DB = atomB->GetMndoDerivedParameterD(2);
-      rhoA = atomA->GetMndoDerivedParameterRho(2);
-      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 2);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 2);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 2);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 2);
       double temp4 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            Qyy, Qzz, rhoA, rhoB, DA, DB, Rab);
       value = temp1 + temp2 + temp3 + temp4;
@@ -2243,56 +2243,56 @@ double Mndo::GetNddoRepulsionIntegralFirstDerivative(
    }
    // (36) in [DT_1977]
    else if(mu == pz && nu == pz && lambda == px && sigma == px){
-      DA = atomA->GetMndoDerivedParameterD(0);
-      DB = atomB->GetMndoDerivedParameterD(0);
-      rhoA = atomA->GetMndoDerivedParameterRho(0);
-      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 0);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 0);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 0);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 0);
       double temp1 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            sQ, sQ, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(0);
-      DB = atomB->GetMndoDerivedParameterD(2);
-      rhoA = atomA->GetMndoDerivedParameterRho(0);
-      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 0);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 2);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 0);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 2);
       double temp2 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            sQ, Qxx, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(2);
-      DB = atomB->GetMndoDerivedParameterD(0);
-      rhoA = atomA->GetMndoDerivedParameterRho(2);
-      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 2);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 0);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 2);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 0);
       double temp3 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            Qzz, sQ, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(2);
-      DB = atomB->GetMndoDerivedParameterD(2);
-      rhoA = atomA->GetMndoDerivedParameterRho(2);
-      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 2);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 2);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 2);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 2);
       double temp4 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            Qzz, Qxx, rhoA, rhoB, DA, DB, Rab);
       value = temp1 + temp2 + temp3 + temp4;
       value *= dRabDa;
    }
    else if(mu == pz && nu == pz && lambda == py && sigma == py){
-      DA = atomA->GetMndoDerivedParameterD(0);
-      DB = atomB->GetMndoDerivedParameterD(0);
-      rhoA = atomA->GetMndoDerivedParameterRho(0);
-      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 0);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 0);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 0);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 0);
       double temp1 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            sQ, sQ, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(0);
-      DB = atomB->GetMndoDerivedParameterD(2);
-      rhoA = atomA->GetMndoDerivedParameterRho(0);
-      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 0);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 2);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 0);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 2);
       double temp2 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            sQ, Qyy, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(2);
-      DB = atomB->GetMndoDerivedParameterD(0);
-      rhoA = atomA->GetMndoDerivedParameterRho(2);
-      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 2);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 0);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 2);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 0);
       double temp3 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            Qzz, sQ, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(2);
-      DB = atomB->GetMndoDerivedParameterD(2);
-      rhoA = atomA->GetMndoDerivedParameterRho(2);
-      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 2);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 2);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 2);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 2);
       double temp4 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            Qzz, Qyy, rhoA, rhoB, DA, DB, Rab);
       value = temp1 + temp2 + temp3 + temp4;
@@ -2300,28 +2300,28 @@ double Mndo::GetNddoRepulsionIntegralFirstDerivative(
    }
    // (37) in [DT_1977]
    else if(mu == pz && nu == pz && lambda == pz && sigma == pz){
-      DA = atomA->GetMndoDerivedParameterD(0);
-      DB = atomB->GetMndoDerivedParameterD(0);
-      rhoA = atomA->GetMndoDerivedParameterRho(0);
-      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 0);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 0);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 0);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 0);
       double temp1 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            sQ, sQ, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(0);
-      DB = atomB->GetMndoDerivedParameterD(2);
-      rhoA = atomA->GetMndoDerivedParameterRho(0);
-      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 0);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 2);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 0);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 2);
       double temp2 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            sQ, Qzz, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(2);
-      DB = atomB->GetMndoDerivedParameterD(0);
-      rhoA = atomA->GetMndoDerivedParameterRho(2);
-      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 2);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 0);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 2);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 0);
       double temp3 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            Qzz, sQ, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(2);
-      DB = atomB->GetMndoDerivedParameterD(2);
-      rhoA = atomA->GetMndoDerivedParameterRho(2);
-      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 2);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 2);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 2);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 2);
       double temp4 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            Qzz, Qzz, rhoA, rhoB, DA, DB, Rab);
       value = temp1 + temp2 + temp3 + temp4;
@@ -2329,10 +2329,10 @@ double Mndo::GetNddoRepulsionIntegralFirstDerivative(
    }
    // (38) in [DT_1977]
    else if(mu == s && nu == pz && lambda == s && sigma == s){
-      DA = atomA->GetMndoDerivedParameterD(1);
-      DB = atomB->GetMndoDerivedParameterD(0);
-      rhoA = atomA->GetMndoDerivedParameterRho(1);
-      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 1);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 0);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 1);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 0);
       double temp1 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            muz, sQ, rhoA, rhoB, DA, DB, Rab);
       value = temp1;
@@ -2344,16 +2344,16 @@ double Mndo::GetNddoRepulsionIntegralFirstDerivative(
    }
    // (39) in [DT_1977]
    else if(mu == s && nu == pz && lambda == px && sigma == px){
-      DA = atomA->GetMndoDerivedParameterD(1);
-      DB = atomB->GetMndoDerivedParameterD(0);
-      rhoA = atomA->GetMndoDerivedParameterRho(1);
-      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 1);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 0);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 1);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 0);
       double temp1 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            muz, sQ, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(1);
-      DB = atomB->GetMndoDerivedParameterD(2);
-      rhoA = atomA->GetMndoDerivedParameterRho(1);
-      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 1);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 2);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 1);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 2);
       double temp2 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            muz, Qxx, rhoA, rhoB, DA, DB, Rab);
       value = temp1 + temp2;
@@ -2364,16 +2364,16 @@ double Mndo::GetNddoRepulsionIntegralFirstDerivative(
                     atomA, nu, mu, atomB, lambda, sigma, axisA);
    }
    else if(mu == s && nu == pz && lambda == py && sigma == py){
-      DA = atomA->GetMndoDerivedParameterD(1);
-      DB = atomB->GetMndoDerivedParameterD(0);
-      rhoA = atomA->GetMndoDerivedParameterRho(1);
-      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 1);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 0);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 1);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 0);
       double temp1 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            muz, sQ, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(1);
-      DB = atomB->GetMndoDerivedParameterD(2);
-      rhoA = atomA->GetMndoDerivedParameterRho(1);
-      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 1);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 2);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 1);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 2);
       double temp2 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            muz, Qyy, rhoA, rhoB, DA, DB, Rab);
       value = temp1 + temp2;
@@ -2385,16 +2385,16 @@ double Mndo::GetNddoRepulsionIntegralFirstDerivative(
    }
    // (40) in [DT_1977]
    else if(mu == s && nu == pz && lambda == pz && sigma == pz){
-      DA = atomA->GetMndoDerivedParameterD(1);
-      DB = atomB->GetMndoDerivedParameterD(0);
-      rhoA = atomA->GetMndoDerivedParameterRho(1);
-      rhoB = atomB->GetMndoDerivedParameterRho(0);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 1);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 0);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 1);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 0);
       double temp1 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            muz, sQ, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(1);
-      DB = atomB->GetMndoDerivedParameterD(2);
-      rhoA = atomA->GetMndoDerivedParameterRho(1);
-      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 1);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 2);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 1);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 2);
       double temp2 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            muz, Qzz, rhoA, rhoB, DA, DB, Rab);
       value = temp1 + temp2;
@@ -2406,10 +2406,10 @@ double Mndo::GetNddoRepulsionIntegralFirstDerivative(
    }
    // (41) in [DT_1977]
    else if(mu == s && nu == s && lambda == s && sigma == pz){
-      DA = atomA->GetMndoDerivedParameterD(0);
-      DB = atomB->GetMndoDerivedParameterD(1);
-      rhoA = atomA->GetMndoDerivedParameterRho(0);
-      rhoB = atomB->GetMndoDerivedParameterRho(1);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 0);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 1);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 0);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 1);
       double temp1 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            sQ, muz, rhoA, rhoB, DA, DB, Rab);
       value = temp1;
@@ -2421,16 +2421,16 @@ double Mndo::GetNddoRepulsionIntegralFirstDerivative(
    }
    // (42) in [DT_1977]
    else if(mu == px && nu == px && lambda == s && sigma == pz){
-      DA = atomA->GetMndoDerivedParameterD(0);
-      DB = atomB->GetMndoDerivedParameterD(1);
-      rhoA = atomA->GetMndoDerivedParameterRho(0);
-      rhoB = atomB->GetMndoDerivedParameterRho(1);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 0);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 1);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 0);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 1);
       double temp1 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            sQ, muz, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(2);
-      DB = atomB->GetMndoDerivedParameterD(1);
-      rhoA = atomA->GetMndoDerivedParameterRho(2);
-      rhoB = atomB->GetMndoDerivedParameterRho(1);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 2);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 1);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 2);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 1);
       double temp2 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            Qxx, muz, rhoA, rhoB, DA, DB, Rab);
       value = temp1 + temp2;
@@ -2441,16 +2441,16 @@ double Mndo::GetNddoRepulsionIntegralFirstDerivative(
                     atomA, mu, nu, atomB, sigma, lambda, axisA);
    }
    else if(mu == py && nu == py && lambda == s && sigma == pz){
-      DA = atomA->GetMndoDerivedParameterD(0);
-      DB = atomB->GetMndoDerivedParameterD(1);
-      rhoA = atomA->GetMndoDerivedParameterRho(0);
-      rhoB = atomB->GetMndoDerivedParameterRho(1);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 0);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 1);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 0);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 1);
       double temp1 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            sQ, muz, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(2);
-      DB = atomB->GetMndoDerivedParameterD(1);
-      rhoA = atomA->GetMndoDerivedParameterRho(2);
-      rhoB = atomB->GetMndoDerivedParameterRho(1);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 2);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 1);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 2);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 1);
       double temp2 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            Qyy, muz, rhoA, rhoB, DA, DB, Rab);
       value = temp1 + temp2;
@@ -2462,16 +2462,16 @@ double Mndo::GetNddoRepulsionIntegralFirstDerivative(
    }
    // (43) in [DT_1977]
    else if(mu == pz && nu == pz && lambda == s && sigma == pz){
-      DA = atomA->GetMndoDerivedParameterD(0);
-      DB = atomB->GetMndoDerivedParameterD(1);
-      rhoA = atomA->GetMndoDerivedParameterRho(0);
-      rhoB = atomB->GetMndoDerivedParameterRho(1);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 0);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 1);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 0);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 1);
       double temp1 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            sQ, muz, rhoA, rhoB, DA, DB, Rab);
-      DA = atomA->GetMndoDerivedParameterD(2);
-      DB = atomB->GetMndoDerivedParameterD(1);
-      rhoA = atomA->GetMndoDerivedParameterRho(2);
-      rhoB = atomB->GetMndoDerivedParameterRho(1);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 2);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 1);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 2);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 1);
       double temp2 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            Qzz, muz, rhoA, rhoB, DA, DB, Rab);
       value = temp1 + temp2;
@@ -2483,10 +2483,10 @@ double Mndo::GetNddoRepulsionIntegralFirstDerivative(
    }
    // (44) in [DT_1977]
    else if(mu == s && nu == px && lambda == s && sigma == px){
-      DA = atomA->GetMndoDerivedParameterD(1);
-      DB = atomB->GetMndoDerivedParameterD(1);
-      rhoA = atomA->GetMndoDerivedParameterRho(1);
-      rhoB = atomB->GetMndoDerivedParameterRho(1);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 1);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 1);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 1);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 1);
       double temp1 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            mux, mux, rhoA, rhoB, DA, DB, Rab);
       value = temp1;
@@ -2505,10 +2505,10 @@ double Mndo::GetNddoRepulsionIntegralFirstDerivative(
                     atomA, nu, mu, atomB, sigma, lambda, axisA);
    }
    else if(mu == s && nu == py && lambda == s && sigma == py){
-      DA = atomA->GetMndoDerivedParameterD(1);
-      DB = atomB->GetMndoDerivedParameterD(1);
-      rhoA = atomA->GetMndoDerivedParameterRho(1);
-      rhoB = atomB->GetMndoDerivedParameterRho(1);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 1);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 1);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 1);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 1);
       double temp1 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            muy, muy, rhoA, rhoB, DA, DB, Rab);
       value = temp1;
@@ -2528,10 +2528,10 @@ double Mndo::GetNddoRepulsionIntegralFirstDerivative(
    }
    // (45) in [DT_1977]
    else if(mu == s && nu == pz && lambda == s && sigma == pz){
-      DA = atomA->GetMndoDerivedParameterD(1);
-      DB = atomB->GetMndoDerivedParameterD(1);
-      rhoA = atomA->GetMndoDerivedParameterRho(1);
-      rhoB = atomB->GetMndoDerivedParameterRho(1);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 1);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 1);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 1);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 1);
       double temp1 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            muz, muz, rhoA, rhoB, DA, DB, Rab);
       value = temp1;
@@ -2551,10 +2551,10 @@ double Mndo::GetNddoRepulsionIntegralFirstDerivative(
    }
    // (46) in [DT_1977]
    else if(mu == s && nu == px && lambda == px && sigma == pz){
-      DA = atomA->GetMndoDerivedParameterD(1);
-      DB = atomB->GetMndoDerivedParameterD(2);
-      rhoA = atomA->GetMndoDerivedParameterRho(1);
-      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 1);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 2);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 1);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 2);
       double temp1 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            mux, Qxz, rhoA, rhoB, DA, DB, Rab);
       value = temp1;
@@ -2573,10 +2573,10 @@ double Mndo::GetNddoRepulsionIntegralFirstDerivative(
                     atomA, nu, mu, atomB, sigma, lambda, axisA);
    }
    else if(mu == s && nu == py && lambda == py && sigma == pz){
-      DA = atomA->GetMndoDerivedParameterD(1);
-      DB = atomB->GetMndoDerivedParameterD(2);
-      rhoA = atomA->GetMndoDerivedParameterRho(1);
-      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 1);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 2);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 1);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 2);
       double temp1 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            muy, Qyz, rhoA, rhoB, DA, DB, Rab);
       value = temp1;
@@ -2596,10 +2596,10 @@ double Mndo::GetNddoRepulsionIntegralFirstDerivative(
    }
    // (47) in [DT_1977]
    else if(mu == px && nu == pz && lambda == s && sigma == px){
-      DA = atomA->GetMndoDerivedParameterD(2);
-      DB = atomB->GetMndoDerivedParameterD(1);
-      rhoA = atomA->GetMndoDerivedParameterRho(2);
-      rhoB = atomB->GetMndoDerivedParameterRho(1);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 2);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 1);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 2);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 1);
       double temp1 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            Qxz, mux, rhoA, rhoB, DA, DB, Rab);
       value = temp1;
@@ -2618,10 +2618,10 @@ double Mndo::GetNddoRepulsionIntegralFirstDerivative(
                     atomA, nu, mu, atomB, sigma, lambda, axisA);
    }
    else if(mu == py && nu == pz && lambda == s && sigma == py){
-      DA = atomA->GetMndoDerivedParameterD(2);
-      DB = atomB->GetMndoDerivedParameterD(1);
-      rhoA = atomA->GetMndoDerivedParameterRho(2);
-      rhoB = atomB->GetMndoDerivedParameterRho(1);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 2);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 1);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 2);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 1);
       double temp1 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            Qyz, muy, rhoA, rhoB, DA, DB, Rab);
       value = temp1;
@@ -2641,10 +2641,10 @@ double Mndo::GetNddoRepulsionIntegralFirstDerivative(
    }
    // (48) in [DT_1977]
    else if(mu == px && nu == pz && lambda == px && sigma == pz){
-      DA = atomA->GetMndoDerivedParameterD(2);
-      DB = atomB->GetMndoDerivedParameterD(2);
-      rhoA = atomA->GetMndoDerivedParameterRho(2);
-      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 2);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 2);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 2);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 2);
       double temp1 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            Qxz, Qxz, rhoA, rhoB, DA, DB, Rab);
       value = temp1;
@@ -2663,10 +2663,10 @@ double Mndo::GetNddoRepulsionIntegralFirstDerivative(
                     atomA, nu, mu, atomB, sigma, lambda, axisA);
    }
    else if(mu == py && nu == pz && lambda == py && sigma == pz){
-      DA = atomA->GetMndoDerivedParameterD(2);
-      DB = atomB->GetMndoDerivedParameterD(2);
-      rhoA = atomA->GetMndoDerivedParameterRho(2);
-      rhoB = atomB->GetMndoDerivedParameterRho(2);
+      DA = atomA->GetNddoDerivedParameterD(this->theory, 2);
+      DB = atomB->GetNddoDerivedParameterD(this->theory, 2);
+      rhoA = atomA->GetNddoDerivedParameterRho(this->theory, 2);
+      rhoB = atomB->GetNddoDerivedParameterRho(this->theory, 2);
       double temp1 = this->GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                            Qyz, Qyz, rhoA, rhoB, DA, DB, Rab);
       value = temp1;
