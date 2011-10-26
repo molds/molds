@@ -514,25 +514,6 @@ void Mndo::CalcDiatomicOverlapFirstDerivativeInDiatomicFrame(
 double Mndo::GetMolecularIntegralElement(int moI, int moJ, int moK, int moL, 
                                           Molecule* molecule, double** fockMatrix, double** gammaAB){
    double value = 0.0;
-   return value;
-}
-
-// right-upper part is only calculated by this method.
-void Mndo::CalcCISMatrix(double** matrixCIS, int numberOcc, int numberVir){
-   cout << this->messageStartCalcCISMatrix;
-   double ompStartTime = omp_get_wtime();
-   //#pragma omp parallel for schedule(auto)
-   for(int k=0; k<numberOcc*numberVir; k++){
-      // single excitation from I-th (occupied)MO to A-th (virtual)MO
-      int moI = this->molecule->GetTotalNumberValenceElectrons()/2 - (k/numberVir) -1;
-      int moA = this->molecule->GetTotalNumberValenceElectrons()/2 + (k%numberVir);
-
-      for(int l=k; l<numberOcc*numberVir; l++){
-         // single excitation from J-th (occupied)MO to B-th (virtual)MO
-         int moJ = this->molecule->GetTotalNumberValenceElectrons()/2 - (l/numberVir) -1;
-         int moB = this->molecule->GetTotalNumberValenceElectrons()/2 + (l%numberVir);
-         double value=0.0;
-
          for(int A=0; A<molecule->GetAtomVect()->size(); A++){
             Atom* atomA = (*molecule->GetAtomVect())[A];
             int firstAOIndexA = atomA->GetFirstAOIndex();
@@ -558,14 +539,10 @@ void Mndo::CalcCISMatrix(double** matrixCIS, int numberOcc, int numberVir){
                                                           [lambda-firstAOIndexB]
                                                           [sigma-firstAOIndexB];
 
-                              value += 2.0*gamma*fockMatrix[moA][mu]
-                                                *fockMatrix[moI][nu]
-                                                *fockMatrix[moJ][lambda]
-                                                *fockMatrix[moB][sigma];
-                              value -=     gamma*fockMatrix[moA][mu]
-                                                *fockMatrix[moB][nu]
-                                                *fockMatrix[moI][lambda]
-                                                *fockMatrix[moJ][sigma];
+                              value += gamma*fockMatrix[moI][mu]
+                                                *fockMatrix[moJ][nu]
+                                                *fockMatrix[moK][lambda]
+                                                *fockMatrix[moL][sigma];
 
                            }
                            else{
@@ -583,14 +560,10 @@ void Mndo::CalcCISMatrix(double** matrixCIS, int numberOcc, int numberVir){
                                  gamma = 0.0;
                               }
 
-                              value += 2.0*gamma*fockMatrix[moA][mu]
-                                                *fockMatrix[moI][nu]
-                                                *fockMatrix[moJ][lambda]
-                                                *fockMatrix[moB][sigma];
-                              value -=     gamma*fockMatrix[moA][mu]
-                                                *fockMatrix[moB][nu]
-                                                *fockMatrix[moI][lambda]
-                                                *fockMatrix[moJ][sigma];
+                              value += gamma*fockMatrix[moI][mu]
+                                                *fockMatrix[moJ][nu]
+                                                *fockMatrix[moK][lambda]
+                                                *fockMatrix[moL][sigma];
                            }  
                         }
                      }
@@ -598,6 +571,29 @@ void Mndo::CalcCISMatrix(double** matrixCIS, int numberOcc, int numberVir){
                }
             }
          }
+   return value;
+}
+
+// right-upper part is only calculated by this method.
+void Mndo::CalcCISMatrix(double** matrixCIS, int numberOcc, int numberVir){
+   cout << this->messageStartCalcCISMatrix;
+   double ompStartTime = omp_get_wtime();
+
+   #pragma omp parallel for schedule(auto)
+   for(int k=0; k<numberOcc*numberVir; k++){
+      // single excitation from I-th (occupied)MO to A-th (virtual)MO
+      int moI = this->molecule->GetTotalNumberValenceElectrons()/2 - (k/numberVir) -1;
+      int moA = this->molecule->GetTotalNumberValenceElectrons()/2 + (k%numberVir);
+
+      for(int l=k; l<numberOcc*numberVir; l++){
+         // single excitation from J-th (occupied)MO to B-th (virtual)MO
+         int moJ = this->molecule->GetTotalNumberValenceElectrons()/2 - (l/numberVir) -1;
+         int moB = this->molecule->GetTotalNumberValenceElectrons()/2 + (l%numberVir);
+         double value=0.0;
+         value = 2.0*this->GetMolecularIntegralElement(moA, moI, moJ, moB, 
+                                                       this->molecule, this->fockMatrix, NULL)
+                    -this->GetMolecularIntegralElement(moA, moB, moI, moJ, 
+                                                       this->molecule, this->fockMatrix, NULL);
          // Diagonal term
          if(k==l){
             value += this->energiesMO[moA] - this->energiesMO[moI];
