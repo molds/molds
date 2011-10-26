@@ -98,9 +98,9 @@ protected:
    double* energiesMO;
    double** matrixForce;
    double****** twoElecTwoCore;
-   void CalcRotatingMatrixFirstDerivative(double*** rMatFirstDeri, 
-                                          Atom* atomA,
-                                          Atom* atomB);
+   void CalcRotatingMatrixFirstDerivatives(double*** rMatFirstDeri, 
+                                           Atom* atomA,
+                                           Atom* atomB);
    struct MoEnergy{
       double energy;
       int occIndex;
@@ -1312,7 +1312,7 @@ void Cndo2::CalcOverlap(double** overlap, Molecule* molecule){
 // First derivative of diatomic overlap integrals between AOs in space fixed flame.
 // The Overlap matrix is S_{\mu\nu} in (3.74) in J. A. Pople book.
 // Note that this methoc can not treat d-obitals 
-// because CalcRotatingMatrixFirstDerivative can not treat d-orbitals.
+// because CalcRotatingMatrixFirstDerivatives can not treat d-orbitals.
 void Cndo2::CalcDiatomicOverlapFirstDerivative(double*** overlapFirstDeri, 
                                                Atom* atomA, Atom* atomB){
 
@@ -1338,7 +1338,7 @@ void Cndo2::CalcDiatomicOverlapFirstDerivative(double*** overlapFirstDeri,
       this->CalcRotatingMatrix(rotatingMatrix, atomA, atomB);
       this->CalcDiatomicOverlapFirstDerivativeInDiatomicFrame
                      (diaOverlapDeriR, atomA, atomB);
-      this->CalcRotatingMatrixFirstDerivative(rMatDeri, atomA, atomB);
+      this->CalcRotatingMatrixFirstDerivatives(rMatDeri, atomA, atomB);
 
       // rotate
       for(int i=0; i<OrbitalType_end; i++){
@@ -2032,7 +2032,7 @@ void Cndo2::CalcRotatingMatrix(double** rotatingMatrix, Atom* atomA, Atom* atomB
 // This method can not calculate d-orbital yet.
 // For rotating matirxi, see J. Mol. Struc. (Theochem), 419, 19 (1997) (ref. [BFB_1997])
 // we set gamma=0 always.
-void Cndo2::CalcRotatingMatrixFirstDerivative(
+void Cndo2::CalcRotatingMatrixFirstDerivatives(
             double*** rMatFirstDeri, 
             Atom* atomA, 
             Atom* atomB){
