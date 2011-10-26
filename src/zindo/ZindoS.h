@@ -1177,7 +1177,7 @@ void ZindoS::CalcCISMatrix(double** matrixCIS, int numberOcc, int numberVir){
          int moJ = this->molecule->GetTotalNumberValenceElectrons()/2 - (l/numberVir) -1;
          int moB = this->molecule->GetTotalNumberValenceElectrons()/2 + (l%numberVir);
          double value=0.0;
-
+         
          // Fast algorith, but this is not easy to read. Slow algorithm is alos written below.
          Atom* atomA = NULL;
          Atom* atomB = NULL;
@@ -1398,28 +1398,17 @@ void ZindoS::CalcCISMatrix(double** matrixCIS, int numberOcc, int numberVir){
             }
          }
          // End of the fast algorith.
-
-         /*
+         /* 
          // Slow algorith, but this is easy to read. Fast altorithm is also written above.
-         // diagonal term
+         value = 2.0*this->GetMolecularIntegralElement(moA, moI, moJ, moB, 
+                                                       this->molecule, this->fockMatrix, NULL)
+                    -this->GetMolecularIntegralElement(moA, moB, moI, moJ, 
+                                                       this->molecule, this->fockMatrix, NULL);
          if(k==l){
-            value = this->energiesMO[moA] - this->energiesMO[moI] 
-                     +2.0*this->GetMolecularIntegralElement(moI, moA, moA, moI, 
-                                          this->molecule, this->fockMatrix, NULL)
-                     -    this->GetMolecularIntegralElement(moI, moI, moA, moA, 
-                                          this->molecule, this->fockMatrix, NULL);
-
-         }
-         // Off diagonal term (right upper)
-         else if(k<l){
-            value = 2.0*this->GetMolecularIntegralElement(moA, moI, moJ, moB, 
-                                          this->molecule, this->fockMatrix, NULL)
-                     -    this->GetMolecularIntegralElement(moA, moB, moI, moJ, 
-                                          this->molecule, this->fockMatrix, NULL);
+            value += this->energiesMO[moA] - this->energiesMO[moI];
          }
          // End of the slow algorith.
          */
-
          matrixCIS[k][l] = value;
       }
    }
