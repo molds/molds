@@ -65,15 +65,28 @@ int main(){
    long double AQ_old=0.0;
    long double AQ_old2=0.0;
 
-   long double orbitalExponentS=0.0;
-   long double orbitalExponentP=0.0;
-   long double Gss = 12.848 * Parameters::GetInstance()->GetEV2AU();
-   long double Gpp = 0.0 * Parameters::GetInstance()->GetEV2AU();
-   long double Gsp = 0.0 * Parameters::GetInstance()->GetEV2AU();
-   long double Gpp2= 0.0 * Parameters::GetInstance()->GetEV2AU();
-   long double Hsp = 0.0 * Parameters::GetInstance()->GetEV2AU();
+   long double orbitalExponentS=2.699905;
+   long double orbitalExponentP=2.699905;
+   long double Gss = 15.42 * Parameters::GetInstance()->GetEV2AU();
+   long double Gpp = 14.52 * Parameters::GetInstance()->GetEV2AU();
+   long double Gsp = 14.48 * Parameters::GetInstance()->GetEV2AU();
+   long double Gpp2= 12.98 * Parameters::GetInstance()->GetEV2AU();
+   long double Hsp = 3.94 * Parameters::GetInstance()->GetEV2AU();
    long double Hpp = 0.5*(Gpp - Gpp2);
 
+   // output prepared parameters
+   printf("=====  NDDO parameters =====\n");
+   printf("orbital exponent S in [a.u.] = %.10lf\n",(double)orbitalExponentS);
+   printf("orbital exponent P in [a.u.] = %.10lf\n",(double)orbitalExponentP);
+   printf("Gss in [a.u.] = %.10lf\n",(double)Gss);
+   printf("Gpp in [a.u.] = %.10lf\n",(double)Gpp);
+   printf("Gsp in [a.u.] = %.10lf\n",(double)Gsp);
+   printf("Gpp2 in [a.u.] = %.10lf\n",(double)Gpp2);
+   printf("Hsp in [a.u.] = %.10lf\n",(double)Hsp);
+   printf("Hpp = 0.5*(Gpp - Gpp2)\n\n\n");
+
+   // calculateion and output derived parameters
+   printf("=====  NDDO derived parameters =====\n");
    // Calc. D1
    D1 = 5.0*pow(3.0,-0.5)
        *pow(4.0*orbitalExponentS*orbitalExponentP,2.5)
