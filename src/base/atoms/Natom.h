@@ -75,6 +75,36 @@ Natom::Natom(double x, double y, double z) : Atom(x, y, z){
    //this->mndoDerivedParameterRho[0] = 0.529751 * Parameters::GetInstance()->GetAngstrom2AU();  
    //this->mndoDerivedParameterRho[1] = 0.337322 * Parameters::GetInstance()->GetAngstrom2AU();  
    //this->mndoDerivedParameterRho[2] = 0.324853 * Parameters::GetInstance()->GetAngstrom2AU();  
+   this->am1CoreintegralS = -71.860000 * Parameters::GetInstance()->GetEV2AU();         
+   this->am1CoreintegralP = -57.167581 * Parameters::GetInstance()->GetEV2AU();         
+   this->am1OrbitalExponentS = 2.315410;      
+   this->am1OrbitalExponentP = 2.157940;      
+   this->am1BondingParameterS = -20.299110 * Parameters::GetInstance()->GetEV2AU();     
+   this->am1BondingParameterP = -18.238666 * Parameters::GetInstance()->GetEV2AU();     
+   this->am1Alpha = 2.947286 / Parameters::GetInstance()->GetAngstrom2AU();        
+   this->am1Gss = this->mndoGss;
+   this->am1Gpp = this->mndoGpp;
+   this->am1Gsp = this->mndoGsp;
+   this->am1Gpp2 = this->mndoGpp2;
+   this->am1Hsp = this->mndoHsp;
+   this->am1DerivedParameterD[0] = 0.0;    
+   this->am1DerivedParameterD[1] = 0.6433247425;    
+   this->am1DerivedParameterD[2] = 0.5675527917;    
+   this->am1DerivedParameterRho[0] = 0.5/0.4994193177;
+   this->am1DerivedParameterRho[1] = 0.5/0.7820630445;  
+   this->am1DerivedParameterRho[2] = 0.5/0.7883351388;  
+   this->am1ParameterK[0] = 0.025251 * Parameters::GetInstance()->GetEV2AU();
+   this->am1ParameterK[1] = 0.028953 * Parameters::GetInstance()->GetEV2AU();
+   this->am1ParameterK[2] =-0.005806 * Parameters::GetInstance()->GetEV2AU();
+   this->am1ParameterK[3] = 0.00 * Parameters::GetInstance()->GetEV2AU();
+   this->am1ParameterL[0] = 5.00 / pow(Parameters::GetInstance()->GetAngstrom2AU(),2.0);
+   this->am1ParameterL[1] = 5.00 / pow(Parameters::GetInstance()->GetAngstrom2AU(),2.0);
+   this->am1ParameterL[2] = 2.00 / pow(Parameters::GetInstance()->GetAngstrom2AU(),2.0);
+   this->am1ParameterL[3] = 0.00 / pow(Parameters::GetInstance()->GetAngstrom2AU(),2.0);
+   this->am1ParameterM[0] = 1.50 * Parameters::GetInstance()->GetAngstrom2AU();
+   this->am1ParameterM[1] = 2.10 * Parameters::GetInstance()->GetAngstrom2AU();
+   this->am1ParameterM[2] = 2.40 * Parameters::GetInstance()->GetAngstrom2AU();
+   this->am1ParameterM[3] = 0.00 * Parameters::GetInstance()->GetAngstrom2AU();
 }
 
 double Natom::GetCoreIntegral(OrbitalType orbital, double gamma, bool isGuess, TheoryType theory){
@@ -120,6 +150,9 @@ double Natom::GetCoreIntegral(OrbitalType orbital, double gamma, bool isGuess, T
    }
    else if(theory == MNDO){
       value = this->GetMndoCoreIntegral(orbital);
+   }
+   else if(theory == AM1){
+      value = this->GetAm1CoreIntegral(orbital);
    }
 
    return value;

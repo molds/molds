@@ -94,6 +94,36 @@ Satom::Satom(double x, double y, double z) : Atom(x, y, z){
    this->mndoDerivedParameterRho[0] = 0.5/0.4733554;
    this->mndoDerivedParameterRho[1] = 0.5/0.5544502;
    this->mndoDerivedParameterRho[2] = 0.5/0.5585244;
+   this->am1CoreintegralS = -56.694056 * Parameters::GetInstance()->GetEV2AU();         
+   this->am1CoreintegralP = -48.717049 * Parameters::GetInstance()->GetEV2AU();         
+   this->am1OrbitalExponentS = 2.366515;      
+   this->am1OrbitalExponentP = 1.667263;      
+   this->am1BondingParameterS = -3.920566 * Parameters::GetInstance()->GetEV2AU();     
+   this->am1BondingParameterP = -7.905278 * Parameters::GetInstance()->GetEV2AU();     
+   this->am1Alpha = 2.461648 / Parameters::GetInstance()->GetAngstrom2AU();        
+   this->am1Gss =  11.786329 * Parameters::GetInstance()->GetEV2AU();   
+   this->am1Gpp =  10.039308 * Parameters::GetInstance()->GetEV2AU();   
+   this->am1Gsp =   8.663127 * Parameters::GetInstance()->GetEV2AU();   
+   this->am1Gpp2 =  7.781688 * Parameters::GetInstance()->GetEV2AU();  
+   this->am1Hsp =   2.532137 * Parameters::GetInstance()->GetEV2AU();   
+   this->am1DerivedParameterD[0] = 0.0;    
+   this->am1DerivedParameterD[1] = 0.6630874862;    
+   this->am1DerivedParameterD[2] = 0.7345840886;    
+   this->am1DerivedParameterRho[0] = 0.5/0.4331361580;
+   this->am1DerivedParameterRho[1] = 0.5/0.6985577161;  
+   this->am1DerivedParameterRho[2] = 0.5/0.7835093650;  
+   this->am1ParameterK[0] =-0.509195 * Parameters::GetInstance()->GetEV2AU();
+   this->am1ParameterK[1] =-0.011863 * Parameters::GetInstance()->GetEV2AU();
+   this->am1ParameterK[2] = 0.012334 * Parameters::GetInstance()->GetEV2AU();
+   this->am1ParameterK[3] = 0.00 * Parameters::GetInstance()->GetEV2AU();
+   this->am1ParameterL[0] = 4.593691 / pow(Parameters::GetInstance()->GetAngstrom2AU(),2.0);
+   this->am1ParameterL[1] = 5.865731 / pow(Parameters::GetInstance()->GetAngstrom2AU(),2.0);
+   this->am1ParameterL[2] = 13.557336 / pow(Parameters::GetInstance()->GetAngstrom2AU(),2.0);
+   this->am1ParameterL[3] = 0.00 / pow(Parameters::GetInstance()->GetAngstrom2AU(),2.0);
+   this->am1ParameterM[0] = 0.770665 * Parameters::GetInstance()->GetAngstrom2AU();
+   this->am1ParameterM[1] = 1.503313 * Parameters::GetInstance()->GetAngstrom2AU();
+   this->am1ParameterM[2] = 2.009173 * Parameters::GetInstance()->GetAngstrom2AU();
+   this->am1ParameterM[3] = 0.00 * Parameters::GetInstance()->GetAngstrom2AU();
 }
 
 double Satom::GetCoreIntegral(OrbitalType orbital, double gamma, bool isGuess, TheoryType theory){
@@ -124,6 +154,10 @@ double Satom::GetCoreIntegral(OrbitalType orbital, double gamma, bool isGuess, T
    else if(theory == MNDO){
       value = this->GetMndoCoreIntegral(orbital);
    }
+   else if(theory == AM1){
+      value = this->GetAm1CoreIntegral(orbital);
+   }
+
 
    return value;
 }

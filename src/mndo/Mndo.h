@@ -16,6 +16,15 @@ public:
    virtual ~Mndo();
    virtual void SetMolecule(Molecule* molecule);
 protected:
+   string errorMessageGetSemiEmpiricalMultipoleInteractionBadMultipoles;
+   string errorMessageGetSemiEmpiricalMultipoleInteractionFirstDeriBadMultipoles;
+   string errorMessageGetNddoRepulsionIntegral;
+   string errorMessageGetNddoRepulsionIntegralFirstDerivative;
+   string errorMessageCalcTwoElecTwoCoreDiatomicNullMatrix;
+   string errorMessageCalcTwoElecTwoCoreNullMatrix;
+   string errorMessageCalcTwoElecTwoCoreDiatomicSameAtoms;
+   string errorMessageCalcTwoElecTwoCoreDiatomicFirstDerivativesNullMatrix;
+   string errorMessageCalcTwoElecTwoCoreDiatomicFirstDerivativesSameAtoms;
    virtual void SetMessages();
    virtual void SetEnableAtomTypes();
    virtual void CalcCoreRepulsionEnergy();
@@ -69,18 +78,15 @@ protected:
                                               double** gammaAB);
    virtual void CalcCISMatrix(double** matrixCIS, int numberOcc, int numberVir);
    virtual void CalcForce(int electronicStateIndex);
+   double GetNddoRepulsionIntegral(Atom* atomA, OrbitalType mu, OrbitalType nu,
+                                   Atom* atomB, OrbitalType lambda, OrbitalType sigma);
+   double GetNddoRepulsionIntegralFirstDerivative(
+                                   Atom* atomA, OrbitalType mu, OrbitalType nu,
+                                   Atom* atomB, OrbitalType lambda, OrbitalType sigma,
+                                   CartesianType axisA);
 private:
-   string errorMessageGetSemiEmpiricalMultipoleInteractionBadMultipoles;
-   string errorMessageGetSemiEmpiricalMultipoleInteractionFirstDeriBadMultipoles;
    string errorMessageMultipoleA;
    string errorMessageMultipoleB;
-   string errorMessageGetNddoRepulsionIntegral;
-   string errorMessageGetNddoRepulsionIntegralFirstDerivative;
-   string errorMessageCalcTwoElecTwoCoreDiatomicNullMatrix;
-   string errorMessageCalcTwoElecTwoCoreNullMatrix;
-   string errorMessageCalcTwoElecTwoCoreDiatomicSameAtoms;
-   string errorMessageCalcTwoElecTwoCoreDiatomicFirstDerivativesNullMatrix;
-   string errorMessageCalcTwoElecTwoCoreDiatomicFirstDerivativesSameAtoms;
    string messageHeatsFormation;
    string messageHeatsFormationTitle;
    double heatsFormation;
@@ -102,12 +108,6 @@ private:
                                                                    double**** twoElecTwoCoreDiatomic,
                                                                    double** rotatingMatrix,
                                                                    double*** rMatDeri);
-   double GetNddoRepulsionIntegral(Atom* atomA, OrbitalType mu, OrbitalType nu,
-                                   Atom* atomB, OrbitalType lambda, OrbitalType sigma);
-   double GetNddoRepulsionIntegralFirstDerivative(
-                                   Atom* atomA, OrbitalType mu, OrbitalType nu,
-                                   Atom* atomB, OrbitalType lambda, OrbitalType sigma,
-                                   CartesianType axisA);
    double GetSemiEmpiricalMultipoleInteraction(MultipoleType multipoleA,
                                                MultipoleType multipoleB,
                                                double rhoA,
