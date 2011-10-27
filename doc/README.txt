@@ -1,4 +1,4 @@
-
+==============================================================================
 Compile: 
    for 32 bit
    $icc MolDS.cpp -lmkl_intel -lmkl_intel_thread -lmkl_core -liomp5 -lpthread -O3
@@ -8,12 +8,14 @@ Compile:
    $icc MolDS.cpp -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread
    $icc MolDS.cpp -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread -O3 -openmp -openmp-report2
 
-
+==============================================================================
 Carring Out:
    $./a.out < input.in
 
+==============================================================================
 Capabilities:
 
+   Electronic calculations:
             | HF  | CIS | MD(gs) | MD(es) |
    ---------|-----|-----|--------|--------|
    CNDO2    | OK  | --  | --     | --     |
@@ -22,11 +24,24 @@ Capabilities:
    ---------|-----|-----|--------|--------|
    ZINDO/S  | OK  | OK  | OK     | --     |
    ---------|-----|-----|--------|--------|
-   MNDO     | Sch | Sch | Sch    | Sch    |
+   MNDO     | OK  | Sch | OK     | Sch    |
+   ---------|-----|-----|--------|--------|
+   AM1      | OK  | Sch | OK     | Sch    |
+   ---------|-----|-----|--------|--------|
+   PM3      | OK  | Sch | OK     | Sch    |
 
       "OK", "Sch", and "--" mean available, shceduled, and non-scheduled methods, respectively.
       MD(gs) and MD(es) mean Molecular Dynamics on ground and excited states, respectively. 
 
+   Elements:
+   CNDO2    | H, Li, C, N, O, and S
+   INDO     | H, Li, C, N, O, and S 
+   ZINDO/S  | H, C, N, O, and S
+   MNDO     | H, C, N, O, and S 
+   AM1      | H, C, N, O, and S 
+   PM3      | H, C, N, O, and S 
+
+==============================================================================
 How to Write Input-files:
 
    Comment Out:
@@ -34,7 +49,8 @@ How to Write Input-files:
 
 
    SCF:
-      Write "cndo/2", "indo", or "zindo/s" in theory-directive.
+      Write "cndo/2", "indo", "zindo/s", "mndo", "am1", or "pm3" in theory-directive.
+      AM1 only supports (can calculate) Heats of formation.
 
       E.g. 
          THEORY
@@ -63,7 +79,7 @@ How to Write Input-files:
             diis_start_error 0.01
             diis_end_error 0.00000001
          SCF_END
-
+      
 
    CIS:
       Write CIS-directive.
@@ -137,6 +153,12 @@ How to Write Input-files:
        "dt" should be set in femto-second.
        Default value of "dt" is 0.1[fs].
 
+      E.g.
+         MD
+            total_steps 50
+            electronic_state 0
+            dt 0.05
+         MD_END
 
    Principal Axes (Diagonalizing the inertia tensor):
       Write "principal_axes" in theory-directive.
