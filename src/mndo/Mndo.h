@@ -27,7 +27,7 @@ protected:
    string errorMessageCalcTwoElecTwoCoreDiatomicFirstDerivativesSameAtoms;
    virtual void SetMessages();
    virtual void SetEnableAtomTypes();
-   virtual void CalcCoreRepulsionEnergy();
+   virtual double CalcDiatomCoreRepulsionEnergy(int indexAtomA, int indexAtomB);
    virtual double GetDiatomCoreRepulsionFirstDerivative(int atomAIndex,
                                                         int atomBIndex, 
                                                         CartesianType axisA);
@@ -208,39 +208,27 @@ void Mndo::SetEnableAtomTypes(){
    this->enableAtomTypes.push_back(S);
 }
 
-void Mndo::CalcCoreRepulsionEnergy(){
-   double energy = 0.0;
-   double distance = 0.0;
-   double twoElecInt = 0.0;
-   double alphaA = 0.0;
-   double alphaB = 0.0;
-   Atom* atomA = NULL;
-   Atom* atomB = NULL;
-   double temp = 0.0;
+double Mndo::CalcDiatomCoreRepulsionEnergy(int indexAtomA, int indexAtomB){
+   Atom* atomA = (*this->molecule->GetAtomVect())[indexAtomA];
+   Atom* atomB = (*this->molecule->GetAtomVect())[indexAtomB];
+   double distance = this->molecule->GetDistanceAtoms(indexAtomA, indexAtomB);
    double ang2AU = Parameters::GetInstance()->GetAngstrom2AU();
-   for(int i=0; i<this->molecule->GetAtomVect()->size(); i++){
-      atomA = (*this->molecule->GetAtomVect())[i];
-      alphaA = atomA->GetNddoAlpha(this->theory);
-      for(int j=i+1; j<this->molecule->GetAtomVect()->size(); j++){
-         atomB = (*this->molecule->GetAtomVect())[j];
-         alphaB = atomB->GetNddoAlpha(this->theory);
-         distance = this->molecule->GetDistanceAtoms(i, j);
-         if(atomA->GetAtomType() == H && (atomB->GetAtomType() == N || 
-                                          atomB->GetAtomType() == O)  ){
-            temp = 1.0 + (distance/ang2AU)*exp(-alphaB*distance) + exp(-alphaA*distance);
-         }
-         else if(atomB->GetAtomType() == H && (atomA->GetAtomType() == N || 
-                                               atomA->GetAtomType() == O)  ){
-            temp = 1.0 + (distance/ang2AU)*exp(-alphaA*distance) + exp(-alphaB*distance);
-         }
-         else{
-            temp = 1.0 + exp(-alphaA*distance) + exp(-alphaB*distance);
-         }
-         twoElecInt = this->GetNddoRepulsionIntegral(atomA, s, s, atomB, s, s);
-         energy += atomA->GetCoreCharge()*atomB->GetCoreCharge()*twoElecInt*temp; 
-      }
+   double alphaA = atomA->GetNddoAlpha(this->theory);
+   double alphaB = atomB->GetNddoAlpha(this->theory);
+   double temp = 0.0;
+   if(atomA->GetAtomType() == H && (atomB->GetAtomType() == N || 
+                                    atomB->GetAtomType() == O)  ){
+      temp = 1.0 + (distance/ang2AU)*exp(-alphaB*distance) + exp(-alphaA*distance);
    }
-   this->coreRepulsionEnergy = energy;
+   else if(atomB->GetAtomType() == H && (atomA->GetAtomType() == N || 
+                                         atomA->GetAtomType() == O)  ){
+      temp = 1.0 + (distance/ang2AU)*exp(-alphaA*distance) + exp(-alphaB*distance);
+   }
+   else{
+      temp = 1.0 + exp(-alphaA*distance) + exp(-alphaB*distance);
+   }
+   double twoElecInt = this->GetNddoRepulsionIntegral(atomA, s, s, atomB, s, s);
+   return  atomA->GetCoreCharge()*atomB->GetCoreCharge()*twoElecInt*temp; 
 }
 
 // First derivative of diatomic core repulsion energy.

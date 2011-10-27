@@ -47,7 +47,7 @@ protected:
    vector<AtomType> enableAtomTypes;
    double coreRepulsionEnergy;
    virtual void CalcHFProperties();
-   virtual void CalcCoreRepulsionEnergy();
+   virtual double CalcDiatomCoreRepulsionEnergy(int indexAtomA, int indexAtomB);
    virtual double GetDiatomCoreRepulsionFirstDerivative(int indexAtomA, 
                                                         int indexAtomB, 
                                                         CartesianType axisA);
@@ -129,7 +129,7 @@ private:
    static const double Y[ShellType_end+1][ShellType_end+1][ShellType_end][ShellType_end][ShellType_end][2*ShellType_end+1][2*ShellType_end+1];
    // use Z[na][nb][k] as Z_{k} in (B.30) in Pople book for give na, nb, and k. 
    static const double Z[2*ShellType_end][2*ShellType_end][4*ShellType_end-1];
-
+   void CalcCoreRepulsionEnergy();
    bool SatisfyConvergenceCriterion(double** oldOrbitalElectronPopulation, 
                                     double** orbitalElectronPopulation,
                                     int numberAOs, double* rmsDensity, int times);
@@ -389,18 +389,19 @@ void Cndo2::CheckEnableAtomType(Molecule* molecule){
 
 void Cndo2::CalcCoreRepulsionEnergy(){
    double energy = 0.0;
-   double distance = 0.0;
-   Atom* atomA = NULL;
-   Atom* atomB = NULL;
    for(int i=0; i<this->molecule->GetAtomVect()->size(); i++){
-      atomA = (*this->molecule->GetAtomVect())[i];
       for(int j=i+1; j<this->molecule->GetAtomVect()->size(); j++){
-         atomB = (*this->molecule->GetAtomVect())[j];
-         distance = this->molecule->GetDistanceAtoms(i, j);
-         energy += atomA->GetCoreCharge()*atomB->GetCoreCharge()/distance; 
+         energy += this->CalcDiatomCoreRepulsionEnergy(i, j);
       }
    }
    this->coreRepulsionEnergy = energy;
+}
+
+double Cndo2::CalcDiatomCoreRepulsionEnergy(int indexAtomA, int indexAtomB){
+   Atom* atomA = (*this->molecule->GetAtomVect())[indexAtomA];
+   Atom* atomB = (*this->molecule->GetAtomVect())[indexAtomB];
+   double distance = this->molecule->GetDistanceAtoms(indexAtomA, indexAtomB);
+   return atomA->GetCoreCharge()*atomB->GetCoreCharge()/distance; 
 }
 
 // First derivative of the core repulsion related to the coordinate of atom A.
