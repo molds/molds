@@ -156,10 +156,11 @@ void Am1::CalcCoreRepulsionEnergy(){
 // First derivative of diatomic core repulsion energy.
 // This derivative is related to the coordinate of atomA.
 double Am1::GetDiatomCoreRepulsionFirstDerivative(int atomAIndex,
-                                                   int atomBIndex, 
-                                                   CartesianType axisA){
-   double value =0.0;
-   /*
+                                                  int atomBIndex, 
+                                                  CartesianType axisA){
+   double value = Mndo::GetDiatomCoreRepulsionFirstDerivative(atomAIndex,
+                                                              atomBIndex,
+                                                              axisA);
    double ang2AU = Parameters::GetInstance()->GetAngstrom2AU();
    Atom* atomA = (*this->molecule->GetAtomVect())[atomAIndex];
    Atom* atomB = (*this->molecule->GetAtomVect())[atomBIndex];
@@ -167,43 +168,22 @@ double Am1::GetDiatomCoreRepulsionFirstDerivative(int atomAIndex,
    double alphaB = atomB->GetNddoAlpha(this->theory);
    double Rab = this->molecule->GetDistanceAtoms(atomAIndex, atomBIndex);
    double dRabDa = (atomA->GetXyz()[axisA] - atomB->GetXyz()[axisA])/Rab;
-   double twoElecInt = this->GetNddoRepulsionIntegral(atomA, s, s, atomB, s, s);
-   double twoElecIntFirstDeri = this->GetNddoRepulsionIntegralFirstDerivative(
-                                      atomA, s, s, atomB, s, s, axisA);
    double temp1 = 0.0;
-   if(atomA->GetAtomType() == H && (atomB->GetAtomType() == N || 
-                                    atomB->GetAtomType() == O)  ){
-      temp1 = 1.0 + (Rab/ang2AU)*exp(-alphaB*Rab) + exp(-alphaA*Rab);
-   }
-   else if(atomB->GetAtomType() == H && (atomA->GetAtomType() == N || 
-                                         atomA->GetAtomType() == O)  ){
-      temp1 = 1.0 + (Rab/ang2AU)*exp(-alphaA*Rab) + exp(-alphaB*Rab);
-   }
-   else{
-      temp1 = 1.0 + exp(-alphaA*Rab) + exp(-alphaB*Rab);
-   }
-
    double temp2 = 0.0;
-   if(atomA->GetAtomType() == H && (atomB->GetAtomType() == N || 
-                                    atomB->GetAtomType() == O)  ){
-      temp2 = (1.0/ang2AU)*exp(-alphaB*Rab) 
-             -alphaB*(Rab/ang2AU)*exp(-alphaB*Rab) 
-             -alphaA*exp(-alphaA*Rab);
+   for(int i=0; i<4; i++){
+      double kA = atomA->GetNddoParameterK(this->theory, i);
+      double lA = atomA->GetNddoParameterL(this->theory, i);
+      double mA = atomA->GetNddoParameterM(this->theory, i);
+      double kB = atomB->GetNddoParameterK(this->theory, i);
+      double lB = atomB->GetNddoParameterL(this->theory, i);
+      double mB = atomB->GetNddoParameterM(this->theory, i);
+      temp1 += kA*exp(-lA*pow(Rab-mA,2.0));
+      temp1 += kB*exp(-lB*pow(Rab-mB,2.0));
+      temp2 += -2.0*lA*(Rab-mA)*kA*exp(-lA*pow(Rab-mA,2.0));
+      temp2 += -2.0*lB*(Rab-mB)*kB*exp(-lB*pow(Rab-mB,2.0));
    }
-   else if(atomB->GetAtomType() == H && (atomA->GetAtomType() == N || 
-                                         atomA->GetAtomType() == O)  ){
-      temp2 = (1.0/ang2AU)*exp(-alphaA*Rab)
-             -alphaA*(Rab/ang2AU)*exp(-alphaA*Rab) 
-             -alphaB*exp(-alphaB*Rab);
-   }
-   else{
-      temp2 = -alphaA*exp(-alphaA*Rab) 
-              -alphaB*exp(-alphaB*Rab);
-   }
-   temp2 *= dRabDa;
-   value = atomA->GetCoreCharge()*atomB->GetCoreCharge()
-          *(twoElecIntFirstDeri*temp1 + twoElecInt*temp2); 
-   */
+   value -= dRabDa*atomA->GetCoreCharge()*atomB->GetCoreCharge()*temp1/(pow(Rab,2.0)/ang2AU);
+   value += dRabDa*atomA->GetCoreCharge()*atomB->GetCoreCharge()*temp2/(Rab/ang2AU);
    return value;
 }
 

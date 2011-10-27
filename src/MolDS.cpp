@@ -112,6 +112,7 @@ int main(){
             if(Parameters::GetInstance()->RequiresMD()){
                MolDS_md::MD* md = new MolDS_md::MD();
                md->SetTheory(electronicStructure);
+               md->DoesMD();
                delete md;
             }
          }
