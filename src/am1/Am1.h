@@ -123,7 +123,6 @@ void Am1::CalcCoreRepulsionEnergy(){
          atomB = (*this->molecule->GetAtomVect())[j];
          alphaB = atomB->GetNddoAlpha(this->theory);
          distance = this->molecule->GetDistanceAtoms(i, j);
-         //temp = 1.0 + exp(-alphaA*distance) + exp(-alphaB*distance);
          if(atomA->GetAtomType() == H && (atomB->GetAtomType() == N || 
                                           atomB->GetAtomType() == O)  ){
             temp = 1.0 + (distance/ang2AU)*exp(-alphaB*distance) + exp(-alphaA*distance);
