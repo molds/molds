@@ -25,15 +25,6 @@ protected:
    virtual void OutputHFResults(double** fockMatrix, double* energiesMO, 
                                 double* atomicElectronPopulation, Molecule* molecule);
 private:
-   string errorMessageGetSemiEmpiricalMultipoleInteractionBadMultipoles;
-   string errorMessageGetSemiEmpiricalMultipoleInteractionFirstDeriBadMultipoles;
-   string errorMessageGetNddoRepulsionIntegral;
-   string errorMessageGetNddoRepulsionIntegralFirstDerivative;
-   string errorMessageCalcTwoElecTwoCoreDiatomicNullMatrix;
-   string errorMessageCalcTwoElecTwoCoreNullMatrix;
-   string errorMessageCalcTwoElecTwoCoreDiatomicSameAtoms;
-   string errorMessageCalcTwoElecTwoCoreDiatomicFirstDerivativesNullMatrix;
-   string errorMessageCalcTwoElecTwoCoreDiatomicFirstDerivativesSameAtoms;
 };
 
 Am1::Am1() : MolDS_mndo::Mndo(){
@@ -44,16 +35,6 @@ Am1::Am1() : MolDS_mndo::Mndo(){
 }
 
 Am1::~Am1(){
-   if(this->twoElecTwoCore != NULL){
-      MallocerFreer::GetInstance()->FreeDoubleMatrix6d(
-                                    &this->twoElecTwoCore, 
-                                    this->molecule->GetAtomVect()->size(),
-                                    this->molecule->GetAtomVect()->size(),
-                                    dxy,
-                                    dxy,
-                                    dxy);
-      //cout << "twoElecTwoCore deleted\n";
-   }
    //cout << "Am1 deleted\n";
 }
 
