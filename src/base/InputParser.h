@@ -56,6 +56,7 @@ private:
    string stringTheoryZINDOS;
    string stringTheoryMNDO;
    string stringTheoryAM1;
+   string stringTheoryPM3;
    string stringTheoryPrincipalAxes;
    string stringTheoryTranslate;
    string stringTheoryRotate;
@@ -150,6 +151,7 @@ InputParser::InputParser(){
    this->stringTheoryZINDOS = "zindo/s";
    this->stringTheoryMNDO = "mndo";
    this->stringTheoryAM1 = "am1";
+   this->stringTheoryPM3 = "pm3";
    this->stringTheoryPrincipalAxes = "principal_axes";
    this->stringTheoryTranslate = "translate";
    this->stringTheoryRotate = "rotate";
@@ -533,6 +535,11 @@ void InputParser::Parse(Molecule* molecule){
             // AM1
             else if(inputTerms[j].compare(this->stringTheoryAM1) == 0){
                Parameters::GetInstance()->SetCurrentTheory(AM1);
+            }
+
+            // PM3
+            else if(inputTerms[j].compare(this->stringTheoryPM3) == 0){
+               Parameters::GetInstance()->SetCurrentTheory(PM3);
             }
 
             // Princepal axes

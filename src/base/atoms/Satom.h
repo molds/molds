@@ -124,6 +124,36 @@ Satom::Satom(double x, double y, double z) : Atom(x, y, z){
    this->am1ParameterM[1] = 1.503313 * Parameters::GetInstance()->GetAngstrom2AU();
    this->am1ParameterM[2] = 2.009173 * Parameters::GetInstance()->GetAngstrom2AU();
    this->am1ParameterM[3] = 0.00 * Parameters::GetInstance()->GetAngstrom2AU();
+   this->pm3CoreintegralS = -49.895371 * Parameters::GetInstance()->GetEV2AU();         
+   this->pm3CoreintegralP = -44.392583 * Parameters::GetInstance()->GetEV2AU();         
+   this->pm3OrbitalExponentS = 1.891185;      
+   this->pm3OrbitalExponentP = 1.658972;      
+   this->pm3BondingParameterS = -8.827465 * Parameters::GetInstance()->GetEV2AU();     
+   this->pm3BondingParameterP = -8.091415 * Parameters::GetInstance()->GetEV2AU();     
+   this->pm3Alpha = 2.269706 / Parameters::GetInstance()->GetAngstrom2AU();        
+   this->pm3Gss = 8.964667 * Parameters::GetInstance()->GetEV2AU();   
+   this->pm3Gpp = 9.968164 * Parameters::GetInstance()->GetEV2AU();   
+   this->pm3Gsp = 6.785936 * Parameters::GetInstance()->GetEV2AU();   
+   this->pm3Gpp2 = 7.970247 * Parameters::GetInstance()->GetEV2AU();   
+   this->pm3Hsp = 4.041836 * Parameters::GetInstance()->GetEV2AU();   
+   this->pm3DerivedParameterD[0] = 0.0;    
+   this->pm3DerivedParameterD[1] = 1.1214312500;    
+   this->pm3DerivedParameterD[2] = 1.0086487614;    
+   this->pm3DerivedParameterRho[0] = 0.5/0.3294428165;
+   this->pm3DerivedParameterRho[1] = 0.5/0.6678906502;  
+   this->pm3DerivedParameterRho[2] = 0.5/0.6137333700;  
+   this->pm3ParameterK[0] = -0.399191 * Parameters::GetInstance()->GetEV2AU();
+   this->pm3ParameterK[1] = -0.054899 * Parameters::GetInstance()->GetEV2AU();
+   this->pm3ParameterK[2] = 0.0;
+   this->pm3ParameterK[3] = 0.0;
+   this->pm3ParameterL[0] = 6.000669 / pow(Parameters::GetInstance()->GetAngstrom2AU(),2.0);
+   this->pm3ParameterL[1] = 6.001845 / pow(Parameters::GetInstance()->GetAngstrom2AU(),2.0);
+   this->pm3ParameterL[2] = 0.00;
+   this->pm3ParameterL[3] = 0.00;
+   this->pm3ParameterM[0] = 0.962123 * Parameters::GetInstance()->GetAngstrom2AU();
+   this->pm3ParameterM[1] = 1.579944 * Parameters::GetInstance()->GetAngstrom2AU();
+   this->pm3ParameterM[2] = 0.00;
+   this->pm3ParameterM[3] = 0.00;
 }
 
 double Satom::GetCoreIntegral(OrbitalType orbital, double gamma, bool isGuess, TheoryType theory){
@@ -156,6 +186,9 @@ double Satom::GetCoreIntegral(OrbitalType orbital, double gamma, bool isGuess, T
    }
    else if(theory == AM1){
       value = this->GetAm1CoreIntegral(orbital);
+   }
+   else if(theory == PM3){
+      value = this->GetPm3CoreIntegral(orbital);
    }
 
 

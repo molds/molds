@@ -30,8 +30,8 @@ public:
    ShellType GetValenceShellType();
    int GetNumberValenceElectrons();
    double GetImuAmu(OrbitalType orbitalType);  // return 0.5*(I_mu + A_mu)
-   double GetOrbitalExponent(ShellType shellType, OrbitalType orbitalType, TheoryType theory);  // See (1.73) in J. A. Pople book for CNDO, INDO, and ZINDOS. See [BT_1977] for MNDO. See [DZHS_1985, DY_1990] for AM1.
-   virtual double GetCoreIntegral(OrbitalType orbital, double gamma, bool isGuess, TheoryType theory) = 0; // P82 - 83 in J. A. Pople book for INDO or Eq. (13) in [BZ_1979] for ZINDO/S. See [BT_1977] for MNDO. See [DZHS_1985, DY_1990] for AM1.
+   double GetOrbitalExponent(ShellType shellType, OrbitalType orbitalType, TheoryType theory);  // See (1.73) in J. A. Pople book for CNDO, INDO, and ZINDOS. See [BT_1977] for MNDO. See [DZHS_1985, DY_1990] for AM1. See [S_1989] for PM3.
+   virtual double GetCoreIntegral(OrbitalType orbital, double gamma, bool isGuess, TheoryType theory) = 0; // P82 - 83 in J. A. Pople book for INDO or Eq. (13) in [BZ_1979] for ZINDO/S. See [BT_1977] for MNDO. See [DZHS_1985, DY_1990] for AM1. See [S_1989] for PM3.
    double GetCoreIntegral(OrbitalType orbital, bool isGuess, TheoryType theory);
    double GetIndoF2();
    double GetIndoG1();
@@ -58,7 +58,7 @@ public:
    double GetZindoF2ddLower();                 // Apendix in ref. [BZ_1979]
    double GetZindoF4ddLower();                 // Apendix in ref. [BZ_1979]
    double GetIonPot(OrbitalType orbital);
-   double GetNddoAlpha(TheoryType theory); // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S for MNDO. Table I in ref. [DZHS_1985] for H, C, N, O, and Table I in re. [DY_1990] for S for AM1.
+   double GetNddoAlpha(TheoryType theory); // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S for MNDO. Table I in ref. [DZHS_1985] for H, C, N, O, and Table I in re. [DY_1990] for S for AM1. [S_1989] for PM3.
    double GetNddoDerivedParameterD(TheoryType theory, int dIndex);    // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S. Or, calculated in tools/deriveParametersNDDO/deriveParametersNDDO.cpp.
    double GetNddoDerivedParameterRho(TheoryType theory, int rhoIndex);  // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S. Or, calculated in tools/deriveParametersNDDO/deriveParametersNDDO.cpp.
    double GetMndoElecEnergyAtom();        // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S.
@@ -69,9 +69,9 @@ public:
    double GetNddoGpp2(TheoryType theory);
    double GetNddoHsp(TheoryType theory);
    double GetNddoHpp(TheoryType theory);
-   double GetNddoParameterK(TheoryType theory, int kIndex);//Table I in ref. [DZHS_1985] for H, C, N, O, and Table I in re. [DY_1990] for S for AM1.
-   double GetNddoParameterL(TheoryType theory, int lIndex);//Table I in ref. [DZHS_1985] for H, C, N, O, and Table I in re. [DY_1990] for S for AM1.
-   double GetNddoParameterM(TheoryType theory, int mIndex);//Table I in ref. [DZHS_1985] for H, C, N, O, and Table I in re. [DY_1990] for S for AM1.
+   double GetNddoParameterK(TheoryType theory, int kIndex);//Table I in ref. [DZHS_1985] for H, C, N, O, and Table I in re. [DY_1990] for S for AM1. [S_1989] for PM3.
+   double GetNddoParameterL(TheoryType theory, int lIndex);//Table I in ref. [DZHS_1985] for H, C, N, O, and Table I in re. [DY_1990] for S for AM1. [S_1989] for PM3.
+   double GetNddoParameterM(TheoryType theory, int mIndex);//Table I in ref. [DZHS_1985] for H, C, N, O, and Table I in re. [DY_1990] for S for AM1. [S_1989] for PM3.
 protected:
    string errorMessageIndoCoreIntegral;
    string errorMessageZindoSCoreIntegral;
@@ -147,9 +147,27 @@ protected:
    double am1ParameterK[4];// Table I in ref. [DZHS_1985] for H, C, N, O, and Table I in re. [DY_1990] for S.
    double am1ParameterL[4];// Table I in ref. [DZHS_1985] for H, C, N, O, and Table I in re. [DY_1990] for S.
    double am1ParameterM[4];// Table I in ref. [DZHS_1985] for H, C, N, O, and Table I in re. [DY_1990] for S.
+   double pm3CoreintegralS; // Table II in ref. [S_1989].
+   double pm3CoreintegralP; // Table II in ref. [S_1989].
+   double pm3OrbitalExponentS;// Table II in ref. [S_1989].
+   double pm3OrbitalExponentP;// Table II in ref. [S_1989].
+   double pm3BondingParameterS; // Table II in ref. [S_1989].
+   double pm3BondingParameterP; // Table II in ref. [S_1989].
+   double pm3Alpha;// Table II in ref. [S_1989].
+   double pm3Gss; // Table II in ref. [S_1989].
+   double pm3Gpp; // Table II in ref. [S_1989].
+   double pm3Gsp; // Table II in ref. [S_1989].
+   double pm3Gpp2; // Table II in ref. [S_1989].
+   double pm3Hsp; // Table II in ref. [S_1989].
+   double pm3DerivedParameterD[3];    // Calculated by tools/deriveParametersNDDO/deriveParametersNDDO.cpp.
+   double pm3DerivedParameterRho[3];  // Calculated by tools/deriveParametersNDDO/deriveParametersNDDO.cpp.
+   double pm3ParameterK[4];// Table II in ref. [S_1989].
+   double pm3ParameterL[4];// Table II in ref. [S_1989].
+   double pm3ParameterM[4];// Table II in ref. [S_1989].
    double GetZindoCoreIntegral(OrbitalType orbital, int l, int m, int n); // Eq. (13) in [BZ_1979]
    double GetMndoCoreIntegral(OrbitalType orbital); 
    double GetAm1CoreIntegral(OrbitalType orbital); 
+   double GetPm3CoreIntegral(OrbitalType orbital); 
 private:
    void SetMessages();
    string errorMessageImuAmu;
@@ -159,6 +177,7 @@ private:
    string errorMessageZindoCoreIntegral;
    string errorMessageMndoCoreIntegral;
    string errorMessageAm1CoreIntegral;
+   string errorMessagePm3CoreIntegral;
    string errorMessageGetOrbitalExponentBadTheory;
    string errorMessageTheoryType;
    string errorMessageGetBondingParameterBadTheoryBadOrbital;
@@ -224,6 +243,7 @@ void Atom::SetMessages(){
    this->errorMessageZindoSCoreIntegral = "Error in base_atoms::Atom::GetCoreIntegral: Invalid orbitalType for ZINDO/S.\n";
    this->errorMessageMndoCoreIntegral = "Error in base_atoms::Atom::GetMndoCoreINtegral: Invalid orbitalType for MNDO.\n";
    this->errorMessageAm1CoreIntegral = "Error in base_atoms::Atom::GetAm1CoreINtegral: Invalid orbitalType for AM1.\n";
+   this->errorMessagePm3CoreIntegral = "Error in base_atoms::Atom::GetPm3CoreINtegral: Invalid orbitalType for PM3.\n";
    this->errorMessageIonPot = "Error in base_atoms::Atom::GetIonPot: Invalid orbitalType.\n";
    this->errorMessageAtomType = "\tatom type = ";
    this->errorMessageOrbitalType = "\torbital type = ";
@@ -339,6 +359,14 @@ double Atom::GetBondingParameter(TheoryType theory, OrbitalType orbital){
                                orbital == py ||
                                orbital == pz ) ){
       value = this->am1BondingParameterP;
+   }
+   else if(theory == PM3 && orbital == s){
+      value = this->pm3BondingParameterS;
+   }
+   else if(theory == PM3 && ( orbital == px ||
+                               orbital == py ||
+                               orbital == pz ) ){
+      value = this->pm3BondingParameterP;
    }
    else{
       stringstream ss;
@@ -494,6 +522,24 @@ double Atom::GetOrbitalExponent(ShellType shellType, OrbitalType orbitalType, Th
          throw MolDSException(ss.str());
       }
    }
+   else if(theory == PM3){
+      if(orbitalType == s){ 
+         return this->pm3OrbitalExponentS;
+      }
+      else if(orbitalType == px ||
+              orbitalType == py ||
+              orbitalType == pz){
+         return this->pm3OrbitalExponentP;
+      }
+      else{
+         stringstream ss;
+         ss << this->errorMessageOrbitalExponent;
+         ss << this->errorMessageAtomType << AtomTypeStr(this->atomType) << "\n";
+         ss << this->errorMessageShellType << ShellTypeStr(shellType) << "\n";
+         ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbitalType) << "\n";
+         throw MolDSException(ss.str());
+      }
+   }
    else{
       stringstream ss;
       ss << this->errorMessageGetOrbitalExponentBadTheory;
@@ -609,6 +655,26 @@ double Atom::GetAm1CoreIntegral(OrbitalType orbital){
    return value;
 }
 
+double Atom::GetPm3CoreIntegral(OrbitalType orbital){
+   double value=0.0;
+
+   if(orbital == s){
+      value = this->pm3CoreintegralS;
+   }
+   else if(orbital == px || orbital == py || orbital == pz){
+      value = this->pm3CoreintegralP;
+   }
+   else{
+      stringstream ss;
+      ss << this->errorMessagePm3CoreIntegral;
+      ss << this->errorMessageAtomType << AtomTypeStr(this->atomType) << endl;
+      ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbital) << endl;
+      throw MolDSException(ss.str());
+   }
+
+   return value;
+}
+
 double Atom::GetIndoF2(){
    return this->indoF2;
 }
@@ -625,6 +691,9 @@ double Atom::GetNddoAlpha(TheoryType theory){
    else if(theory == AM1){
       value = this->am1Alpha;
    }
+   else if(theory == PM3){
+      value = this->pm3Alpha;
+   }
    else{
       // ToDo: error log.
    }
@@ -638,6 +707,9 @@ double Atom::GetNddoDerivedParameterD(TheoryType theory, int dIndex){
       }
       else if(theory == AM1){
          return this->am1DerivedParameterD[dIndex];
+      }
+      else if(theory == PM3){
+         return this->pm3DerivedParameterD[dIndex];
       }
       else{
          stringstream ss;
@@ -662,6 +734,9 @@ double Atom::GetNddoDerivedParameterRho(TheoryType theory, int rhoIndex){
       else if(theory == AM1){
          return this->am1DerivedParameterRho[rhoIndex];
       }
+      else if(theory == PM3){
+         return this->pm3DerivedParameterRho[rhoIndex];
+      }
       else{
          stringstream ss;
          ss << this->errorMessageGetNddoDerivedParameterDBadTheory;
@@ -681,6 +756,9 @@ double Atom::GetNddoParameterK(TheoryType theory, int kIndex){
    if(kIndex == 0 || kIndex == 1 || kIndex == 2 || kIndex == 3){
       if(theory == AM1){
          return this->am1ParameterK[kIndex];
+      }
+      else if(theory == PM3){
+         return this->pm3ParameterK[kIndex];
       }
       else{
          stringstream ss;
@@ -702,6 +780,9 @@ double Atom::GetNddoParameterL(TheoryType theory, int lIndex){
       if(theory == AM1){
          return this->am1ParameterL[lIndex];
       }
+      else if(theory == PM3){
+         return this->pm3ParameterL[lIndex];
+      }
       else{
          stringstream ss;
          ss << this->errorMessageGetNddoParameterLBadTheory;
@@ -721,6 +802,9 @@ double Atom::GetNddoParameterM(TheoryType theory, int mIndex){
    if(mIndex == 0 || mIndex == 1 || mIndex == 2 || mIndex == 3){
       if(theory == AM1){
          return this->am1ParameterM[mIndex];
+      }
+      else if(theory == PM3){
+         return this->pm3ParameterM[mIndex];
       }
       else{
          stringstream ss;
@@ -752,6 +836,9 @@ double Atom::GetNddoGss(TheoryType theory){
    else if(theory == AM1){
       return this->am1Gss;
    }
+   else if(theory == PM3){
+      return this->pm3Gss;
+   }
    else{
       stringstream ss;
       ss << this->errorMessageGetNddoGssBadTheory;
@@ -766,6 +853,9 @@ double Atom::GetNddoGpp(TheoryType theory){
    }
    else if(theory == AM1){
       return this->am1Gpp;
+   }
+   else if(theory == PM3){
+      return this->pm3Gpp;
    }
    else{
       stringstream ss;
@@ -782,6 +872,9 @@ double Atom::GetNddoGsp(TheoryType theory){
    else if(theory == AM1){
       return this->am1Gsp;
    }
+   else if(theory == PM3){
+      return this->pm3Gsp;
+   }
    else{
       stringstream ss;
       ss << this->errorMessageGetNddoGspBadTheory;
@@ -796,6 +889,9 @@ double Atom::GetNddoGpp2(TheoryType theory){
    }
    else if(theory == AM1){
       return this->am1Gpp2;
+   }
+   else if(theory == PM3){
+      return this->pm3Gpp2;
    }
    else{
       stringstream ss;
@@ -812,6 +908,9 @@ double Atom::GetNddoHsp(TheoryType theory){
    else if(theory == AM1){
       return this->am1Hsp;
    }
+   else if(theory == PM3){
+      return this->pm3Hsp;
+   }
    else{
       stringstream ss;
       ss << this->errorMessageGetNddoHspBadTheory;
@@ -827,6 +926,9 @@ double Atom::GetNddoHpp(TheoryType theory){
    }
    else if(theory == AM1){
       return 0.5*(this->am1Gpp - this->am1Gpp2);
+   }
+   else if(theory == PM3){
+      return 0.5*(this->pm3Gpp - this->pm3Gpp2);
    }
    else{
       stringstream ss;

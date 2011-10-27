@@ -4,7 +4,8 @@ THEORY
    //indo
    //zindo/s
    //mndo
-   am1
+   //am1
+   pm3
    //none 
    //principal_axes
    //translate
@@ -31,11 +32,11 @@ SCF_END
 //   norm_tol 0.000001
 //CIS_END
 
-//MD
-//   total_steps 50
-//   electronic_state 0
-//   dt 0.05
-//MD_END
+MD
+   total_steps 50
+   electronic_state 0
+   dt 0.05
+MD_END
 
 //INERTIA
 //   origin 1.0 2.0 30.0
@@ -167,6 +168,12 @@ SCF_END
 //GEOMETRY
 //   N 0.0  0.168464    0.673854    
 //   N 0.0  1.369664    0.673854    
+//GEOMETRY_END
+
+// o2 
+//GEOMETRY
+//   O 0.0  0.168464    0.673854    
+//   O 0.0  1.369664    0.673854    
 //GEOMETRY_END
 
 // h2s

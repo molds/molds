@@ -105,6 +105,36 @@ Natom::Natom(double x, double y, double z) : Atom(x, y, z){
    this->am1ParameterM[1] = 2.10 * Parameters::GetInstance()->GetAngstrom2AU();
    this->am1ParameterM[2] = 2.40 * Parameters::GetInstance()->GetAngstrom2AU();
    this->am1ParameterM[3] = 0.00 * Parameters::GetInstance()->GetAngstrom2AU();
+   this->pm3CoreintegralS = -49.335672 * Parameters::GetInstance()->GetEV2AU();         
+   this->pm3CoreintegralP = -47.509736 * Parameters::GetInstance()->GetEV2AU();         
+   this->pm3OrbitalExponentS = 2.028094;      
+   this->pm3OrbitalExponentP = 2.313728;      
+   this->pm3BondingParameterS = -14.062521 * Parameters::GetInstance()->GetEV2AU();     
+   this->pm3BondingParameterP = -20.043848 * Parameters::GetInstance()->GetEV2AU();     
+   this->pm3Alpha = 2.830545 / Parameters::GetInstance()->GetAngstrom2AU();        
+   this->pm3Gss = 11.904787 * Parameters::GetInstance()->GetEV2AU();   
+   this->pm3Gpp = 11.754672 * Parameters::GetInstance()->GetEV2AU();   
+   this->pm3Gsp = 7.348565 * Parameters::GetInstance()->GetEV2AU();   
+   this->pm3Gpp2 = 10.807277 * Parameters::GetInstance()->GetEV2AU();   
+   this->pm3Hsp = 1.136713 * Parameters::GetInstance()->GetEV2AU();   
+   this->pm3DerivedParameterD[0] = 0.0;    
+   this->pm3DerivedParameterD[1] = 0.6577005762;    
+   this->pm3DerivedParameterD[2] = 0.5293383109;    
+   this->pm3DerivedParameterRho[0] = 0.5/0.4374893746;
+   this->pm3DerivedParameterRho[1] = 0.5/0.5030877737;  
+   this->pm3DerivedParameterRho[2] = 0.5/0.7364801616;  
+   this->pm3ParameterK[0] = 1.501674 * Parameters::GetInstance()->GetEV2AU();
+   this->pm3ParameterK[1] =-1.505772 * Parameters::GetInstance()->GetEV2AU();
+   this->pm3ParameterK[2] = 0.0;
+   this->pm3ParameterK[3] = 0.0;
+   this->pm3ParameterL[0] = 5.901148 / pow(Parameters::GetInstance()->GetAngstrom2AU(),2.0);
+   this->pm3ParameterL[1] = 6.004658 / pow(Parameters::GetInstance()->GetAngstrom2AU(),2.0);
+   this->pm3ParameterL[2] = 0.00;
+   this->pm3ParameterL[3] = 0.00;
+   this->pm3ParameterM[0] = 1.710740 * Parameters::GetInstance()->GetAngstrom2AU();
+   this->pm3ParameterM[1] = 1.716149 * Parameters::GetInstance()->GetAngstrom2AU();
+   this->pm3ParameterM[2] = 0.00;
+   this->pm3ParameterM[3] = 0.00;
 }
 
 double Natom::GetCoreIntegral(OrbitalType orbital, double gamma, bool isGuess, TheoryType theory){
@@ -153,6 +183,9 @@ double Natom::GetCoreIntegral(OrbitalType orbital, double gamma, bool isGuess, T
    }
    else if(theory == AM1){
       value = this->GetAm1CoreIntegral(orbital);
+   }
+   else if(theory == PM3){
+      value = this->GetPm3CoreIntegral(orbital);
    }
 
    return value;

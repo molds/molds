@@ -37,6 +37,7 @@
 #include"zindo/ZindoS.h"
 #include"mndo/Mndo.h"
 #include"am1/Am1.h"
+#include"pm3/Pm3.h"
 #include"md/MD.h"
 
 
@@ -84,7 +85,8 @@ int main(){
                             Parameters::GetInstance()->GetCurrentTheory() == INDO || 
                             Parameters::GetInstance()->GetCurrentTheory() == ZINDOS ||
                             Parameters::GetInstance()->GetCurrentTheory() == MNDO ||
-                            Parameters::GetInstance()->GetCurrentTheory() == AM1)){
+                            Parameters::GetInstance()->GetCurrentTheory() == AM1 ||
+                            Parameters::GetInstance()->GetCurrentTheory() == PM3)){
          MolDS_cndo::Cndo2* electronicStructure = NULL;
          if(Parameters::GetInstance()->GetCurrentTheory() == CNDO2 ){
             electronicStructure = new MolDS_cndo::Cndo2();
@@ -100,6 +102,9 @@ int main(){
          }
          else if(Parameters::GetInstance()->GetCurrentTheory() == AM1 ){
             electronicStructure = new MolDS_am1::Am1();
+         }
+         else if(Parameters::GetInstance()->GetCurrentTheory() == PM3 ){
+            electronicStructure = new MolDS_pm3::Pm3();
          }
          else{
          }

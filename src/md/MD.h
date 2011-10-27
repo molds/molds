@@ -200,6 +200,7 @@ void MD::SetEnableTheoryTypes(){
    this->enableTheoryTypes.push_back(ZINDOS);
    this->enableTheoryTypes.push_back(MNDO);
    this->enableTheoryTypes.push_back(AM1);
+   this->enableTheoryTypes.push_back(PM3);
 }
 
 void MD::CheckEnableTheoryType(TheoryType theoryType){
