@@ -21,6 +21,9 @@ protected:
    virtual double GetDiatomCoreRepulsionFirstDerivative(int atomAIndex,
                                                         int atomBIndex, 
                                                         CartesianType axisA);
+   virtual void CalcHFProperties();
+   virtual void OutputHFResults(double** fockMatrix, double* energiesMO, 
+                                double* atomicElectronPopulation, Molecule* molecule);
 private:
    string errorMessageGetSemiEmpiricalMultipoleInteractionBadMultipoles;
    string errorMessageGetSemiEmpiricalMultipoleInteractionFirstDeriBadMultipoles;
@@ -203,6 +206,18 @@ double Am1::GetDiatomCoreRepulsionFirstDerivative(int atomAIndex,
           *(twoElecIntFirstDeri*temp1 + twoElecInt*temp2); 
    */
    return value;
+}
+
+void Am1::CalcHFProperties(){
+   MolDS_cndo::Cndo2::CalcHFProperties();
+}
+
+void Am1::OutputHFResults(double** fockMatrix, double* energiesMO, 
+                          double* atomicElectronPopulation, Molecule* molecule){
+   MolDS_cndo::Cndo2::OutputHFResults(fockMatrix, 
+                                      energiesMO, 
+                                      atomicElectronPopulation, 
+                                      molecule);
 }
 
 }

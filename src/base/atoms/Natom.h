@@ -58,7 +58,6 @@ Natom::Natom(double x, double y, double z) : Atom(x, y, z){
    this->mndoAlpha = 2.861342 / Parameters::GetInstance()->GetAngstrom2AU();        
    this->mndoElecEnergyAtom = -202.581201 * Parameters::GetInstance()->GetEV2AU();        
    this->mndoHeatsFormAtom = 113.00 * Parameters::GetInstance()->GetKcalMolin2AU();
-   this->mndoDiffEnergyHeatsFormAtom = -207.466249 * Parameters::GetInstance()->GetEV2AU();
    this->mndoGss =  13.59 * Parameters::GetInstance()->GetEV2AU();   
    this->mndoGpp =  12.98 * Parameters::GetInstance()->GetEV2AU();   
    this->mndoGsp =  12.66 * Parameters::GetInstance()->GetEV2AU();   

@@ -83,7 +83,6 @@ Satom::Satom(double x, double y, double z) : Atom(x, y, z){
    this->mndoAlpha = 2.478026 / Parameters::GetInstance()->GetAngstrom2AU();        
    this->mndoElecEnergyAtom = -226.01239 * Parameters::GetInstance()->GetEV2AU();        
    this->mndoHeatsFormAtom = 66.40 * Parameters::GetInstance()->GetKcalMolin2AU();
-   this->mndoDiffEnergyHeatsFormAtom = -228.891710 * Parameters::GetInstance()->GetEV2AU();
    this->mndoGss =  12.88 * Parameters::GetInstance()->GetEV2AU();   
    this->mndoGpp =   9.90 * Parameters::GetInstance()->GetEV2AU();   
    this->mndoGsp =  11.26 * Parameters::GetInstance()->GetEV2AU();   

@@ -63,7 +63,6 @@ public:
    double GetNddoDerivedParameterRho(TheoryType theory, int rhoIndex);  // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S. Or, calculated in tools/deriveParametersNDDO/deriveParametersNDDO.cpp.
    double GetMndoElecEnergyAtom();        // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S.
    double GetMndoHeatsFormAtom();         // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S.
-   double GetNddoDiffEnergyHeatsFormAtom(TheoryType theory); // = ElecEnergy of Atom - HeatsForm of Atom. see MOPAC HP.
    double GetNddoGss(TheoryType theory);
    double GetNddoGpp(TheoryType theory);
    double GetNddoGsp(TheoryType theory);
@@ -126,7 +125,6 @@ protected:
    double mndoDerivedParameterRho[3];  // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S. Or, calculated by tools/deriveParametersNDDO/deriveParametersNDDO.cpp.
    double mndoElecEnergyAtom;        // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S.
    double mndoHeatsFormAtom;         // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S.
-   double mndoDiffEnergyHeatsFormAtom; // = mndoElecEnergyAtom - mndoHeatsFormAtom. see MOPAC HP.
    double mndoGss;   //Table I in ref. [BDL_1975] for H, B, C, N, O, F, Si, P, S, and Cl.
    double mndoGpp;   //Table I in ref. [BDL_1975] for H, B, C, N, O, F, Si, P, S, and Cl.
    double mndoGsp;   //Table I in ref. [BDL_1975] for H, B, C, N, O, F, Si, P, S, and Cl.
@@ -180,7 +178,6 @@ private:
    string errorMessageGetNddoParameterMBadTheory;
    string errorMessageMIndex;
    string errorMessageGetNddoGssBadTheory;
-   string errorMessageGetNddoDiffEnergyHeatsFormAtomBadTheory;
    string errorMessageGetNddoGppBadTheory;
    string errorMessageGetNddoGspBadTheory;
    string errorMessageGetNddoGpp2BadTheory;
@@ -262,8 +259,6 @@ void Atom::SetMessages(){
    this->errorMessageGetNddoParameterMBadTheory
       = "Error in base_atoms::Atom::GetNddoParameterM: Bad theory is set.\n";
    this->errorMessageKIndex  = "mIndex = ";
-   this->errorMessageGetNddoDiffEnergyHeatsFormAtomBadTheory
-      = "Error in base_atoms::Atom::GetNddoDiffEnergyHeatsFormAtom: Bad theory is set.\n";
    this->errorMessageGetNddoGssBadTheory 
       = "Error in base_atoms::Atom::GetNddoGss: Bad theory is set.\n";
    this->errorMessageGetNddoGppBadTheory 
@@ -748,22 +743,6 @@ double Atom::GetMndoElecEnergyAtom(){
 
 double Atom::GetMndoHeatsFormAtom(){
    return this->mndoHeatsFormAtom;
-}
-
-double Atom::GetNddoDiffEnergyHeatsFormAtom(TheoryType theory){
-   if(theory == MNDO){
-      return this->mndoDiffEnergyHeatsFormAtom;
-   }
-   else if(theory == AM1){
-      //return this->am1Gss;
-      return 0.0;
-   }
-   else{
-      stringstream ss;
-      ss << this->errorMessageGetNddoDiffEnergyHeatsFormAtomBadTheory;
-      ss << this->errorMessageTheoryType << TheoryTypeStr(theory) << "\n";
-      throw MolDSException(ss.str());
-   }
 }
 
 double Atom::GetNddoGss(TheoryType theory){

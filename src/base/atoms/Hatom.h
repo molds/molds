@@ -55,7 +55,6 @@ Hatom::Hatom(double x, double y, double z) : Atom(x, y, z){
    this->mndoAlpha = 2.544134 / Parameters::GetInstance()->GetAngstrom2AU();        
    this->mndoElecEnergyAtom = -11.906276 * Parameters::GetInstance()->GetEV2AU();        
    this->mndoHeatsFormAtom = 52.102 * Parameters::GetInstance()->GetKcalMolin2AU();
-   this->mndoDiffEnergyHeatsFormAtom = -14.165588 * Parameters::GetInstance()->GetEV2AU();
    this->mndoGss = 12.848 * Parameters::GetInstance()->GetEV2AU();   
    this->mndoGpp = 0.0 * Parameters::GetInstance()->GetEV2AU();   
    this->mndoGsp = 0.0 * Parameters::GetInstance()->GetEV2AU();   
