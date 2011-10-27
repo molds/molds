@@ -58,6 +58,7 @@ Oatom::Oatom(double x, double y, double z) : Atom(x, y, z){
    this->mndoAlpha = 3.160604 / Parameters::GetInstance()->GetAngstrom2AU();        
    this->mndoElecEnergyAtom = -317.868506 * Parameters::GetInstance()->GetEV2AU();        
    this->mndoHeatsFormAtom = 59.559 * Parameters::GetInstance()->GetKcalMolin2AU();
+   this->mndoDiffEnergyHeatsFormAtom = -320.451178 * Parameters::GetInstance()->GetEV2AU();
    this->mndoGss =  15.42 * Parameters::GetInstance()->GetEV2AU();   
    this->mndoGpp =  14.52 * Parameters::GetInstance()->GetEV2AU();   
    this->mndoGsp =  14.48 * Parameters::GetInstance()->GetEV2AU();   

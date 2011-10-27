@@ -58,6 +58,7 @@ Catom::Catom(double x, double y, double z) : Atom(x, y, z){
    this->mndoAlpha = 2.546380 / Parameters::GetInstance()->GetAngstrom2AU();        
    this->mndoElecEnergyAtom = -120.500606 * Parameters::GetInstance()->GetEV2AU();        
    this->mndoHeatsFormAtom = 170.89 * Parameters::GetInstance()->GetKcalMolin2AU();
+   this->mndoDiffEnergyHeatsFormAtom = -127.910952 * Parameters::GetInstance()->GetEV2AU();
    this->mndoGss =  12.23 * Parameters::GetInstance()->GetEV2AU();   
    this->mndoGpp =  11.08 * Parameters::GetInstance()->GetEV2AU();   
    this->mndoGsp =  11.47 * Parameters::GetInstance()->GetEV2AU();   

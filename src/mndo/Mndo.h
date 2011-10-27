@@ -299,8 +299,7 @@ void Mndo::CalcHeatsFormation(double* heatsFormation, Molecule* molecule){
    *heatsFormation = this->GetElectronicEnergy();
    for(int A=0; A<molecule->GetAtomVect()->size(); A++){
       Atom* atom = (*molecule->GetAtomVect())[A];
-      *heatsFormation -= atom->GetMndoElecEnergyAtom();
-      *heatsFormation += atom->GetMndoHeatsFormAtom();
+      *heatsFormation -= atom->GetNddoDiffEnergyHeatsFormAtom(this->theory);
    }
 }
 

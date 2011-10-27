@@ -3,8 +3,8 @@ THEORY
    //cndo/2
    //indo
    //zindo/s
-   //mndo
-   am1
+   mndo
+   //am1
    //none 
    //principal_axes
    //translate
@@ -177,11 +177,11 @@ CIS_END
 //GEOMETRY_END
 
 // h2s-2
-//GEOMETRY
-//   S                  0.0000     0.0000     0.0000
-//   H                  1.2993     0.0000     0.0000
-//   H                 -0.1814     1.2865     0.0000
-//GEOMETRY_END
+GEOMETRY
+   S                  0.0000     0.0000     0.0000
+   H                  1.2993     0.0000     0.0000
+   H                 -0.1814     1.2865     0.0000
+GEOMETRY_END
 
 // benzene
 //GEOMETRY
@@ -250,7 +250,7 @@ CIS_END
 //   H                  -0.4009    -0.5171     0.8956
 //   H                   1.9218     0.5171    -0.8956
 //   H                   1.9218     0.5171     0.8956
-//   H                   1.9218    -1.0342     0.0000
+//  H                   1.9218    -1.0342     0.0000
 //GEOMETRY_END
 
 // methylene-2
