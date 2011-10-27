@@ -31,6 +31,9 @@ using namespace MolDS_base;
  *    Therory > Semiempirical theory > NDDO two-electron two-center integrals
  *    in http://openmopac.net/manual/index.html
  *
+ * Methods calculating D1 and D2 should be selected according to the periodic table.
+ * That is, see commented outed coded to calculate D1 and D2 in this file.
+ *
  * refferences
  * [MOPAC_1990] J. J. P. Stewart, J. Computer-Aided Molecular Design 4, 1 (1990)
 *********************************************************************/
@@ -65,13 +68,13 @@ int main(){
    long double AQ_old=0.0;
    long double AQ_old2=0.0;
 
-   long double orbitalExponentS=2.699905;
-   long double orbitalExponentP=2.699905;
-   long double Gss = 15.42 * Parameters::GetInstance()->GetEV2AU();
-   long double Gpp = 14.52 * Parameters::GetInstance()->GetEV2AU();
-   long double Gsp = 14.48 * Parameters::GetInstance()->GetEV2AU();
-   long double Gpp2= 12.98 * Parameters::GetInstance()->GetEV2AU();
-   long double Hsp = 3.94 * Parameters::GetInstance()->GetEV2AU();
+   long double orbitalExponentS=1.891185;
+   long double orbitalExponentP=1.658972;
+   long double Gss = 8.964667 * Parameters::GetInstance()->GetEV2AU();
+   long double Gpp = 9.968164 * Parameters::GetInstance()->GetEV2AU();
+   long double Gsp = 6.785936 * Parameters::GetInstance()->GetEV2AU();
+   long double Gpp2= 7.970247 * Parameters::GetInstance()->GetEV2AU();
+   long double Hsp = 4.041836 * Parameters::GetInstance()->GetEV2AU();
    long double Hpp = 0.5*(Gpp - Gpp2);
 
    // output prepared parameters
@@ -87,14 +90,29 @@ int main(){
 
    // calculateion and output derived parameters
    printf("=====  NDDO derived parameters =====\n");
-   // Calc. D1
+
+   /*
+   // Calc. D1 for n=2 (C, N, O, and etc.)
    D1 = 5.0*pow(3.0,-0.5)
        *pow(4.0*orbitalExponentS*orbitalExponentP,2.5)
        /pow(orbitalExponentS+orbitalExponentP,6.0);
    printf("D1 in [a.u.] = %.10lf\n",(double)D1);
+   */
 
-   // Calc. D2
+   // Calc. D1 for n=3 (S and etc.)
+   D1 = 7.0*pow(3.0,-0.5)
+       *pow(4.0*orbitalExponentS*orbitalExponentP,3.5)
+       /pow(orbitalExponentS+orbitalExponentP,8.0);
+   printf("D1 in [a.u.] = %.10lf\n",(double)D1);
+
+   /*
+   // Calc. D2 for n=2  (C, N, O, and etc.)
    D2 = pow(1.5,0.5)/orbitalExponentP;
+   printf("D2 in [a.u.] = %.10lf\n",(double)D2);
+   */
+
+   // Calc. D2 for n=3  (S and etc.)
+   D2 = pow(2.8,0.5)/orbitalExponentP;
    printf("D2 in [a.u.] = %.10lf\n",(double)D2);
 
    // Calc. AM
