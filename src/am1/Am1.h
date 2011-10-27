@@ -105,7 +105,6 @@ void Am1::SetEnableAtomTypes(){
 
 void Am1::CalcCoreRepulsionEnergy(){
    double energy = 0.0;
-   /*
    double distance = 0.0;
    double twoElecInt = 0.0;
    double alphaA = 0.0;
@@ -121,6 +120,7 @@ void Am1::CalcCoreRepulsionEnergy(){
          atomB = (*this->molecule->GetAtomVect())[j];
          alphaB = atomB->GetNddoAlpha(this->theory);
          distance = this->molecule->GetDistanceAtoms(i, j);
+         //temp = 1.0 + exp(-alphaA*distance) + exp(-alphaB*distance);
          if(atomA->GetAtomType() == H && (atomB->GetAtomType() == N || 
                                           atomB->GetAtomType() == O)  ){
             temp = 1.0 + (distance/ang2AU)*exp(-alphaB*distance) + exp(-alphaA*distance);
@@ -134,9 +134,20 @@ void Am1::CalcCoreRepulsionEnergy(){
          }
          twoElecInt = this->GetNddoRepulsionIntegral(atomA, s, s, atomB, s, s);
          energy += atomA->GetCoreCharge()*atomB->GetCoreCharge()*twoElecInt*temp; 
+         temp = 0.0;
+         for(int i=0; i<4; i++){
+            double kA = atomA->GetNddoParameterK(this->theory, i);
+            double lA = atomA->GetNddoParameterL(this->theory, i);
+            double mA = atomA->GetNddoParameterM(this->theory, i);
+            double kB = atomB->GetNddoParameterK(this->theory, i);
+            double lB = atomB->GetNddoParameterL(this->theory, i);
+            double mB = atomB->GetNddoParameterM(this->theory, i);
+            temp += kA*exp(-lA*pow(distance-mA,2.0));
+            temp += kB*exp(-lB*pow(distance-mB,2.0));
+         }
+         energy += atomA->GetCoreCharge()*atomB->GetCoreCharge()*temp/(distance/ang2AU);
       }
    }
-   */
    this->coreRepulsionEnergy = energy;
 }
 
