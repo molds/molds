@@ -507,19 +507,18 @@ double Mndo::GetMolecularIntegralElement(int moI, int moJ, int moK, int moL,
       int firstAOIndexA = atomA->GetFirstAOIndex();
       int numberAOsA = atomA->GetValence().size();
 
-      for(int mu=firstAOIndexA; mu<firstAOIndexA+numberAOsA; mu++){
-         for(int nu=firstAOIndexA; nu<firstAOIndexA+numberAOsA; nu++){
+      for(int B=A; B<molecule->GetAtomVect()->size(); B++){
+         Atom* atomB = (*molecule->GetAtomVect())[B];
+         int firstAOIndexB = atomB->GetFirstAOIndex();
+         int numberAOsB = atomB->GetValence().size();
 
-            for(int B=0; B<molecule->GetAtomVect()->size(); B++){
-               Atom* atomB = (*molecule->GetAtomVect())[B];
-               int firstAOIndexB = atomB->GetFirstAOIndex();
-               int numberAOsB = atomB->GetValence().size();
-
-               for(int lambda=firstAOIndexB; lambda<firstAOIndexB+numberAOsB; lambda++){
-                  for(int sigma=firstAOIndexB; sigma<firstAOIndexB+numberAOsB; sigma++){
-                     OrbitalType orbitalSigma = atomB->GetValence()[sigma-firstAOIndexB];
-                     double gamma = 0.0;
-                     if(A!=B){
+         double gamma = 0.0;
+         if(A!=B){
+            for(int mu=firstAOIndexA; mu<firstAOIndexA+numberAOsA; mu++){
+               for(int nu=mu; nu<firstAOIndexA+numberAOsA; nu++){
+                  for(int lambda=firstAOIndexB; lambda<firstAOIndexB+numberAOsB; lambda++){
+                     for(int sigma=lambda; sigma<firstAOIndexB+numberAOsB; sigma++){
+                        OrbitalType orbitalSigma = atomB->GetValence()[sigma-firstAOIndexB];
                         gamma = this->twoElecTwoCore[A]
                                                     [B]
                                                     [mu-firstAOIndexA]
@@ -531,8 +530,50 @@ double Mndo::GetMolecularIntegralElement(int moI, int moJ, int moK, int moL,
                                       *fockMatrix[moJ][nu]
                                       *fockMatrix[moK][lambda]
                                       *fockMatrix[moL][sigma];
+                        value += gamma*fockMatrix[moI][lambda]
+                                      *fockMatrix[moJ][sigma]
+                                      *fockMatrix[moK][mu]
+                                      *fockMatrix[moL][nu];
+                        if(lambda != sigma){
+                           value += gamma*fockMatrix[moI][mu]
+                                         *fockMatrix[moJ][nu]
+                                         *fockMatrix[moK][sigma]
+                                         *fockMatrix[moL][lambda];
+                           value += gamma*fockMatrix[moI][sigma]
+                                         *fockMatrix[moJ][lambda]
+                                         *fockMatrix[moK][mu]
+                                         *fockMatrix[moL][nu];
+                        }
+                        if(mu != nu){
+                           value += gamma*fockMatrix[moI][nu]
+                                         *fockMatrix[moJ][mu]
+                                         *fockMatrix[moK][lambda]
+                                         *fockMatrix[moL][sigma];
+                           value += gamma*fockMatrix[moI][lambda]
+                                         *fockMatrix[moJ][sigma]
+                                         *fockMatrix[moK][nu]
+                                         *fockMatrix[moL][mu];
+                        }
+                        if(mu != nu && lambda != sigma){
+                           value += gamma*fockMatrix[moI][nu]
+                                         *fockMatrix[moJ][mu]
+                                         *fockMatrix[moK][sigma]
+                                         *fockMatrix[moL][lambda];
+                           value += gamma*fockMatrix[moI][sigma]
+                                         *fockMatrix[moJ][lambda]
+                                         *fockMatrix[moK][nu]
+                                         *fockMatrix[moL][mu];
+                        }
                      }
-                     else{
+                  }
+               }
+            }
+         }
+         else{
+            for(int mu=firstAOIndexA; mu<firstAOIndexA+numberAOsA; mu++){
+               for(int nu=firstAOIndexA; nu<firstAOIndexA+numberAOsA; nu++){
+                  for(int lambda=firstAOIndexB; lambda<firstAOIndexB+numberAOsB; lambda++){
+                     for(int sigma=firstAOIndexB; sigma<firstAOIndexB+numberAOsB; sigma++){
                         if(mu==nu && lambda==sigma){
                            OrbitalType orbitalMu = atomA->GetValence()[mu-firstAOIndexA];
                            OrbitalType orbitalLambda = atomB->GetValence()[lambda-firstAOIndexB];
