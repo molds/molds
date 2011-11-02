@@ -181,6 +181,7 @@ private:
    string errorMessageGetOrbitalExponentBadTheory;
    string errorMessageTheoryType;
    string errorMessageGetBondingParameterBadTheoryBadOrbital;
+   string errorMessageGetNddoAlphaBadTheory;
    string errorMessageGetNddoDerivedParameterDBadTheory;
    string errorMessageGetNddoDerivedParameterDBadDIndex;
    string errorMessageDIndex;
@@ -258,6 +259,8 @@ void Atom::SetMessages(){
       = "Error in base_atoms::Atom::GetNddoDerivedParameterD: Bad index for parameter D(dIndex). Only 0, 1, and 2 are permitted.\n";
    this->errorMessageGetNddoDerivedParameterDBadTheory
       = "Error in base_atoms::Atom::GetNddoDerivedParameterD: Bad theory is set.\n";
+   this->errorMessageGetNddoAlphaBadTheory
+      = "Error in base_atoms::Atom::GetNddoAlpha: Bad theory is set.\n";
    this->errorMessageDIndex  = "dIndex = ";
    this->errorMessageGetNddoDerivedParameterRhoBadRhoIndex 
       = "Error in base_atoms::Atom::GetNddoDerivedParameterRho: Bad index for parameter rho(rhoIndex). Only 0, 1, and 2 are permitted.\n";
@@ -695,7 +698,10 @@ double Atom::GetNddoAlpha(TheoryType theory){
       value = this->pm3Alpha;
    }
    else{
-      // ToDo: error log.
+      stringstream ss;
+      ss << this->errorMessageGetNddoAlphaBadTheory;
+      ss << this->errorMessageTheoryType << TheoryTypeStr(theory) << "\n";
+      throw MolDSException(ss.str());
    }
    return value;
 }
