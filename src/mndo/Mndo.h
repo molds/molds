@@ -502,63 +502,61 @@ void Mndo::CalcDiatomicOverlapFirstDerivativeInDiatomicFrame(
 double Mndo::GetMolecularIntegralElement(int moI, int moJ, int moK, int moL, 
                                           Molecule* molecule, double** fockMatrix, double** gammaAB){
    double value = 0.0;
-         for(int A=0; A<molecule->GetAtomVect()->size(); A++){
-            Atom* atomA = (*molecule->GetAtomVect())[A];
-            int firstAOIndexA = atomA->GetFirstAOIndex();
-            int numberAOsA = atomA->GetValence().size();
+   for(int A=0; A<molecule->GetAtomVect()->size(); A++){
+      Atom* atomA = (*molecule->GetAtomVect())[A];
+      int firstAOIndexA = atomA->GetFirstAOIndex();
+      int numberAOsA = atomA->GetValence().size();
 
-            for(int mu=firstAOIndexA; mu<firstAOIndexA+numberAOsA; mu++){
-               for(int nu=firstAOIndexA; nu<firstAOIndexA+numberAOsA; nu++){
+      for(int mu=firstAOIndexA; mu<firstAOIndexA+numberAOsA; mu++){
+         for(int nu=firstAOIndexA; nu<firstAOIndexA+numberAOsA; nu++){
 
-                  for(int B=0; B<molecule->GetAtomVect()->size(); B++){
-                     Atom* atomB = (*molecule->GetAtomVect())[B];
-                     int firstAOIndexB = atomB->GetFirstAOIndex();
-                     int numberAOsB = atomB->GetValence().size();
+            for(int B=0; B<molecule->GetAtomVect()->size(); B++){
+               Atom* atomB = (*molecule->GetAtomVect())[B];
+               int firstAOIndexB = atomB->GetFirstAOIndex();
+               int numberAOsB = atomB->GetValence().size();
 
-                     for(int lambda=firstAOIndexB; lambda<firstAOIndexB+numberAOsB; lambda++){
-                        for(int sigma=firstAOIndexB; sigma<firstAOIndexB+numberAOsB; sigma++){
-                           OrbitalType orbitalSigma = atomB->GetValence()[sigma-firstAOIndexB];
-                           double gamma = 0.0;
-                           if(A!=B){
-                              gamma = this->twoElecTwoCore[A]
-                                                          [B]
-                                                          [mu-firstAOIndexA]
-                                                          [nu-firstAOIndexA]
-                                                          [lambda-firstAOIndexB]
-                                                          [sigma-firstAOIndexB];
+               for(int lambda=firstAOIndexB; lambda<firstAOIndexB+numberAOsB; lambda++){
+                  for(int sigma=firstAOIndexB; sigma<firstAOIndexB+numberAOsB; sigma++){
+                     OrbitalType orbitalSigma = atomB->GetValence()[sigma-firstAOIndexB];
+                     double gamma = 0.0;
+                     if(A!=B){
+                        gamma = this->twoElecTwoCore[A]
+                                                    [B]
+                                                    [mu-firstAOIndexA]
+                                                    [nu-firstAOIndexA]
+                                                    [lambda-firstAOIndexB]
+                                                    [sigma-firstAOIndexB];
 
-                              value += gamma*fockMatrix[moI][mu]
-                                                *fockMatrix[moJ][nu]
-                                                *fockMatrix[moK][lambda]
-                                                *fockMatrix[moL][sigma];
-
-                           }
-                           else{
-                              if(mu==nu && lambda==sigma){
-                                 OrbitalType orbitalMu = atomA->GetValence()[mu-firstAOIndexA];
-                                 OrbitalType orbitalLambda = atomB->GetValence()[lambda-firstAOIndexB];
-                                 gamma = this->GetCoulombInt(orbitalMu, orbitalLambda, atomA);
-                              }
-                              else if((mu==lambda && nu==sigma) || (nu==lambda && mu==sigma) ){
-                                 OrbitalType orbitalMu = atomA->GetValence()[mu-firstAOIndexA];
-                                 OrbitalType orbitalNu = atomA->GetValence()[nu-firstAOIndexA];
-                                 gamma = this->GetExchangeInt(orbitalMu, orbitalNu, atomA);
-                              }
-                              else{
-                                 gamma = 0.0;
-                              }
-
-                              value += gamma*fockMatrix[moI][mu]
-                                                *fockMatrix[moJ][nu]
-                                                *fockMatrix[moK][lambda]
-                                                *fockMatrix[moL][sigma];
-                           }  
-                        }
+                        value += gamma*fockMatrix[moI][mu]
+                                      *fockMatrix[moJ][nu]
+                                      *fockMatrix[moK][lambda]
+                                      *fockMatrix[moL][sigma];
                      }
+                     else{
+                        if(mu==nu && lambda==sigma){
+                           OrbitalType orbitalMu = atomA->GetValence()[mu-firstAOIndexA];
+                           OrbitalType orbitalLambda = atomB->GetValence()[lambda-firstAOIndexB];
+                           gamma = this->GetCoulombInt(orbitalMu, orbitalLambda, atomA);
+                        }
+                        else if((mu==lambda && nu==sigma) || (nu==lambda && mu==sigma) ){
+                           OrbitalType orbitalMu = atomA->GetValence()[mu-firstAOIndexA];
+                           OrbitalType orbitalNu = atomA->GetValence()[nu-firstAOIndexA];
+                           gamma = this->GetExchangeInt(orbitalMu, orbitalNu, atomA);
+                        }
+                        else{
+                           gamma = 0.0;
+                        }
+                        value += gamma*fockMatrix[moI][mu]
+                                      *fockMatrix[moJ][nu]
+                                      *fockMatrix[moK][lambda]
+                                      *fockMatrix[moL][sigma];
+                     }  
                   }
                }
             }
          }
+      }
+   }
    return value;
 }
 
