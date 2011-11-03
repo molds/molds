@@ -77,7 +77,7 @@ protected:
                                               double** fockMatrix, 
                                               double** gammaAB);
    virtual void CalcCISMatrix(double** matrixCIS, int numberOcc, int numberVir);
-   virtual void CalcForce(int electronicStateIndex);
+   virtual void CalcForce(vector<int> elecStates);
    double GetNddoRepulsionIntegral(Atom* atomA, OrbitalType mu, OrbitalType nu,
                                    Atom* atomB, OrbitalType lambda, OrbitalType sigma);
    double GetNddoRepulsionIntegralFirstDerivative(
@@ -776,21 +776,8 @@ void Mndo::CalcCISMatrix(double** matrixCIS, int numberOcc, int numberVir){
 
 // electronicStateIndex is index of the electroinc eigen state.
 // "electronicStateIndex = 0" means electronic ground state. 
-void Mndo::CalcForce(int electronicStateIndex){
-
-   // malloc or initialize Force matrix
-   if(this->matrixForce == NULL){
-      this->matrixForce = MallocerFreer::GetInstance()->
-                          MallocDoubleMatrix2d(this->molecule->GetAtomVect()->size(), 
-                                               CartesianType_end);
-   }
-   else{
-      MallocerFreer::GetInstance()->
-      InitializeDoubleMatrix2d(this->matrixForce,
-                               this->molecule->GetAtomVect()->size(),
-                               CartesianType_end);
-   }
-
+void Mndo::CalcForce(vector<int> elecStates){
+   this->CheckMatrixForce(elecStates);
    #pragma omp parallel
    {
       double***** twoElecTwoCoreFirstDeriv = MallocerFreer::GetInstance()->MallocDoubleMatrix5d(
@@ -882,12 +869,12 @@ void Mndo::CalcForce(int electronicStateIndex){
                      }
                   }
                   for(int i=0; i<CartesianType_end; i++){
-                     this->matrixForce[b][i] += electronicForce1[i];
-                     this->matrixForce[b][i] += electronicForce3[i];
-                     this->matrixForce[a][i] -= coreRepulsion[i]
-                                               +electronicForce1[i] 
-                                               +electronicForce2[i]
-                                               +electronicForce3[i];
+                     this->matrixForce[0][b][i] += electronicForce1[i];
+                     this->matrixForce[0][b][i] += electronicForce3[i];
+                     this->matrixForce[0][a][i] -= coreRepulsion[i]
+                                                  +electronicForce1[i] 
+                                                  +electronicForce2[i]
+                                                  +electronicForce3[i];
                   }
                }
             }
@@ -899,22 +886,6 @@ void Mndo::CalcForce(int electronicStateIndex){
       }
       this->FreeCalcForceTempMatrices(&overlapDer, &twoElecTwoCoreFirstDeriv);
    }
-   /*
-   // checking of calculated force
-   cout << "chek the force\n";
-   double checkSumForce[3] = {0.0, 0.0, 0.0};
-   for(int a=0; a<this->molecule->GetAtomVect()->size(); a++){
-      for(int i=0; i<CartesianType_end; i++){
-         cout << this->matrixForce[a][i] << " ";
-         checkSumForce[i] += this->matrixForce[a][i];
-      }
-      cout << endl;
-   }
-   cout << endl << endl;
-   for(int i=0; i<CartesianType_end; i++){
-      cout << "force:" << i << " "  << checkSumForce[i] << endl;
-   }
-   */
 }
 
 void Mndo::FreeCalcForceTempMatrices(double**** overlapDer, double****** twoElecTwoCoreFirstDeriv){

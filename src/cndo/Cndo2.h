@@ -20,7 +20,8 @@ public:
    void DoesSCF();
    void DoesSCF(bool requiresGuess);
    virtual void DoesCIS();
-   double** GetForce(int electronicStateIndex);
+   double** GetForce(int elecState);
+   double*** GetForce(vector<int> elecStates);
    double GetElectronicEnergy();
    double GetCoreRepulsionEnergy();
 protected:
@@ -87,7 +88,7 @@ protected:
    virtual double GetMolecularIntegralElement(int moI, int moJ, int moK, int moL, 
                                               Molecule* molecule, double** fockMatrix, double** gammaAB);
    virtual void CalcTwoElecTwoCore(double****** twoElecTwoCore, Molecule* molecule);
-   virtual void CalcForce(int electronicStateIndex);
+   virtual void CalcForce(vector<int> elecStates);
    virtual void OutputHFResults(double** fockMatrix, 
                                 double* energiesMO, 
                                 double* atomicElectronPopulation, 
@@ -96,7 +97,7 @@ protected:
    Molecule* molecule;
    double** fockMatrix;
    double* energiesMO;
-   double** matrixForce;
+   double*** matrixForce;
    double****** twoElecTwoCore;
    void CalcRotatingMatrixFirstDerivatives(double*** rMatFirstDeri, 
                                            Atom* atomA,
@@ -224,6 +225,7 @@ Cndo2::Cndo2(){
    this->fockMatrix = NULL;
    this->energiesMO = NULL;
    this->molecule = NULL;
+   this->matrixForce = NULL;
    this->elecEnergy = 0.0;
    this->coreRepulsionEnergy = 0.0;
    //cout << "Cndo created\n";
@@ -596,9 +598,17 @@ double Cndo2::GetElectronicEnergy(){
 double Cndo2::GetCoreRepulsionEnergy(){
    return this->coreRepulsionEnergy;
 }
-double** Cndo2::GetForce(int electronicStateIndex){
-   this->CalcForce(electronicStateIndex);
+
+double*** Cndo2::GetForce(vector<int> elecStates){
+   this->CalcForce(elecStates);
    return this->matrixForce;
+}
+
+double** Cndo2::GetForce(int elecState){
+   vector<int> elecStates;
+   elecStates.push_back(elecState);
+   this->CalcForce(elecStates);
+   return this->matrixForce[0];
 }
 
 void Cndo2::CalcTwoElecTwoCore(double****** twoElecTwoCore, Molecule* molecule){
@@ -606,7 +616,7 @@ void Cndo2::CalcTwoElecTwoCore(double****** twoElecTwoCore, Molecule* molecule){
    // two electron two core integrals are needed for CNDO, INDO, and ZINDO/S.
 }
 
-void Cndo2::CalcForce(int electronicStateIndex){
+void Cndo2::CalcForce(vector<int> elecStates){
    stringstream ss;
    ss << this->errorMessageCalcForceNotImplemented;
    throw MolDSException(ss.str());

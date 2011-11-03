@@ -68,7 +68,8 @@ protected:
                                               double** fockMatrix, 
                                               double** gammaAB);
    virtual void CalcCISMatrix(double** matrixCIS, int numberOcc, int numberVir);
-   virtual void CalcForce(int electronicStateIndex);
+   virtual void CalcForce(vector<int> elecStates);
+   void CheckMatrixForce(vector<int> elecStates);
 private:
    double** matrixCIS;
    double* excitedEnergies;
@@ -134,7 +135,6 @@ ZindoS::ZindoS() : MolDS_cndo::Cndo2(){
    this->matrixCISdimension = 0;
    this->nishimotoMatagaParamA = 1.2;
    this->nishimotoMatagaParamB = 2.4;
-   this->matrixForce = NULL;
    this->overlapCorrectionSigma = 1.267;
    this->overlapCorrectionPi = 0.585;
    //cout << "ZindoS created\n";
@@ -150,7 +150,11 @@ ZindoS::~ZindoS(){
       //cout << "exceitedEnergies deleted\n";
    }
    if(this->matrixForce != NULL){
-      MallocerFreer::GetInstance()->FreeDoubleMatrix2d(&this->matrixForce, this->molecule->GetAtomVect()->size());
+      int elecStatesNum = sizeof(this->matrixForce) /sizeof(this->matrixForce[0]);
+      MallocerFreer::GetInstance()->FreeDoubleMatrix3d(&this->matrixForce, 
+                                                       elecStatesNum,
+                                                       this->molecule->GetAtomVect()->size());
+      //cout << "elecStatesNum = " << elecStatesNum << endl;
       //cout << "matrixForce deleted\n";
    }
    //cout << "ZindoS deleted\n";
@@ -1419,22 +1423,27 @@ void ZindoS::CalcCISMatrix(double** matrixCIS, int numberOcc, int numberVir){
    cout << this->messageDoneCalcCISMatrix;
 }
 
-// electronicStateIndex is index of the electroinc eigen state.
-// "electronicStateIndex = 0" means electronic ground state. 
-void ZindoS::CalcForce(int electronicStateIndex){
-
+void ZindoS::CheckMatrixForce(vector<int> elecStates){
    // malloc or initialize Force matrix
    if(this->matrixForce == NULL){
       this->matrixForce = MallocerFreer::GetInstance()->
-                          MallocDoubleMatrix2d(this->molecule->GetAtomVect()->size(), 
+                          MallocDoubleMatrix3d(elecStates.size(),
+                                               this->molecule->GetAtomVect()->size(), 
                                                CartesianType_end);
    }
    else{
       MallocerFreer::GetInstance()->
-      InitializeDoubleMatrix2d(this->matrixForce,
+      InitializeDoubleMatrix3d(this->matrixForce,
+                               elecStates.size(),
                                this->molecule->GetAtomVect()->size(),
                                CartesianType_end);
    }
+}
+
+// electronicStates is indeces of the electroinc eigen states.
+// The index = 0 means electronic ground state. 
+void ZindoS::CalcForce(vector<int> elecStates){
+   this->CheckMatrixForce(elecStates);
    #pragma omp parallel
    {
       double*** overlapDer = MallocerFreer::GetInstance()->MallocDoubleMatrix3d
@@ -1491,10 +1500,10 @@ void ZindoS::CalcForce(int electronicStateIndex){
                }
             }
             for(int i=0; i<CartesianType_end; i++){
-               this->matrixForce[a][i] = -1.0*(coreRepulsion[i]
-                                              -electronicForce1[i] 
-                                              +electronicForce2[i]
-                                              +electronicForce3[i]);
+               this->matrixForce[0][a][i] = -1.0*(coreRepulsion[i]
+                                                 -electronicForce1[i] 
+                                                 +electronicForce2[i]
+                                                 +electronicForce3[i]);
             }
          }
       }
@@ -1566,28 +1575,11 @@ void ZindoS::CalcForce(int electronicStateIndex){
             }
          }
 
-         this->matrixForce[a][i] = -1.0*(coreRepulsion 
-                                          - electronicForce1 
-                                          + electronicForce2
-                                          + electronicForce3);
+         this->matrixForce[0][a][i] = -1.0*(coreRepulsion 
+                                           -electronicForce1 
+                                           +electronicForce2
+                                           +electronicForce3);
       }
-   }
-   */
-
-   /*  
-   // checking of calculated force
-   cout << "chek the force\n";
-   double checkSumForce[3] = {0.0, 0.0, 0.0};
-   for(int a=0; a<this->molecule->GetAtomVect()->size(); a++){
-      for(int i=0; i<CartesianType_end; i++){
-         cout << this->matrixForce[a][i] << " ";
-         checkSumForce[i] += this->matrixForce[a][i];
-      }
-      cout << endl;
-   }
-   cout << endl << endl;
-   for(int i=0; i<CartesianType_end; i++){
-      cout << "force: " << i << " "  << checkSumForce[i] << endl;
    }
    */
 }
