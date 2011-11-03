@@ -74,6 +74,7 @@ private:
    double** matrixCIS;
    double* excitedEnergies;
    int matrixCISdimension;
+   int matrixForceElecStatesNum;
    double GetNishimotoMatagaTwoEleInt(Atom* atomA, OrbitalType orbitalA, 
                                       Atom* atomB, OrbitalType orbitalB); // ref. [MN_1957] and (5a) in [AEZ_1986]
    double GetNishimotoMatagaTwoEleIntFirstDerivative(Atom* atomA, OrbitalType orbitalA, 
@@ -133,6 +134,7 @@ ZindoS::ZindoS() : MolDS_cndo::Cndo2(){
    this->matrixCIS = NULL;
    this->excitedEnergies = NULL;
    this->matrixCISdimension = 0;
+   this->matrixForceElecStatesNum = 0;
    this->nishimotoMatagaParamA = 1.2;
    this->nishimotoMatagaParamB = 2.4;
    this->overlapCorrectionSigma = 1.267;
@@ -150,11 +152,9 @@ ZindoS::~ZindoS(){
       //cout << "exceitedEnergies deleted\n";
    }
    if(this->matrixForce != NULL){
-      int elecStatesNum = sizeof(this->matrixForce) /sizeof(this->matrixForce[0]);
       MallocerFreer::GetInstance()->FreeDoubleMatrix3d(&this->matrixForce, 
-                                                       elecStatesNum,
+                                                       this->matrixForceElecStatesNum,
                                                        this->molecule->GetAtomVect()->size());
-      //cout << "elecStatesNum = " << elecStatesNum << endl;
       //cout << "matrixForce deleted\n";
    }
    //cout << "ZindoS deleted\n";
@@ -1430,6 +1430,7 @@ void ZindoS::CheckMatrixForce(vector<int> elecStates){
                           MallocDoubleMatrix3d(elecStates.size(),
                                                this->molecule->GetAtomVect()->size(), 
                                                CartesianType_end);
+      this->matrixForceElecStatesNum = elecStates.size();
    }
    else{
       MallocerFreer::GetInstance()->
