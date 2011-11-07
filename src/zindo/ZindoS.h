@@ -71,6 +71,8 @@ protected:
    virtual void CalcForce(vector<int> elecStates);
    void CheckMatrixForce(vector<int> elecStates);
 private:
+   string errorMessageCalcForceNotGroundState;
+   string errorMessageElecState;
    double** matrixCIS;
    double* excitedEnergies;
    int matrixCISdimension;
@@ -179,6 +181,9 @@ void ZindoS::SetMessages(){
    this->errorMessageDavidsonNotConverged =  "Error in zindo::ZindoS::DoesCISDavidson: Davidson did not met convergence criterion. \n";
    this->errorMessageDavidsonMaxIter = "Davidson roop reaches max_iter=";
    this->errorMessageDavidsonMaxDim = "Dimension of the expansion vectors reaches max_dim=";
+   this->errorMessageCalcForceNotGroundState 
+      = "Error in zindo::ZindoS::CalcForce: Only ground state is enable in ZindoS.";
+   this->errorMessageElecState = "Electronic State = ";
    this->messageSCFMetConvergence = "\n\n\n\t\tZINDO/S-SCF met convergence criterion(^^b\n\n\n";
    this->messageStartSCF = "**********  START: ZINDO/S-SCF  **********\n";
    this->messageDoneSCF = "**********  DONE: ZINDO/S-SCF  **********\n\n\n";
@@ -1444,6 +1449,15 @@ void ZindoS::CheckMatrixForce(vector<int> elecStates){
 // electronicStates is indeces of the electroinc eigen states.
 // The index = 0 means electronic ground state. 
 void ZindoS::CalcForce(vector<int> elecStates){
+   int elecState = elecStates[0];
+   int groundState = 0;
+   if(elecState != groundState){
+      stringstream ss;
+      ss << this->errorMessageCalcForceNotGroundState;
+      ss << this->errorMessageElecState << elecState << "\n";
+      throw MolDSException(ss.str());
+   }
+
    this->CheckMatrixForce(elecStates);
    #pragma omp parallel
    {
@@ -1501,10 +1515,10 @@ void ZindoS::CalcForce(vector<int> elecStates){
                }
             }
             for(int i=0; i<CartesianType_end; i++){
-               this->matrixForce[0][a][i] = -1.0*(coreRepulsion[i]
-                                                 -electronicForce1[i] 
-                                                 +electronicForce2[i]
-                                                 +electronicForce3[i]);
+               this->matrixForce[elecState][a][i] = -1.0*(coreRepulsion[i]
+                                                         -electronicForce1[i] 
+                                                         +electronicForce2[i]
+                                                         +electronicForce3[i]);
             }
          }
       }
