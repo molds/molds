@@ -329,7 +329,6 @@ TheoryType Cndo2::GetTheoryType(){
 }
 
 void Cndo2::SetMolecule(Molecule* molecule){
-
    // check of number of valence electrons
    this->CheckNumberValenceElectrons(molecule);
 
@@ -352,8 +351,6 @@ void Cndo2::SetMolecule(Molecule* molecule){
                    (this->molecule->GetTotalNumberAOs(), this->molecule->GetTotalNumberAOs());
    this->energiesMO = MallocerFreer::GetInstance()->MallocDoubleMatrix1d
                    (this->molecule->GetTotalNumberAOs());
-
-   
 }
 
 Molecule* Cndo2::GetMolecule(){
@@ -361,7 +358,6 @@ Molecule* Cndo2::GetMolecule(){
 }
 
 void Cndo2::CheckNumberValenceElectrons(Molecule* molecule){
-
    if(molecule->GetTotalNumberValenceElectrons() % 2 == 1){
       stringstream ss;
       ss << this->errorMessageOddTotalValenceElectrions << molecule->GetTotalNumberValenceElectrons() << "\n";
@@ -370,7 +366,6 @@ void Cndo2::CheckNumberValenceElectrons(Molecule* molecule){
 }
 
 void Cndo2::CheckEnableAtomType(Molecule* molecule){
-
    for(int i=0; i<molecule->GetAtomVect()->size(); i++){
       AtomType atomType = (*molecule->GetAtomVect())[i]->GetAtomType();
       bool enable = false;
@@ -426,7 +421,6 @@ double Cndo2::GetDiatomCoreRepulsionFirstDerivative(int indexAtomA, int indexAto
  *
  *****/
 void Cndo2::DoesSCF(bool requiresGuess){
-
    cout << this->messageStartSCF;
    double ompStartTime = omp_get_wtime();
 
@@ -438,7 +432,6 @@ void Cndo2::DoesSCF(bool requiresGuess){
 
    // diis parameters
    int diisNumErrorVect = Parameters::GetInstance()->GetDiisNumErrorVectSCF();
-
 
    // malloc temporary matrices for scf
    double** oldOrbitalElectronPopulation = MallocerFreer::GetInstance()->MallocDoubleMatrix2d
@@ -505,7 +498,9 @@ void Cndo2::DoesSCF(bool requiresGuess){
          // check convergence or update oldpopulation
          if(this->SatisfyConvergenceCriterion(oldOrbitalElectronPopulation, 
                                               this->orbitalElectronPopulation,
-                                              this->molecule->GetTotalNumberAOs(), &rmsDensity, i)){
+                                              this->molecule->GetTotalNumberAOs(), 
+                                              &rmsDensity, 
+                                              i)){
             // converged!!!!!
             cout << this->messageSCFMetConvergence;
 
@@ -521,7 +516,10 @@ void Cndo2::DoesSCF(bool requiresGuess){
          else{
             if(!isGuess){ 
                // damping
-               this->DoesDamp(rmsDensity, this->orbitalElectronPopulation, oldOrbitalElectronPopulation, this->molecule);
+               this->DoesDamp(rmsDensity, 
+                              this->orbitalElectronPopulation, 
+                              oldOrbitalElectronPopulation, 
+                              this->molecule);
            
                // diis 
                this->DoesDIIS(this->orbitalElectronPopulation,
@@ -655,7 +653,6 @@ void Cndo2::FreeSCFTemporaryMatrices(double*** oldOrbitalElectronPopulation,
       (diisErrorCoefficients);
       //cout << "diisErrorCoefficients deleted\n";
    } 
-
 }
 
 /***
@@ -672,7 +669,6 @@ void Cndo2::DoesDIIS(double** orbitalElectronPopulation,
                      int diisNumErrorVect,
                      Molecule* molecule,
                      int step){
-
    int totalNumberAOs = molecule->GetTotalNumberAOs();
    double diisStartError = Parameters::GetInstance()->GetDiisStartErrorSCF();
    double diisEndError = Parameters::GetInstance()->GetDiisEndErrorSCF();
@@ -686,7 +682,6 @@ void Cndo2::DoesDIIS(double** orbitalElectronPopulation,
             }
          }
       }
-
       for(int j=0; j<totalNumberAOs; j++){
          for(int k=0; k<totalNumberAOs; k++){
             diisStoredDensityMatrix[diisNumErrorVect-1][j][k] = orbitalElectronPopulation[j][k];
@@ -695,7 +690,6 @@ void Cndo2::DoesDIIS(double** orbitalElectronPopulation,
                      
          }
       }
-
       for(int mi=0; mi<diisNumErrorVect-1; mi++){
          for(int mj=0; mj<diisNumErrorVect-1; mj++){
             diisErrorProducts[mi][mj] = diisErrorProducts[mi+1][mj+1];
@@ -707,7 +701,8 @@ void Cndo2::DoesDIIS(double** orbitalElectronPopulation,
          tempErrorProduct = 0.0;
          for(int j=0; j<totalNumberAOs; j++){
             for(int k=0; k<totalNumberAOs; k++){
-               tempErrorProduct += diisStoredErrorVect[mi][j][k]*diisStoredErrorVect[diisNumErrorVect-1][j][k];
+               tempErrorProduct += diisStoredErrorVect[mi][j][k]
+                                  *diisStoredErrorVect[diisNumErrorVect-1][j][k];
             }
          }
          diisErrorProducts[mi][diisNumErrorVect-1] = tempErrorProduct;
@@ -738,14 +733,12 @@ void Cndo2::DoesDIIS(double** orbitalElectronPopulation,
                }
             }
          }
-
       }
    }
 }
 
 void Cndo2::DoesDamp(double rmsDensity, double** orbitalElectronPopulation, 
                      double** oldOrbitalElectronPopulation, Molecule* molecule){
-
    double dampingThresh = Parameters::GetInstance()->GetDampingThreshSCF();
    double dampingWeight = Parameters::GetInstance()->GetDampingWeightSCF();
    if(0.0 < dampingWeight && dampingThresh < rmsDensity){
@@ -760,7 +753,6 @@ void Cndo2::DoesDamp(double rmsDensity, double** orbitalElectronPopulation,
 }
 
 void Cndo2::OutputHFResults(double** fockMatrix, double* energiesMO, double* atomicElectronPopulation, Molecule* molecule){
-
    // output MO energy
    cout << this->messageEnergiesMOs;
    cout << this->messageEnergiesMOsTitle;
@@ -798,13 +790,15 @@ void Cndo2::OutputHFResults(double** fockMatrix, double* energiesMO, double* ato
       printf("\t\t%d\t%s\t%e\t%e\n",a,AtomTypeStr(atom->GetAtomType()),atom->GetCoreCharge(),atom->GetCoreCharge()-atomicElectronPopulation[a]);
    }
    cout << endl;
-
-
 }
 
-void Cndo2::CalcElecEnergy(double* elecEnergy, Molecule* molecule, double* energiesMO, double** fockMatrix, double** gammaAB, double coreRepulsionEnergy){
+void Cndo2::CalcElecEnergy(double* elecEnergy, 
+                           Molecule* molecule, 
+                           double* energiesMO, 
+                           double** fockMatrix, 
+                           double** gammaAB, 
+                           double coreRepulsionEnergy){
    double electronicEnergy = 0.0;
-
    // use density matrix for electronic energy
    int totalNumberAOs = this->molecule->GetTotalNumberAOs();
    double** fMatrix = MallocerFreer::GetInstance()->MallocDoubleMatrix2d
@@ -886,7 +880,6 @@ void Cndo2::FreeElecEnergyMatrices(double*** fMatrix,
                                     double*** hMatrix, 
                                     double*** dammyOrbitalElectronPopulation, 
                                     double**  dammyAtomicElectronPopulation ){
-   
    int totalNumberAOs = this->molecule->GetTotalNumberAOs();
    if(*fMatrix != NULL){
       MallocerFreer::GetInstance()->FreeDoubleMatrix2d(fMatrix, totalNumberAOs);
@@ -905,7 +898,6 @@ void Cndo2::FreeElecEnergyMatrices(double*** fMatrix,
       MallocerFreer::GetInstance()->FreeDoubleMatrix1d(dammyAtomicElectronPopulation);
       //cout << "dammyAtomicElectronPopulation deleted\n";
    }
-
 }
 
 // The order of mol, moJ, moK, moL is consistent with Eq. (9) in [RZ_1973]
@@ -940,14 +932,12 @@ double Cndo2::GetMolecularIntegralElement(int moI, int moJ, int moK, int moL,
 
       }
    }
-
    return value;
 }
 
 void Cndo2::UpdateOldOrbitalElectronPopulation(double** oldOrbitalElectronPopulation, 
                                                double** orbitalElectronPopulation,
                                                int numberAOs){
-
    for(int i=0; i<numberAOs; i++){
       for(int j=0; j<numberAOs; j++){
          oldOrbitalElectronPopulation[i][j] = orbitalElectronPopulation[i][j];
@@ -959,7 +949,6 @@ bool Cndo2::SatisfyConvergenceCriterion(double** oldOrbitalElectronPopulation,
                                         double** orbitalElectronPopulation,
                                         int numberAOs, double* rmsDensity, int times){
    bool satisfy = false;
-
    double change = 0.0;
    for(int i=0; i<numberAOs; i++){
       for(int j=0; j<numberAOs; j++){
@@ -986,10 +975,9 @@ bool Cndo2::SatisfyConvergenceCriterion(double** oldOrbitalElectronPopulation,
 void Cndo2::CalcFockMatrix(double** fockMatrix, Molecule* molecule, double** overlap, double** gammaAB,
                            double** orbitalElectronPopulation, double* atomicElectronPopulation,
                            double****** twoElecTwoCore, bool isGuess){
-
-   MallocerFreer::GetInstance()->InitializeDoubleMatrix2d
-                                 (fockMatrix, molecule->GetTotalNumberAOs(), molecule->GetTotalNumberAOs());
-
+   MallocerFreer::GetInstance()->InitializeDoubleMatrix2d(fockMatrix, 
+                                                          molecule->GetTotalNumberAOs(), 
+                                                          molecule->GetTotalNumberAOs());
    #pragma omp parallel for schedule(auto)
    for(int A=0; A<molecule->GetAtomVect()->size(); A++){
       Atom* atomA = (*molecule->GetAtomVect())[A];
@@ -1049,7 +1037,6 @@ void Cndo2::CalcFockMatrix(double** fockMatrix, Molecule* molecule, double** ove
    }
    printf("\n\n");
    */
-
 }
 
 double Cndo2::GetFockDiagElement(Atom* atomA, int atomAIndex, int mu, 
@@ -1083,24 +1070,20 @@ double Cndo2::GetFockOffDiagElement(Atom* atomA, Atom* atomB, int atomAIndex, in
                                     double** orbitalElectronPopulation, 
                                     double****** twoElecTwoCore, bool isGuess){
    double value;
-
    double K = 1.0;  // = 1.0 or 0.75, see Eq. (3.79) in J. A. Pople book
    if(atomA->GetValenceShellType() >= m || atomB->GetValenceShellType() >= m){
       K = 0.75;
    }
-
    double bondParameter = 0.5*K*(atomA->GetBondingParameter() + atomB->GetBondingParameter()); 
    value =  bondParameter*overlap[mu][nu];
    if(!isGuess){
       value -= 0.5*orbitalElectronPopulation[mu][nu]*gammaAB[atomAIndex][atomBIndex];
    }
-
    return value;
 }
 
 void Cndo2::CalcOrbitalElectronPopulation(double** orbitalElectronPopulation, 
                                           Molecule* molecule, double** fockMatrix){
-
    int totalNumberAOs = molecule->GetTotalNumberAOs();
    MallocerFreer::GetInstance()->InitializeDoubleMatrix2d
                                  (orbitalElectronPopulation, totalNumberAOs, totalNumberAOs);
@@ -1116,12 +1099,10 @@ void Cndo2::CalcOrbitalElectronPopulation(double** orbitalElectronPopulation,
    int numberTotalValenceElectrons = molecule->GetTotalNumberValenceElectrons();
    for(int mu=0; mu<totalNumberAOs; mu++){
       for(int nu=mu; nu<totalNumberAOs; nu++){
-
          value = 0.0;
          for(int mo=0; mo<numberTotalValenceElectrons/2; mo++){
             value += transposedFockMatrix[mu][mo]*transposedFockMatrix[nu][mo];
          }
-
          orbitalElectronPopulation[mu][nu] = 2.0*value;
       }
    }
@@ -1142,12 +1123,10 @@ void Cndo2::CalcOrbitalElectronPopulation(double** orbitalElectronPopulation,
    }
    printf("\n");
    */
-
 }
 
 void Cndo2::CalcAtomicElectronPopulation(double* atomicElectronPopulation,
                                          double** orbitalElectronPopulation, Molecule* molecule){
-
    int totalNumberAtoms = molecule->GetAtomVect()->size();
    MallocerFreer::GetInstance()->InitializeDoubleMatrix1d
                                  (atomicElectronPopulation, totalNumberAtoms);
@@ -1157,19 +1136,16 @@ void Cndo2::CalcAtomicElectronPopulation(double* atomicElectronPopulation,
    for(int A=0; A<totalNumberAtoms; A++){
       firstAOIndex = (*molecule->GetAtomVect())[A]->GetFirstAOIndex();
       numberAOs = (*molecule->GetAtomVect())[A]->GetValence().size();
-
       atomicElectronPopulation[A] = 0.0;
       for(int i=firstAOIndex; i<firstAOIndex+numberAOs; i++){
          atomicElectronPopulation[A] += orbitalElectronPopulation[i][i];
       }
       //printf("P_AA[%d]=%lf\n",A,atomicElectronPopulation[A]);
    }
-
 }
 
 // calculate gammaAB matrix. (B.56) and (B.62) in J. A. Pople book.
 void Cndo2::CalcGammaAB(double** gammaAB, Molecule* molecule){
-
    int totalAtomNumber = molecule->GetAtomVect()->size();
    #pragma omp parallel for schedule(auto)
    for(int A=0; A<totalAtomNumber; A++){
@@ -1203,13 +1179,15 @@ void Cndo2::CalcGammaAB(double** gammaAB, Molecule* molecule){
                temp *= pow(2.0*orbitalExponentB, 2*nb-l);
                temp /= Factorial(2*nb-l)*2.0*nb;
                temp *= pow(0.5*R, 2.0*nb-l+2.0*na);
-               temp *= this->GetReducedOverlap(2*na-1, 2*nb-l, 2.0*orbitalExponentA*R, 2.0*orbitalExponentB*R);
+               temp *= this->GetReducedOverlap(2*na-1, 
+                                               2*nb-l, 
+                                               2.0*orbitalExponentA*R, 
+                                               2.0*orbitalExponentB*R);
                value -= temp;
             }
 
             value *= pow(2.0*orbitalExponentA, 2.0*na+1.0);
             value /= Factorial(2*na);
-
          }
          else{
             // (B.62)
@@ -1255,7 +1233,6 @@ void Cndo2::CalcGammaAB(double** gammaAB, Molecule* molecule){
 }
 
 void Cndo2::FreeDiatomicOverlapAndRotatingMatrix(double*** diatomicOverlap, double*** rotatingMatrix){
-
    // free
    if(*diatomicOverlap != NULL){
       MallocerFreer::GetInstance()->FreeDoubleMatrix2d(diatomicOverlap, OrbitalType_end);
@@ -1265,7 +1242,6 @@ void Cndo2::FreeDiatomicOverlapAndRotatingMatrix(double*** diatomicOverlap, doub
       MallocerFreer::GetInstance()->FreeDoubleMatrix2d(rotatingMatrix, OrbitalType_end);
       //cout << "rotatingMatrix deleted\n";
    }
-
 }
 
 // calculate Overlap matrix. E.g. S_{\mu\nu} in (3.74) in J. A. Pople book.
@@ -1317,7 +1293,6 @@ void Cndo2::CalcOverlap(double** overlap, Molecule* molecule){
    }
    printf("\n");
    */
-
 }
 
 // First derivative of diatomic overlap integrals between AOs in space fixed flame.
@@ -1326,7 +1301,6 @@ void Cndo2::CalcOverlap(double** overlap, Molecule* molecule){
 // because CalcRotatingMatrixFirstDerivatives can not treat d-orbitals.
 void Cndo2::CalcDiatomicOverlapFirstDerivative(double*** overlapFirstDeri, 
                                                Atom* atomA, Atom* atomB){
-
    double Cartesian[CartesianType_end] = {atomA->GetXyz()[XAxis] - atomB->GetXyz()[XAxis], 
                                           atomA->GetXyz()[YAxis] - atomB->GetXyz()[YAxis],
                                           atomA->GetXyz()[ZAxis] - atomB->GetXyz()[ZAxis]};
@@ -1375,7 +1349,6 @@ void Cndo2::CalcDiatomicOverlapFirstDerivative(double*** overlapFirstDeri,
                   }
                }
                overlapFirstDeri[i][j][c] = temp1 + temp2 + temp3;
-
             }
          }
       }
