@@ -98,7 +98,7 @@ private:
                                   double* ritzVector, 
                                   double* interactionEigenEnergies, 
                                   int residualVectorIndex);
-   void SortSingleExcitationSlaterDeterminants(vector<MoEnergy>* moEnergies);
+   void SortSingleExcitationSlaterDeterminants(vector<MoEnergyGap>* moEnergyGaps);
    void UpdateExpansionVectors(double** expansionVectors, 
                                double* interactionEigenEnergies, 
                                double* residualVector,
@@ -856,7 +856,7 @@ void ZindoS::DoesCIS(){
    cout << this->messageDoneCIS;
 }
 
-void ZindoS::SortSingleExcitationSlaterDeterminants(vector<MoEnergy>* moEnergies){
+void ZindoS::SortSingleExcitationSlaterDeterminants(vector<MoEnergyGap>* moEnergyGaps){
 
    int numberOcc = Parameters::GetInstance()->GetActiveOccCIS();
    int numberVir = Parameters::GetInstance()->GetActiveVirCIS();
@@ -865,10 +865,10 @@ void ZindoS::SortSingleExcitationSlaterDeterminants(vector<MoEnergy>* moEnergies
       int moI = this->molecule->GetTotalNumberValenceElectrons()/2 - (k/numberVir) -1;
       int moA = this->molecule->GetTotalNumberValenceElectrons()/2 + (k%numberVir);
 
-      MoEnergy moEnergy = {this->energiesMO[moA] - this->energiesMO[moI], moI, moA, k};
-      moEnergies->push_back(moEnergy);
+      MoEnergyGap moEnergyGap = {this->energiesMO[moA] - this->energiesMO[moI], moI, moA, k};
+      moEnergyGaps->push_back(moEnergyGap);
    }
-   sort(moEnergies->begin(), moEnergies->end(), LessMoEnergy());
+   sort(moEnergyGaps->begin(), moEnergyGaps->end(), LessMoEnergyGap());
 }
 
 // This method is used for Davidson
@@ -985,12 +985,12 @@ void ZindoS::DoesCISDavidson(){
 
    try{
       // sort single excitation slater determinants
-      vector<MoEnergy> moEnergies;
-      this->SortSingleExcitationSlaterDeterminants(&moEnergies);
+      vector<MoEnergyGap> moEnergyGaps;
+      this->SortSingleExcitationSlaterDeterminants(&moEnergyGaps);
 
       // set initial expansion vectors and initial conveged vectors
       for(int k=0; k<numberExcitedStates; k++){
-         expansionVectors[moEnergies[k].slaterIndex][k] = 1.0;
+         expansionVectors[moEnergyGaps[k].slaterIndex][k] = 1.0;
          convergeExcitedStates[k] = false;
       }
 

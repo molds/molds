@@ -102,14 +102,14 @@ protected:
    void CalcRotatingMatrixFirstDerivatives(double*** rMatFirstDeri, 
                                            Atom* atomA,
                                            Atom* atomB);
-   struct MoEnergy{
-      double energy;
+   struct MoEnergyGap{
+      double energyGap;
       int occIndex;
       int virIndex;
       int slaterIndex;
    };
-   struct LessMoEnergy { bool operator()(const MoEnergy& rLeft, const MoEnergy& rRight) 
-      const { return rLeft.energy < rRight.energy; } };
+   struct LessMoEnergyGap { bool operator()(const MoEnergyGap& rLeft, const MoEnergyGap& rRight) 
+      const { return rLeft.energyGap < rRight.energyGap; } };
 private:
    string messageEnergiesMOs;
    string messageEnergiesMOsTitle;
