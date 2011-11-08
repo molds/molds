@@ -202,9 +202,9 @@ private:
    void CalcElecEnergy(double* elecEnergy, Molecule* molecule, double* energiesMO, 
                          double** fockMatrix, double** gammaAB, double coreRepulsionEnergy);
    void FreeElecEnergyMatrices(double*** fMatrix, 
-                                double*** hMatrix, 
-                                double*** dammyOrbitalElectronPopulation, 
-                                double**  dammyAtomicElectronPopulation );
+                               double*** hMatrix, 
+                               double*** dammyOrbitalElectronPopulation, 
+                               double**  dammyAtomicElectronPopulation );
    void FreeSCFTemporaryMatrices(double*** oldOrbitalElectronPopulation,
                                  double**** diisStoredDensityMatrix,
                                  double**** diisStoredErrorVect,
