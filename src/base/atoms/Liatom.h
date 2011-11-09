@@ -54,9 +54,9 @@ Liatom::Liatom(double x, double y, double z) : Atom(x, y, z){
    this->zindoL = 1;
    this->zindoM = 0;
    this->zindoN = 0;
-   this->ionPotS = 5.39 * Parameters::GetInstance()->GetEV2AU();
-   this->ionPotP = 3.54 * Parameters::GetInstance()->GetEV2AU();
-   this->ionPotD = 0.0 * Parameters::GetInstance()->GetEV2AU();
+   this->zindoIonPotS = 5.39 * Parameters::GetInstance()->GetEV2AU();
+   this->zindoIonPotP = 3.54 * Parameters::GetInstance()->GetEV2AU();
+   this->zindoIonPotD = 0.0 * Parameters::GetInstance()->GetEV2AU();
 }
 }
 #endif

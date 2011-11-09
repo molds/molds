@@ -54,9 +54,9 @@ Oatom::Oatom(double x, double y, double z) : Atom(x, y, z){
    this->zindoL = 2;
    this->zindoM = 4;
    this->zindoN = 0;
-   this->ionPotS = 32.90 * Parameters::GetInstance()->GetEV2AU();
-   this->ionPotP = 17.28 * Parameters::GetInstance()->GetEV2AU();
-   this->ionPotD = 0.0 * Parameters::GetInstance()->GetEV2AU();
+   this->zindoIonPotS = 32.90 * Parameters::GetInstance()->GetEV2AU();
+   this->zindoIonPotP = 17.28 * Parameters::GetInstance()->GetEV2AU();
+   this->zindoIonPotD = 0.0 * Parameters::GetInstance()->GetEV2AU();
    this->mndoCoreintegralS = -99.64309 * Parameters::GetInstance()->GetEV2AU();         
    this->mndoCoreintegralP = -77.797472 * Parameters::GetInstance()->GetEV2AU();         
    this->mndoOrbitalExponentS = 2.699905;      

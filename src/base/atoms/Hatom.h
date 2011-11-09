@@ -51,9 +51,9 @@ Hatom::Hatom(double x, double y, double z) : Atom(x, y, z){
    this->zindoL = 1;
    this->zindoM = 0;
    this->zindoN = 0;
-   this->ionPotS = 13.06 * Parameters::GetInstance()->GetEV2AU();
-   this->ionPotP = 0.0 * Parameters::GetInstance()->GetEV2AU();
-   this->ionPotD = 0.0 * Parameters::GetInstance()->GetEV2AU();
+   this->zindoIonPotS = 13.06 * Parameters::GetInstance()->GetEV2AU();
+   this->zindoIonPotP = 0.0 * Parameters::GetInstance()->GetEV2AU();
+   this->zindoIonPotD = 0.0 * Parameters::GetInstance()->GetEV2AU();
    this->mndoCoreintegralS = -11.906276 * Parameters::GetInstance()->GetEV2AU();         
    this->mndoCoreintegralP = 0.0;         
    this->mndoOrbitalExponentS = 1.331967;      

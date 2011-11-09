@@ -54,9 +54,9 @@ Natom::Natom(double x, double y, double z) : Atom(x, y, z){
    this->zindoL = 2;
    this->zindoM = 3;
    this->zindoN = 0;
-   this->ionPotS = 25.69 * Parameters::GetInstance()->GetEV2AU();
-   this->ionPotP = 14.05 * Parameters::GetInstance()->GetEV2AU();
-   this->ionPotD = 0.0 * Parameters::GetInstance()->GetEV2AU();
+   this->zindoIonPotS = 25.69 * Parameters::GetInstance()->GetEV2AU();
+   this->zindoIonPotP = 14.05 * Parameters::GetInstance()->GetEV2AU();
+   this->zindoIonPotD = 0.0 * Parameters::GetInstance()->GetEV2AU();
    this->mndoCoreintegralS = -71.932122 * Parameters::GetInstance()->GetEV2AU();         
    this->mndoCoreintegralP = -57.172319 * Parameters::GetInstance()->GetEV2AU();         
    this->mndoOrbitalExponentS = 2.255614;      

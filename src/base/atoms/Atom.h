@@ -57,7 +57,7 @@ public:
    double GetZindoG3pdLower();                 // Apendix in ref. [BZ_1979]
    double GetZindoF2ddLower();                 // Apendix in ref. [BZ_1979]
    double GetZindoF4ddLower();                 // Apendix in ref. [BZ_1979]
-   double GetIonPot(OrbitalType orbital);
+   double GetZindoIonPot(OrbitalType orbital);
    double GetNddoAlpha(TheoryType theory); // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S for MNDO. Table I in ref. [DZHS_1985] for H, C, N, O, and Table I in re. [DY_1990] for S for AM1. [S_1989] for PM3.
    double GetNddoDerivedParameterD(TheoryType theory, int dIndex);    // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S. Or, calculated in tools/deriveParametersNDDO/deriveParametersNDDO.cpp.
    double GetNddoDerivedParameterRho(TheoryType theory, int rhoIndex);  // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S. Or, calculated in tools/deriveParametersNDDO/deriveParametersNDDO.cpp.
@@ -120,9 +120,9 @@ protected:
    int zindoL;              // see l of (13) in [BZ_1979]
    int zindoM;              // see m of (13) in [BZ_1979]
    int zindoN;              // see n (13) in [BZ_1979]
-   double ionPotS;   // Ionization potential, Table 4 in [BZ_1979]
-   double ionPotP;   // Ionization potential, Table 4 in [BZ_1979]
-   double ionPotD;   // Ionization potential, Table 4 in [BZ_1979]
+   double zindoIonPotS;   // Ionization potential, Table 4 in [BZ_1979]
+   double zindoIonPotP;   // Ionization potential, Table 4 in [BZ_1979]
+   double zindoIonPotD;   // Ionization potential, Table 4 in [BZ_1979]
    double mndoCoreintegralS;         // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S.
    double mndoCoreintegralP;         // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S. 
    double mndoOrbitalExponentS;      // Table III in ref. [DT_1977-2] for H, B, C, N, O, and F. Table I & II in ref. [DMR_1978] and Table I in ref. [DR_1986] for S.
@@ -255,7 +255,7 @@ void Atom::SetMessages(){
    this->errorMessageMndoCoreIntegral = "Error in base_atoms::Atom::GetMndoCoreINtegral: Invalid orbitalType for MNDO.\n";
    this->errorMessageAm1CoreIntegral = "Error in base_atoms::Atom::GetAm1CoreINtegral: Invalid orbitalType for AM1.\n";
    this->errorMessagePm3CoreIntegral = "Error in base_atoms::Atom::GetPm3CoreINtegral: Invalid orbitalType for PM3.\n";
-   this->errorMessageIonPot = "Error in base_atoms::Atom::GetIonPot: Invalid orbitalType.\n";
+   this->errorMessageIonPot = "Error in base_atoms::Atom::GetZindoIonPot: Invalid orbitalType.\n";
    this->errorMessageAtomType = "\tatom type = ";
    this->errorMessageOrbitalType = "\torbital type = ";
    this->errorMessageShellType = "\tshell type = ";
@@ -630,19 +630,19 @@ double Atom::GetZindoCoreIntegral(OrbitalType orbital){
    double value=0.0;
 
    if(orbital == s){
-      value = -1.0*this->ionPotS 
+      value = -1.0*this->zindoIonPotS 
               - this->GetJss()*(double)(this->zindoL-1) 
               - this->GetJsp()*(double)this->zindoM
               - this->GetJsd()*(double)this->zindoN;
    }
    else if(orbital == px || orbital == py || orbital == pz){
-      value = -1.0*this->ionPotP
+      value = -1.0*this->zindoIonPotP
               - this->GetJpp()*(double)(this->zindoM-1) 
               - this->GetJsp()*(double)this->zindoL
               - this->GetJpd()*(double)this->zindoN;
    }
    else if(orbital == dxy || orbital == dyz || orbital == dzz || orbital == dzx || orbital == dxxyy ){
-      value = -1.0*this->ionPotD
+      value = -1.0*this->zindoIonPotD
               - this->GetJdd()*(double)(this->zindoN-1) 
               - this->GetJsd()*(double)this->zindoL
               - this->GetJpd()*(double)this->zindoM;
@@ -1122,17 +1122,17 @@ double Atom::GetCoreIntegral(OrbitalType orbital, bool isGuess, TheoryType theor
    return this->GetCoreIntegral(orbital, 0.0, isGuess, theory);
 }
 
-double Atom::GetIonPot(OrbitalType orbital){
+double Atom::GetZindoIonPot(OrbitalType orbital){
    double value=0.0;
 
    if(orbital == s){
-      value = -1.0*this->ionPotS;
+      value = -1.0*this->zindoIonPotS;
    }
    else if(orbital == px || orbital == py || orbital == pz){
-      value = -1.0*this->ionPotP;
+      value = -1.0*this->zindoIonPotP;
    }
    else if(orbital == dxy || orbital == dyz || orbital == dzz || orbital == dzx || orbital == dxxyy ){
-      value = -1.0*this->ionPotD;
+      value = -1.0*this->zindoIonPotD;
    }
    else{
       stringstream ss;

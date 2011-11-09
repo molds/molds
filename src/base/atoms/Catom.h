@@ -54,9 +54,9 @@ Catom::Catom(double x, double y, double z) : Atom(x, y, z){
    this->zindoL = 2;
    this->zindoM = 2;
    this->zindoN = 0;
-   this->ionPotS = 19.84 * Parameters::GetInstance()->GetEV2AU();
-   this->ionPotP = 10.93 * Parameters::GetInstance()->GetEV2AU();
-   this->ionPotD = 0.0 * Parameters::GetInstance()->GetEV2AU();
+   this->zindoIonPotS = 19.84 * Parameters::GetInstance()->GetEV2AU();
+   this->zindoIonPotP = 10.93 * Parameters::GetInstance()->GetEV2AU();
+   this->zindoIonPotD = 0.0 * Parameters::GetInstance()->GetEV2AU();
    this->mndoCoreintegralS = -52.279745 * Parameters::GetInstance()->GetEV2AU();         
    this->mndoCoreintegralP = -39.205558 * Parameters::GetInstance()->GetEV2AU();         
    this->mndoOrbitalExponentS = 1.787537;      

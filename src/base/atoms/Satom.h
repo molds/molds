@@ -79,9 +79,9 @@ Satom::Satom(double x, double y, double z) : Atom(x, y, z){
    this->zindoL = 2;
    this->zindoM = 4;
    this->zindoN = 0;
-   this->ionPotS = 21.11 * Parameters::GetInstance()->GetEV2AU();
-   this->ionPotP = 12.39 * Parameters::GetInstance()->GetEV2AU();
-   this->ionPotD = 4.11 * Parameters::GetInstance()->GetEV2AU();
+   this->zindoIonPotS = 21.11 * Parameters::GetInstance()->GetEV2AU();
+   this->zindoIonPotP = 12.39 * Parameters::GetInstance()->GetEV2AU();
+   this->zindoIonPotD = 4.11 * Parameters::GetInstance()->GetEV2AU();
    this->mndoCoreintegralS = -72.242281 * Parameters::GetInstance()->GetEV2AU();         
    this->mndoCoreintegralP = -56.973207 * Parameters::GetInstance()->GetEV2AU();         
    this->mndoOrbitalExponentS = 2.312962;      
