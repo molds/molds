@@ -9,7 +9,6 @@ namespace MolDS_base_atoms{
 class Satom : public Atom {
 public:
    Satom(double x, double y, double z);
-   double GetCoreIntegral(OrbitalType orbital, double gamma, bool isGuess, TheoryType theory); 
 private:
 };
 
@@ -164,50 +163,5 @@ Satom::Satom(double x, double y, double z) : Atom(x, y, z){
    this->pm3ParameterM[2] = 0.00;
    this->pm3ParameterM[3] = 0.00;
 }
-
-double Satom::GetCoreIntegral(OrbitalType orbital, double gamma, bool isGuess, TheoryType theory){
-   double value = 0.0;
-   if(theory == INDO){
-      if(orbital == s){
-         value = -1.0*this->imuAmuS;
-         if(!isGuess){
-            value -= this->indoF0CoefficientS*gamma 
-                    +this->indoG1CoefficientS*this->indoG1
-                    +this->indoF2CoefficientS*this->indoF2;
-         }
-      }
-      else if(orbital == px || orbital == py || orbital == pz){
-         value = -1.0*this->imuAmuP;
-         if(!isGuess){
-            value -= this->indoF0CoefficientP*gamma 
-                    +this->indoG1CoefficientP*this->indoG1
-                    +this->indoF2CoefficientP*this->indoF2;
-         }
-      }
-      else{
-         stringstream ss;
-         ss << this->errorMessageIndoCoreIntegral;
-         ss << this->errorMessageAtomType << AtomTypeStr(this->atomType) << endl;
-         ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbital) << endl;
-         throw MolDSException(ss.str());
-      }
-   }
-   else if(theory == ZINDOS){
-      value = this->GetZindoCoreIntegral(orbital);
-   }
-   else if(theory == MNDO){
-      value = this->GetMndoCoreIntegral(orbital);
-   }
-   else if(theory == AM1){
-      value = this->GetAm1CoreIntegral(orbital);
-   }
-   else if(theory == PM3){
-      value = this->GetPm3CoreIntegral(orbital);
-   }
-   return value;
-}
-
-
-
 }
 #endif

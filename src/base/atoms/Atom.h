@@ -31,7 +31,7 @@ public:
    int GetNumberValenceElectrons();
    double GetImuAmu(OrbitalType orbitalType);  // return 0.5*(I_mu + A_mu)
    double GetOrbitalExponent(ShellType shellType, OrbitalType orbitalType, TheoryType theory);  // See (1.73) in J. A. Pople book for CNDO, INDO, and ZINDOS. See [BT_1977] for MNDO. See [DZHS_1985, DY_1990] for AM1. See [S_1989] for PM3.
-   virtual double GetCoreIntegral(OrbitalType orbital, double gamma, bool isGuess, TheoryType theory) = 0; // P82 - 83 in J. A. Pople book for INDO or Eq. (13) in [BZ_1979] for ZINDO/S. See [BT_1977] for MNDO. See [DZHS_1985, DY_1990] for AM1. See [S_1989] for PM3.
+   double GetCoreIntegral(OrbitalType orbital, double gamma, bool isGuess, TheoryType theory); // P82 - 83 in J. A. Pople book for INDO or Eq. (13) in [BZ_1979] for ZINDO/S. See [BT_1977] for MNDO. See [DZHS_1985, DY_1990] for AM1. See [S_1989] for PM3.
    double GetCoreIntegral(OrbitalType orbital, bool isGuess, TheoryType theory);
    double GetIndoF2();
    double GetIndoG1();
@@ -173,6 +173,7 @@ protected:
    double pm3ParameterK[4];// Table II in ref. [S_1989].
    double pm3ParameterL[4];// Table II in ref. [S_1989].
    double pm3ParameterM[4];// Table II in ref. [S_1989].
+   double GetIndoCoreIntegral(OrbitalType orbital, double gamma, bool isGuess);
    double GetZindoCoreIntegral(OrbitalType orbital); // Eq. (13) in [BZ_1979]
    double GetMndoCoreIntegral(OrbitalType orbital); 
    double GetAm1CoreIntegral(OrbitalType orbital); 
@@ -593,6 +594,36 @@ double Atom::GetJpd(){
 double Atom::GetJdd(){
    return this->zindoF0dd - 2.0*(this->zindoF2dd + this->zindoF4dd)/63.0;
 }
+
+// (3.93) - (3.99) in J. A. Pople book.
+double Atom::GetIndoCoreIntegral(OrbitalType orbital, double gamma, bool isGuess){
+   double value = 0.0;
+   if(orbital == s){
+      value = -1.0*this->imuAmuS;
+      if(!isGuess){
+         value -= this->indoF0CoefficientS*gamma 
+                 +this->indoG1CoefficientS*this->indoG1
+                 +this->indoF2CoefficientS*this->indoF2;
+      }
+   }
+   else if(orbital == px || orbital == py || orbital == pz){
+      value = -1.0*this->imuAmuP;
+      if(!isGuess){
+         value -= this->indoF0CoefficientP*gamma 
+                 +this->indoG1CoefficientP*this->indoG1
+                 +this->indoF2CoefficientP*this->indoF2;
+      }
+   }
+   else{
+      stringstream ss;
+      ss << this->errorMessageIndoCoreIntegral;
+      ss << this->errorMessageAtomType << AtomTypeStr(this->atomType) << endl;
+      ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbital) << endl;
+      throw MolDSException(ss.str());
+   }
+   return value;
+}
+
 
 // Eq. (13) in [BZ_1979]
 double Atom::GetZindoCoreIntegral(OrbitalType orbital){
@@ -1064,6 +1095,28 @@ double Atom::GetZindoF4ddLower(){
    return this->zindoF4dd/441.0;
 }
 
+double Atom::GetCoreIntegral(OrbitalType orbital, 
+                             double gamma, 
+                             bool isGuess, 
+                             TheoryType theory){
+   double value = 0.0;
+   if(theory == INDO){
+      value = this->GetIndoCoreIntegral(orbital, gamma, isGuess);
+   }
+   else if(theory == ZINDOS){
+      value = this->GetZindoCoreIntegral(orbital);
+   }
+   else if(theory == MNDO){
+      value = this->GetMndoCoreIntegral(orbital);
+   }
+   else if(theory == AM1){
+      value = this->GetAm1CoreIntegral(orbital);
+   }
+   else if(theory == PM3){
+      value = this->GetPm3CoreIntegral(orbital);
+   }
+   return value;
+}
 
 double Atom::GetCoreIntegral(OrbitalType orbital, bool isGuess, TheoryType theory){
    return this->GetCoreIntegral(orbital, 0.0, isGuess, theory);

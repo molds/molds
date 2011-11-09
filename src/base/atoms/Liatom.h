@@ -9,7 +9,6 @@ namespace MolDS_base_atoms{
 class Liatom : public Atom {
 public:
    Liatom(double x, double y, double z);
-   double GetCoreIntegral(OrbitalType orbital, double gamma, bool isGuess, TheoryType theory); 
 private:
 };
 
@@ -59,42 +58,5 @@ Liatom::Liatom(double x, double y, double z) : Atom(x, y, z){
    this->ionPotP = 3.54 * Parameters::GetInstance()->GetEV2AU();
    this->ionPotD = 0.0 * Parameters::GetInstance()->GetEV2AU();
 }
-
-double Liatom::GetCoreIntegral(OrbitalType orbital, double gamma, bool isGuess, TheoryType theory){
-   
-   double value = 0.0;
-
-   if(theory == INDO){
-      if(orbital == s){
-         value = -1.0*this->imuAmuS;
-         if(!isGuess){
-            value -= this->indoF0CoefficientS*gamma 
-                    +this->indoG1CoefficientS*this->indoG1
-                    +this->indoF2CoefficientS*this->indoF2;
-         }
-      }
-      else if(orbital == px || orbital == py || orbital == pz){
-         value = -1.0*this->imuAmuP;
-         if(!isGuess){
-            value -= this->indoF0CoefficientP*gamma 
-                    +this->indoG1CoefficientP*this->indoG1
-                    +this->indoF2CoefficientP*this->indoF2;
-         }
-      }
-      else{
-         stringstream ss;
-         ss << this->errorMessageIndoCoreIntegral;
-         ss << this->errorMessageAtomType << AtomTypeStr(this->atomType) << endl;
-         ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbital) << endl;
-         throw MolDSException(ss.str());
-      }
-   }
-   else if(theory == ZINDOS){
-      value = this->GetZindoCoreIntegral(orbital);
-   }
-
-   return value;
-}
-
 }
 #endif
