@@ -20,8 +20,6 @@ Natom::Natom(double x, double y, double z) : Atom(x, y, z){
    this->valence.push_back(pz);
    this->valence.push_back(px);
    this->bondingParameter = -25.0*Parameters::GetInstance()->GetEV2AU();
-   this->bondingParameterSZindo = -26.0*Parameters::GetInstance()->GetEV2AU();
-   this->bondingParameterDZindo = 0.0;
    this->coreCharge = 5.0;
    this->imuAmuS = 19.316*Parameters::GetInstance()->GetEV2AU();
    this->imuAmuP = 7.275*Parameters::GetInstance()->GetEV2AU();
@@ -40,6 +38,8 @@ Natom::Natom(double x, double y, double z) : Atom(x, y, z){
    this->indoG1CoefficientP = -1.0/3.0;
    this->indoF2CoefficientS = 0.0;
    this->indoF2CoefficientP = -2.0*(this->coreCharge - 2.5)/25.0;
+   this->zindoBondingParameterS = -26.0*Parameters::GetInstance()->GetEV2AU();
+   this->zindoBondingParameterD = 0.0;
    this->zindoF0ss = 12.01 * Parameters::GetInstance()->GetEV2AU();                  
    this->zindoF0sd = 0.0;                   
    this->zindoF0dd = 0.0;                  

@@ -28,8 +28,6 @@ Satom::Satom(double x, double y, double z) : Atom(x, y, z){
       this->valence.push_back(dxxyy);
    }
    this->bondingParameter = -18.150*Parameters::GetInstance()->GetEV2AU();
-   this->bondingParameterSZindo = -14.0*Parameters::GetInstance()->GetEV2AU();
-   this->bondingParameterDZindo =   4.0*Parameters::GetInstance()->GetEV2AU();
    this->coreCharge = 6.0;
    this->imuAmuS = 17.650*Parameters::GetInstance()->GetEV2AU();
    this->imuAmuP = 6.989*Parameters::GetInstance()->GetEV2AU();
@@ -54,6 +52,8 @@ Satom::Satom(double x, double y, double z) : Atom(x, y, z){
    this->indoG1CoefficientP = 0.0;
    this->indoF2CoefficientS = 0.0;
    this->indoF2CoefficientP = 0.0;
+   this->zindoBondingParameterS = -14.0*Parameters::GetInstance()->GetEV2AU();
+   this->zindoBondingParameterD =   4.0*Parameters::GetInstance()->GetEV2AU();
    // the zindoF0ss for sulfer atoms are set to be equal 
    // to the one (10.09eV) in "ORCA 2.8"( http://www.thch.uni-bonn.de/tc/orca/ ).
    this->zindoF0ss = 10.09 * Parameters::GetInstance()->GetEV2AU(); 

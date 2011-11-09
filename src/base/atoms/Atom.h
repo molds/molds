@@ -90,8 +90,6 @@ protected:
    double imuAmuP;                      // Table 3.4 or 3.5 in J. A. Pople book
    double imuAmuD;                      // Table 3.4 or 3.5 in J. A. Pople book
    double bondingParameter;             // Table 3.2 and 3.4 in J. A. Pople book
-   double bondingParameterSZindo;        // Table 1 in [RZ_1976], table 1 in [HKLWNZ_1982], or table 3 in [AEZ_1986]
-   double bondingParameterDZindo;        // Table 1 in [RZ_1976], table 1 in [HKLWNZ_1982], or table 3 in [AEZ_1986]
    double coreCharge;                   // = Z_A in J. A. Pople book.
    double effectiveNuclearChargeK;      // Table 1.5 in J. A. Pople book or table 1 in [HKLWNZ_1982]
    double effectiveNuclearChargeL;      // Table 1.5 in J. A. Pople book or table 1 in [HKLWNZ_1982]
@@ -106,6 +104,8 @@ protected:
    double indoG1CoefficientP;       // (3.93-3.99) in J. A. Pople book
    double indoF2CoefficientS;       // (3.93-3.99) in J. A. Pople book
    double indoF2CoefficientP;       // (3.93-3.99) in J. A. Pople book
+   double zindoBondingParameterS;        // Table 1 in [RZ_1976], table 1 in [HKLWNZ_1982], or table 3 in [AEZ_1986]
+   double zindoBondingParameterD;        // Table 1 in [RZ_1976], table 1 in [HKLWNZ_1982], or table 3 in [AEZ_1986]
    double zindoF0ss;                // Table 1 in ref. [RZ_1976], Table 1 in [AEZ_1986], or Table 1 in [GD_1972]
    double zindoF0sd;                  // Table 1 in [AEZ_1986]
    double zindoF0dd;                  // Table 1 in [AEZ_1986]
@@ -348,14 +348,14 @@ double Atom::GetBondingParameter(TheoryType theory, OrbitalType orbital){
                                  orbital == px ||
                                  orbital == py ||
                                  orbital == pz ) ){
-      value = this->bondingParameterSZindo;
+      value = this->zindoBondingParameterS;
    }
    else if(theory == ZINDOS && ( orbital == dxy ||
                                  orbital == dyz ||
                                  orbital == dzz ||
                                  orbital == dzx ||
                                  orbital == dxxyy ) ){
-      value = this->bondingParameterDZindo;
+      value = this->zindoBondingParameterD;
    }
    else if(theory == MNDO && orbital == s){
       value = this->mndoBondingParameterS;

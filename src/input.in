@@ -1,8 +1,8 @@
 // example of the input file
 THEORY
    //cndo/2
-   indo
-   //zindo/s
+   //indo
+   zindo/s
    //mndo
    //am1
    //pm3
@@ -223,12 +223,12 @@ CIS_END
 //GEOMETRY_END
 
 // acetylene3
-//GEOMETRY
-// C                     0.24933   0.01  -0.01 
-// C                     1.45053   0.0    0.20 
-// H                    -0.82067   0.02  -0.050 
-// H                     2.52053  -0.10   0.0 
-//GEOMETRY_END
+GEOMETRY
+ C                     0.24933   0.01  -0.01 
+ C                     1.45053   0.0    0.20 
+ H                    -0.82067   0.02  -0.050 
+ H                     2.52053  -0.10   0.0 
+GEOMETRY_END
 
 // C2Li2
 //GEOMETRY
@@ -279,10 +279,10 @@ CIS_END
 //GEOMETRY_END
 
 // LiH 2
-GEOMETRY
-   H   0.464960      0.485175      0.000000
-   Li  1.994960      0.485175      0.000000
-GEOMETRY_END
+//GEOMETRY
+//   H   0.464960      0.485175      0.000000
+//   Li  1.994960      0.485175      0.000000
+//GEOMETRY_END
 
 // LiH 3
 //GEOMETRY

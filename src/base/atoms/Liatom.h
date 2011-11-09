@@ -20,8 +20,6 @@ Liatom::Liatom(double x, double y, double z) : Atom(x, y, z){
    this->valence.push_back(pz);
    this->valence.push_back(px);
    this->bondingParameter = -9.0*Parameters::GetInstance()->GetEV2AU();
-   this->bondingParameterSZindo = 0.0;
-   this->bondingParameterDZindo = 0.0;
    this->coreCharge = 1.0;
    this->imuAmuS = 3.106*Parameters::GetInstance()->GetEV2AU();
    this->imuAmuP = 1.258*Parameters::GetInstance()->GetEV2AU();
@@ -40,6 +38,8 @@ Liatom::Liatom(double x, double y, double z) : Atom(x, y, z){
    this->indoG1CoefficientP = -1.0/12.0;
    this->indoF2CoefficientS = 0.0;
    this->indoF2CoefficientP = 0.0;
+   this->zindoBondingParameterS = 0.0;
+   this->zindoBondingParameterD = 0.0;
    this->zindoF0ss = 0.0;
    this->zindoF0sd = 0.0;        
    this->zindoF0dd = 0.0;              
