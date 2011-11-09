@@ -309,19 +309,19 @@ void Cndo2::SetEnableAtomTypes(){
    this->enableAtomTypes.clear();
    this->enableAtomTypes.push_back(H);
    this->enableAtomTypes.push_back(Li);
-   this->enableAtomTypes.push_back(Be);
-   this->enableAtomTypes.push_back(B);
+   //this->enableAtomTypes.push_back(Be);
+   //this->enableAtomTypes.push_back(B);
    this->enableAtomTypes.push_back(C);
    this->enableAtomTypes.push_back(N);
    this->enableAtomTypes.push_back(O);
-   this->enableAtomTypes.push_back(F);
-   this->enableAtomTypes.push_back(Na);
-   this->enableAtomTypes.push_back(Mg);
-   this->enableAtomTypes.push_back(Al);
-   this->enableAtomTypes.push_back(Si);
-   this->enableAtomTypes.push_back(P);
+   //this->enableAtomTypes.push_back(F);
+   //this->enableAtomTypes.push_back(Na);
+   //this->enableAtomTypes.push_back(Mg);
+   //this->enableAtomTypes.push_back(Al);
+   //this->enableAtomTypes.push_back(Si);
+   //this->enableAtomTypes.push_back(P);
    this->enableAtomTypes.push_back(S);
-   this->enableAtomTypes.push_back(Cl);
+   //this->enableAtomTypes.push_back(Cl);
 }
 
 TheoryType Cndo2::GetTheoryType(){
@@ -1045,10 +1045,12 @@ double Cndo2::GetFockDiagElement(Atom* atomA, int atomAIndex, int mu,
                                  double****** twoElecTwoCore, bool isGuess){
    double value;
    int firstAOIndexA = atomA->GetFirstAOIndex();
-   value = -1.0 * atomA->GetImuAmu(atomA->GetValence()[mu-firstAOIndexA]);
+   value = atomA->GetCoreIntegral(atomA->GetValence()[mu-firstAOIndexA], 
+                                     gammaAB[atomAIndex][atomAIndex], 
+                                     isGuess, this->theory);
    if(!isGuess){
-      double temp = atomicElectronPopulation[atomAIndex] - atomA->GetCoreCharge() 
-                            -0.5*( orbitalElectronPopulation[mu][mu] -1.0  );
+      double temp = atomicElectronPopulation[atomAIndex] 
+                   -0.5*orbitalElectronPopulation[mu][mu];
       value += temp*gammaAB[atomAIndex][atomAIndex];
 
       temp = 0.0;

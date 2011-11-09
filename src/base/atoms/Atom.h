@@ -29,7 +29,6 @@ public:
    void SetFirstAOIndex(int firstAOIndex);
    ShellType GetValenceShellType();
    int GetNumberValenceElectrons();
-   double GetImuAmu(OrbitalType orbitalType);  // return 0.5*(I_mu + A_mu)
    double GetOrbitalExponent(ShellType shellType, OrbitalType orbitalType, TheoryType theory);  // See (1.73) in J. A. Pople book for CNDO, INDO, and ZINDOS. See [BT_1977] for MNDO. See [DZHS_1985, DY_1990] for AM1. See [S_1989] for PM3.
    double GetCoreIntegral(OrbitalType orbital, double gamma, bool isGuess, TheoryType theory); // P82 - 83 in J. A. Pople book for INDO or Eq. (13) in [BZ_1979] for ZINDO/S. See [BT_1977] for MNDO. See [DZHS_1985, DY_1990] for AM1. See [S_1989] for PM3.
    double GetCoreIntegral(OrbitalType orbital, bool isGuess, TheoryType theory);
@@ -90,7 +89,6 @@ protected:
    double effectiveNuclearChargeL;      // Table 1.5 in J. A. Pople book or table 1 in [HKLWNZ_1982]
    double effectiveNuclearChargeMsp;    // Table 1.5 in J. A. Pople book
    double effectiveNuclearChargeMd;     // Table 1.5 in J. A. Pople book
-   int GetEffectivePrincipalQuantumNumber(ShellType shellType); // Table 1.4 in J. A. Pople book
    double indoF2;                   // Table 3.6 in J. A. Pople book
    double indoG1;                   // Table 3.6 in J. A. Pople book
    double indoF0CoefficientS;       // (3.93-3.99) in J. A. Pople book
@@ -168,20 +166,15 @@ protected:
    double pm3ParameterK[4];// Table II in ref. [S_1989].
    double pm3ParameterL[4];// Table II in ref. [S_1989].
    double pm3ParameterM[4];// Table II in ref. [S_1989].
-   double GetIndoCoreIntegral(OrbitalType orbital, double gamma, bool isGuess);
-   double GetZindoCoreIntegral(OrbitalType orbital); // Eq. (13) in [BZ_1979]
-   double GetMndoCoreIntegral(OrbitalType orbital); 
-   double GetAm1CoreIntegral(OrbitalType orbital); 
-   double GetPm3CoreIntegral(OrbitalType orbital); 
 private:
    void SetMessages();
    string errorMessageIonPot;
    string errorMessageAtomType;
    string errorMessageOrbitalType;
-   string errorMessageImuAmu;
    string errorMessageOrbitalExponent;
    string errorMessageShellType;
    string errorMessageEffectivPrincipalQuantumNumber;
+   string errorMessageCndo2CoreIntegral;
    string errorMessageIndoCoreIntegral;
    string errorMessageZindoCoreIntegral;
    string errorMessageMndoCoreIntegral;
@@ -212,13 +205,19 @@ private:
    string errorMessageGetNddoGpp2BadTheory;
    string errorMessageGetNddoHspBadTheory;
    string errorMessageGetNddoHppBadTheory;
+   int GetEffectivePrincipalQuantumNumber(ShellType shellType); // Table 1.4 in J. A. Pople book
    double GetJss();  // Part of Eq. (13) in [BZ_1979]
    double GetJsp();  // Part of Eq. (13) in [BZ_1979]
    double GetJsd();  // Part of Eq. (13) in [BZ_1979]
    double GetJpp();  // Part of Eq. (13) in [BZ_1979]
    double GetJpd();  // Part of Eq. (13) in [BZ_1979]
    double GetJdd();  // Part of Eq. (13) in [BZ_1979]
-
+   double GetCndo2CoreIntegral(OrbitalType orbital, double gamma, bool isGuess);
+   double GetIndoCoreIntegral(OrbitalType orbital, double gamma, bool isGuess);
+   double GetZindoCoreIntegral(OrbitalType orbital); // Eq. (13) in [BZ_1979]
+   double GetMndoCoreIntegral(OrbitalType orbital); 
+   double GetAm1CoreIntegral(OrbitalType orbital); 
+   double GetPm3CoreIntegral(OrbitalType orbital); 
 };
 
 Atom::Atom(){
@@ -247,8 +246,8 @@ Atom::~Atom(){
 }
 
 void Atom::SetMessages(){
-   this->errorMessageImuAmu = "Error in base_atoms::Atom::GetImuAmu: Invalid orbitalType.\n";
    this->errorMessageOrbitalExponent = "Error in base_atoms::Atom::GetOrbitalExponent: Invalid shelltype or orbitalType.\n";
+   this->errorMessageCndo2CoreIntegral = "Error in base_atoms::Atom::GetCoreIntegral: Invalid orbitalType for Cndo2.\n";
    this->errorMessageIndoCoreIntegral = "Error in base_atoms::Atom::GetCoreIntegral: Invalid orbitalType for INDO.\n";
    this->errorMessageMndoCoreIntegral = "Error in base_atoms::Atom::GetMndoCoreINtegral: Invalid orbitalType for MNDO.\n";
    this->errorMessageAm1CoreIntegral = "Error in base_atoms::Atom::GetAm1CoreINtegral: Invalid orbitalType for AM1.\n";
@@ -434,31 +433,6 @@ int Atom::GetNumberValenceElectrons(){
    return this->numberValenceElectrons;
 }
 
-
-// return 0.5*(I_mu + A_mu)
-double Atom::GetImuAmu(OrbitalType orbitalType){
-   if(orbitalType == s){ 
-      return this->imuAmuS;
-   }   
-   else if(orbitalType == px || orbitalType == py || orbitalType == pz ){
-      return this->imuAmuP;
-   }   
-   else if(orbitalType == dxy || 
-           orbitalType == dyz || 
-           orbitalType == dzz || 
-           orbitalType == dzx || 
-           orbitalType == dxxyy ){
-      return this->imuAmuD;
-   }   
-   else{
-      stringstream ss;
-      ss << errorMessageImuAmu;
-      ss << this->errorMessageAtomType << AtomTypeStr(this->atomType) << "\n";
-      ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbitalType) << "\n";
-      throw MolDSException(ss.str());
-   }   
-}
-
 // (1.73) in J. A. Pople book
 double Atom::GetOrbitalExponent(ShellType shellType, OrbitalType orbitalType, TheoryType theory){
    if(theory == CNDO2 || theory == INDO || theory == ZINDOS){
@@ -591,6 +565,35 @@ double Atom::GetJpd(){
 // Part of Eq. (13) in [BZ_1979]
 double Atom::GetJdd(){
    return this->zindoF0dd - 2.0*(this->zindoF2dd + this->zindoF4dd)/63.0;
+}
+
+// (3.72) in J. A. Pople book.
+double Atom::GetCndo2CoreIntegral(OrbitalType orbital, double gamma, bool isGuess){
+   double value = 0.0;
+   if(orbital == s){
+      value = -1.0*this->imuAmuS;
+   }
+   else if(orbital == px || orbital == py || orbital == pz){
+      value = -1.0*this->imuAmuP;
+   }
+   else if(orbital == dxy || 
+           orbital == dyz || 
+           orbital == dzz || 
+           orbital == dzx || 
+           orbital == dxxyy ){
+      value = -1.0*this->imuAmuD;
+   }   
+   else{
+      stringstream ss;
+      ss << this->errorMessageCndo2CoreIntegral;
+      ss << this->errorMessageAtomType << AtomTypeStr(this->atomType) << endl;
+      ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbital) << endl;
+      throw MolDSException(ss.str());
+   }
+   if(!isGuess){
+      value -= (this->coreCharge - 0.5)*gamma;
+   }
+   return value;
 }
 
 // (3.93) - (3.99) in J. A. Pople book.
@@ -1098,7 +1101,10 @@ double Atom::GetCoreIntegral(OrbitalType orbital,
                              bool isGuess, 
                              TheoryType theory){
    double value = 0.0;
-   if(theory == INDO){
+   if(theory == CNDO2){
+      value = this->GetCndo2CoreIntegral(orbital, gamma, isGuess);
+   }
+   else if(theory == INDO){
       value = this->GetIndoCoreIntegral(orbital, gamma, isGuess);
    }
    else if(theory == ZINDOS){
