@@ -15,6 +15,9 @@ private:
 Satom::Satom(double x, double y, double z) : Atom(x, y, z){
    this->atomType = S;
    this->atomicMass = 32.066*Parameters::GetInstance()->GetGMolin2AU();
+   this->coreCharge = 6.0;
+   this->numberValenceElectrons = 6;
+   this->valenceShellType = m;
    this->valence.push_back(s);
    this->valence.push_back(py);
    this->valence.push_back(pz);
@@ -28,11 +31,9 @@ Satom::Satom(double x, double y, double z) : Atom(x, y, z){
       this->valence.push_back(dxxyy);
    }
    this->bondingParameter = -18.150*Parameters::GetInstance()->GetEV2AU();
-   this->coreCharge = 6.0;
    this->imuAmuS = 17.650*Parameters::GetInstance()->GetEV2AU();
    this->imuAmuP = 6.989*Parameters::GetInstance()->GetEV2AU();
    this->imuAmuD = 0.713*Parameters::GetInstance()->GetEV2AU();
-   this->valenceShellType = m;
    this->effectiveNuclearChargeK = 15.70;
    this->effectiveNuclearChargeL = 11.85;
    if(Parameters::GetInstance()->GetCurrentTheory() == ZINDOS){
@@ -43,7 +44,6 @@ Satom::Satom(double x, double y, double z) : Atom(x, y, z){
       this->effectiveNuclearChargeMsp = 5.45;
       this->effectiveNuclearChargeMd = 5.45;
    }
-   this->numberValenceElectrons = 6;
    this->indoG1 = 0.267708;
    this->indoF2 = 0.17372;
    this->indoF0CoefficientS = 0.0;

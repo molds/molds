@@ -15,18 +15,18 @@ private:
 Hatom::Hatom(double x, double y, double z) : Atom(x, y, z){
    this->atomType = H;
    this->atomicMass = 1.00794*Parameters::GetInstance()->GetGMolin2AU();
+   this->coreCharge = 1.0;
+   this->numberValenceElectrons = 1;
+   this->valenceShellType = k;
    this->valence.push_back(s);
    this->bondingParameter = -9.0*Parameters::GetInstance()->GetEV2AU();
-   this->coreCharge = 1.0;
    this->imuAmuS = 7.176*Parameters::GetInstance()->GetEV2AU();
    this->imuAmuP = 0.0;
    this->imuAmuD = 0.0;
-   this->valenceShellType = k;
    this->effectiveNuclearChargeK = 1.2; // see P78 in J. A. Pople book
    this->effectiveNuclearChargeL = 0.0;
    this->effectiveNuclearChargeMsp = 0.0;
    this->effectiveNuclearChargeMd = 0.0;
-   this->numberValenceElectrons = 1;
    this->indoG1 = 0.0;
    this->indoF2 = 0.0;
    this->indoF0CoefficientS = 0.5;

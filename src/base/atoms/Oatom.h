@@ -15,6 +15,9 @@ private:
 Oatom::Oatom(double x, double y, double z) : Atom(x, y, z){
    this->atomType = O;
    this->atomicMass = 15.9994*Parameters::GetInstance()->GetGMolin2AU();
+   this->coreCharge = 6.0;
+   this->numberValenceElectrons = 6;
+   this->valenceShellType = l;
    this->valence.push_back(s);
    this->valence.push_back(py);
    this->valence.push_back(pz);
@@ -23,12 +26,10 @@ Oatom::Oatom(double x, double y, double z) : Atom(x, y, z){
    this->imuAmuS = 25.390*Parameters::GetInstance()->GetEV2AU();
    this->imuAmuP = 9.111*Parameters::GetInstance()->GetEV2AU();
    this->imuAmuD = 0.0;
-   this->valenceShellType = l;
    this->effectiveNuclearChargeK = 7.70;
    this->effectiveNuclearChargeL = 4.55;
    this->effectiveNuclearChargeMsp = 0.0;
    this->effectiveNuclearChargeMd = 0.0;
-   this->numberValenceElectrons = 6;
    this->indoG1 = 0.346029;
    this->indoF2 = 0.219055;
    this->indoF0CoefficientS = (this->coreCharge - 0.5);
@@ -39,7 +40,6 @@ Oatom::Oatom(double x, double y, double z) : Atom(x, y, z){
    this->indoF2CoefficientP = -2.0*(this->coreCharge - 2.5)/25.0;
    this->zindoBondingParameterS = -34.0*Parameters::GetInstance()->GetEV2AU();
    this->zindoBondingParameterD = 0.0;
-   this->coreCharge = 6.0;
    this->zindoF0ss = 13.00 * Parameters::GetInstance()->GetEV2AU();                  
    this->zindoF0sd = 0.0;                   
    this->zindoF0dd = 0.0;                  

@@ -15,21 +15,21 @@ private:
 Natom::Natom(double x, double y, double z) : Atom(x, y, z){
    this->atomType = N;
    this->atomicMass = 14.00674*Parameters::GetInstance()->GetGMolin2AU();
+   this->coreCharge = 5.0;
+   this->numberValenceElectrons = 5;
+   this->valenceShellType = l;
    this->valence.push_back(s);
    this->valence.push_back(py);
    this->valence.push_back(pz);
    this->valence.push_back(px);
    this->bondingParameter = -25.0*Parameters::GetInstance()->GetEV2AU();
-   this->coreCharge = 5.0;
    this->imuAmuS = 19.316*Parameters::GetInstance()->GetEV2AU();
    this->imuAmuP = 7.275*Parameters::GetInstance()->GetEV2AU();
    this->imuAmuD = 0.0;
-   this->valenceShellType = l;
    this->effectiveNuclearChargeK = 6.7;
    this->effectiveNuclearChargeL = 3.90;
    this->effectiveNuclearChargeMsp = 0.0;
    this->effectiveNuclearChargeMd = 0.0;
-   this->numberValenceElectrons = 5;
    this->indoG1 = 0.346029;
    this->indoF2 = 0.219055;
    this->indoF0CoefficientS = (this->coreCharge - 0.5);

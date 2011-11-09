@@ -15,21 +15,21 @@ private:
 Liatom::Liatom(double x, double y, double z) : Atom(x, y, z){
    this->atomType = Li;
    this->atomicMass = 6.941*Parameters::GetInstance()->GetGMolin2AU();
+   this->coreCharge = 1.0;
+   this->numberValenceElectrons = 1;
+   this->valenceShellType = l;
    this->valence.push_back(s);
    this->valence.push_back(py);
    this->valence.push_back(pz);
    this->valence.push_back(px);
    this->bondingParameter = -9.0*Parameters::GetInstance()->GetEV2AU();
-   this->coreCharge = 1.0;
    this->imuAmuS = 3.106*Parameters::GetInstance()->GetEV2AU();
    this->imuAmuP = 1.258*Parameters::GetInstance()->GetEV2AU();
    this->imuAmuD = 0.0;
-   this->valenceShellType = l;
    this->effectiveNuclearChargeK = 2.7;
    this->effectiveNuclearChargeL = 1.3;
    this->effectiveNuclearChargeMsp = 0.0;
    this->effectiveNuclearChargeMd = 0.0;
-   this->numberValenceElectrons = 1;
    this->indoG1 = 0.092012;
    this->indoF2 = 0.049865;
    this->indoF0CoefficientS = 0.5;

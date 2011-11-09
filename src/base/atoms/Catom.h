@@ -15,21 +15,21 @@ private:
 Catom::Catom(double x, double y, double z) : Atom(x, y, z){
    this->atomType = C;
    this->atomicMass = 12.0107*Parameters::GetInstance()->GetGMolin2AU();
+   this->coreCharge = 4.0;
+   this->numberValenceElectrons = 4;
+   this->valenceShellType = l;
    this->valence.push_back(s);
    this->valence.push_back(py);
    this->valence.push_back(pz);
    this->valence.push_back(px);
    this->bondingParameter = -21.0*Parameters::GetInstance()->GetEV2AU();
-   this->coreCharge = 4.0;
    this->imuAmuS = 14.051*Parameters::GetInstance()->GetEV2AU();
    this->imuAmuP = 5.572*Parameters::GetInstance()->GetEV2AU();
    this->imuAmuD = 0.0;
-   this->valenceShellType = l;
    this->effectiveNuclearChargeK = 5.7;
    this->effectiveNuclearChargeL = 3.25;
    this->effectiveNuclearChargeMsp = 0.0;
    this->effectiveNuclearChargeMd = 0.0;
-   this->numberValenceElectrons = 4;
    this->indoG1 = 0.267708;
    this->indoF2 = 0.17372;
    this->indoF0CoefficientS = (this->coreCharge - 0.5);
