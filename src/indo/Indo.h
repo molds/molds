@@ -79,12 +79,12 @@ void Indo::SetEnableAtomTypes(){
    this->enableAtomTypes.clear();
    this->enableAtomTypes.push_back(H);
    this->enableAtomTypes.push_back(Li);
-   this->enableAtomTypes.push_back(Be);
-   this->enableAtomTypes.push_back(B);
+   //this->enableAtomTypes.push_back(Be);
+   //this->enableAtomTypes.push_back(B);
    this->enableAtomTypes.push_back(C);
    this->enableAtomTypes.push_back(N);
    this->enableAtomTypes.push_back(O);
-   this->enableAtomTypes.push_back(F);
+   //this->enableAtomTypes.push_back(F);
 }
 
 double Indo::GetFockDiagElement(Atom* atomA, int atomAIndex, int mu, 

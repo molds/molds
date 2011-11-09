@@ -35,6 +35,12 @@ Liatom::Liatom(double x, double y, double z) : Atom(x, y, z){
    this->numberValenceElectrons = 1;
    this->indoG1 = 0.092012;
    this->indoF2 = 0.049865;
+   this->indoF0CoefficientS = 0.5;
+   this->indoF0CoefficientP = 0.5;
+   this->indoG1CoefficientS = 0.0;
+   this->indoG1CoefficientP = -1.0/12.0;
+   this->indoF2CoefficientS = 0.0;
+   this->indoF2CoefficientP = 0.0;
    this->zindoF0ss = 0.0;
    this->zindoF0sd = 0.0;        
    this->zindoF0dd = 0.0;              
@@ -46,6 +52,9 @@ Liatom::Liatom(double x, double y, double z) : Atom(x, y, z){
    this->zindoG3pd = 0.0;             
    this->zindoF2dd = 0.0;             
    this->zindoF4dd = 0.0;       
+   this->zindoL = 1;
+   this->zindoM = 0;
+   this->zindoN = 0;
    this->ionPotS = 5.39 * Parameters::GetInstance()->GetEV2AU();
    this->ionPotP = 3.54 * Parameters::GetInstance()->GetEV2AU();
    this->ionPotD = 0.0 * Parameters::GetInstance()->GetEV2AU();
@@ -59,13 +68,17 @@ double Liatom::GetCoreIntegral(OrbitalType orbital, double gamma, bool isGuess, 
       if(orbital == s){
          value = -1.0*this->imuAmuS;
          if(!isGuess){
-            value -= 0.5*gamma;
+            value -= this->indoF0CoefficientS*gamma 
+                    +this->indoG1CoefficientS*this->indoG1
+                    +this->indoF2CoefficientS*this->indoF2;
          }
       }
       else if(orbital == px || orbital == py || orbital == pz){
          value = -1.0*this->imuAmuP;
          if(!isGuess){
-            value -= 0.5*gamma - this->indoG1/12.0;
+            value -= this->indoF0CoefficientP*gamma 
+                    +this->indoG1CoefficientP*this->indoG1
+                    +this->indoF2CoefficientP*this->indoF2;
          }
       }
       else{
@@ -77,11 +90,7 @@ double Liatom::GetCoreIntegral(OrbitalType orbital, double gamma, bool isGuess, 
       }
    }
    else if(theory == ZINDOS){
-      stringstream ss;
-      ss << this->errorMessageZindoSCoreIntegral;
-      ss << this->errorMessageAtomType << AtomTypeStr(this->atomType) << endl;
-      ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbital) << endl;
-      throw MolDSException(ss.str());
+      value = this->GetZindoCoreIntegral(orbital);
    }
 
    return value;

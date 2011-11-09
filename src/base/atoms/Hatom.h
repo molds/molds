@@ -32,6 +32,12 @@ Hatom::Hatom(double x, double y, double z) : Atom(x, y, z){
    this->numberValenceElectrons = 1;
    this->indoG1 = 0.0;
    this->indoF2 = 0.0;
+   this->indoF0CoefficientS = 0.5;
+   this->indoF0CoefficientP = 0.0;
+   this->indoG1CoefficientS = 0.0;
+   this->indoG1CoefficientP = 0.0;
+   this->indoF2CoefficientS = 0.0;
+   this->indoF2CoefficientP = 0.0;
    this->zindoF0ss = 12.85 * Parameters::GetInstance()->GetEV2AU();                  
    this->zindoF0sd = 0.0;                   
    this->zindoF0dd = 0.0;                  
@@ -43,6 +49,9 @@ Hatom::Hatom(double x, double y, double z) : Atom(x, y, z){
    this->zindoG3pd = 0.0;                 
    this->zindoF2dd = 0.0;                 
    this->zindoF4dd = 0.0;                 
+   this->zindoL = 1;
+   this->zindoM = 0;
+   this->zindoN = 0;
    this->ionPotS = 13.06 * Parameters::GetInstance()->GetEV2AU();
    this->ionPotP = 0.0 * Parameters::GetInstance()->GetEV2AU();
    this->ionPotD = 0.0 * Parameters::GetInstance()->GetEV2AU();
@@ -136,7 +145,17 @@ double Hatom::GetCoreIntegral(OrbitalType orbital, double gamma, bool isGuess, T
       if(orbital == s){
          value = -1.0*this->imuAmuS;
          if(!isGuess){
-            value -= 0.5*gamma;
+            value -= this->indoF0CoefficientS*gamma 
+                    +this->indoG1CoefficientS*this->indoG1
+                    +this->indoF2CoefficientS*this->indoF2;
+         }
+      }
+      else if(orbital == px || orbital == py || orbital == pz){
+         value = -1.0*this->imuAmuP;
+         if(!isGuess){
+            value -= this->indoF0CoefficientP*gamma 
+                    +this->indoG1CoefficientP*this->indoG1
+                    +this->indoF2CoefficientP*this->indoF2;
          }
       }
       else{
@@ -148,16 +167,7 @@ double Hatom::GetCoreIntegral(OrbitalType orbital, double gamma, bool isGuess, T
       }
    }
    else if(theory == ZINDOS){
-      if(orbital == s){
-         value = this->GetZindoCoreIntegral(orbital, 1, 0, 0);
-      }
-      else{
-         stringstream ss;
-         ss << this->errorMessageZindoSCoreIntegral;
-         ss << this->errorMessageAtomType << AtomTypeStr(this->atomType) << endl;
-         ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbital) << endl;
-         throw MolDSException(ss.str());
-      }
+      value = this->GetZindoCoreIntegral(orbital);
    }
    else if(theory == MNDO){
       value = this->GetMndoCoreIntegral(orbital);

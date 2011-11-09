@@ -100,6 +100,12 @@ protected:
    int GetEffectivePrincipalQuantumNumber(ShellType shellType); // Table 1.4 in J. A. Pople book
    double indoF2;                   // Table 3.6 in J. A. Pople book
    double indoG1;                   // Table 3.6 in J. A. Pople book
+   double indoF0CoefficientS;       // (3.93-3.99) in J. A. Pople book
+   double indoF0CoefficientP;       // (3.93-3.99) in J. A. Pople book
+   double indoG1CoefficientS;       // (3.93-3.99) in J. A. Pople book
+   double indoG1CoefficientP;       // (3.93-3.99) in J. A. Pople book
+   double indoF2CoefficientS;       // (3.93-3.99) in J. A. Pople book
+   double indoF2CoefficientP;       // (3.93-3.99) in J. A. Pople book
    double zindoF0ss;                // Table 1 in ref. [RZ_1976], Table 1 in [AEZ_1986], or Table 1 in [GD_1972]
    double zindoF0sd;                  // Table 1 in [AEZ_1986]
    double zindoF0dd;                  // Table 1 in [AEZ_1986]
@@ -111,6 +117,9 @@ protected:
    double zindoG3pd;                 // Table 3 in ref. [BZ_1979] or table 1 in [HKLWNZ_1982]
    double zindoF2dd;                 // Table 3 in ref. [BZ_1979] or table 1 in [HKLWNZ_1982]
    double zindoF4dd;                 // Table 3 in ref. [BZ_1979] or table 1 in [HKLWNZ_1982]
+   int zindoL;              // see l of (13) in [BZ_1979]
+   int zindoM;              // see m of (13) in [BZ_1979]
+   int zindoN;              // see n (13) in [BZ_1979]
    double ionPotS;   // Ionization potential, Table 4 in [BZ_1979]
    double ionPotP;   // Ionization potential, Table 4 in [BZ_1979]
    double ionPotD;   // Ionization potential, Table 4 in [BZ_1979]
@@ -164,7 +173,7 @@ protected:
    double pm3ParameterK[4];// Table II in ref. [S_1989].
    double pm3ParameterL[4];// Table II in ref. [S_1989].
    double pm3ParameterM[4];// Table II in ref. [S_1989].
-   double GetZindoCoreIntegral(OrbitalType orbital, int l, int m, int n); // Eq. (13) in [BZ_1979]
+   double GetZindoCoreIntegral(OrbitalType orbital); // Eq. (13) in [BZ_1979]
    double GetMndoCoreIntegral(OrbitalType orbital); 
    double GetAm1CoreIntegral(OrbitalType orbital); 
    double GetPm3CoreIntegral(OrbitalType orbital); 
@@ -586,26 +595,26 @@ double Atom::GetJdd(){
 }
 
 // Eq. (13) in [BZ_1979]
-double Atom::GetZindoCoreIntegral(OrbitalType orbital, int l, int m, int n){
+double Atom::GetZindoCoreIntegral(OrbitalType orbital){
    double value=0.0;
 
    if(orbital == s){
       value = -1.0*this->ionPotS 
-              - this->GetJss()*(double)(l-1) 
-              - this->GetJsp()*(double)m 
-              - this->GetJsd()*(double)n;
+              - this->GetJss()*(double)(this->zindoL-1) 
+              - this->GetJsp()*(double)this->zindoM
+              - this->GetJsd()*(double)this->zindoN;
    }
    else if(orbital == px || orbital == py || orbital == pz){
       value = -1.0*this->ionPotP
-              - this->GetJpp()*(double)(m-1) 
-              - this->GetJsp()*(double)l
-              - this->GetJpd()*(double)n;
+              - this->GetJpp()*(double)(this->zindoM-1) 
+              - this->GetJsp()*(double)this->zindoL
+              - this->GetJpd()*(double)this->zindoN;
    }
    else if(orbital == dxy || orbital == dyz || orbital == dzz || orbital == dzx || orbital == dxxyy ){
       value = -1.0*this->ionPotD
-              - this->GetJdd()*(double)(n-1) 
-              - this->GetJsd()*(double)l
-              - this->GetJpd()*(double)m;
+              - this->GetJdd()*(double)(this->zindoN-1) 
+              - this->GetJsd()*(double)this->zindoL
+              - this->GetJpd()*(double)this->zindoM;
    }
    else{
       stringstream ss;

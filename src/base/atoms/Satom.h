@@ -49,6 +49,12 @@ Satom::Satom(double x, double y, double z) : Atom(x, y, z){
    this->numberValenceElectrons = 6;
    this->indoG1 = 0.267708;
    this->indoF2 = 0.17372;
+   this->indoF0CoefficientS = 0.0;
+   this->indoF0CoefficientP = 0.0;
+   this->indoG1CoefficientS = 0.0;
+   this->indoG1CoefficientP = 0.0;
+   this->indoF2CoefficientS = 0.0;
+   this->indoF2CoefficientP = 0.0;
    // the zindoF0ss for sulfer atoms are set to be equal 
    // to the one (10.09eV) in "ORCA 2.8"( http://www.thch.uni-bonn.de/tc/orca/ ).
    this->zindoF0ss = 10.09 * Parameters::GetInstance()->GetEV2AU(); 
@@ -71,6 +77,9 @@ Satom::Satom(double x, double y, double z) : Atom(x, y, z){
    //this->zindoG3pd = 20587*Parameters::GetInstance()->GetKayser2AU();           
    //this->zindoF2dd = 28411*Parameters::GetInstance()->GetKayser2AU();           
    //this->zindoF4dd = 18529*Parameters::GetInstance()->GetKayser2AU();           
+   this->zindoL = 2;
+   this->zindoM = 4;
+   this->zindoN = 0;
    this->ionPotS = 21.11 * Parameters::GetInstance()->GetEV2AU();
    this->ionPotP = 12.39 * Parameters::GetInstance()->GetEV2AU();
    this->ionPotD = 4.11 * Parameters::GetInstance()->GetEV2AU();
@@ -158,28 +167,33 @@ Satom::Satom(double x, double y, double z) : Atom(x, y, z){
 
 double Satom::GetCoreIntegral(OrbitalType orbital, double gamma, bool isGuess, TheoryType theory){
    double value = 0.0;
-
    if(theory == INDO){
-      stringstream ss;
-      ss << this->errorMessageIndoCoreIntegral;
-      ss << this->errorMessageAtomType << AtomTypeStr(this->atomType) << endl;
-      ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbital) << endl;
-      throw MolDSException(ss.str());
-   }
-   else if(theory == ZINDOS){
       if(orbital == s){
-         value = this->GetZindoCoreIntegral(orbital, 2, 4, 0);
+         value = -1.0*this->imuAmuS;
+         if(!isGuess){
+            value -= this->indoF0CoefficientS*gamma 
+                    +this->indoG1CoefficientS*this->indoG1
+                    +this->indoF2CoefficientS*this->indoF2;
+         }
       }
       else if(orbital == px || orbital == py || orbital == pz){
-         value = this->GetZindoCoreIntegral(orbital, 2, 4, 0);
+         value = -1.0*this->imuAmuP;
+         if(!isGuess){
+            value -= this->indoF0CoefficientP*gamma 
+                    +this->indoG1CoefficientP*this->indoG1
+                    +this->indoF2CoefficientP*this->indoF2;
+         }
       }
       else{
          stringstream ss;
-         ss << this->errorMessageZindoSCoreIntegral;
+         ss << this->errorMessageIndoCoreIntegral;
          ss << this->errorMessageAtomType << AtomTypeStr(this->atomType) << endl;
          ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbital) << endl;
          throw MolDSException(ss.str());
       }
+   }
+   else if(theory == ZINDOS){
+      value = this->GetZindoCoreIntegral(orbital);
    }
    else if(theory == MNDO){
       value = this->GetMndoCoreIntegral(orbital);
@@ -190,8 +204,6 @@ double Satom::GetCoreIntegral(OrbitalType orbital, double gamma, bool isGuess, T
    else if(theory == PM3){
       value = this->GetPm3CoreIntegral(orbital);
    }
-
-
    return value;
 }
 

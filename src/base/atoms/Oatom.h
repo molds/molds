@@ -35,6 +35,12 @@ Oatom::Oatom(double x, double y, double z) : Atom(x, y, z){
    this->numberValenceElectrons = 6;
    this->indoG1 = 0.346029;
    this->indoF2 = 0.219055;
+   this->indoF0CoefficientS = (this->coreCharge - 0.5);
+   this->indoF0CoefficientP = (this->coreCharge - 0.5);
+   this->indoG1CoefficientS = -1.0*(this->coreCharge - 1.5)/6.0;
+   this->indoG1CoefficientP = -1.0/3.0;
+   this->indoF2CoefficientS = 0.0;
+   this->indoF2CoefficientP = -2.0*(this->coreCharge - 2.5)/25.0;
    this->zindoF0ss = 13.00 * Parameters::GetInstance()->GetEV2AU();                  
    this->zindoF0sd = 0.0;                   
    this->zindoF0dd = 0.0;                  
@@ -46,6 +52,9 @@ Oatom::Oatom(double x, double y, double z) : Atom(x, y, z){
    this->zindoG3pd = 0.0;                 
    this->zindoF2dd = 0.0;                 
    this->zindoF4dd = 0.0;                 
+   this->zindoL = 2;
+   this->zindoM = 4;
+   this->zindoN = 0;
    this->ionPotS = 32.90 * Parameters::GetInstance()->GetEV2AU();
    this->ionPotP = 17.28 * Parameters::GetInstance()->GetEV2AU();
    this->ionPotD = 0.0 * Parameters::GetInstance()->GetEV2AU();
@@ -144,15 +153,17 @@ double Oatom::GetCoreIntegral(OrbitalType orbital, double gamma, bool isGuess, T
       if(orbital == s){
          value = -1.0*this->imuAmuS;
          if(!isGuess){
-            value -= (this->coreCharge-0.5)*gamma - (this->coreCharge - 1.5)*this->indoG1/6.0;
+            value -= this->indoF0CoefficientS*gamma 
+                    +this->indoG1CoefficientS*this->indoG1
+                    +this->indoF2CoefficientS*this->indoF2;
          }
       }
       else if(orbital == px || orbital == py || orbital == pz){
          value = -1.0*this->imuAmuP;
          if(!isGuess){
-            value -= (this->coreCharge-0.5)*gamma 
-                    - this->indoG1/3.0 
-                    - (this->coreCharge - 2.5)*this->indoF2*2.0/25.0;
+            value -= this->indoF0CoefficientP*gamma 
+                    +this->indoG1CoefficientP*this->indoG1
+                    +this->indoF2CoefficientP*this->indoF2;
          }
       }
       else{
@@ -164,19 +175,7 @@ double Oatom::GetCoreIntegral(OrbitalType orbital, double gamma, bool isGuess, T
       }
    }
    else if(theory == ZINDOS){
-      if(orbital == s){
-         value = this->GetZindoCoreIntegral(orbital, 2, 4, 0);
-      }
-      else if(orbital == px || orbital == py || orbital == pz){
-         value = this->GetZindoCoreIntegral(orbital, 2, 4, 0);
-      }
-      else{
-         stringstream ss;
-         ss << this->errorMessageZindoSCoreIntegral;
-         ss << this->errorMessageAtomType << AtomTypeStr(this->atomType) << endl;
-         ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbital) << endl;
-         throw MolDSException(ss.str());
-      }
+      value = this->GetZindoCoreIntegral(orbital);
    }
    else if(theory == MNDO){
       value = this->GetMndoCoreIntegral(orbital);
