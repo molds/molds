@@ -206,12 +206,12 @@ private:
    string errorMessageGetNddoHspBadTheory;
    string errorMessageGetNddoHppBadTheory;
    int GetEffectivePrincipalQuantumNumber(ShellType shellType); // Table 1.4 in J. A. Pople book
-   double GetJss();  // Part of Eq. (13) in [BZ_1979]
-   double GetJsp();  // Part of Eq. (13) in [BZ_1979]
-   double GetJsd();  // Part of Eq. (13) in [BZ_1979]
-   double GetJpp();  // Part of Eq. (13) in [BZ_1979]
-   double GetJpd();  // Part of Eq. (13) in [BZ_1979]
-   double GetJdd();  // Part of Eq. (13) in [BZ_1979]
+   double GetZindoJss();  // Part of Eq. (13) in [BZ_1979]
+   double GetZindoJsp();  // Part of Eq. (13) in [BZ_1979]
+   double GetZindoJsd();  // Part of Eq. (13) in [BZ_1979]
+   double GetZindoJpp();  // Part of Eq. (13) in [BZ_1979]
+   double GetZindoJpd();  // Part of Eq. (13) in [BZ_1979]
+   double GetZindoJdd();  // Part of Eq. (13) in [BZ_1979]
    double GetCndo2CoreIntegral(OrbitalType orbital, double gamma, bool isGuess);
    double GetIndoCoreIntegral(OrbitalType orbital, double gamma, bool isGuess);
    double GetZindoCoreIntegral(OrbitalType orbital); // Eq. (13) in [BZ_1979]
@@ -535,35 +535,35 @@ double Atom::GetOrbitalExponent(ShellType shellType, OrbitalType orbitalType, Th
 
 
 // Part of Eq. (13) in [BZ_1979]
-double Atom::GetJss(){
+double Atom::GetZindoJss(){
    return this->zindoF0ss;
 }
 
 // Part of Eq. (13) in [BZ_1979]
-double Atom::GetJsp(){
+double Atom::GetZindoJsp(){
    // F0ss = F0sp
    return this->zindoF0ss - this->zindoG1sp/6.0;
 }
 
 // Part of Eq. (13) in [BZ_1979]
-double Atom::GetJsd(){
+double Atom::GetZindoJsd(){
    return this->zindoF0sd - this->zindoG2sd/10.0;
 }
 
 // Part of Eq. (13) in [BZ_1979]
-double Atom::GetJpp(){
+double Atom::GetZindoJpp(){
    // F0pp = F0ss
    return this->zindoF0ss - 2.0*this->zindoF2pp/25.0;
 }
 
 // Part of Eq. (13) in [BZ_1979]
-double Atom::GetJpd(){
+double Atom::GetZindoJpd(){
    // F0pd = F0sd
    return this->zindoF0sd - this->zindoG1pd/15.0 - 3.0*this->zindoG3pd/70.0;
 }
 
 // Part of Eq. (13) in [BZ_1979]
-double Atom::GetJdd(){
+double Atom::GetZindoJdd(){
    return this->zindoF0dd - 2.0*(this->zindoF2dd + this->zindoF4dd)/63.0;
 }
 
@@ -632,21 +632,21 @@ double Atom::GetZindoCoreIntegral(OrbitalType orbital){
 
    if(orbital == s){
       value = -1.0*this->zindoIonPotS 
-              - this->GetJss()*(double)(this->zindoL-1) 
-              - this->GetJsp()*(double)this->zindoM
-              - this->GetJsd()*(double)this->zindoN;
+              - this->GetZindoJss()*(double)(this->zindoL-1) 
+              - this->GetZindoJsp()*(double)this->zindoM
+              - this->GetZindoJsd()*(double)this->zindoN;
    }
    else if(orbital == px || orbital == py || orbital == pz){
       value = -1.0*this->zindoIonPotP
-              - this->GetJpp()*(double)(this->zindoM-1) 
-              - this->GetJsp()*(double)this->zindoL
-              - this->GetJpd()*(double)this->zindoN;
+              - this->GetZindoJpp()*(double)(this->zindoM-1) 
+              - this->GetZindoJsp()*(double)this->zindoL
+              - this->GetZindoJpd()*(double)this->zindoN;
    }
    else if(orbital == dxy || orbital == dyz || orbital == dzz || orbital == dzx || orbital == dxxyy ){
       value = -1.0*this->zindoIonPotD
-              - this->GetJdd()*(double)(this->zindoN-1) 
-              - this->GetJsd()*(double)this->zindoL
-              - this->GetJpd()*(double)this->zindoM;
+              - this->GetZindoJdd()*(double)(this->zindoN-1) 
+              - this->GetZindoJsd()*(double)this->zindoL
+              - this->GetZindoJpd()*(double)this->zindoM;
    }
    else{
       stringstream ss;
