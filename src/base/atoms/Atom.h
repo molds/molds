@@ -73,11 +73,6 @@ public:
    double GetNddoParameterL(TheoryType theory, int lIndex);//Table I in ref. [DZHS_1985] for H, C, N, O, and Table I in re. [DY_1990] for S for AM1. [S_1989] for PM3.
    double GetNddoParameterM(TheoryType theory, int mIndex);//Table I in ref. [DZHS_1985] for H, C, N, O, and Table I in re. [DY_1990] for S for AM1. [S_1989] for PM3.
 protected:
-   string errorMessageIndoCoreIntegral;
-   string errorMessageZindoSCoreIntegral;
-   string errorMessageIonPot;
-   string errorMessageAtomType;
-   string errorMessageOrbitalType;
    double* xyz; // coordinates
    double* pxyz; // momentum. Note that this is not velocity!! 
    AtomType atomType;
@@ -180,10 +175,14 @@ protected:
    double GetPm3CoreIntegral(OrbitalType orbital); 
 private:
    void SetMessages();
+   string errorMessageIonPot;
+   string errorMessageAtomType;
+   string errorMessageOrbitalType;
    string errorMessageImuAmu;
    string errorMessageOrbitalExponent;
    string errorMessageShellType;
    string errorMessageEffectivPrincipalQuantumNumber;
+   string errorMessageIndoCoreIntegral;
    string errorMessageZindoCoreIntegral;
    string errorMessageMndoCoreIntegral;
    string errorMessageAm1CoreIntegral;
@@ -251,7 +250,6 @@ void Atom::SetMessages(){
    this->errorMessageImuAmu = "Error in base_atoms::Atom::GetImuAmu: Invalid orbitalType.\n";
    this->errorMessageOrbitalExponent = "Error in base_atoms::Atom::GetOrbitalExponent: Invalid shelltype or orbitalType.\n";
    this->errorMessageIndoCoreIntegral = "Error in base_atoms::Atom::GetCoreIntegral: Invalid orbitalType for INDO.\n";
-   this->errorMessageZindoSCoreIntegral = "Error in base_atoms::Atom::GetCoreIntegral: Invalid orbitalType for ZINDO/S.\n";
    this->errorMessageMndoCoreIntegral = "Error in base_atoms::Atom::GetMndoCoreINtegral: Invalid orbitalType for MNDO.\n";
    this->errorMessageAm1CoreIntegral = "Error in base_atoms::Atom::GetAm1CoreINtegral: Invalid orbitalType for AM1.\n";
    this->errorMessagePm3CoreIntegral = "Error in base_atoms::Atom::GetPm3CoreINtegral: Invalid orbitalType for PM3.\n";
