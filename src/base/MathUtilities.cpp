@@ -6,6 +6,7 @@
 #include<stdexcept>
 #include"MolDSException.h"
 #include"Enums.h"
+#include"MathUtilities.h"
 using namespace std;
 
 namespace MolDS_base{
