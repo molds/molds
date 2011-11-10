@@ -14,21 +14,13 @@
 #include"mkl_wrapper/LapackWrapper.h"
 #include"base/Utilities.h"
 #include"base/Enums.h"
-#include"base/MathUtilities.h"
 #include"base/MallocerFreer.h"
 #include"base/EularAngle.h"
 #include"base/Parameters.h"
 #include"base/atoms/Atom.h"
-#include"base/atoms/Hatom.h"
-#include"base/atoms/Liatom.h"
-#include"base/atoms/Catom.h"
-#include"base/atoms/Natom.h"
-#include"base/atoms/Oatom.h"
-#include"base/atoms/Satom.h"
 #include"base/Molecule.h"
 #include"base/InputParser.h"
 #include"base/GTOExpansionSTO.h"
-#include"base/RealSphericalHarmonicsIndex.h"
 #include"cndo/Cndo2.h"
 #include"indo/Indo.h"
 #include"zindo/ZindoS.h"
@@ -38,7 +30,6 @@
 #include"md/MD.h"
 using namespace std;
 using namespace MolDS_base;
-using namespace MolDS_mkl_wrapper;
 
 int main(){
 
@@ -60,7 +51,7 @@ int main(){
       Molecule* molecule = new Molecule();
       MallocerFreer::GetInstance();
       Parameters::GetInstance();
-      LapackWrapper::GetInstance();
+      MolDS_mkl_wrapper::LapackWrapper::GetInstance();
       GTOExpansionSTO::GetInstance();
 
       // Parse input
@@ -158,7 +149,7 @@ int main(){
 
       //Free 
       GTOExpansionSTO::DeleteInstance();
-      LapackWrapper::DeleteInstance(); 
+      MolDS_mkl_wrapper::LapackWrapper::DeleteInstance(); 
       Parameters::DeleteInstance();
       MallocerFreer::DeleteInstance();
       delete molecule;
