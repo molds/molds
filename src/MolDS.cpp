@@ -9,13 +9,10 @@
 #include<vector>
 #include<stdexcept>
 #include<omp.h>
-#include"base/MolDSException.h"
 #include"mkl.h"
+#include"base/MolDSException.h"
 #include"mkl_wrapper/LapackWrapper.h"
 #include"base/Utilities.h"
-#include"base/Enums.h"
-#undef INCLUDED_ENUMS
-#define RENUMSTR_BODY 1  
 #include"base/Enums.h"
 #include"base/MathUtilities.h"
 #include"base/MallocerFreer.h"
@@ -23,10 +20,10 @@
 #include"base/Parameters.h"
 #include"base/atoms/Atom.h"
 #include"base/atoms/Hatom.h"
+#include"base/atoms/Liatom.h"
 #include"base/atoms/Catom.h"
 #include"base/atoms/Natom.h"
 #include"base/atoms/Oatom.h"
-#include"base/atoms/Liatom.h"
 #include"base/atoms/Satom.h"
 #include"base/Molecule.h"
 #include"base/InputParser.h"
@@ -39,13 +36,9 @@
 #include"am1/Am1.h"
 #include"pm3/Pm3.h"
 #include"md/MD.h"
-
-
-
 using namespace std;
 using namespace MolDS_base;
 using namespace MolDS_mkl_wrapper;
-
 
 int main(){
 
@@ -69,7 +62,6 @@ int main(){
       Parameters::GetInstance();
       LapackWrapper::GetInstance();
       GTOExpansionSTO::GetInstance();
-
 
       // Parse input
       try{
@@ -172,7 +164,6 @@ int main(){
       delete molecule;
       InputParser::DeleteInstance();
 
-
       // Farewell Messages
       time_t endTime;
       time(&endTime);
@@ -197,16 +188,4 @@ int main(){
 
    return 0;
 }
-
-
-
-
-
-
-
-
-
-
-
-
 

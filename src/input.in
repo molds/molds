@@ -1,11 +1,11 @@
 // example of the input file
 THEORY
-   cndo/2
+   //cndo/2
    //indo
    //zindo/s
    //mndo
    //am1
-   //pm3
+   pm3
    //none 
    //principal_axes
    //translate
@@ -32,11 +32,11 @@ CIS
    norm_tol 0.000001
 CIS_END
 
-//MD
-//   total_steps 1
-//   electronic_state 0
-//   dt 0.05
-//MD_END
+MD
+   total_steps 1
+   electronic_state 0
+   dt 0.05
+MD_END
 
 //INERTIA
 //   origin 1.0 2.0 30.0
@@ -177,11 +177,11 @@ CIS_END
 //GEOMETRY_END
 
 // h2s
-GEOMETRY
-     S       -0.559299    0.471698    0.000000
-     H        0.750701    0.471698    0.000000
-     H       -0.996586    1.706558    0.000000
-GEOMETRY_END
+//GEOMETRY
+//     S       -0.559299    0.471698    0.000000
+//     H        0.750701    0.471698    0.000000
+//     H       -0.996586    1.706558    0.000000
+//GEOMETRY_END
 
 // h2s-2
 //GEOMETRY
@@ -223,12 +223,12 @@ GEOMETRY_END
 //GEOMETRY_END
 
 // acetylene3
-//GEOMETRY
-// C                     0.24933   0.01  -0.01 
-// C                     1.45053   0.0    0.20 
-// H                    -0.82067   0.02  -0.050 
-// H                     2.52053  -0.10   0.0 
-//GEOMETRY_END
+GEOMETRY
+ C                     0.24933   0.01  -0.01 
+ C                     1.45053   0.0    0.20 
+ H                    -0.82067   0.02  -0.050 
+ H                     2.52053  -0.10   0.0 
+GEOMETRY_END
 
 // C2Li2
 //GEOMETRY
