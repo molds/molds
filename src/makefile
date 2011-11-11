@@ -28,6 +28,7 @@ ifeq ($(wildcard $(DEPFILE)), $(DEPFILE))
 include $(DEPFILE)
 endif
 
+.PHONY : clean
 clean :
 	rm -f $(ALL_OBJ_FILES)
 	rm -f $(EXENAME)
