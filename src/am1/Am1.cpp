@@ -17,7 +17,6 @@
 #include"../base/atoms/Satom.h"
 #include"../base/Molecule.h"
 #include"../cndo/Cndo2.h"
-#include"../indo/Indo.h"
 #include"../zindo/ZindoS.h"
 #include"../mndo/Mndo.h"
 #include"Am1.h"
