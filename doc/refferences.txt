@@ -25,6 +25,8 @@
 [DY_1990] M. J. S. Dewar and Y.-C. Yuan, Inorg. Chem. 29, 3881 (1990)
 [S_1991] J. J. P. Stewart, J. Comp. Chem. 12, 320 (1991)
 [MOPAC_1990] J. J. P. Stewart, J. Computer-Aided Molecular Design 4, 1 (1990)
+[PT_1996] S. Patchkovskii and W. Thiel, Theor. Chim. Acta 93, 87 (1996)
+[PT_1997] S. Patchkovskii and W. Thiel, Theor. Chim. Acta 98, 1 (1997)
 [I_1998] IWANAMI-SHOTEN "IWANAMI RIKAGAKUJITEN", ISBN4-00-080090-6 (1988)
 [S_2004] J. J. P. Stewart, J. Mol. Model. 10, 155 (2004)
 [S_2007] J. J. P. Stewart, J. Mol. Model. 13, 1173 (2007)

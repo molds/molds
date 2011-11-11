@@ -1,12 +1,23 @@
 ==============================================================================
-Compile: 
+Compile(using GNUmake): 
    for 32 bit
-   $icc MolDS.cpp -lmkl_intel -lmkl_intel_thread -lmkl_core -liomp5 -lpthread -O3
-   $icc MolDS.cpp -lmkl_intel -lmkl_intel_thread -lmkl_core -liomp5 -lpthread -O3 -openmp -openmp-report2
+   $make depend INTEL=32
+   $make INTEL=32
 
    for 64 bit
-   $icc MolDS.cpp -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread
-   $icc MolDS.cpp -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread -O3 -openmp -openmp-report2
+   $make depend INTEL=64
+   $make INTEL=64
+   
+   (if you wanna clean the compilation, use "$make clean")
+
+Compile(primitive method): 
+   for 32 bit
+   $icc <MolDS.cpp and all cpp-files> -lmkl_intel -lmkl_intel_thread -lmkl_core -liomp5 -lpthread -O3
+   $icc <MolDS.cpp and all cpp-files> -lmkl_intel -lmkl_intel_thread -lmkl_core -liomp5 -lpthread -O3 -openmp -openmp-report2
+
+   for 64 bit
+   $icc <MolDS.cpp and all cpp-files> -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread
+   $icc <MolDS.cpp and all cpp-files> -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread -O3 -openmp -openmp-report2
 
 ==============================================================================
 Carring Out:
@@ -35,7 +46,7 @@ Capabilities:
 
    Elements:
    CNDO2    | H, Li, C, N, O, and S
-   INDO     | H, Li, C, N, O, and S 
+   INDO     | H, Li, C, N, and O
    ZINDO/S  | H, C, N, O, and S
    MNDO     | H, C, N, O, and S 
    AM1      | H, C, N, O, and S 
