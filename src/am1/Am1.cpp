@@ -71,6 +71,10 @@ void Am1::SetMessages(){
       = "Error in am1::Am1::CalcTwoElecTwoCoreDiatomicFirstDerivatives: The two elec two core diatomic matrix is NULL.\n"; 
    this->errorMessageCalcTwoElecTwoCoreDiatomicFirstDerivativesSameAtoms
       = "Error in am1::Am1::CalcTwoElecTwoCoreDiatomicFirstDerivatives: Atom A and B is same.\n"; 
+   this->errorMessageGetElectronicEnergyEnergyNotCalculated
+      = "Error in am1::Am1::GetElectronicEnergy: Set electronic state is not calculated by CIS.\n";
+   this->errorMessageGetElectronicEnergyNULLCISEnergy 
+      = "Error in am1::Am1::GetElectronicEnergy: excitedEnergies is NULL\n";
    this->messageSCFMetConvergence = "\n\n\n\t\tAM1/S-SCF met convergence criterion(^^b\n\n\n";
    this->messageStartSCF = "**********  START: AM1/S-SCF  **********\n";
    this->messageDoneSCF = "**********  DONE: AM1/S-SCF  **********\n\n\n";

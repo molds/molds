@@ -172,6 +172,7 @@ void MD::SetMessages(){
 }
 
 double MD::OutputEnergies(){
+   int elecState = Parameters::GetInstance()->GetElectronicStateIndexMD();
    Molecule* molecule = this->cndo->GetMolecule();
    double coreKineticEnergy = 0.0;
    for(int a=0; a<molecule->GetAtomVect()->size(); a++){
@@ -192,15 +193,15 @@ double MD::OutputEnergies(){
                              this->cndo->GetCoreRepulsionEnergy()
                              /Parameters::GetInstance()->GetEV2AU());
    printf("\t\t%s\t%e\t%e\n",this->messageElectronicEnergy.c_str(), 
-                             this->cndo->GetElectronicEnergy(),
-                             this->cndo->GetElectronicEnergy()
+                             this->cndo->GetElectronicEnergy(elecState),
+                             this->cndo->GetElectronicEnergy(elecState)
                              /Parameters::GetInstance()->GetEV2AU());
    printf("\t\t%s\t%e\t%e\n",this->messageTotalEnergy.c_str(), 
-                             (coreKineticEnergy + this->cndo->GetElectronicEnergy()),
-                             (coreKineticEnergy + this->cndo->GetElectronicEnergy())
+                             (coreKineticEnergy + this->cndo->GetElectronicEnergy(elecState)),
+                             (coreKineticEnergy + this->cndo->GetElectronicEnergy(elecState))
                              /Parameters::GetInstance()->GetEV2AU());
 
-   return (coreKineticEnergy + this->cndo->GetElectronicEnergy());
+   return (coreKineticEnergy + this->cndo->GetElectronicEnergy(elecState));
 }
 
 void MD::OutputEnergies(double initialEnergy){

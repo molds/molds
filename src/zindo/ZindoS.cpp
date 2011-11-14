@@ -37,9 +37,6 @@ ZindoS::ZindoS() : MolDS_cndo::Cndo2(){
    this->theory = ZINDOS;
    this->SetMessages();
    this->SetEnableAtomTypes();
-   this->matrixCIS = NULL;
-   this->excitedEnergies = NULL;
-   this->matrixCISdimension = 0;
    this->matrixForceElecStatesNum = 0;
    this->nishimotoMatagaParamA = 1.2;
    this->nishimotoMatagaParamB = 2.4;
@@ -89,6 +86,10 @@ void ZindoS::SetMessages(){
    this->errorMessageCalcForceNotGroundState 
       = "Error in zindo::ZindoS::CalcForce: Only ground state is enable in ZindoS.";
    this->errorMessageElecState = "Electronic State = ";
+   this->errorMessageGetElectronicEnergyEnergyNotCalculated
+      = "Error in zindo::ZindoS::GetElectronicEnergy: Set electronic state is not calculated by CIS.\n";
+   this->errorMessageGetElectronicEnergyNULLCISEnergy 
+      = "Error in zindo::ZindoS::GetElectronicEnergy: excitedEnergies is NULL\n";
    this->messageSCFMetConvergence = "\n\n\n\t\tZINDO/S-SCF met convergence criterion(^^b\n\n\n";
    this->messageStartSCF = "**********  START: ZINDO/S-SCF  **********\n";
    this->messageDoneSCF = "**********  DONE: ZINDO/S-SCF  **********\n\n\n";
@@ -1151,6 +1152,10 @@ void ZindoS::DoesCISDirect(){
                                                            this->matrixCISdimension, 
                                                            calcEigenVectors);
    cout << this->messageDoneDirectCIS;
+}
+
+int ZindoS::GetMatrixCISdimension(){
+   return this->matrixCISdimension;
 }
 
 void ZindoS::CalcCISMatrix(double** matrixCIS, int numberOcc, int numberVir){

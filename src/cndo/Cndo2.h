@@ -17,7 +17,7 @@ public:
    virtual void DoesCIS();
    double** GetForce(int elecState);
    double*** GetForce(std::vector<int> elecStates);
-   double GetElectronicEnergy();
+   double GetElectronicEnergy(int elecState);
    double GetCoreRepulsionEnergy();
 protected:
    std::string errorMessageAtomA;
@@ -35,6 +35,10 @@ protected:
    std::string errorMessageGetGaussianOverlapFirstDerivativeOrbitalD;
    std::string errorMessageCISNotImplemented;
    std::string errorMessageCalcForceNotImplemented;
+   std::string errorMessageGetElectronicEnergyNULLCISEnergy;
+   std::string errorMessageGetElectronicEnergyEnergyNotCalculated;
+   std::string errorMessageGetElectronicEnergyNumberCISStates;
+   std::string errorMessageGetElectronicEnergySetElecState;
    std::string messageSCFMetConvergence;
    std::string messageStartSCF;
    std::string messageDoneSCF;
@@ -120,6 +124,9 @@ protected:
    double* energiesMO;
    double*** matrixForce;
    double****** twoElecTwoCore;
+   double** matrixCIS;
+   double* excitedEnergies;
+   int matrixCISdimension;
    void CalcRotatingMatrixFirstDerivatives(double*** rMatFirstDeri, 
                                            MolDS_base_atoms::Atom* atomA,
                                            MolDS_base_atoms::Atom* atomB);

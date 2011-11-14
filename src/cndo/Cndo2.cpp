@@ -49,6 +49,9 @@ Cndo2::Cndo2(){
    this->matrixForce = NULL;
    this->elecEnergy = 0.0;
    this->coreRepulsionEnergy = 0.0;
+   this->matrixCIS = NULL;
+   this->excitedEnergies = NULL;
+   this->matrixCISdimension = 0;
    //cout << "Cndo created\n";
 }
 
@@ -109,6 +112,14 @@ void Cndo2::SetMessages(){
       = "Error in cndo::Cndo2::DoesCIS: CIS is not implemented for CNDO2.\n";
    this->errorMessageCalcForceNotImplemented
       = "Error in cndo::Cndo2::CalcForce: Force is not available in CNDO2.\n";
+   this->errorMessageGetElectronicEnergyNumberCISStates 
+      = "\tNumber of calculated CIS states (excluding ground state) = ";
+   this->errorMessageGetElectronicEnergySetElecState
+      = "\tSet Electronic state = ";
+   this->errorMessageGetElectronicEnergyEnergyNotCalculated
+      = "Error in cndo::Cndo2::GetElectronicEnergy: Set electronic state is not calculated by CIS.\n";
+   this->errorMessageGetElectronicEnergyNULLCISEnergy 
+      = "Error in cndo::Cndo2::GetElectronicEnergy: excitedEnergies is NULL\n";
    this->messageSCFMetConvergence = "\n\n\n\t\tCNDO/2-SCF met convergence criterion(^^b\n\n\n";
    this->messageStartSCF = "**********  START: CNDO/2-SCF  **********\n";
    this->messageDoneSCF = "**********  DONE: CNDO/2-SCF  **********\n\n\n";
@@ -410,8 +421,27 @@ void Cndo2::DoesCIS(){
    throw MolDSException(ss.str());
 }
 
-double Cndo2::GetElectronicEnergy(){
-   return this->elecEnergy;
+// elecState=0 means ground state
+double Cndo2::GetElectronicEnergy(int elecState){
+   if(elecState==0){
+      return this->elecEnergy;
+   }
+   else{
+      if(this->excitedEnergies == NULL){
+         stringstream ss;
+         ss << this->errorMessageGetElectronicEnergyNULLCISEnergy;
+         throw MolDSException(ss.str());
+      }
+      int numberExcitedStates = Parameters::GetInstance()->GetNumberExcitedStatesCIS();
+      if(numberExcitedStates < elecState){
+         stringstream ss;
+         ss << this->errorMessageGetElectronicEnergyEnergyNotCalculated;
+         ss << this->errorMessageGetElectronicEnergySetElecState << elecState << endl;
+         ss << errorMessageGetElectronicEnergyNumberCISStates << numberExcitedStates << endl;
+         throw MolDSException(ss.str());
+      }
+      return this->elecEnergy + this->excitedEnergies[elecState+1];
+   }
 }
 
 double Cndo2::GetCoreRepulsionEnergy(){

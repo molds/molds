@@ -26,7 +26,6 @@
 using namespace std;
 using namespace MolDS_base;
 using namespace MolDS_base_atoms;
-
 namespace MolDS_mndo{
 
 /***
@@ -37,6 +36,8 @@ Mndo::Mndo() : MolDS_zindo::ZindoS(){
    this->SetMessages();
    this->SetEnableAtomTypes();
    this->heatsFormation = 0.0;
+   this->zMatrixForceElecStatesNum = 0;
+   this->zMatrixForce = NULL;
    //cout << "Mndo created\n";
 }
 
@@ -51,7 +52,12 @@ Mndo::~Mndo(){
                                     dxy);
       //cout << "twoElecTwoCore deleted\n";
    }
-   //cout << "Mndo deleted\n";
+   if(this->zMatrixForce != NULL){
+      MallocerFreer::GetInstance()->FreeDoubleMatrix3d(&this->zMatrixForce, 
+                                                       this->zMatrixForceElecStatesNum,
+                                                       this->molecule->GetTotalNumberAOs());
+      //cout << "zMatrixForce deleted\n";
+   }
 }
 
 void Mndo::SetMolecule(Molecule* molecule){
@@ -95,6 +101,10 @@ void Mndo::SetMessages(){
       = "Error in mndo::Mndo::CalcTwoElecTwoCoreDiatomicFirstDerivatives: The two elec two core diatomic matrix is NULL.\n"; 
    this->errorMessageCalcTwoElecTwoCoreDiatomicFirstDerivativesSameAtoms
       = "Error in mndo::Mndo::CalcTwoElecTwoCoreDiatomicFirstDerivatives: Atom A and B is same.\n"; 
+   this->errorMessageGetElectronicEnergyEnergyNotCalculated
+      = "Error in mndo::Mndo::GetElectronicEnergy: Set electronic state is not calculated by CIS.\n";
+   this->errorMessageGetElectronicEnergyNULLCISEnergy 
+      = "Error in mndo::Mndo::GetElectronicEnergy: excitedEnergies is NULL\n";
    this->messageSCFMetConvergence = "\n\n\n\t\tMNDO/S-SCF met convergence criterion(^^b\n\n\n";
    this->messageStartSCF = "**********  START: MNDO/S-SCF  **********\n";
    this->messageDoneSCF = "**********  DONE: MNDO/S-SCF  **********\n\n\n";
@@ -190,7 +200,8 @@ double Mndo::GetDiatomCoreRepulsionFirstDerivative(int atomAIndex,
 }
 
 void Mndo::CalcHeatsFormation(double* heatsFormation, Molecule* molecule){
-   *heatsFormation = this->GetElectronicEnergy();
+   int groundState = 0;
+   *heatsFormation = this->GetElectronicEnergy(groundState);
    for(int A=0; A<molecule->GetAtomVect()->size(); A++){
       Atom* atom = (*molecule->GetAtomVect())[A];
       *heatsFormation -= atom->GetMndoElecEnergyAtom();
@@ -203,8 +214,10 @@ void Mndo::CalcHFProperties(){
    this->CalcHeatsFormation(&this->heatsFormation, this->molecule);
 }
 
-void Mndo::OutputHFResults(double** fockMatrix, double* energiesMO, 
-                           double* atomicElectronPopulation, Molecule* molecule){
+void Mndo::OutputHFResults(double** fockMatrix, 
+                           double* energiesMO, 
+                           double* atomicElectronPopulation, 
+                           Molecule* molecule){
    MolDS_cndo::Cndo2::OutputHFResults(fockMatrix, 
                                       energiesMO, 
                                       atomicElectronPopulation, 
@@ -213,14 +226,19 @@ void Mndo::OutputHFResults(double** fockMatrix, double* energiesMO,
    cout << this->messageHeatsFormation;
    cout << this->messageHeatsFormationTitle;
    printf("\t\t%e\t%e\n\n",this->heatsFormation,
-                           this->heatsFormation/Parameters::GetInstance()->GetKcalMolin2AU());
+                           this->heatsFormation/Parameters::GetInstance()->
+                                                            GetKcalMolin2AU());
 }
 
-double Mndo::GetFockDiagElement(Atom* atomA, int atomAIndex, int mu, 
-                                 Molecule* molecule, double** gammaAB,
-                                 double** orbitalElectronPopulation, 
-                                 double* atomicElectronPopulation,
-                                 double****** twoElecTwoCore, bool isGuess){
+double Mndo::GetFockDiagElement(Atom* atomA, 
+                                int atomAIndex, 
+                                int mu, 
+                                Molecule* molecule, 
+                                double** gammaAB,
+                                double** orbitalElectronPopulation, 
+                                double* atomicElectronPopulation,
+                                double****** twoElecTwoCore, 
+                                bool isGuess){
    double value=0.0;
    int firstAOIndexA = atomA->GetFirstAOIndex();
    mu -= firstAOIndexA;
@@ -232,7 +250,8 @@ double Mndo::GetFockDiagElement(Atom* atomA, int atomAIndex, int mu,
          OrbitalType orbitalNu = atomA->GetValence()[nu];
          double coulomb  = this->GetCoulombInt(orbitalMu, orbitalNu, atomA);
          double exchange = this->GetExchangeInt(orbitalMu, orbitalNu, atomA);
-         temp += orbitalElectronPopulation[nu+firstAOIndexA][nu+firstAOIndexA]
+         temp += orbitalElectronPopulation[nu+firstAOIndexA]
+                                          [nu+firstAOIndexA]
                 *(coulomb - 0.5*exchange);
       }
       value += temp;
@@ -244,11 +263,16 @@ double Mndo::GetFockDiagElement(Atom* atomA, int atomAIndex, int mu,
             int firstAOIndexB = atomB->GetFirstAOIndex();
             for(int lambda=0; lambda<atomB->GetValence().size(); lambda++){
                for(int sigma=0; sigma<atomB->GetValence().size(); sigma++){
-                  temp += orbitalElectronPopulation[lambda+firstAOIndexB][sigma+firstAOIndexB]
+                  temp += orbitalElectronPopulation[lambda+firstAOIndexB]
+                                                   [sigma+firstAOIndexB]
                          *twoElecTwoCore[atomAIndex][B][mu][mu][lambda][sigma];
                }
             }
-            temp += this->GetElectronCoreAttraction(atomAIndex, B, mu, mu, twoElecTwoCore);
+            temp += this->GetElectronCoreAttraction(atomAIndex, 
+                                                    B, 
+                                                    mu, 
+                                                    mu, 
+                                                    twoElecTwoCore);
          }
       }
       value += temp;
@@ -413,15 +437,13 @@ double Mndo::GetElectronCoreAttractionFirstDerivative(int atomAIndex,
 void Mndo::CalcDiatomicOverlapInDiatomicFrame(double** diatomicOverlap, 
                                               Atom* atomA, 
                                               Atom* atomB){
-   MolDS_cndo::Cndo2::CalcDiatomicOverlapInDiatomicFrame(diatomicOverlap, 
-                                                         atomA, 
-                                                         atomB);
+   MolDS_cndo::Cndo2::CalcDiatomicOverlapInDiatomicFrame(diatomicOverlap, atomA, atomB);
 }
 
 void Mndo::CalcDiatomicOverlapFirstDerivativeInDiatomicFrame(
-                                                double** diatomicOverlapDeri, 
-                                                Atom* atomA, 
-                                                Atom* atomB){
+                                          double** diatomicOverlapDeri, 
+                                          Atom* atomA, 
+                                          Atom* atomB){
    MolDS_cndo::Cndo2::CalcDiatomicOverlapFirstDerivativeInDiatomicFrame(
                         diatomicOverlapDeri,atomA, atomB);
 }
@@ -547,6 +569,7 @@ void Mndo::CalcCISMatrix(double** matrixCIS, int numberOcc, int numberVir){
          int moJ = this->molecule->GetTotalNumberValenceElectrons()/2 - (l/numberVir) -1;
          int moB = this->molecule->GetTotalNumberValenceElectrons()/2 + (l%numberVir);
          double value=0.0;
+          
          // Fast algorith, but this is not easy to read. Slow algorithm is alos written below.
          for(int A=0; A<molecule->GetAtomVect()->size(); A++){
             Atom* atomA = (*molecule->GetAtomVect())[A];
@@ -688,9 +711,9 @@ void Mndo::CalcCISMatrix(double** matrixCIS, int numberOcc, int numberVir){
                                                        this->molecule, this->fockMatrix, NULL)
                     -this->GetMolecularIntegralElement(moA, moB, moI, moJ, 
                                                        this->molecule, this->fockMatrix, NULL);
-         // Diagonal term
          // End of the slow algorith.
          */
+         // Diagonal term
          if(k==l){
             value += this->energiesMO[moA] - this->energiesMO[moI];
          }
@@ -704,10 +727,230 @@ void Mndo::CalcCISMatrix(double** matrixCIS, int numberOcc, int numberVir){
    cout << this->messageDoneCalcCISMatrix;
 }
 
+void Mndo::CheckZMatrixForce(vector<int> elecStates){
+   // malloc or initialize Force matrix
+   if(this->zMatrixForce == NULL){
+      this->zMatrixForce = MallocerFreer::GetInstance()->
+                           MallocDoubleMatrix3d(elecStates.size(),
+                                                this->molecule->GetTotalNumberAOs(), 
+                                                this->molecule->GetTotalNumberAOs());
+      this->zMatrixForceElecStatesNum = elecStates.size();
+   }
+   else{
+      MallocerFreer::GetInstance()->
+      InitializeDoubleMatrix3d(this->zMatrixForce,
+                               elecStates.size(),
+                               this->molecule->GetTotalNumberAOs(), 
+                               this->molecule->GetTotalNumberAOs());
+   }
+}
+
+// see variable Q-vector in [PT_1996, PT_1997]
+void Mndo::CalcActiveSetVariablesQ(vector<MoIndexPair>* nonRedundantQIndeces, 
+                                   vector<MoIndexPair>* redundantQIndeces){
+   int numberAOs = this->molecule->GetTotalNumberAOs();
+   int numberOcc = this->molecule->GetTotalNumberValenceElectrons()/2;
+   int numberVir = numberAOs - numberOcc;
+   int numberActiveOcc = Parameters::GetInstance()->GetActiveOccCIS();
+   int numberActiveVir = Parameters::GetInstance()->GetActiveVirCIS();
+   for(int i=0; i<numberOcc; i++){
+      for(int j=numberOcc; j<numberAOs; j++){
+         MoIndexPair moIndexPair = {i, j};
+         nonRedundantQIndeces->push_back(moIndexPair);
+      }
+   }
+   for(int i=numberOcc-numberActiveOcc; i<numberOcc; i++){
+      for(int j=i; j<numberOcc; j++){
+         MoIndexPair moIndexPair = {i, j};
+         redundantQIndeces->push_back(moIndexPair);
+      }
+   }
+   for(int i=numberOcc; i<numberOcc+numberActiveVir; i++){
+      for(int j=i; j<numberOcc+numberActiveVir; j++){
+         MoIndexPair moIndexPair = {i, j};
+         redundantQIndeces->push_back(moIndexPair);
+      }
+   }
+}
+
+void Mndo::MallocTempMatrixForZMatrix(double*** delta,
+                                           double** q,
+                                           double*** kNR,
+                                           double*** kRDag,
+                                           double** y,
+                                           double** b,
+                                           int numElecStates,
+                                           int sizeQNR,
+                                           int sizeQR){
+   *delta = MallocerFreer::GetInstance()->MallocDoubleMatrix2d(
+                                          numElecStates,
+                                          this->GetMatrixCISdimension());
+   *q = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(
+                                      sizeQNR+sizeQR);
+   *kNR = MallocerFreer::GetInstance()->MallocDoubleMatrix2d(
+                                        sizeQNR,
+                                        sizeQR);
+   *kRDag = MallocerFreer::GetInstance()->MallocDoubleMatrix2d(
+                                          sizeQNR,
+                                          sizeQR);
+   *y = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(
+                                      sizeQNR);
+   *b = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(
+                                      sizeQNR);
+}
+
+void Mndo::FreeTempMatrixForZMatrix(double*** delta,
+                                         double** q,
+                                         double*** kNR,
+                                         double*** kRDag,
+                                         double** y,
+                                         double** b,
+                                         int numElecStates,
+                                         int sizeQNR,
+                                         int sizeQR){
+   if(*delta != NULL){
+      MallocerFreer::GetInstance()->FreeDoubleMatrix2d(delta, numElecStates);
+      //cout << "delta  deleted" << endl;
+   }
+   if(*q != NULL){
+      MallocerFreer::GetInstance()->FreeDoubleMatrix1d(q);
+      //cout << "q  deleted" << endl;
+   }
+   if(*kNR != NULL){
+      MallocerFreer::GetInstance()->FreeDoubleMatrix2d(kNR, sizeQNR);
+      //cout << "kNR  deleted" << endl;
+   }
+   if(*kRDag != NULL){
+      MallocerFreer::GetInstance()->FreeDoubleMatrix2d(kRDag, sizeQNR);
+      //cout << "kRDag  deleted" << endl;
+   }
+   if(*y != NULL){
+      MallocerFreer::GetInstance()->FreeDoubleMatrix1d(y);
+      //cout << "y  deleted" << endl;
+   }
+   if(*b != NULL){
+      MallocerFreer::GetInstance()->FreeDoubleMatrix1d(b);
+      //cout << "b  deleted" << endl;
+   }
+}
+
+// \epsilon_{r}^{kl} in (1) in [PT_1997].
+// k and l are index of CIS matrix.
+double Mndo::GetCISCoefficientMOEnergy(int k, int l, int r, int numberActiveVir){
+   double value=0.0;
+   if(k==l){
+      int moI = this->molecule->GetTotalNumberValenceElectrons()/2 - (k/numberActiveVir) -1;
+      int moA = this->molecule->GetTotalNumberValenceElectrons()/2 + (k%numberActiveVir);
+      if(r==moI){
+         // r is index of occupied MO.
+         value = -1.0;
+      }
+      else if(r==moA){
+         // r is index of virtual MO.
+         value = 1.0;
+      }
+   }
+   return value;
+}
+
+// \f_{pqrs}^{lm} in (1) in [PT_1997].
+// k and l are index of CIS matrix.
+double Mndo::GetCISCoefficientTwoElecIntegral(int k, 
+                                              int l, 
+                                              int p, 
+                                              int q, 
+                                              int r, 
+                                              int s,
+                                              int numberActiveVir){
+   double value=0.0;
+   // single excitation from I-th (occupied)MO to A-th (virtual)MO
+   int moI = this->molecule->GetTotalNumberValenceElectrons()/2 - (k/numberActiveVir) -1;
+   int moA = this->molecule->GetTotalNumberValenceElectrons()/2 + (k%numberActiveVir);
+   // single excitation from J-th (occupied)MO to B-th (virtual)MO
+   int moJ = this->molecule->GetTotalNumberValenceElectrons()/2 - (l/numberActiveVir) -1;
+   int moB = this->molecule->GetTotalNumberValenceElectrons()/2 + (l%numberActiveVir);
+   if(p==moI && q==moA && r==moJ && s==moB ){
+      value = 2.0;
+   }
+   else if(p==moI && q==moJ && r==moA && s==moB ){
+      value = -1.0;
+   }
+   return value;
+}
+
+void Mndo::CalcDeltaVector(double** delta, vector<int> elecStates){
+   double value = 0.0;
+   for(int n=0; n<elecStates.size(); n++){
+      for(int r=0; r<this->GetMatrixCISdimension(); r++){
+      // ToDo: 
+      }
+   }
+}
+
+// see [PT_1996, PT_1997]
+void Mndo::CalcZMatrixForce(vector<int> elecStates){
+   this->CheckZMatrixForce(elecStates); 
+   int numberAOs = this->molecule->GetTotalNumberAOs();
+   int numberOcc = this->molecule->GetTotalNumberValenceElectrons()/2;
+   int numberVir = numberAOs - numberOcc;
+   int numberActiveOcc = Parameters::GetInstance()->GetActiveOccCIS();
+   int numberActiveVir = Parameters::GetInstance()->GetActiveVirCIS();
+
+   // creat MO-index-pair for Q variables. 
+   vector<MoIndexPair> nonRedundantQIndeces;
+   vector<MoIndexPair> redundantQIndeces;
+   this->CalcActiveSetVariablesQ(&nonRedundantQIndeces, &redundantQIndeces);
+
+   // malloc temporary arraies
+   double** delta = NULL; // Delta matrix, see (9) in [PT_1997]
+   double* q = NULL; //// Q-vector in (19) in [PT_1997]
+   double** kNR = NULL; // K_{NR} matrix, see (45) in [PT_1996]
+   double** kRDag = NULL; // Daggar of K_{R} matrix, see (46) in [PT_1996]
+   double* y = NULL; // y-vector in (54) in [PT_1996]
+   double* b = NULL; // right-hand-side of (54) in [PT_1996]
+   this->MallocTempMatrixForZMatrix(&delta,
+                                    &q,
+                                    &kNR,
+                                    &kRDag,
+                                    &y,
+                                    &b,
+                                    elecStates.size(),
+                                    nonRedundantQIndeces.size(),
+                                    redundantQIndeces.size());
+   try{
+      // delta
+      this->CalcDeltaVector(delta, elecStates);
+         
+
+   }
+   catch(MolDSException ex){
+      this->FreeTempMatrixForZMatrix(&delta,
+                                     &q,
+                                     &kNR,
+                                     &kRDag,
+                                     &y,
+                                     &b,
+                                     elecStates.size(),
+                                     nonRedundantQIndeces.size(),
+                                     redundantQIndeces.size());
+      throw ex;
+   }
+   this->FreeTempMatrixForZMatrix(&delta,
+                                  &q,
+                                  &kNR,
+                                  &kRDag,
+                                  &y,
+                                  &b,
+                                  elecStates.size(),
+                                  nonRedundantQIndeces.size(),
+                                  redundantQIndeces.size());
+}
+
 // electronicStateIndex is index of the electroinc eigen state.
 // "electronicStateIndex = 0" means electronic ground state. 
 void Mndo::CalcForce(vector<int> elecStates){
    this->CheckMatrixForce(elecStates);
+   this->CalcZMatrixForce(elecStates);
    #pragma omp parallel
    {
       double***** twoElecTwoCoreFirstDeriv = MallocerFreer::GetInstance()->MallocDoubleMatrix5d(
@@ -735,7 +978,9 @@ void Mndo::CalcForce(vector<int> elecStates){
                   // calc. first derivative of overlap.
                   this->CalcDiatomicOverlapFirstDerivative(overlapDer, atomA, atomB);
                   // calc. first derivative of two elec two core interaction
-                  this->CalcTwoElecTwoCoreDiatomicFirstDerivatives(twoElecTwoCoreFirstDeriv, a, b);
+                  this->CalcTwoElecTwoCoreDiatomicFirstDerivatives(twoElecTwoCoreFirstDeriv, 
+                                                                   a, 
+                                                                   b);
 
                   double coreRepulsion[CartesianType_end] = {0.0,0.0,0.0};
                   for(int i=0; i<CartesianType_end; i++){
@@ -749,7 +994,10 @@ void Mndo::CalcForce(vector<int> elecStates){
                         for(int i=0; i<CartesianType_end; i++){
                            electronicForce1[i] += this->orbitalElectronPopulation[mu][nu]
                                                  *this->GetElectronCoreAttractionFirstDerivative(
-                                                        a, b, mu-firstAOIndexA, nu-firstAOIndexA,
+                                                        a, 
+                                                        b, 
+                                                        mu-firstAOIndexA, 
+                                                        nu-firstAOIndexA,
                                                         twoElecTwoCoreFirstDeriv,
                                                         (CartesianType)i);
                         }
@@ -818,8 +1066,7 @@ void Mndo::CalcForce(vector<int> elecStates){
    }
 }
 
-void Mndo::FreeCalcForceTempMatrices(double**** overlapDer, 
-                                     double****** twoElecTwoCoreFirstDeriv){
+void Mndo::FreeCalcForceTempMatrices(double**** overlapDer, double****** twoElecTwoCoreFirstDeriv){
    if(*overlapDer != NULL){
       MallocerFreer::GetInstance()->FreeDoubleMatrix3d(overlapDer, 
                                                        OrbitalType_end,
@@ -851,9 +1098,8 @@ void Mndo::CalcTwoElecTwoCore(double****** twoElecTwoCore, Molecule* molecule){
 
    #pragma omp parallel
    {
-      double**** twoElecTwoCoreDiatomic = MallocerFreer::GetInstance()->
-                                                         MallocDoubleMatrix4d(
-                                                         dxy, dxy, dxy, dxy);
+      double**** twoElecTwoCoreDiatomic = MallocerFreer::GetInstance()->MallocDoubleMatrix4d(
+                                                                        dxy, dxy, dxy, dxy);
       try{
          // note that terms with condition a==b are not needed to calculate. 
          #pragma omp for schedule(auto)
@@ -941,7 +1187,7 @@ void Mndo::CalcTwoElecTwoCoreDiatomic(double**** matrix, int atomAIndex, int ato
 
    // rotate matirix into the space frame
    double** rotatingMatrix = MallocerFreer::GetInstance()->MallocDoubleMatrix2d(
-                                             OrbitalType_end, OrbitalType_end);
+                                            OrbitalType_end, OrbitalType_end);
    try{
       this->CalcRotatingMatrix(rotatingMatrix, atomA, atomB);
       this->RotateTwoElecTwoCoreDiatomicToSpaceFramegc(matrix, rotatingMatrix);
@@ -3107,8 +3353,6 @@ double Mndo::GetSemiEmpiricalMultipoleInteractionFirstDerivative(
    }
    return value;
 }
-
 }
-
 
 

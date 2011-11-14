@@ -56,16 +56,14 @@ protected:
                                                    MolDS_base_atoms::Atom* atomB);
    virtual void CalcDiatomicOverlapFirstDerivativeInDiatomicFrame(
                                                 double** diatomicOverlapDeri, 
-                                                MolDS_base_atoms::Atom* atomA, 
-                                                MolDS_base_atoms::Atom* atomB);
+                                                MolDS_base_atoms::Atom* atomA, MolDS_base_atoms::Atom* atomB);
    virtual double GetCoulombInt(MolDS_base::OrbitalType orbital1, 
                                 MolDS_base::OrbitalType orbital2, 
                                 MolDS_base_atoms::Atom* atom); 
    virtual double GetExchangeInt(MolDS_base::OrbitalType orbital1, 
                                  MolDS_base::OrbitalType orbital2, 
                                  MolDS_base_atoms::Atom* atom); 
-   virtual void CalcTwoElecTwoCore(double****** twoElecTwoCore, 
-                                   MolDS_base::Molecule* molecule);
+   virtual void CalcTwoElecTwoCore(double****** twoElecTwoCore, MolDS_base::Molecule* molecule);
    virtual double GetMolecularIntegralElement(int moI, 
                                               int moJ, 
                                               int moK, 
@@ -75,49 +73,73 @@ protected:
                                               double** gammaAB);
    virtual void CalcCISMatrix(double** matrixCIS, int numberOcc, int numberVir);
    virtual void CalcForce(std::vector<int> elecStates);
-   double GetNddoRepulsionIntegral(MolDS_base_atoms::Atom* atomA, 
-                                   MolDS_base::OrbitalType mu, 
-                                   MolDS_base::OrbitalType nu,
-                                   MolDS_base_atoms::Atom* atomB, 
-                                   MolDS_base::OrbitalType lambda, 
-                                   MolDS_base::OrbitalType sigma);
-   double GetNddoRepulsionIntegralFirstDerivative(MolDS_base_atoms::Atom* atomA, 
-                                                  MolDS_base::OrbitalType mu, 
-                                                  MolDS_base::OrbitalType nu,
-                                                  MolDS_base_atoms::Atom* atomB, 
-                                                  MolDS_base::OrbitalType lambda, 
-                                                  MolDS_base::OrbitalType sigma,
-                                                  MolDS_base::CartesianType axisA);
+   double GetNddoRepulsionIntegral(MolDS_base_atoms::Atom* atomA, MolDS_base::OrbitalType mu, MolDS_base::OrbitalType nu,
+                                   MolDS_base_atoms::Atom* atomB, MolDS_base::OrbitalType lambda, MolDS_base::OrbitalType sigma);
+   double GetNddoRepulsionIntegralFirstDerivative(
+                                   MolDS_base_atoms::Atom* atomA, MolDS_base::OrbitalType mu, MolDS_base::OrbitalType nu,
+                                   MolDS_base_atoms::Atom* atomB, MolDS_base::OrbitalType lambda, MolDS_base::OrbitalType sigma,
+                                   MolDS_base::CartesianType axisA);
 private:
    std::string errorMessageMultipoleA;
    std::string errorMessageMultipoleB;
    std::string messageHeatsFormation;
    std::string messageHeatsFormationTitle;
+   struct MoIndexPair{int moI; int moJ;};
+   double*** zMatrixForce;
+   int zMatrixForceElecStatesNum;
    double heatsFormation;
+   void MallocTempMatrixForZMatrix(double*** delta,
+                                   double** q,
+                                   double*** kNR, 
+                                   double*** kRDag,
+                                   double** y,
+                                   double** b,
+                                   int numElecStates,
+                                   int sizeQNR,
+                                   int sizeQR);
+   void FreeTempMatrixForZMatrix(double*** delta,
+                                 double** q,
+                                 double*** kNR, 
+                                 double*** kRDag,
+                                 double** y,
+                                 double** b,
+                                 int numElecStates,
+                                 int sizeQNR,
+                                 int sizeQR);
+   void CalcDeltaVector(double** delta, std::vector<int> elecStates);
+   void CalcZMatrixForce(std::vector<int> elecStates);
+   double GetCISCoefficientMOEnergy(int k, 
+                                    int l, 
+                                    int r, 
+                                    int numberActiveVir);
+   double GetCISCoefficientTwoElecIntegral(int k, 
+                                           int l, 
+                                           int p, 
+                                           int q, 
+                                           int r, 
+                                           int s, 
+                                           int numberActiveVir);
+   void CheckZMatrixForce(std::vector<int> elecStates);
+   void CalcActiveSetVariablesQ(std::vector<MoIndexPair>* nonRedundantQIndeces, 
+                                std::vector<MoIndexPair>* redundantQIndeces);
    void CalcHeatsFormation(double* heatsFormation, MolDS_base::Molecule* molecule);
-   double GetElectronCoreAttraction(int atomAIndex, 
-                                    int atomBIndex, 
-                                    int mu, 
-                                    int nu, 
-                                    double****** twoElecTwoCore);
-   double GetElectronCoreAttractionFirstDerivative(
-                                    int atomAIndex, 
-                                    int atomBIndex, 
-                                    int mu, 
-                                    int nu, 
-                                    double***** twoElecTwoCoreFirstDerivative,
-                                    MolDS_base::CartesianType axisA);
+   double GetElectronCoreAttraction(int atomAIndex, int atomBIndex, 
+                                    int mu, int nu, double****** twoElecTwoCore);
+   double GetElectronCoreAttractionFirstDerivative(int atomAIndex, 
+                                                   int atomBIndex, 
+                                                   int mu, 
+                                                   int nu, 
+                                                   double***** twoElecTwoCoreFirstDerivative,
+                                                   MolDS_base::CartesianType axisA);
    void CalcTwoElecTwoCoreDiatomic(double**** matrix, int atomAIndex, int atomBIndex);
    void CalcTwoElecTwoCoreDiatomicFirstDerivatives(double***** matrix, 
                                                    int atomAIndex, 
                                                    int atomBIndex);
-   void RotateTwoElecTwoCoreDiatomicToSpaceFramegc(double**** matrix, 
-                                                   double** rotatingMatrix);
-   void RotateTwoElecTwoCoreDiatomicFirstDerivativesToSpaceFramegc(
-                                             double***** matrix, 
-                                             double**** twoElecTwoCoreDiatomic,
-                                             double** rotatingMatrix,
-                                             double*** rMatDeri);
+   void RotateTwoElecTwoCoreDiatomicToSpaceFramegc(double**** matrix, double** rotatingMatrix);
+   void RotateTwoElecTwoCoreDiatomicFirstDerivativesToSpaceFramegc(double***** matrix, 
+                                                                   double**** twoElecTwoCoreDiatomic,
+                                                                   double** rotatingMatrix,
+                                                                   double*** rMatDeri);
    double GetSemiEmpiricalMultipoleInteraction(MolDS_base::MultipoleType multipoleA,
                                                MolDS_base::MultipoleType multipoleB,
                                                double rhoA,
@@ -133,8 +155,7 @@ private:
                                                double DA,
                                                double DB,
                                                double Rab);
-   void FreeCalcForceTempMatrices(double**** overlapDer, 
-                                  double****** twoElecTwoCoreFirstDeriv);
+   void FreeCalcForceTempMatrices(double**** overlapDer, double****** twoElecTwoCoreFirstDeriv);
 };
 
 }

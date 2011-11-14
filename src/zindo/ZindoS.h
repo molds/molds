@@ -20,6 +20,7 @@ protected:
    std::string messageOmpElapsedTimeCalcCISMarix;
    std::string messageOmpElapsedTimeCIS;
    std::string messageDoneCalcCISMatrix;
+   int GetMatrixCISdimension();
    virtual void CalcGammaAB(double** gammaAB, MolDS_base::Molecule* molecule);
    virtual void SetMessages();
    virtual void SetEnableAtomTypes();
@@ -82,9 +83,6 @@ private:
    std::string messageDavidsonGoToDirect;
    std::string messageExcitedStatesEnergies;
    std::string messageExcitedStatesEnergiesTitle;
-   double** matrixCIS;
-   double* excitedEnergies;
-   int matrixCISdimension;
    int matrixForceElecStatesNum;
    double GetNishimotoMatagaTwoEleInt(MolDS_base_atoms::Atom* atomA, 
                                       MolDS_base::OrbitalType orbitalA, 
