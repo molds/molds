@@ -88,25 +88,23 @@ private:
    double*** zMatrixForce;
    int zMatrixForceElecStatesNum;
    double heatsFormation;
-   void MallocTempMatrixForZMatrix(double*** delta,
+   void MallocTempMatrixForZMatrix(double** delta,
                                    double** q,
                                    double*** kNR, 
                                    double*** kRDag,
                                    double** y,
                                    double** b,
-                                   int numElecStates,
                                    int sizeQNR,
                                    int sizeQR);
-   void FreeTempMatrixForZMatrix(double*** delta,
+   void FreeTempMatrixForZMatrix(double** delta,
                                  double** q,
                                  double*** kNR, 
                                  double*** kRDag,
                                  double** y,
                                  double** b,
-                                 int numElecStates,
                                  int sizeQNR,
                                  int sizeQR);
-   void CalcDeltaVector(double** delta, std::vector<int> elecStates);
+   void CalcDeltaVector(double* delta, int elecStates);
    void CalcZMatrixForce(std::vector<int> elecStates);
    double GetCISCoefficientMOEnergy(int k, 
                                     int l, 

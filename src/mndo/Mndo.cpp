@@ -773,19 +773,17 @@ void Mndo::CalcActiveSetVariablesQ(vector<MoIndexPair>* nonRedundantQIndeces,
    }
 }
 
-void Mndo::MallocTempMatrixForZMatrix(double*** delta,
-                                           double** q,
-                                           double*** kNR,
-                                           double*** kRDag,
-                                           double** y,
-                                           double** b,
-                                           int numElecStates,
-                                           int sizeQNR,
-                                           int sizeQR){
+void Mndo::MallocTempMatrixForZMatrix(double** delta,
+                                      double** q,
+                                      double*** kNR,
+                                      double*** kRDag,
+                                      double** y,
+                                      double** b,
+                                      int sizeQNR,
+                                      int sizeQR){
    int numberActiveMO = Parameters::GetInstance()->GetActiveOccCIS()
                        +Parameters::GetInstance()->GetActiveVirCIS();
-   *delta = MallocerFreer::GetInstance()->MallocDoubleMatrix2d(
-                                          numElecStates,
+   *delta = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(
                                           numberActiveMO);
    *q = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(
                                       sizeQNR+sizeQR);
@@ -801,17 +799,16 @@ void Mndo::MallocTempMatrixForZMatrix(double*** delta,
                                       sizeQNR);
 }
 
-void Mndo::FreeTempMatrixForZMatrix(double*** delta,
+void Mndo::FreeTempMatrixForZMatrix(double** delta,
                                     double** q,
                                     double*** kNR,
                                     double*** kRDag,
                                     double** y,
                                     double** b,
-                                    int numElecStates,
                                     int sizeQNR,
                                     int sizeQR){
    if(*delta != NULL){
-      MallocerFreer::GetInstance()->FreeDoubleMatrix2d(delta, numElecStates);
+      MallocerFreer::GetInstance()->FreeDoubleMatrix1d(delta);
       //cout << "delta  deleted" << endl;
    }
    if(*q != NULL){
@@ -880,38 +877,36 @@ double Mndo::GetCISCoefficientTwoElecIntegral(int k,
    return value;
 }
 
-void Mndo::CalcDeltaVector(double** delta, vector<int> elecStates){
+void Mndo::CalcDeltaVector(double* delta, int elecState){
    int numberActiveOcc = Parameters::GetInstance()->GetActiveOccCIS();
    int numberActiveVir = Parameters::GetInstance()->GetActiveVirCIS();
    int numberActiveMO = numberActiveOcc + numberActiveVir;
-   for(int n=0; n<elecStates.size(); n++){
-      for(int r=0; r<numberActiveMO; r++){
-         double value = 0.0;
-         if(r<numberActiveOcc){
-            // r is active occupied MO
-            for(int a=0; a<numberActiveVir; a++){
-               int slaterDeterminantIndex = numberActiveVir*r + a;
-               value -= pow(this->matrixCIS[elecStates[n]][slaterDeterminantIndex],2.0);
-               //c.f. The index of each MO (r and a)is below:
-               //int numberOcc = this->molecule->GetTotalNumberValenceElectrons()/2;
-               //int moR = numberOcc - (slaterDeterminantIndex/numberActiveVir) -1;
-               //int moA = numberOcc + (slaterDeterminantIndex%numberActiveVir); 
-            }
-
+   MallocerFreer::GetInstance()->InitializeDoubleMatrix1d(delta, numberActiveMO);
+   for(int r=0; r<numberActiveMO; r++){
+      double value = 0.0;
+      if(r<numberActiveOcc){
+         // r is active occupied MO
+         for(int a=0; a<numberActiveVir; a++){
+            int slaterDeterminantIndex = numberActiveVir*r + a;
+            value -= pow(this->matrixCIS[elecState][slaterDeterminantIndex],2.0);
+            //c.f. The index of each MO (r and a)is below:
+            //int numberOcc = this->molecule->GetTotalNumberValenceElectrons()/2;
+            //int moR = numberOcc - (slaterDeterminantIndex/numberActiveVir) -1;
+            //int moA = numberOcc + (slaterDeterminantIndex%numberActiveVir); 
          }
-         else{
-            // r is active virtual MO
-            for(int i=0; i<numberActiveOcc; i++){
-               int slaterDeterminantIndex = numberActiveVir*i + (r-numberActiveOcc);
-               value += pow(this->matrixCIS[elecStates[n]][slaterDeterminantIndex],2.0);
-               //c.f. The index of each MO (i and r)is below:
-               //int numberOcc = this->molecule->GetTotalNumberValenceElectrons()/2;
-               //int moI = numberOcc - (slaterDeterminantIndex/numberActiveVir) -1;
-               //int moR = numberOcc + (slaterDeterminantIndex%numberActiveVir); 
-            }
-         }
-         delta[n][r] = value;
       }
+      else{
+         // r is active virtual MO
+         for(int i=0; i<numberActiveOcc; i++){
+            int slaterDeterminantIndex = numberActiveVir*i + (r-numberActiveOcc);
+            value += pow(this->matrixCIS[elecState][slaterDeterminantIndex],2.0);
+            //c.f. The index of each MO (i and r)is below:
+            //int numberOcc = this->molecule->GetTotalNumberValenceElectrons()/2;
+            //int moI = numberOcc - (slaterDeterminantIndex/numberActiveVir) -1;
+            //int moR = numberOcc + (slaterDeterminantIndex%numberActiveVir); 
+         }
+      }
+      delta[r] = value;
    }
 }
 
@@ -930,7 +925,7 @@ void Mndo::CalcZMatrixForce(vector<int> elecStates){
    this->CalcActiveSetVariablesQ(&nonRedundantQIndeces, &redundantQIndeces);
 
    // malloc temporary arraies
-   double** delta = NULL; // Delta matrix, see (9) in [PT_1997]
+   double* delta = NULL; // Delta matrix, see (9) in [PT_1997]
    double* q = NULL; //// Q-vector in (19) in [PT_1997]
    double** kNR = NULL; // K_{NR} matrix, see (45) in [PT_1996]
    double** kRDag = NULL; // Daggar of K_{R} matrix, see (46) in [PT_1996]
@@ -942,14 +937,14 @@ void Mndo::CalcZMatrixForce(vector<int> elecStates){
                                     &kRDag,
                                     &y,
                                     &b,
-                                    elecStates.size(),
                                     nonRedundantQIndeces.size(),
                                     redundantQIndeces.size());
    try{
-      // delta
-      this->CalcDeltaVector(delta, elecStates);
-         
-
+      for(int n=0; n<elecStates.size(); n++){
+         int elecState = elecStates[n];
+         // delta
+         this->CalcDeltaVector(delta, elecState);
+      }
    }
    catch(MolDSException ex){
       this->FreeTempMatrixForZMatrix(&delta,
@@ -958,7 +953,6 @@ void Mndo::CalcZMatrixForce(vector<int> elecStates){
                                      &kRDag,
                                      &y,
                                      &b,
-                                     elecStates.size(),
                                      nonRedundantQIndeces.size(),
                                      redundantQIndeces.size());
       throw ex;
@@ -969,7 +963,6 @@ void Mndo::CalcZMatrixForce(vector<int> elecStates){
                                   &kRDag,
                                   &y,
                                   &b,
-                                  elecStates.size(),
                                   nonRedundantQIndeces.size(),
                                   redundantQIndeces.size());
 }
