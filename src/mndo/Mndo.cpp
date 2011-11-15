@@ -782,9 +782,11 @@ void Mndo::MallocTempMatrixForZMatrix(double*** delta,
                                            int numElecStates,
                                            int sizeQNR,
                                            int sizeQR){
+   int numberActiveMO = Parameters::GetInstance()->GetActiveOccCIS()
+                       +Parameters::GetInstance()->GetActiveVirCIS();
    *delta = MallocerFreer::GetInstance()->MallocDoubleMatrix2d(
                                           numElecStates,
-                                          this->GetMatrixCISdimension());
+                                          numberActiveMO);
    *q = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(
                                       sizeQNR+sizeQR);
    *kNR = MallocerFreer::GetInstance()->MallocDoubleMatrix2d(
@@ -800,14 +802,14 @@ void Mndo::MallocTempMatrixForZMatrix(double*** delta,
 }
 
 void Mndo::FreeTempMatrixForZMatrix(double*** delta,
-                                         double** q,
-                                         double*** kNR,
-                                         double*** kRDag,
-                                         double** y,
-                                         double** b,
-                                         int numElecStates,
-                                         int sizeQNR,
-                                         int sizeQR){
+                                    double** q,
+                                    double*** kNR,
+                                    double*** kRDag,
+                                    double** y,
+                                    double** b,
+                                    int numElecStates,
+                                    int sizeQNR,
+                                    int sizeQR){
    if(*delta != NULL){
       MallocerFreer::GetInstance()->FreeDoubleMatrix2d(delta, numElecStates);
       //cout << "delta  deleted" << endl;
@@ -879,10 +881,36 @@ double Mndo::GetCISCoefficientTwoElecIntegral(int k,
 }
 
 void Mndo::CalcDeltaVector(double** delta, vector<int> elecStates){
-   double value = 0.0;
+   int numberActiveOcc = Parameters::GetInstance()->GetActiveOccCIS();
+   int numberActiveVir = Parameters::GetInstance()->GetActiveVirCIS();
+   int numberActiveMO = numberActiveOcc + numberActiveVir;
    for(int n=0; n<elecStates.size(); n++){
-      for(int r=0; r<this->GetMatrixCISdimension(); r++){
-      // ToDo: 
+      for(int r=0; r<numberActiveMO; r++){
+         double value = 0.0;
+         if(r<numberActiveOcc){
+            // r is active occupied MO
+            for(int a=0; a<numberActiveVir; a++){
+               int slaterDeterminantIndex = numberActiveVir*r + a;
+               value -= pow(this->matrixCIS[elecStates[n]][slaterDeterminantIndex],2.0);
+               //c.f. The index of each MO (r and a)is below:
+               //int numberOcc = this->molecule->GetTotalNumberValenceElectrons()/2;
+               //int moR = numberOcc - (slaterDeterminantIndex/numberActiveVir) -1;
+               //int moA = numberOcc + (slaterDeterminantIndex%numberActiveVir); 
+            }
+
+         }
+         else{
+            // r is active virtual MO
+            for(int i=0; i<numberActiveOcc; i++){
+               int slaterDeterminantIndex = numberActiveVir*i + (r-numberActiveOcc);
+               value += pow(this->matrixCIS[elecStates[n]][slaterDeterminantIndex],2.0);
+               //c.f. The index of each MO (i and r)is below:
+               //int numberOcc = this->molecule->GetTotalNumberValenceElectrons()/2;
+               //int moI = numberOcc - (slaterDeterminantIndex/numberActiveVir) -1;
+               //int moR = numberOcc + (slaterDeterminantIndex%numberActiveVir); 
+            }
+         }
+         delta[n][r] = value;
       }
    }
 }

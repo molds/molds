@@ -1154,10 +1154,6 @@ void ZindoS::DoesCISDirect(){
    cout << this->messageDoneDirectCIS;
 }
 
-int ZindoS::GetMatrixCISdimension(){
-   return this->matrixCISdimension;
-}
-
 void ZindoS::CalcCISMatrix(double** matrixCIS, int numberOcc, int numberVir){
    cout << this->messageStartCalcCISMatrix;
    double ompStartTime = omp_get_wtime();

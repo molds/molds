@@ -20,7 +20,6 @@ protected:
    std::string messageOmpElapsedTimeCalcCISMarix;
    std::string messageOmpElapsedTimeCIS;
    std::string messageDoneCalcCISMatrix;
-   int GetMatrixCISdimension();
    virtual void CalcGammaAB(double** gammaAB, MolDS_base::Molecule* molecule);
    virtual void SetMessages();
    virtual void SetEnableAtomTypes();
