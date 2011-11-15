@@ -104,7 +104,7 @@ private:
                                  double** b,
                                  int sizeQNR,
                                  int sizeQR);
-   void CalcDeltaVector(double* delta, int elecStates);
+   void CalcDeltaVector(double* delta, int elecState);
    void CalcZMatrixForce(std::vector<int> elecStates);
    double GetCISCoefficientMOEnergy(int k, 
                                     int l, 
