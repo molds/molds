@@ -84,7 +84,7 @@ private:
    std::string errorMessageMultipoleB;
    std::string messageHeatsFormation;
    std::string messageHeatsFormationTitle;
-   struct MoIndexPair{int moI; int moJ;};
+   struct MoIndexPair{int moI; int moJ; bool isMoICIMO; bool isMoJCIMO;};
    double*** zMatrixForce;
    int zMatrixForceElecStatesNum;
    double heatsFormation;
@@ -118,8 +118,16 @@ private:
                                  int sizeQNR,
                                  int sizeQR);
    void CalcDeltaVector(double* delta, int elecState);
+   double GetSmallQElement(int moI, 
+                           int moP, 
+                           double**xiOcc, 
+                           double** xiVir,
+                           double** eta);
    void CalcQVector(double* q, 
                     double* delta, 
+                    double** xiOcc,
+                    double** xiVir,
+                    double** eta,
                     int elecState,
                     std::vector<MoIndexPair> nonRedundantQIndeces,
                     std::vector<MoIndexPair> redundantQIndeces);

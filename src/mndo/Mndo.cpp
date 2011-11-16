@@ -755,20 +755,26 @@ void Mndo::CalcActiveSetVariablesQ(vector<MoIndexPair>* nonRedundantQIndeces,
    int numberActiveOcc = Parameters::GetInstance()->GetActiveOccCIS();
    int numberActiveVir = Parameters::GetInstance()->GetActiveVirCIS();
    for(int i=0; i<numberOcc; i++){
+      bool isMoICIMO = numberOcc-numberActiveOcc<=i ? true : false;
       for(int j=numberOcc; j<numberAOs; j++){
-         MoIndexPair moIndexPair = {i, j};
+         bool isMoJCIMO = j<numberOcc+numberActiveVir ? true : false;
+         MoIndexPair moIndexPair = {i, j, isMoICIMO, isMoJCIMO};
          nonRedundantQIndeces->push_back(moIndexPair);
       }
    }
    for(int i=numberOcc-numberActiveOcc; i<numberOcc; i++){
+      bool isMoICIMO = true;
       for(int j=i; j<numberOcc; j++){
-         MoIndexPair moIndexPair = {i, j};
+         bool isMoJCIMO = true;
+         MoIndexPair moIndexPair = {i, j, isMoICIMO, isMoJCIMO};
          redundantQIndeces->push_back(moIndexPair);
       }
    }
    for(int i=numberOcc; i<numberOcc+numberActiveVir; i++){
+      bool isMoICIMO = true;
       for(int j=i; j<numberOcc+numberActiveVir; j++){
-         MoIndexPair moIndexPair = {i, j};
+         bool isMoJCIMO = true;
+         MoIndexPair moIndexPair = {i, j, isMoICIMO, isMoJCIMO};
          redundantQIndeces->push_back(moIndexPair);
       }
    }
@@ -1035,9 +1041,196 @@ void Mndo::CalcDeltaVector(double* delta, int elecState){
    }
 }
 
+// see (18) in [PT_1977]
+double Mndo::GetSmallQElement(int moI, 
+                              int moP, 
+                              double** xiOcc, 
+                              double** xiVir, 
+                              double** eta){
+   double value = 0.0;
+   int numberOcc = this->molecule->GetTotalNumberValenceElectrons()/2;
+   bool isMoPOcc = moP<numberOcc ? true : false;
+   
+   for(int A=0; A<molecule->GetAtomVect()->size(); A++){
+      Atom* atomA = (*molecule->GetAtomVect())[A];
+      int firstAOIndexA = atomA->GetFirstAOIndex();
+      int numberAOsA = atomA->GetValence().size();
+
+      for(int B=A; B<molecule->GetAtomVect()->size(); B++){
+         Atom* atomB = (*molecule->GetAtomVect())[B];
+         int firstAOIndexB = atomB->GetFirstAOIndex();
+         int numberAOsB = atomB->GetValence().size();
+
+         if(A!=B){
+            for(int mu=firstAOIndexA; mu<firstAOIndexA+numberAOsA; mu++){
+               for(int nu=mu; nu<firstAOIndexA+numberAOsA; nu++){
+                  for(int lambda=firstAOIndexB; lambda<firstAOIndexB+numberAOsB; lambda++){
+                     for(int sigma=lambda; sigma<firstAOIndexB+numberAOsB; sigma++){
+                        double twoElecInt = 0.0;
+                        twoElecInt = this->twoElecTwoCore[A]
+                                                         [B]
+                                                         [mu-firstAOIndexA]
+                                                         [nu-firstAOIndexA]
+                                                         [lambda-firstAOIndexB]
+                                                         [sigma-firstAOIndexB];
+                        double temp = 0.0;
+                        if(isMoPOcc){
+                           int p = numberOcc - (moP+1);
+                           temp = 4.0*xiOcc[p][nu]*eta[lambda][sigma]
+                                 -1.0*xiOcc[p][lambda]*eta[nu][sigma]
+                                 -1.0*xiOcc[p][sigma]*eta[nu][lambda];
+                           value += twoElecInt*this->fockMatrix[moI][mu]*temp;
+                           temp = 4.0*xiOcc[p][sigma]*eta[mu][nu]
+                                 -1.0*xiOcc[p][mu]*eta[sigma][nu]
+                                 -1.0*xiOcc[p][nu]*eta[sigma][mu];
+                           value += twoElecInt*this->fockMatrix[moI][lambda]*temp;
+                        }
+                        else{
+                           int p = moP - numberOcc;
+                           temp = 4.0*xiVir[p][nu]*eta[lambda][sigma]
+                                 -1.0*xiVir[p][lambda]*eta[sigma][nu]
+                                 -1.0*xiVir[p][sigma]*eta[lambda][nu];
+                           value += twoElecInt*this->fockMatrix[moI][mu]*temp;
+                           temp = 4.0*xiVir[p][sigma]*eta[mu][nu]
+                                 -1.0*xiVir[p][mu]*eta[nu][sigma]
+                                 -1.0*xiVir[p][nu]*eta[mu][sigma];
+                           value += twoElecInt*this->fockMatrix[moI][lambda]*temp;
+                        }
+                         
+                        if(lambda!=sigma){
+                           if(isMoPOcc){
+                              int p = numberOcc - (moP+1);
+                              temp = 4.0*xiOcc[p][nu]*eta[sigma][lambda]
+                                    -1.0*xiOcc[p][sigma]*eta[nu][lambda]
+                                    -1.0*xiOcc[p][lambda]*eta[nu][sigma];
+                              value += twoElecInt*this->fockMatrix[moI][mu]*temp;
+                              temp = 4.0*xiOcc[p][lambda]*eta[mu][nu]
+                                    -1.0*xiOcc[p][mu]*eta[lambda][nu]
+                                    -1.0*xiOcc[p][nu]*eta[lambda][mu];
+                              value += twoElecInt*this->fockMatrix[moI][sigma]*temp;
+                           }
+                           else{
+                              int p = moP - numberOcc;
+                              temp = 4.0*xiVir[p][nu]*eta[sigma][lambda]
+                                    -1.0*xiVir[p][sigma]*eta[lambda][nu]
+                                    -1.0*xiVir[p][lambda]*eta[sigma][nu];
+                              value += twoElecInt*this->fockMatrix[moI][mu]*temp;
+                              temp = 4.0*xiVir[p][lambda]*eta[mu][nu]
+                                    -1.0*xiVir[p][mu]*eta[nu][lambda]
+                                    -1.0*xiVir[p][nu]*eta[mu][lambda];
+                              value += twoElecInt*this->fockMatrix[moI][sigma]*temp;
+                           }
+                        }
+                        
+                        if(mu!=nu){
+                           if(isMoPOcc){
+                              int p = numberOcc - (moP+1);
+                              temp = 4.0*xiOcc[p][mu]*eta[lambda][sigma]
+                                    -1.0*xiOcc[p][lambda]*eta[mu][sigma]
+                                    -1.0*xiOcc[p][sigma]*eta[mu][lambda];
+                              value += twoElecInt*this->fockMatrix[moI][nu]*temp;
+                              temp = 4.0*xiOcc[p][sigma]*eta[nu][mu]
+                                    -1.0*xiOcc[p][nu]*eta[sigma][mu]
+                                    -1.0*xiOcc[p][mu]*eta[sigma][nu];
+                              value += twoElecInt*this->fockMatrix[moI][lambda]*temp;
+                           }
+                           else{
+                              int p = moP - numberOcc;
+                              temp = 4.0*xiVir[p][mu]*eta[lambda][sigma]
+                                    -1.0*xiVir[p][lambda]*eta[sigma][mu]
+                                       -1.0*xiVir[p][sigma]*eta[lambda][mu];
+                              value += twoElecInt*this->fockMatrix[moI][nu]*temp;
+                              temp = 4.0*xiVir[p][sigma]*eta[nu][mu]
+                                    -1.0*xiVir[p][nu]*eta[mu][sigma]
+                                    -1.0*xiVir[p][mu]*eta[nu][sigma];
+                              value += twoElecInt*this->fockMatrix[moI][lambda]*temp;
+                           }
+
+                        if(mu!=nu && lambda!=sigma){
+                           if(isMoPOcc){
+                              int p = numberOcc - (moP+1);
+                              temp = 4.0*xiOcc[p][mu]*eta[sigma][lambda]
+                                    -1.0*xiOcc[p][sigma]*eta[mu][lambda]
+                                    -1.0*xiOcc[p][lambda]*eta[mu][sigma];
+                              value += twoElecInt*this->fockMatrix[moI][nu]*temp;
+                              temp = 4.0*xiOcc[p][lambda]*eta[nu][mu]
+                                    -1.0*xiOcc[p][nu]*eta[lambda][mu]
+                                    -1.0*xiOcc[p][mu]*eta[lambda][nu];
+                              value += twoElecInt*this->fockMatrix[moI][sigma]*temp;
+                           }
+                           else{
+                              int p = moP - numberOcc;
+                              temp = 4.0*xiVir[p][mu]*eta[sigma][lambda]
+                                    -1.0*xiVir[p][sigma]*eta[lambda][mu]
+                                    -1.0*xiVir[p][lambda]*eta[sigma][mu];
+                              value += twoElecInt*this->fockMatrix[moI][nu]*temp;
+                              temp = 4.0*xiVir[p][lambda]*eta[nu][mu]
+                                    -1.0*xiVir[p][nu]*eta[mu][lambda]
+                                    -1.0*xiVir[p][mu]*eta[nu][lambda];
+                              value += twoElecInt*this->fockMatrix[moI][sigma]*temp;
+                           }
+                        }
+                        
+                        }
+                     }
+                  }
+               }
+            }
+         }
+         else{
+            for(int mu=firstAOIndexA; mu<firstAOIndexA+numberAOsA; mu++){
+               for(int nu=firstAOIndexA; nu<firstAOIndexA+numberAOsA; nu++){
+                  for(int lambda=firstAOIndexB; lambda<firstAOIndexB+numberAOsB; lambda++){
+                     for(int sigma=firstAOIndexB; sigma<firstAOIndexB+numberAOsB; sigma++){
+                        double twoElecInt = 0.0;
+                        if(mu==nu && lambda==sigma){
+                           OrbitalType orbitalMu = atomA->GetValence()[mu-firstAOIndexA];
+                           OrbitalType orbitalLambda = atomB->GetValence()[lambda-firstAOIndexB];
+                           twoElecInt = this->GetCoulombInt(orbitalMu, 
+                                                            orbitalLambda, 
+                                                            atomA);
+                        }
+                        else if((mu==lambda && nu==sigma) || (nu==lambda && mu==sigma) ){
+                           OrbitalType orbitalMu = atomA->GetValence()[mu-firstAOIndexA];
+                           OrbitalType orbitalNu = atomA->GetValence()[nu-firstAOIndexA];
+                           twoElecInt = this->GetExchangeInt(orbitalMu, 
+                                                             orbitalNu, 
+                                                             atomA);
+                        }
+                        else{
+                           twoElecInt = 0.0;
+                        }
+
+                        double temp = 0.0;
+                        if(isMoPOcc){
+                           int p = numberOcc - (moP+1);
+                           temp = 4.0*xiOcc[p][nu]*eta[lambda][sigma]
+                                 -1.0*xiOcc[p][lambda]*eta[nu][sigma]
+                                 -1.0*xiOcc[p][sigma]*eta[nu][lambda];
+                        }
+                        else{
+                           int p = moP - numberOcc;
+                           temp = 4.0*xiVir[p][nu]*eta[lambda][sigma]
+                                 -1.0*xiVir[p][lambda]*eta[sigma][nu]
+                                 -1.0*xiVir[p][sigma]*eta[lambda][nu];
+                        }
+                        value += twoElecInt*this->fockMatrix[moI][mu]*temp;
+                     }  
+                  }
+               }
+            }
+         }
+      }
+   }
+   return value;
+}
+
 // see (20) - (23) in [PT_1997]
 void Mndo::CalcQVector(double* q, 
                        double* delta, 
+                       double** xiOcc,
+                       double** xiVir,
+                       double** eta,
                        int elecState,
                        vector<MoIndexPair> nonRedundantQIndeces,
                        vector<MoIndexPair> redundantQIndeces){
@@ -1045,10 +1238,54 @@ void Mndo::CalcQVector(double* q,
                                  q,
                                  nonRedundantQIndeces.size()+redundantQIndeces.size());
 
-   // ToDo: implement CalcQVector
-   stringstream ss;
-   ss << "Error: Mndo::CalcQVector is not implemented.";
-   throw MolDSException(ss.str());
+   int numberOcc = this->molecule->GetTotalNumberValenceElectrons()/2;
+   int numberActiveOcc = Parameters::GetInstance()->GetActiveOccCIS();
+   int moI = 0;
+   int moJ = 0;
+   bool isMoICIMO = false;
+   bool isMoJCIMO = false;
+   for(int i=0; i<nonRedundantQIndeces.size(); i++){
+      moI = nonRedundantQIndeces[i].moI;
+      moJ = nonRedundantQIndeces[i].moJ;
+      isMoICIMO = nonRedundantQIndeces[i].isMoICIMO;
+      isMoJCIMO = nonRedundantQIndeces[i].isMoJCIMO;
+      if(!isMoICIMO && isMoJCIMO){
+         q[i] = this->GetSmallQElement(moI, moJ, xiOcc, xiVir, eta);
+      }
+      else if(isMoICIMO && !isMoJCIMO){
+         q[i] = -1.0*this->GetSmallQElement(moJ, moI, xiOcc, xiVir, eta);
+      }
+      else if(isMoICIMO && isMoJCIMO){
+         q[i] = this->GetSmallQElement(moI, moJ, xiOcc, xiVir, eta)
+               -this->GetSmallQElement(moJ, moI, xiOcc, xiVir, eta);
+      }
+      else{
+         q[i] = 0.0;
+      }
+   }
+   for(int i=0; i<redundantQIndeces.size(); i++){
+      int r = nonRedundantQIndeces.size() + i;
+      moI = redundantQIndeces[i].moI;
+      moJ = redundantQIndeces[i].moJ;
+      if(moI == moJ){
+         int rr = moI - (numberOcc-numberActiveOcc);
+         q[r] = delta[rr];
+      }
+      else{
+         q[r] = this->GetSmallQElement(moI, moJ, xiOcc, xiVir, eta)
+               -this->GetSmallQElement(moJ, moI, xiOcc, xiVir, eta);
+          
+      }
+   }
+   /* 
+   for(int i=0; i<nonRedundantQIndeces.size(); i++){
+      printf("q[%d] = %e\n",i,q[i]);
+   }
+   for(int i=0; i<redundantQIndeces.size(); i++){
+      int r = nonRedundantQIndeces.size() + i;
+      printf("q[%d] = %e\n",r,q[r]);
+   }
+   */
 }
 
 // see (43) and (45) in [PT_1996].
@@ -1246,12 +1483,19 @@ void Mndo::CalcZMatrixForce(vector<int> elecStates){
             this->CalcDeltaVector(delta, elecState);
             this->CalcXiMatrices(xiOcc, xiVir, elecState, transposedFockMatrix);
             this->CalcEtaMatrix(eta, elecState, transposedFockMatrix);
-            this->CalcQVector(q, delta, elecState, nonRedundantQIndeces, redundantQIndeces);
+            this->CalcQVector(q, 
+                              delta, 
+                              xiOcc, 
+                              xiVir,
+                              eta,
+                              elecState, 
+                              nonRedundantQIndeces, 
+                              redundantQIndeces);
             this->CaclAuxiliaryVector(y, q, kRDager, nonRedundantQIndeces, redundantQIndeces);
             // solve (54) in [PT_1996]
-            //MolDS_mkl_wrapper::LapackWrapper::GetInstance()->Dsysv(kNR, 
-            //                                                       y, 
-            //                                                       nonRedundantQIndeces.size());
+            MolDS_mkl_wrapper::LapackWrapper::GetInstance()->Dsysv(kNR, 
+                                                                   y, 
+                                                                   nonRedundantQIndeces.size());
 
             // calculate each element of Z matrix.
             for(int mu=0; mu<numberAOs; mu++){
@@ -1298,7 +1542,7 @@ void Mndo::CalcZMatrixForce(vector<int> elecStates){
 
 bool Mndo::RequiresExcitedStatesForce(vector<int> elecStates){
    bool requires = true;
-   if(elecStates.size()==0 && elecStates[0]==0){
+   if(elecStates.size()==1 && elecStates[0]==0){
       requires = false;
    }
    return requires;
