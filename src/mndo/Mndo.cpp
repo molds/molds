@@ -780,10 +780,15 @@ void Mndo::MallocTempMatrixForZMatrix(double** delta,
                                       double*** kRDag,
                                       double** y,
                                       double*** transposedFockMatrix,
+                                      double*** xiOcc,
+                                      double*** xiVir,
+                                      double*** eta,
                                       int sizeQNR,
                                       int sizeQR){
-   int numberActiveMO = Parameters::GetInstance()->GetActiveOccCIS()
-                       +Parameters::GetInstance()->GetActiveVirCIS();
+   int numberActiveOcc = Parameters::GetInstance()->GetActiveOccCIS();
+   int numberActiveVir = Parameters::GetInstance()->GetActiveVirCIS();
+   int numberActiveMO = numberActiveOcc + numberActiveVir;
+   int numberAOs = this->molecule->GetTotalNumberAOs();
    *delta = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(
                                           numberActiveMO);
    *q = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(
@@ -796,10 +801,18 @@ void Mndo::MallocTempMatrixForZMatrix(double** delta,
                                           sizeQR);
    *y = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(
                                       sizeQNR);
-   int numberAOs = this->molecule->GetTotalNumberAOs();
    *transposedFockMatrix = MallocerFreer::GetInstance()->MallocDoubleMatrix2d(
                                                          numberAOs,
                                                          numberAOs);
+   *xiOcc = MallocerFreer::GetInstance()->MallocDoubleMatrix2d(
+                                          numberActiveOcc,
+                                          numberAOs);
+   *xiVir = MallocerFreer::GetInstance()->MallocDoubleMatrix2d(
+                                          numberActiveVir,
+                                          numberAOs);
+   *eta = MallocerFreer::GetInstance()->MallocDoubleMatrix2d(
+                                        numberAOs,
+                                        numberAOs);
 }
 
 void Mndo::FreeTempMatrixForZMatrix(double** delta,
@@ -808,6 +821,9 @@ void Mndo::FreeTempMatrixForZMatrix(double** delta,
                                     double*** kRDag,
                                     double** y,
                                     double*** transposedFockMatrix,
+                                    double*** xiOcc,
+                                    double*** xiVir,
+                                    double*** eta,
                                     int sizeQNR,
                                     int sizeQR){
    if(*delta != NULL){
@@ -835,6 +851,24 @@ void Mndo::FreeTempMatrixForZMatrix(double** delta,
       MallocerFreer::GetInstance()->FreeDoubleMatrix2d(transposedFockMatrix,
                                                        numberAOs);
       //cout << "transposedFockMatrix  deleted" << endl;
+   }
+   if(*xiOcc != NULL){
+      int numberActiveOcc = Parameters::GetInstance()->GetActiveOccCIS();
+      MallocerFreer::GetInstance()->FreeDoubleMatrix2d(xiOcc,
+                                                       numberActiveOcc);
+      //cout << "xiOcc deleted" << endl;
+   }
+   if(*xiVir != NULL){
+      int numberActiveVir = Parameters::GetInstance()->GetActiveVirCIS();
+      MallocerFreer::GetInstance()->FreeDoubleMatrix2d(xiVir,
+                                                       numberActiveVir);
+      //cout << "xiVir deleted" << endl;
+   }
+   if(*eta != NULL){
+      int numberAOs = this->molecule->GetTotalNumberAOs();
+      MallocerFreer::GetInstance()->FreeDoubleMatrix2d(eta,
+                                                       numberAOs);
+      //cout << "eta deleted" << endl;
    }
 }
 
@@ -978,7 +1012,7 @@ void Mndo::CalcDeltaVector(double* delta, int elecState){
       if(r<numberActiveOcc){
          // r is active occupied MO
          for(int a=0; a<numberActiveVir; a++){
-            int slaterDeterminantIndex = numberActiveVir*r + a;
+            int slaterDeterminantIndex = this->GetSlaterDeterminantIndex(r,a);
             value -= pow(this->matrixCIS[elecState][slaterDeterminantIndex],2.0);
             //c.f. The index of each MO (r and a)is below:
             //int numberOcc = this->molecule->GetTotalNumberValenceElectrons()/2;
@@ -989,7 +1023,7 @@ void Mndo::CalcDeltaVector(double* delta, int elecState){
       else{
          // r is active virtual MO
          for(int i=0; i<numberActiveOcc; i++){
-            int slaterDeterminantIndex = numberActiveVir*i + (r-numberActiveOcc);
+            int slaterDeterminantIndex = this->GetSlaterDeterminantIndex(i,(r-numberActiveOcc));
             value += pow(this->matrixCIS[elecState][slaterDeterminantIndex],2.0);
             //c.f. The index of each MO (i and r)is below:
             //int numberOcc = this->molecule->GetTotalNumberValenceElectrons()/2;
@@ -1111,6 +1145,61 @@ double Mndo::GetZMatrixForceElement(double* y,
    return value;
 }
 
+void Mndo::CalcXiMatrices(double** xiOcc, 
+                          double** xiVir, 
+                          int elecState, 
+                          double** transposedFockMatrix){
+   int numberAOs = this->molecule->GetTotalNumberAOs();
+   int numberActiveOcc = Parameters::GetInstance()->GetActiveOccCIS();
+   int numberActiveVir = Parameters::GetInstance()->GetActiveVirCIS();
+   MallocerFreer::GetInstance()->InitializeDoubleMatrix2d(
+                                 xiOcc, numberActiveOcc, numberAOs);
+   MallocerFreer::GetInstance()->InitializeDoubleMatrix2d(
+                                 xiVir, numberActiveVir, numberAOs);
+   // xiOcc
+   for(int p=0; p<numberActiveOcc; p++){
+      for(int mu=0; mu<numberAOs; mu++){
+         int slaterDeterminantIndex = 0;
+         for(int a=0; a<numberActiveVir; a++){
+            slaterDeterminantIndex = this->GetSlaterDeterminantIndex(p,a);
+            xiOcc[p][mu] += this->matrixCIS[elecState][slaterDeterminantIndex]
+                           *transposedFockMatrix[mu][a];
+         }
+      }
+   }
+   // xiVir
+   for(int p=0; p<numberActiveVir; p++){
+      for(int mu=0; mu<numberAOs; mu++){
+         int slaterDeterminantIndex = 0;
+         for(int i=0; i<numberActiveOcc; i++){
+            slaterDeterminantIndex = this->GetSlaterDeterminantIndex(i,p);
+            xiVir[p][mu] += this->matrixCIS[elecState][slaterDeterminantIndex]
+                           *transposedFockMatrix[mu][i];
+         }
+      }
+   }
+}
+
+void Mndo::CalcEtaMatrix(double** eta, int elecState, double** transposedFockMatrix){
+   int numberAOs = this->molecule->GetTotalNumberAOs();
+   int numberActiveOcc = Parameters::GetInstance()->GetActiveOccCIS();
+   int numberActiveVir = Parameters::GetInstance()->GetActiveVirCIS();
+   MallocerFreer::GetInstance()->InitializeDoubleMatrix2d(
+                                 eta, numberAOs, numberAOs);
+   for(int mu=0; mu<numberAOs; mu++){
+      for(int nu=0; nu<numberAOs; nu++){
+         int slaterDeterminantIndex = 0;
+         for(int i=0; i<numberActiveOcc; i++){
+            for(int a=0; a<numberActiveVir; a++){
+               slaterDeterminantIndex = this->GetSlaterDeterminantIndex(i,a);
+               eta[mu][nu] += this->matrixCIS[elecState][slaterDeterminantIndex]
+                             *transposedFockMatrix[mu][i]
+                             *transposedFockMatrix[nu][a];
+            }
+         }
+      }
+   }
+}
 
 // see [PT_1996, PT_1997]
 void Mndo::CalcZMatrixForce(vector<int> elecStates){
@@ -1133,29 +1222,31 @@ void Mndo::CalcZMatrixForce(vector<int> elecStates){
    double** kRDager = NULL; // Dagar of K_{R} matrix, see (46) in [PT_1996]
    double* y = NULL; // y-vector in (54) in [PT_1996]
    double** transposedFockMatrix = NULL; // transposed CIS matrix
+   double** xiOcc = NULL;
+   double** xiVir = NULL;
+   double** eta = NULL;
    this->MallocTempMatrixForZMatrix(&delta,
                                     &q,
                                     &kNR,
                                     &kRDager,
                                     &y,
                                     &transposedFockMatrix,
+                                    &xiOcc,
+                                    &xiVir,
+                                    &eta,
                                     nonRedundantQIndeces.size(),
                                     redundantQIndeces.size());
    try{
-      // transpose Fock matrix
       this->TransposeFockMatrixMatrix(transposedFockMatrix);
-      // \Gamma_{NR} - K_{NR}
       this->CalcKNRMatrix(kNR, nonRedundantQIndeces);
-      // K_{R}^{\dager} * \Gamma_{R}^{-1}
       this->CalcKRDagerMatrix(kRDager, nonRedundantQIndeces,redundantQIndeces);
       for(int n=0; n<elecStates.size(); n++){
          if(0 < elecStates[n]){
             int elecState = elecStates[n]-1;
-            // delta
             this->CalcDeltaVector(delta, elecState);
-            // Q
+            this->CalcXiMatrices(xiOcc, xiVir, elecState, transposedFockMatrix);
+            this->CalcEtaMatrix(eta, elecState, transposedFockMatrix);
             this->CalcQVector(q, delta, elecState, nonRedundantQIndeces, redundantQIndeces);
-            // right hand side of (54) in [PT_1996]      
             this->CaclAuxiliaryVector(y, q, kRDager, nonRedundantQIndeces, redundantQIndeces);
             // solve (54) in [PT_1996]
             //MolDS_mkl_wrapper::LapackWrapper::GetInstance()->Dsysv(kNR, 
@@ -1185,6 +1276,9 @@ void Mndo::CalcZMatrixForce(vector<int> elecStates){
                                      &kRDager,
                                      &y,
                                      &transposedFockMatrix,
+                                     &xiOcc,
+                                     &xiVir,
+                                     &eta,
                                      nonRedundantQIndeces.size(),
                                      redundantQIndeces.size());
       throw ex;
@@ -1195,6 +1289,9 @@ void Mndo::CalcZMatrixForce(vector<int> elecStates){
                                   &kRDager,
                                   &y,
                                   &transposedFockMatrix,
+                                  &xiOcc,
+                                  &xiVir,
+                                  &eta,
                                   nonRedundantQIndeces.size(),
                                   redundantQIndeces.size());
 }

@@ -65,6 +65,7 @@ protected:
                                               double** gammaAB);
    virtual void CalcCISMatrix(double** matrixCIS, int numberOcc, int numberVir);
    virtual void CalcForce(std::vector<int> elecStates);
+   int GetSlaterDeterminantIndex(int activeOccIndex, int activeVirIndex);
    void CheckMatrixForce(std::vector<int> elecStates);
 private:
    std::string errorMessageCalcForceNotGroundState;

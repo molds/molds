@@ -1435,6 +1435,14 @@ void ZindoS::CheckMatrixForce(vector<int> elecStates){
    }
 }
 
+// Note taht activeOccIndex and activeVirIndex are not MO's number.
+int ZindoS::GetSlaterDeterminantIndex(int activeOccIndex, 
+                                      int activeVirIndex){
+   return Parameters::GetInstance()->GetActiveVirCIS()
+         *activeOccIndex
+         +activeVirIndex; 
+}
+
 // electronicStates is indeces of the electroinc eigen states.
 // The index = 0 means electronic ground state. 
 void ZindoS::CalcForce(vector<int> elecStates){
