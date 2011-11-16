@@ -1067,10 +1067,22 @@ double Mndo::GetZMatrixForceElement(double* y,
                                     int mu,
                                     int nu){
    double value=0.0;
-   // ToDo: implement GetZMatrixForceElement.
-   stringstream ss;
-   ss << "Error: Mndo::GetZMatrixForceElement is not implemented.";
-   throw MolDSException(ss.str());
+   for(int i=0; i<nonRedundantQIndeces.size(); i++){
+      int moI = nonRedundantQIndeces[i].moI;
+      int moJ = nonRedundantQIndeces[i].moJ;
+      value += y[i]
+              *transposedFockMatrix[mu][moI]
+              *transposedFockMatrix[nu][moJ];
+   }
+   for(int i=0; i<redundantQIndeces.size(); i++){
+      int j = nonRedundantQIndeces.size() + i;
+      int moI = redundantQIndeces[i].moI;
+      int moJ = redundantQIndeces[i].moJ;
+      value +=(q[j]
+              /this->GetGammaRElement(moI, moJ, moI, moJ))
+              *transposedFockMatrix[mu][moI]
+              *transposedFockMatrix[nu][moJ];
+   }
    return value;
 }
 
