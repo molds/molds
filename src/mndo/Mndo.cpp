@@ -943,6 +943,11 @@ double Mndo::GetKNRElement(int moI, int moJ, int moK, int moL){
    return value;
 }
 
+// Dager of (45) in [PT_1996]. Note taht the (45) is real number.
+double Mndo::GetKRDagerElement(int moI, int moJ, int moK, int moL){
+   return this->GetKRElement(moK, moL, moI, moJ);
+}
+
 // see (45) in [PT_1996]
 double Mndo::GetKRElement(int moI, int moJ, int moK, int moL){
    double value=0.0;
@@ -1035,10 +1040,16 @@ void Mndo::CalcKNRMatrix(double** kNR, vector<MoIndexPair> nonRedundantQIndeces)
 void Mndo::CalcKRDagerMatrix(double** kRDager, 
                              vector<MoIndexPair> nonRedundantQIndeces,
                              vector<MoIndexPair> redundantQIndeces){
-   // ToDo: implement "K_{R}^{\dager} * \Gamma_{R}^{-1}"
-   stringstream ss;
-   ss << "Error: Mndo::CalcKRDagerMatrix is not implemented.";
-   throw MolDSException(ss.str());
+   for(int i=0; i<nonRedundantQIndeces.size(); i++){
+      int moI = nonRedundantQIndeces[i].moI;
+      int moJ = nonRedundantQIndeces[i].moJ;
+      for(int j=0; j<redundantQIndeces.size(); j++){
+         int moK = redundantQIndeces[j].moI;
+         int moL = redundantQIndeces[j].moJ;
+         kRDager[i][j] = this->GetKRDagerElement(moI, moJ, moK, moL)
+                        /this->GetGammaRElement(moK, moL, moK, moL);
+      }
+   }
 }
 
 // right hand side of (54) in [PT_1996]      
