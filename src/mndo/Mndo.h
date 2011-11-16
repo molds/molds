@@ -93,7 +93,7 @@ private:
                                    double*** kNR, 
                                    double*** kRDag,
                                    double** y,
-                                   double** b,
+                                   double*** transposedMatrixCIS,
                                    int sizeQNR,
                                    int sizeQR);
    void FreeTempMatrixForZMatrix(double** delta,
@@ -101,10 +101,33 @@ private:
                                  double*** kNR, 
                                  double*** kRDag,
                                  double** y,
-                                 double** b,
+                                 double*** transposedMatrixCIS,
                                  int sizeQNR,
                                  int sizeQR);
    void CalcDeltaVector(double* delta, int elecState);
+   void CalcQVector(double* q, 
+                    double* delta, 
+                    int elecState,
+                    std::vector<MoIndexPair> nonRedundantQIndeces,
+                    std::vector<MoIndexPair> redundantQIndeces);
+   void TransposeMatrixCISMatrix(double** transposedMatrixCIS);
+   void CalcKNRMatrix(double** kNR, 
+                      std::vector<MoIndexPair> nonRedundantQIndeces);
+   void CalcKRDagerMatrix(double** kRDager, 
+                          std::vector<MoIndexPair> nonRedundantQIndeces,
+                          std::vector<MoIndexPair> redundantQIndeces);
+   void CaclAuxiliaryVector(double* y,
+                            double* q,
+                            double** kRDager,
+                            std::vector<MoIndexPair> nonRedundantQIndeces,
+                            std::vector<MoIndexPair> redundantQIndeces);
+   double GetZMatrixForceElement(double* y,
+                                 double* q,
+                                 double** transposedMatrixCIS,
+                                 std::vector<MoIndexPair> nonRedundantQIndeces,
+                                 std::vector<MoIndexPair> redundantQIndeces,
+                                 int mu, 
+                                 int nu);
    void CalcZMatrixForce(std::vector<int> elecStates);
    double GetCISCoefficientMOEnergy(int k, 
                                     int l, 

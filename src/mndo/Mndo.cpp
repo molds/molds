@@ -8,6 +8,7 @@
 #include<stdexcept>
 #include<omp.h>
 #include"../base/MolDSException.h"
+#include"../mkl_wrapper/LapackWrapper.h"
 #include"../base/Enums.h"
 #include"../base/MallocerFreer.h"
 #include"../base/EularAngle.h"
@@ -778,7 +779,7 @@ void Mndo::MallocTempMatrixForZMatrix(double** delta,
                                       double*** kNR,
                                       double*** kRDag,
                                       double** y,
-                                      double** b,
+                                      double*** transposedMatrixCIS,
                                       int sizeQNR,
                                       int sizeQR){
    int numberActiveMO = Parameters::GetInstance()->GetActiveOccCIS()
@@ -789,14 +790,15 @@ void Mndo::MallocTempMatrixForZMatrix(double** delta,
                                       sizeQNR+sizeQR);
    *kNR = MallocerFreer::GetInstance()->MallocDoubleMatrix2d(
                                         sizeQNR,
-                                        sizeQR);
+                                        sizeQNR);
    *kRDag = MallocerFreer::GetInstance()->MallocDoubleMatrix2d(
                                           sizeQNR,
                                           sizeQR);
    *y = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(
                                       sizeQNR);
-   *b = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(
-                                      sizeQNR);
+   *transposedMatrixCIS = MallocerFreer::GetInstance()->MallocDoubleMatrix2d(
+                                                        matrixCISdimension,
+                                                        matrixCISdimension);
 }
 
 void Mndo::FreeTempMatrixForZMatrix(double** delta,
@@ -804,7 +806,7 @@ void Mndo::FreeTempMatrixForZMatrix(double** delta,
                                     double*** kNR,
                                     double*** kRDag,
                                     double** y,
-                                    double** b,
+                                    double*** transposedMatrixCIS,
                                     int sizeQNR,
                                     int sizeQR){
    if(*delta != NULL){
@@ -827,9 +829,10 @@ void Mndo::FreeTempMatrixForZMatrix(double** delta,
       MallocerFreer::GetInstance()->FreeDoubleMatrix1d(y);
       //cout << "y  deleted" << endl;
    }
-   if(*b != NULL){
-      MallocerFreer::GetInstance()->FreeDoubleMatrix1d(b);
-      //cout << "b  deleted" << endl;
+   if(*transposedMatrixCIS != NULL){
+      MallocerFreer::GetInstance()->FreeDoubleMatrix2d(transposedMatrixCIS,
+                                                       matrixCISdimension);
+      //cout << "transposedMatrixCIS  deleted" << endl;
    }
 }
 
@@ -877,6 +880,7 @@ double Mndo::GetCISCoefficientTwoElecIntegral(int k,
    return value;
 }
 
+// see (9) in [PT_1997]
 void Mndo::CalcDeltaVector(double* delta, int elecState){
    int numberActiveOcc = Parameters::GetInstance()->GetActiveOccCIS();
    int numberActiveVir = Parameters::GetInstance()->GetActiveVirCIS();
@@ -910,6 +914,85 @@ void Mndo::CalcDeltaVector(double* delta, int elecState){
    }
 }
 
+// see (20) - (23) in [PT_1997]
+void Mndo::CalcQVector(double* q, 
+                       double* delta, 
+                       int elecState,
+                       vector<MoIndexPair> nonRedundantQIndeces,
+                       vector<MoIndexPair> redundantQIndeces){
+   MallocerFreer::GetInstance()->InitializeDoubleMatrix1d(
+                                 q,
+                                 nonRedundantQIndeces.size()+redundantQIndeces.size());
+
+   // ToDo: implement CalcQVector
+   stringstream ss;
+   ss << "Error: Mndo::CalcQVector is not implemented.";
+   throw MolDSException(ss.str());
+}
+
+// see (43) and (45) in [PT_1996].
+// This method calculates "\Gamma_{NR} - K_{NR}".
+// Note taht K_{NR} is not calculated.
+void Mndo::CalcKNRMatrix(double** kNR, vector<MoIndexPair> nonRedundantQIndeces){
+   // ToDo: implement "\Gamma_{NR} - K_{NR}"
+   stringstream ss;
+   ss << "Error: Mndo::CalcKNRMatrix is not implemented.";
+   throw MolDSException(ss.str());
+}
+
+// see (44) and (46) in [PT_1996].
+// This method calculates "K_{R}^{\dager} * \Gamma_{NR}^{-1}".
+// Note taht K_{R}^{\dager} is not calculated.
+void Mndo::CalcKRDagerMatrix(double** kRDager, 
+                             vector<MoIndexPair> nonRedundantQIndeces,
+                             vector<MoIndexPair> redundantQIndeces){
+   // ToDo: implement "K_{R}^{\dager} * \Gamma_{NR}^{-1}"
+   stringstream ss;
+   ss << "Error: Mndo::CalcKRDagerMatrix is not implemented.";
+   throw MolDSException(ss.str());
+}
+
+// right hand side of (54) in [PT_1996]      
+void Mndo::CaclAuxiliaryVector(double* y, 
+                               double* q, 
+                               double** kRDager, 
+                               vector<MoIndexPair> nonRedundantQIndeces, 
+                               vector<MoIndexPair> redundantQIndeces){
+   MallocerFreer::GetInstance()->InitializeDoubleMatrix1d(
+                                 y,
+                                 nonRedundantQIndeces.size());
+   // ToDo: implement CaclAuxiliaryVector.
+   stringstream ss;
+   ss << "Error: Mndo::CaclAuxiliaryVector is not implemented.";
+   throw MolDSException(ss.str());
+}
+
+void Mndo::TransposeMatrixCISMatrix(double** transposedMatrixCIS){
+   for(int i=0; i<matrixCISdimension; i++){
+      for(int j=0; j<matrixCISdimension; j++){
+         transposedMatrixCIS[j][i] = this->matrixCIS[i][j];
+      }
+   }
+}
+
+// each element (mu, nu) of z matrix.
+// see (57) in [PT_1996]
+double Mndo::GetZMatrixForceElement(double* y,
+                                    double* q,
+                                    double** transposedMatrixCIS,
+                                    vector<MoIndexPair> nonRedundantQIndeces,
+                                    vector<MoIndexPair> redundantQIndeces,
+                                    int mu,
+                                    int nu){
+   double value=0.0;
+   // ToDo: implement GetZMatrixForceElement.
+   stringstream ss;
+   ss << "Error: Mndo::GetZMatrixForceElement is not implemented.";
+   throw MolDSException(ss.str());
+   return value;
+}
+
+
 // see [PT_1996, PT_1997]
 void Mndo::CalcZMatrixForce(vector<int> elecStates){
    this->CheckZMatrixForce(elecStates); 
@@ -928,31 +1011,59 @@ void Mndo::CalcZMatrixForce(vector<int> elecStates){
    double* delta = NULL; // Delta matrix, see (9) in [PT_1997]
    double* q = NULL; //// Q-vector in (19) in [PT_1997]
    double** kNR = NULL; // K_{NR} matrix, see (45) in [PT_1996]
-   double** kRDag = NULL; // Daggar of K_{R} matrix, see (46) in [PT_1996]
+   double** kRDager = NULL; // Dagar of K_{R} matrix, see (46) in [PT_1996]
    double* y = NULL; // y-vector in (54) in [PT_1996]
-   double* b = NULL; // right-hand-side of (54) in [PT_1996]
+   double** transposedMatrixCIS = NULL; // transposed CIS matrix
    this->MallocTempMatrixForZMatrix(&delta,
                                     &q,
                                     &kNR,
-                                    &kRDag,
+                                    &kRDager,
                                     &y,
-                                    &b,
+                                    &transposedMatrixCIS,
                                     nonRedundantQIndeces.size(),
                                     redundantQIndeces.size());
    try{
+      // transpose CIS matrix
+      this->TransposeMatrixCISMatrix(transposedMatrixCIS);
+      // \Gamma_{NR} - K_{NR}
+      this->CalcKNRMatrix(kNR, nonRedundantQIndeces);
+      // K_{R}^{\dager} * \Gamma_{NR}^{-1}
+      this->CalcKRDagerMatrix(kRDager, nonRedundantQIndeces,redundantQIndeces);
       for(int n=0; n<elecStates.size(); n++){
          int elecState = elecStates[n];
          // delta
          this->CalcDeltaVector(delta, elecState);
+         // Q
+         this->CalcQVector(q, delta, elecState, nonRedundantQIndeces, redundantQIndeces);
+         // right hand side of (54) in [PT_1996]      
+         this->CaclAuxiliaryVector(y, q, kRDager, nonRedundantQIndeces, redundantQIndeces);
+         // solve (54) in [PT_1996]
+         //MolDS_mkl_wrapper::LapackWrapper::GetInstance()->Dsysv(kNR, 
+         //                                                       y, 
+         //                                                       nonRedundantQIndeces.size());
+
+         // calculate each element of Z matrix.
+         for(int mu=0; mu<numberAOs; mu++){
+            for(int nu=0; nu<numberAOs; nu++){
+               this->zMatrixForce[n][mu][nu] = this->GetZMatrixForceElement(
+                                                     y,
+                                                     q,
+                                                     transposedMatrixCIS,
+                                                     nonRedundantQIndeces,
+                                                     redundantQIndeces,
+                                                     mu,
+                                                     nu);
+            }
+         }
       }
    }
    catch(MolDSException ex){
       this->FreeTempMatrixForZMatrix(&delta,
                                      &q,
                                      &kNR,
-                                     &kRDag,
+                                     &kRDager,
                                      &y,
-                                     &b,
+                                     &transposedMatrixCIS,
                                      nonRedundantQIndeces.size(),
                                      redundantQIndeces.size());
       throw ex;
@@ -960,9 +1071,9 @@ void Mndo::CalcZMatrixForce(vector<int> elecStates){
    this->FreeTempMatrixForZMatrix(&delta,
                                   &q,
                                   &kNR,
-                                  &kRDag,
+                                  &kRDager,
                                   &y,
-                                  &b,
+                                  &transposedMatrixCIS,
                                   nonRedundantQIndeces.size(),
                                   redundantQIndeces.size());
 }
