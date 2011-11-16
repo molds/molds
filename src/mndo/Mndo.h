@@ -136,6 +136,7 @@ private:
                                  int mu, 
                                  int nu);
    void CalcZMatrixForce(std::vector<int> elecStates);
+   bool RequiresExcitedStatesForce(std::vector<int> elecStates);
    double GetCISCoefficientMOEnergy(int k, 
                                     int l, 
                                     int r, 

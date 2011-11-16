@@ -1149,30 +1149,32 @@ void Mndo::CalcZMatrixForce(vector<int> elecStates){
       // K_{R}^{\dager} * \Gamma_{R}^{-1}
       this->CalcKRDagerMatrix(kRDager, nonRedundantQIndeces,redundantQIndeces);
       for(int n=0; n<elecStates.size(); n++){
-         int elecState = elecStates[n];
-         // delta
-         this->CalcDeltaVector(delta, elecState);
-         // Q
-         this->CalcQVector(q, delta, elecState, nonRedundantQIndeces, redundantQIndeces);
-         // right hand side of (54) in [PT_1996]      
-         this->CaclAuxiliaryVector(y, q, kRDager, nonRedundantQIndeces, redundantQIndeces);
-         // solve (54) in [PT_1996]
-         //MolDS_mkl_wrapper::LapackWrapper::GetInstance()->Dsysv(kNR, 
-         //                                                       y, 
-         //                                                       nonRedundantQIndeces.size());
+         if(0 < elecStates[n]){
+            int elecState = elecStates[n]-1;
+            // delta
+            this->CalcDeltaVector(delta, elecState);
+            // Q
+            this->CalcQVector(q, delta, elecState, nonRedundantQIndeces, redundantQIndeces);
+            // right hand side of (54) in [PT_1996]      
+            this->CaclAuxiliaryVector(y, q, kRDager, nonRedundantQIndeces, redundantQIndeces);
+            // solve (54) in [PT_1996]
+            //MolDS_mkl_wrapper::LapackWrapper::GetInstance()->Dsysv(kNR, 
+            //                                                       y, 
+            //                                                       nonRedundantQIndeces.size());
 
-         // calculate each element of Z matrix.
-         for(int mu=0; mu<numberAOs; mu++){
-            for(int nu=0; nu<numberAOs; nu++){
-               this->zMatrixForce[n][mu][nu] = this->GetZMatrixForceElement(
-                                                     y,
-                                                     q,
-                                                     transposedFockMatrix,
-                                                     nonRedundantQIndeces,
-                                                     redundantQIndeces,
-                                                     mu,
-                                                     nu);
-            }
+            // calculate each element of Z matrix.
+            for(int mu=0; mu<numberAOs; mu++){
+               for(int nu=0; nu<numberAOs; nu++){
+                  this->zMatrixForce[n][mu][nu] = this->GetZMatrixForceElement(
+                                                        y,
+                                                        q,
+                                                        transposedFockMatrix,
+                                                        nonRedundantQIndeces,
+                                                        redundantQIndeces,
+                                                        mu,
+                                                        nu);
+               }
+            }  
          }
       }
    }
@@ -1197,11 +1199,21 @@ void Mndo::CalcZMatrixForce(vector<int> elecStates){
                                   redundantQIndeces.size());
 }
 
+bool Mndo::RequiresExcitedStatesForce(vector<int> elecStates){
+   bool requires = true;
+   if(elecStates.size()==0 && elecStates[0]==0){
+      requires = false;
+   }
+   return requires;
+}
+
 // electronicStateIndex is index of the electroinc eigen state.
 // "electronicStateIndex = 0" means electronic ground state. 
 void Mndo::CalcForce(vector<int> elecStates){
    this->CheckMatrixForce(elecStates);
-   this->CalcZMatrixForce(elecStates);
+   if(this->RequiresExcitedStatesForce(elecStates)){
+      this->CalcZMatrixForce(elecStates);
+   }
    #pragma omp parallel
    {
       double***** twoElecTwoCoreFirstDeriv = MallocerFreer::GetInstance()->MallocDoubleMatrix5d(
