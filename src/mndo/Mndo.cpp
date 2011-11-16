@@ -1023,12 +1023,12 @@ void Mndo::CalcKNRMatrix(double** kNR, vector<MoIndexPair> nonRedundantQIndeces)
 }
 
 // see (44) and (46) in [PT_1996].
-// This method calculates "K_{R}^{\dager} * \Gamma_{NR}^{-1}".
+// This method calculates "K_{R}^{\dager} * \Gamma_{R}^{-1}".
 // Note taht K_{R}^{\dager} is not calculated.
 void Mndo::CalcKRDagerMatrix(double** kRDager, 
                              vector<MoIndexPair> nonRedundantQIndeces,
                              vector<MoIndexPair> redundantQIndeces){
-   // ToDo: implement "K_{R}^{\dager} * \Gamma_{NR}^{-1}"
+   // ToDo: implement "K_{R}^{\dager} * \Gamma_{R}^{-1}"
    stringstream ss;
    ss << "Error: Mndo::CalcKRDagerMatrix is not implemented.";
    throw MolDSException(ss.str());
@@ -1043,10 +1043,17 @@ void Mndo::CaclAuxiliaryVector(double* y,
    MallocerFreer::GetInstance()->InitializeDoubleMatrix1d(
                                  y,
                                  nonRedundantQIndeces.size());
-   // ToDo: implement CaclAuxiliaryVector.
-   stringstream ss;
-   ss << "Error: Mndo::CaclAuxiliaryVector is not implemented.";
-   throw MolDSException(ss.str());
+   for(int i=0; i<nonRedundantQIndeces.size(); i++){
+      int moI = nonRedundantQIndeces[i].moI;
+      int moJ = nonRedundantQIndeces[i].moJ;
+      y[i] += q[i]/this->GetNRElement(moI, moJ, moI, moJ);
+      for(int j=0; j<redundantQIndeces.size(); j++){
+         int k = nonRedundantQIndeces.size() + j; 
+         int moK = redundantQIndeces[j].moI;
+         int moL = redundantQIndeces[j].moJ;
+         y[i] += kRDager[i][j]*q[k];
+      }
+   }
 }
 
 void Mndo::TransposeFockMatrixMatrix(double** transposedFockMatrix){
@@ -1117,11 +1124,11 @@ void Mndo::CalcZMatrixForce(vector<int> elecStates){
                                     nonRedundantQIndeces.size(),
                                     redundantQIndeces.size());
    try{
-      // transpose CIS matrix
+      // transpose Fock matrix
       this->TransposeFockMatrixMatrix(transposedFockMatrix);
       // \Gamma_{NR} - K_{NR}
       this->CalcKNRMatrix(kNR, nonRedundantQIndeces);
-      // K_{R}^{\dager} * \Gamma_{NR}^{-1}
+      // K_{R}^{\dager} * \Gamma_{R}^{-1}
       this->CalcKRDagerMatrix(kRDager, nonRedundantQIndeces,redundantQIndeces);
       for(int n=0; n<elecStates.size(); n++){
          int elecState = elecStates[n];
