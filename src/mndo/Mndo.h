@@ -93,7 +93,7 @@ private:
                                    double*** kNR, 
                                    double*** kRDag,
                                    double** y,
-                                   double*** transposedMatrixCIS,
+                                   double*** transposedFockMatrix,
                                    int sizeQNR,
                                    int sizeQR);
    void FreeTempMatrixForZMatrix(double** delta,
@@ -101,7 +101,7 @@ private:
                                  double*** kNR, 
                                  double*** kRDag,
                                  double** y,
-                                 double*** transposedMatrixCIS,
+                                 double*** transposedFockMatrix,
                                  int sizeQNR,
                                  int sizeQR);
    void CalcDeltaVector(double* delta, int elecState);
@@ -110,7 +110,7 @@ private:
                     int elecState,
                     std::vector<MoIndexPair> nonRedundantQIndeces,
                     std::vector<MoIndexPair> redundantQIndeces);
-   void TransposeMatrixCISMatrix(double** transposedMatrixCIS);
+   void TransposeFockMatrixMatrix(double** transposedFockMatrix);
    void CalcKNRMatrix(double** kNR, 
                       std::vector<MoIndexPair> nonRedundantQIndeces);
    void CalcKRDagerMatrix(double** kRDager, 
@@ -123,7 +123,7 @@ private:
                             std::vector<MoIndexPair> redundantQIndeces);
    double GetZMatrixForceElement(double* y,
                                  double* q,
-                                 double** transposedMatrixCIS,
+                                 double** transposedFockMatrix,
                                  std::vector<MoIndexPair> nonRedundantQIndeces,
                                  std::vector<MoIndexPair> redundantQIndeces,
                                  int mu, 

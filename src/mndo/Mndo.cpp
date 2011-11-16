@@ -779,7 +779,7 @@ void Mndo::MallocTempMatrixForZMatrix(double** delta,
                                       double*** kNR,
                                       double*** kRDag,
                                       double** y,
-                                      double*** transposedMatrixCIS,
+                                      double*** transposedFockMatrix,
                                       int sizeQNR,
                                       int sizeQR){
    int numberActiveMO = Parameters::GetInstance()->GetActiveOccCIS()
@@ -796,9 +796,10 @@ void Mndo::MallocTempMatrixForZMatrix(double** delta,
                                           sizeQR);
    *y = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(
                                       sizeQNR);
-   *transposedMatrixCIS = MallocerFreer::GetInstance()->MallocDoubleMatrix2d(
-                                                        matrixCISdimension,
-                                                        matrixCISdimension);
+   int numberAOs = this->molecule->GetTotalNumberAOs();
+   *transposedFockMatrix = MallocerFreer::GetInstance()->MallocDoubleMatrix2d(
+                                                         numberAOs,
+                                                         numberAOs);
 }
 
 void Mndo::FreeTempMatrixForZMatrix(double** delta,
@@ -806,7 +807,7 @@ void Mndo::FreeTempMatrixForZMatrix(double** delta,
                                     double*** kNR,
                                     double*** kRDag,
                                     double** y,
-                                    double*** transposedMatrixCIS,
+                                    double*** transposedFockMatrix,
                                     int sizeQNR,
                                     int sizeQR){
    if(*delta != NULL){
@@ -829,10 +830,11 @@ void Mndo::FreeTempMatrixForZMatrix(double** delta,
       MallocerFreer::GetInstance()->FreeDoubleMatrix1d(y);
       //cout << "y  deleted" << endl;
    }
-   if(*transposedMatrixCIS != NULL){
-      MallocerFreer::GetInstance()->FreeDoubleMatrix2d(transposedMatrixCIS,
-                                                       matrixCISdimension);
-      //cout << "transposedMatrixCIS  deleted" << endl;
+   if(*transposedFockMatrix != NULL){
+      int numberAOs = this->molecule->GetTotalNumberAOs();
+      MallocerFreer::GetInstance()->FreeDoubleMatrix2d(transposedFockMatrix,
+                                                       numberAOs);
+      //cout << "transposedFockMatrix  deleted" << endl;
    }
 }
 
@@ -967,10 +969,10 @@ void Mndo::CaclAuxiliaryVector(double* y,
    throw MolDSException(ss.str());
 }
 
-void Mndo::TransposeMatrixCISMatrix(double** transposedMatrixCIS){
-   for(int i=0; i<matrixCISdimension; i++){
-      for(int j=0; j<matrixCISdimension; j++){
-         transposedMatrixCIS[j][i] = this->matrixCIS[i][j];
+void Mndo::TransposeFockMatrixMatrix(double** transposedFockMatrix){
+   for(int i=0; i<this->molecule->GetTotalNumberAOs(); i++){
+      for(int j=0; j<this->molecule->GetTotalNumberAOs(); j++){
+         transposedFockMatrix[j][i] = this->fockMatrix[i][j];
       }
    }
 }
@@ -979,7 +981,7 @@ void Mndo::TransposeMatrixCISMatrix(double** transposedMatrixCIS){
 // see (57) in [PT_1996]
 double Mndo::GetZMatrixForceElement(double* y,
                                     double* q,
-                                    double** transposedMatrixCIS,
+                                    double** transposedFockMatrix,
                                     vector<MoIndexPair> nonRedundantQIndeces,
                                     vector<MoIndexPair> redundantQIndeces,
                                     int mu,
@@ -1013,18 +1015,18 @@ void Mndo::CalcZMatrixForce(vector<int> elecStates){
    double** kNR = NULL; // K_{NR} matrix, see (45) in [PT_1996]
    double** kRDager = NULL; // Dagar of K_{R} matrix, see (46) in [PT_1996]
    double* y = NULL; // y-vector in (54) in [PT_1996]
-   double** transposedMatrixCIS = NULL; // transposed CIS matrix
+   double** transposedFockMatrix = NULL; // transposed CIS matrix
    this->MallocTempMatrixForZMatrix(&delta,
                                     &q,
                                     &kNR,
                                     &kRDager,
                                     &y,
-                                    &transposedMatrixCIS,
+                                    &transposedFockMatrix,
                                     nonRedundantQIndeces.size(),
                                     redundantQIndeces.size());
    try{
       // transpose CIS matrix
-      this->TransposeMatrixCISMatrix(transposedMatrixCIS);
+      this->TransposeFockMatrixMatrix(transposedFockMatrix);
       // \Gamma_{NR} - K_{NR}
       this->CalcKNRMatrix(kNR, nonRedundantQIndeces);
       // K_{R}^{\dager} * \Gamma_{NR}^{-1}
@@ -1048,7 +1050,7 @@ void Mndo::CalcZMatrixForce(vector<int> elecStates){
                this->zMatrixForce[n][mu][nu] = this->GetZMatrixForceElement(
                                                      y,
                                                      q,
-                                                     transposedMatrixCIS,
+                                                     transposedFockMatrix,
                                                      nonRedundantQIndeces,
                                                      redundantQIndeces,
                                                      mu,
@@ -1063,7 +1065,7 @@ void Mndo::CalcZMatrixForce(vector<int> elecStates){
                                      &kNR,
                                      &kRDager,
                                      &y,
-                                     &transposedMatrixCIS,
+                                     &transposedFockMatrix,
                                      nonRedundantQIndeces.size(),
                                      redundantQIndeces.size());
       throw ex;
@@ -1073,7 +1075,7 @@ void Mndo::CalcZMatrixForce(vector<int> elecStates){
                                   &kNR,
                                   &kRDager,
                                   &y,
-                                  &transposedMatrixCIS,
+                                  &transposedFockMatrix,
                                   nonRedundantQIndeces.size(),
                                   redundantQIndeces.size());
 }
