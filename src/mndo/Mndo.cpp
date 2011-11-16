@@ -1015,11 +1015,18 @@ void Mndo::CalcQVector(double* q,
 // see (43) and (45) in [PT_1996].
 // This method calculates "\Gamma_{NR} - K_{NR}".
 // Note taht K_{NR} is not calculated.
+// Note taht right upper part is only calulated because this matrix is symmetric.
 void Mndo::CalcKNRMatrix(double** kNR, vector<MoIndexPair> nonRedundantQIndeces){
-   // ToDo: implement "\Gamma_{NR} - K_{NR}"
-   stringstream ss;
-   ss << "Error: Mndo::CalcKNRMatrix is not implemented.";
-   throw MolDSException(ss.str());
+   for(int i=0; i<nonRedundantQIndeces.size(); i++){
+      int moI = nonRedundantQIndeces[i].moI;
+      int moJ = nonRedundantQIndeces[i].moJ;
+      for(int j=0; j<nonRedundantQIndeces.size(); j++){
+         int moK = nonRedundantQIndeces[j].moI;
+         int moL = nonRedundantQIndeces[j].moJ;
+         kNR[i][j] = this->GetGammaNRElement(moI, moJ, moK, moL)
+                    -this->GetKNRElement(moI, moJ, moK, moL);
+      }
+   }
 }
 
 // see (44) and (46) in [PT_1996].
