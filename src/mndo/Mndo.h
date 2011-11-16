@@ -88,6 +88,12 @@ private:
    double*** zMatrixForce;
    int zMatrixForceElecStatesNum;
    double heatsFormation;
+   double GetGammaNRElement(int moI, int moJ, int moK, int moL);
+   double GetGammaRElement(int moI, int moJ, int moK, int moL);
+   double GetNNRElement(int moI, int moJ, int moK, int moL);
+   double GetNRElement(int moI, int moJ, int moK, int moL);
+   double GetKNRElement(int moI, int moJ, int moK, int moL);
+   double GetKRElement(int moI, int moJ, int moK, int moL);
    void MallocTempMatrixForZMatrix(double** delta,
                                    double** q,
                                    double*** kNR, 

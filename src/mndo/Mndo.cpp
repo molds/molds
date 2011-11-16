@@ -882,6 +882,86 @@ double Mndo::GetCISCoefficientTwoElecIntegral(int k,
    return value;
 }
 
+// see (40) in [PT_1996]
+double Mndo::GetGammaNRElement(int moI, int moJ, int moK, int moL){
+   double value=0.0;
+   if(moI==moK && moJ==moL){
+      int numberOcc = this->molecule->GetTotalNumberValenceElectrons()/2;
+      int nI = moI<numberOcc ? 2 : 1;
+      int nJ = moJ<numberOcc ? 2 : 1;
+      value = (energiesMO[moJ]-energiesMO[moI])/((double)(nJ-nI));
+   }
+   return value;
+}
+
+// see (41) & (42) in [PT_1996]
+double Mndo::GetGammaRElement(int moI, int moJ, int moK, int moL){
+   double value=0.0;
+   if(moI==moK && moJ==moL){
+      value = moI==moJ ? 1 : energiesMO[moJ]-energiesMO[moI];
+   }
+   return value;
+}
+
+// see (43) in [PT_1996]
+double Mndo::GetNNRElement(int moI, int moJ, int moK, int moL){
+   double value=0.0;
+   if(moI==moK && moJ==moL){
+      int numberOcc = this->molecule->GetTotalNumberValenceElectrons()/2;
+      int nI = moI<numberOcc ? 2 : 1;
+      int nJ = moJ<numberOcc ? 2 : 1;
+      value = ((double)(nJ-nI));
+   }
+   return value;
+}
+
+// see (44) in [PT_1996]
+double Mndo::GetNRElement(int moI, int moJ, int moK, int moL){
+   double value=0.0;
+   if(moI==moK && moJ==moL){
+      value = 1.0;
+   }
+   return value;
+}
+
+// see (44) in [PT_1996]
+double Mndo::GetKNRElement(int moI, int moJ, int moK, int moL){
+   double value=0.0;
+   int numberOcc = this->molecule->GetTotalNumberValenceElectrons()/2;
+   int nI = moI<numberOcc ? 2 : 1;
+   int nJ = moJ<numberOcc ? 2 : 1;
+   int nK = moK<numberOcc ? 2 : 1;
+   int nL = moL<numberOcc ? 2 : 1;
+   if(nI!=nJ && nK!=nL){
+      value = 4.0*this->GetMolecularIntegralElement(moI, moJ, moK, moL, 
+                                                    this->molecule, this->fockMatrix, NULL)
+             -1.0*this->GetMolecularIntegralElement(moI, moK, moJ, moL, 
+                                                    this->molecule, this->fockMatrix, NULL)
+             -1.0*this->GetMolecularIntegralElement(moI, moL, moJ, moK, 
+                                                    this->molecule, this->fockMatrix, NULL);
+   }
+   return value;
+}
+
+// see (45) in [PT_1996]
+double Mndo::GetKRElement(int moI, int moJ, int moK, int moL){
+   double value=0.0;
+   int numberOcc = this->molecule->GetTotalNumberValenceElectrons()/2;
+   int nI = moI<numberOcc ? 2 : 1;
+   int nJ = moJ<numberOcc ? 2 : 1;
+   int nK = moK<numberOcc ? 2 : 1;
+   int nL = moL<numberOcc ? 2 : 1;
+   if(nI==nJ && nK!=nL){
+      value = 4.0*this->GetMolecularIntegralElement(moI, moJ, moK, moL, 
+                                                    this->molecule, this->fockMatrix, NULL)
+             -1.0*this->GetMolecularIntegralElement(moI, moK, moJ, moL, 
+                                                    this->molecule, this->fockMatrix, NULL)
+             -1.0*this->GetMolecularIntegralElement(moI, moL, moJ, moK, 
+                                                    this->molecule, this->fockMatrix, NULL);
+   }
+   return value;
+}
+
 // see (9) in [PT_1997]
 void Mndo::CalcDeltaVector(double* delta, int elecState){
    int numberActiveOcc = Parameters::GetInstance()->GetActiveOccCIS();
