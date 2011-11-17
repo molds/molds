@@ -205,7 +205,21 @@ private:
                                                double DA,
                                                double DB,
                                                double Rab);
-   void FreeCalcForceTempMatrices(double**** overlapDer, double****** twoElecTwoCoreFirstDeriv);
+   void FreeCalcForceTempMatrices(double**** overlapDer, 
+                                  double****** twoElecTwoCoreFirstDeriv);
+   void CalcForceHFElecCoreAttractionPart(double* force, 
+                                          int atomAIndex,
+                                          int atomBIndex,
+                                          double***** twoElecTwoCoreFirstDeriv);
+   void CalcForceHFOverlapPart(double* force, 
+                               int atomAIndex,
+                               int atomBIndex,
+                               double*** overlapDer);
+   void CalcForceHFTwoElecPart(double* force, 
+                               int atomAIndex,
+                               int atomBIndex,
+                               double***** twoElecTwoCoreFirstDeriv);
+
 };
 
 }

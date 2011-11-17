@@ -1590,6 +1590,97 @@ bool Mndo::RequiresExcitedStatesForce(vector<int> elecStates){
    return requires;
 }
 
+void Mndo::CalcForceHFElecCoreAttractionPart(double* force, 
+                                             int atomAIndex, 
+                                             int atomBIndex,
+                                             double***** twoElecTwoCoreFirstDeriv){
+   Atom* atomA = (*this->molecule->GetAtomVect())[atomAIndex];
+   Atom* atomB = (*this->molecule->GetAtomVect())[atomBIndex];
+   int firstAOIndexA = atomA->GetFirstAOIndex();
+   int firstAOIndexB = atomB->GetFirstAOIndex();
+   int numberAOsA = atomA->GetValence().size();
+   int numberAOsB = atomB->GetValence().size();
+   for(int mu=firstAOIndexA; mu<firstAOIndexA+numberAOsA; mu++){
+      for(int nu=firstAOIndexA; nu<firstAOIndexA+numberAOsA; nu++){
+         for(int i=0; i<CartesianType_end; i++){
+            force[i] += this->orbitalElectronPopulation[mu][nu]
+                       *this->GetElectronCoreAttractionFirstDerivative(
+                                   atomAIndex, 
+                                   atomBIndex, 
+                                   mu-firstAOIndexA, 
+                                   nu-firstAOIndexA,
+                                   twoElecTwoCoreFirstDeriv,
+                                   (CartesianType)i);
+         }
+      }
+   }
+}
+
+void Mndo::CalcForceHFOverlapPart(double* force, 
+                                  int atomAIndex, 
+                                  int atomBIndex,
+                                  double*** overlapDer){
+   Atom* atomA = (*this->molecule->GetAtomVect())[atomAIndex];
+   Atom* atomB = (*this->molecule->GetAtomVect())[atomBIndex];
+   int firstAOIndexA = atomA->GetFirstAOIndex();
+   int firstAOIndexB = atomB->GetFirstAOIndex();
+   int numberAOsA = atomA->GetValence().size();
+   int numberAOsB = atomB->GetValence().size();
+   for(int mu=firstAOIndexA; mu<firstAOIndexA+numberAOsA; mu++){
+      for(int nu=firstAOIndexB; nu<firstAOIndexB+numberAOsB; nu++){
+         double bondParameter = atomA->GetBondingParameter(
+                                       this->theory, 
+                                       atomA->GetValence()[mu-firstAOIndexA]) 
+                               +atomB->GetBondingParameter(
+                                       this->theory, 
+                                       atomB->GetValence()[nu-firstAOIndexB]); 
+         for(int i=0; i<CartesianType_end; i++){
+            force[i] += this->orbitalElectronPopulation[mu][nu]
+                       *bondParameter
+                       *overlapDer[mu-firstAOIndexA][nu-firstAOIndexB][i];
+         }
+      }
+   }
+}
+
+void Mndo::CalcForceHFTwoElecPart(double* force, 
+                                  int atomAIndex, 
+                                  int atomBIndex,
+                                  double***** twoElecTwoCoreFirstDeriv){
+   Atom* atomA = (*this->molecule->GetAtomVect())[atomAIndex];
+   Atom* atomB = (*this->molecule->GetAtomVect())[atomBIndex];
+   int firstAOIndexA = atomA->GetFirstAOIndex();
+   int firstAOIndexB = atomB->GetFirstAOIndex();
+   int numberAOsA = atomA->GetValence().size();
+   int numberAOsB = atomB->GetValence().size();
+   for(int mu=firstAOIndexA; mu<firstAOIndexA+numberAOsA; mu++){
+      for(int nu=firstAOIndexA; nu<firstAOIndexA+numberAOsA; nu++){
+         for(int lambda=firstAOIndexB; lambda<firstAOIndexB+numberAOsB; lambda++){
+            for(int sigma=firstAOIndexB; sigma<firstAOIndexB+numberAOsB; sigma++){
+               for(int i=0; i<CartesianType_end; i++){
+                  force[i] += 0.5
+                             *this->orbitalElectronPopulation[mu][nu]
+                             *this->orbitalElectronPopulation[lambda][sigma]
+                             *twoElecTwoCoreFirstDeriv[mu-firstAOIndexA]
+                                                      [nu-firstAOIndexA]
+                                                      [lambda-firstAOIndexB]
+                                                      [sigma-firstAOIndexB]
+                                                      [(CartesianType)i];
+                  force[i] -= 0.25
+                             *this->orbitalElectronPopulation[mu][lambda]
+                             *this->orbitalElectronPopulation[nu][sigma]
+                             *twoElecTwoCoreFirstDeriv[mu-firstAOIndexA]
+                                                      [nu-firstAOIndexA]
+                                                      [lambda-firstAOIndexB]
+                                                      [sigma-firstAOIndexB]
+                                                      [(CartesianType)i];
+               }
+            }
+         }
+      }
+   }
+}
+
 // electronicStateIndex is index of the electroinc eigen state.
 // "electronicStateIndex = 0" means electronic ground state. 
 void Mndo::CalcForce(vector<int> elecStates){
@@ -1629,78 +1720,46 @@ void Mndo::CalcForce(vector<int> elecStates){
                                                                    a, 
                                                                    b);
 
+                  // core repulsion part
                   double coreRepulsion[CartesianType_end] = {0.0,0.0,0.0};
                   for(int i=0; i<CartesianType_end; i++){
                      coreRepulsion[i] += this->GetDiatomCoreRepulsionFirstDerivative(
                                                a, b, (CartesianType)i);
                   }  
+  
+                  // electron core attraction part (ground state)
+                  double forceElecCoreAttPart[CartesianType_end] = {0.0,0.0,0.0};
+                  this->CalcForceHFElecCoreAttractionPart(forceElecCoreAttPart,
+                                                          a,
+                                                          b,
+                                                          twoElecTwoCoreFirstDeriv);
    
-                  double electronicForce1[CartesianType_end] = {0.0,0.0,0.0};
-                  for(int mu=firstAOIndexA; mu<firstAOIndexA+numberAOsA; mu++){
-                     for(int nu=firstAOIndexA; nu<firstAOIndexA+numberAOsA; nu++){
-                        for(int i=0; i<CartesianType_end; i++){
-                           electronicForce1[i] += this->orbitalElectronPopulation[mu][nu]
-                                                 *this->GetElectronCoreAttractionFirstDerivative(
-                                                        a, 
-                                                        b, 
-                                                        mu-firstAOIndexA, 
-                                                        nu-firstAOIndexA,
-                                                        twoElecTwoCoreFirstDeriv,
-                                                        (CartesianType)i);
-                        }
-                     }
-                  }
-   
-                  double electronicForce2[CartesianType_end] = {0.0,0.0,0.0};
-                  for(int mu=firstAOIndexA; mu<firstAOIndexA+numberAOsA; mu++){
-                     for(int nu=firstAOIndexB; nu<firstAOIndexB+numberAOsB; nu++){
-                        double bondParameter = atomA->GetBondingParameter(
-                                                      this->theory, 
-                                                      atomA->GetValence()[mu-firstAOIndexA]) 
-                                              +atomB->GetBondingParameter(
-                                                      this->theory, 
-                                                      atomB->GetValence()[nu-firstAOIndexB]); 
-                        for(int i=0; i<CartesianType_end; i++){
-                           electronicForce2[i] += this->orbitalElectronPopulation[mu][nu]
-                                                 *bondParameter
-                                                 *overlapDer[mu-firstAOIndexA][nu-firstAOIndexB][i];
-                        }
+                  // overlap part (ground state)
+                  double forceOverlapPart[CartesianType_end] = {0.0,0.0,0.0};
+                  this->CalcForceHFOverlapPart(forceOverlapPart, 
+                                               a,
+                                               b,
+                                               overlapDer);
+                  
+                  // two electron part (ground state)
+                  double forceTwoElecPart[CartesianType_end] = {0.0,0.0,0.0};
+                  this->CalcForceHFTwoElecPart(forceTwoElecPart,
+                                               a,
+                                               b,
+                                               twoElecTwoCoreFirstDeriv);
+
+                  // sum up contributions from each part (ground state)
+                  for(int n=0; n<elecStates.size(); n++){
+                     for(int i=0; i<CartesianType_end; i++){
+                        this->matrixForce[n][b][i] += forceElecCoreAttPart[i];
+                        this->matrixForce[n][b][i] += forceTwoElecPart[i];
+                        this->matrixForce[n][a][i] -= coreRepulsion[i]
+                                                     +forceElecCoreAttPart[i] 
+                                                     +forceOverlapPart[i]
+                                                     +forceTwoElecPart[i];
                      }
                   }
 
-                  double electronicForce3[CartesianType_end] = {0.0,0.0,0.0};
-                  for(int mu=firstAOIndexA; mu<firstAOIndexA+numberAOsA; mu++){
-                     for(int nu=firstAOIndexA; nu<firstAOIndexA+numberAOsA; nu++){
-                        for(int lambda=firstAOIndexB; lambda<firstAOIndexB+numberAOsB; lambda++){
-                           for(int sigma=firstAOIndexB; sigma<firstAOIndexB+numberAOsB; sigma++){
-                              for(int i=0; i<CartesianType_end; i++){
-                                 electronicForce3[i] += 0.5*orbitalElectronPopulation[mu][nu]
-                                                       *orbitalElectronPopulation[lambda][sigma]
-                                                       *twoElecTwoCoreFirstDeriv[mu-firstAOIndexA]
-                                                                                [nu-firstAOIndexA]
-                                                                                [lambda-firstAOIndexB]
-                                                                                [sigma-firstAOIndexB]
-                                                                                [(CartesianType)i];
-                                 electronicForce3[i] -= 0.25*orbitalElectronPopulation[mu][lambda]
-                                                       *orbitalElectronPopulation[nu][sigma]
-                                                       *twoElecTwoCoreFirstDeriv[mu-firstAOIndexA]
-                                                                                [nu-firstAOIndexA]
-                                                                                [lambda-firstAOIndexB]
-                                                                                [sigma-firstAOIndexB]
-                                                                                [(CartesianType)i];
-                              }
-                           }
-                        }
-                     }
-                  }
-                  for(int i=0; i<CartesianType_end; i++){
-                     this->matrixForce[0][b][i] += electronicForce1[i];
-                     this->matrixForce[0][b][i] += electronicForce3[i];
-                     this->matrixForce[0][a][i] -= coreRepulsion[i]
-                                                  +electronicForce1[i] 
-                                                  +electronicForce2[i]
-                                                  +electronicForce3[i];
-                  }
                }
             }
          }
