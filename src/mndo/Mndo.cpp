@@ -38,6 +38,7 @@ Mndo::Mndo() : MolDS_zindo::ZindoS(){
    this->SetEnableAtomTypes();
    this->heatsFormation = 0.0;
    this->zMatrixForceElecStatesNum = 0;
+   this->etaMatrixForceElecStatesNum = 0;
    this->zMatrixForce = NULL;
    //cout << "Mndo created\n";
 }
@@ -58,6 +59,12 @@ Mndo::~Mndo(){
                                                        this->zMatrixForceElecStatesNum,
                                                        this->molecule->GetTotalNumberAOs());
       //cout << "zMatrixForce deleted\n";
+   }
+   if(this->etaMatrixForce != NULL){
+      MallocerFreer::GetInstance()->FreeDoubleMatrix3d(&this->etaMatrixForce, 
+                                                       this->etaMatrixForceElecStatesNum,
+                                                       this->molecule->GetTotalNumberAOs());
+      //cout << "etaMatrixForce deleted\n";
    }
 }
 
@@ -106,6 +113,8 @@ void Mndo::SetMessages(){
       = "Error in mndo::Mndo::GetElectronicEnergy: Set electronic state is not calculated by CIS.\n";
    this->errorMessageGetElectronicEnergyNULLCISEnergy 
       = "Error in mndo::Mndo::GetElectronicEnergy: excitedEnergies is NULL\n";
+   this->errorMessageCalcZMatrixForceEtaNull 
+      = "Error in mndo::Mndo::CalcZMatrixForce: Nndo::etaMatrixForce is NULL. Call Mndo::CalcEtaMatrixForce before calling Mndo::CalcZMatrixForce.\n";
    this->messageSCFMetConvergence = "\n\n\n\t\tMNDO/S-SCF met convergence criterion(^^b\n\n\n";
    this->messageStartSCF = "**********  START: MNDO/S-SCF  **********\n";
    this->messageDoneSCF = "**********  DONE: MNDO/S-SCF  **********\n\n\n";
@@ -729,7 +738,7 @@ void Mndo::CalcCISMatrix(double** matrixCIS, int numberOcc, int numberVir){
 }
 
 void Mndo::CheckZMatrixForce(vector<int> elecStates){
-   // malloc or initialize Force matrix
+   // malloc or initialize Z matrix
    if(this->zMatrixForce == NULL){
       this->zMatrixForce = MallocerFreer::GetInstance()->
                            MallocDoubleMatrix3d(elecStates.size(),
@@ -740,6 +749,24 @@ void Mndo::CheckZMatrixForce(vector<int> elecStates){
    else{
       MallocerFreer::GetInstance()->
       InitializeDoubleMatrix3d(this->zMatrixForce,
+                               elecStates.size(),
+                               this->molecule->GetTotalNumberAOs(), 
+                               this->molecule->GetTotalNumberAOs());
+   }
+}
+
+void Mndo::CheckEtaMatrixForce(vector<int> elecStates){
+   // malloc or initialize eta matrix
+   if(this->etaMatrixForce == NULL){
+      this->etaMatrixForce = MallocerFreer::GetInstance()->
+                             MallocDoubleMatrix3d(elecStates.size(),
+                                                  this->molecule->GetTotalNumberAOs(), 
+                                                  this->molecule->GetTotalNumberAOs());
+      this->etaMatrixForceElecStatesNum = elecStates.size();
+   }
+   else{
+      MallocerFreer::GetInstance()->
+      InitializeDoubleMatrix3d(this->etaMatrixForce,
                                elecStates.size(),
                                this->molecule->GetTotalNumberAOs(), 
                                this->molecule->GetTotalNumberAOs());
@@ -788,7 +815,6 @@ void Mndo::MallocTempMatrixForZMatrix(double** delta,
                                       double*** transposedFockMatrix,
                                       double*** xiOcc,
                                       double*** xiVir,
-                                      double*** eta,
                                       int sizeQNR,
                                       int sizeQR){
    int numberActiveOcc = Parameters::GetInstance()->GetActiveOccCIS();
@@ -816,9 +842,6 @@ void Mndo::MallocTempMatrixForZMatrix(double** delta,
    *xiVir = MallocerFreer::GetInstance()->MallocDoubleMatrix2d(
                                           numberActiveVir,
                                           numberAOs);
-   *eta = MallocerFreer::GetInstance()->MallocDoubleMatrix2d(
-                                        numberAOs,
-                                        numberAOs);
 }
 
 void Mndo::FreeTempMatrixForZMatrix(double** delta,
@@ -829,7 +852,6 @@ void Mndo::FreeTempMatrixForZMatrix(double** delta,
                                     double*** transposedFockMatrix,
                                     double*** xiOcc,
                                     double*** xiVir,
-                                    double*** eta,
                                     int sizeQNR,
                                     int sizeQR){
    if(*delta != NULL){
@@ -869,12 +891,6 @@ void Mndo::FreeTempMatrixForZMatrix(double** delta,
       MallocerFreer::GetInstance()->FreeDoubleMatrix2d(xiVir,
                                                        numberActiveVir);
       //cout << "xiVir deleted" << endl;
-   }
-   if(*eta != NULL){
-      int numberAOs = this->molecule->GetTotalNumberAOs();
-      MallocerFreer::GetInstance()->FreeDoubleMatrix2d(eta,
-                                                       numberAOs);
-      //cout << "eta deleted" << endl;
    }
 }
 
@@ -1277,7 +1293,7 @@ void Mndo::CalcQVector(double* q,
           
       }
    }
-   /* 
+    
    for(int i=0; i<nonRedundantQIndeces.size(); i++){
       printf("q[%d] = %e\n",i,q[i]);
    }
@@ -1285,7 +1301,7 @@ void Mndo::CalcQVector(double* q,
       int r = nonRedundantQIndeces.size() + i;
       printf("q[%d] = %e\n",r,q[r]);
    }
-   */
+   
 }
 
 // see (43) and (45) in [PT_1996].
@@ -1417,29 +1433,13 @@ void Mndo::CalcXiMatrices(double** xiOcc,
    }
 }
 
-void Mndo::CalcEtaMatrix(double** eta, int elecState, double** transposedFockMatrix){
-   int numberAOs = this->molecule->GetTotalNumberAOs();
-   int numberActiveOcc = Parameters::GetInstance()->GetActiveOccCIS();
-   int numberActiveVir = Parameters::GetInstance()->GetActiveVirCIS();
-   MallocerFreer::GetInstance()->InitializeDoubleMatrix2d(
-                                 eta, numberAOs, numberAOs);
-   for(int mu=0; mu<numberAOs; mu++){
-      for(int nu=0; nu<numberAOs; nu++){
-         int slaterDeterminantIndex = 0;
-         for(int i=0; i<numberActiveOcc; i++){
-            for(int a=0; a<numberActiveVir; a++){
-               slaterDeterminantIndex = this->GetSlaterDeterminantIndex(i,a);
-               eta[mu][nu] += this->matrixCIS[elecState][slaterDeterminantIndex]
-                             *transposedFockMatrix[mu][i]
-                             *transposedFockMatrix[nu][a];
-            }
-         }
-      }
-   }
-}
-
 // see [PT_1996, PT_1997]
 void Mndo::CalcZMatrixForce(vector<int> elecStates){
+   if(this->etaMatrixForce == NULL){
+      stringstream ss;
+      ss << this->errorMessageCalcZMatrixForceEtaNull;
+      throw MolDSException(ss.str());
+   }
    this->CheckZMatrixForce(elecStates); 
    int numberAOs = this->molecule->GetTotalNumberAOs();
    int numberOcc = this->molecule->GetTotalNumberValenceElectrons()/2;
@@ -1461,7 +1461,6 @@ void Mndo::CalcZMatrixForce(vector<int> elecStates){
    double** transposedFockMatrix = NULL; // transposed CIS matrix
    double** xiOcc = NULL;
    double** xiVir = NULL;
-   double** eta = NULL;
    this->MallocTempMatrixForZMatrix(&delta,
                                     &q,
                                     &kNR,
@@ -1470,7 +1469,6 @@ void Mndo::CalcZMatrixForce(vector<int> elecStates){
                                     &transposedFockMatrix,
                                     &xiOcc,
                                     &xiVir,
-                                    &eta,
                                     nonRedundantQIndeces.size(),
                                     redundantQIndeces.size());
    try{
@@ -1482,12 +1480,11 @@ void Mndo::CalcZMatrixForce(vector<int> elecStates){
             int elecState = elecStates[n]-1;
             this->CalcDeltaVector(delta, elecState);
             this->CalcXiMatrices(xiOcc, xiVir, elecState, transposedFockMatrix);
-            this->CalcEtaMatrix(eta, elecState, transposedFockMatrix);
             this->CalcQVector(q, 
                               delta, 
                               xiOcc, 
                               xiVir,
-                              eta,
+                              this->etaMatrixForce[n],
                               elecState, 
                               nonRedundantQIndeces, 
                               redundantQIndeces);
@@ -1522,7 +1519,6 @@ void Mndo::CalcZMatrixForce(vector<int> elecStates){
                                      &transposedFockMatrix,
                                      &xiOcc,
                                      &xiVir,
-                                     &eta,
                                      nonRedundantQIndeces.size(),
                                      redundantQIndeces.size());
       throw ex;
@@ -1535,9 +1531,55 @@ void Mndo::CalcZMatrixForce(vector<int> elecStates){
                                   &transposedFockMatrix,
                                   &xiOcc,
                                   &xiVir,
-                                  &eta,
                                   nonRedundantQIndeces.size(),
                                   redundantQIndeces.size());
+}
+
+void Mndo::CalcEtaMatrixForce(vector<int> elecStates){
+   this->CheckEtaMatrixForce(elecStates); 
+   int numberAOs = this->molecule->GetTotalNumberAOs();
+   int numberActiveOcc = Parameters::GetInstance()->GetActiveOccCIS();
+   int numberActiveVir = Parameters::GetInstance()->GetActiveVirCIS();
+   double** transposedFockMatrix = NULL; // transposed CIS matrix
+   transposedFockMatrix = MallocerFreer::GetInstance()->MallocDoubleMatrix2d(
+                                                        numberAOs,
+                                                        numberAOs);
+   try{
+      this->TransposeFockMatrixMatrix(transposedFockMatrix);
+      for(int n=0; n<elecStates.size(); n++){
+         if(0 < elecStates[n]){
+            int elecState = elecStates[n]-1;
+
+            // calc each element
+            for(int mu=0; mu<numberAOs; mu++){
+               for(int nu=0; nu<numberAOs; nu++){
+                  int slaterDeterminantIndex = 0;
+                  for(int i=0; i<numberActiveOcc; i++){
+                     for(int a=0; a<numberActiveVir; a++){
+                        slaterDeterminantIndex = this->GetSlaterDeterminantIndex(i,a);
+                        this->etaMatrixForce[n][mu][nu] 
+                                 += this->matrixCIS[elecState][slaterDeterminantIndex]
+                                   *transposedFockMatrix[mu][i]
+                                   *transposedFockMatrix[nu][a];
+                     }
+                  }
+               }
+            }
+
+         }
+      }
+   }
+   catch(MolDSException ex){
+      if(transposedFockMatrix != NULL){
+         MallocerFreer::GetInstance()->FreeDoubleMatrix2d(&transposedFockMatrix,numberAOs);
+         //cout << "transposedFockMatrix  deleted" << endl;
+      }
+      throw ex;
+   }
+   if(transposedFockMatrix != NULL){
+      MallocerFreer::GetInstance()->FreeDoubleMatrix2d(&transposedFockMatrix,numberAOs);
+      //cout << "transposedFockMatrix  deleted" << endl;
+   }
 }
 
 bool Mndo::RequiresExcitedStatesForce(vector<int> elecStates){
@@ -1553,6 +1595,7 @@ bool Mndo::RequiresExcitedStatesForce(vector<int> elecStates){
 void Mndo::CalcForce(vector<int> elecStates){
    this->CheckMatrixForce(elecStates);
    if(this->RequiresExcitedStatesForce(elecStates)){
+      this->CalcEtaMatrixForce(elecStates);
       this->CalcZMatrixForce(elecStates);
    }
    #pragma omp parallel

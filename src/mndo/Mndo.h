@@ -20,6 +20,7 @@ protected:
    std::string errorMessageCalcTwoElecTwoCoreDiatomicSameAtoms;
    std::string errorMessageCalcTwoElecTwoCoreDiatomicFirstDerivativesNullMatrix;
    std::string errorMessageCalcTwoElecTwoCoreDiatomicFirstDerivativesSameAtoms;
+   std::string errorMessageCalcZMatrixForceEtaNull;
    virtual void SetMessages();
    virtual void SetEnableAtomTypes();
    virtual double CalcDiatomCoreRepulsionEnergy(int indexAtomA, int indexAtomB);
@@ -86,7 +87,9 @@ private:
    std::string messageHeatsFormationTitle;
    struct MoIndexPair{int moI; int moJ; bool isMoICIMO; bool isMoJCIMO;};
    double*** zMatrixForce;
+   double*** etaMatrixForce;
    int zMatrixForceElecStatesNum;
+   int etaMatrixForceElecStatesNum;
    double heatsFormation;
    double GetGammaNRElement(int moI, int moJ, int moK, int moL);
    double GetGammaRElement(int moI, int moJ, int moK, int moL);
@@ -103,7 +106,6 @@ private:
                                    double*** transposedFockMatrix,
                                    double*** xiOcc,
                                    double*** xiVir,
-                                   double*** eta,
                                    int sizeQNR,
                                    int sizeQR);
    void FreeTempMatrixForZMatrix(double** delta,
@@ -114,7 +116,6 @@ private:
                                  double*** transposedFockMatrix,
                                  double*** xiOcc,
                                  double*** xiVir,
-                                 double*** eta,
                                  int sizeQNR,
                                  int sizeQR);
    void CalcDeltaVector(double* delta, int elecState);
@@ -146,9 +147,6 @@ private:
                        double** xiVir, 
                        int elecState,
                        double** transposedFockMatrix);
-   void CalcEtaMatrix(double** eta, 
-                      int elecState, 
-                      double** transposedFockMatrix);
    double GetZMatrixForceElement(double* y,
                                  double* q,
                                  double** transposedFockMatrix,
@@ -156,7 +154,10 @@ private:
                                  std::vector<MoIndexPair> redundantQIndeces,
                                  int mu, 
                                  int nu);
+   void CheckZMatrixForce(std::vector<int> elecStates);
+   void CheckEtaMatrixForce(std::vector<int> elecStates);
    void CalcZMatrixForce(std::vector<int> elecStates);
+   void CalcEtaMatrixForce(std::vector<int> elecStates);
    bool RequiresExcitedStatesForce(std::vector<int> elecStates);
    double GetCISCoefficientMOEnergy(int k, 
                                     int l, 
@@ -169,7 +170,6 @@ private:
                                            int r, 
                                            int s, 
                                            int numberActiveVir);
-   void CheckZMatrixForce(std::vector<int> elecStates);
    void CalcActiveSetVariablesQ(std::vector<MoIndexPair>* nonRedundantQIndeces, 
                                 std::vector<MoIndexPair>* redundantQIndeces);
    void CalcHeatsFormation(double* heatsFormation, MolDS_base::Molecule* molecule);
