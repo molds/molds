@@ -443,7 +443,6 @@ double Mndo::GetElectronCoreAttractionFirstDerivative(int atomAIndex,
    return value;
 }
 
-
 void Mndo::CalcDiatomicOverlapInDiatomicFrame(double** diatomicOverlap, 
                                               Atom* atomA, 
                                               Atom* atomB){
@@ -778,30 +777,29 @@ void Mndo::CalcActiveSetVariablesQ(vector<MoIndexPair>* nonRedundantQIndeces,
                                    vector<MoIndexPair>* redundantQIndeces){
    int numberAOs = this->molecule->GetTotalNumberAOs();
    int numberOcc = this->molecule->GetTotalNumberValenceElectrons()/2;
-   int numberVir = numberAOs - numberOcc;
    int numberActiveOcc = Parameters::GetInstance()->GetActiveOccCIS();
    int numberActiveVir = Parameters::GetInstance()->GetActiveVirCIS();
-   for(int i=0; i<numberOcc; i++){
-      bool isMoICIMO = numberOcc-numberActiveOcc<=i ? true : false;
-      for(int j=numberOcc; j<numberAOs; j++){
-         bool isMoJCIMO = j<numberOcc+numberActiveVir ? true : false;
-         MoIndexPair moIndexPair = {i, j, isMoICIMO, isMoJCIMO};
+   for(int moI=0; moI<numberOcc; moI++){
+      bool isMoICIMO = numberOcc-numberActiveOcc<=moI ? true : false;
+      for(int moJ=numberOcc; moJ<numberAOs; moJ++){
+         bool isMoJCIMO = moJ<numberOcc+numberActiveVir ? true : false;
+         MoIndexPair moIndexPair = {moI, moJ, isMoICIMO, isMoJCIMO};
          nonRedundantQIndeces->push_back(moIndexPair);
       }
    }
-   for(int i=numberOcc-numberActiveOcc; i<numberOcc; i++){
+   for(int moI=numberOcc-numberActiveOcc; moI<numberOcc; moI++){
       bool isMoICIMO = true;
-      for(int j=i; j<numberOcc; j++){
+      for(int moJ=moI; moJ<numberOcc; moJ++){
          bool isMoJCIMO = true;
-         MoIndexPair moIndexPair = {i, j, isMoICIMO, isMoJCIMO};
+         MoIndexPair moIndexPair = {moI, moJ, isMoICIMO, isMoJCIMO};
          redundantQIndeces->push_back(moIndexPair);
       }
    }
-   for(int i=numberOcc; i<numberOcc+numberActiveVir; i++){
+   for(int moI=numberOcc; moI<numberOcc+numberActiveVir; moI++){
       bool isMoICIMO = true;
-      for(int j=i; j<numberOcc+numberActiveVir; j++){
+      for(int moJ=moI; moJ<numberOcc+numberActiveVir; moJ++){
          bool isMoJCIMO = true;
-         MoIndexPair moIndexPair = {i, j, isMoICIMO, isMoJCIMO};
+         MoIndexPair moIndexPair = {moI, moJ, isMoICIMO, isMoJCIMO};
          redundantQIndeces->push_back(moIndexPair);
       }
    }
@@ -943,9 +941,9 @@ double Mndo::GetGammaNRElement(int moI, int moJ, int moK, int moL){
    double value=0.0;
    if(moI==moK && moJ==moL){
       int numberOcc = this->molecule->GetTotalNumberValenceElectrons()/2;
-      int nI = moI<numberOcc ? 2 : 1;
-      int nJ = moJ<numberOcc ? 2 : 1;
-      value = (energiesMO[moJ]-energiesMO[moI])/((double)(nJ-nI));
+      double nI = moI<numberOcc ? 2.0 : 0.0;
+      double nJ = moJ<numberOcc ? 2.0 : 0.0;
+      value = (this->energiesMO[moJ]-this->energiesMO[moI])/(nJ-nI);
    }
    return value;
 }
@@ -954,7 +952,7 @@ double Mndo::GetGammaNRElement(int moI, int moJ, int moK, int moL){
 double Mndo::GetGammaRElement(int moI, int moJ, int moK, int moL){
    double value=0.0;
    if(moI==moK && moJ==moL){
-      value = moI==moJ ? 1 : energiesMO[moJ]-energiesMO[moI];
+      value = moI==moJ ? 1.0 : this->energiesMO[moJ]-this->energiesMO[moI];
    }
    return value;
 }
@@ -964,9 +962,9 @@ double Mndo::GetNNRElement(int moI, int moJ, int moK, int moL){
    double value=0.0;
    if(moI==moK && moJ==moL){
       int numberOcc = this->molecule->GetTotalNumberValenceElectrons()/2;
-      int nI = moI<numberOcc ? 2 : 1;
-      int nJ = moJ<numberOcc ? 2 : 1;
-      value = ((double)(nJ-nI));
+      double nI = moI<numberOcc ? 2.0 : 0.0;
+      double nJ = moJ<numberOcc ? 2.0 : 0.0;
+      value = (nJ-nI);
    }
    return value;
 }
@@ -984,19 +982,22 @@ double Mndo::GetNRElement(int moI, int moJ, int moK, int moL){
 double Mndo::GetKNRElement(int moI, int moJ, int moK, int moL){
    double value=0.0;
    int numberOcc = this->molecule->GetTotalNumberValenceElectrons()/2;
-   int nI = moI<numberOcc ? 2 : 1;
-   int nJ = moJ<numberOcc ? 2 : 1;
-   int nK = moK<numberOcc ? 2 : 1;
-   int nL = moL<numberOcc ? 2 : 1;
+   int nI = moI<numberOcc ? 2 : 0;
+   int nJ = moJ<numberOcc ? 2 : 0;
+   int nK = moK<numberOcc ? 2 : 0;
+   int nL = moL<numberOcc ? 2 : 0;
    if(nI!=nJ && nK!=nL){
       value = 4.0*this->GetMolecularIntegralElement(moI, moJ, moK, moL, 
-                                                    this->molecule, this->fockMatrix, NULL)
+                                                    this->molecule, 
+                                                    this->fockMatrix, NULL)
              -1.0*this->GetMolecularIntegralElement(moI, moK, moJ, moL, 
-                                                    this->molecule, this->fockMatrix, NULL)
+                                                    this->molecule, 
+                                                    this->fockMatrix, NULL)
              -1.0*this->GetMolecularIntegralElement(moI, moL, moJ, moK, 
-                                                    this->molecule, this->fockMatrix, NULL);
+                                                    this->molecule, 
+                                                    this->fockMatrix, NULL);
    }
-   return value;
+   return 0.5*value;
 }
 
 // Dager of (45) in [PT_1996]. Note taht the (45) is real number.
@@ -1008,23 +1009,26 @@ double Mndo::GetKRDagerElement(int moI, int moJ, int moK, int moL){
 double Mndo::GetKRElement(int moI, int moJ, int moK, int moL){
    double value=0.0;
    int numberOcc = this->molecule->GetTotalNumberValenceElectrons()/2;
-   int nI = moI<numberOcc ? 2 : 1;
-   int nJ = moJ<numberOcc ? 2 : 1;
-   int nK = moK<numberOcc ? 2 : 1;
-   int nL = moL<numberOcc ? 2 : 1;
+   int nI = moI<numberOcc ? 2 : 0;
+   int nJ = moJ<numberOcc ? 2 : 0;
+   int nK = moK<numberOcc ? 2 : 0;
+   int nL = moL<numberOcc ? 2 : 0;
    if(nI==nJ && nK!=nL){
       value = 4.0*this->GetMolecularIntegralElement(moI, moJ, moK, moL, 
-                                                    this->molecule, this->fockMatrix, NULL)
+                                                    this->molecule, 
+                                                    this->fockMatrix, NULL)
              -1.0*this->GetMolecularIntegralElement(moI, moK, moJ, moL, 
-                                                    this->molecule, this->fockMatrix, NULL)
+                                                    this->molecule, 
+                                                    this->fockMatrix, NULL)
              -1.0*this->GetMolecularIntegralElement(moI, moL, moJ, moK, 
-                                                    this->molecule, this->fockMatrix, NULL);
+                                                    this->molecule, 
+                                                    this->fockMatrix, NULL);
    }
-   return value;
+   return 0.5*value;
 }
 
 // see (9) in [PT_1997]
-void Mndo::CalcDeltaVector(double* delta, int elecState){
+void Mndo::CalcDeltaVector(double* delta, int exciteState){
    int numberActiveOcc = Parameters::GetInstance()->GetActiveOccCIS();
    int numberActiveVir = Parameters::GetInstance()->GetActiveVirCIS();
    int numberActiveMO = numberActiveOcc + numberActiveVir;
@@ -1033,24 +1037,18 @@ void Mndo::CalcDeltaVector(double* delta, int elecState){
       double value = 0.0;
       if(r<numberActiveOcc){
          // r is active occupied MO
+         int rr=numberActiveOcc-(r+1);
          for(int a=0; a<numberActiveVir; a++){
-            int slaterDeterminantIndex = this->GetSlaterDeterminantIndex(r,a);
-            value -= pow(this->matrixCIS[elecState][slaterDeterminantIndex],2.0);
-            //c.f. The index of each MO (r and a)is below:
-            //int numberOcc = this->molecule->GetTotalNumberValenceElectrons()/2;
-            //int moR = numberOcc - (slaterDeterminantIndex/numberActiveVir) -1;
-            //int moA = numberOcc + (slaterDeterminantIndex%numberActiveVir); 
+            int slaterDeterminantIndex = this->GetSlaterDeterminantIndex(rr,a);
+            value -= pow(this->matrixCIS[exciteState][slaterDeterminantIndex],2.0);
          }
       }
       else{
          // r is active virtual MO
+         int rr=r-numberActiveOcc;
          for(int i=0; i<numberActiveOcc; i++){
-            int slaterDeterminantIndex = this->GetSlaterDeterminantIndex(i,(r-numberActiveOcc));
-            value += pow(this->matrixCIS[elecState][slaterDeterminantIndex],2.0);
-            //c.f. The index of each MO (i and r)is below:
-            //int numberOcc = this->molecule->GetTotalNumberValenceElectrons()/2;
-            //int moI = numberOcc - (slaterDeterminantIndex/numberActiveVir) -1;
-            //int moR = numberOcc + (slaterDeterminantIndex%numberActiveVir); 
+            int slaterDeterminantIndex = this->GetSlaterDeterminantIndex(i,rr);
+            value += pow(this->matrixCIS[exciteState][slaterDeterminantIndex],2.0);
          }
       }
       delta[r] = value;
@@ -1154,13 +1152,14 @@ double Mndo::GetSmallQElement(int moI,
                               int p = moP - numberOcc;
                               temp = 4.0*xiVir[p][mu]*eta[lambda][sigma]
                                     -1.0*xiVir[p][lambda]*eta[sigma][mu]
-                                       -1.0*xiVir[p][sigma]*eta[lambda][mu];
+                                    -1.0*xiVir[p][sigma]*eta[lambda][mu];
                               value += twoElecInt*this->fockMatrix[moI][nu]*temp;
                               temp = 4.0*xiVir[p][sigma]*eta[nu][mu]
                                     -1.0*xiVir[p][nu]*eta[mu][sigma]
                                     -1.0*xiVir[p][mu]*eta[nu][sigma];
                               value += twoElecInt*this->fockMatrix[moI][lambda]*temp;
                            }
+                        }
 
                         if(mu!=nu && lambda!=sigma){
                            if(isMoPOcc){
@@ -1187,7 +1186,6 @@ double Mndo::GetSmallQElement(int moI,
                            }
                         }
                         
-                        }
                      }
                   }
                }
@@ -1247,7 +1245,6 @@ void Mndo::CalcQVector(double* q,
                        double** xiOcc,
                        double** xiVir,
                        double** eta,
-                       int elecState,
                        vector<MoIndexPair> nonRedundantQIndeces,
                        vector<MoIndexPair> redundantQIndeces){
    MallocerFreer::GetInstance()->InitializeDoubleMatrix1d(
@@ -1256,15 +1253,11 @@ void Mndo::CalcQVector(double* q,
 
    int numberOcc = this->molecule->GetTotalNumberValenceElectrons()/2;
    int numberActiveOcc = Parameters::GetInstance()->GetActiveOccCIS();
-   int moI = 0;
-   int moJ = 0;
-   bool isMoICIMO = false;
-   bool isMoJCIMO = false;
    for(int i=0; i<nonRedundantQIndeces.size(); i++){
-      moI = nonRedundantQIndeces[i].moI;
-      moJ = nonRedundantQIndeces[i].moJ;
-      isMoICIMO = nonRedundantQIndeces[i].isMoICIMO;
-      isMoJCIMO = nonRedundantQIndeces[i].isMoJCIMO;
+      int moI = nonRedundantQIndeces[i].moI;
+      int moJ = nonRedundantQIndeces[i].moJ;
+      bool isMoICIMO = nonRedundantQIndeces[i].isMoICIMO;
+      bool isMoJCIMO = nonRedundantQIndeces[i].isMoJCIMO;
       if(!isMoICIMO && isMoJCIMO){
          q[i] = this->GetSmallQElement(moI, moJ, xiOcc, xiVir, eta);
       }
@@ -1281,8 +1274,8 @@ void Mndo::CalcQVector(double* q,
    }
    for(int i=0; i<redundantQIndeces.size(); i++){
       int r = nonRedundantQIndeces.size() + i;
-      moI = redundantQIndeces[i].moI;
-      moJ = redundantQIndeces[i].moJ;
+      int moI = redundantQIndeces[i].moI;
+      int moJ = redundantQIndeces[i].moJ;
       if(moI == moJ){
          int rr = moI - (numberOcc-numberActiveOcc);
          q[r] = delta[rr];
@@ -1290,10 +1283,9 @@ void Mndo::CalcQVector(double* q,
       else{
          q[r] = this->GetSmallQElement(moI, moJ, xiOcc, xiVir, eta)
                -this->GetSmallQElement(moJ, moI, xiOcc, xiVir, eta);
-          
       }
    }
-    
+   /* 
    for(int i=0; i<nonRedundantQIndeces.size(); i++){
       printf("q[%d] = %e\n",i,q[i]);
    }
@@ -1301,18 +1293,17 @@ void Mndo::CalcQVector(double* q,
       int r = nonRedundantQIndeces.size() + i;
       printf("q[%d] = %e\n",r,q[r]);
    }
-   
+   */
 }
 
 // see (43) and (45) in [PT_1996].
 // This method calculates "\Gamma_{NR} - K_{NR}".
 // Note taht K_{NR} is not calculated.
-// Note taht right upper part is only calulated because this matrix is symmetric.
 void Mndo::CalcKNRMatrix(double** kNR, vector<MoIndexPair> nonRedundantQIndeces){
    for(int i=0; i<nonRedundantQIndeces.size(); i++){
       int moI = nonRedundantQIndeces[i].moI;
       int moJ = nonRedundantQIndeces[i].moJ;
-      for(int j=0; j<nonRedundantQIndeces.size(); j++){
+      for(int j=i; j<nonRedundantQIndeces.size(); j++){
          int moK = nonRedundantQIndeces[j].moI;
          int moL = nonRedundantQIndeces[j].moJ;
          kNR[i][j] = this->GetGammaNRElement(moI, moJ, moK, moL)
@@ -1340,7 +1331,7 @@ void Mndo::CalcKRDagerMatrix(double** kRDager,
 }
 
 // right hand side of (54) in [PT_1996]      
-void Mndo::CaclAuxiliaryVector(double* y, 
+void Mndo::CalcAuxiliaryVector(double* y, 
                                double* q, 
                                double** kRDager, 
                                vector<MoIndexPair> nonRedundantQIndeces, 
@@ -1351,11 +1342,9 @@ void Mndo::CaclAuxiliaryVector(double* y,
    for(int i=0; i<nonRedundantQIndeces.size(); i++){
       int moI = nonRedundantQIndeces[i].moI;
       int moJ = nonRedundantQIndeces[i].moJ;
-      y[i] += q[i]/this->GetNRElement(moI, moJ, moI, moJ);
+      y[i] += q[i]/this->GetNNRElement(moI, moJ, moI, moJ);
       for(int j=0; j<redundantQIndeces.size(); j++){
          int k = nonRedundantQIndeces.size() + j; 
-         int moK = redundantQIndeces[j].moI;
-         int moL = redundantQIndeces[j].moJ;
          y[i] += kRDager[i][j]*q[k];
       }
    }
@@ -1390,8 +1379,7 @@ double Mndo::GetZMatrixForceElement(double* y,
       int j = nonRedundantQIndeces.size() + i;
       int moI = redundantQIndeces[i].moI;
       int moJ = redundantQIndeces[i].moJ;
-      value +=(q[j]
-              /this->GetGammaRElement(moI, moJ, moI, moJ))
+      value += (q[j]/this->GetGammaRElement(moI, moJ, moI, moJ))
               *transposedFockMatrix[mu][moI]
               *transposedFockMatrix[nu][moJ];
    }
@@ -1400,9 +1388,10 @@ double Mndo::GetZMatrixForceElement(double* y,
 
 void Mndo::CalcXiMatrices(double** xiOcc, 
                           double** xiVir, 
-                          int elecState, 
+                          int exciteState, 
                           double** transposedFockMatrix){
    int numberAOs = this->molecule->GetTotalNumberAOs();
+   int numberOcc = this->molecule->GetTotalNumberValenceElectrons()/2;
    int numberActiveOcc = Parameters::GetInstance()->GetActiveOccCIS();
    int numberActiveVir = Parameters::GetInstance()->GetActiveVirCIS();
    MallocerFreer::GetInstance()->InitializeDoubleMatrix2d(
@@ -1412,22 +1401,22 @@ void Mndo::CalcXiMatrices(double** xiOcc,
    // xiOcc
    for(int p=0; p<numberActiveOcc; p++){
       for(int mu=0; mu<numberAOs; mu++){
-         int slaterDeterminantIndex = 0;
          for(int a=0; a<numberActiveVir; a++){
-            slaterDeterminantIndex = this->GetSlaterDeterminantIndex(p,a);
-            xiOcc[p][mu] += this->matrixCIS[elecState][slaterDeterminantIndex]
-                           *transposedFockMatrix[mu][a];
+            int moA = numberOcc + a;
+            int slaterDeterminantIndex = this->GetSlaterDeterminantIndex(p,a);
+            xiOcc[p][mu] += this->matrixCIS[exciteState][slaterDeterminantIndex]
+                           *transposedFockMatrix[mu][moA];
          }
       }
    }
    // xiVir
    for(int p=0; p<numberActiveVir; p++){
       for(int mu=0; mu<numberAOs; mu++){
-         int slaterDeterminantIndex = 0;
          for(int i=0; i<numberActiveOcc; i++){
-            slaterDeterminantIndex = this->GetSlaterDeterminantIndex(i,p);
-            xiVir[p][mu] += this->matrixCIS[elecState][slaterDeterminantIndex]
-                           *transposedFockMatrix[mu][i];
+            int moI = numberOcc - (i+1);
+            int slaterDeterminantIndex = this->GetSlaterDeterminantIndex(i,p);
+            xiVir[p][mu] += this->matrixCIS[exciteState][slaterDeterminantIndex]
+                           *transposedFockMatrix[mu][moI];
          }
       }
    }
@@ -1441,11 +1430,6 @@ void Mndo::CalcZMatrixForce(vector<int> elecStates){
       throw MolDSException(ss.str());
    }
    this->CheckZMatrixForce(elecStates); 
-   int numberAOs = this->molecule->GetTotalNumberAOs();
-   int numberOcc = this->molecule->GetTotalNumberValenceElectrons()/2;
-   int numberVir = numberAOs - numberOcc;
-   int numberActiveOcc = Parameters::GetInstance()->GetActiveOccCIS();
-   int numberActiveVir = Parameters::GetInstance()->GetActiveVirCIS();
 
    // creat MO-index-pair for Q variables. 
    vector<MoIndexPair> nonRedundantQIndeces;
@@ -1458,7 +1442,7 @@ void Mndo::CalcZMatrixForce(vector<int> elecStates){
    double** kNR = NULL; // K_{NR} matrix, see (45) in [PT_1996]
    double** kRDager = NULL; // Dagar of K_{R} matrix, see (46) in [PT_1996]
    double* y = NULL; // y-vector in (54) in [PT_1996]
-   double** transposedFockMatrix = NULL; // transposed CIS matrix
+   double** transposedFockMatrix = NULL; // transposed Fock matrix
    double** xiOcc = NULL;
    double** xiVir = NULL;
    this->MallocTempMatrixForZMatrix(&delta,
@@ -1475,28 +1459,27 @@ void Mndo::CalcZMatrixForce(vector<int> elecStates){
       this->TransposeFockMatrixMatrix(transposedFockMatrix);
       this->CalcKNRMatrix(kNR, nonRedundantQIndeces);
       this->CalcKRDagerMatrix(kRDager, nonRedundantQIndeces,redundantQIndeces);
+      int groundState=0;
       for(int n=0; n<elecStates.size(); n++){
-         if(0 < elecStates[n]){
-            int elecState = elecStates[n]-1;
-            this->CalcDeltaVector(delta, elecState);
-            this->CalcXiMatrices(xiOcc, xiVir, elecState, transposedFockMatrix);
+         if(groundState < elecStates[n]){
+            int exciteState = elecStates[n]-1;
+            this->CalcDeltaVector(delta, exciteState);
+            this->CalcXiMatrices(xiOcc, xiVir, exciteState, transposedFockMatrix);
             this->CalcQVector(q, 
                               delta, 
                               xiOcc, 
                               xiVir,
                               this->etaMatrixForce[n],
-                              elecState, 
                               nonRedundantQIndeces, 
                               redundantQIndeces);
-            this->CaclAuxiliaryVector(y, q, kRDager, nonRedundantQIndeces, redundantQIndeces);
+            this->CalcAuxiliaryVector(y, q, kRDager, nonRedundantQIndeces, redundantQIndeces);
             // solve (54) in [PT_1996]
             MolDS_mkl_wrapper::LapackWrapper::GetInstance()->Dsysv(kNR, 
                                                                    y, 
                                                                    nonRedundantQIndeces.size());
-
             // calculate each element of Z matrix.
-            for(int mu=0; mu<numberAOs; mu++){
-               for(int nu=0; nu<numberAOs; nu++){
+            for(int mu=0; mu<this->molecule->GetTotalNumberAOs(); mu++){
+               for(int nu=0; nu<this->molecule->GetTotalNumberAOs(); nu++){
                   this->zMatrixForce[n][mu][nu] = this->GetZMatrixForceElement(
                                                         y,
                                                         q,
@@ -1507,6 +1490,7 @@ void Mndo::CalcZMatrixForce(vector<int> elecStates){
                                                         nu);
                }
             }  
+
          }
       }
    }
@@ -1538,29 +1522,32 @@ void Mndo::CalcZMatrixForce(vector<int> elecStates){
 void Mndo::CalcEtaMatrixForce(vector<int> elecStates){
    this->CheckEtaMatrixForce(elecStates); 
    int numberAOs = this->molecule->GetTotalNumberAOs();
+   int numberOcc = this->molecule->GetTotalNumberValenceElectrons()/2;
    int numberActiveOcc = Parameters::GetInstance()->GetActiveOccCIS();
    int numberActiveVir = Parameters::GetInstance()->GetActiveVirCIS();
-   double** transposedFockMatrix = NULL; // transposed CIS matrix
+   int groundState = 0;
+   double** transposedFockMatrix = NULL; // transposed Fock matrix
    transposedFockMatrix = MallocerFreer::GetInstance()->MallocDoubleMatrix2d(
                                                         numberAOs,
                                                         numberAOs);
    try{
       this->TransposeFockMatrixMatrix(transposedFockMatrix);
       for(int n=0; n<elecStates.size(); n++){
-         if(0 < elecStates[n]){
-            int elecState = elecStates[n]-1;
+         if(groundState < elecStates[n]){
+            int exciteState = elecStates[n]-1;
 
             // calc each element
             for(int mu=0; mu<numberAOs; mu++){
                for(int nu=0; nu<numberAOs; nu++){
-                  int slaterDeterminantIndex = 0;
                   for(int i=0; i<numberActiveOcc; i++){
+                     int moI = numberOcc-(i+1);
                      for(int a=0; a<numberActiveVir; a++){
-                        slaterDeterminantIndex = this->GetSlaterDeterminantIndex(i,a);
+                        int moA = numberOcc+a;
+                        int slaterDeterminantIndex = this->GetSlaterDeterminantIndex(i,a);
                         this->etaMatrixForce[n][mu][nu] 
-                                 += this->matrixCIS[elecState][slaterDeterminantIndex]
-                                   *transposedFockMatrix[mu][i]
-                                   *transposedFockMatrix[nu][a];
+                                 += this->matrixCIS[exciteState][slaterDeterminantIndex]
+                                   *transposedFockMatrix[mu][moI]
+                                   *transposedFockMatrix[nu][moA];
                      }
                   }
                }
@@ -1595,11 +1582,8 @@ void Mndo::CalcForceHFElecCoreAttractionPart(double* force,
                                              int atomBIndex,
                                              double***** twoElecTwoCoreFirstDeriv){
    Atom* atomA = (*this->molecule->GetAtomVect())[atomAIndex];
-   Atom* atomB = (*this->molecule->GetAtomVect())[atomBIndex];
    int firstAOIndexA = atomA->GetFirstAOIndex();
-   int firstAOIndexB = atomB->GetFirstAOIndex();
    int numberAOsA = atomA->GetValence().size();
-   int numberAOsB = atomB->GetValence().size();
    for(int mu=firstAOIndexA; mu<firstAOIndexA+numberAOsA; mu++){
       for(int nu=firstAOIndexA; nu<firstAOIndexA+numberAOsA; nu++){
          for(int i=0; i<CartesianType_end; i++){
@@ -1681,6 +1665,130 @@ void Mndo::CalcForceHFTwoElecPart(double* force,
    }
 }
 
+void Mndo::CalcForceExcitedStaticPart(double* force, 
+                                      int elecStateIndex,
+                                      int atomAIndex, 
+                                      int atomBIndex,
+                                      double***** twoElecTwoCoreFirstDeriv){
+   Atom* atomA = (*this->molecule->GetAtomVect())[atomAIndex];
+   Atom* atomB = (*this->molecule->GetAtomVect())[atomBIndex];
+   int firstAOIndexA = atomA->GetFirstAOIndex();
+   int firstAOIndexB = atomB->GetFirstAOIndex();
+   int numberAOsA = atomA->GetValence().size();
+   int numberAOsB = atomB->GetValence().size();
+   for(int mu=firstAOIndexA; mu<firstAOIndexA+numberAOsA; mu++){
+      for(int nu=firstAOIndexA; nu<firstAOIndexA+numberAOsA; nu++){
+         for(int lambda=firstAOIndexB; lambda<firstAOIndexB+numberAOsB; lambda++){
+            for(int sigma=firstAOIndexB; sigma<firstAOIndexB+numberAOsB; sigma++){
+               for(int i=0; i<CartesianType_end; i++){
+                  double temp= 2.0*this->etaMatrixForce[elecStateIndex][mu][nu]
+                                  *this->etaMatrixForce[elecStateIndex][lambda][sigma]
+                              -1.0*this->etaMatrixForce[elecStateIndex][mu][lambda]
+                                  *this->etaMatrixForce[elecStateIndex][nu][sigma];
+                  force[i] += temp
+                             *twoElecTwoCoreFirstDeriv[mu-firstAOIndexA]
+                                                      [nu-firstAOIndexA]
+                                                      [lambda-firstAOIndexB]
+                                                      [sigma-firstAOIndexB]
+                                                      [i];
+               }
+            }
+         }
+      }
+   }
+}
+
+void Mndo::CalcForceExcitedElecCoreAttractionPart(double* force, 
+                                                  int elecStateIndex,
+                                                  int atomAIndex, 
+                                                  int atomBIndex,
+                                                  double***** twoElecTwoCoreFirstDeriv){
+   Atom* atomA = (*this->molecule->GetAtomVect())[atomAIndex];
+   int firstAOIndexA = atomA->GetFirstAOIndex();
+   int numberAOsA = atomA->GetValence().size();
+   for(int mu=firstAOIndexA; mu<firstAOIndexA+numberAOsA; mu++){
+      for(int nu=firstAOIndexA; nu<firstAOIndexA+numberAOsA; nu++){
+         for(int i=0; i<CartesianType_end; i++){
+            force[i] += this->zMatrixForce[elecStateIndex][mu][nu]
+                       *this->GetElectronCoreAttractionFirstDerivative(
+                                   atomAIndex, 
+                                   atomBIndex, 
+                                   mu-firstAOIndexA, 
+                                   nu-firstAOIndexA,
+                                   twoElecTwoCoreFirstDeriv,
+                                   (CartesianType)i);
+         }
+      }
+   }
+}
+
+void Mndo::CalcForceExcitedOverlapPart(double* force, 
+                                       int elecStateIndex,
+                                       int atomAIndex, 
+                                       int atomBIndex,
+                                       double*** overlapDer){
+   Atom* atomA = (*this->molecule->GetAtomVect())[atomAIndex];
+   Atom* atomB = (*this->molecule->GetAtomVect())[atomBIndex];
+   int firstAOIndexA = atomA->GetFirstAOIndex();
+   int firstAOIndexB = atomB->GetFirstAOIndex();
+   int numberAOsA = atomA->GetValence().size();
+   int numberAOsB = atomB->GetValence().size();
+   for(int mu=firstAOIndexA; mu<firstAOIndexA+numberAOsA; mu++){
+      for(int nu=firstAOIndexB; nu<firstAOIndexB+numberAOsB; nu++){
+         double bondParameter = atomA->GetBondingParameter(
+                                       this->theory, 
+                                       atomA->GetValence()[mu-firstAOIndexA]) 
+                               +atomB->GetBondingParameter(
+                                       this->theory, 
+                                       atomB->GetValence()[nu-firstAOIndexB]); 
+         bondParameter *= 0.5;
+         for(int i=0; i<CartesianType_end; i++){
+            force[i] += this->zMatrixForce[elecStateIndex][mu][nu]
+                       *bondParameter
+                       *overlapDer[mu-firstAOIndexA][nu-firstAOIndexB][i];
+         }
+      }
+   }
+}
+
+void Mndo::CalcForceExcitedTwoElecPart(double* force, 
+                                       int elecStateIndex,
+                                       int atomAIndex, 
+                                       int atomBIndex,
+                                       double***** twoElecTwoCoreFirstDeriv){
+   Atom* atomA = (*this->molecule->GetAtomVect())[atomAIndex];
+   Atom* atomB = (*this->molecule->GetAtomVect())[atomBIndex];
+   int firstAOIndexA = atomA->GetFirstAOIndex();
+   int firstAOIndexB = atomB->GetFirstAOIndex();
+   int numberAOsA = atomA->GetValence().size();
+   int numberAOsB = atomB->GetValence().size();
+   for(int mu=firstAOIndexA; mu<firstAOIndexA+numberAOsA; mu++){
+      for(int nu=firstAOIndexA; nu<firstAOIndexA+numberAOsA; nu++){
+         for(int lambda=firstAOIndexB; lambda<firstAOIndexB+numberAOsB; lambda++){
+            for(int sigma=firstAOIndexB; sigma<firstAOIndexB+numberAOsB; sigma++){
+               for(int i=0; i<CartesianType_end; i++){
+                  force[i] += this->zMatrixForce[elecStateIndex][mu][nu]
+                             *this->orbitalElectronPopulation[lambda][sigma]
+                             *twoElecTwoCoreFirstDeriv[mu-firstAOIndexA]
+                                                      [nu-firstAOIndexA]
+                                                      [lambda-firstAOIndexB]
+                                                      [sigma-firstAOIndexB]
+                                                      [i];
+                  force[i] -= 0.50
+                             *this->zMatrixForce[elecStateIndex][mu][lambda]
+                             *this->orbitalElectronPopulation[nu][sigma]
+                             *twoElecTwoCoreFirstDeriv[mu-firstAOIndexA]
+                                                      [nu-firstAOIndexA]
+                                                      [lambda-firstAOIndexB]
+                                                      [sigma-firstAOIndexB]
+                                                      [(CartesianType)i];
+               }
+            }
+         }
+      }
+   }
+}
+
 // electronicStateIndex is index of the electroinc eigen state.
 // "electronicStateIndex = 0" means electronic ground state. 
 void Mndo::CalcForce(vector<int> elecStates){
@@ -1702,7 +1810,7 @@ void Mndo::CalcForce(vector<int> elecStates){
                                                            OrbitalType_end, 
                                                            CartesianType_end);
       try{
-      #pragma omp for schedule(auto)
+         #pragma omp for schedule(auto)
          for(int a=0; a<this->molecule->GetAtomVect()->size(); a++){
             Atom* atomA = (*molecule->GetAtomVect())[a];
             int firstAOIndexA = atomA->GetFirstAOIndex();
@@ -1726,28 +1834,24 @@ void Mndo::CalcForce(vector<int> elecStates){
                      coreRepulsion[i] += this->GetDiatomCoreRepulsionFirstDerivative(
                                                a, b, (CartesianType)i);
                   }  
-  
                   // electron core attraction part (ground state)
                   double forceElecCoreAttPart[CartesianType_end] = {0.0,0.0,0.0};
                   this->CalcForceHFElecCoreAttractionPart(forceElecCoreAttPart,
                                                           a,
                                                           b,
                                                           twoElecTwoCoreFirstDeriv);
-   
                   // overlap part (ground state)
                   double forceOverlapPart[CartesianType_end] = {0.0,0.0,0.0};
                   this->CalcForceHFOverlapPart(forceOverlapPart, 
                                                a,
                                                b,
                                                overlapDer);
-                  
                   // two electron part (ground state)
                   double forceTwoElecPart[CartesianType_end] = {0.0,0.0,0.0};
                   this->CalcForceHFTwoElecPart(forceTwoElecPart,
                                                a,
                                                b,
                                                twoElecTwoCoreFirstDeriv);
-
                   // sum up contributions from each part (ground state)
                   for(int n=0; n<elecStates.size(); n++){
                      for(int i=0; i<CartesianType_end; i++){
@@ -1759,7 +1863,58 @@ void Mndo::CalcForce(vector<int> elecStates){
                                                      +forceTwoElecPart[i];
                      }
                   }
+                  
+                  // excited state potential
+                  for(int n=0; n<elecStates.size(); n++){
+                     if(0<elecStates[n]){
+                        // static part
+                        double forceExcitedStaticPart[CartesianType_end] = {0.0,0.0,0.0};
+                        this->CalcForceExcitedStaticPart(forceExcitedStaticPart,
+                                                         n,
+                                                         a,
+                                                         b,
+                                                         twoElecTwoCoreFirstDeriv);
+                        // sum up contributions from static part (excited state)
+                        for(int i=0; i<CartesianType_end; i++){
+                           this->matrixForce[n][b][i] += forceExcitedStaticPart[i];
+                           this->matrixForce[n][a][i] -= forceExcitedStaticPart[i];
+                        }
 
+                        // response part
+                        // electron core attraction part (excited state)
+                        double forceExcitedElecCoreAttPart[CartesianType_end]={0.0,0.0,0.0};
+                        this->CalcForceExcitedElecCoreAttractionPart(
+                                                   forceExcitedElecCoreAttPart,
+                                                   n,
+                                                   a,
+                                                   b,
+                                                   twoElecTwoCoreFirstDeriv);
+                        // overlap part (excited state)
+                        double forceExcitedOverlapPart[CartesianType_end] = {0.0,0.0,0.0};
+                        this->CalcForceExcitedOverlapPart(forceExcitedOverlapPart, 
+                                                          n,
+                                                          a,
+                                                          b,
+                                                          overlapDer);
+                        // two electron part (ground state)
+                        double forceExcitedTwoElecPart[CartesianType_end] = {0.0,0.0,0.0};
+                        this->CalcForceExcitedTwoElecPart(forceExcitedTwoElecPart,
+                                                          n,
+                                                          a,
+                                                          b,
+                                                          twoElecTwoCoreFirstDeriv);
+                        // sum up contributions from response part (excited state)
+                        for(int i=0; i<CartesianType_end; i++){
+                           this->matrixForce[n][b][i] += forceExcitedElecCoreAttPart[i];
+                           this->matrixForce[n][b][i] += forceExcitedOverlapPart[i];
+                           this->matrixForce[n][b][i] += forceExcitedTwoElecPart[i];
+                           this->matrixForce[n][a][i] -= forceExcitedElecCoreAttPart[i];
+                           this->matrixForce[n][a][i] -= forceExcitedOverlapPart[i];
+                           this->matrixForce[n][a][i] -= forceExcitedTwoElecPart[i];
+                        }
+
+                     }
+                  }
                }
             }
          }

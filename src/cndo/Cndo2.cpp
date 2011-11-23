@@ -423,7 +423,8 @@ void Cndo2::DoesCIS(){
 
 // elecState=0 means ground state
 double Cndo2::GetElectronicEnergy(int elecState){
-   if(elecState==0){
+   int groundState = 0;
+   if(elecState==groundState){
       return this->elecEnergy;
    }
    else{
@@ -440,7 +441,7 @@ double Cndo2::GetElectronicEnergy(int elecState){
          ss << errorMessageGetElectronicEnergyNumberCISStates << numberExcitedStates << endl;
          throw MolDSException(ss.str());
       }
-      return this->elecEnergy + this->excitedEnergies[elecState+1];
+      return this->elecEnergy + this->excitedEnergies[elecState-1];
    }
 }
 

@@ -118,7 +118,7 @@ private:
                                  double*** xiVir,
                                  int sizeQNR,
                                  int sizeQR);
-   void CalcDeltaVector(double* delta, int elecState);
+   void CalcDeltaVector(double* delta, int exciteState);
    double GetSmallQElement(int moI, 
                            int moP, 
                            double**xiOcc, 
@@ -129,7 +129,6 @@ private:
                     double** xiOcc,
                     double** xiVir,
                     double** eta,
-                    int elecState,
                     std::vector<MoIndexPair> nonRedundantQIndeces,
                     std::vector<MoIndexPair> redundantQIndeces);
    void TransposeFockMatrixMatrix(double** transposedFockMatrix);
@@ -138,14 +137,14 @@ private:
    void CalcKRDagerMatrix(double** kRDager, 
                           std::vector<MoIndexPair> nonRedundantQIndeces,
                           std::vector<MoIndexPair> redundantQIndeces);
-   void CaclAuxiliaryVector(double* y,
+   void CalcAuxiliaryVector(double* y,
                             double* q,
                             double** kRDager,
                             std::vector<MoIndexPair> nonRedundantQIndeces,
                             std::vector<MoIndexPair> redundantQIndeces);
    void CalcXiMatrices(double** xiOcc, 
                        double** xiVir, 
-                       int elecState,
+                       int exciteState,
                        double** transposedFockMatrix);
    double GetZMatrixForceElement(double* y,
                                  double* q,
@@ -219,6 +218,26 @@ private:
                                int atomAIndex,
                                int atomBIndex,
                                double***** twoElecTwoCoreFirstDeriv);
+   void CalcForceExcitedStaticPart(double* force, 
+                                   int elecStateIndex,
+                                   int atomAIndex,
+                                   int atomBIndex,
+                                   double***** twoElecTwoCoreFirstDeriv);
+   void CalcForceExcitedElecCoreAttractionPart(double* force, 
+                                               int elecStateIndex,
+                                               int atomAIndex,
+                                               int atomBIndex,
+                                               double***** twoElecTwoCoreFirstDeriv);
+   void CalcForceExcitedOverlapPart(double* force, 
+                                    int elecStateIndex,
+                                    int atomAIndex,
+                                    int atomBIndex,
+                                    double*** overlapDer);
+   void CalcForceExcitedTwoElecPart(double* force, 
+                                    int elecStateIndex,
+                                    int atomAIndex,
+                                    int atomBIndex,
+                                    double***** twoElecTwoCoreFirstDeriv);
 
 };
 
