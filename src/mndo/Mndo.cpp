@@ -1858,18 +1858,20 @@ void Mndo::CalcForce(vector<int> elecStates){
                                                b,
                                                twoElecTwoCoreFirstDeriv);
                   // sum up contributions from each part (ground state)
-                  for(int n=0; n<elecStates.size(); n++){
-                     for(int i=0; i<CartesianType_end; i++){
-                        this->matrixForce[n][a][i] -= coreRepulsion[i];
-                        this->matrixForce[n][a][i] += forceElecCoreAttPart[i];
-                        this->matrixForce[n][a][i] += forceOverlapPart[i];
-                        this->matrixForce[n][a][i] += forceTwoElecPart[i];
-                        this->matrixForce[n][b][i] -= forceElecCoreAttPart[i];
-                        this->matrixForce[n][b][i] -= forceOverlapPart[i];
-                        this->matrixForce[n][b][i] -= forceTwoElecPart[i];
+                  #pragma omp critical
+                  {
+                     for(int n=0; n<elecStates.size(); n++){
+                        for(int i=0; i<CartesianType_end; i++){
+                           this->matrixForce[n][a][i] -= coreRepulsion[i];
+                           this->matrixForce[n][a][i] += forceElecCoreAttPart[i];
+                           this->matrixForce[n][a][i] += forceOverlapPart[i];
+                           this->matrixForce[n][a][i] += forceTwoElecPart[i];
+                           this->matrixForce[n][b][i] -= forceElecCoreAttPart[i];
+                           this->matrixForce[n][b][i] -= forceOverlapPart[i];
+                           this->matrixForce[n][b][i] -= forceTwoElecPart[i];
+                        }
                      }
                   }
-                  
                   // excited state potential
                   for(int n=0; n<elecStates.size(); n++){
                      if(0<elecStates[n]){
@@ -1910,13 +1912,16 @@ void Mndo::CalcForce(vector<int> elecStates){
                                                           b,
                                                           twoElecTwoCoreFirstDeriv);
                         // sum up contributions from response part (excited state)
-                        for(int i=0; i<CartesianType_end; i++){
-                           this->matrixForce[n][a][i] += forceExcitedElecCoreAttPart[i];
-                           this->matrixForce[n][a][i] += forceExcitedOverlapPart[i];
-                           this->matrixForce[n][a][i] += forceExcitedTwoElecPart[i];
-                           this->matrixForce[n][b][i] -= forceExcitedElecCoreAttPart[i];
-                           this->matrixForce[n][b][i] -= forceExcitedOverlapPart[i];
-                           this->matrixForce[n][b][i] -= forceExcitedTwoElecPart[i];
+                        #pragma omp critical
+                        {
+                           for(int i=0; i<CartesianType_end; i++){
+                              this->matrixForce[n][a][i] += forceExcitedElecCoreAttPart[i];
+                              this->matrixForce[n][a][i] += forceExcitedOverlapPart[i];
+                              this->matrixForce[n][a][i] += forceExcitedTwoElecPart[i];
+                              this->matrixForce[n][b][i] -= forceExcitedElecCoreAttPart[i];
+                              this->matrixForce[n][b][i] -= forceExcitedOverlapPart[i];
+                              this->matrixForce[n][b][i] -= forceExcitedTwoElecPart[i];
+                           }
                         }
 
                      }
