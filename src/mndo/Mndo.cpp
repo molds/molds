@@ -1587,7 +1587,8 @@ void Mndo::CalcForceHFElecCoreAttractionPart(double* force,
    for(int mu=firstAOIndexA; mu<firstAOIndexA+numberAOsA; mu++){
       for(int nu=firstAOIndexA; nu<firstAOIndexA+numberAOsA; nu++){
          for(int i=0; i<CartesianType_end; i++){
-            force[i] += this->orbitalElectronPopulation[mu][nu]
+            force[i] += -1.0
+                       *this->orbitalElectronPopulation[mu][nu]
                        *this->GetElectronCoreAttractionFirstDerivative(
                                    atomAIndex, 
                                    atomBIndex, 
@@ -1618,8 +1619,10 @@ void Mndo::CalcForceHFOverlapPart(double* force,
                                +atomB->GetBondingParameter(
                                        this->theory, 
                                        atomB->GetValence()[nu-firstAOIndexB]); 
+         bondParameter*=0.5;
          for(int i=0; i<CartesianType_end; i++){
-            force[i] += this->orbitalElectronPopulation[mu][nu]
+            force[i] += -1.0
+                       *this->orbitalElectronPopulation[mu][nu]
                        *bondParameter
                        *overlapDer[mu-firstAOIndexA][nu-firstAOIndexB][i];
          }
@@ -1642,7 +1645,7 @@ void Mndo::CalcForceHFTwoElecPart(double* force,
          for(int lambda=firstAOIndexB; lambda<firstAOIndexB+numberAOsB; lambda++){
             for(int sigma=firstAOIndexB; sigma<firstAOIndexB+numberAOsB; sigma++){
                for(int i=0; i<CartesianType_end; i++){
-                  force[i] += 0.5
+                  force[i] -= 0.5
                              *this->orbitalElectronPopulation[mu][nu]
                              *this->orbitalElectronPopulation[lambda][sigma]
                              *twoElecTwoCoreFirstDeriv[mu-firstAOIndexA]
@@ -1650,7 +1653,7 @@ void Mndo::CalcForceHFTwoElecPart(double* force,
                                                       [lambda-firstAOIndexB]
                                                       [sigma-firstAOIndexB]
                                                       [(CartesianType)i];
-                  force[i] -= 0.25
+                  force[i] += 0.25
                              *this->orbitalElectronPopulation[mu][lambda]
                              *this->orbitalElectronPopulation[nu][sigma]
                              *twoElecTwoCoreFirstDeriv[mu-firstAOIndexA]
@@ -1855,12 +1858,13 @@ void Mndo::CalcForce(vector<int> elecStates){
                   // sum up contributions from each part (ground state)
                   for(int n=0; n<elecStates.size(); n++){
                      for(int i=0; i<CartesianType_end; i++){
-                        this->matrixForce[n][b][i] += forceElecCoreAttPart[i];
-                        this->matrixForce[n][b][i] += forceTwoElecPart[i];
-                        this->matrixForce[n][a][i] -= coreRepulsion[i]
-                                                     +forceElecCoreAttPart[i] 
-                                                     +forceOverlapPart[i]
-                                                     +forceTwoElecPart[i];
+                        this->matrixForce[n][a][i] -= coreRepulsion[i];
+                        this->matrixForce[n][a][i] += forceElecCoreAttPart[i];
+                        this->matrixForce[n][a][i] += forceOverlapPart[i];
+                        this->matrixForce[n][a][i] += forceTwoElecPart[i];
+                        this->matrixForce[n][b][i] -= forceElecCoreAttPart[i];
+                        this->matrixForce[n][b][i] -= forceOverlapPart[i];
+                        this->matrixForce[n][b][i] -= forceTwoElecPart[i];
                      }
                   }
                   
