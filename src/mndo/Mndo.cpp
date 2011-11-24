@@ -1033,6 +1033,7 @@ void Mndo::CalcDeltaVector(double* delta, int exciteState){
    int numberActiveVir = Parameters::GetInstance()->GetActiveVirCIS();
    int numberActiveMO = numberActiveOcc + numberActiveVir;
    MallocerFreer::GetInstance()->InitializeDoubleMatrix1d(delta, numberActiveMO);
+   #pragma omp parallel for schedule(auto)
    for(int r=0; r<numberActiveMO; r++){
       double value = 0.0;
       if(r<numberActiveOcc){
@@ -1253,6 +1254,7 @@ void Mndo::CalcQVector(double* q,
 
    int numberOcc = this->molecule->GetTotalNumberValenceElectrons()/2;
    int numberActiveOcc = Parameters::GetInstance()->GetActiveOccCIS();
+   #pragma omp parallel for schedule(auto)
    for(int i=0; i<nonRedundantQIndeces.size(); i++){
       int moI = nonRedundantQIndeces[i].moI;
       int moJ = nonRedundantQIndeces[i].moJ;
@@ -1272,6 +1274,7 @@ void Mndo::CalcQVector(double* q,
          q[i] = 0.0;
       }
    }
+   #pragma omp parallel for schedule(auto)
    for(int i=0; i<redundantQIndeces.size(); i++){
       int r = nonRedundantQIndeces.size() + i;
       int moI = redundantQIndeces[i].moI;
@@ -1300,6 +1303,7 @@ void Mndo::CalcQVector(double* q,
 // This method calculates "\Gamma_{NR} - K_{NR}".
 // Note taht K_{NR} is not calculated.
 void Mndo::CalcKNRMatrix(double** kNR, vector<MoIndexPair> nonRedundantQIndeces){
+   #pragma omp parallel for schedule(auto)
    for(int i=0; i<nonRedundantQIndeces.size(); i++){
       int moI = nonRedundantQIndeces[i].moI;
       int moJ = nonRedundantQIndeces[i].moJ;
@@ -1318,6 +1322,7 @@ void Mndo::CalcKNRMatrix(double** kNR, vector<MoIndexPair> nonRedundantQIndeces)
 void Mndo::CalcKRDagerMatrix(double** kRDager, 
                              vector<MoIndexPair> nonRedundantQIndeces,
                              vector<MoIndexPair> redundantQIndeces){
+   #pragma omp parallel for schedule(auto)
    for(int i=0; i<nonRedundantQIndeces.size(); i++){
       int moI = nonRedundantQIndeces[i].moI;
       int moJ = nonRedundantQIndeces[i].moJ;
@@ -1339,6 +1344,7 @@ void Mndo::CalcAuxiliaryVector(double* y,
    MallocerFreer::GetInstance()->InitializeDoubleMatrix1d(
                                  y,
                                  nonRedundantQIndeces.size());
+   #pragma omp parallel for schedule(auto)
    for(int i=0; i<nonRedundantQIndeces.size(); i++){
       int moI = nonRedundantQIndeces[i].moI;
       int moJ = nonRedundantQIndeces[i].moJ;
@@ -1399,6 +1405,7 @@ void Mndo::CalcXiMatrices(double** xiOcc,
    MallocerFreer::GetInstance()->InitializeDoubleMatrix2d(
                                  xiVir, numberActiveVir, numberAOs);
    // xiOcc
+   #pragma omp parallel for schedule(auto)
    for(int p=0; p<numberActiveOcc; p++){
       for(int mu=0; mu<numberAOs; mu++){
          for(int a=0; a<numberActiveVir; a++){
@@ -1410,6 +1417,7 @@ void Mndo::CalcXiMatrices(double** xiOcc,
       }
    }
    // xiVir
+   #pragma omp parallel for schedule(auto)
    for(int p=0; p<numberActiveVir; p++){
       for(int mu=0; mu<numberAOs; mu++){
          for(int i=0; i<numberActiveOcc; i++){
@@ -1478,6 +1486,7 @@ void Mndo::CalcZMatrixForce(vector<int> elecStates){
                                                                    y, 
                                                                    nonRedundantQIndeces.size());
             // calculate each element of Z matrix.
+            #pragma omp parallel for schedule(auto)
             for(int mu=0; mu<this->molecule->GetTotalNumberAOs(); mu++){
                for(int nu=0; nu<this->molecule->GetTotalNumberAOs(); nu++){
                   this->zMatrixForce[n][mu][nu] = this->GetZMatrixForceElement(
@@ -1537,6 +1546,7 @@ void Mndo::CalcEtaMatrixForce(vector<int> elecStates){
             int exciteState = elecStates[n]-1;
 
             // calc each element
+            #pragma omp parallel for schedule(auto)
             for(int mu=0; mu<numberAOs; mu++){
                for(int nu=0; nu<numberAOs; nu++){
                   for(int i=0; i<numberActiveOcc; i++){
