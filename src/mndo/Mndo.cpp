@@ -1712,7 +1712,8 @@ void Mndo::CalcForceExcitedElecCoreAttractionPart(double* force,
    for(int mu=firstAOIndexA; mu<firstAOIndexA+numberAOsA; mu++){
       for(int nu=firstAOIndexA; nu<firstAOIndexA+numberAOsA; nu++){
          for(int i=0; i<CartesianType_end; i++){
-            force[i] += this->zMatrixForce[elecStateIndex][mu][nu]
+            force[i] += -1.0
+                       *this->zMatrixForce[elecStateIndex][mu][nu]
                        *this->GetElectronCoreAttractionFirstDerivative(
                                    atomAIndex, 
                                    atomBIndex, 
@@ -1746,7 +1747,8 @@ void Mndo::CalcForceExcitedOverlapPart(double* force,
                                        atomB->GetValence()[nu-firstAOIndexB]); 
          bondParameter *= 0.5;
          for(int i=0; i<CartesianType_end; i++){
-            force[i] += this->zMatrixForce[elecStateIndex][mu][nu]
+            force[i] += -1.0
+                       *this->zMatrixForce[elecStateIndex][mu][nu]
                        *bondParameter
                        *overlapDer[mu-firstAOIndexA][nu-firstAOIndexB][i];
          }
@@ -1770,14 +1772,14 @@ void Mndo::CalcForceExcitedTwoElecPart(double* force,
          for(int lambda=firstAOIndexB; lambda<firstAOIndexB+numberAOsB; lambda++){
             for(int sigma=firstAOIndexB; sigma<firstAOIndexB+numberAOsB; sigma++){
                for(int i=0; i<CartesianType_end; i++){
-                  force[i] += this->zMatrixForce[elecStateIndex][mu][nu]
+                  force[i] -= this->zMatrixForce[elecStateIndex][mu][nu]
                              *this->orbitalElectronPopulation[lambda][sigma]
                              *twoElecTwoCoreFirstDeriv[mu-firstAOIndexA]
                                                       [nu-firstAOIndexA]
                                                       [lambda-firstAOIndexB]
                                                       [sigma-firstAOIndexB]
                                                       [i];
-                  force[i] -= 0.50
+                  force[i] += 0.50
                              *this->zMatrixForce[elecStateIndex][mu][lambda]
                              *this->orbitalElectronPopulation[nu][sigma]
                              *twoElecTwoCoreFirstDeriv[mu-firstAOIndexA]
@@ -1909,12 +1911,12 @@ void Mndo::CalcForce(vector<int> elecStates){
                                                           twoElecTwoCoreFirstDeriv);
                         // sum up contributions from response part (excited state)
                         for(int i=0; i<CartesianType_end; i++){
-                           this->matrixForce[n][b][i] += forceExcitedElecCoreAttPart[i];
-                           this->matrixForce[n][b][i] += forceExcitedOverlapPart[i];
-                           this->matrixForce[n][b][i] += forceExcitedTwoElecPart[i];
-                           this->matrixForce[n][a][i] -= forceExcitedElecCoreAttPart[i];
-                           this->matrixForce[n][a][i] -= forceExcitedOverlapPart[i];
-                           this->matrixForce[n][a][i] -= forceExcitedTwoElecPart[i];
+                           this->matrixForce[n][a][i] += forceExcitedElecCoreAttPart[i];
+                           this->matrixForce[n][a][i] += forceExcitedOverlapPart[i];
+                           this->matrixForce[n][a][i] += forceExcitedTwoElecPart[i];
+                           this->matrixForce[n][b][i] -= forceExcitedElecCoreAttPart[i];
+                           this->matrixForce[n][b][i] -= forceExcitedOverlapPart[i];
+                           this->matrixForce[n][b][i] -= forceExcitedTwoElecPart[i];
                         }
 
                      }
