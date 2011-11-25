@@ -8,7 +8,9 @@
 #include<stdexcept>
 #include"../MolDSException.h"
 #include"../Enums.h"
+#include"../MathUtilities.h"
 #include"../MallocerFreer.h"
+#include"../EularAngle.h"
 #include"Atom.h"
 using namespace std;
 using namespace MolDS_base;
@@ -51,6 +53,12 @@ void Atom::SetMessages(){
    this->errorMessageOrbitalType = "\torbital type = ";
    this->errorMessageShellType = "\tshell type = ";
    this->errorMessageTheoryType = "\tTheory = ";
+   this->errorMessageNumberValences = "\tnumber of valences = ";
+   this->errorMessageValenceIndex = "\tvalenceIndex = ";
+   this->errorMessageGetAtomicBasisValueBadValenceIndex 
+      = "Error in molds_atoms::Atom::GetAtomicBasisValue: Bad valenceIndex is set.\n";
+   this->errorMessageGetRealAnuglarPartAOBadValence 
+      = "Error in molds_atoms::Atom::GetRealAnuglarPartAO: Bad valence orbital is set.\n";
    this->errorMessageEffectivPrincipalQuantumNumber = 
       "Error in base::Atom::GetEffectivePrincipalQuantumNumber: invalid shelltype.\n";
    this->errorMessageZindoCoreIntegral = "Error in base_atoms::Atom::GetZindoCoreINtegral: Invalid orbitalType.\n";
@@ -128,6 +136,85 @@ void Atom::SetPxyz(double px, double py, double pz){
 vector<OrbitalType> Atom::GetValence(){
    return this->valence;
 }
+
+double Atom::GetAtomicBasisValue(double x, 
+                                 double y, 
+                                 double z, 
+                                 int valenceIndex, 
+                                 TheoryType theory){
+   if(this->valence.size()<=valenceIndex){
+      stringstream ss;
+      ss << this->errorMessageGetAtomicBasisValueBadValenceIndex;
+      ss << this->errorMessageAtomType << AtomTypeStr(this->atomType) << endl;
+      ss << this->errorMessageNumberValences << this->valence.size() << endl;
+      ss << this->errorMessageValenceIndex << valenceIndex << endl;
+      throw MolDSException(ss.str());
+   }
+   double dx = x - this->xyz[XAxis];
+   double dy = y - this->xyz[YAxis];
+   double dz = z - this->xyz[ZAxis];
+   double dr = sqrt( pow(dx,2.0) + pow(dy,2.0) + pow(dz,2.0) );
+   EularAngle eularAngle(dx, dy, dz);
+   double angularPart = this->GetRealAnuglarPartAO(eularAngle.GetBeta(),
+                                                   eularAngle.GetAlpha(),
+                                                   this->valence[valenceIndex]);
+   double orbitalExponent = this->GetOrbitalExponent(this->valenceShellType,
+                                                     this->valence[valenceIndex],
+                                                     theory);
+   double radialPart = this->GetRadialPartAO(dr, orbitalExponent, this->valenceShellType);
+   return angularPart*radialPart;
+}
+
+// See (1.74) & (1.72) in J. A. Pople book.
+double Atom::GetRadialPartAO(double dr, double orbitalExponent, MolDS_base::ShellType shell){
+   int principalQuantumNumber = (int)shell + 1;
+   double temp1 = pow(2.0*orbitalExponent,(double)principalQuantumNumber+0.5);
+   double temp2 = pow(Factorial(2*principalQuantumNumber),-0.5);
+   return temp1*temp2*pow(dr,principalQuantumNumber-1)*exp(-1.0*orbitalExponent*dr);
+}
+
+// See Table 1 in [BFB_1997] or Table 1.2 in J. A. Pople book.
+// See Table 1 in [BFB_1997] or p25 in J. A. Pople book for defenitions of theta and phi.
+double Atom::GetRealAnuglarPartAO(double theta, double phi, OrbitalType orbital){
+   double value=0.0;
+   switch(orbital){
+      case s:
+         value = pow(4.0*M_PI,-0.5);
+         break;
+      case py:
+         value = pow(3.0/(4.0*M_PI),0.5)*sin(theta)*sin(phi);
+         break;
+      case pz:
+         value = pow(3.0/(4.0*M_PI),0.5)*cos(theta);
+         break;
+      case px:
+         value = pow(3.0/(4.0*M_PI),0.5)*sin(theta)*cos(phi);
+         break;
+      case dxy:
+         value = pow(15.0/(16.0*M_PI),0.5)*pow(sin(theta),2.0)*sin(2.0*phi);
+         break;
+      case dyz:
+         value = pow(15.0/(16.0*M_PI),0.5)*sin(2.0*theta)*sin(phi);
+         break;
+      case dzz:
+         value = pow(5.0/(16.0*M_PI),0.5)*(3.0*pow(cos(theta),2.0) - 1.0);
+         break;
+      case dzx:
+         value = pow(15.0/(16.0*M_PI),0.5)*sin(2.0*theta)*cos(phi);
+         break;
+      case dxxyy:
+         value = pow(15.0/(16.0*M_PI),0.5)*pow(sin(theta),2.0)*cos(2.0*phi);
+         break;
+      default:
+         stringstream ss;
+         ss << this->errorMessageGetRealAnuglarPartAOBadValence;
+         ss << this->errorMessageAtomType << AtomTypeStr(this->atomType) << endl;
+         ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbital) << endl;
+         throw MolDSException(ss.str());
+   }
+   return value;
+}
+
 
 double Atom::GetBondingParameter(TheoryType theory, OrbitalType orbital){
 

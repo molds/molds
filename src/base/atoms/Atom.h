@@ -14,6 +14,11 @@ public:
    double* GetPxyz();
    void SetPxyz(double px, double py, double pz);
    std::vector<MolDS_base::OrbitalType> GetValence();
+   double GetAtomicBasisValue(double x, 
+                              double y, 
+                              double z, 
+                              int valenceIndex,
+                              MolDS_base::TheoryType theory);
    double GetBondingParameter();
    double GetBondingParameter(MolDS_base::TheoryType theory, 
                               MolDS_base::OrbitalType orbital);
@@ -167,9 +172,10 @@ protected:
    double pm3ParameterL[4];// Table II in ref. [S_1989].
    double pm3ParameterM[4];// Table II in ref. [S_1989].
 private:
-   void SetMessages();
    std::string errorMessageIonPot;
    std::string errorMessageAtomType;
+   std::string errorMessageNumberValences;
+   std::string errorMessageValenceIndex;
    std::string errorMessageOrbitalType;
    std::string errorMessageOrbitalExponent;
    std::string errorMessageShellType;
@@ -180,6 +186,8 @@ private:
    std::string errorMessageMndoCoreIntegral;
    std::string errorMessageAm1CoreIntegral;
    std::string errorMessagePm3CoreIntegral;
+   std::string errorMessageGetAtomicBasisValueBadValenceIndex;
+   std::string errorMessageGetRealAnuglarPartAOBadValence;
    std::string errorMessageGetOrbitalExponentBadTheory;
    std::string errorMessageTheoryType;
    std::string errorMessageGetBondingParameterBadTheoryBadOrbital;
@@ -205,6 +213,9 @@ private:
    std::string errorMessageGetNddoGpp2BadTheory;
    std::string errorMessageGetNddoHspBadTheory;
    std::string errorMessageGetNddoHppBadTheory;
+   void SetMessages();
+   double GetRealAnuglarPartAO(double theta, double phi, MolDS_base::OrbitalType orbital);
+   double GetRadialPartAO(double dr, double orbitalExponent, MolDS_base::ShellType shell);
    int GetEffectivePrincipalQuantumNumber(MolDS_base::ShellType shellType); // Table 1.4 in J. A. Pople book
    double GetZindoJss();  // Part of Eq. (13) in [BZ_1979]
    double GetZindoJsp();  // Part of Eq. (13) in [BZ_1979]
