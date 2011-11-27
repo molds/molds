@@ -23,6 +23,14 @@ public:
    void SetDiisStartErrorSCF(double diisStartErrorSCF);
    double GetDiisEndErrorSCF();
    void SetDiisEndErrorSCF(double diisEndErrorSCF);
+   std::string GetFileNamePrefixMOPlot();
+   void SetFileNamePrefixMOPlot(std::string fileNamePrefixMOPlot);
+   int* GetGridNumberMOPlot();
+   void SetGridNumberMOPlot(int Nx, int Ny, int Nz);
+   double* GetFrameLengthMOPlot();
+   void SetFrameLengthMOPlot(double lx, double ly, double lz);
+   std::vector<int> GetIndecesMOPlot();
+   void AddIndexMOPlot(int moIndex);
    double GetEV2AU();
    double GetKcalMolin2AU();
    double GetAngstrom2AU();
@@ -78,13 +86,6 @@ private:
    void operator = (Parameters&);
    ~Parameters();
 
-   double thresholdSCF;
-   int maxIterationsSCF;
-   double dampingThreshSCF;
-   double dampingWeightSCF;
-   int diisNumErrorVectSCF;
-   double diisStartErrorSCF;
-   double diisEndErrorSCF;
    void SetDefaultValues();
    double eV2AU;
    double kcalMolin2AU;
@@ -93,6 +94,17 @@ private:
    double gMolin2AU;
    double degree2Radian;
    double fs2AU;
+   double thresholdSCF;
+   int maxIterationsSCF;
+   double dampingThreshSCF;
+   double dampingWeightSCF;
+   int diisNumErrorVectSCF;
+   double diisStartErrorSCF;
+   double diisEndErrorSCF;
+   std::string fileNamePrefixMOPlot;
+   int gridNumberMOPlot[CartesianType_end];
+   double frameLengthMOPlot[CartesianType_end];
+   std::vector<int> indecesMOPlot;
    double bondingAdjustParameterK; //see (3.79) in J. A. Pople book
    TheoryType currentTheory;
    double translatingDifference[3];

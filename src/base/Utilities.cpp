@@ -1,6 +1,8 @@
 #include<stdio.h>
 #include<stdlib.h>
+#include<sstream>
 #include<string>
+#include<math.h>
 #include"Utilities.h"
 using namespace std;
 
@@ -44,6 +46,16 @@ string TrimString(const string str){
       }
    }
    return(str.substr( nStart, nEnd - nStart + 1 ));
+}
+
+string Num2String(int number, int digit){
+   stringstream ss;
+   int numberDigit = (int)(log10((double)number)) + 1;
+   for(int i=0; i<digit-numberDigit; i++){
+      ss << "0";
+   }
+   ss << number;
+   return ss.str();
 }
 }
 

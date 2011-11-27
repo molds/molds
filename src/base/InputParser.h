@@ -40,6 +40,11 @@ private:
    std::string messageMdTotalSteps;
    std::string messageMdElecState;
    std::string messageMdTimeWidth;
+   std::string messageMOPlotConditions;
+   std::string messageMOPlotIndex;
+   std::string messageMOPlotGridNumber;
+   std::string messageMOPlotFrameLength;
+   std::string messageMOPlotFilePrefix;
    std::string messageFs;
    std::string stringYES;
    std::string stringNO;
@@ -68,6 +73,12 @@ private:
    std::string stringScfDiisNumErrorVect;
    std::string stringScfDiisStartError;
    std::string stringScfDiisEndError;
+   std::string stringMO;
+   std::string stringMOPlot;
+   std::string stringMOPlotEnd;
+   std::string stringMOPlotGridNumber;
+   std::string stringMOPlotFrameLength;
+   std::string stringMOPlotFilePrefix;
    std::string stringInertiaTensor;
    std::string stringInertiaTensorEnd;
    std::string stringInertiaTensorOrigin;
@@ -104,6 +115,7 @@ private:
    void OutputScfConditions();
    void OutputCisConditions();
    void OutputMdConditions();
+   void OutputMOPlotConditions();
    void OutputInputTerms(std::vector<std::string> inputTerms);
    bool IsCommentOut(std::string str);
    std::vector<std::string> GetInputTerms();

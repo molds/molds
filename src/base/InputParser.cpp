@@ -51,6 +51,11 @@ InputParser::InputParser(){
    this->messageMdTotalSteps = "\t\tTotal steps: ";
    this->messageMdElecState = "\t\tElectronic eigen state: ";
    this->messageMdTimeWidth = "\t\tTime width(dt): ";
+   this->messageMOPlotConditions = "\tMO plot conditions:\n";
+   this->messageMOPlotIndex = "\t\tMO index: ";
+   this->messageMOPlotGridNumber = "\t\tNumber of grid(x, y, z): ";
+   this->messageMOPlotFrameLength = "\t\tFrame length[angst.](x, y, z): ";
+   this->messageMOPlotFilePrefix = "\t\tFile name prefix: ";
    this->messageFs = "[fs]";
    this->stringYES = "yes";
    this->stringNO = "no";
@@ -79,6 +84,12 @@ InputParser::InputParser(){
    this->stringScfDiisNumErrorVect = "diis_num_error_vect";
    this->stringScfDiisStartError = "diis_start_error";
    this->stringScfDiisEndError = "diis_end_error";
+   this->stringMO = "mo";
+   this->stringMOPlot = "moplot";
+   this->stringMOPlotEnd = "moplot_end";
+   this->stringMOPlotGridNumber = "grid_number";
+   this->stringMOPlotFrameLength = "frame_length";
+   this->stringMOPlotFilePrefix = "file_prefix";
    this->stringInertiaTensor = "inertia";
    this->stringInertiaTensorEnd = "inertia_end";
    this->stringInertiaTensorOrigin = "origin";
@@ -333,6 +344,46 @@ void InputParser::Parse(Molecule* molecule){
          i = j;
       }
       
+   this->stringMOPlotFilePrefix = "file_prefix";
+      // mo plot condition
+      if(inputTerms[i].compare(this->stringMOPlot) == 0){
+         int j=i+1;
+         while(inputTerms[j].compare(this->stringMOPlotEnd) != 0){
+            // Frame length
+            if(inputTerms[j].compare(this->stringMOPlotFrameLength) == 0){
+               double lx = atof(inputTerms[j+1].c_str()) 
+                          *Parameters::GetInstance()->GetAngstrom2AU();
+               double ly = atof(inputTerms[j+2].c_str()) 
+                          *Parameters::GetInstance()->GetAngstrom2AU();
+               double lz = atof(inputTerms[j+3].c_str()) 
+                          *Parameters::GetInstance()->GetAngstrom2AU();
+               Parameters::GetInstance()->SetFrameLengthMOPlot(lx, ly, lz);
+               j += 3;
+            }
+            // Grid number
+            if(inputTerms[j].compare(this->stringMOPlotGridNumber) == 0){
+               int nx = atof(inputTerms[j+1].c_str());
+               int ny = atof(inputTerms[j+2].c_str());
+               int nz = atof(inputTerms[j+3].c_str());
+               Parameters::GetInstance()->SetGridNumberMOPlot(nx, ny, nz);
+               j += 3;
+            }
+            // mo index
+            if(inputTerms[j].compare(this->stringMO) == 0){
+               int moIndex = atoi(inputTerms[j+1].c_str());
+               Parameters::GetInstance()->AddIndexMOPlot(moIndex);
+               j++;
+            }
+            // file prefix
+            if(inputTerms[j].compare(this->stringMOPlotFilePrefix) == 0){
+               string filePrefix(inputTerms[j+1].c_str());
+               Parameters::GetInstance()->SetFileNamePrefixMOPlot(filePrefix);
+               j++;
+            }
+            j++;   
+         }
+         i = j;
+      }
       // cis condition
       if(inputTerms[i].compare(this->stringCIS) == 0){
          Parameters::GetInstance()->SetRequiresCIS(true);
@@ -497,6 +548,9 @@ void InputParser::Parse(Molecule* molecule){
    if(Parameters::GetInstance()->RequiresMD()){
       this->OutputMdConditions();
    }
+   if(0<Parameters::GetInstance()->GetIndecesMOPlot().size()){
+      this->OutputMOPlotConditions();
+   }
 
    // output inputs
    this->OutputInputTerms(inputTerms);
@@ -602,6 +656,29 @@ void InputParser::OutputMdConditions(){
    printf("%s%lf%s\n",this->messageMdTimeWidth.c_str(),Parameters::GetInstance()->GetTimeWidthMD()/Parameters::GetInstance()->GetFs2AU(),this->messageFs.c_str());
 
    cout << "\n";
+}
+
+void InputParser::OutputMOPlotConditions(){
+   cout << this->messageMOPlotConditions;
+   vector<int> moIndeces = Parameters::GetInstance()->GetIndecesMOPlot();
+   for(int i=0; i<moIndeces.size(); i++){
+      printf("%s%d\n", this->messageMOPlotIndex.c_str(), moIndeces[i]);
+   }
+   int* gridNum = Parameters::GetInstance()->GetGridNumberMOPlot();
+   printf("%s%d %d %d\n", this->messageMOPlotGridNumber.c_str(), 
+                              gridNum[XAxis], 
+                              gridNum[YAxis],
+                              gridNum[ZAxis]);
+   double* frameLength = Parameters::GetInstance()->GetFrameLengthMOPlot();
+   double ang2AU = Parameters::GetInstance()->GetAngstrom2AU();
+   printf("%s%e %e %e\n", this->messageMOPlotFrameLength.c_str(), 
+                              frameLength[XAxis]/ang2AU, 
+                              frameLength[YAxis]/ang2AU,
+                              frameLength[ZAxis]/ang2AU);
+   printf("%s%s\n", this->messageMOPlotFilePrefix.c_str(),
+                      Parameters::GetInstance()->GetFileNamePrefixMOPlot().c_str());
+
+   cout << endl;
 }
 
 void InputParser::OutputInputTerms(vector<string> inputTerms){

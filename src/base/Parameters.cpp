@@ -3,6 +3,8 @@
 #include<iostream>
 #include<sstream>
 #include<math.h>
+#include<string>
+#include<vector>
 #include"Enums.h"
 #include"MallocerFreer.h"
 #include"EularAngle.h"
@@ -55,6 +57,13 @@ void Parameters::SetDefaultValues(){
    this->diisNumErrorVectSCF = 5;
    this->diisStartErrorSCF = pow(10.0, -2.0);
    this->diisEndErrorSCF = pow(10.0, -8.0);
+   this->fileNamePrefixMOPlot = "MO_";
+   this->gridNumberMOPlot[XAxis] = 25;
+   this->gridNumberMOPlot[YAxis] = 25;
+   this->gridNumberMOPlot[ZAxis] = 25;
+   this->frameLengthMOPlot[XAxis] = 20.0;
+   this->frameLengthMOPlot[YAxis] = 20.0;
+   this->frameLengthMOPlot[ZAxis] = 20.0;
    this->currentTheory = CNDO2;
    this->gMolin2AU = pow(10.0,5.0)/(6.0221415*9.1095);
    this->degree2Radian = M_PI / 180.0;
@@ -137,6 +146,34 @@ double Parameters::GetDiisEndErrorSCF(){
 
 void Parameters::SetDiisEndErrorSCF(double diisEndErrorSCF){
    this->diisEndErrorSCF = diisEndErrorSCF;
+}
+
+string Parameters::GetFileNamePrefixMOPlot(){
+   return this->fileNamePrefixMOPlot;
+}
+
+void Parameters::SetFileNamePrefixMOPlot(string fileNamePrefixMOPlot){
+   this->fileNamePrefixMOPlot = fileNamePrefixMOPlot;
+}
+
+int* Parameters::GetGridNumberMOPlot(){
+   return this->gridNumberMOPlot;
+}
+
+void Parameters::SetGridNumberMOPlot(int Nx, int Ny, int Nz){
+   this->gridNumberMOPlot[XAxis] = Nx;
+   this->gridNumberMOPlot[YAxis] = Ny;
+   this->gridNumberMOPlot[ZAxis] = Nz;
+}
+
+double* Parameters::GetFrameLengthMOPlot(){
+   return this->frameLengthMOPlot;
+}
+
+void Parameters::SetFrameLengthMOPlot(double lx, double ly, double lz){
+   this->frameLengthMOPlot[XAxis] = lx;
+   this->frameLengthMOPlot[YAxis] = ly;
+   this->frameLengthMOPlot[ZAxis] = lz;
 }
 
 double Parameters::GetEV2AU(){
@@ -286,6 +323,14 @@ bool Parameters::RequiresCIS(){
 
 void Parameters::SetRequiresCIS(bool requiresCIS){
    this->requiresCIS = requiresCIS;
+}
+
+vector<int> Parameters::GetIndecesMOPlot(){
+   return this->indecesMOPlot;
+}
+
+void Parameters::AddIndexMOPlot(int moIndex){
+   this->indecesMOPlot.push_back(moIndex);
 }
 
 bool Parameters::IsDavidsonCIS(){

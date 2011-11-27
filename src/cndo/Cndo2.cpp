@@ -24,6 +24,7 @@
 #include"../base/Molecule.h"
 #include"../base/GTOExpansionSTO.h"
 #include"../base/RealSphericalHarmonicsIndex.h"
+#include"../base/MOLogger.h"
 #include"Cndo2.h"
 using namespace std;
 using namespace MolDS_base;
@@ -642,6 +643,13 @@ void Cndo2::OutputHFResults(double** fockMatrix, double* energiesMO, double* ato
       printf("\t\t%d\t%s\t%e\t%e\n",a,AtomTypeStr(atom->GetAtomType()),atom->GetCoreCharge(),atom->GetCoreCharge()-atomicElectronPopulation[a]);
    }
    cout << endl;
+
+   // output MOs
+   if(0<Parameters::GetInstance()->GetIndecesMOPlot().size()){
+      MOLogger* moLogger = new MOLogger(molecule, fockMatrix, this->theory);
+      moLogger->DrawMO(Parameters::GetInstance()->GetIndecesMOPlot());
+      delete moLogger;
+   }
 }
 
 void Cndo2::CalcElecEnergy(double* elecEnergy, 
