@@ -35,11 +35,11 @@ Capabilities:
    ---------|-----|-----|--------|--------|
    ZINDO/S  | OK  | OK  | OK     | --     |
    ---------|-----|-----|--------|--------|
-   MNDO     | OK  | Sch | OK     | Sch    |
+   MNDO     | OK  | OK  | OK     | OK     |
    ---------|-----|-----|--------|--------|
-   AM1      | OK  | Sch | OK     | Sch    |
+   AM1      | OK  | OK  | OK     | OK     |
    ---------|-----|-----|--------|--------|
-   PM3      | OK  | Sch | OK     | Sch    |
+   PM3      | OK  | OK  | OK     | OK     |
 
       "OK", "Sch", and "--" mean available, shceduled, and non-scheduled methods, respectively.
       MD(gs) and MD(es) mean Molecular Dynamics on ground and excited states, respectively. 
@@ -90,7 +90,29 @@ How to Write Input-files:
             diis_start_error 0.01
             diis_end_error 0.00000001
          SCF_END
-      
+   
+   MO Plot:
+      writ MO plot directive
+
+      E.g.
+         MOPlot 
+            (options)
+         MOPlot_END
+
+      -options
+       "mo", "grid_number", "frame_length", and "file_prefix" are prepared.
+
+       "mo" is index of the molcular orbital. mo=0 means the lowest energy MO.
+       Default value of "mo" is not set.
+
+       "grid_number" is the grid number of the frame in xyz-coordinates.
+       Default values are 25, 25, and 25 for x, y, and z coordinates, respectively.
+
+       "frame_length" is the length of the frame of each coordinate.
+       Default values are 10, 10, and 10[angst.] for x, y, and z coordinates.
+
+       "file_prefix" is a prefix of the file name to which the MO is written.
+       Default values is "MO_".
 
    CIS:
       Write CIS-directive.
