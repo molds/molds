@@ -161,16 +161,16 @@ protected:
    double pm3BondingParameterS; // Table II in ref. [S_1989].
    double pm3BondingParameterP; // Table II in ref. [S_1989].
    double pm3Alpha;// Table II in ref. [S_1989].
-   double pm3Gss; // Table II in ref. [S_1989].
-   double pm3Gpp; // Table II in ref. [S_1989].
-   double pm3Gsp; // Table II in ref. [S_1989].
-   double pm3Gpp2; // Table II in ref. [S_1989].
-   double pm3Hsp; // Table II in ref. [S_1989].
    double pm3DerivedParameterD[3];    // Calculated by tools/deriveParametersNDDO/deriveParametersNDDO.cpp.
    double pm3DerivedParameterRho[3];  // Calculated by tools/deriveParametersNDDO/deriveParametersNDDO.cpp.
    double pm3ParameterK[4];// Table II in ref. [S_1989].
    double pm3ParameterL[4];// Table II in ref. [S_1989].
    double pm3ParameterM[4];// Table II in ref. [S_1989].
+   double pm3Gss; // Table II in ref. [S_1989].
+   double pm3Gpp; // Table II in ref. [S_1989].
+   double pm3Gsp; // Table II in ref. [S_1989].
+   double pm3Gpp2; // Table II in ref. [S_1989].
+   double pm3Hsp; // Table II in ref. [S_1989].
 private:
    std::string errorMessageIonPot;
    std::string errorMessageAtomType;

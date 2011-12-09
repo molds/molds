@@ -120,11 +120,6 @@ Natom::Natom(double x, double y, double z) : Atom(x, y, z){
    this->pm3BondingParameterS = -14.062521 * Parameters::GetInstance()->GetEV2AU();     
    this->pm3BondingParameterP = -20.043848 * Parameters::GetInstance()->GetEV2AU();     
    this->pm3Alpha = 2.830545 / Parameters::GetInstance()->GetAngstrom2AU();        
-   this->pm3Gss = 11.904787 * Parameters::GetInstance()->GetEV2AU();   
-   this->pm3Gpp = 11.754672 * Parameters::GetInstance()->GetEV2AU();   
-   this->pm3Gsp = 7.348565 * Parameters::GetInstance()->GetEV2AU();   
-   this->pm3Gpp2 = 10.807277 * Parameters::GetInstance()->GetEV2AU();   
-   this->pm3Hsp = 1.136713 * Parameters::GetInstance()->GetEV2AU();   
    this->pm3DerivedParameterD[0] = 0.0;    
    this->pm3DerivedParameterD[1] = 0.6577005762;    
    this->pm3DerivedParameterD[2] = 0.5293383109;    
@@ -143,5 +138,10 @@ Natom::Natom(double x, double y, double z) : Atom(x, y, z){
    this->pm3ParameterM[1] = 1.716149 * Parameters::GetInstance()->GetAngstrom2AU();
    this->pm3ParameterM[2] = 0.00;
    this->pm3ParameterM[3] = 0.00;
+   this->pm3Gss = 11.904787 * Parameters::GetInstance()->GetEV2AU();   
+   this->pm3Gpp = 11.754672 * Parameters::GetInstance()->GetEV2AU();   
+   this->pm3Gsp = 7.348565 * Parameters::GetInstance()->GetEV2AU();   
+   this->pm3Gpp2 = 10.807277 * Parameters::GetInstance()->GetEV2AU();   
+   this->pm3Hsp = 1.136713 * Parameters::GetInstance()->GetEV2AU();   
 }
 }

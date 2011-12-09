@@ -120,11 +120,6 @@ Oatom::Oatom(double x, double y, double z) : Atom(x, y, z){
    this->pm3BondingParameterS = -45.202651 * Parameters::GetInstance()->GetEV2AU();     
    this->pm3BondingParameterP = -24.752515 * Parameters::GetInstance()->GetEV2AU();     
    this->pm3Alpha = 3.217102 / Parameters::GetInstance()->GetAngstrom2AU();        
-   this->pm3Gss = 15.755760 * Parameters::GetInstance()->GetEV2AU();   
-   this->pm3Gpp = 13.654016 * Parameters::GetInstance()->GetEV2AU();   
-   this->pm3Gsp = 10.621160 * Parameters::GetInstance()->GetEV2AU();   
-   this->pm3Gpp2 = 12.40609 * Parameters::GetInstance()->GetEV2AU();   
-   this->pm3Hsp = 0.593883 * Parameters::GetInstance()->GetEV2AU();   
    this->pm3DerivedParameterD[0] = 0.0;    
    this->pm3DerivedParameterD[1] = 0.4086173087;    
    this->pm3DerivedParameterD[2] = 0.5125738036;    
@@ -143,5 +138,10 @@ Oatom::Oatom(double x, double y, double z) : Atom(x, y, z){
    this->pm3ParameterM[1] = 1.598395 * Parameters::GetInstance()->GetAngstrom2AU();
    this->pm3ParameterM[2] = 0.00;
    this->pm3ParameterM[3] = 0.00;
+   this->pm3Gss = 15.755760 * Parameters::GetInstance()->GetEV2AU();   
+   this->pm3Gpp = 13.654016 * Parameters::GetInstance()->GetEV2AU();   
+   this->pm3Gsp = 10.621160 * Parameters::GetInstance()->GetEV2AU();   
+   this->pm3Gpp2 = 12.40609 * Parameters::GetInstance()->GetEV2AU();   
+   this->pm3Hsp = 0.593883 * Parameters::GetInstance()->GetEV2AU();   
 }
 }

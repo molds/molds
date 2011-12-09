@@ -114,11 +114,6 @@ Hatom::Hatom(double x, double y, double z) : Atom(x, y, z){
    this->pm3BondingParameterS = -5.626512 * Parameters::GetInstance()->GetEV2AU();     
    this->pm3BondingParameterP = 0.0;
    this->pm3Alpha = 3.356386 / Parameters::GetInstance()->GetAngstrom2AU();        
-   this->pm3Gss = 14.794208 * Parameters::GetInstance()->GetEV2AU();   
-   this->pm3Gpp = 0.0;
-   this->pm3Gsp = 0.0;
-   this->pm3Gpp2 = 0.0;   
-   this->pm3Hsp = 0.0;    
    this->pm3DerivedParameterD[0] = 0.0;    
    this->pm3DerivedParameterD[1] = 0.0;    
    this->pm3DerivedParameterD[2] = 0.0;    
@@ -137,5 +132,10 @@ Hatom::Hatom(double x, double y, double z) : Atom(x, y, z){
    this->pm3ParameterM[1] = 1.570189 * Parameters::GetInstance()->GetAngstrom2AU();
    this->pm3ParameterM[2] = 0.00;
    this->pm3ParameterM[3] = 0.00;
+   this->pm3Gss = 14.794208 * Parameters::GetInstance()->GetEV2AU();   
+   this->pm3Gpp = 0.0;
+   this->pm3Gsp = 0.0;
+   this->pm3Gpp2 = 0.0;   
+   this->pm3Hsp = 0.0;    
 }
 }

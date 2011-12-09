@@ -139,11 +139,6 @@ Satom::Satom(double x, double y, double z) : Atom(x, y, z){
    this->pm3BondingParameterS = -8.827465 * Parameters::GetInstance()->GetEV2AU();     
    this->pm3BondingParameterP = -8.091415 * Parameters::GetInstance()->GetEV2AU();     
    this->pm3Alpha = 2.269706 / Parameters::GetInstance()->GetAngstrom2AU();        
-   this->pm3Gss = 8.964667 * Parameters::GetInstance()->GetEV2AU();   
-   this->pm3Gpp = 9.968164 * Parameters::GetInstance()->GetEV2AU();   
-   this->pm3Gsp = 6.785936 * Parameters::GetInstance()->GetEV2AU();   
-   this->pm3Gpp2 = 7.970247 * Parameters::GetInstance()->GetEV2AU();   
-   this->pm3Hsp = 4.041836 * Parameters::GetInstance()->GetEV2AU();   
    this->pm3DerivedParameterD[0] = 0.0;    
    this->pm3DerivedParameterD[1] = 1.1214312500;    
    this->pm3DerivedParameterD[2] = 1.0086487614;    
@@ -162,5 +157,10 @@ Satom::Satom(double x, double y, double z) : Atom(x, y, z){
    this->pm3ParameterM[1] = 1.579944 * Parameters::GetInstance()->GetAngstrom2AU();
    this->pm3ParameterM[2] = 0.00;
    this->pm3ParameterM[3] = 0.00;
+   this->pm3Gss = 8.964667 * Parameters::GetInstance()->GetEV2AU();   
+   this->pm3Gpp = 9.968164 * Parameters::GetInstance()->GetEV2AU();   
+   this->pm3Gsp = 6.785936 * Parameters::GetInstance()->GetEV2AU();   
+   this->pm3Gpp2 = 7.970247 * Parameters::GetInstance()->GetEV2AU();   
+   this->pm3Hsp = 4.041836 * Parameters::GetInstance()->GetEV2AU();   
 }
 }

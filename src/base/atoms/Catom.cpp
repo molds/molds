@@ -120,11 +120,6 @@ Catom::Catom(double x, double y, double z) : Atom(x, y, z){
    this->pm3BondingParameterS = -11.910015 * Parameters::GetInstance()->GetEV2AU();     
    this->pm3BondingParameterP = -9.802755 * Parameters::GetInstance()->GetEV2AU();     
    this->pm3Alpha = 2.707807 / Parameters::GetInstance()->GetAngstrom2AU();        
-   this->pm3Gss = 11.200708 * Parameters::GetInstance()->GetEV2AU();   
-   this->pm3Gpp = 10.796292 * Parameters::GetInstance()->GetEV2AU();   
-   this->pm3Gsp = 10.265027 * Parameters::GetInstance()->GetEV2AU();   
-   this->pm3Gpp2 = 9.042566 * Parameters::GetInstance()->GetEV2AU();   
-   this->pm3Hsp = 2.290980 * Parameters::GetInstance()->GetEV2AU();   
    this->pm3DerivedParameterD[0] = 0.0;    
    this->pm3DerivedParameterD[1] = 0.8332396384;    
    this->pm3DerivedParameterD[2] = 0.6647749859;    
@@ -143,5 +138,10 @@ Catom::Catom(double x, double y, double z) : Atom(x, y, z){
    this->pm3ParameterM[1] = 0.892488 * Parameters::GetInstance()->GetAngstrom2AU();
    this->pm3ParameterM[2] = 0.00;
    this->pm3ParameterM[3] = 0.00;
+   this->pm3Gss = 11.200708 * Parameters::GetInstance()->GetEV2AU();   
+   this->pm3Gpp = 10.796292 * Parameters::GetInstance()->GetEV2AU();   
+   this->pm3Gsp = 10.265027 * Parameters::GetInstance()->GetEV2AU();   
+   this->pm3Gpp2 = 9.042566 * Parameters::GetInstance()->GetEV2AU();   
+   this->pm3Hsp = 2.290980 * Parameters::GetInstance()->GetEV2AU();   
 }
 }
