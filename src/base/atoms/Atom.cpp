@@ -91,7 +91,7 @@ void Atom::SetMessages(){
       = "Error in base_atoms::Atom::GetNddoParameterM: Bad index for parameter M(mIndex). Only 0, 1, 2, and 3 are permitted.\n";
    this->errorMessageGetNddoParameterMBadTheory
       = "Error in base_atoms::Atom::GetNddoParameterM: Bad theory is set.\n";
-   this->errorMessageKIndex  = "mIndex = ";
+   this->errorMessageMIndex  = "mIndex = ";
    this->errorMessageGetNddoGssBadTheory 
       = "Error in base_atoms::Atom::GetNddoGss: Bad theory is set.\n";
    this->errorMessageGetNddoGppBadTheory 
