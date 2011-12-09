@@ -13,9 +13,9 @@ protected:
    virtual void SetMessages();
    virtual void SetEnableAtomTypes();
    virtual double CalcDiatomCoreRepulsionEnergy(int indexAtomA, int indexAtomB);
-   //virtual double GetDiatomCoreRepulsionFirstDerivative(int atomAIndex,
-   //                                                     int atomBIndex, 
-   //                                                     MolDS_base::CartesianType axisA);
+   virtual double GetDiatomCoreRepulsionFirstDerivative(int atomAIndex,
+                                                        int atomBIndex, 
+                                                        MolDS_base::CartesianType axisA);
 private:
 };
 

@@ -102,7 +102,6 @@ double Pm3Pddg::CalcDiatomCoreRepulsionEnergy(int indexAtomA, int indexAtomB){
    double na = (double)(atomA->GetNumberValenceElectrons());
    double nb = (double)(atomB->GetNumberValenceElectrons());
    double distance = this->molecule->GetDistanceAtoms(indexAtomA, indexAtomB);
-   double ang2AU = Parameters::GetInstance()->GetAngstrom2AU();
    double temp = 0.0;
    for(int i=0; i<2; i++){
       double pa = atomA->GetPm3PddgParameterPa(i);
@@ -115,6 +114,35 @@ double Pm3Pddg::CalcDiatomCoreRepulsionEnergy(int indexAtomA, int indexAtomB){
    }
    energy += temp/(na+nb);
    return energy;
+}
+
+// First derivative of diatomic core repulsion energy.
+// This derivative is related to the coordinate of atomA.
+double Pm3Pddg::GetDiatomCoreRepulsionFirstDerivative(int atomAIndex,
+                                                      int atomBIndex, 
+                                                      CartesianType axisA){
+   double value = Pm3::GetDiatomCoreRepulsionFirstDerivative(atomAIndex,
+                                                             atomBIndex,
+                                                             axisA);
+   Atom* atomA = (*this->molecule->GetAtomVect())[atomAIndex];
+   Atom* atomB = (*this->molecule->GetAtomVect())[atomBIndex];
+   double Rab = this->molecule->GetDistanceAtoms(atomAIndex, atomBIndex);
+   double dRabDa = (atomA->GetXyz()[axisA] - atomB->GetXyz()[axisA])/Rab;
+   double na = (double)(atomA->GetNumberValenceElectrons());
+   double nb = (double)(atomB->GetNumberValenceElectrons());
+   double temp = 0.0;
+   for(int i=0; i<2; i++){
+      double pa = atomA->GetPm3PddgParameterPa(i);
+      double da = atomA->GetPm3PddgParameterDa(i);
+      for(int j=0; j<2; j++){
+         double pb = atomB->GetPm3PddgParameterPa(j);
+         double db = atomB->GetPm3PddgParameterDa(j);
+         temp += (na*pa +nb*pb)*exp(-10.0*pow((Rab-da-db),2.0))
+                *(-20.0*(Rab-da-db));
+      }
+   }
+   value += temp*dRabDa/(na+nb);
+   return value;
 }
 
 

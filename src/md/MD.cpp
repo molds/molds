@@ -17,6 +17,7 @@
 #include"../mndo/Mndo.h"
 #include"../am1/Am1.h"
 #include"../pm3/Pm3.h"
+#include"../pm3/Pm3Pddg.h"
 using namespace std;
 using namespace MolDS_base;
 using namespace MolDS_base_atoms;
@@ -218,6 +219,7 @@ void MD::SetEnableTheoryTypes(){
    this->enableTheoryTypes.push_back(MNDO);
    this->enableTheoryTypes.push_back(AM1);
    this->enableTheoryTypes.push_back(PM3);
+   this->enableTheoryTypes.push_back(PM3PDDG);
 }
 
 void MD::CheckEnableTheoryType(TheoryType theoryType){
