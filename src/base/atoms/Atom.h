@@ -76,6 +76,8 @@ public:
    double GetNddoParameterK(MolDS_base::TheoryType theory, int kIndex);//Table I in ref. [DZHS_1985] for H, C, N, O, and Table I in re. [DY_1990] for S for AM1. [S_1989] for PM3.
    double GetNddoParameterL(MolDS_base::TheoryType theory, int lIndex);//Table I in ref. [DZHS_1985] for H, C, N, O, and Table I in re. [DY_1990] for S for AM1. [S_1989] for PM3.
    double GetNddoParameterM(MolDS_base::TheoryType theory, int mIndex);//Table I in ref. [DZHS_1985] for H, C, N, O, and Table I in re. [DY_1990] for S for AM1. [S_1989] for PM3.
+   double GetPm3PddgParameterPa(int paIndex);
+   double GetPm3PddgParameterDa(int daIndex);
 protected:
    double* xyz; // coordinates
    double* pxyz; // momentum. Note that this is not velocity!! 
@@ -171,6 +173,20 @@ protected:
    double pm3Gsp; // Table II in ref. [S_1989].
    double pm3Gpp2; // Table II in ref. [S_1989].
    double pm3Hsp; // Table II in ref. [S_1989].
+   double pm3PddgCoreintegralS; // Table II in ref. [RCJ_2002] for H, C, N, O, and Table II in re. [BGJ_2003] for S.
+   double pm3PddgCoreintegralP; // Table II in ref. [RCJ_2002] for H, C, N, O, and Table II in re. [BGJ_2003] for S.
+   double pm3PddgOrbitalExponentS;// Table II in ref. [RCJ_2002] for H, C, N, O, and Table II in re. [BGJ_2003] for S.
+   double pm3PddgOrbitalExponentP;// Table II in ref. [RCJ_2002] for H, C, N, O, and Table II in re. [BGJ_2003] for S.
+   double pm3PddgBondingParameterS; // Table II in ref. [RCJ_2002] for H, C, N, O, and Table II in re. [BGJ_2003] for S.
+   double pm3PddgBondingParameterP; // Table II in ref. [RCJ_2002] for H, C, N, O, and Table II in re. [BGJ_2003] for S.
+   double pm3PddgAlpha;// Table II in ref. [RCJ_2002] for H, C, N, O, and Table II in re. [BGJ_2003] for S.
+   double pm3PddgDerivedParameterD[3];    // Table II in ref. [RCJ_2002] for H, C, N, O, and Table II in re. [BGJ_2003] for S.
+   double pm3PddgDerivedParameterRho[3];  // Table II in ref. [RCJ_2002] for H, C, N, O, and Table II in re. [BGJ_2003] for S.
+   double pm3PddgParameterK[4];// Table II in ref. [RCJ_2002] for H, C, N, O, and Table II in re. [BGJ_2003] for S.
+   double pm3PddgParameterL[4];// Table II in ref. [RCJ_2002] for H, C, N, O, and Table II in re. [BGJ_2003] for S.
+   double pm3PddgParameterM[4];// Table II in ref. [RCJ_2002] for H, C, N, O, and Table II in re. [BGJ_2003] for S.
+   double pm3PddgParameterPa[2];// Table II in ref. [RCJ_2002] for H, C, N, O, and Table II in re. [BGJ_2003] for S.
+   double pm3PddgParameterDa[2];// Table II in ref. [RCJ_2002] for H, C, N, O, and Table II in re. [BGJ_2003] for S.
 private:
    std::string errorMessageIonPot;
    std::string errorMessageAtomType;
@@ -186,6 +202,7 @@ private:
    std::string errorMessageMndoCoreIntegral;
    std::string errorMessageAm1CoreIntegral;
    std::string errorMessagePm3CoreIntegral;
+   std::string errorMessagePm3PddgCoreIntegral;
    std::string errorMessageGetAtomicBasisValueBadValenceIndex;
    std::string errorMessageGetRealAnuglarPartAOBadValence;
    std::string errorMessageGetOrbitalExponentBadTheory;
@@ -207,6 +224,10 @@ private:
    std::string errorMessageGetNddoParameterMBadMIndex;
    std::string errorMessageGetNddoParameterMBadTheory;
    std::string errorMessageMIndex;
+   std::string errorMessageGetPm3PddgParameterPaBadPaIndex;
+   std::string errorMessagePaIndex;
+   std::string errorMessageGetPm3PddgParameterDaBadDaIndex;
+   std::string errorMessageDaIndex;
    std::string errorMessageGetNddoGssBadTheory;
    std::string errorMessageGetNddoGppBadTheory;
    std::string errorMessageGetNddoGspBadTheory;
@@ -229,6 +250,7 @@ private:
    double GetMndoCoreIntegral(MolDS_base::OrbitalType orbital); 
    double GetAm1CoreIntegral(MolDS_base::OrbitalType orbital); 
    double GetPm3CoreIntegral(MolDS_base::OrbitalType orbital); 
+   double GetPm3PddgCoreIntegral(MolDS_base::OrbitalType orbital); 
 };
 }
 #endif

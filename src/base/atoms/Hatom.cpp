@@ -137,5 +137,34 @@ Hatom::Hatom(double x, double y, double z) : Atom(x, y, z){
    this->pm3Gsp = 0.0;
    this->pm3Gpp2 = 0.0;   
    this->pm3Hsp = 0.0;    
+   this->pm3PddgCoreintegralS = -12.893272 * Parameters::GetInstance()->GetEV2AU();         
+   this->pm3PddgCoreintegralP = 0.0;
+   this->pm3PddgOrbitalExponentS = 0.972786;      
+   this->pm3PddgOrbitalExponentP = 0.0;      
+   this->pm3PddgBondingParameterS = -6.152654 * Parameters::GetInstance()->GetEV2AU();     
+   this->pm3PddgBondingParameterP = 0.0;
+   this->pm3PddgAlpha = 3.381686 / Parameters::GetInstance()->GetAngstrom2AU();        
+   this->pm3PddgDerivedParameterD[0] = 0.0;    
+   this->pm3PddgDerivedParameterD[1] = 0.0;    
+   this->pm3PddgDerivedParameterD[2] = 0.0;    
+   this->pm3PddgDerivedParameterRho[0] = 0.919616;
+   this->pm3PddgDerivedParameterRho[1] = 0.0;  
+   this->pm3PddgDerivedParameterRho[2] = 0.0;  
+   this->pm3PddgParameterK[0] = 1.122244 * Parameters::GetInstance()->GetEV2AU();
+   this->pm3PddgParameterK[1] =-1.069737 * Parameters::GetInstance()->GetEV2AU();
+   this->pm3PddgParameterK[2] = 0.0;
+   this->pm3PddgParameterK[3] = 0.0;
+   this->pm3PddgParameterL[0] = 4.707790 / pow(Parameters::GetInstance()->GetAngstrom2AU(),2.0);
+   this->pm3PddgParameterL[1] = 5.857995 / pow(Parameters::GetInstance()->GetAngstrom2AU(),2.0);
+   this->pm3PddgParameterL[2] = 0.00;
+   this->pm3PddgParameterL[3] = 0.00;
+   this->pm3PddgParameterM[0] = 1.547099 * Parameters::GetInstance()->GetAngstrom2AU();
+   this->pm3PddgParameterM[1] = 1.567893 * Parameters::GetInstance()->GetAngstrom2AU();
+   this->pm3PddgParameterM[2] = 0.00;
+   this->pm3PddgParameterM[3] = 0.00;
+   this->pm3PddgParameterPa[0] = 0.057193 * Parameters::GetInstance()->GetEV2AU();
+   this->pm3PddgParameterPa[1] =-0.034823 * Parameters::GetInstance()->GetEV2AU();
+   this->pm3PddgParameterDa[0] = 0.663395 * Parameters::GetInstance()->GetAngstrom2AU();
+   this->pm3PddgParameterDa[1] = 1.081901 * Parameters::GetInstance()->GetAngstrom2AU();
 }
 }

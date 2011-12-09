@@ -67,6 +67,7 @@ InputParser::InputParser(){
    this->stringTheoryMNDO = "mndo";
    this->stringTheoryAM1 = "am1";
    this->stringTheoryPM3 = "pm3";
+   this->stringTheoryPM3PDDG = "pm3/pddg";
    this->stringTheoryPrincipalAxes = "principal_axes";
    this->stringTheoryTranslate = "translate";
    this->stringTheoryRotate = "rotate";
@@ -501,6 +502,11 @@ void InputParser::Parse(Molecule* molecule){
             // PM3
             else if(inputTerms[j].compare(this->stringTheoryPM3) == 0){
                Parameters::GetInstance()->SetCurrentTheory(PM3);
+            }
+
+            // PM3/PDG
+            else if(inputTerms[j].compare(this->stringTheoryPM3PDDG) == 0){
+               Parameters::GetInstance()->SetCurrentTheory(PM3PDDG);
             }
 
             // Princepal axes

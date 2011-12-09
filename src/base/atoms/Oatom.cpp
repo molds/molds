@@ -143,5 +143,34 @@ Oatom::Oatom(double x, double y, double z) : Atom(x, y, z){
    this->pm3Gsp = 10.621160 * Parameters::GetInstance()->GetEV2AU();   
    this->pm3Gpp2 = 12.40609 * Parameters::GetInstance()->GetEV2AU();   
    this->pm3Hsp = 0.593883 * Parameters::GetInstance()->GetEV2AU();   
+   this->pm3PddgCoreintegralS = -87.412505 * Parameters::GetInstance()->GetEV2AU();         
+   this->pm3PddgCoreintegralP = -72.183070 * Parameters::GetInstance()->GetEV2AU();
+   this->pm3PddgOrbitalExponentS = 3.814565;      
+   this->pm3PddgOrbitalExponentP = 2.318011;      
+   this->pm3PddgBondingParameterS = -44.874553 * Parameters::GetInstance()->GetEV2AU();     
+   this->pm3PddgBondingParameterP = -24.601939 * Parameters::GetInstance()->GetEV2AU();
+   this->pm3PddgAlpha = 3.225309 / Parameters::GetInstance()->GetAngstrom2AU();        
+   this->pm3PddgDerivedParameterD[0] = 0.0;    
+   this->pm3PddgDerivedParameterD[1] = 0.403741;    
+   this->pm3PddgDerivedParameterD[2] = 0.528360;    
+   this->pm3PddgDerivedParameterRho[0] = 0.863494;
+   this->pm3PddgDerivedParameterRho[1] = 0.936266;  
+   this->pm3PddgDerivedParameterRho[2] = 0.624291;  
+   this->pm3PddgParameterK[0] =-1.138455 * Parameters::GetInstance()->GetEV2AU();
+   this->pm3PddgParameterK[1] = 1.146007 * Parameters::GetInstance()->GetEV2AU();
+   this->pm3PddgParameterK[2] = 0.0;
+   this->pm3PddgParameterK[3] = 0.0;
+   this->pm3PddgParameterL[0] = 6.000043 / pow(Parameters::GetInstance()->GetAngstrom2AU(),2.0);
+   this->pm3PddgParameterL[1] = 5.963494 / pow(Parameters::GetInstance()->GetAngstrom2AU(),2.0);
+   this->pm3PddgParameterL[2] = 0.00;
+   this->pm3PddgParameterL[3] = 0.00;
+   this->pm3PddgParameterM[0] = 1.622362 * Parameters::GetInstance()->GetAngstrom2AU();
+   this->pm3PddgParameterM[1] = 1.614788 * Parameters::GetInstance()->GetAngstrom2AU();
+   this->pm3PddgParameterM[2] = 0.00;
+   this->pm3PddgParameterM[3] = 0.00;
+   this->pm3PddgParameterPa[0] =-0.001000 * Parameters::GetInstance()->GetEV2AU();
+   this->pm3PddgParameterPa[1] =-0.001522 * Parameters::GetInstance()->GetEV2AU();
+   this->pm3PddgParameterDa[0] = 1.360685 * Parameters::GetInstance()->GetAngstrom2AU();
+   this->pm3PddgParameterDa[1] = 1.366407 * Parameters::GetInstance()->GetAngstrom2AU();
 }
 }

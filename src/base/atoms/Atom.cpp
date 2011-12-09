@@ -48,6 +48,7 @@ void Atom::SetMessages(){
    this->errorMessageMndoCoreIntegral = "Error in base_atoms::Atom::GetMndoCoreINtegral: Invalid orbitalType for MNDO.\n";
    this->errorMessageAm1CoreIntegral = "Error in base_atoms::Atom::GetAm1CoreINtegral: Invalid orbitalType for AM1.\n";
    this->errorMessagePm3CoreIntegral = "Error in base_atoms::Atom::GetPm3CoreINtegral: Invalid orbitalType for PM3.\n";
+   this->errorMessagePm3PddgCoreIntegral = "Error in base_atoms::Atom::GetPm3PddgCoreINtegral: Invalid orbitalType for PM3.\n";
    this->errorMessageIonPot = "Error in base_atoms::Atom::GetZindoIonPot: Invalid orbitalType.\n";
    this->errorMessageAtomType = "\tatom type = ";
    this->errorMessageOrbitalType = "\torbital type = ";
@@ -103,6 +104,12 @@ void Atom::SetMessages(){
       = "Error in base_atoms::Atom::GetNddoHsp: Bad theory is set.\n";
    this->errorMessageGetNddoHppBadTheory 
       = "Error in base_atoms::Atom::GetNddoHp: Bad theory is set.\n";
+   this->errorMessageGetPm3PddgParameterPaBadPaIndex 
+      = "Error in base_atoms::Atom::GetPm3PddgParameterPa: Bad index for parameter Pa(paIndex). Only 0, and 1 are permitted.\n";
+   this->errorMessagePaIndex  = "paIndex = ";
+   this->errorMessageGetPm3PddgParameterDaBadDaIndex 
+      = "Error in base_atoms::Atom::GetPm3PddgParameterDa: Bad index for parameter Da(daIndex). Only 0, and 1 are permitted.\n";
+   this->errorMessageDaIndex  = "daIndex = ";
 }
 
 AtomType Atom::GetAtomType(){
@@ -247,17 +254,25 @@ double Atom::GetBondingParameter(TheoryType theory, OrbitalType orbital){
       value = this->am1BondingParameterS;
    }
    else if(theory == AM1 && ( orbital == px ||
-                               orbital == py ||
-                               orbital == pz ) ){
+                              orbital == py ||
+                              orbital == pz ) ){
       value = this->am1BondingParameterP;
    }
    else if(theory == PM3 && orbital == s){
       value = this->pm3BondingParameterS;
    }
    else if(theory == PM3 && ( orbital == px ||
-                               orbital == py ||
-                               orbital == pz ) ){
+                              orbital == py ||
+                              orbital == pz ) ){
       value = this->pm3BondingParameterP;
+   }
+   else if(theory == PM3PDDG && orbital == s){
+      value = this->pm3PddgBondingParameterS;
+   }
+   else if(theory == PM3PDDG && ( orbital == px ||
+                                  orbital == py ||
+                                  orbital == pz ) ){
+      value = this->pm3PddgBondingParameterP;
    }
    else{
       stringstream ss;
@@ -396,6 +411,24 @@ double Atom::GetOrbitalExponent(ShellType shellType, OrbitalType orbitalType, Th
               orbitalType == py ||
               orbitalType == pz){
          return this->pm3OrbitalExponentP;
+      }
+      else{
+         stringstream ss;
+         ss << this->errorMessageOrbitalExponent;
+         ss << this->errorMessageAtomType << AtomTypeStr(this->atomType) << "\n";
+         ss << this->errorMessageShellType << ShellTypeStr(shellType) << "\n";
+         ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbitalType) << "\n";
+         throw MolDSException(ss.str());
+      }
+   }
+   else if(theory == PM3PDDG){
+      if(orbitalType == s){ 
+         return this->pm3PddgOrbitalExponentS;
+      }
+      else if(orbitalType == px ||
+              orbitalType == py ||
+              orbitalType == pz){
+         return this->pm3PddgOrbitalExponentP;
       }
       else{
          stringstream ss;
@@ -600,6 +633,26 @@ double Atom::GetPm3CoreIntegral(OrbitalType orbital){
    return value;
 }
 
+double Atom::GetPm3PddgCoreIntegral(OrbitalType orbital){
+   double value=0.0;
+
+   if(orbital == s){
+      value = this->pm3PddgCoreintegralS;
+   }
+   else if(orbital == px || orbital == py || orbital == pz){
+      value = this->pm3PddgCoreintegralP;
+   }
+   else{
+      stringstream ss;
+      ss << this->errorMessagePm3PddgCoreIntegral;
+      ss << this->errorMessageAtomType << AtomTypeStr(this->atomType) << endl;
+      ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbital) << endl;
+      throw MolDSException(ss.str());
+   }
+
+   return value;
+}
+
 double Atom::GetIndoF2(){
    return this->indoF2;
 }
@@ -618,6 +671,9 @@ double Atom::GetNddoAlpha(TheoryType theory){
    }
    else if(theory == PM3){
       value = this->pm3Alpha;
+   }
+   else if(theory == PM3PDDG){
+      value = this->pm3PddgAlpha;
    }
    else{
       stringstream ss;
@@ -638,6 +694,9 @@ double Atom::GetNddoDerivedParameterD(TheoryType theory, int dIndex){
       }
       else if(theory == PM3){
          return this->pm3DerivedParameterD[dIndex];
+      }
+      else if(theory == PM3PDDG){
+         return this->pm3PddgDerivedParameterD[dIndex];
       }
       else{
          stringstream ss;
@@ -665,6 +724,9 @@ double Atom::GetNddoDerivedParameterRho(TheoryType theory, int rhoIndex){
       else if(theory == PM3){
          return this->pm3DerivedParameterRho[rhoIndex];
       }
+      else if(theory == PM3PDDG){
+         return this->pm3PddgDerivedParameterRho[rhoIndex];
+      }
       else{
          stringstream ss;
          ss << this->errorMessageGetNddoDerivedParameterDBadTheory;
@@ -687,6 +749,9 @@ double Atom::GetNddoParameterK(TheoryType theory, int kIndex){
       }
       else if(theory == PM3){
          return this->pm3ParameterK[kIndex];
+      }
+      else if(theory == PM3PDDG){
+         return this->pm3PddgParameterK[kIndex];
       }
       else{
          stringstream ss;
@@ -711,6 +776,9 @@ double Atom::GetNddoParameterL(TheoryType theory, int lIndex){
       else if(theory == PM3){
          return this->pm3ParameterL[lIndex];
       }
+      else if(theory == PM3PDDG){
+         return this->pm3PddgParameterL[lIndex];
+      }
       else{
          stringstream ss;
          ss << this->errorMessageGetNddoParameterLBadTheory;
@@ -734,6 +802,9 @@ double Atom::GetNddoParameterM(TheoryType theory, int mIndex){
       else if(theory == PM3){
          return this->pm3ParameterM[mIndex];
       }
+      else if(theory == PM3PDDG){
+         return this->pm3PddgParameterM[mIndex];
+      }
       else{
          stringstream ss;
          ss << this->errorMessageGetNddoParameterMBadTheory;
@@ -745,6 +816,30 @@ double Atom::GetNddoParameterM(TheoryType theory, int mIndex){
       stringstream ss;
       ss << this->errorMessageGetNddoParameterMBadMIndex;
       ss << this->errorMessageMIndex << mIndex << endl;
+      throw MolDSException(ss.str());
+   }
+}
+
+double Atom::GetPm3PddgParameterPa(int paIndex){
+   if(paIndex == 0 || paIndex == 1 ){
+      return this->pm3PddgParameterPa[paIndex];
+   }
+   else{
+      stringstream ss;
+      ss << this->errorMessageGetPm3PddgParameterPaBadPaIndex;
+      ss << this->errorMessagePaIndex << paIndex << endl;
+      throw MolDSException(ss.str());
+   }
+}
+
+double Atom::GetPm3PddgParameterDa(int daIndex){
+   if(daIndex == 0 || daIndex == 1 ){
+      return this->pm3PddgParameterDa[daIndex];
+   }
+   else{
+      stringstream ss;
+      ss << this->errorMessageGetPm3PddgParameterDaBadDaIndex;
+      ss << this->errorMessageDaIndex << daIndex << endl;
       throw MolDSException(ss.str());
    }
 }
@@ -767,6 +862,9 @@ double Atom::GetNddoGss(TheoryType theory){
    else if(theory == PM3){
       return this->pm3Gss;
    }
+   else if(theory == PM3PDDG){
+      return this->pm3Gss;
+   }
    else{
       stringstream ss;
       ss << this->errorMessageGetNddoGssBadTheory;
@@ -783,6 +881,9 @@ double Atom::GetNddoGpp(TheoryType theory){
       return this->am1Gpp;
    }
    else if(theory == PM3){
+      return this->pm3Gpp;
+   }
+   else if(theory == PM3PDDG){
       return this->pm3Gpp;
    }
    else{
@@ -803,6 +904,9 @@ double Atom::GetNddoGsp(TheoryType theory){
    else if(theory == PM3){
       return this->pm3Gsp;
    }
+   else if(theory == PM3PDDG){
+      return this->pm3Gsp;
+   }
    else{
       stringstream ss;
       ss << this->errorMessageGetNddoGspBadTheory;
@@ -819,6 +923,9 @@ double Atom::GetNddoGpp2(TheoryType theory){
       return this->am1Gpp2;
    }
    else if(theory == PM3){
+      return this->pm3Gpp2;
+   }
+   else if(theory == PM3PDDG){
       return this->pm3Gpp2;
    }
    else{
@@ -839,6 +946,9 @@ double Atom::GetNddoHsp(TheoryType theory){
    else if(theory == PM3){
       return this->pm3Hsp;
    }
+   else if(theory == PM3PDDG){
+      return this->pm3Hsp;
+   }
    else{
       stringstream ss;
       ss << this->errorMessageGetNddoHspBadTheory;
@@ -856,6 +966,9 @@ double Atom::GetNddoHpp(TheoryType theory){
       return 0.5*(this->am1Gpp - this->am1Gpp2);
    }
    else if(theory == PM3){
+      return 0.5*(this->pm3Gpp - this->pm3Gpp2);
+   }
+   else if(theory == PM3PDDG){
       return 0.5*(this->pm3Gpp - this->pm3Gpp2);
    }
    else{
@@ -999,6 +1112,9 @@ double Atom::GetCoreIntegral(OrbitalType orbital,
    }
    else if(theory == PM3){
       value = this->GetPm3CoreIntegral(orbital);
+   }
+   else if(theory == PM3PDDG){
+      value = this->GetPm3PddgCoreIntegral(orbital);
    }
    return value;
 }

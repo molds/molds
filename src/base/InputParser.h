@@ -58,6 +58,7 @@ private:
    std::string stringTheoryMNDO;
    std::string stringTheoryAM1;
    std::string stringTheoryPM3;
+   std::string stringTheoryPM3PDDG;
    std::string stringTheoryPrincipalAxes;
    std::string stringTheoryTranslate;
    std::string stringTheoryRotate;
