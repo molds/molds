@@ -50,7 +50,7 @@ Cndo2::Cndo2(){
    this->matrixForce = NULL;
    this->bondingAdjustParameterK[0] = 1.000; //see (3.79) in J. A. Pople book
    this->bondingAdjustParameterK[1] = 0.750; //see (3.79) in J. A. Pople book
-   this->elecEnergy = 0.0;
+   this->elecHFEnergy = 0.0;
    this->coreRepulsionEnergy = 0.0;
    this->matrixCIS = NULL;
    this->excitedEnergies = NULL;
@@ -410,7 +410,7 @@ void Cndo2::CalcHFProperties(){
                                       this->orbitalElectronPopulation, 
                                       this->molecule);
    this->CalcCoreRepulsionEnergy();
-   this->CalcElecEnergy(&this->elecEnergy, 
+   this->CalcElecEnergy(&this->elecHFEnergy, 
                         this->molecule, 
                         this->energiesMO, 
                         this->fockMatrix, 
@@ -436,7 +436,7 @@ void Cndo2::DoesCIS(){
 double Cndo2::GetElectronicEnergy(int elecState){
    int groundState = 0;
    if(elecState==groundState){
-      return this->elecEnergy;
+      return this->elecHFEnergy;
    }
    else{
       if(this->excitedEnergies == NULL){
@@ -452,7 +452,7 @@ double Cndo2::GetElectronicEnergy(int elecState){
          ss << errorMessageGetElectronicEnergyNumberCISStates << numberExcitedStates << endl;
          throw MolDSException(ss.str());
       }
-      return this->elecEnergy + this->excitedEnergies[elecState-1];
+      return this->elecHFEnergy + this->excitedEnergies[elecState-1];
    }
 }
 
@@ -635,8 +635,8 @@ void Cndo2::OutputHFResults(double** fockMatrix, double* energiesMO, double* ato
    // output total energy
    cout << this->messageElecEnergy;
    cout << this->messageElecEnergyTitle;
-   printf("\t\t%e\t%e\n\n",this->elecEnergy, 
-                           this->elecEnergy / Parameters::GetInstance()->GetEV2AU());
+   printf("\t\t%e\t%e\n\n",this->elecHFEnergy, 
+                           this->elecHFEnergy / Parameters::GetInstance()->GetEV2AU());
 
    // output core repulsion energy
    cout << this->messageCoreRepulsion;
@@ -662,7 +662,7 @@ void Cndo2::OutputHFResults(double** fockMatrix, double* energiesMO, double* ato
    }
 }
 
-void Cndo2::CalcElecEnergy(double* elecEnergy, 
+void Cndo2::CalcElecEnergy(double* elecHFEnergy, 
                            Molecule* molecule, 
                            double* energiesMO, 
                            double** fockMatrix, 
@@ -743,7 +743,7 @@ void Cndo2::CalcElecEnergy(double* elecEnergy,
    }
    */
 
-   *elecEnergy = electronicEnergy + coreRepulsionEnergy;
+   *elecHFEnergy = electronicEnergy + coreRepulsionEnergy;
 }
 
 void Cndo2::FreeElecEnergyMatrices(double*** fMatrix, 

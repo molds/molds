@@ -153,7 +153,7 @@ private:
    std::string messageUnOcc;
    std::string messageCoreRepulsionTitle;
    std::string messageCoreRepulsion;
-   double elecEnergy;
+   double elecHFEnergy;
    double** gammaAB;
    double** overlap;
    double bondingAdjustParameterK[2]; //see (3.79) in J. A. Pople book
@@ -255,7 +255,7 @@ private:
    void CheckNumberValenceElectrons(MolDS_base::Molecule* molecule);
    void FreeDiatomicOverlapAndRotatingMatrix(double*** diatomicOverlap, 
                                              double*** rotatingMatrix);
-   void CalcElecEnergy(double* elecEnergy, 
+   void CalcElecEnergy(double* elecHFEnergy, 
                        MolDS_base::Molecule* molecule, 
                        double* energiesMO, 
                        double** fockMatrix, 
