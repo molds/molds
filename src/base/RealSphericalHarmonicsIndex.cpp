@@ -3,7 +3,9 @@
 #include<iostream>
 #include<sstream>
 #include<string>
+#include<stdexcept>
 #include"Enums.h"
+#include"MolDSException.h"
 #include"RealSphericalHarmonicsIndex.h"
 using namespace std;
 namespace MolDS_base{
@@ -50,8 +52,9 @@ RealSphericalHarmonicsIndex::RealSphericalHarmonicsIndex(OrbitalType orbitalType
       this->m = 2;
    }
    else{
-      // ToDo: error handling
-      cout << errorMessageInvalidOrbital;
+      stringstream ss;
+      ss << errorMessageInvalidOrbital;
+      throw MolDSException(ss.str());
    }
 
 }
