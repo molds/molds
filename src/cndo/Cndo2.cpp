@@ -410,7 +410,7 @@ void Cndo2::CalcHFProperties(){
                                       this->orbitalElectronPopulation, 
                                       this->molecule);
    this->CalcCoreRepulsionEnergy();
-   this->CalcElecEnergy(&this->elecHFEnergy, 
+   this->CalcElecHFEnergy(&this->elecHFEnergy, 
                         this->molecule, 
                         this->energiesMO, 
                         this->fockMatrix, 
@@ -662,7 +662,7 @@ void Cndo2::OutputHFResults(double** fockMatrix, double* energiesMO, double* ato
    }
 }
 
-void Cndo2::CalcElecEnergy(double* elecHFEnergy, 
+void Cndo2::CalcElecHFEnergy(double* elecHFEnergy, 
                            Molecule* molecule, 
                            double* energiesMO, 
                            double** fockMatrix, 

@@ -255,7 +255,7 @@ private:
    void CheckNumberValenceElectrons(MolDS_base::Molecule* molecule);
    void FreeDiatomicOverlapAndRotatingMatrix(double*** diatomicOverlap, 
                                              double*** rotatingMatrix);
-   void CalcElecEnergy(double* elecHFEnergy, 
+   void CalcElecHFEnergy(double* elecHFEnergy, 
                        MolDS_base::Molecule* molecule, 
                        double* energiesMO, 
                        double** fockMatrix, 
