@@ -77,11 +77,11 @@ void Pm3::SetMessages(){
       = "Error in pm3::Pm3::GetElectronicEnergy: Set electronic state is not calculated by CIS.\n";
    this->errorMessageGetElectronicEnergyNULLCISEnergy 
       = "Error in pm3::Pm3::GetElectronicEnergy: excitedEnergies is NULL\n";
-   this->messageSCFMetConvergence = "\n\n\n\t\tPM3/S-SCF met convergence criterion(^^b\n\n\n";
-   this->messageStartSCF = "**********  START: PM3/S-SCF  **********\n";
-   this->messageDoneSCF = "**********  DONE: PM3/S-SCF  **********\n\n\n";
-   this->messageStartCIS = "**********  START: PM3/S-CIS  **********\n";
-   this->messageDoneCIS = "**********  DONE: PM3/S-CIS  **********\n\n\n";
+   this->messageSCFMetConvergence = "\n\n\n\t\tPM3-SCF met convergence criterion(^^b\n\n\n";
+   this->messageStartSCF = "**********  START: PM3-SCF  **********\n";
+   this->messageDoneSCF = "**********  DONE: PM3-SCF  **********\n\n\n";
+   this->messageStartCIS = "**********  START: PM3-CIS  **********\n";
+   this->messageDoneCIS = "**********  DONE: PM3-CIS  **********\n\n\n";
    this->messageDavidsonConverge = "\n\n\t\tDavidson for PM3-CIS met convergence criterion(^^b\n\n\n";
 }
 

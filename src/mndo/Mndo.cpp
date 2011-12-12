@@ -115,13 +115,13 @@ void Mndo::SetMessages(){
       = "Error in mndo::Mndo::GetElectronicEnergy: excitedEnergies is NULL\n";
    this->errorMessageCalcZMatrixForceEtaNull 
       = "Error in mndo::Mndo::CalcZMatrixForce: Nndo::etaMatrixForce is NULL. Call Mndo::CalcEtaMatrixForce before calling Mndo::CalcZMatrixForce.\n";
-   this->messageSCFMetConvergence = "\n\n\n\t\tMNDO/S-SCF met convergence criterion(^^b\n\n\n";
-   this->messageStartSCF = "**********  START: MNDO/S-SCF  **********\n";
-   this->messageDoneSCF = "**********  DONE: MNDO/S-SCF  **********\n\n\n";
+   this->messageSCFMetConvergence = "\n\n\n\t\tMNDO-SCF met convergence criterion(^^b\n\n\n";
+   this->messageStartSCF = "**********  START: MNDO-SCF  **********\n";
+   this->messageDoneSCF = "**********  DONE: MNDO-SCF  **********\n\n\n";
    this->messageHeatsFormation = "\tHeats of formation:\n";
    this->messageHeatsFormationTitle = "\t\t| [a.u.] | [Kcal/mol] | \n";
-   this->messageStartCIS = "**********  START: MNDO/S-CIS  **********\n";
-   this->messageDoneCIS = "**********  DONE: MNDO/S-CIS  **********\n\n\n";
+   this->messageStartCIS = "**********  START: MNDO-CIS  **********\n";
+   this->messageDoneCIS = "**********  DONE: MNDO-CIS  **********\n\n\n";
    this->messageDavidsonConverge = "\n\n\t\tDavidson for MNDO-CIS met convergence criterion(^^b\n\n\n";
 }
 
