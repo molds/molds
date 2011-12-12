@@ -47,6 +47,8 @@ protected:
    std::vector<MolDS_base::AtomType> enableAtomTypes;
    double coreRepulsionEnergy;
    virtual void CalcHFProperties();
+   double GetBondingAdjustParameterK(MolDS_base::ShellType shellA, 
+                                     MolDS_base::ShellType shellB);
    virtual double CalcDiatomCoreRepulsionEnergy(int indexAtomA, int indexAtomB);
    virtual double GetDiatomCoreRepulsionFirstDerivative(int indexAtomA, 
                                                         int indexAtomB, 
@@ -154,6 +156,7 @@ private:
    double elecEnergy;
    double** gammaAB;
    double** overlap;
+   double bondingAdjustParameterK[2]; //see (3.79) in J. A. Pople book
 
    // use Y[na][nb][la][lb][m][i][j] 
    // as Y_{ij\lammda} in (B.20) in Pople book for give na, nb, la, lb, m, i, and j.

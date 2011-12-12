@@ -204,10 +204,6 @@ double Parameters::GetFs2AU(){
    return this->fs2AU;
 }
 
-double Parameters::GetBondingAdjustParameterK(){
-   return this->bondingAdjustParameterK;
-}
-
 TheoryType Parameters::GetCurrentTheory(){
    return this->currentTheory;
 }

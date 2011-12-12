@@ -119,10 +119,7 @@ double Indo::GetFockOffDiagElement(Atom* atomA, Atom* atomB, int atomAIndex, int
                                     double****** twoElecTwoCore,
                                     bool isGuess){
    double value;
-   double K = 1.0;  // = 1.0 or 0.75, see Eq. (3.79) in J. A. Pople book
-   if(m <= atomA->GetValenceShellType() || m <= atomB->GetValenceShellType()){
-      K = 0.75;
-   }
+   double K = this->GetBondingAdjustParameterK(atomA->GetValenceShellType(), atomB->GetValenceShellType());
    double bondParameter = 0.5*K*(atomA->GetBondingParameter() + atomB->GetBondingParameter()); 
 
    if(isGuess){

@@ -38,7 +38,6 @@ public:
    double GetGMolin2AU();
    double GetDegree2Radian();
    double GetFs2AU();
-   double GetBondingAdjustParameterK();
    TheoryType GetCurrentTheory();
    void SetCurrentTheory(TheoryType theory);
    void SetTranslatingDifference(double x, double y, double z);
@@ -105,7 +104,6 @@ private:
    int gridNumberMOPlot[CartesianType_end];
    double frameLengthMOPlot[CartesianType_end];
    std::vector<int> indecesMOPlot;
-   double bondingAdjustParameterK; //see (3.79) in J. A. Pople book
    TheoryType currentTheory;
    double translatingDifference[3];
    double* inertiaTensorOrigin;

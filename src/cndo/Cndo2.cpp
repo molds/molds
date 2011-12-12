@@ -48,6 +48,8 @@ Cndo2::Cndo2(){
    this->energiesMO = NULL;
    this->molecule = NULL;
    this->matrixForce = NULL;
+   this->bondingAdjustParameterK[0] = 1.000; //see (3.79) in J. A. Pople book
+   this->bondingAdjustParameterK[1] = 0.750; //see (3.79) in J. A. Pople book
    this->elecEnergy = 0.0;
    this->coreRepulsionEnergy = 0.0;
    this->matrixCIS = NULL;
@@ -414,6 +416,14 @@ void Cndo2::CalcHFProperties(){
                         this->fockMatrix, 
                         this->gammaAB,
                         this->coreRepulsionEnergy);
+}
+
+double Cndo2::GetBondingAdjustParameterK(ShellType shellA, ShellType shellB){
+   double value=1.0;
+   if(shellA >= m || shellB >= m){
+      return this->bondingAdjustParameterK[1];
+   }
+   return value;
 }
 
 void Cndo2::DoesCIS(){
@@ -932,10 +942,7 @@ double Cndo2::GetFockOffDiagElement(Atom* atomA, Atom* atomB, int atomAIndex, in
                                     double** orbitalElectronPopulation, 
                                     double****** twoElecTwoCore, bool isGuess){
    double value;
-   double K = 1.0;  // = 1.0 or 0.75, see Eq. (3.79) in J. A. Pople book
-   if(atomA->GetValenceShellType() >= m || atomB->GetValenceShellType() >= m){
-      K = 0.75;
-   }
+   double K = this->GetBondingAdjustParameterK(atomA->GetValenceShellType(), atomB->GetValenceShellType());
    double bondParameter = 0.5*K*(atomA->GetBondingParameter() + atomB->GetBondingParameter()); 
    value =  bondParameter*overlap[mu][nu];
    if(!isGuess){
