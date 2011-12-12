@@ -563,20 +563,20 @@ double Mndo::GetMolecularIntegralElement(int moI, int moJ, int moK, int moL,
 }
 
 // right-upper part is only calculated by this method.
-void Mndo::CalcCISMatrix(double** matrixCIS, int numberOcc, int numberVir){
+void Mndo::CalcCISMatrix(double** matrixCIS, int numberActiveOcc, int numberActiveVir){
    cout << this->messageStartCalcCISMatrix;
    double ompStartTime = omp_get_wtime();
 
    #pragma omp parallel for schedule(auto)
-   for(int k=0; k<numberOcc*numberVir; k++){
+   for(int k=0; k<numberActiveOcc*numberActiveVir; k++){
       // single excitation from I-th (occupied)MO to A-th (virtual)MO
-      int moI = this->molecule->GetTotalNumberValenceElectrons()/2 - (k/numberVir) -1;
-      int moA = this->molecule->GetTotalNumberValenceElectrons()/2 + (k%numberVir);
+      int moI = this->molecule->GetTotalNumberValenceElectrons()/2 - (k/numberActiveVir) -1;
+      int moA = this->molecule->GetTotalNumberValenceElectrons()/2 + (k%numberActiveVir);
 
-      for(int l=k; l<numberOcc*numberVir; l++){
+      for(int l=k; l<numberActiveOcc*numberActiveVir; l++){
          // single excitation from J-th (occupied)MO to B-th (virtual)MO
-         int moJ = this->molecule->GetTotalNumberValenceElectrons()/2 - (l/numberVir) -1;
-         int moB = this->molecule->GetTotalNumberValenceElectrons()/2 + (l%numberVir);
+         int moJ = this->molecule->GetTotalNumberValenceElectrons()/2 - (l/numberActiveVir) -1;
+         int moB = this->molecule->GetTotalNumberValenceElectrons()/2 + (l%numberActiveVir);
          double value=0.0;
           
          // Fast algorith, but this is not easy to read. Slow algorithm is alos written below.

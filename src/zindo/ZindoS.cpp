@@ -755,11 +755,11 @@ void ZindoS::DoesCIS(){
    cout << this->messageStartCIS;
    double ompStartTime = omp_get_wtime();
 
-   int numberOcc = Parameters::GetInstance()->GetActiveOccCIS();
-   int numberVir = Parameters::GetInstance()->GetActiveVirCIS();
+   int numberActiveOcc = Parameters::GetInstance()->GetActiveOccCIS();
+   int numberActiveVir = Parameters::GetInstance()->GetActiveVirCIS();
    // malloc or initialize  CIS matrix
    if(this->matrixCIS == NULL){
-      this->matrixCISdimension = numberOcc*numberVir;
+      this->matrixCISdimension = numberActiveOcc*numberActiveVir;
       this->matrixCIS = MallocerFreer::GetInstance()->MallocDoubleMatrix2d(
                                                       this->matrixCISdimension, 
                                                       this->matrixCISdimension);
@@ -779,7 +779,7 @@ void ZindoS::DoesCIS(){
                                                              this->matrixCISdimension);
    }
    // calculate CIS matrix
-   this->CalcCISMatrix(matrixCIS, numberOcc, numberVir);
+   this->CalcCISMatrix(matrixCIS, numberActiveOcc, numberActiveVir);
    // calculate excited energies
    if(Parameters::GetInstance()->IsDavidsonCIS()){
       this->DoesCISDavidson();
@@ -1154,20 +1154,20 @@ void ZindoS::DoesCISDirect(){
    cout << this->messageDoneDirectCIS;
 }
 
-void ZindoS::CalcCISMatrix(double** matrixCIS, int numberOcc, int numberVir){
+void ZindoS::CalcCISMatrix(double** matrixCIS, int numberActiveOcc, int numberActiveVir){
    cout << this->messageStartCalcCISMatrix;
    double ompStartTime = omp_get_wtime();
 
    #pragma omp parallel for schedule(auto)
-   for(int k=0; k<numberOcc*numberVir; k++){
+   for(int k=0; k<numberActiveOcc*numberActiveVir; k++){
       // single excitation from I-th (occupied)MO to A-th (virtual)MO
-      int moI = this->molecule->GetTotalNumberValenceElectrons()/2 - (k/numberVir) -1;
-      int moA = this->molecule->GetTotalNumberValenceElectrons()/2 + (k%numberVir);
+      int moI = this->molecule->GetTotalNumberValenceElectrons()/2 - (k/numberActiveVir) -1;
+      int moA = this->molecule->GetTotalNumberValenceElectrons()/2 + (k%numberActiveVir);
 
-      for(int l=k; l<numberOcc*numberVir; l++){
+      for(int l=k; l<numberActiveOcc*numberActiveVir; l++){
          // single excitation from J-th (occupied)MO to B-th (virtual)MO
-         int moJ = this->molecule->GetTotalNumberValenceElectrons()/2 - (l/numberVir) -1;
-         int moB = this->molecule->GetTotalNumberValenceElectrons()/2 + (l%numberVir);
+         int moJ = this->molecule->GetTotalNumberValenceElectrons()/2 - (l/numberActiveVir) -1;
+         int moB = this->molecule->GetTotalNumberValenceElectrons()/2 + (l%numberActiveVir);
          double value=0.0;
          
          // Fast algorith, but this is not easy to read. Slow algorithm is alos written below.

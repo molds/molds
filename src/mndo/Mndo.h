@@ -72,7 +72,7 @@ protected:
                                               MolDS_base::Molecule* molecule, 
                                               double** fockMatrix, 
                                               double** gammaAB);
-   virtual void CalcCISMatrix(double** matrixCIS, int numberOcc, int numberVir);
+   virtual void CalcCISMatrix(double** matrixCIS, int numberActiveOcc, int numberActiveVir);
    virtual void CalcForce(std::vector<int> elecStates);
    double GetNddoRepulsionIntegral(MolDS_base_atoms::Atom* atomA, MolDS_base::OrbitalType mu, MolDS_base::OrbitalType nu,
                                    MolDS_base_atoms::Atom* atomB, MolDS_base::OrbitalType lambda, MolDS_base::OrbitalType sigma);
