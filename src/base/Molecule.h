@@ -33,6 +33,7 @@ private:
    bool wasCalculatedXyzCOC;
    int totalNumberAOs;
    int totalNumberValenceElectrons;
+   void SetMessages();
    void CalcInertiaTensor(double** inertiaTensor, double* inertiaTensorOrigin);
    void FreeInertiaTensorMoments(double*** inertiaTensor, double** inertiaMoments);
    void Rotate(MolDS_base::EularAngle eularAngle, double* rotatingOrigin, RotatedObjectType rotatedObj);

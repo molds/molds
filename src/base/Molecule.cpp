@@ -26,6 +26,30 @@ Molecule::Molecule(){
    this->xyzCOC = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(3);
    this->wasCalculatedXyzCOM = false;
    this->wasCalculatedXyzCOC = false;
+   this->SetMessages();
+}
+
+Molecule::~Molecule(){
+   if(this->atomVect != NULL){
+      for(int i=0; i<this->atomVect->size(); i++){
+         delete (*atomVect)[i];
+         (*atomVect)[i] = NULL;
+      }
+      delete this->atomVect;
+      this->atomVect = NULL;
+      //cout << "atomVect deleted\n";
+   }
+   if(this->xyzCOM != NULL){
+      MallocerFreer::GetInstance()->FreeDoubleMatrix1d(&this->xyzCOM);
+      //cout << "xyzCOM deleted\n";
+   }
+   if(this->xyzCOC != NULL){
+      MallocerFreer::GetInstance()->FreeDoubleMatrix1d(&this->xyzCOC);
+      //cout << "xyzCOC deleted\n";
+   }
+}
+
+void Molecule::SetMessages(){
    this->messageTotalNumberAOs = "\tTotal number of valence AOs: ";
    this->messageTotalNumberAtoms = "\tTotal number of atoms: ";
    this->messageTotalNumberValenceElectrons = "\tTotal number of valence electrons: ";
@@ -64,26 +88,6 @@ Molecule::Molecule(){
    this->messageTranslatingDifference = "\tTranslating Difference:\n";
    this->messageTranslatingDifferenceTitleAU = "\t\t| x[a.u.] | y[a.u.] | z[a.u.] |\n";
    this->messageTranslatingDifferenceTitleAng = "\t\t| x[angst.] | y[angst.] | z[angst.] |\n";
-}
-
-Molecule::~Molecule(){
-   if(this->atomVect != NULL){
-      for(int i=0; i<this->atomVect->size(); i++){
-         delete (*atomVect)[i];
-         (*atomVect)[i] = NULL;
-      }
-      delete this->atomVect;
-      this->atomVect = NULL;
-      //cout << "atomVect deleted\n";
-   }
-   if(this->xyzCOM != NULL){
-      MallocerFreer::GetInstance()->FreeDoubleMatrix1d(&this->xyzCOM);
-      //cout << "xyzCOM deleted\n";
-   }
-   if(this->xyzCOC != NULL){
-      MallocerFreer::GetInstance()->FreeDoubleMatrix1d(&this->xyzCOC);
-      //cout << "xyzCOC deleted\n";
-   }
 }
 
 vector<Atom*>* Molecule::GetAtomVect(){
