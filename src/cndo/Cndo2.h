@@ -45,7 +45,16 @@ protected:
    std::string messageOmpElapsedTimeSCF;
    std::string messageUnitSec; 
    std::vector<MolDS_base::AtomType> enableAtomTypes;
+   MolDS_base::TheoryType theory;
+   MolDS_base::Molecule* molecule;
    double coreRepulsionEnergy;
+   double** fockMatrix;
+   double* energiesMO;
+   double*** matrixForce;
+   double****** twoElecTwoCore;
+   double** matrixCIS;
+   double* excitedEnergies;
+   int matrixCISdimension;
    virtual void CalcHFProperties();
    double GetBondingAdjustParameterK(MolDS_base::ShellType shellA, 
                                      MolDS_base::ShellType shellB);
@@ -120,15 +129,6 @@ protected:
                                 double* energiesMO, 
                                 double* atomicElectronPopulation, 
                                 MolDS_base::Molecule* molecule);
-   MolDS_base::TheoryType theory;
-   MolDS_base::Molecule* molecule;
-   double** fockMatrix;
-   double* energiesMO;
-   double*** matrixForce;
-   double****** twoElecTwoCore;
-   double** matrixCIS;
-   double* excitedEnergies;
-   int matrixCISdimension;
    void CalcRotatingMatrixFirstDerivatives(double*** rMatFirstDeri, 
                                            MolDS_base_atoms::Atom* atomA,
                                            MolDS_base_atoms::Atom* atomB);
