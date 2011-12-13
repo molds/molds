@@ -25,6 +25,27 @@ namespace MolDS_base{
 InputParser* InputParser::inputParser = NULL;
 
 InputParser::InputParser(){
+   this->SetMessages();
+}
+
+InputParser::~InputParser(){
+}
+
+InputParser* InputParser::GetInstance(){
+   if(inputParser == NULL){
+      inputParser = new InputParser();
+   }
+   return inputParser;
+}
+
+void InputParser::DeleteInstance(){
+   if(inputParser != NULL){
+      delete inputParser; 
+   }
+   inputParser = NULL;
+}
+
+void InputParser::SetMessages(){
    this->messageStartParseInput = "**********  START: Parse input  **********\n";
    this->messageDoneParseInput =  "**********  DONE: Parse input  ***********\n\n\n";
    this->messageTotalNumberAOs = "\tTotal number of valence AOs: ";
@@ -120,23 +141,6 @@ InputParser::InputParser(){
    this->stringMDTotalSteps = "total_steps";
    this->stringMDElecState = "electronic_state";
    this->stringMDTimeWidth = "dt";
-}
-
-InputParser::~InputParser(){
-}
-
-InputParser* InputParser::GetInstance(){
-   if(inputParser == NULL){
-      inputParser = new InputParser();
-   }
-   return inputParser;
-}
-
-void InputParser::DeleteInstance(){
-   if(inputParser != NULL){
-      delete inputParser; 
-   }
-   inputParser = NULL;
 }
 
 vector<string> InputParser::GetInputTerms(){

@@ -14,6 +14,7 @@ private:
    InputParser(InputParser&);
    void operator = (InputParser&);
    ~InputParser();
+   void SetMessages();
    std::string messageStartParseInput;
    std::string messageDoneParseInput;
    std::string messageTotalNumberAOs;
