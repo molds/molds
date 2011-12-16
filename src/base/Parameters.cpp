@@ -13,6 +13,13 @@ using namespace std;
 namespace MolDS_base{
 
 Parameters* Parameters::parameters = NULL;
+const double Parameters::Parameters::eV2AU = 0.03674903;
+const double Parameters::kcalMolin2AU = 0.00159360175;
+const double Parameters::angstrom2AU = 1.0/0.5291772;
+const double Parameters::kayser2AU = 4.556336*pow(10.0,-6.0);
+const double Parameters::fs2AU = 1.0/(2.418884326505*pow(10.0,-2.0));
+const double Parameters::gMolin2AU = pow(10.0,5.0)/(6.0221415*9.1095);
+const double Parameters::degree2Radian = M_PI / 180.0;
 
 Parameters::Parameters(){
    this->SetDefaultValues();
@@ -45,11 +52,6 @@ void Parameters::DeleteInstance(){
 }
 
 void Parameters::SetDefaultValues(){
-   this->eV2AU = 0.03674903;
-   this->kcalMolin2AU = 0.00159360175;
-   this->angstrom2AU = 1.0/0.5291772;
-   this->kayser2AU = 4.556336*pow(10.0,-6.0);
-   this->fs2AU = 1.0/(2.418884326505*pow(10.0,-2.0));
    this->thresholdSCF = pow(10.0, -8.0);
    this->maxIterationsSCF = 100;
    this->dampingThreshSCF = 1.0;
@@ -65,8 +67,6 @@ void Parameters::SetDefaultValues(){
    this->frameLengthMOPlot[YAxis] = 20.0;
    this->frameLengthMOPlot[ZAxis] = 20.0;
    this->currentTheory = CNDO2;
-   this->gMolin2AU = pow(10.0,5.0)/(6.0221415*9.1095);
-   this->degree2Radian = M_PI / 180.0;
    this->translatingDifference[0] = 0.0;
    this->translatingDifference[1] = 0.0;
    this->translatingDifference[2] = 0.0;

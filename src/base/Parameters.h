@@ -86,13 +86,13 @@ private:
    ~Parameters();
 
    void SetDefaultValues();
-   double eV2AU;
-   double kcalMolin2AU;
-   double angstrom2AU;
-   double kayser2AU;
-   double gMolin2AU;
-   double degree2Radian;
-   double fs2AU;
+   static const double eV2AU;
+   static const double kcalMolin2AU;
+   static const double angstrom2AU;
+   static const double kayser2AU;
+   static const double gMolin2AU;
+   static const double degree2Radian;
+   static const double fs2AU;
    double thresholdSCF;
    int maxIterationsSCF;
    double dampingThreshSCF;
