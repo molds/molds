@@ -40,6 +40,8 @@ Capabilities:
    AM1      | OK  | OK  | OK     | OK     |
    ---------|-----|-----|--------|--------|
    PM3      | OK  | OK  | OK     | OK     |
+   ---------|-----|-----|--------|--------|
+   PM3/PDDG | OK  | OK  | OK     | OK     |
 
       "OK", "Sch", and "--" mean available, shceduled, and non-scheduled methods, respectively.
       MD(gs) and MD(es) mean Molecular Dynamics on ground and excited states, respectively. 
@@ -61,7 +63,7 @@ How to Write Input-files:
 
    SCF:
       Write "cndo/2", "indo", "zindo/s", "mndo", "am1", or "pm3" in theory-directive.
-      AM1 only supports (can calculate) Heats of formation.
+      MNDO only supports (can calculate) Heats of formation.
 
       E.g. 
          THEORY
