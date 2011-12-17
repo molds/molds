@@ -124,7 +124,7 @@ double* Atom::GetXyz() const{
    return this->xyz;
 }
 
-double* Atom::GetPxyz(){
+double* Atom::GetPxyz() const{
    return this->pxyz;
 }
 
@@ -140,7 +140,7 @@ void Atom::SetPxyz(double px, double py, double pz){
    pxyz[2]= pz;
 }
 
-vector<OrbitalType> Atom::GetValence(){
+vector<OrbitalType> Atom::GetValence() const{
    return this->valence;
 }
 
@@ -148,7 +148,7 @@ double Atom::GetAtomicBasisValue(double x,
                                  double y, 
                                  double z, 
                                  int valenceIndex, 
-                                 TheoryType theory){
+                                 TheoryType theory) const{
    if(this->valence.size()<=valenceIndex){
       stringstream ss;
       ss << this->errorMessageGetAtomicBasisValueBadValenceIndex;
@@ -173,7 +173,9 @@ double Atom::GetAtomicBasisValue(double x,
 }
 
 // See (1.74) & (1.72) in J. A. Pople book.
-double Atom::GetRadialPartAO(double dr, double orbitalExponent, MolDS_base::ShellType shell){
+double Atom::GetRadialPartAO(double dr, 
+                             double orbitalExponent, 
+                             MolDS_base::ShellType shell) const{
    int principalQuantumNumber = (int)shell + 1;
    double temp1 = pow(2.0*orbitalExponent,(double)principalQuantumNumber+0.5);
    double temp2 = pow(Factorial(2*principalQuantumNumber),-0.5);
@@ -182,7 +184,9 @@ double Atom::GetRadialPartAO(double dr, double orbitalExponent, MolDS_base::Shel
 
 // See Table 1 in [BFB_1997] or Table 1.2 in J. A. Pople book.
 // See Table 1 in [BFB_1997] or p25 in J. A. Pople book for defenitions of theta and phi.
-double Atom::GetRealAnuglarPartAO(double theta, double phi, OrbitalType orbital){
+double Atom::GetRealAnuglarPartAO(double theta, 
+                                  double phi, 
+                                  OrbitalType orbital) const{
    double value=0.0;
    switch(orbital){
       case s:
@@ -290,11 +294,11 @@ double Atom::GetBondingParameter() const{
    return this->GetBondingParameter(CNDO2, s);
 }
 
-double Atom::GetCoreCharge(){
+double Atom::GetCoreCharge() const{
    return this->coreCharge;
 }
 
-int Atom::GetFirstAOIndex(){
+int Atom::GetFirstAOIndex() const{
    return this->firstAOIndex;
 }
 
@@ -302,11 +306,11 @@ void Atom::SetFirstAOIndex(int firstAOIndex){
    this->firstAOIndex = firstAOIndex;
 }
 
-ShellType Atom::GetValenceShellType(){
+ShellType Atom::GetValenceShellType() const{
    return this->valenceShellType;
 }
 
-int Atom::GetEffectivePrincipalQuantumNumber(ShellType shellType){
+int Atom::GetEffectivePrincipalQuantumNumber(ShellType shellType) const{
    if(shellType == k){
       return 1.0;
    }
@@ -325,12 +329,14 @@ int Atom::GetEffectivePrincipalQuantumNumber(ShellType shellType){
    }
 }   
 
-int Atom::GetNumberValenceElectrons(){
+int Atom::GetNumberValenceElectrons() const{
    return this->numberValenceElectrons;
 }
 
 // (1.73) in J. A. Pople book
-double Atom::GetOrbitalExponent(ShellType shellType, OrbitalType orbitalType, TheoryType theory){
+double Atom::GetOrbitalExponent(ShellType shellType, 
+                                OrbitalType orbitalType, 
+                                TheoryType theory) const{
    if(theory == CNDO2 || theory == INDO || theory == ZINDOS){
       if(shellType == k && orbitalType == s){ 
          return this->effectiveNuclearChargeK
@@ -449,40 +455,40 @@ double Atom::GetOrbitalExponent(ShellType shellType, OrbitalType orbitalType, Th
 
 
 // Part of Eq. (13) in [BZ_1979]
-double Atom::GetZindoJss(){
+double Atom::GetZindoJss() const{
    return this->zindoF0ss;
 }
 
 // Part of Eq. (13) in [BZ_1979]
-double Atom::GetZindoJsp(){
+double Atom::GetZindoJsp() const{
    // F0ss = F0sp
    return this->zindoF0ss - this->zindoG1sp/6.0;
 }
 
 // Part of Eq. (13) in [BZ_1979]
-double Atom::GetZindoJsd(){
+double Atom::GetZindoJsd() const{
    return this->zindoF0sd - this->zindoG2sd/10.0;
 }
 
 // Part of Eq. (13) in [BZ_1979]
-double Atom::GetZindoJpp(){
+double Atom::GetZindoJpp() const{
    // F0pp = F0ss
    return this->zindoF0ss - 2.0*this->zindoF2pp/25.0;
 }
 
 // Part of Eq. (13) in [BZ_1979]
-double Atom::GetZindoJpd(){
+double Atom::GetZindoJpd() const{
    // F0pd = F0sd
    return this->zindoF0sd - this->zindoG1pd/15.0 - 3.0*this->zindoG3pd/70.0;
 }
 
 // Part of Eq. (13) in [BZ_1979]
-double Atom::GetZindoJdd(){
+double Atom::GetZindoJdd() const{
    return this->zindoF0dd - 2.0*(this->zindoF2dd + this->zindoF4dd)/63.0;
 }
 
 // (3.72) in J. A. Pople book.
-double Atom::GetCndo2CoreIntegral(OrbitalType orbital, double gamma, bool isGuess){
+double Atom::GetCndo2CoreIntegral(OrbitalType orbital, double gamma, bool isGuess) const{
    double value = 0.0;
    if(orbital == s){
       value = -1.0*this->imuAmuS;
@@ -511,7 +517,7 @@ double Atom::GetCndo2CoreIntegral(OrbitalType orbital, double gamma, bool isGues
 }
 
 // (3.93) - (3.99) in J. A. Pople book.
-double Atom::GetIndoCoreIntegral(OrbitalType orbital, double gamma, bool isGuess){
+double Atom::GetIndoCoreIntegral(OrbitalType orbital, double gamma, bool isGuess) const{
    double value = 0.0;
    if(orbital == s){
       value = -1.0*this->imuAmuS;
@@ -541,7 +547,7 @@ double Atom::GetIndoCoreIntegral(OrbitalType orbital, double gamma, bool isGuess
 
 
 // Eq. (13) in [BZ_1979]
-double Atom::GetZindoCoreIntegral(OrbitalType orbital){
+double Atom::GetZindoCoreIntegral(OrbitalType orbital) const{
    double value=0.0;
 
    if(orbital == s){
@@ -573,7 +579,7 @@ double Atom::GetZindoCoreIntegral(OrbitalType orbital){
    return value;
 }
 
-double Atom::GetMndoCoreIntegral(OrbitalType orbital){
+double Atom::GetMndoCoreIntegral(OrbitalType orbital) const{
    double value=0.0;
 
    if(orbital == s){
@@ -593,7 +599,7 @@ double Atom::GetMndoCoreIntegral(OrbitalType orbital){
    return value;
 }
 
-double Atom::GetAm1CoreIntegral(OrbitalType orbital){
+double Atom::GetAm1CoreIntegral(OrbitalType orbital) const{
    double value=0.0;
 
    if(orbital == s){
@@ -613,7 +619,7 @@ double Atom::GetAm1CoreIntegral(OrbitalType orbital){
    return value;
 }
 
-double Atom::GetPm3CoreIntegral(OrbitalType orbital){
+double Atom::GetPm3CoreIntegral(OrbitalType orbital) const{
    double value=0.0;
 
    if(orbital == s){
@@ -633,7 +639,7 @@ double Atom::GetPm3CoreIntegral(OrbitalType orbital){
    return value;
 }
 
-double Atom::GetPm3PddgCoreIntegral(OrbitalType orbital){
+double Atom::GetPm3PddgCoreIntegral(OrbitalType orbital) const{
    double value=0.0;
 
    if(orbital == s){
@@ -653,15 +659,15 @@ double Atom::GetPm3PddgCoreIntegral(OrbitalType orbital){
    return value;
 }
 
-double Atom::GetIndoF2(){
+double Atom::GetIndoF2() const{
    return this->indoF2;
 }
 
-double Atom::GetIndoG1(){
+double Atom::GetIndoG1() const{
    return this->indoG1;
 }
 
-double Atom::GetNddoAlpha(TheoryType theory){
+double Atom::GetNddoAlpha(TheoryType theory) const{
    double value = 0.0;
    if(theory == MNDO){
       value = this->mndoAlpha;
@@ -684,7 +690,7 @@ double Atom::GetNddoAlpha(TheoryType theory){
    return value;
 }
 
-double Atom::GetNddoDerivedParameterD(TheoryType theory, int dIndex){
+double Atom::GetNddoDerivedParameterD(TheoryType theory, int dIndex) const{
    if(dIndex == 0 || dIndex == 1 || dIndex == 2){
       if(theory == MNDO){
          return this->mndoDerivedParameterD[dIndex];
@@ -713,7 +719,7 @@ double Atom::GetNddoDerivedParameterD(TheoryType theory, int dIndex){
    }
 }
 
-double Atom::GetNddoDerivedParameterRho(TheoryType theory, int rhoIndex){
+double Atom::GetNddoDerivedParameterRho(TheoryType theory, int rhoIndex) const{
    if(rhoIndex == 0 || rhoIndex == 1 || rhoIndex == 2){
       if(theory == MNDO){
          return this->mndoDerivedParameterRho[rhoIndex];
@@ -742,7 +748,7 @@ double Atom::GetNddoDerivedParameterRho(TheoryType theory, int rhoIndex){
    }
 }
 
-double Atom::GetNddoParameterK(TheoryType theory, int kIndex){
+double Atom::GetNddoParameterK(TheoryType theory, int kIndex) const{
    if(kIndex == 0 || kIndex == 1 || kIndex == 2 || kIndex == 3){
       if(theory == AM1){
          return this->am1ParameterK[kIndex];
@@ -768,7 +774,7 @@ double Atom::GetNddoParameterK(TheoryType theory, int kIndex){
    }
 }
 
-double Atom::GetNddoParameterL(TheoryType theory, int lIndex){
+double Atom::GetNddoParameterL(TheoryType theory, int lIndex) const{
    if(lIndex == 0 || lIndex == 1 || lIndex == 2 || lIndex == 3){
       if(theory == AM1){
          return this->am1ParameterL[lIndex];
@@ -794,7 +800,7 @@ double Atom::GetNddoParameterL(TheoryType theory, int lIndex){
    }
 }
 
-double Atom::GetNddoParameterM(TheoryType theory, int mIndex){
+double Atom::GetNddoParameterM(TheoryType theory, int mIndex) const{
    if(mIndex == 0 || mIndex == 1 || mIndex == 2 || mIndex == 3){
       if(theory == AM1){
          return this->am1ParameterM[mIndex];
@@ -820,7 +826,7 @@ double Atom::GetNddoParameterM(TheoryType theory, int mIndex){
    }
 }
 
-double Atom::GetPm3PddgParameterPa(int paIndex){
+double Atom::GetPm3PddgParameterPa(int paIndex) const{
    if(paIndex == 0 || paIndex == 1 ){
       return this->pm3PddgParameterPa[paIndex];
    }
@@ -832,7 +838,7 @@ double Atom::GetPm3PddgParameterPa(int paIndex){
    }
 }
 
-double Atom::GetPm3PddgParameterDa(int daIndex){
+double Atom::GetPm3PddgParameterDa(int daIndex) const{
    if(daIndex == 0 || daIndex == 1 ){
       return this->pm3PddgParameterDa[daIndex];
    }
@@ -844,15 +850,15 @@ double Atom::GetPm3PddgParameterDa(int daIndex){
    }
 }
 
-double Atom::GetMndoElecEnergyAtom(){
+double Atom::GetMndoElecEnergyAtom() const{
    return this->mndoElecEnergyAtom;
 }
 
-double Atom::GetMndoHeatsFormAtom(){
+double Atom::GetMndoHeatsFormAtom() const{
    return this->mndoHeatsFormAtom;
 }
 
-double Atom::GetNddoGss(TheoryType theory){
+double Atom::GetNddoGss(TheoryType theory) const{
    if(theory == MNDO){
       return this->mndoGss;
    }
@@ -873,7 +879,7 @@ double Atom::GetNddoGss(TheoryType theory){
    }
 }
 
-double Atom::GetNddoGpp(TheoryType theory){
+double Atom::GetNddoGpp(TheoryType theory) const{
    if(theory == MNDO){
       return this->mndoGpp;
    }
@@ -894,7 +900,7 @@ double Atom::GetNddoGpp(TheoryType theory){
    }
 }
 
-double Atom::GetNddoGsp(TheoryType theory){
+double Atom::GetNddoGsp(TheoryType theory) const{
    if(theory == MNDO){
       return this->mndoGsp;
    }
@@ -915,7 +921,7 @@ double Atom::GetNddoGsp(TheoryType theory){
    }
 }
 
-double Atom::GetNddoGpp2(TheoryType theory){
+double Atom::GetNddoGpp2(TheoryType theory) const{
    if(theory == MNDO){
       return this->mndoGpp2;
    }
@@ -936,7 +942,7 @@ double Atom::GetNddoGpp2(TheoryType theory){
    }
 }
 
-double Atom::GetNddoHsp(TheoryType theory){
+double Atom::GetNddoHsp(TheoryType theory) const{
    if(theory == MNDO){
       return this->mndoHsp;
    }
@@ -958,7 +964,7 @@ double Atom::GetNddoHsp(TheoryType theory){
 }
 
 // see p17 in [MOPAC_1990]
-double Atom::GetNddoHpp(TheoryType theory){
+double Atom::GetNddoHpp(TheoryType theory) const{
    if(theory == MNDO){
       return 0.5*(this->mndoGpp - this->mndoGpp2);
    }
@@ -980,120 +986,119 @@ double Atom::GetNddoHpp(TheoryType theory){
 }
 
 // Table 1 in ref. [RZ_1976], Table 1 in [AEZ_1986], or Table 1 in [GD_1972]
-double Atom::GetZindoF0ss(){
+double Atom::GetZindoF0ss() const{
    return this->zindoF0ss;
 }
 
 // Table 1 in [AEZ_1986]
-double Atom::GetZindoF0sd(){
+double Atom::GetZindoF0sd() const{
    return this->zindoF0sd;
 }
 
-
 // Table 1 in [AEZ_1986]
-double Atom::GetZindoF0dd(){
+double Atom::GetZindoF0dd() const{
    return this->zindoF0dd;
 }
 
 // Table 3 in ref. [BZ_1979]
-double Atom::GetZindoG1sp(){
+double Atom::GetZindoG1sp() const{
    return this->zindoG1sp;
 }
 
 // Table 3 in ref. [BZ_1979]
-double Atom::GetZindoF2pp(){
+double Atom::GetZindoF2pp() const{
    return this->zindoF2pp;
 }
 
 // Table 3 in ref. [BZ_1979]
-double Atom::GetZindoG2sd(){
+double Atom::GetZindoG2sd() const{
    return this->zindoG2sd;
 }
 
 // Table 3 in ref. [BZ_1979]
-double Atom::GetZindoG1pd(){
+double Atom::GetZindoG1pd() const{
    return this->zindoG1pd;
 }
 
 // Table 3 in ref. [BZ_1979]
-double Atom::GetZindoF2pd(){
+double Atom::GetZindoF2pd() const{
    return this->zindoF2pd;
 }
 
 // Table 3 in ref. [BZ_1979]
-double Atom::GetZindoG3pd(){
+double Atom::GetZindoG3pd() const{
    return this->zindoG3pd;
 }
 
 // Table 3 in ref. [BZ_1979]
-double Atom::GetZindoF2dd(){
+double Atom::GetZindoF2dd() const{
    return this->zindoF2dd;
 }
 
 // Table 3 in ref. [BZ_1979]
-double Atom::GetZindoF4dd(){
+double Atom::GetZindoF4dd() const{
    return this->zindoF4dd;
 }
 
 // Apendix in ref. [BZ_1979]
-double Atom::GetZindoF0ssLower(){
+double Atom::GetZindoF0ssLower() const{
    return this->zindoF0ss;
 }
 
 // Apendix in ref. [BZ_1979]
-double Atom::GetZindoF0sdLower(){
+double Atom::GetZindoF0sdLower() const{
    return this->zindoF0sd;
 }
 
 // Apendix in ref. [BZ_1979]
-double Atom::GetZindoF0ddLower(){
+double Atom::GetZindoF0ddLower() const{
    return this->zindoF0dd;
 }
 
 // Apendix in ref. [BZ_1979]
-double Atom::GetZindoG1spLower(){
+double Atom::GetZindoG1spLower() const{
    return this->zindoG1sp/3.0;
 }
 
 // Apendix in ref. [BZ_1979]
-double Atom::GetZindoF2ppLower(){
+double Atom::GetZindoF2ppLower() const{
    return this->zindoF2pp/25.0;
 }
 
 // Apendix in ref. [BZ_1979]
-double Atom::GetZindoG2sdLower(){
+double Atom::GetZindoG2sdLower() const{
    return this->zindoG2sd/5.0;
 }
 
 // Apendix in ref. [BZ_1979]
-double Atom::GetZindoG1pdLower(){
+double Atom::GetZindoG1pdLower() const{
    return this->zindoG1pd/15.0;
 }
 
 // Apendix in ref. [BZ_1979]
-double Atom::GetZindoF2pdLower(){
+double Atom::GetZindoF2pdLower() const{
    return this->zindoF2pd/35.0;
 }
 
 // Apendix in ref. [BZ_1979]
-double Atom::GetZindoG3pdLower(){
+double Atom::GetZindoG3pdLower() const{
    return this->zindoG3pd/245.0;
 }
 
 // Apendix in ref. [BZ_1979]
-double Atom::GetZindoF2ddLower(){
+double Atom::GetZindoF2ddLower() const{
    return this->zindoF2dd/49.0;
 }
 
 // Apendix in ref. [BZ_1979]
-double Atom::GetZindoF4ddLower(){
+double Atom::GetZindoF4ddLower() const{
    return this->zindoF4dd/441.0;
 }
 
 double Atom::GetCoreIntegral(OrbitalType orbital, 
                              double gamma, 
                              bool isGuess, 
-                             TheoryType theory){
+                             TheoryType theory) const{
    double value = 0.0;
    if(theory == CNDO2){
       value = this->GetCndo2CoreIntegral(orbital, gamma, isGuess);
@@ -1119,11 +1124,11 @@ double Atom::GetCoreIntegral(OrbitalType orbital,
    return value;
 }
 
-double Atom::GetCoreIntegral(OrbitalType orbital, bool isGuess, TheoryType theory){
+double Atom::GetCoreIntegral(OrbitalType orbital, bool isGuess, TheoryType theory) const{
    return this->GetCoreIntegral(orbital, 0.0, isGuess, theory);
 }
 
-double Atom::GetZindoIonPot(OrbitalType orbital){
+double Atom::GetZindoIonPot(OrbitalType orbital) const{
    double value=0.0;
 
    if(orbital == s){
