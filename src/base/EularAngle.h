@@ -7,9 +7,9 @@ public:
    EularAngle();
    EularAngle(double x, double y, double z);
    EularAngle(double* angles);
-   double GetAlpha();
-   double GetBeta();
-   double GetGamma();
+   double GetAlpha() const;
+   double GetBeta() const;
+   double GetGamma() const;
    void SetAlpha(double alpha);
    void SetBeta(double beta);
    void SetGamma(double gamma);

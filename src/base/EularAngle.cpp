@@ -52,15 +52,15 @@ EularAngle::EularAngle(double* angles){
    this->gamma = angles[2];
 }
 
-double EularAngle::GetAlpha(){
+double EularAngle::GetAlpha() const{
    return this->alpha;
 }
 
-double EularAngle::GetBeta(){
+double EularAngle::GetBeta() const{
    return this->beta;
 }
 
-double EularAngle::GetGamma(){
+double EularAngle::GetGamma() const{
    return this->gamma;
 }
 
