@@ -7,7 +7,7 @@ class InputParser{
 public:
    static InputParser* GetInstance();
    static void DeleteInstance();
-   void Parse(Molecule* molecule);
+   void Parse(Molecule* molecule) const;
 private:
    static InputParser* inputParser;
    InputParser();
@@ -110,17 +110,17 @@ private:
    std::string stringMDTotalSteps;
    std::string stringMDElecState;
    std::string stringMDTimeWidth;
-   void CalcMolecularBasics(Molecule* molecule);
-   void CheckCisConditions(Molecule* molecule);
-   void CheckMdConditions();
-   void OutputMolecularBasics(Molecule* molecule);
-   void OutputScfConditions();
-   void OutputCisConditions();
-   void OutputMdConditions();
-   void OutputMOPlotConditions();
-   void OutputInputTerms(std::vector<std::string> inputTerms);
-   bool IsCommentOut(std::string str);
-   std::vector<std::string> GetInputTerms();
+   void CalcMolecularBasics(Molecule* molecule) const;
+   void CheckCisConditions(const Molecule& molecule) const;
+   void CheckMdConditions() const;
+   void OutputMolecularBasics(Molecule* molecule) const;
+   void OutputScfConditions() const;
+   void OutputCisConditions() const;
+   void OutputMdConditions() const;
+   void OutputMOPlotConditions() const;
+   void OutputInputTerms(std::vector<std::string> inputTerms) const;
+   bool IsCommentOut(std::string str) const;
+   std::vector<std::string> GetInputTerms() const;
 };
 
 }

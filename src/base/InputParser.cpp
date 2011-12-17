@@ -143,7 +143,7 @@ void InputParser::SetMessages(){
    this->stringMDTimeWidth = "dt";
 }
 
-vector<string> InputParser::GetInputTerms(){
+vector<string> InputParser::GetInputTerms() const{
 
    string str;
    string inputTerm;
@@ -182,7 +182,7 @@ vector<string> InputParser::GetInputTerms(){
 
 }
 
-void InputParser::Parse(Molecule* molecule){
+void InputParser::Parse(Molecule* molecule) const{
 
    cout << messageStartParseInput;
 
@@ -349,7 +349,6 @@ void InputParser::Parse(Molecule* molecule){
          i = j;
       }
       
-   this->stringMOPlotFilePrefix = "file_prefix";
       // mo plot condition
       if(inputTerms[i].compare(this->stringMOPlot) == 0){
          int j=i+1;
@@ -543,7 +542,7 @@ void InputParser::Parse(Molecule* molecule){
    // calculate basics and check conditions
    this->CalcMolecularBasics(molecule);
    if(Parameters::GetInstance()->RequiresCIS()){
-      this->CheckCisConditions(molecule);
+      this->CheckCisConditions(*molecule);
    }
    if(Parameters::GetInstance()->RequiresMD()){
       this->CheckMdConditions();
@@ -568,19 +567,18 @@ void InputParser::Parse(Molecule* molecule){
 
 }
 
-void InputParser::CalcMolecularBasics(Molecule* molecule){
-
+void InputParser::CalcMolecularBasics(Molecule* molecule) const{
    molecule->CalcTotalNumberAOs();
    molecule->CalcTotalNumberValenceElectrons();
    molecule->CalcXyzCOM();
    molecule->CalcXyzCOC();
 }
 
-void InputParser::CheckCisConditions(Molecule* molecule){
+void InputParser::CheckCisConditions(const Molecule& molecule) const{
 
    // direct CIS
-   int numberOcc = molecule->GetTotalNumberValenceElectrons()/2;
-   int numberVir = molecule->GetTotalNumberAOs() - numberOcc;
+   int numberOcc = molecule.GetTotalNumberValenceElectrons()/2;
+   int numberVir = molecule.GetTotalNumberAOs() - numberOcc;
 
    // check the number of active occupied orbitals.
    if(numberOcc < Parameters::GetInstance()->GetActiveOccCIS()){
@@ -609,14 +607,14 @@ void InputParser::CheckCisConditions(Molecule* molecule){
    
 }
 
-void InputParser::CheckMdConditions(){
+void InputParser::CheckMdConditions() const{
    if(Parameters::GetInstance()->GetCurrentTheory() == ZINDOS){
       int groundStateIndex = 0;
       Parameters::GetInstance()->SetElectronicStateIndexMD(groundStateIndex);
    }
 }
 
-void InputParser::OutputMolecularBasics(Molecule* molecule){
+void InputParser::OutputMolecularBasics(Molecule* molecule) const{
 
    molecule->OutputTotalNumberAtomsAOsValenceelectrons();
    molecule->OutputConfiguration();
@@ -624,7 +622,7 @@ void InputParser::OutputMolecularBasics(Molecule* molecule){
    molecule->OutputXyzCOC();
 }
 
-void InputParser::OutputScfConditions(){
+void InputParser::OutputScfConditions() const{
 
    cout << this->messageScfConditions;
    printf("%s%d\n",this->messageScfMaxIterations.c_str(),Parameters::GetInstance()->GetMaxIterationsSCF());
@@ -638,7 +636,7 @@ void InputParser::OutputScfConditions(){
 
 }
 
-void InputParser::OutputCisConditions(){
+void InputParser::OutputCisConditions() const{
    cout << this->messageCisConditions;
 
    printf("%s%d\n",this->messageCisNumberActiveOcc.c_str(),Parameters::GetInstance()->GetActiveOccCIS());
@@ -658,7 +656,7 @@ void InputParser::OutputCisConditions(){
    cout << "\n";
 }
 
-void InputParser::OutputMdConditions(){
+void InputParser::OutputMdConditions() const{
    cout << this->messageMdConditions;
 
    printf("%s%d\n",this->messageMdElecState.c_str(),Parameters::GetInstance()->GetElectronicStateIndexMD());
@@ -668,7 +666,7 @@ void InputParser::OutputMdConditions(){
    cout << "\n";
 }
 
-void InputParser::OutputMOPlotConditions(){
+void InputParser::OutputMOPlotConditions() const{
    cout << this->messageMOPlotConditions;
    vector<int> moIndeces = Parameters::GetInstance()->GetIndecesMOPlot();
    for(int i=0; i<moIndeces.size(); i++){
@@ -691,7 +689,7 @@ void InputParser::OutputMOPlotConditions(){
    cout << endl;
 }
 
-void InputParser::OutputInputTerms(vector<string> inputTerms){
+void InputParser::OutputInputTerms(vector<string> inputTerms) const{
    
    // output input terms
    cout << this->messageInputTerms;
@@ -710,7 +708,7 @@ void InputParser::OutputInputTerms(vector<string> inputTerms){
  *  # or // are treated as comment out 
  *
  ****/
-bool InputParser::IsCommentOut(string tempStr){
+bool InputParser::IsCommentOut(string tempStr) const{
 
    string str = TrimString(tempStr);
 
