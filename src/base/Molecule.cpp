@@ -90,7 +90,7 @@ void Molecule::SetMessages(){
    this->messageTranslatingDifferenceTitleAng = "\t\t| x[angst.] | y[angst.] | z[angst.] |\n";
 }
 
-vector<Atom*>* Molecule::GetAtomVect(){
+vector<Atom*>* Molecule::GetAtomVect() const{
    return this->atomVect;
 }
 
@@ -158,7 +158,7 @@ void Molecule::CalcXyzCOC(){
    this->wasCalculatedXyzCOC = true;
 }
 
-int Molecule::GetTotalNumberAOs(){
+int Molecule::GetTotalNumberAOs() const{
    return this->totalNumberAOs;
 }
 
@@ -170,7 +170,7 @@ void Molecule::CalcTotalNumberAOs(){
    }
 }
 
-int Molecule::GetTotalNumberValenceElectrons(){
+int Molecule::GetTotalNumberValenceElectrons() const{
    return this->totalNumberValenceElectrons;
 }
 
@@ -181,7 +181,7 @@ void Molecule::CalcTotalNumberValenceElectrons(){
    }
 }
 
-void Molecule::OutputConfiguration(){
+void Molecule::OutputConfiguration() const{
    double ang2AU = Parameters::GetInstance()->GetAngstrom2AU();
    cout << this->messageConfiguration;
    cout << this->messageConfigurationTitleAng;
@@ -202,7 +202,7 @@ void Molecule::OutputConfiguration(){
 
 }
 
-void Molecule::OutputMomenta(){
+void Molecule::OutputMomenta() const{
    double ang2AU = Parameters::GetInstance()->GetAngstrom2AU();
    double fs2AU = Parameters::GetInstance()->GetFs2AU();
    double gMolin2AU = Parameters::GetInstance()->GetGMolin2AU();
@@ -228,7 +228,7 @@ void Molecule::OutputMomenta(){
 
 }
 
-void Molecule::OutputXyzCOM(){
+void Molecule::OutputXyzCOM() const{
    double ang2AU = Parameters::GetInstance()->GetAngstrom2AU();
    cout << this->messageCOM;
    cout << this->messageCOMTitleAng;
@@ -245,7 +245,7 @@ void Molecule::OutputXyzCOM(){
 
 }
 
-void Molecule::OutputXyzCOC(){
+void Molecule::OutputXyzCOC() const{
    double ang2AU = Parameters::GetInstance()->GetAngstrom2AU();
    cout << this->messageCOC;
    cout << this->messageCOMTitleAng;
@@ -262,14 +262,14 @@ void Molecule::OutputXyzCOC(){
 
 }
 
-void Molecule::OutputTotalNumberAtomsAOsValenceelectrons(){
+void Molecule::OutputTotalNumberAtomsAOsValenceelectrons() const{
    cout << this->messageTotalNumberAtoms << this->atomVect->size() << "\n";
    cout << this->messageTotalNumberAOs << this->totalNumberAOs << "\n";
    cout << this->messageTotalNumberValenceElectrons << this->totalNumberValenceElectrons << "\n\n";
 }
 
 void Molecule::OutputPrincipalAxes(double const* const* inertiaTensor, 
-                                   double const* inertiaMoments){
+                                   double const* inertiaMoments) const{
    double ang2AU = Parameters::GetInstance()->GetAngstrom2AU();
    double gMolin2AU = Parameters::GetInstance()->GetGMolin2AU();
 
@@ -294,7 +294,7 @@ void Molecule::OutputPrincipalAxes(double const* const* inertiaTensor,
 
 }
 
-void Molecule::OutputInertiaTensorOrigin(double* inertiaTensorOrigin){
+void Molecule::OutputInertiaTensorOrigin(double* inertiaTensorOrigin) const{
    double ang2AU = Parameters::GetInstance()->GetAngstrom2AU();
 
    cout << this->messageInertiaTensorOrigin;
@@ -504,7 +504,7 @@ void Molecule::OutputRotatingConditions(RotatingType rotatingType,
                                         double const* rotatingOrigin, 
                                         double const* rotatingAxis, 
                                         double rotatingAngle, 
-                                        EularAngle rotatingEularAngles){
+                                        EularAngle rotatingEularAngles) const{
 
    double angst2AU = Parameters::GetInstance()->GetAngstrom2AU();
    double degree2Radian = Parameters::GetInstance()->GetDegree2Radian();
@@ -582,7 +582,7 @@ void Molecule::Translate(){
    cout << this->messageDoneTranslate;
 }
 
-void Molecule::OutputTranslatingConditions(double const* translatingDifference){
+void Molecule::OutputTranslatingConditions(double const* translatingDifference) const{
 
    double angst2AU = Parameters::GetInstance()->GetAngstrom2AU();
 
@@ -599,13 +599,13 @@ void Molecule::OutputTranslatingConditions(double const* translatingDifference){
 
 }
 
-double Molecule::GetDistanceAtoms(int atomAIndex, int atomBIndex){
+double Molecule::GetDistanceAtoms(int atomAIndex, int atomBIndex) const{
    Atom* atomA = (*this->atomVect)[atomAIndex];
    Atom* atomB = (*this->atomVect)[atomBIndex];
    return this->GetDistanceAtoms(*atomA, *atomB);
 }
 
-double Molecule::GetDistanceAtoms(const Atom& atomA, const Atom& atomB){
+double Molecule::GetDistanceAtoms(const Atom& atomA, const Atom& atomB) const{
 
    double distance=0.0;
    distance = sqrt( pow(atomA.GetXyz()[0] - atomB.GetXyz()[0], 2.0)

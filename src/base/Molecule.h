@@ -6,26 +6,26 @@ class Molecule{
 public:
    Molecule();
    ~Molecule();
-   std::vector<MolDS_base_atoms::Atom*>* GetAtomVect(); 
+   std::vector<MolDS_base_atoms::Atom*>* GetAtomVect() const; 
    double* GetXyzCOM();
    double* GetXyzCOC();
    void CalcXyzCOM();
    void CalcXyzCOC();
-   int GetTotalNumberAOs();
+   int GetTotalNumberAOs() const;
    void CalcTotalNumberAOs();
-   int GetTotalNumberValenceElectrons();
+   int GetTotalNumberValenceElectrons() const;
    void CalcTotalNumberValenceElectrons();
-   void OutputXyzCOM();
-   void OutputXyzCOC();
-   void OutputTotalNumberAtomsAOsValenceelectrons();
-   void OutputConfiguration();
-   void OutputMomenta();
+   void OutputXyzCOM() const;
+   void OutputXyzCOC() const;
+   void OutputTotalNumberAtomsAOsValenceelectrons() const;
+   void OutputConfiguration() const;
+   void OutputMomenta() const;
    void CalcPrincipalAxes();
    void Rotate();
    void Translate();
-   double GetDistanceAtoms(int atomAIndex, int atomBIndex);
+   double GetDistanceAtoms(int atomAIndex, int atomBIndex) const;
    double GetDistanceAtoms(const MolDS_base_atoms::Atom& atomA, 
-                           const MolDS_base_atoms::Atom& atomB);
+                           const MolDS_base_atoms::Atom& atomB) const;
 private:
    std::vector<MolDS_base_atoms::Atom*>* atomVect;
    double* xyzCOM; // x, y, z coordinates of Center of Mass;
@@ -43,14 +43,14 @@ private:
                const double* rotatingOrigin, 
                RotatedObjectType rotatedObj);
    void OutputPrincipalAxes(double const* const* inertiaTensor, 
-                            double const* inertiaMoments);
-   void OutputInertiaTensorOrigin(double* inertiaTensorOrigin);
+                            double const* inertiaMoments) const;
+   void OutputInertiaTensorOrigin(double* inertiaTensorOrigin) const;
    void OutputRotatingConditions(RotatingType rotatingType, 
                                  double const* rotatingOrigin, 
                                  double const* rotatingAxis, 
                                  double rotatingAngle, 
-                                 MolDS_base::EularAngle rotatingEularAngles);
-   void OutputTranslatingConditions(double const* translatingDifference);
+                                 MolDS_base::EularAngle rotatingEularAngles)const;
+   void OutputTranslatingConditions(double const* translatingDifference) const;
    std::string messageTotalNumberAOs;
    std::string messageTotalNumberAtoms;
    std::string messageTotalNumberValenceElectrons;
