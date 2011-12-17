@@ -19,8 +19,10 @@ using namespace std;
 using namespace MolDS_base_atoms;
 namespace MolDS_base{
 
-MOLogger::MOLogger(Molecule* molecule, double** fockMatrix, TheoryType theory){
-   this->molecule = molecule;
+MOLogger::MOLogger(const Molecule& molecule, 
+                   double const* const* fockMatrix, 
+                   TheoryType theory){
+   this->molecule = &molecule;
    this->fockMatrix = fockMatrix;
    this->theory = theory;
    this->SetMessage();

@@ -4,7 +4,7 @@ namespace MolDS_base{
 
 class MOLogger{
 public:
-   MOLogger(MolDS_base::Molecule* molecule, double** fockMatrix, MolDS_base::TheoryType theory);
+   MOLogger(const MolDS_base::Molecule& molecule, double const* const* fockMatrix, MolDS_base::TheoryType theory);
    void DrawMO(int moIndex);
    void DrawMO(std::vector<int> moIndeces);
 private:
@@ -15,8 +15,8 @@ private:
    std::string messageEndMOPlot;
    std::string messageSkippedMOIndex;
    MOLogger();
-   MolDS_base::Molecule* molecule;
-   double** fockMatrix;
+   MolDS_base::Molecule const* molecule;
+   double const* const* fockMatrix;
    MolDS_base::TheoryType theory;
    void SetMessage();
 };

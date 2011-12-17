@@ -656,7 +656,7 @@ void Cndo2::OutputHFResults(double** fockMatrix, double* energiesMO, double* ato
 
    // output MOs
    if(0<Parameters::GetInstance()->GetIndecesMOPlot().size()){
-      MOLogger* moLogger = new MOLogger(molecule, fockMatrix, this->theory);
+      MOLogger* moLogger = new MOLogger(*molecule, fockMatrix, this->theory);
       moLogger->DrawMO(Parameters::GetInstance()->GetIndecesMOPlot());
       delete moLogger;
    }

@@ -7,7 +7,9 @@ public:
    Molecule();
    ~Molecule();
    std::vector<MolDS_base_atoms::Atom*>* GetAtomVect() const; 
+   double* GetXyzCOM() const;
    double* GetXyzCOM();
+   double* GetXyzCOC() const;
    double* GetXyzCOC();
    void CalcXyzCOM();
    void CalcXyzCOC();

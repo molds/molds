@@ -94,11 +94,19 @@ vector<Atom*>* Molecule::GetAtomVect() const{
    return this->atomVect;
 }
 
+double* Molecule::GetXyzCOM() const{
+   return this->xyzCOM;
+}
+
 double* Molecule::GetXyzCOM(){
    if(!this->wasCalculatedXyzCOM){
       this->CalcXyzCOM();
    }
    return this->xyzCOM;
+}
+
+double* Molecule::GetXyzCOC() const{
+   return this->xyzCOC;
 }
 
 double* Molecule::GetXyzCOC(){
