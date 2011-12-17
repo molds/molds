@@ -92,7 +92,7 @@ void Parameters::SetDefaultValues(){
    this->timeWidthMD = 0.1*this->fs2AU;
 }
 
-double Parameters::GetThresholdSCF(){
+double Parameters::GetThresholdSCF() const{
    return this->thresholdSCF;
 }
 
@@ -100,7 +100,7 @@ void Parameters::SetThresholdSCF(double thresholdSCF){
    this->thresholdSCF = thresholdSCF;
 }
 
-int Parameters::GetMaxIterationsSCF(){
+int Parameters::GetMaxIterationsSCF() const{
    return this->maxIterationsSCF;
 }
 
@@ -108,7 +108,7 @@ void Parameters::SetMaxIterationsSCF(int maxIterationsSCF){
    this->maxIterationsSCF = maxIterationsSCF;
 }
 
-double Parameters::GetDampingThreshSCF(){
+double Parameters::GetDampingThreshSCF() const{
    return this->dampingThreshSCF;
 }
 
@@ -116,7 +116,7 @@ void Parameters::SetDampingThreshSCF(double dampingThreshSCF){
    this->dampingThreshSCF = dampingThreshSCF;
 }
 
-double Parameters::GetDampingWeightSCF(){
+double Parameters::GetDampingWeightSCF() const{
    return this->dampingWeightSCF;
 }
 
@@ -124,7 +124,7 @@ void Parameters::SetDampingWeightSCF(double dampingWeightSCF){
    this->dampingWeightSCF = dampingWeightSCF;
 }
 
-int Parameters::GetDiisNumErrorVectSCF(){
+int Parameters::GetDiisNumErrorVectSCF() const{
    return this->diisNumErrorVectSCF;
 }
 
@@ -132,7 +132,7 @@ void Parameters::SetDiisNumErrorVectSCF(int diisNumErrorVectSCF){
    this->diisNumErrorVectSCF = diisNumErrorVectSCF;
 }
 
-double Parameters::GetDiisStartErrorSCF(){
+double Parameters::GetDiisStartErrorSCF() const{
    return this->diisStartErrorSCF;
 }
 
@@ -140,7 +140,7 @@ void Parameters::SetDiisStartErrorSCF(double diisStartErrorSCF){
    this->diisStartErrorSCF = diisStartErrorSCF;
 }
 
-double Parameters::GetDiisEndErrorSCF(){
+double Parameters::GetDiisEndErrorSCF() const{
    return this->diisEndErrorSCF;
 }
 
@@ -148,7 +148,7 @@ void Parameters::SetDiisEndErrorSCF(double diisEndErrorSCF){
    this->diisEndErrorSCF = diisEndErrorSCF;
 }
 
-string Parameters::GetFileNamePrefixMOPlot(){
+string Parameters::GetFileNamePrefixMOPlot() const{
    return this->fileNamePrefixMOPlot;
 }
 
@@ -156,8 +156,8 @@ void Parameters::SetFileNamePrefixMOPlot(string fileNamePrefixMOPlot){
    this->fileNamePrefixMOPlot = fileNamePrefixMOPlot;
 }
 
-int* Parameters::GetGridNumberMOPlot(){
-   return this->gridNumberMOPlot;
+int* Parameters::GetGridNumberMOPlot() const{
+   return (int*)this->gridNumberMOPlot;
 }
 
 void Parameters::SetGridNumberMOPlot(int Nx, int Ny, int Nz){
@@ -166,8 +166,8 @@ void Parameters::SetGridNumberMOPlot(int Nx, int Ny, int Nz){
    this->gridNumberMOPlot[ZAxis] = Nz;
 }
 
-double* Parameters::GetFrameLengthMOPlot(){
-   return this->frameLengthMOPlot;
+double* Parameters::GetFrameLengthMOPlot() const{
+   return (double*)this->frameLengthMOPlot;
 }
 
 void Parameters::SetFrameLengthMOPlot(double lx, double ly, double lz){
@@ -176,35 +176,35 @@ void Parameters::SetFrameLengthMOPlot(double lx, double ly, double lz){
    this->frameLengthMOPlot[ZAxis] = lz;
 }
 
-double Parameters::GetEV2AU(){
+double Parameters::GetEV2AU() const{
    return this->eV2AU;
 }
 
-double Parameters::GetKcalMolin2AU(){
+double Parameters::GetKcalMolin2AU() const{
    return this->kcalMolin2AU;
 }
 
-double Parameters::GetAngstrom2AU(){
+double Parameters::GetAngstrom2AU() const{
    return this->angstrom2AU;
 }
 
-double Parameters::GetKayser2AU(){
+double Parameters::GetKayser2AU() const{
    return this->kayser2AU;
 }
 
-double Parameters::GetGMolin2AU(){
+double Parameters::GetGMolin2AU() const{
    return this->gMolin2AU;
 }
 
-double Parameters::GetDegree2Radian(){
+double Parameters::GetDegree2Radian() const{
    return this->degree2Radian;
 }
 
-double Parameters::GetFs2AU(){
+double Parameters::GetFs2AU() const{
    return this->fs2AU;
 }
 
-TheoryType Parameters::GetCurrentTheory(){
+TheoryType Parameters::GetCurrentTheory() const{
    return this->currentTheory;
 }
 
@@ -218,8 +218,8 @@ void Parameters::SetTranslatingDifference(double x, double y, double z){
    this->translatingDifference[2] = z;
 }
 
-double* Parameters::GetTranslatingDifference(){
-   return this->translatingDifference;
+double* Parameters::GetTranslatingDifference() const{
+   return (double*)this->translatingDifference;
 }
 
 void Parameters::SetInertiaTensorOrigin(double x, double y, double z){
@@ -233,8 +233,8 @@ void Parameters::SetInertiaTensorOrigin(double x, double y, double z){
 
 }
 
-double* Parameters::GetInertiaTensorOrigin(){
-   return this->inertiaTensorOrigin;
+double* Parameters::GetInertiaTensorOrigin() const{
+   return (double*)this->inertiaTensorOrigin;
 }
 
 void Parameters::SetRotatingOrigin(double x, double y, double z){
@@ -248,15 +248,15 @@ void Parameters::SetRotatingOrigin(double x, double y, double z){
 
 }
 
-double* Parameters::GetRotatingOrigin(){
-   return this->rotatingOrigin;
+double* Parameters::GetRotatingOrigin() const{
+   return (double*)this->rotatingOrigin;
 }
 
 void Parameters::SetRotatingType(RotatingType rotatingType){
    this->rotatingType = rotatingType;
 }
 
-RotatingType Parameters::GetRotatingType(){
+RotatingType Parameters::GetRotatingType() const{
    return this->rotatingType;
 }
 
@@ -267,15 +267,15 @@ void Parameters::SetRotatingAxis(double x, double y, double z){
 
 }
 
-double* Parameters::GetRotatingAxis(){
-   return this->rotatingAxis;
+double* Parameters::GetRotatingAxis() const{
+   return (double*)this->rotatingAxis;
 }
 
 void Parameters::SetRotatingAngle(double rotatingAngle){
    this->rotatingAngle = rotatingAngle;
 }
 
-double Parameters::GetRotatingAngle(){
+double Parameters::GetRotatingAngle() const{
    return this->rotatingAngle;
 }
 
@@ -285,11 +285,11 @@ void Parameters::SetRotatingEularAngles(double alpha, double beta, double gamma)
    this->rotatingEularAngles.SetGamma(gamma);
 }
 
-EularAngle Parameters::GetRotatingEularAngles(){
+EularAngle Parameters::GetRotatingEularAngles() const{
    return this->rotatingEularAngles;
 }
 
-int Parameters::GetActiveOccCIS(){
+int Parameters::GetActiveOccCIS() const{
    return this->activeOccCIS;
 }
    
@@ -297,7 +297,7 @@ void Parameters::SetActiveOccCIS(int activeOccCIS){
    this->activeOccCIS = activeOccCIS;
 }
 
-int Parameters::GetActiveVirCIS(){
+int Parameters::GetActiveVirCIS() const{
    return this->activeVirCIS;
 }
 
@@ -305,7 +305,7 @@ void Parameters::SetActiveVirCIS(int activeVirCIS){
    this->activeVirCIS = activeVirCIS;
 }
 
-int Parameters::GetNumberExcitedStatesCIS(){
+int Parameters::GetNumberExcitedStatesCIS() const{
    return this->numberExcitedStatesCIS;
 }
 
@@ -313,7 +313,7 @@ void Parameters::SetNumberExcitedStatesCIS(int nStates){
    this->numberExcitedStatesCIS = nStates;
 }
 
-bool Parameters::RequiresCIS(){
+bool Parameters::RequiresCIS() const{
    return this->requiresCIS;
 }
 
@@ -321,7 +321,7 @@ void Parameters::SetRequiresCIS(bool requiresCIS){
    this->requiresCIS = requiresCIS;
 }
 
-vector<int> Parameters::GetIndecesMOPlot(){
+vector<int> Parameters::GetIndecesMOPlot() const{
    return this->indecesMOPlot;
 }
 
@@ -329,7 +329,7 @@ void Parameters::AddIndexMOPlot(int moIndex){
    this->indecesMOPlot.push_back(moIndex);
 }
 
-bool Parameters::IsDavidsonCIS(){
+bool Parameters::IsDavidsonCIS() const{
    return this->isDavidsonCIS;
 }
 
@@ -337,7 +337,7 @@ void Parameters::SetIsDavidsonCIS(bool isDavidsonCIS){
    this->isDavidsonCIS = isDavidsonCIS;
 }
 
-int Parameters::GetMaxIterationsCIS(){
+int Parameters::GetMaxIterationsCIS() const{
    return this->maxIterationsCIS;
 }
 
@@ -345,7 +345,7 @@ void Parameters::SetMaxIterationsCIS(int maxIterationsCIS){
    this->maxIterationsCIS = maxIterationsCIS;
 }
 
-int Parameters::GetMaxDimensionsCIS(){
+int Parameters::GetMaxDimensionsCIS() const{
    return this->maxDimensionsCIS;
 }
 
@@ -353,7 +353,7 @@ void Parameters::SetMaxDimensionsCIS(int maxDimensionsCIS){
    this->maxDimensionsCIS = maxDimensionsCIS;
 }
 
-double Parameters::GetNormToleranceCIS(){
+double Parameters::GetNormToleranceCIS() const{
    return this->normToleranceCIS;
 }
 
@@ -361,7 +361,7 @@ void Parameters::SetNormToleranceCIS(double normToleranceCIS){
    this->normToleranceCIS = normToleranceCIS;
 }
 
-bool Parameters::RequiresMD(){
+bool Parameters::RequiresMD() const{
    return this->requiresMD;
 }
 
@@ -369,7 +369,7 @@ void Parameters::SetRequiresMD(bool requiresMD){
    this->requiresMD = requiresMD;
 }
 
-int Parameters::GetElectronicStateIndexMD(){
+int Parameters::GetElectronicStateIndexMD() const{
    return this->electronicStateIndexMD;
 }
 
@@ -377,7 +377,7 @@ void Parameters::SetElectronicStateIndexMD(int electronicStateIndex){
    this->electronicStateIndexMD = electronicStateIndex;
 }
 
-int Parameters::GetTotalStepsMD(){
+int Parameters::GetTotalStepsMD() const{
    return this->totalStepsMD;
 }
 
@@ -385,7 +385,7 @@ void Parameters::SetTotalStepsMD(int totalSteps){
    this->totalStepsMD = totalSteps;
 }
 
-double Parameters::GetTimeWidthMD(){
+double Parameters::GetTimeWidthMD() const{
    return this->timeWidthMD;
 }
 
