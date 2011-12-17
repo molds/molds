@@ -495,7 +495,7 @@ double ZindoS::GetExchangeInt(OrbitalType orbital1, OrbitalType orbital2, Atom* 
 // ref. [MN_1957] and (5a) in [AEZ_1986]
 double ZindoS::GetNishimotoMatagaTwoEleInt(Atom* atomA, OrbitalType orbitalA, 
                                            Atom* atomB, OrbitalType orbitalB){
-   double r = this->molecule->GetDistanceAtoms(atomA, atomB);
+   double r = this->molecule->GetDistanceAtoms(*atomA, *atomB);
    double gammaAA;
    if(orbitalA == s || 
       orbitalA == px ||
@@ -604,7 +604,7 @@ double ZindoS::GetNishimotoMatagaTwoEleIntFirstDerivative(Atom* atomA,
       throw MolDSException(ss.str());
    }  
 
-   double r = this->molecule->GetDistanceAtoms(atomA, atomB);
+   double r = this->molecule->GetDistanceAtoms(*atomA, *atomB);
    double dCartesian = atomA->GetXyz()[axisA] - atomB->GetXyz()[axisA];
    double value = -1.0*dCartesian/r;
    value *= this->nishimotoMatagaParamA;

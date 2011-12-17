@@ -120,7 +120,7 @@ double Atom::GetAtomicMass(){
    return this->atomicMass;
 }
 
-double* Atom::GetXyz(){
+double* Atom::GetXyz() const{
    return this->xyz;
 }
 
@@ -223,7 +223,7 @@ double Atom::GetRealAnuglarPartAO(double theta, double phi, OrbitalType orbital)
 }
 
 
-double Atom::GetBondingParameter(TheoryType theory, OrbitalType orbital){
+double Atom::GetBondingParameter(TheoryType theory, OrbitalType orbital) const{
 
    double value = 0.0;
    if(theory == CNDO2 || theory == INDO){
@@ -286,7 +286,7 @@ double Atom::GetBondingParameter(TheoryType theory, OrbitalType orbital){
 
 }
 
-double Atom::GetBondingParameter(){
+double Atom::GetBondingParameter() const{
    return this->GetBondingParameter(CNDO2, s);
 }
 

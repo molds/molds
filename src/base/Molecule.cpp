@@ -268,7 +268,8 @@ void Molecule::OutputTotalNumberAtomsAOsValenceelectrons(){
    cout << this->messageTotalNumberValenceElectrons << this->totalNumberValenceElectrons << "\n\n";
 }
 
-void Molecule::OutputPrincipalAxes(double** inertiaTensor, double* inertiaMoments){
+void Molecule::OutputPrincipalAxes(double const* const* inertiaTensor, 
+                                   double const* inertiaMoments){
    double ang2AU = Parameters::GetInstance()->GetAngstrom2AU();
    double gMolin2AU = Parameters::GetInstance()->GetGMolin2AU();
 
@@ -349,7 +350,7 @@ void Molecule::CalcPrincipalAxes(){
    
 }
 
-void Molecule::CalcInertiaTensor(double** inertiaTensor, double* inertiaTensorOrigin){
+void Molecule::CalcInertiaTensor(double** inertiaTensor, const double* inertiaTensorOrigin){
 
    Atom* atom;
    double x;
@@ -439,7 +440,7 @@ void Molecule::Rotate(){
  * rotatedObj == System: Molecule is rotated.
  * rotatedObj == Frame: De Cartesian is rotated.
  */
-void Molecule::Rotate(EularAngle eularAngle, double* rotatingOrigin, RotatedObjectType rotatedObj){
+void Molecule::Rotate(EularAngle eularAngle, const double* rotatingOrigin, RotatedObjectType rotatedObj){
 
    double rotatingMatrixAlpha[3][3];
    double rotatingMatrixBeta[3][3];
@@ -499,8 +500,10 @@ void Molecule::Rotate(EularAngle eularAngle, double* rotatingOrigin, RotatedObje
    }
 }
 
-void Molecule::OutputRotatingConditions(RotatingType rotatingType, double* rotatingOrigin, 
-                                        double* rotatingAxis, double rotatingAngle, 
+void Molecule::OutputRotatingConditions(RotatingType rotatingType, 
+                                        double const* rotatingOrigin, 
+                                        double const* rotatingAxis, 
+                                        double rotatingAngle, 
                                         EularAngle rotatingEularAngles){
 
    double angst2AU = Parameters::GetInstance()->GetAngstrom2AU();
@@ -579,7 +582,7 @@ void Molecule::Translate(){
    cout << this->messageDoneTranslate;
 }
 
-void Molecule::OutputTranslatingConditions(double* translatingDifference){
+void Molecule::OutputTranslatingConditions(double const* translatingDifference){
 
    double angst2AU = Parameters::GetInstance()->GetAngstrom2AU();
 
@@ -599,15 +602,15 @@ void Molecule::OutputTranslatingConditions(double* translatingDifference){
 double Molecule::GetDistanceAtoms(int atomAIndex, int atomBIndex){
    Atom* atomA = (*this->atomVect)[atomAIndex];
    Atom* atomB = (*this->atomVect)[atomBIndex];
-   return this->GetDistanceAtoms(atomA, atomB);
+   return this->GetDistanceAtoms(*atomA, *atomB);
 }
 
-double Molecule::GetDistanceAtoms(Atom* atomA, Atom* atomB){
+double Molecule::GetDistanceAtoms(const Atom& atomA, const Atom& atomB){
 
    double distance=0.0;
-   distance = sqrt( pow(atomA->GetXyz()[0] - atomB->GetXyz()[0], 2.0)
-                   +pow(atomA->GetXyz()[1] - atomB->GetXyz()[1], 2.0)
-                   +pow(atomA->GetXyz()[2] - atomB->GetXyz()[2], 2.0) );
+   distance = sqrt( pow(atomA.GetXyz()[0] - atomB.GetXyz()[0], 2.0)
+                   +pow(atomA.GetXyz()[1] - atomB.GetXyz()[1], 2.0)
+                   +pow(atomA.GetXyz()[2] - atomB.GetXyz()[2], 2.0) );
    return distance;
 
 }

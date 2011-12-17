@@ -9,7 +9,7 @@ public:
    ~Atom();
    MolDS_base::AtomType GetAtomType();
    double GetAtomicMass();
-   double* GetXyz();
+   double* GetXyz() const;
    void SetXyz(double x, double y, double z);
    double* GetPxyz();
    void SetPxyz(double px, double py, double pz);
@@ -19,9 +19,9 @@ public:
                               double z, 
                               int valenceIndex,
                               MolDS_base::TheoryType theory);
-   double GetBondingParameter();
+   double GetBondingParameter() const;
    double GetBondingParameter(MolDS_base::TheoryType theory, 
-                              MolDS_base::OrbitalType orbital);
+                              MolDS_base::OrbitalType orbital) const;
    double GetCoreCharge();
    int GetFirstAOIndex();
    void SetFirstAOIndex(int firstAOIndex);

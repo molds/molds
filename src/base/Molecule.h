@@ -24,7 +24,8 @@ public:
    void Rotate();
    void Translate();
    double GetDistanceAtoms(int atomAIndex, int atomBIndex);
-   double GetDistanceAtoms(MolDS_base_atoms::Atom* atomA, MolDS_base_atoms::Atom* atomB);
+   double GetDistanceAtoms(const MolDS_base_atoms::Atom& atomA, 
+                           const MolDS_base_atoms::Atom& atomB);
 private:
    std::vector<MolDS_base_atoms::Atom*>* atomVect;
    double* xyzCOM; // x, y, z coordinates of Center of Mass;
@@ -34,15 +35,22 @@ private:
    int totalNumberAOs;
    int totalNumberValenceElectrons;
    void SetMessages();
-   void CalcInertiaTensor(double** inertiaTensor, double* inertiaTensorOrigin);
-   void FreeInertiaTensorMoments(double*** inertiaTensor, double** inertiaMoments);
-   void Rotate(MolDS_base::EularAngle eularAngle, double* rotatingOrigin, RotatedObjectType rotatedObj);
-   void OutputPrincipalAxes(double** inertiaTensor, double* inertiaMoments);
+   void CalcInertiaTensor(double** inertiaTensor, 
+                          double const* inertiaTensorOrigin);
+   void FreeInertiaTensorMoments(double*** inertiaTensor, 
+                                 double** inertiaMoments);
+   void Rotate(MolDS_base::EularAngle eularAngle, 
+               const double* rotatingOrigin, 
+               RotatedObjectType rotatedObj);
+   void OutputPrincipalAxes(double const* const* inertiaTensor, 
+                            double const* inertiaMoments);
    void OutputInertiaTensorOrigin(double* inertiaTensorOrigin);
-   void OutputRotatingConditions(RotatingType rotatingType, double* rotatingOrigin, 
-                                 double* rotatingAxis, double rotatingAngle, 
+   void OutputRotatingConditions(RotatingType rotatingType, 
+                                 double const* rotatingOrigin, 
+                                 double const* rotatingAxis, 
+                                 double rotatingAngle, 
                                  MolDS_base::EularAngle rotatingEularAngles);
-   void OutputTranslatingConditions(double* translatingDifference);
+   void OutputTranslatingConditions(double const* translatingDifference);
    std::string messageTotalNumberAOs;
    std::string messageTotalNumberAtoms;
    std::string messageTotalNumberValenceElectrons;

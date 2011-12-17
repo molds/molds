@@ -2315,7 +2315,7 @@ double Mndo::GetNddoRepulsionIntegral(Atom* atomA, OrbitalType mu, OrbitalType n
    double DB=0.0;
    double rhoA = 0.0;
    double rhoB = 0.0;
-   double Rab = this->molecule->GetDistanceAtoms(atomA, atomB);
+   double Rab = this->molecule->GetDistanceAtoms(*atomA, *atomB);
    int lA = 0;
    int lB = 0;
    // (28) in [DT_1977]
@@ -2952,7 +2952,7 @@ double Mndo::GetNddoRepulsionIntegralFirstDerivative(
    double DB=0.0;
    double rhoA = 0.0;
    double rhoB = 0.0;
-   double Rab = this->molecule->GetDistanceAtoms(atomA, atomB);
+   double Rab = this->molecule->GetDistanceAtoms(*atomA, *atomB);
    double dRabDa = (atomA->GetXyz()[axisA] - atomB->GetXyz()[axisA])/Rab;
    int lA = 0;
    int lB = 0;
