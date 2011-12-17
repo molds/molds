@@ -10,11 +10,11 @@ public:
    double GetExponent(MolDS_base::STOnGType stonG, 
                       MolDS_base::ShellType shellType, 
                       OrbitalType orbitalType, 
-                      int index);
+                      int index) const;
    double GetCoefficient(MolDS_base::STOnGType stonG, 
                          MolDS_base::ShellType shellType, 
                          OrbitalType orbitalType, 
-                         int index);
+                         int index) const;
 
 private:
    static GTOExpansionSTO* gTOExpansionSTO;

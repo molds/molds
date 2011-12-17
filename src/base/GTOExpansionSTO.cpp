@@ -40,7 +40,7 @@ void GTOExpansionSTO::DeleteInstance(){
    gTOExpansionSTO = NULL;
 }
 
-double GTOExpansionSTO::GetExponent(STOnGType stonG, ShellType shellType, OrbitalType orbitalType, int index){
+double GTOExpansionSTO::GetExponent(STOnGType stonG, ShellType shellType, OrbitalType orbitalType, int index) const{
 
    AzimuthalType azimuthalType;
    if(orbitalType == s){
@@ -63,7 +63,7 @@ double GTOExpansionSTO::GetExponent(STOnGType stonG, ShellType shellType, Orbita
    return this->exponents[stonG][shellType][azimuthalType][index];
 }
 
-double GTOExpansionSTO::GetCoefficient(STOnGType stonG, ShellType shellType, OrbitalType orbitalType, int index){
+double GTOExpansionSTO::GetCoefficient(STOnGType stonG, ShellType shellType, OrbitalType orbitalType, int index) const{
 
    AzimuthalType azimuthalType;
    if(orbitalType == s){
