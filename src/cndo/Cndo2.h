@@ -9,9 +9,7 @@ class Cndo2{
 public:
    Cndo2();
    virtual ~Cndo2();
-   MolDS_base::TheoryType GetTheoryType() const;
    virtual void SetMolecule(MolDS_base::Molecule* molecule);
-   MolDS_base::Molecule* GetMolecule();
    void DoesSCF();
    void DoesSCF(bool requiresGuess);
    virtual void DoesCIS();
@@ -19,6 +17,8 @@ public:
    double*** GetForce(std::vector<int> elecStates);
    double GetElectronicEnergy(int elecState) const;
    double GetCoreRepulsionEnergy() const;
+   MolDS_base::Molecule* GetMolecule();
+   MolDS_base::TheoryType GetTheoryType() const;
 protected:
    std::string errorMessageAtomA;
    std::string errorMessageAtomB;
