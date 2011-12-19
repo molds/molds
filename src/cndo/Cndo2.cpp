@@ -230,21 +230,21 @@ void Cndo2::CalcCoreRepulsionEnergy(){
 }
 
 double Cndo2::GetDiatomCoreRepulsionEnergy(int indexAtomA, int indexAtomB) const{
-   Atom* atomA = (*this->molecule->GetAtomVect())[indexAtomA];
-   Atom* atomB = (*this->molecule->GetAtomVect())[indexAtomB];
+   const Atom& atomA = *(*this->molecule->GetAtomVect())[indexAtomA];
+   const Atom& atomB = *(*this->molecule->GetAtomVect())[indexAtomB];
    double distance = this->molecule->GetDistanceAtoms(indexAtomA, indexAtomB);
-   return atomA->GetCoreCharge()*atomB->GetCoreCharge()/distance; 
+   return atomA.GetCoreCharge()*atomB.GetCoreCharge()/distance; 
 }
 
 // First derivative of the core repulsion related to the coordinate of atom A.
 double Cndo2::GetDiatomCoreRepulsionFirstDerivative(int indexAtomA, int indexAtomB, 
                                                     CartesianType axisA) const{
    double value=0.0;
-   Atom* atomA = (*this->molecule->GetAtomVect())[indexAtomA];
-   Atom* atomB = (*this->molecule->GetAtomVect())[indexAtomB];
+   const Atom& atomA = *(*this->molecule->GetAtomVect())[indexAtomA];
+   const Atom& atomB = *(*this->molecule->GetAtomVect())[indexAtomB];
    double distance = this->molecule->GetDistanceAtoms(indexAtomA, indexAtomB);
-   value = atomA->GetCoreCharge()*atomB->GetCoreCharge();
-   value *= (atomA->GetXyz()[axisA] - atomB->GetXyz()[axisA])/distance;
+   value = atomA.GetCoreCharge()*atomB.GetCoreCharge();
+   value *= (atomA.GetXyz()[axisA] - atomB.GetXyz()[axisA])/distance;
    value *= -1.0/pow(distance,2.0);
    return value;
 }
@@ -783,8 +783,6 @@ double Cndo2::GetMolecularIntegralElement(int moI, int moJ, int moK, int moL,
                                           double const* const* fockMatrix, 
                                           double const* const* gammaAB) const{
    double value = 0.0;
-   Atom* atomA;
-   Atom* atomB;
    int firstAOIndexA;
    int firstAOIndexB;
    int numberAOsA;
@@ -792,14 +790,14 @@ double Cndo2::GetMolecularIntegralElement(int moI, int moJ, int moK, int moL,
    double gamma;
 
    for(int A=0; A<molecule.GetAtomVect()->size(); A++){
-      atomA = (*molecule.GetAtomVect())[A];
-      firstAOIndexA = atomA->GetFirstAOIndex();
-      numberAOsA = atomA->GetValence().size();
+      const Atom& atomA = *(*molecule.GetAtomVect())[A];
+      firstAOIndexA = atomA.GetFirstAOIndex();
+      numberAOsA = atomA.GetValence().size();
 
       for(int B=0; B<molecule.GetAtomVect()->size(); B++){
-         atomB = (*molecule.GetAtomVect())[B];
-         firstAOIndexB = atomB->GetFirstAOIndex();
-         numberAOsB = atomB->GetValence().size();
+         const Atom& atomB = *(*molecule.GetAtomVect())[B];
+         firstAOIndexB = atomB.GetFirstAOIndex();
+         numberAOsB = atomB.GetValence().size();
          gamma = gammaAB[A][B];
 
          for(int mu=firstAOIndexA; mu<firstAOIndexA+numberAOsA; mu++){
@@ -864,21 +862,21 @@ void Cndo2::CalcFockMatrix(double** fockMatrix,
                                                           molecule.GetTotalNumberAOs());
    #pragma omp parallel for schedule(auto)
    for(int A=0; A<molecule.GetAtomVect()->size(); A++){
-      Atom* atomA = (*molecule.GetAtomVect())[A];
-      int firstAOIndexA = atomA->GetFirstAOIndex();
-      int numberAOsA = atomA->GetValence().size();
+      const Atom& atomA = *(*molecule.GetAtomVect())[A];
+      int firstAOIndexA = atomA.GetFirstAOIndex();
+      int numberAOsA = atomA.GetValence().size();
 
       for(int B=A; B<molecule.GetAtomVect()->size(); B++){
-         Atom* atomB = (*molecule.GetAtomVect())[B];
-         int firstAOIndexB = atomB->GetFirstAOIndex();
-         int numberAOsB = atomB->GetValence().size();
+         const Atom& atomB = *(*molecule.GetAtomVect())[B];
+         int firstAOIndexB = atomB.GetFirstAOIndex();
+         int numberAOsB = atomB.GetValence().size();
 
          for(int mu=firstAOIndexA; mu<firstAOIndexA+numberAOsA; mu++){
             for(int nu=firstAOIndexB; nu<firstAOIndexB+numberAOsB; nu++){
 
                if(mu == nu){
                   // diagonal part
-                  fockMatrix[mu][mu] = this->GetFockDiagElement(*atomA, 
+                  fockMatrix[mu][mu] = this->GetFockDiagElement(atomA, 
                                                                 A, 
                                                                 mu, 
                                                                 molecule, 
@@ -890,8 +888,8 @@ void Cndo2::CalcFockMatrix(double** fockMatrix,
                }
                else if(mu < nu){
                   // upper right part
-                  fockMatrix[mu][nu] = this->GetFockOffDiagElement(*atomA, 
-                                                                   *atomB,
+                  fockMatrix[mu][nu] = this->GetFockOffDiagElement(atomA, 
+                                                                   atomB,
                                                                    A, 
                                                                    B, 
                                                                    mu, 
@@ -945,8 +943,8 @@ double Cndo2::GetFockDiagElement(const Atom& atomA,
       temp = 0.0;
       for(int BB=0; BB<molecule.GetAtomVect()->size(); BB++){
          if(BB != atomAIndex){
-            Atom* atomBB = (*molecule.GetAtomVect())[BB];
-            temp += ( atomicElectronPopulation[BB] - atomBB->GetCoreCharge()  )
+            const Atom& atomBB = *(*molecule.GetAtomVect())[BB];
+            temp += ( atomicElectronPopulation[BB] - atomBB.GetCoreCharge()  )
                      *gammaAB[atomAIndex][BB];
          }
       }
@@ -1047,15 +1045,15 @@ void Cndo2::CalcGammaAB(double** gammaAB, const Molecule& molecule) const{
    int totalAtomNumber = molecule.GetAtomVect()->size();
    #pragma omp parallel for schedule(auto)
    for(int A=0; A<totalAtomNumber; A++){
-      Atom* atomA = (*(molecule.GetAtomVect()))[A];
-      int na = atomA->GetValenceShellType() + 1;
-      double orbitalExponentA = atomA->GetOrbitalExponent(
-                                       atomA->GetValenceShellType(), s, this->theory);
+      const Atom& atomA = *(*molecule.GetAtomVect())[A];
+      int na = atomA.GetValenceShellType() + 1;
+      double orbitalExponentA = atomA.GetOrbitalExponent(
+                                      atomA.GetValenceShellType(), s, this->theory);
       for(int B=A; B<totalAtomNumber; B++){
-         Atom* atomB = (*(molecule.GetAtomVect()))[B];
-         int nb = atomB->GetValenceShellType() + 1;
-         double orbitalExponentB = atomB->GetOrbitalExponent(
-                                          atomB->GetValenceShellType(), s, this->theory);
+         const Atom& atomB = *(*molecule.GetAtomVect())[B];
+         int nb = atomB.GetValenceShellType() + 1;
+         double orbitalExponentB = atomB.GetOrbitalExponent(
+                                         atomB.GetValenceShellType(), s, this->theory);
 
          // inter nuclear distance
          double R = molecule.GetDistanceAtoms(A, B);
@@ -1159,14 +1157,14 @@ void Cndo2::CalcOverlap(double** overlap, const Molecule& molecule) const{
 
          #pragma omp for schedule(auto)
          for(int A=0; A<totalAtomNumber; A++){
-            Atom* atomA = (*(molecule.GetAtomVect()))[A];
+            const Atom& atomA = *(*molecule.GetAtomVect())[A];
             for(int B=A+1; B<totalAtomNumber; B++){
-               Atom* atomB = (*(molecule.GetAtomVect()))[B];
+               const Atom& atomB = *(*molecule.GetAtomVect())[B];
 
-               this->CalcDiatomicOverlapInDiatomicFrame(diatomicOverlap, *atomA, *atomB);
-               this->CalcRotatingMatrix(rotatingMatrix, *atomA, *atomB);
+               this->CalcDiatomicOverlapInDiatomicFrame(diatomicOverlap, atomA, atomB);
+               this->CalcRotatingMatrix(rotatingMatrix, atomA, atomB);
                this->RotateDiatmicOverlapToSpaceFrame(diatomicOverlap, rotatingMatrix);
-               this->SetOverlapElement(overlap, diatomicOverlap, *atomA, *atomB);
+               this->SetOverlapElement(overlap, diatomicOverlap, atomA, atomB);
 
             }
          }
@@ -1303,18 +1301,18 @@ void Cndo2::CalcOverlapByGTOExpansion(double** overlap,
 
    #pragma omp for schedule(auto)
    for(int A=0; A<totalAtomNumber; A++){
-      Atom* atomA = (*(molecule.GetAtomVect()))[A];
-      int firstAOIndexAtomA = atomA->GetFirstAOIndex();
+      const Atom& atomA = *(*molecule.GetAtomVect())[A];
+      int firstAOIndexAtomA = atomA.GetFirstAOIndex();
       for(int B=A+1; B<totalAtomNumber; B++){
-         Atom* atomB = (*(molecule.GetAtomVect()))[B];
-         int firstAOIndexAtomB = atomB->GetFirstAOIndex();
+         const Atom& atomB = *(*molecule.GetAtomVect())[B];
+         int firstAOIndexAtomB = atomB.GetFirstAOIndex();
 
-         for(int a=0; a<atomA->GetValence().size(); a++){
-            for(int b=0; b<atomB->GetValence().size(); b++){
+         for(int a=0; a<atomA.GetValence().size(); a++){
+            for(int b=0; b<atomB.GetValence().size(); b++){
          
                int mu = firstAOIndexAtomA + a;      
                int nu = firstAOIndexAtomB + b;      
-               double value = this->GetOverlapElementByGTOExpansion(*atomA, a, *atomB, b, stonG);
+               double value = this->GetOverlapElementByGTOExpansion(atomA, a, atomB, b, stonG);
                overlap[mu][nu] = value;
                overlap[nu][mu] = value;
             }
