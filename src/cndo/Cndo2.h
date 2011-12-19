@@ -58,10 +58,10 @@ protected:
    virtual void CalcHFProperties();
    double GetBondingAdjustParameterK(MolDS_base::ShellType shellA, 
                                      MolDS_base::ShellType shellB);
-   virtual double CalcDiatomCoreRepulsionEnergy(int indexAtomA, int indexAtomB);
+   virtual double GetDiatomCoreRepulsionEnergy(int indexAtomA, int indexAtomB) const;
    virtual double GetDiatomCoreRepulsionFirstDerivative(int indexAtomA, 
                                                         int indexAtomB, 
-                                                        MolDS_base::CartesianType axisA);
+                                                        MolDS_base::CartesianType axisA) const;
    double** orbitalElectronPopulation; //P_{\mu\nu} of (2.50) in J. A. Pople book.
    double*   atomicElectronPopulation; //P_{AB} of (3.21) in J. A. Pople book.
    double GetReducedOverlap(int na, int la, int m, 
@@ -125,10 +125,10 @@ protected:
    virtual void CalcTwoElecTwoCore(double****** twoElecTwoCore, 
                                    MolDS_base::Molecule* molecule);
    virtual void CalcForce(std::vector<int> elecStates);
-   virtual void OutputHFResults(double** fockMatrix, 
-                                double* energiesMO, 
-                                double* atomicElectronPopulation, 
-                                MolDS_base::Molecule* molecule);
+   virtual void OutputHFResults(double const* const* fockMatrix, 
+                                double const* energiesMO, 
+                                double const* atomicElectronPopulation, 
+                                const MolDS_base::Molecule& molecule) const;
    void CalcRotatingMatrixFirstDerivatives(double*** rMatFirstDeri, 
                                            MolDS_base_atoms::Atom* atomA,
                                            MolDS_base_atoms::Atom* atomB);

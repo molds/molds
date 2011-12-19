@@ -95,8 +95,8 @@ void Pm3Pddg::SetEnableAtomTypes(){
    this->enableAtomTypes.push_back(S);
 }
 
-double Pm3Pddg::CalcDiatomCoreRepulsionEnergy(int indexAtomA, int indexAtomB){
-   double energy = Pm3::CalcDiatomCoreRepulsionEnergy(indexAtomA, indexAtomB);
+double Pm3Pddg::GetDiatomCoreRepulsionEnergy(int indexAtomA, int indexAtomB) const{
+   double energy = Pm3::GetDiatomCoreRepulsionEnergy(indexAtomA, indexAtomB);
    Atom* atomA = (*this->molecule->GetAtomVect())[indexAtomA];
    Atom* atomB = (*this->molecule->GetAtomVect())[indexAtomB];
    double na = (double)(atomA->GetNumberValenceElectrons());
@@ -120,7 +120,7 @@ double Pm3Pddg::CalcDiatomCoreRepulsionEnergy(int indexAtomA, int indexAtomB){
 // This derivative is related to the coordinate of atomA.
 double Pm3Pddg::GetDiatomCoreRepulsionFirstDerivative(int atomAIndex,
                                                       int atomBIndex, 
-                                                      CartesianType axisA){
+                                                      CartesianType axisA) const{
    double value = Pm3::GetDiatomCoreRepulsionFirstDerivative(atomAIndex,
                                                              atomBIndex,
                                                              axisA);

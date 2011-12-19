@@ -92,8 +92,8 @@ void Am1::SetEnableAtomTypes(){
    this->enableAtomTypes.push_back(S);
 }
 
-double Am1::CalcDiatomCoreRepulsionEnergy(int indexAtomA, int indexAtomB){
-   double energy = Mndo::CalcDiatomCoreRepulsionEnergy(indexAtomA, indexAtomB);
+double Am1::GetDiatomCoreRepulsionEnergy(int indexAtomA, int indexAtomB) const{
+   double energy = Mndo::GetDiatomCoreRepulsionEnergy(indexAtomA, indexAtomB);
    Atom* atomA = (*this->molecule->GetAtomVect())[indexAtomA];
    Atom* atomB = (*this->molecule->GetAtomVect())[indexAtomB];
    double distance = this->molecule->GetDistanceAtoms(indexAtomA, indexAtomB);
@@ -119,7 +119,7 @@ double Am1::CalcDiatomCoreRepulsionEnergy(int indexAtomA, int indexAtomB){
 // This derivative is related to the coordinate of atomA.
 double Am1::GetDiatomCoreRepulsionFirstDerivative(int atomAIndex,
                                                   int atomBIndex, 
-                                                  CartesianType axisA){
+                                                  CartesianType axisA) const{
    double value = Mndo::GetDiatomCoreRepulsionFirstDerivative(atomAIndex,
                                                               atomBIndex,
                                                               axisA);
@@ -160,10 +160,10 @@ void Am1::CalcHFProperties(){
    MolDS_cndo::Cndo2::CalcHFProperties();
 }
 
-void Am1::OutputHFResults(double** fockMatrix, 
-                          double* energiesMO, 
-                          double* atomicElectronPopulation, 
-                          Molecule* molecule){
+void Am1::OutputHFResults(double const* const* fockMatrix, 
+                          double const* energiesMO, 
+                          double const* atomicElectronPopulation, 
+                          const Molecule& molecule) const{
    MolDS_cndo::Cndo2::OutputHFResults(fockMatrix, 
                                       energiesMO, 
                                       atomicElectronPopulation, 

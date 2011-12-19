@@ -223,13 +223,13 @@ void Cndo2::CalcCoreRepulsionEnergy(){
    double energy = 0.0;
    for(int i=0; i<this->molecule->GetAtomVect()->size(); i++){
       for(int j=i+1; j<this->molecule->GetAtomVect()->size(); j++){
-         energy += this->CalcDiatomCoreRepulsionEnergy(i, j);
+         energy += this->GetDiatomCoreRepulsionEnergy(i, j);
       }
    }
    this->coreRepulsionEnergy = energy;
 }
 
-double Cndo2::CalcDiatomCoreRepulsionEnergy(int indexAtomA, int indexAtomB){
+double Cndo2::GetDiatomCoreRepulsionEnergy(int indexAtomA, int indexAtomB) const{
    Atom* atomA = (*this->molecule->GetAtomVect())[indexAtomA];
    Atom* atomB = (*this->molecule->GetAtomVect())[indexAtomB];
    double distance = this->molecule->GetDistanceAtoms(indexAtomA, indexAtomB);
@@ -238,7 +238,7 @@ double Cndo2::CalcDiatomCoreRepulsionEnergy(int indexAtomA, int indexAtomB){
 
 // First derivative of the core repulsion related to the coordinate of atom A.
 double Cndo2::GetDiatomCoreRepulsionFirstDerivative(int indexAtomA, int indexAtomB, 
-                                                    CartesianType axisA){
+                                                    CartesianType axisA) const{
    double value=0.0;
    Atom* atomA = (*this->molecule->GetAtomVect())[indexAtomA];
    Atom* atomB = (*this->molecule->GetAtomVect())[indexAtomB];
@@ -345,7 +345,7 @@ void Cndo2::DoesSCF(bool requiresGuess){
             this->OutputHFResults(this->fockMatrix, 
                                   this->energiesMO, 
                                   this->atomicElectronPopulation, 
-                                  this->molecule);
+                                  *this->molecule);
             break;
          }
          else{
@@ -615,13 +615,16 @@ void Cndo2::DoesDamp(double rmsDensity, double** orbitalElectronPopulation,
 
 }
 
-void Cndo2::OutputHFResults(double** fockMatrix, double* energiesMO, double* atomicElectronPopulation, Molecule* molecule){
+void Cndo2::OutputHFResults(double const* const* fockMatrix, 
+                            double const* energiesMO, 
+                            double const* atomicElectronPopulation, 
+                            const Molecule& molecule) const{
    // output MO energy
    cout << this->messageEnergiesMOs;
    cout << this->messageEnergiesMOsTitle;
    double eV2AU = Parameters::GetInstance()->GetEV2AU();
-   for(int mo=0; mo<molecule->GetTotalNumberAOs(); mo++){
-      if(mo < molecule->GetTotalNumberValenceElectrons()/2){
+   for(int mo=0; mo<molecule.GetTotalNumberAOs(); mo++){
+      if(mo < molecule.GetTotalNumberValenceElectrons()/2){
          printf("\t\t %d\t%s\t%e\t%e \n",
          mo, this->messageOcc.c_str(), energiesMO[mo], energiesMO[mo]/eV2AU);
       }
@@ -648,15 +651,15 @@ void Cndo2::OutputHFResults(double** fockMatrix, double* energiesMO, double* ato
    // output Mulliken charge
    cout << messageMullikenAtoms;
    cout << messageMullikenAtomsTitle;
-   for(int a=0; a<molecule->GetAtomVect()->size(); a++){
-      Atom* atom = (*molecule->GetAtomVect())[a];
+   for(int a=0; a<molecule.GetAtomVect()->size(); a++){
+      Atom* atom = (*molecule.GetAtomVect())[a];
       printf("\t\t%d\t%s\t%e\t%e\n",a,AtomTypeStr(atom->GetAtomType()),atom->GetCoreCharge(),atom->GetCoreCharge()-atomicElectronPopulation[a]);
    }
    cout << endl;
 
    // output MOs
    if(0<Parameters::GetInstance()->GetIndecesMOPlot().size()){
-      MOLogger* moLogger = new MOLogger(*molecule, fockMatrix, this->theory);
+      MOLogger* moLogger = new MOLogger(molecule, fockMatrix, this->theory);
       moLogger->DrawMO(Parameters::GetInstance()->GetIndecesMOPlot());
       delete moLogger;
    }

@@ -134,7 +134,7 @@ void Mndo::SetEnableAtomTypes(){
    this->enableAtomTypes.push_back(S);
 }
 
-double Mndo::CalcDiatomCoreRepulsionEnergy(int indexAtomA, int indexAtomB){
+double Mndo::GetDiatomCoreRepulsionEnergy(int indexAtomA, int indexAtomB) const{
    Atom* atomA = (*this->molecule->GetAtomVect())[indexAtomA];
    Atom* atomB = (*this->molecule->GetAtomVect())[indexAtomB];
    double distance = this->molecule->GetDistanceAtoms(indexAtomA, indexAtomB);
@@ -161,7 +161,7 @@ double Mndo::CalcDiatomCoreRepulsionEnergy(int indexAtomA, int indexAtomB){
 // This derivative is related to the coordinate of atomA.
 double Mndo::GetDiatomCoreRepulsionFirstDerivative(int atomAIndex,
                                                    int atomBIndex, 
-                                                   CartesianType axisA){
+                                                   CartesianType axisA) const{
    double value =0.0;
    double ang2AU = Parameters::GetInstance()->GetAngstrom2AU();
    Atom* atomA = (*this->molecule->GetAtomVect())[atomAIndex];
@@ -224,10 +224,10 @@ void Mndo::CalcHFProperties(){
    this->CalcHeatsFormation(&this->heatsFormation, this->molecule);
 }
 
-void Mndo::OutputHFResults(double** fockMatrix, 
-                           double* energiesMO, 
-                           double* atomicElectronPopulation, 
-                           Molecule* molecule){
+void Mndo::OutputHFResults(double const* const* fockMatrix, 
+                           double const* energiesMO, 
+                           double const* atomicElectronPopulation, 
+                           const Molecule& molecule) const{
    MolDS_cndo::Cndo2::OutputHFResults(fockMatrix, 
                                       energiesMO, 
                                       atomicElectronPopulation, 
@@ -2309,7 +2309,7 @@ void Mndo::RotateTwoElecTwoCoreDiatomicFirstDerivativesToSpaceFramegc(double****
 // Orbital mu and nu belong atom A, 
 // orbital lambda and sigma belong atomB.
 double Mndo::GetNddoRepulsionIntegral(Atom* atomA, OrbitalType mu, OrbitalType nu,
-                                      Atom* atomB, OrbitalType lambda, OrbitalType sigma){
+                                      Atom* atomB, OrbitalType lambda, OrbitalType sigma) const{
    double value = 0.0;
    double DA=0.0;
    double DB=0.0;
@@ -2946,7 +2946,7 @@ double Mndo::GetNddoRepulsionIntegral(Atom* atomA, OrbitalType mu, OrbitalType n
 double Mndo::GetNddoRepulsionIntegralFirstDerivative(
                                        Atom* atomA, OrbitalType mu, OrbitalType nu,
                                        Atom* atomB, OrbitalType lambda, OrbitalType sigma,
-                                       CartesianType axisA){
+                                       CartesianType axisA) const{
    double value = 0.0;
    double DA=0.0;
    double DB=0.0;
@@ -3728,7 +3728,7 @@ double Mndo::GetSemiEmpiricalMultipoleInteraction(MultipoleType multipoleA,
                                                   double rhoB,
                                                   double DA,
                                                   double DB,
-                                                  double Rab){
+                                                  double Rab) const{
    double value = 0.0;
    double a = rhoA + rhoB;
 
@@ -3965,7 +3965,7 @@ double Mndo::GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                                                   double rhoB,
                                                   double DA,
                                                   double DB,
-                                                  double Rab){
+                                                  double Rab) const{
    double value = 0.0;
    double a = rhoA + rhoB;
 

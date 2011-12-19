@@ -23,15 +23,15 @@ protected:
    std::string errorMessageCalcZMatrixForceEtaNull;
    virtual void SetMessages();
    virtual void SetEnableAtomTypes();
-   virtual double CalcDiatomCoreRepulsionEnergy(int indexAtomA, int indexAtomB);
+   virtual double GetDiatomCoreRepulsionEnergy(int indexAtomA, int indexAtomB) const;
    virtual double GetDiatomCoreRepulsionFirstDerivative(int atomAIndex,
                                                         int atomBIndex, 
-                                                        MolDS_base::CartesianType axisA);
+                                                        MolDS_base::CartesianType axisA) const;
    virtual void CalcHFProperties();
-   virtual void OutputHFResults(double** fockMatrix, 
-                                double* energiesMO, 
-                                double* atomicElectronPopulation, 
-                                MolDS_base::Molecule* molecule);
+   virtual void OutputHFResults(double const* const* fockMatrix, 
+                                double const* energiesMO, 
+                                double const* atomicElectronPopulation, 
+                                const MolDS_base::Molecule& molecule) const;
    virtual double GetFockDiagElement(MolDS_base_atoms::Atom* atomA, 
                                      int atomAIndex, 
                                      int mu, 
@@ -74,12 +74,19 @@ protected:
                                               double** gammaAB);
    virtual void CalcCISMatrix(double** matrixCIS, int numberActiveOcc, int numberActiveVir);
    virtual void CalcForce(std::vector<int> elecStates);
-   double GetNddoRepulsionIntegral(MolDS_base_atoms::Atom* atomA, MolDS_base::OrbitalType mu, MolDS_base::OrbitalType nu,
-                                   MolDS_base_atoms::Atom* atomB, MolDS_base::OrbitalType lambda, MolDS_base::OrbitalType sigma);
-   double GetNddoRepulsionIntegralFirstDerivative(
-                                   MolDS_base_atoms::Atom* atomA, MolDS_base::OrbitalType mu, MolDS_base::OrbitalType nu,
-                                   MolDS_base_atoms::Atom* atomB, MolDS_base::OrbitalType lambda, MolDS_base::OrbitalType sigma,
-                                   MolDS_base::CartesianType axisA);
+   double GetNddoRepulsionIntegral(MolDS_base_atoms::Atom* atomA, 
+                                   MolDS_base::OrbitalType mu, 
+                                   MolDS_base::OrbitalType nu,
+                                   MolDS_base_atoms::Atom* atomB, 
+                                   MolDS_base::OrbitalType lambda, 
+                                   MolDS_base::OrbitalType sigma) const;
+   double GetNddoRepulsionIntegralFirstDerivative(MolDS_base_atoms::Atom* atomA, 
+                                                  MolDS_base::OrbitalType mu, 
+                                                  MolDS_base::OrbitalType nu,
+                                                  MolDS_base_atoms::Atom* atomB, 
+                                                  MolDS_base::OrbitalType lambda, 
+                                                  MolDS_base::OrbitalType sigma,
+                                                  MolDS_base::CartesianType axisA) const;
 private:
    std::string errorMessageMultipoleA;
    std::string errorMessageMultipoleB;
@@ -195,7 +202,7 @@ private:
                                                double rhoB,
                                                double DA,
                                                double DB,
-                                               double Rab);
+                                               double Rab) const;
    double GetSemiEmpiricalMultipoleInteractionFirstDerivative(
                                                MolDS_base::MultipoleType multipoleA,
                                                MolDS_base::MultipoleType multipoleB,
@@ -203,7 +210,7 @@ private:
                                                double rhoB,
                                                double DA,
                                                double DB,
-                                               double Rab);
+                                               double Rab) const;
    void FreeCalcForceTempMatrices(double**** overlapDer, 
                                   double****** twoElecTwoCoreFirstDeriv);
    void CalcForceHFElecCoreAttractionPart(double* force, 
