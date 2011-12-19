@@ -154,7 +154,7 @@ int LapackWrapper::Dsyevd(double** matrix, double* eigenValues, int size, bool c
  * The X is stored in b.
  *
  */
-int LapackWrapper::Dsysv(double** matrix, double* b, int size){
+int LapackWrapper::Dsysv(double const* const* matrix, double* b, int size){
    int info = 0;
    int lwork;
    char uplo = 'U';

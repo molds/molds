@@ -7,7 +7,7 @@ public:
    static LapackWrapper* GetInstance();
    static void DeleteInstance();
    int Dsyevd(double** matrix, double* eigenValues, int size, bool calcEigenVectors);
-   int Dsysv(double** matrix, double* b, int size);
+   int Dsysv(double const* const* matrix, double* b, int size);
 private:
    LapackWrapper();
    LapackWrapper(LapackWrapper&);
