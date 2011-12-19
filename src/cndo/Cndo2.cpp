@@ -165,10 +165,10 @@ TheoryType Cndo2::GetTheoryType(){
 
 void Cndo2::SetMolecule(Molecule* molecule){
    // check of number of valence electrons
-   this->CheckNumberValenceElectrons(molecule);
+   this->CheckNumberValenceElectrons(*molecule);
 
    // check enable atom type
-   this->CheckEnableAtomType(molecule);
+   this->CheckEnableAtomType(*molecule);
 
    // set molecule and malloc
    this->molecule = molecule;
@@ -192,17 +192,17 @@ Molecule* Cndo2::GetMolecule(){
    return this->molecule;
 }
 
-void Cndo2::CheckNumberValenceElectrons(Molecule* molecule){
-   if(molecule->GetTotalNumberValenceElectrons() % 2 == 1){
+void Cndo2::CheckNumberValenceElectrons(const Molecule& molecule) const{
+   if(molecule.GetTotalNumberValenceElectrons() % 2 == 1){
       stringstream ss;
-      ss << this->errorMessageOddTotalValenceElectrions << molecule->GetTotalNumberValenceElectrons() << "\n";
+      ss << this->errorMessageOddTotalValenceElectrions << molecule.GetTotalNumberValenceElectrons() << "\n";
       throw MolDSException(ss.str());
    }
 }
 
-void Cndo2::CheckEnableAtomType(Molecule* molecule){
-   for(int i=0; i<molecule->GetAtomVect()->size(); i++){
-      AtomType atomType = (*molecule->GetAtomVect())[i]->GetAtomType();
+void Cndo2::CheckEnableAtomType(const Molecule& molecule) const{
+   for(int i=0; i<molecule.GetAtomVect()->size(); i++){
+      AtomType atomType = (*molecule.GetAtomVect())[i]->GetAtomType();
       bool enable = false;
       for(int j=0; j<this->enableAtomTypes.size(); j++){
          if(atomType == this->enableAtomTypes[j]){
@@ -354,7 +354,7 @@ void Cndo2::DoesSCF(bool requiresGuess){
                this->DoesDamp(rmsDensity, 
                               this->orbitalElectronPopulation, 
                               oldOrbitalElectronPopulation, 
-                              this->molecule);
+                              *this->molecule);
            
                // diis 
                this->DoesDIIS(this->orbitalElectronPopulation,
@@ -364,7 +364,7 @@ void Cndo2::DoesSCF(bool requiresGuess){
                               diisErrorProducts,
                               diisErrorCoefficients,
                               diisNumErrorVect,
-                              this->molecule,
+                              *this->molecule,
                               i);
             }
          }
@@ -411,11 +411,11 @@ void Cndo2::CalcHFProperties(){
                                       *this->molecule);
    this->CalcCoreRepulsionEnergy();
    this->CalcElecHFEnergy(&this->elecHFEnergy, 
-                        this->molecule, 
-                        this->energiesMO, 
-                        this->fockMatrix, 
-                        this->gammaAB,
-                        this->coreRepulsionEnergy);
+                          *this->molecule, 
+                          this->energiesMO, 
+                          this->fockMatrix, 
+                          this->gammaAB,
+                          this->coreRepulsionEnergy);
 }
 
 double Cndo2::GetBondingAdjustParameterK(ShellType shellA, ShellType shellB) const{
@@ -487,7 +487,7 @@ void Cndo2::FreeSCFTemporaryMatrices(double*** oldOrbitalElectronPopulation,
                                      double**** diisStoredDensityMatrix,
                                      double**** diisStoredErrorVect,
                                      double*** diisErrorProducts,
-                                     double** diisErrorCoefficients){
+                                     double** diisErrorCoefficients) const{
 
    int diisNumErrorVect = Parameters::GetInstance()->GetDiisNumErrorVectSCF();
    if(*oldOrbitalElectronPopulation != NULL){
@@ -524,15 +524,15 @@ void Cndo2::FreeSCFTemporaryMatrices(double*** oldOrbitalElectronPopulation,
  *
  */
 void Cndo2::DoesDIIS(double** orbitalElectronPopulation,
-                     double** oldOrbitalElectronPopulation,
+                     double const* const* oldOrbitalElectronPopulation,
                      double*** diisStoredDensityMatrix,
                      double*** diisStoredErrorVect,
                      double** diisErrorProducts,
                      double* diisErrorCoefficients,
                      int diisNumErrorVect,
-                     Molecule* molecule,
-                     int step){
-   int totalNumberAOs = molecule->GetTotalNumberAOs();
+                     const Molecule& molecule,
+                     int step) const{
+   int totalNumberAOs = molecule.GetTotalNumberAOs();
    double diisStartError = Parameters::GetInstance()->GetDiisStartErrorSCF();
    double diisEndError = Parameters::GetInstance()->GetDiisEndErrorSCF();
 
@@ -600,13 +600,15 @@ void Cndo2::DoesDIIS(double** orbitalElectronPopulation,
    }
 }
 
-void Cndo2::DoesDamp(double rmsDensity, double** orbitalElectronPopulation, 
-                     double** oldOrbitalElectronPopulation, Molecule* molecule){
+void Cndo2::DoesDamp(double rmsDensity, 
+                     double** orbitalElectronPopulation, 
+                     double const* const* oldOrbitalElectronPopulation, 
+                     const Molecule& molecule) const{
    double dampingThresh = Parameters::GetInstance()->GetDampingThreshSCF();
    double dampingWeight = Parameters::GetInstance()->GetDampingWeightSCF();
    if(0.0 < dampingWeight && dampingThresh < rmsDensity){
-      for(int j=0; j<molecule->GetTotalNumberAOs(); j++){
-         for(int k=0; k<molecule->GetTotalNumberAOs(); k++){
+      for(int j=0; j<molecule.GetTotalNumberAOs(); j++){
+         for(int k=0; k<molecule.GetTotalNumberAOs(); k++){
             orbitalElectronPopulation[j][k] *= (1.0 - dampingWeight);
             orbitalElectronPopulation[j][k] += dampingWeight*oldOrbitalElectronPopulation[j][k];
          }
@@ -666,27 +668,28 @@ void Cndo2::OutputHFResults(double const* const* fockMatrix,
 }
 
 void Cndo2::CalcElecHFEnergy(double* elecHFEnergy, 
-                           Molecule* molecule, 
-                           double* energiesMO, 
-                           double** fockMatrix, 
-                           double** gammaAB, 
-                           double coreRepulsionEnergy){
+                             const Molecule& molecule, 
+                             double const* energiesMO, 
+                             double const* const* fockMatrix, 
+                             double const* const* gammaAB, 
+                             double coreRepulsionEnergy) const{
    double electronicEnergy = 0.0;
    // use density matrix for electronic energy
    int totalNumberAOs = this->molecule->GetTotalNumberAOs();
-   double** fMatrix = MallocerFreer::GetInstance()->MallocDoubleMatrix2d
-                       (totalNumberAOs, totalNumberAOs);
-   double** hMatrix = MallocerFreer::GetInstance()->MallocDoubleMatrix2d
-                       (totalNumberAOs, totalNumberAOs);
-   double** dammyOrbitalElectronPopulation  = MallocerFreer::GetInstance()->MallocDoubleMatrix2d
-                       (totalNumberAOs, totalNumberAOs);
-   double* dammyAtomicElectronPopulation  = MallocerFreer::GetInstance()->MallocDoubleMatrix1d
-                       (molecule->GetAtomVect()->size());
+   double** fMatrix = MallocerFreer::GetInstance()->MallocDoubleMatrix2d(totalNumberAOs, 
+                                                                         totalNumberAOs);
+   double** hMatrix = MallocerFreer::GetInstance()->MallocDoubleMatrix2d(totalNumberAOs, 
+                                                                         totalNumberAOs);
+   double** dammyOrbitalElectronPopulation  = MallocerFreer::GetInstance()->MallocDoubleMatrix2d(
+                                                                            totalNumberAOs, 
+                                                                            totalNumberAOs);
+   double* dammyAtomicElectronPopulation  = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(
+                                                                          molecule.GetAtomVect()->size());
 
    try{
       bool isGuess = false;
       this->CalcFockMatrix(fMatrix, 
-                           *this->molecule, 
+                           molecule, 
                            this->overlap, 
                            this->gammaAB,
                            this->orbitalElectronPopulation, 
@@ -694,7 +697,7 @@ void Cndo2::CalcElecHFEnergy(double* elecHFEnergy,
                            this->twoElecTwoCore,
                            isGuess);
       this->CalcFockMatrix(hMatrix, 
-                           *this->molecule, 
+                           molecule, 
                            this->overlap, 
                            this->gammaAB,
                            dammyOrbitalElectronPopulation, 
@@ -719,24 +722,24 @@ void Cndo2::CalcElecHFEnergy(double* elecHFEnergy,
    }
    catch(MolDSException ex){
       this->FreeElecEnergyMatrices(&fMatrix, 
-                                    &hMatrix, 
-                                    &dammyOrbitalElectronPopulation, 
-                                    &dammyAtomicElectronPopulation );
+                                   &hMatrix, 
+                                   &dammyOrbitalElectronPopulation, 
+                                   &dammyAtomicElectronPopulation );
       throw ex;
    }
    this->FreeElecEnergyMatrices(&fMatrix, 
-                                 &hMatrix, 
-                                 &dammyOrbitalElectronPopulation, 
-                                 &dammyAtomicElectronPopulation );
+                                &hMatrix, 
+                                &dammyOrbitalElectronPopulation, 
+                                &dammyAtomicElectronPopulation );
 
    // use two electrons integrals for electronic energy
    /*
-   for(int mo=0; mo<molecule->GetTotalNumberValenceElectrons()/2; mo++){
+   for(int mo=0; mo<molecule.GetTotalNumberValenceElectrons()/2; mo++){
       electronicEnergy += 2.0*energiesMO[mo];
    }
 
-   for(int moA=0; moA<molecule->GetTotalNumberValenceElectrons()/2; moA++){
-      for(int moB=0; moB<molecule->GetTotalNumberValenceElectrons()/2; moB++){
+   for(int moA=0; moA<molecule.GetTotalNumberValenceElectrons()/2; moA++){
+      for(int moB=0; moB<molecule.GetTotalNumberValenceElectrons()/2; moB++){
 
          electronicEnergy -= 2.0*this->GetMolecularIntegralElement(moA, moA, moB, moB, 
                                                               molecule, fockMatrix, gammaAB);
@@ -750,9 +753,9 @@ void Cndo2::CalcElecHFEnergy(double* elecHFEnergy,
 }
 
 void Cndo2::FreeElecEnergyMatrices(double*** fMatrix, 
-                                    double*** hMatrix, 
-                                    double*** dammyOrbitalElectronPopulation, 
-                                    double**  dammyAtomicElectronPopulation ){
+                                   double*** hMatrix, 
+                                   double*** dammyOrbitalElectronPopulation, 
+                                   double**  dammyAtomicElectronPopulation ) const{
    int totalNumberAOs = this->molecule->GetTotalNumberAOs();
    if(*fMatrix != NULL){
       MallocerFreer::GetInstance()->FreeDoubleMatrix2d(fMatrix, totalNumberAOs);

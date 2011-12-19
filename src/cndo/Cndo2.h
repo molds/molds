@@ -239,36 +239,36 @@ private:
    double GetAuxiliaryBFirstDerivative(int k, double rho) const;
    void DoesDamp(double rmsDensity, 
                  double** orbitalElectronPopulation, 
-                 double** oldOrbitalElectronPopulation, 
-                 MolDS_base::Molecule* molecule);
+                 double const* const* oldOrbitalElectronPopulation, 
+                 const MolDS_base::Molecule& molecule) const;
    void DoesDIIS(double** orbitalElectronPopulation,
-                 double** oldOrbitalElectronPopulation,
+                 double const* const* oldOrbitalElectronPopulation,
                  double*** diisStoredDensityMatrix,
                  double*** diisStoredErrorVect,
                  double** diisErrorProducts,
                  double* diisErrorCoefficients,
                  int diisNumErrorVect,
-                 MolDS_base::Molecule* molecule, 
-                 int step);
-   void CheckEnableAtomType(MolDS_base::Molecule* molecule);
-   void CheckNumberValenceElectrons(MolDS_base::Molecule* molecule);
+                 const MolDS_base::Molecule& molecule, 
+                 int step) const;
+   void CheckEnableAtomType(const MolDS_base::Molecule& molecule) const;
+   void CheckNumberValenceElectrons(const MolDS_base::Molecule& molecule) const;
    void FreeDiatomicOverlapAndRotatingMatrix(double*** diatomicOverlap, 
                                              double*** rotatingMatrix) const;
    void CalcElecHFEnergy(double* elecHFEnergy, 
-                       MolDS_base::Molecule* molecule, 
-                       double* energiesMO, 
-                       double** fockMatrix, 
-                       double** gammaAB, 
-                       double coreRepulsionEnergy);
+                         const MolDS_base::Molecule& molecule, 
+                         double const* energiesMO, 
+                         double const* const* fockMatrix, 
+                         double const* const* gammaAB, 
+                         double coreRepulsionEnergy) const;
    void FreeElecEnergyMatrices(double*** fMatrix, 
                                double*** hMatrix, 
                                double*** dammyOrbitalElectronPopulation, 
-                               double**  dammyAtomicElectronPopulation );
+                               double**  dammyAtomicElectronPopulation ) const;
    void FreeSCFTemporaryMatrices(double*** oldOrbitalElectronPopulation,
                                  double**** diisStoredDensityMatrix,
                                  double**** diisStoredErrorVect,
                                  double*** diisErrorProducts,
-                                 double** diisErrorCoefficients);
+                                 double** diisErrorCoefficients) const;
 };
 
 
