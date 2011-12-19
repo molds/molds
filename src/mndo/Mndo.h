@@ -64,7 +64,8 @@ protected:
    virtual double GetExchangeInt(MolDS_base::OrbitalType orbital1, 
                                  MolDS_base::OrbitalType orbital2, 
                                  const MolDS_base_atoms::Atom& atom) const; 
-   virtual void CalcTwoElecTwoCore(double****** twoElecTwoCore, MolDS_base::Molecule* molecule);
+   virtual void CalcTwoElecTwoCore(double****** twoElecTwoCore, 
+                                   const MolDS_base::Molecule& molecule) const;
    virtual double GetMolecularIntegralElement(int moI, 
                                               int moJ, 
                                               int moK, 
@@ -226,31 +227,31 @@ private:
    void CalcForceHFOverlapPart(double* force, 
                                int atomAIndex,
                                int atomBIndex,
-                               double*** overlapDer);
+                               double const* const* const* overlapDer) const;
    void CalcForceHFTwoElecPart(double* force, 
                                int atomAIndex,
                                int atomBIndex,
-                               double***** twoElecTwoCoreFirstDeriv);
+                               double const* const* const* const* const* twoElecTwoCoreFirstDeriv) const;
    void CalcForceExcitedStaticPart(double* force, 
                                    int elecStateIndex,
                                    int atomAIndex,
                                    int atomBIndex,
-                                   double***** twoElecTwoCoreFirstDeriv);
+                                   double const* const* const* const* const* twoElecTwoCoreFirstDeriv) const;
    void CalcForceExcitedElecCoreAttractionPart(double* force, 
                                                int elecStateIndex,
                                                int atomAIndex,
                                                int atomBIndex,
-                                               double***** twoElecTwoCoreFirstDeriv);
+                                               double const* const* const* const* const* twoElecTwoCoreFirstDeriv) const;
    void CalcForceExcitedOverlapPart(double* force, 
                                     int elecStateIndex,
                                     int atomAIndex,
                                     int atomBIndex,
-                                    double*** overlapDer);
+                                    double const* const* const* overlapDer) const;
    void CalcForceExcitedTwoElecPart(double* force, 
                                     int elecStateIndex,
                                     int atomAIndex,
                                     int atomBIndex,
-                                    double***** twoElecTwoCoreFirstDeriv);
+                                    double const* const* const* const* const* twoElecTwoCoreFirstDeriv) const;
 
 };
 

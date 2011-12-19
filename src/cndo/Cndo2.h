@@ -122,7 +122,7 @@ protected:
                                               double const* const* fockMatrix, 
                                               double const* const* gammaAB) const;
    virtual void CalcTwoElecTwoCore(double****** twoElecTwoCore, 
-                                   MolDS_base::Molecule* molecule);
+                                   const MolDS_base::Molecule& molecule) const;
    virtual void CalcForce(std::vector<int> elecStates);
    virtual void OutputHFResults(double const* const* fockMatrix, 
                                 double const* energiesMO, 

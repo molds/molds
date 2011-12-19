@@ -290,7 +290,7 @@ void Cndo2::DoesSCF(bool requiresGuess){
       // calculate electron integral
       this->CalcGammaAB(this->gammaAB, *this->molecule);
       this->CalcOverlap(this->overlap, *this->molecule);
-      this->CalcTwoElecTwoCore(this->twoElecTwoCore, this->molecule);
+      this->CalcTwoElecTwoCore(this->twoElecTwoCore, *this->molecule);
 
       // SCF
       double rmsDensity;
@@ -472,7 +472,8 @@ double** Cndo2::GetForce(int elecState){
    return this->matrixForce[0];
 }
 
-void Cndo2::CalcTwoElecTwoCore(double****** twoElecTwoCore, Molecule* molecule){
+void Cndo2::CalcTwoElecTwoCore(double****** twoElecTwoCore, 
+                               const Molecule& molecule) const{
    // do nothing for CNDO, INDO, and ZINDO/S.
    // two electron two core integrals are needed for CNDO, INDO, and ZINDO/S.
 }

@@ -1614,7 +1614,7 @@ void Mndo::CalcForceHFElecCoreAttractionPart(double* force,
 void Mndo::CalcForceHFOverlapPart(double* force, 
                                   int atomAIndex, 
                                   int atomBIndex,
-                                  double*** overlapDer){
+                                  double const* const* const* overlapDer) const{
    Atom* atomA = (*this->molecule->GetAtomVect())[atomAIndex];
    Atom* atomB = (*this->molecule->GetAtomVect())[atomBIndex];
    int firstAOIndexA = atomA->GetFirstAOIndex();
@@ -1643,7 +1643,7 @@ void Mndo::CalcForceHFOverlapPart(double* force,
 void Mndo::CalcForceHFTwoElecPart(double* force, 
                                   int atomAIndex, 
                                   int atomBIndex,
-                                  double***** twoElecTwoCoreFirstDeriv){
+                                  double const* const* const* const* const* twoElecTwoCoreFirstDeriv) const{
    Atom* atomA = (*this->molecule->GetAtomVect())[atomAIndex];
    Atom* atomB = (*this->molecule->GetAtomVect())[atomBIndex];
    int firstAOIndexA = atomA->GetFirstAOIndex();
@@ -1682,7 +1682,7 @@ void Mndo::CalcForceExcitedStaticPart(double* force,
                                       int elecStateIndex,
                                       int atomAIndex, 
                                       int atomBIndex,
-                                      double***** twoElecTwoCoreFirstDeriv){
+                                      double const* const* const* const* const* twoElecTwoCoreFirstDeriv) const{
    Atom* atomA = (*this->molecule->GetAtomVect())[atomAIndex];
    Atom* atomB = (*this->molecule->GetAtomVect())[atomBIndex];
    int firstAOIndexA = atomA->GetFirstAOIndex();
@@ -1715,7 +1715,7 @@ void Mndo::CalcForceExcitedElecCoreAttractionPart(double* force,
                                                   int elecStateIndex,
                                                   int atomAIndex, 
                                                   int atomBIndex,
-                                                  double***** twoElecTwoCoreFirstDeriv){
+                                                  double const* const* const* const* const* twoElecTwoCoreFirstDeriv) const{
    Atom* atomA = (*this->molecule->GetAtomVect())[atomAIndex];
    int firstAOIndexA = atomA->GetFirstAOIndex();
    int numberAOsA = atomA->GetValence().size();
@@ -1740,7 +1740,7 @@ void Mndo::CalcForceExcitedOverlapPart(double* force,
                                        int elecStateIndex,
                                        int atomAIndex, 
                                        int atomBIndex,
-                                       double*** overlapDer){
+                                       double const* const* const* overlapDer) const{
    Atom* atomA = (*this->molecule->GetAtomVect())[atomAIndex];
    Atom* atomB = (*this->molecule->GetAtomVect())[atomBIndex];
    int firstAOIndexA = atomA->GetFirstAOIndex();
@@ -1770,7 +1770,7 @@ void Mndo::CalcForceExcitedTwoElecPart(double* force,
                                        int elecStateIndex,
                                        int atomAIndex, 
                                        int atomBIndex,
-                                       double***** twoElecTwoCoreFirstDeriv){
+                                       double const* const* const* const* const* twoElecTwoCoreFirstDeriv) const{
    Atom* atomA = (*this->molecule->GetAtomVect())[atomAIndex];
    Atom* atomB = (*this->molecule->GetAtomVect())[atomBIndex];
    int firstAOIndexA = atomA->GetFirstAOIndex();
@@ -1965,7 +1965,8 @@ void Mndo::FreeCalcForceTempMatrices(double**** overlapDer, double****** twoElec
    }
 }
 
-void Mndo::CalcTwoElecTwoCore(double****** twoElecTwoCore, Molecule* molecule){
+void Mndo::CalcTwoElecTwoCore(double****** twoElecTwoCore, 
+                              const Molecule& molecule) const{
    if(twoElecTwoCore == NULL){
       stringstream ss;
       ss << this->errorMessageCalcTwoElecTwoCoreNullMatrix;
@@ -1973,8 +1974,8 @@ void Mndo::CalcTwoElecTwoCore(double****** twoElecTwoCore, Molecule* molecule){
    }
    else{
       MallocerFreer::GetInstance()->InitializeDoubleMatrix6d(twoElecTwoCore, 
-                                                      molecule->GetAtomVect()->size(),
-                                                      molecule->GetAtomVect()->size(),
+                                                      molecule.GetAtomVect()->size(),
+                                                      molecule.GetAtomVect()->size(),
                                                       dxy, dxy, dxy, dxy);
    } 
 
@@ -1985,8 +1986,8 @@ void Mndo::CalcTwoElecTwoCore(double****** twoElecTwoCore, Molecule* molecule){
       try{
          // note that terms with condition a==b are not needed to calculate. 
          #pragma omp for schedule(auto)
-         for(int a=0; a<molecule->GetAtomVect()->size(); a++){
-            for(int b=a+1; b<molecule->GetAtomVect()->size(); b++){
+         for(int a=0; a<molecule.GetAtomVect()->size(); a++){
+            for(int b=a+1; b<molecule.GetAtomVect()->size(); b++){
                this->CalcTwoElecTwoCoreDiatomic(twoElecTwoCoreDiatomic, a, b);
                for(int mu=0; mu<dxy; mu++){
                   for(int nu=mu; nu<dxy; nu++){
