@@ -62,7 +62,9 @@ protected:
                                               const MolDS_base::Molecule& molecule, 
                                               double const* const* fockMatrix, 
                                               double const* const* gammaAB) const;
-   virtual void CalcCISMatrix(double** matrixCIS, int numberActiveOcc, int numberActiveVir) const;
+   virtual void CalcCISMatrix(double** matrixCIS, 
+                              int numberActiveOcc, 
+                              int numberActiveVir) const;
    virtual void CalcForce(std::vector<int> elecStates);
    int GetSlaterDeterminantIndex(int activeOccIndex, int activeVirIndex) const;
    void CheckMatrixForce(std::vector<int> elecStates);
@@ -120,7 +122,7 @@ private:
                               int interactionMatrixDimension) const;
    void FreeDavidsonCISTemporaryMtrices(double*** expansionVectors, 
                                         double** residualVector, 
-                                        double** ritzVector);
+                                        double** ritzVector) const;
    void FreeDavidsonRoopCISTemporaryMtrices(double*** interactionMatrix, 
                                             double interactionMatrixDimension, 
                                             double** interactionEigenEnergies) const;

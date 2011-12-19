@@ -1112,7 +1112,7 @@ void ZindoS::DoesCISDavidson(){
 
 void ZindoS::FreeDavidsonCISTemporaryMtrices(double*** expansionVectors, 
                                              double** residualVector, 
-                                             double** ritzVector){
+                                             double** ritzVector) const{
    if(*expansionVectors != NULL){
       MallocerFreer::GetInstance()->FreeDoubleMatrix2d(expansionVectors, 
                                                        this->matrixCISdimension);
