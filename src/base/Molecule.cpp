@@ -118,7 +118,6 @@ double* Molecule::GetXyzCOC(){
 
 void Molecule::CalcXyzCOM(){
    double totalAtomicMass = 0.0;
-   Atom* atom;
    double* atomicXyz;
    double atomicMass = 0.0;
 
@@ -127,9 +126,9 @@ void Molecule::CalcXyzCOM(){
    }
       
    for(int i=0; i<this->atomVect->size(); i++){
-      atom = (*this->atomVect)[i]; 
-      atomicXyz = atom->GetXyz();
-      atomicMass = atom->GetAtomicMass();
+      const Atom& atom = *(*this->atomVect)[i]; 
+      atomicXyz = atom.GetXyz();
+      atomicMass = atom.GetAtomicMass();
       totalAtomicMass += atomicMass;
       for(int j=0; j<3; j++){
          this->xyzCOM[j] += atomicXyz[j] * atomicMass;
@@ -143,7 +142,6 @@ void Molecule::CalcXyzCOM(){
 
 void Molecule::CalcXyzCOC(){
    double totalCoreMass = 0.0;
-   Atom* atom;
    double* atomicXyz;
    double coreMass = 0.0;
 
@@ -152,9 +150,9 @@ void Molecule::CalcXyzCOC(){
    }
       
    for(int i=0; i<this->atomVect->size(); i++){
-      atom = (*this->atomVect)[i]; 
-      atomicXyz = atom->GetXyz();
-      coreMass = atom->GetAtomicMass() - (double)atom->GetNumberValenceElectrons();
+      const Atom& atom = *(*this->atomVect)[i]; 
+      atomicXyz = atom.GetXyz();
+      coreMass = atom.GetAtomicMass() - (double)atom.GetNumberValenceElectrons();
       totalCoreMass += coreMass;
       for(int j=0; j<3; j++){
          this->xyzCOC[j] += atomicXyz[j] * coreMass;
@@ -194,17 +192,17 @@ void Molecule::OutputConfiguration() const{
    cout << this->messageConfiguration;
    cout << this->messageConfigurationTitleAng;
    for(int a=0; a<this->atomVect->size(); a++){
-      Atom* atom = (*this->atomVect)[a];
-      printf("\t\t%d\t%s\t%e\t%e\t%e\n",a,AtomTypeStr(atom->GetAtomType()),
-            atom->GetXyz()[0]/ang2AU, atom->GetXyz()[1]/ang2AU, atom->GetXyz()[2]/ang2AU);
+      const Atom& atom = *(*this->atomVect)[a];
+      printf("\t\t%d\t%s\t%e\t%e\t%e\n",a,AtomTypeStr(atom.GetAtomType()),
+            atom.GetXyz()[0]/ang2AU, atom.GetXyz()[1]/ang2AU, atom.GetXyz()[2]/ang2AU);
    }
    cout << "\n";
 
    cout << this->messageConfigurationTitleAU;
    for(int a=0; a<this->atomVect->size(); a++){
-      Atom* atom = (*this->atomVect)[a];
-      printf("\t\t%d\t%s\t%e\t%e\t%e\n",a,AtomTypeStr(atom->GetAtomType()),
-            atom->GetXyz()[0], atom->GetXyz()[1], atom->GetXyz()[2]);
+      const Atom& atom = *(*this->atomVect)[a];
+      printf("\t\t%d\t%s\t%e\t%e\t%e\n",a,AtomTypeStr(atom.GetAtomType()),
+            atom.GetXyz()[0], atom.GetXyz()[1], atom.GetXyz()[2]);
    }
    cout << "\n";
 
@@ -218,19 +216,19 @@ void Molecule::OutputMomenta() const{
    cout << this->messageMomenta;
    cout << this-> messageMomentaTitleGAngMolinFsin;
    for(int a=0; a<this->atomVect->size(); a++){
-      Atom* atom = (*this->atomVect)[a];
-      printf("\t\t%d\t%s\t%e\t%e\t%e\n",a,AtomTypeStr(atom->GetAtomType()),
-            atom->GetPxyz()[0]/momentumUnit2AU, 
-            atom->GetPxyz()[1]/momentumUnit2AU, 
-            atom->GetPxyz()[2]/momentumUnit2AU);
+      const Atom& atom = *(*this->atomVect)[a];
+      printf("\t\t%d\t%s\t%e\t%e\t%e\n",a,AtomTypeStr(atom.GetAtomType()),
+            atom.GetPxyz()[0]/momentumUnit2AU, 
+            atom.GetPxyz()[1]/momentumUnit2AU, 
+            atom.GetPxyz()[2]/momentumUnit2AU);
    }
    cout << "\n";
 
    cout << this->messageMomentaTitleAU;
    for(int a=0; a<this->atomVect->size(); a++){
-      Atom* atom = (*this->atomVect)[a];
-      printf("\t\t%d\t%s\t%e\t%e\t%e\n",a,AtomTypeStr(atom->GetAtomType()),
-            atom->GetPxyz()[0], atom->GetPxyz()[1], atom->GetPxyz()[2]);
+      const Atom& atom = *(*this->atomVect)[a];
+      printf("\t\t%d\t%s\t%e\t%e\t%e\n",a,AtomTypeStr(atom.GetAtomType()),
+            atom.GetPxyz()[0], atom.GetPxyz()[1], atom.GetPxyz()[2]);
    }
    cout << "\n";
 
@@ -360,17 +358,16 @@ void Molecule::CalcPrincipalAxes(){
 
 void Molecule::CalcInertiaTensor(double** inertiaTensor, const double* inertiaTensorOrigin){
 
-   Atom* atom;
    double x;
    double y;
    double z;
    double atomicMass;
    for(int a=0; a<this->atomVect->size(); a++){
-      atom = (*this->atomVect)[a];
-      atomicMass = atom->GetAtomicMass();
-      x = atom->GetXyz()[0] - inertiaTensorOrigin[0];
-      y = atom->GetXyz()[1] - inertiaTensorOrigin[1];
-      z = atom->GetXyz()[2] - inertiaTensorOrigin[2];
+      const Atom& atom = *(*this->atomVect)[a];
+      atomicMass = atom.GetAtomicMass();
+      x = atom.GetXyz()[0] - inertiaTensorOrigin[0];
+      y = atom.GetXyz()[1] - inertiaTensorOrigin[1];
+      z = atom.GetXyz()[2] - inertiaTensorOrigin[2];
 
       inertiaTensor[0][0] += atomicMass*(y*y + z*z);
       inertiaTensor[0][1] -= atomicMass*x*y;
@@ -493,17 +490,16 @@ void Molecule::Rotate(EularAngle eularAngle, const double* rotatingOrigin, Rotat
    }
 
    double rotatedXyz[3];
-   Atom* atom;
    for(int i=0; i<this->atomVect->size(); i++){
-         atom = (*this->atomVect)[i]; 
+         const Atom& atom = *(*this->atomVect)[i]; 
          for(int j=0; j<3; j++){
             rotatedXyz[j] = 0.0;
             for(int k=0; k<3; k++){
-               rotatedXyz[j] += temp2[j][k] * (atom->GetXyz()[k] - rotatingOrigin[k]);
+               rotatedXyz[j] += temp2[j][k] * (atom.GetXyz()[k] - rotatingOrigin[k]);
             }
          }
          for(int j=0; j<3; j++){
-            atom->GetXyz()[j] = rotatedXyz[j] + rotatingOrigin[j];
+            atom.GetXyz()[j] = rotatedXyz[j] + rotatingOrigin[j];
          }
    }
 }
@@ -570,12 +566,11 @@ void Molecule::Translate(){
 
    this->OutputTranslatingConditions(Parameters::GetInstance()->GetTranslatingDifference()); 
 
-   Atom* atom;
    for(int i=0; i<this->atomVect->size(); i++){
-         atom = (*this->atomVect)[i]; 
-         atom->GetXyz()[0] += x;
-         atom->GetXyz()[1] += y;
-         atom->GetXyz()[2] += z;
+         const Atom& atom = *(*this->atomVect)[i]; 
+         atom.GetXyz()[0] += x;
+         atom.GetXyz()[1] += y;
+         atom.GetXyz()[2] += z;
    }
    
    this->wasCalculatedXyzCOM = false;
@@ -608,9 +603,9 @@ void Molecule::OutputTranslatingConditions(double const* translatingDifference) 
 }
 
 double Molecule::GetDistanceAtoms(int atomAIndex, int atomBIndex) const{
-   Atom* atomA = (*this->atomVect)[atomAIndex];
-   Atom* atomB = (*this->atomVect)[atomBIndex];
-   return this->GetDistanceAtoms(*atomA, *atomB);
+   const Atom& atomA = *(*this->atomVect)[atomAIndex];
+   const Atom& atomB = *(*this->atomVect)[atomBIndex];
+   return this->GetDistanceAtoms(atomA, atomB);
 }
 
 double Molecule::GetDistanceAtoms(const Atom& atomA, const Atom& atomB) const{
