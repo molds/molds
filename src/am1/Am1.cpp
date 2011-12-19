@@ -94,24 +94,24 @@ void Am1::SetEnableAtomTypes(){
 
 double Am1::GetDiatomCoreRepulsionEnergy(int indexAtomA, int indexAtomB) const{
    double energy = Mndo::GetDiatomCoreRepulsionEnergy(indexAtomA, indexAtomB);
-   Atom* atomA = (*this->molecule->GetAtomVect())[indexAtomA];
-   Atom* atomB = (*this->molecule->GetAtomVect())[indexAtomB];
+   const Atom& atomA = *(*this->molecule->GetAtomVect())[indexAtomA];
+   const Atom& atomB = *(*this->molecule->GetAtomVect())[indexAtomB];
    double distance = this->molecule->GetDistanceAtoms(indexAtomA, indexAtomB);
    double ang2AU = Parameters::GetInstance()->GetAngstrom2AU();
-   double alphaA = atomA->GetNddoAlpha(this->theory);
-   double alphaB = atomB->GetNddoAlpha(this->theory);
+   double alphaA = atomA.GetNddoAlpha(this->theory);
+   double alphaB = atomB.GetNddoAlpha(this->theory);
    double temp = 0.0;
    for(int i=0; i<4; i++){
-      double kA = atomA->GetNddoParameterK(this->theory, i);
-      double lA = atomA->GetNddoParameterL(this->theory, i);
-      double mA = atomA->GetNddoParameterM(this->theory, i);
-      double kB = atomB->GetNddoParameterK(this->theory, i);
-      double lB = atomB->GetNddoParameterL(this->theory, i);
-      double mB = atomB->GetNddoParameterM(this->theory, i);
+      double kA = atomA.GetNddoParameterK(this->theory, i);
+      double lA = atomA.GetNddoParameterL(this->theory, i);
+      double mA = atomA.GetNddoParameterM(this->theory, i);
+      double kB = atomB.GetNddoParameterK(this->theory, i);
+      double lB = atomB.GetNddoParameterL(this->theory, i);
+      double mB = atomB.GetNddoParameterM(this->theory, i);
       temp += kA*exp(-lA*pow(distance-mA,2.0));
       temp += kB*exp(-lB*pow(distance-mB,2.0));
    }
-   energy += atomA->GetCoreCharge()*atomB->GetCoreCharge()*temp/(distance/ang2AU);
+   energy += atomA.GetCoreCharge()*atomB.GetCoreCharge()*temp/(distance/ang2AU);
    return energy;
 }
 
@@ -124,34 +124,34 @@ double Am1::GetDiatomCoreRepulsionFirstDerivative(int atomAIndex,
                                                               atomBIndex,
                                                               axisA);
    double ang2AU = Parameters::GetInstance()->GetAngstrom2AU();
-   Atom* atomA = (*this->molecule->GetAtomVect())[atomAIndex];
-   Atom* atomB = (*this->molecule->GetAtomVect())[atomBIndex];
-   double alphaA = atomA->GetNddoAlpha(this->theory);
-   double alphaB = atomB->GetNddoAlpha(this->theory);
+   const Atom& atomA = *(*this->molecule->GetAtomVect())[atomAIndex];
+   const Atom& atomB = *(*this->molecule->GetAtomVect())[atomBIndex];
+   double alphaA = atomA.GetNddoAlpha(this->theory);
+   double alphaB = atomB.GetNddoAlpha(this->theory);
    double Rab = this->molecule->GetDistanceAtoms(atomAIndex, atomBIndex);
-   double dRabDa = (atomA->GetXyz()[axisA] - atomB->GetXyz()[axisA])/Rab;
+   double dRabDa = (atomA.GetXyz()[axisA] - atomB.GetXyz()[axisA])/Rab;
    double temp1 = 0.0;
    double temp2 = 0.0;
    for(int i=0; i<4; i++){
-      double kA = atomA->GetNddoParameterK(this->theory, i);
-      double lA = atomA->GetNddoParameterL(this->theory, i);
-      double mA = atomA->GetNddoParameterM(this->theory, i);
-      double kB = atomB->GetNddoParameterK(this->theory, i);
-      double lB = atomB->GetNddoParameterL(this->theory, i);
-      double mB = atomB->GetNddoParameterM(this->theory, i);
+      double kA = atomA.GetNddoParameterK(this->theory, i);
+      double lA = atomA.GetNddoParameterL(this->theory, i);
+      double mA = atomA.GetNddoParameterM(this->theory, i);
+      double kB = atomB.GetNddoParameterK(this->theory, i);
+      double lB = atomB.GetNddoParameterL(this->theory, i);
+      double mB = atomB.GetNddoParameterM(this->theory, i);
       temp1 += kA*exp(-lA*pow(Rab-mA,2.0));
       temp1 += kB*exp(-lB*pow(Rab-mB,2.0));
       temp2 += -2.0*lA*(Rab-mA)*kA*exp(-lA*pow(Rab-mA,2.0));
       temp2 += -2.0*lB*(Rab-mB)*kB*exp(-lB*pow(Rab-mB,2.0));
    }
    value -= dRabDa
-           *atomA->GetCoreCharge()
-           *atomB->GetCoreCharge()
+           *atomA.GetCoreCharge()
+           *atomB.GetCoreCharge()
            *temp1
            /(pow(Rab,2.0)/ang2AU);
    value += dRabDa
-           *atomA->GetCoreCharge()
-           *atomB->GetCoreCharge()
+           *atomA.GetCoreCharge()
+           *atomB.GetCoreCharge()
            *temp2/(Rab/ang2AU);
    return value;
 }
