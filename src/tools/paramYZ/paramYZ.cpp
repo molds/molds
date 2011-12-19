@@ -5,11 +5,12 @@
 #include<math.h>
 #include<string>
 #include<time.h>
+#include<stdexcept>
 #include"../../base/MolDSException.h"
 #include"../../base/Enums.h"
-#undef INCLUDED_ENUMS
-#define RENUMSTR_BODY 1
-#include"../../base/Enums.h"
+//#undef INCLUDED_ENUMS
+//#define RENUMSTR_BODY 1
+//#include"../../base/Enums.h"
 #include"../../base/MathUtilities.h"
 
 using namespace std;
