@@ -98,13 +98,13 @@ private:
    int zMatrixForceElecStatesNum;
    int etaMatrixForceElecStatesNum;
    double heatsFormation;
-   double GetGammaNRElement(int moI, int moJ, int moK, int moL);
-   double GetGammaRElement(int moI, int moJ, int moK, int moL);
-   double GetNNRElement(int moI, int moJ, int moK, int moL);
-   double GetNRElement(int moI, int moJ, int moK, int moL);
-   double GetKNRElement(int moI, int moJ, int moK, int moL);
-   double GetKRElement(int moI, int moJ, int moK, int moL);
-   double GetKRDagerElement(int moI, int moJ, int moK, int moL);
+   double GetGammaNRElement(int moI, int moJ, int moK, int moL) const;
+   double GetGammaRElement(int moI, int moJ, int moK, int moL) const;
+   double GetNNRElement(int moI, int moJ, int moK, int moL) const;
+   double GetNRElement(int moI, int moJ, int moK, int moL) const;
+   double GetKNRElement(int moI, int moJ, int moK, int moL) const;
+   double GetKRElement(int moI, int moJ, int moK, int moL) const;
+   double GetKRDagerElement(int moI, int moJ, int moK, int moL) const;
    void MallocTempMatrixForZMatrix(double** delta,
                                    double** q,
                                    double*** kNR, 
@@ -114,7 +114,7 @@ private:
                                    double*** xiOcc,
                                    double*** xiVir,
                                    int sizeQNR,
-                                   int sizeQR);
+                                   int sizeQR) const;
    void FreeTempMatrixForZMatrix(double** delta,
                                  double** q,
                                  double*** kNR, 
@@ -124,61 +124,62 @@ private:
                                  double*** xiOcc,
                                  double*** xiVir,
                                  int sizeQNR,
-                                 int sizeQR);
-   void CalcDeltaVector(double* delta, int exciteState);
+                                 int sizeQR) const;
+   void CalcDeltaVector(double* delta, int exciteState) const;
    double GetSmallQElement(int moI, 
                            int moP, 
-                           double**xiOcc, 
-                           double** xiVir,
-                           double** eta);
+                           double const* const* xiOcc, 
+                           double const* const* xiVir,
+                           double const* const* eta) const;
    void CalcQVector(double* q, 
-                    double* delta, 
-                    double** xiOcc,
-                    double** xiVir,
-                    double** eta,
+                    double const* delta, 
+                    double const* const* xiOcc,
+                    double const* const* xiVir,
+                    double const* const* eta,
                     std::vector<MoIndexPair> nonRedundantQIndeces,
-                    std::vector<MoIndexPair> redundantQIndeces);
-   void TransposeFockMatrixMatrix(double** transposedFockMatrix);
+                    std::vector<MoIndexPair> redundantQIndeces) const;
+   void TransposeFockMatrixMatrix(double** transposedFockMatrix) const;
    void CalcKNRMatrix(double** kNR, 
-                      std::vector<MoIndexPair> nonRedundantQIndeces);
+                      std::vector<MoIndexPair> nonRedundantQIndeces) const;
    void CalcKRDagerMatrix(double** kRDager, 
                           std::vector<MoIndexPair> nonRedundantQIndeces,
-                          std::vector<MoIndexPair> redundantQIndeces);
+                          std::vector<MoIndexPair> redundantQIndeces) const;
    void CalcAuxiliaryVector(double* y,
-                            double* q,
-                            double** kRDager,
+                            double const* q,
+                            double const* const* kRDager,
                             std::vector<MoIndexPair> nonRedundantQIndeces,
-                            std::vector<MoIndexPair> redundantQIndeces);
+                            std::vector<MoIndexPair> redundantQIndeces) const;
    void CalcXiMatrices(double** xiOcc, 
                        double** xiVir, 
                        int exciteState,
-                       double** transposedFockMatrix);
-   double GetZMatrixForceElement(double* y,
-                                 double* q,
-                                 double** transposedFockMatrix,
+                       double const* const* transposedFockMatrix) const;
+   double GetZMatrixForceElement(double const* y,
+                                 double const* q,
+                                 double const* const* transposedFockMatrix,
                                  std::vector<MoIndexPair> nonRedundantQIndeces,
                                  std::vector<MoIndexPair> redundantQIndeces,
                                  int mu, 
-                                 int nu);
+                                 int nu) const;
    void CheckZMatrixForce(std::vector<int> elecStates);
    void CheckEtaMatrixForce(std::vector<int> elecStates);
    void CalcZMatrixForce(std::vector<int> elecStates);
    void CalcEtaMatrixForce(std::vector<int> elecStates);
-   bool RequiresExcitedStatesForce(std::vector<int> elecStates);
+   bool RequiresExcitedStatesForce(std::vector<int> elecStates) const;
    double GetCISCoefficientMOEnergy(int k, 
                                     int l, 
                                     int r, 
-                                    int numberActiveVir);
+                                    int numberActiveVir) const;
    double GetCISCoefficientTwoElecIntegral(int k, 
                                            int l, 
                                            int p, 
                                            int q, 
                                            int r, 
                                            int s, 
-                                           int numberActiveVir);
+                                           int numberActiveVir) const;
    void CalcActiveSetVariablesQ(std::vector<MoIndexPair>* nonRedundantQIndeces, 
-                                std::vector<MoIndexPair>* redundantQIndeces);
-   void CalcHeatsFormation(double* heatsFormation, MolDS_base::Molecule* molecule);
+                                std::vector<MoIndexPair>* redundantQIndeces) const;
+   void CalcHeatsFormation(double* heatsFormation, 
+                           const MolDS_base::Molecule& molecule) const;
    double GetElectronCoreAttraction(int atomAIndex, 
                                     int atomBIndex, 
                                     int mu, 
@@ -190,15 +191,17 @@ private:
                                                    int nu, 
                                                    double const* const* const* const* const* twoElecTwoCoreFirstDerivative,
                                                    MolDS_base::CartesianType axisA) const;
-   void CalcTwoElecTwoCoreDiatomic(double**** matrix, int atomAIndex, int atomBIndex);
+   void CalcTwoElecTwoCoreDiatomic(double**** matrix, int atomAIndex, int atomBIndex) const;
    void CalcTwoElecTwoCoreDiatomicFirstDerivatives(double***** matrix, 
                                                    int atomAIndex, 
-                                                   int atomBIndex);
-   void RotateTwoElecTwoCoreDiatomicToSpaceFramegc(double**** matrix, double** rotatingMatrix);
-   void RotateTwoElecTwoCoreDiatomicFirstDerivativesToSpaceFramegc(double***** matrix, 
-                                                                   double**** twoElecTwoCoreDiatomic,
-                                                                   double** rotatingMatrix,
-                                                                   double*** rMatDeri);
+                                                   int atomBIndex) const;
+   void RotateTwoElecTwoCoreDiatomicToSpaceFramegc(double**** matrix, 
+                                                   double const* const* rotatingMatrix) const;
+   void RotateTwoElecTwoCoreDiatomicFirstDerivativesToSpaceFramegc(
+        double***** matrix, 
+        double const* const* const* const* twoElecTwoCoreDiatomic,
+        double const* const* rotatingMatrix,
+        double const* const* const* rMatDeri) const;
    double GetSemiEmpiricalMultipoleInteraction(MolDS_base::MultipoleType multipoleA,
                                                MolDS_base::MultipoleType multipoleB,
                                                double rhoA,
@@ -215,11 +218,11 @@ private:
                                                double DB,
                                                double Rab) const;
    void FreeCalcForceTempMatrices(double**** overlapDer, 
-                                  double****** twoElecTwoCoreFirstDeriv);
+                                  double****** twoElecTwoCoreFirstDeriv) const;
    void CalcForceHFElecCoreAttractionPart(double* force, 
                                           int atomAIndex,
                                           int atomBIndex,
-                                          double***** twoElecTwoCoreFirstDeriv);
+                                          double const* const* const* const* const* twoElecTwoCoreFirstDeriv) const;
    void CalcForceHFOverlapPart(double* force, 
                                int atomAIndex,
                                int atomBIndex,

@@ -209,11 +209,12 @@ double Mndo::GetDiatomCoreRepulsionFirstDerivative(int atomAIndex,
    return value;
 }
 
-void Mndo::CalcHeatsFormation(double* heatsFormation, Molecule* molecule){
+void Mndo::CalcHeatsFormation(double* heatsFormation, 
+                              const Molecule& molecule) const{
    int groundState = 0;
    *heatsFormation = this->GetElectronicEnergy(groundState);
-   for(int A=0; A<molecule->GetAtomVect()->size(); A++){
-      Atom* atom = (*molecule->GetAtomVect())[A];
+   for(int A=0; A<molecule.GetAtomVect()->size(); A++){
+      Atom* atom = (*molecule.GetAtomVect())[A];
       *heatsFormation -= atom->GetMndoElecEnergyAtom();
       *heatsFormation += atom->GetMndoHeatsFormAtom();
    }
@@ -221,7 +222,7 @@ void Mndo::CalcHeatsFormation(double* heatsFormation, Molecule* molecule){
 
 void Mndo::CalcHFProperties(){
    MolDS_cndo::Cndo2::CalcHFProperties();
-   this->CalcHeatsFormation(&this->heatsFormation, this->molecule);
+   this->CalcHeatsFormation(&this->heatsFormation, *this->molecule);
 }
 
 void Mndo::OutputHFResults(double const* const* fockMatrix, 
@@ -773,7 +774,7 @@ void Mndo::CheckEtaMatrixForce(vector<int> elecStates){
 
 // see variable Q-vector in [PT_1996, PT_1997]
 void Mndo::CalcActiveSetVariablesQ(vector<MoIndexPair>* nonRedundantQIndeces, 
-                                   vector<MoIndexPair>* redundantQIndeces){
+                                   vector<MoIndexPair>* redundantQIndeces) const{
    int numberAOs = this->molecule->GetTotalNumberAOs();
    int numberOcc = this->molecule->GetTotalNumberValenceElectrons()/2;
    int numberActiveOcc = Parameters::GetInstance()->GetActiveOccCIS();
@@ -813,7 +814,7 @@ void Mndo::MallocTempMatrixForZMatrix(double** delta,
                                       double*** xiOcc,
                                       double*** xiVir,
                                       int sizeQNR,
-                                      int sizeQR){
+                                      int sizeQR) const{
    int numberActiveOcc = Parameters::GetInstance()->GetActiveOccCIS();
    int numberActiveVir = Parameters::GetInstance()->GetActiveVirCIS();
    int numberActiveMO = numberActiveOcc + numberActiveVir;
@@ -850,7 +851,7 @@ void Mndo::FreeTempMatrixForZMatrix(double** delta,
                                     double*** xiOcc,
                                     double*** xiVir,
                                     int sizeQNR,
-                                    int sizeQR){
+                                    int sizeQR) const{
    if(*delta != NULL){
       MallocerFreer::GetInstance()->FreeDoubleMatrix1d(delta);
       //cout << "delta  deleted" << endl;
@@ -893,7 +894,7 @@ void Mndo::FreeTempMatrixForZMatrix(double** delta,
 
 // \epsilon_{r}^{kl} in (1) in [PT_1997].
 // k and l are index of CIS matrix.
-double Mndo::GetCISCoefficientMOEnergy(int k, int l, int r, int numberActiveVir){
+double Mndo::GetCISCoefficientMOEnergy(int k, int l, int r, int numberActiveVir) const{
    double value=0.0;
    if(k==l){
       int moI = this->molecule->GetTotalNumberValenceElectrons()/2 - (k/numberActiveVir) -1;
@@ -918,7 +919,7 @@ double Mndo::GetCISCoefficientTwoElecIntegral(int k,
                                               int q, 
                                               int r, 
                                               int s,
-                                              int numberActiveVir){
+                                              int numberActiveVir) const{
    double value=0.0;
    // single excitation from I-th (occupied)MO to A-th (virtual)MO
    int moI = this->molecule->GetTotalNumberValenceElectrons()/2 - (k/numberActiveVir) -1;
@@ -936,7 +937,7 @@ double Mndo::GetCISCoefficientTwoElecIntegral(int k,
 }
 
 // see (40) in [PT_1996]
-double Mndo::GetGammaNRElement(int moI, int moJ, int moK, int moL){
+double Mndo::GetGammaNRElement(int moI, int moJ, int moK, int moL) const{
    double value=0.0;
    if(moI==moK && moJ==moL){
       int numberOcc = this->molecule->GetTotalNumberValenceElectrons()/2;
@@ -948,7 +949,7 @@ double Mndo::GetGammaNRElement(int moI, int moJ, int moK, int moL){
 }
 
 // see (41) & (42) in [PT_1996]
-double Mndo::GetGammaRElement(int moI, int moJ, int moK, int moL){
+double Mndo::GetGammaRElement(int moI, int moJ, int moK, int moL) const{
    double value=0.0;
    if(moI==moK && moJ==moL){
       value = moI==moJ ? 1.0 : this->energiesMO[moJ]-this->energiesMO[moI];
@@ -957,7 +958,7 @@ double Mndo::GetGammaRElement(int moI, int moJ, int moK, int moL){
 }
 
 // see (43) in [PT_1996]
-double Mndo::GetNNRElement(int moI, int moJ, int moK, int moL){
+double Mndo::GetNNRElement(int moI, int moJ, int moK, int moL) const{
    double value=0.0;
    if(moI==moK && moJ==moL){
       int numberOcc = this->molecule->GetTotalNumberValenceElectrons()/2;
@@ -969,7 +970,7 @@ double Mndo::GetNNRElement(int moI, int moJ, int moK, int moL){
 }
 
 // see (44) in [PT_1996]
-double Mndo::GetNRElement(int moI, int moJ, int moK, int moL){
+double Mndo::GetNRElement(int moI, int moJ, int moK, int moL) const{
    double value=0.0;
    if(moI==moK && moJ==moL){
       value = 1.0;
@@ -978,7 +979,7 @@ double Mndo::GetNRElement(int moI, int moJ, int moK, int moL){
 }
 
 // see (44) in [PT_1996]
-double Mndo::GetKNRElement(int moI, int moJ, int moK, int moL){
+double Mndo::GetKNRElement(int moI, int moJ, int moK, int moL) const{
    double value=0.0;
    int numberOcc = this->molecule->GetTotalNumberValenceElectrons()/2;
    int nI = moI<numberOcc ? 2 : 0;
@@ -1000,12 +1001,12 @@ double Mndo::GetKNRElement(int moI, int moJ, int moK, int moL){
 }
 
 // Dager of (45) in [PT_1996]. Note taht the (45) is real number.
-double Mndo::GetKRDagerElement(int moI, int moJ, int moK, int moL){
+double Mndo::GetKRDagerElement(int moI, int moJ, int moK, int moL) const{
    return this->GetKRElement(moK, moL, moI, moJ);
 }
 
 // see (45) in [PT_1996]
-double Mndo::GetKRElement(int moI, int moJ, int moK, int moL){
+double Mndo::GetKRElement(int moI, int moJ, int moK, int moL) const{
    double value=0.0;
    int numberOcc = this->molecule->GetTotalNumberValenceElectrons()/2;
    int nI = moI<numberOcc ? 2 : 0;
@@ -1027,7 +1028,7 @@ double Mndo::GetKRElement(int moI, int moJ, int moK, int moL){
 }
 
 // see (9) in [PT_1997]
-void Mndo::CalcDeltaVector(double* delta, int exciteState){
+void Mndo::CalcDeltaVector(double* delta, int exciteState) const{
    int numberActiveOcc = Parameters::GetInstance()->GetActiveOccCIS();
    int numberActiveVir = Parameters::GetInstance()->GetActiveVirCIS();
    int numberActiveMO = numberActiveOcc + numberActiveVir;
@@ -1058,9 +1059,9 @@ void Mndo::CalcDeltaVector(double* delta, int exciteState){
 // see (18) in [PT_1977]
 double Mndo::GetSmallQElement(int moI, 
                               int moP, 
-                              double** xiOcc, 
-                              double** xiVir, 
-                              double** eta){
+                              double const* const* xiOcc, 
+                              double const* const* xiVir, 
+                              double const* const* eta) const{
    double value = 0.0;
    int numberOcc = this->molecule->GetTotalNumberValenceElectrons()/2;
    bool isMoPOcc = moP<numberOcc ? true : false;
@@ -1241,12 +1242,12 @@ double Mndo::GetSmallQElement(int moI,
 
 // see (20) - (23) in [PT_1997]
 void Mndo::CalcQVector(double* q, 
-                       double* delta, 
-                       double** xiOcc,
-                       double** xiVir,
-                       double** eta,
+                       double const* delta, 
+                       double const* const* xiOcc,
+                       double const* const* xiVir,
+                       double const* const* eta,
                        vector<MoIndexPair> nonRedundantQIndeces,
-                       vector<MoIndexPair> redundantQIndeces){
+                       vector<MoIndexPair> redundantQIndeces) const{
    MallocerFreer::GetInstance()->InitializeDoubleMatrix1d(
                                  q,
                                  nonRedundantQIndeces.size()+redundantQIndeces.size());
@@ -1301,7 +1302,7 @@ void Mndo::CalcQVector(double* q,
 // see (43) and (45) in [PT_1996].
 // This method calculates "\Gamma_{NR} - K_{NR}".
 // Note taht K_{NR} is not calculated.
-void Mndo::CalcKNRMatrix(double** kNR, vector<MoIndexPair> nonRedundantQIndeces){
+void Mndo::CalcKNRMatrix(double** kNR, vector<MoIndexPair> nonRedundantQIndeces) const{
    #pragma omp parallel for schedule(auto)
    for(int i=0; i<nonRedundantQIndeces.size(); i++){
       int moI = nonRedundantQIndeces[i].moI;
@@ -1320,7 +1321,7 @@ void Mndo::CalcKNRMatrix(double** kNR, vector<MoIndexPair> nonRedundantQIndeces)
 // Note taht K_{R}^{\dager} is not calculated.
 void Mndo::CalcKRDagerMatrix(double** kRDager, 
                              vector<MoIndexPair> nonRedundantQIndeces,
-                             vector<MoIndexPair> redundantQIndeces){
+                             vector<MoIndexPair> redundantQIndeces) const{
    #pragma omp parallel for schedule(auto)
    for(int i=0; i<nonRedundantQIndeces.size(); i++){
       int moI = nonRedundantQIndeces[i].moI;
@@ -1336,10 +1337,10 @@ void Mndo::CalcKRDagerMatrix(double** kRDager,
 
 // right hand side of (54) in [PT_1996]      
 void Mndo::CalcAuxiliaryVector(double* y, 
-                               double* q, 
-                               double** kRDager, 
+                               double const* q, 
+                               double const* const* kRDager, 
                                vector<MoIndexPair> nonRedundantQIndeces, 
-                               vector<MoIndexPair> redundantQIndeces){
+                               vector<MoIndexPair> redundantQIndeces) const{
    MallocerFreer::GetInstance()->InitializeDoubleMatrix1d(
                                  y,
                                  nonRedundantQIndeces.size());
@@ -1355,7 +1356,7 @@ void Mndo::CalcAuxiliaryVector(double* y,
    }
 }
 
-void Mndo::TransposeFockMatrixMatrix(double** transposedFockMatrix){
+void Mndo::TransposeFockMatrixMatrix(double** transposedFockMatrix) const{
    for(int i=0; i<this->molecule->GetTotalNumberAOs(); i++){
       for(int j=0; j<this->molecule->GetTotalNumberAOs(); j++){
          transposedFockMatrix[j][i] = this->fockMatrix[i][j];
@@ -1365,13 +1366,13 @@ void Mndo::TransposeFockMatrixMatrix(double** transposedFockMatrix){
 
 // each element (mu, nu) of z matrix.
 // see (57) in [PT_1996]
-double Mndo::GetZMatrixForceElement(double* y,
-                                    double* q,
-                                    double** transposedFockMatrix,
+double Mndo::GetZMatrixForceElement(double const* y,
+                                    double const* q,
+                                    double const* const* transposedFockMatrix,
                                     vector<MoIndexPair> nonRedundantQIndeces,
                                     vector<MoIndexPair> redundantQIndeces,
                                     int mu,
-                                    int nu){
+                                    int nu) const{
    double value=0.0;
    for(int i=0; i<nonRedundantQIndeces.size(); i++){
       int moI = nonRedundantQIndeces[i].moI;
@@ -1394,7 +1395,7 @@ double Mndo::GetZMatrixForceElement(double* y,
 void Mndo::CalcXiMatrices(double** xiOcc, 
                           double** xiVir, 
                           int exciteState, 
-                          double** transposedFockMatrix){
+                          double const* const* transposedFockMatrix) const{
    int numberAOs = this->molecule->GetTotalNumberAOs();
    int numberOcc = this->molecule->GetTotalNumberValenceElectrons()/2;
    int numberActiveOcc = Parameters::GetInstance()->GetActiveOccCIS();
@@ -1578,7 +1579,7 @@ void Mndo::CalcEtaMatrixForce(vector<int> elecStates){
    }
 }
 
-bool Mndo::RequiresExcitedStatesForce(vector<int> elecStates){
+bool Mndo::RequiresExcitedStatesForce(vector<int> elecStates) const{
    bool requires = true;
    if(elecStates.size()==1 && elecStates[0]==0){
       requires = false;
@@ -1589,7 +1590,7 @@ bool Mndo::RequiresExcitedStatesForce(vector<int> elecStates){
 void Mndo::CalcForceHFElecCoreAttractionPart(double* force, 
                                              int atomAIndex, 
                                              int atomBIndex,
-                                             double***** twoElecTwoCoreFirstDeriv){
+                                             double const* const* const* const* const* twoElecTwoCoreFirstDeriv) const{
    Atom* atomA = (*this->molecule->GetAtomVect())[atomAIndex];
    int firstAOIndexA = atomA->GetFirstAOIndex();
    int numberAOsA = atomA->GetValence().size();
@@ -1836,7 +1837,7 @@ void Mndo::CalcForce(vector<int> elecStates){
                   int numberAOsB = atomB->GetValence().size();
 
                   // calc. first derivative of overlap.
-                  this->CalcDiatomicOverlapFirstDerivative(overlapDer, atomA, atomB);
+                  this->CalcDiatomicOverlapFirstDerivative(overlapDer, *atomA, *atomB);
                   // calc. first derivative of two elec two core interaction
                   this->CalcTwoElecTwoCoreDiatomicFirstDerivatives(twoElecTwoCoreFirstDeriv, 
                                                                    a, 
@@ -1947,7 +1948,7 @@ void Mndo::CalcForce(vector<int> elecStates){
    }
 }
 
-void Mndo::FreeCalcForceTempMatrices(double**** overlapDer, double****** twoElecTwoCoreFirstDeriv){
+void Mndo::FreeCalcForceTempMatrices(double**** overlapDer, double****** twoElecTwoCoreFirstDeriv) const{
    if(*overlapDer != NULL){
       MallocerFreer::GetInstance()->FreeDoubleMatrix3d(overlapDer, 
                                                        OrbitalType_end,
@@ -2022,7 +2023,7 @@ void Mndo::CalcTwoElecTwoCore(double****** twoElecTwoCore, Molecule* molecule){
 // Note that atomA != atomB.
 // Note taht d-orbital cannot be treated, 
 // that is, matrix[dxy][dxy][dxy][dxy] can be treatable.
-void Mndo::CalcTwoElecTwoCoreDiatomic(double**** matrix, int atomAIndex, int atomBIndex){
+void Mndo::CalcTwoElecTwoCoreDiatomic(double**** matrix, int atomAIndex, int atomBIndex) const{
    Atom* atomA = NULL;
    Atom* atomB = NULL;
    if(atomAIndex == atomBIndex){
@@ -2102,7 +2103,7 @@ void Mndo::CalcTwoElecTwoCoreDiatomic(double**** matrix, int atomAIndex, int ato
 // that is, matrix[dxy][dxy][dxy][dxy][CartesianType_end] can be treatable.
 void Mndo::CalcTwoElecTwoCoreDiatomicFirstDerivatives(double***** matrix, 
                                                       int atomAIndex, 
-                                                      int atomBIndex){
+                                                      int atomBIndex) const{
    Atom* atomA = NULL;
    Atom* atomB = NULL;
    if(atomAIndex == atomBIndex){
@@ -2171,7 +2172,7 @@ void Mndo::CalcTwoElecTwoCoreDiatomicFirstDerivatives(double***** matrix,
 
       // rotate matirix into the space frame
       this->CalcRotatingMatrix(rotatingMatrix, *atomA, *atomB);
-      this->CalcRotatingMatrixFirstDerivatives(rMatDeri, atomA, atomB);
+      this->CalcRotatingMatrixFirstDerivatives(rMatDeri, *atomA, *atomB);
       this->RotateTwoElecTwoCoreDiatomicFirstDerivativesToSpaceFramegc(matrix, 
                                                                        twoElecTwoCoreDiatomic,
                                                                        rotatingMatrix,
@@ -2196,7 +2197,8 @@ void Mndo::CalcTwoElecTwoCoreDiatomicFirstDerivatives(double***** matrix,
 
 // Rotate 4-dimensional matrix from diatomic frame to space frame
 // Note tha in this method d-orbitals can not be treatable.
-void Mndo::RotateTwoElecTwoCoreDiatomicToSpaceFramegc(double**** matrix, double** rotatingMatrix){
+void Mndo::RotateTwoElecTwoCoreDiatomicToSpaceFramegc(double**** matrix, 
+                                                      double const* const* rotatingMatrix) const{
    double oldMatrix[dxy][dxy][dxy][dxy];
    for(int mu=0; mu<dxy; mu++){
       for(int nu=0; nu<dxy; nu++){
@@ -2235,10 +2237,11 @@ void Mndo::RotateTwoElecTwoCoreDiatomicToSpaceFramegc(double**** matrix, double*
 
 // Rotate 5-dimensional matrix from diatomic frame to space frame
 // Note tha in this method d-orbitals can not be treatable.
-void Mndo::RotateTwoElecTwoCoreDiatomicFirstDerivativesToSpaceFramegc(double***** matrix, 
-                                                                      double**** twoElecTwoCoreDiatomic,
-                                                                      double** rotatingMatrix,
-                                                                      double*** rMatDeri){
+void Mndo::RotateTwoElecTwoCoreDiatomicFirstDerivativesToSpaceFramegc(
+           double***** matrix, 
+           double const* const* const* const* twoElecTwoCoreDiatomic,
+           double const* const* rotatingMatrix,
+           double const* const* const* rMatDeri) const{
    double oldMatrix[dxy][dxy][dxy][dxy][CartesianType_end];
    for(int mu=0; mu<dxy; mu++){
       for(int nu=0; nu<dxy; nu++){

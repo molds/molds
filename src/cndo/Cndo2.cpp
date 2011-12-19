@@ -1193,10 +1193,11 @@ void Cndo2::CalcOverlap(double** overlap, const Molecule& molecule) const{
 // Note that this methoc can not treat d-obitals 
 // because CalcRotatingMatrixFirstDerivatives can not treat d-orbitals.
 void Cndo2::CalcDiatomicOverlapFirstDerivative(double*** overlapFirstDeri, 
-                                               Atom* atomA, Atom* atomB){
-   double Cartesian[CartesianType_end] = {atomA->GetXyz()[XAxis] - atomB->GetXyz()[XAxis], 
-                                          atomA->GetXyz()[YAxis] - atomB->GetXyz()[YAxis],
-                                          atomA->GetXyz()[ZAxis] - atomB->GetXyz()[ZAxis]};
+                                               const Atom& atomA, 
+                                               const Atom& atomB) const{
+   double Cartesian[CartesianType_end] = {atomA.GetXyz()[XAxis] - atomB.GetXyz()[XAxis], 
+                                          atomA.GetXyz()[YAxis] - atomB.GetXyz()[YAxis],
+                                          atomA.GetXyz()[ZAxis] - atomB.GetXyz()[ZAxis]};
    double R = sqrt( pow(Cartesian[XAxis],2.0) + 
                     pow(Cartesian[YAxis],2.0) + 
                     pow(Cartesian[ZAxis],2.0) );
@@ -1212,9 +1213,9 @@ void Cndo2::CalcDiatomicOverlapFirstDerivative(double*** overlapFirstDeri,
                                    (OrbitalType_end, OrbitalType_end, CartesianType_end);
 
    try{
-      this->CalcDiatomicOverlapInDiatomicFrame(diatomicOverlap, *atomA, *atomB);
-      this->CalcRotatingMatrix(rotatingMatrix, *atomA, *atomB);
-      this->CalcDiatomicOverlapFirstDerivativeInDiatomicFrame(diaOverlapDeriR, *atomA, *atomB);
+      this->CalcDiatomicOverlapInDiatomicFrame(diatomicOverlap, atomA, atomB);
+      this->CalcRotatingMatrix(rotatingMatrix, atomA, atomB);
+      this->CalcDiatomicOverlapFirstDerivativeInDiatomicFrame(diaOverlapDeriR, atomA, atomB);
       this->CalcRotatingMatrixFirstDerivatives(rMatDeri, atomA, atomB);
 
       // rotate
@@ -1262,7 +1263,7 @@ void Cndo2::CalcDiatomicOverlapFirstDerivative(double*** overlapFirstDeri,
 void Cndo2::FreeDiatomicOverlapDeriTemps(double*** diatomicOverlap, 
                                          double*** rotatingMatrix,
                                          double*** diaOverlapDeriR,
-                                         double**** rMatDeri){
+                                         double**** rMatDeri) const{
 
    // free
    if(*diatomicOverlap != NULL){
@@ -1946,7 +1947,9 @@ void Cndo2::CalcRotatingMatrix(double** rotatingMatrix,
 // This method can not calculate d-orbital yet.
 // For rotating matirxi, see J. Mol. Struc. (Theochem), 419, 19 (1997) (ref. [BFB_1997])
 // we set gamma=0 always.
-void Cndo2::CalcRotatingMatrixFirstDerivatives(double*** rMatFirstDeri, Atom* atomA, Atom* atomB){
+void Cndo2::CalcRotatingMatrixFirstDerivatives(double*** rMatFirstDeri, 
+                                               const Atom& atomA, 
+                                               const Atom& atomB) const{
 
    MallocerFreer::GetInstance()->InitializeDoubleMatrix3d(
                                  rMatFirstDeri,  
@@ -1954,9 +1957,9 @@ void Cndo2::CalcRotatingMatrixFirstDerivatives(double*** rMatFirstDeri, Atom* at
                                  OrbitalType_end,
                                  CartesianType_end);
 
-   double x = atomB->GetXyz()[0] - atomA->GetXyz()[0];
-   double y = atomB->GetXyz()[1] - atomA->GetXyz()[1];
-   double z = atomB->GetXyz()[2] - atomA->GetXyz()[2];
+   double x = atomB.GetXyz()[0] - atomA.GetXyz()[0];
+   double y = atomB.GetXyz()[1] - atomA.GetXyz()[1];
+   double z = atomB.GetXyz()[2] - atomA.GetXyz()[2];
    double r = sqrt( pow(x,2.0) + pow(y,2.0) );
    double R = sqrt( pow(x,2.0) + pow(y,2.0) + pow(z,2.0) );
 

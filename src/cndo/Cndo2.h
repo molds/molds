@@ -111,12 +111,12 @@ protected:
                                                                   const MolDS_base_atoms::Atom& atomA, 
                                                                   const MolDS_base_atoms::Atom& atomB) const;
    void CalcDiatomicOverlapFirstDerivative(double*** overlapFirstDeri, 
-                                           MolDS_base_atoms::Atom* atomA, 
-                                           MolDS_base_atoms::Atom* atomB);
+                                           const MolDS_base_atoms::Atom& atomA, 
+                                           const MolDS_base_atoms::Atom& atomB) const;
    void FreeDiatomicOverlapDeriTemps(double*** diatomicOverlap, 
                                      double*** rotatingMatrix,
                                      double*** diaOverlapDeriR,
-                                     double**** rMatDeri);
+                                     double**** rMatDeri) const;
    virtual double GetMolecularIntegralElement(int moI, int moJ, int moK, int moL, 
                                               const MolDS_base::Molecule& molecule, 
                                               double const* const* fockMatrix, 
@@ -129,8 +129,8 @@ protected:
                                 double const* atomicElectronPopulation, 
                                 const MolDS_base::Molecule& molecule) const;
    void CalcRotatingMatrixFirstDerivatives(double*** rMatFirstDeri, 
-                                           MolDS_base_atoms::Atom* atomA,
-                                           MolDS_base_atoms::Atom* atomB);
+                                           const MolDS_base_atoms::Atom& atomA,
+                                           const MolDS_base_atoms::Atom& atomB) const;
    struct MoEnergyGap{
       double energyGap;
       int occIndex;
