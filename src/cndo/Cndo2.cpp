@@ -159,7 +159,7 @@ void Cndo2::SetEnableAtomTypes(){
    //this->enableAtomTypes.push_back(Cl);
 }
 
-TheoryType Cndo2::GetTheoryType(){
+TheoryType Cndo2::GetTheoryType() const{
    return this->theory;
 }
 
@@ -433,7 +433,7 @@ void Cndo2::DoesCIS(){
 }
 
 // elecState=0 means ground state
-double Cndo2::GetElectronicEnergy(int elecState){
+double Cndo2::GetElectronicEnergy(int elecState) const{
    int groundState = 0;
    if(elecState==groundState){
       return this->elecHFEnergy;
@@ -456,7 +456,7 @@ double Cndo2::GetElectronicEnergy(int elecState){
    }
 }
 
-double Cndo2::GetCoreRepulsionEnergy(){
+double Cndo2::GetCoreRepulsionEnergy() const{
    return this->coreRepulsionEnergy;
 }
 
