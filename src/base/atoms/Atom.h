@@ -6,7 +6,7 @@ class Atom{
 public:
    Atom();
    Atom(double x, double y, double z);
-   ~Atom();
+   virtual ~Atom();
    MolDS_base::AtomType GetAtomType() const;
    double GetAtomicMass() const;
    double* GetXyz() const;
