@@ -18,46 +18,12 @@
 #include"../am1/Am1.h"
 #include"../pm3/Pm3.h"
 #include"../pm3/Pm3Pddg.h"
+#include"MD.h"
 using namespace std;
 using namespace MolDS_base;
 using namespace MolDS_base_atoms;
 
 namespace MolDS_md{
-
-/***
- *  Velocty Verlet is used here.
- */
-class MD{
-public:
-   MD();
-   ~MD();
-   void SetTheory(MolDS_cndo::Cndo2* cndo);
-   void DoesMD();
-private:
-   string messageinitialConditionMD;
-   string messageStartMD;
-   string messageEndMD;
-   string messageStartStepMD;
-   string messageEndStepMD;
-   string messageEnergies;
-   string messageEnergiesTitle;
-   string messageCoreKineticEnergy;
-   string messageCoreRepulsionEnergy;
-   string messageElectronicEnergy;
-   string messageTotalEnergy;
-   string messageErrorEnergy;
-   string messageTime;
-   string errorMessageNotEnebleTheoryType;
-   string errorMessageTheoryType;
-   MolDS_cndo::Cndo2* cndo;
-   vector<TheoryType> enableTheoryTypes;
-   void CheckEnableTheoryType(TheoryType theoryType);
-   void SetMessages();
-   void SetEnableTheoryTypes();
-   void OutputEnergies(double initialEnergy);
-   double OutputEnergies();
-};
-
 MD::MD(){
    this->cndo = NULL;
    this->SetEnableTheoryTypes();
