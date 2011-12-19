@@ -112,11 +112,11 @@ void Atom::SetMessages(){
    this->errorMessageDaIndex  = "daIndex = ";
 }
 
-AtomType Atom::GetAtomType(){
+AtomType Atom::GetAtomType() const{
    return this->atomType;
 }
 
-double Atom::GetAtomicMass(){
+double Atom::GetAtomicMass() const{
    return this->atomicMass;
 }
 

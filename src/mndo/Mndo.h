@@ -32,26 +32,26 @@ protected:
                                 double const* energiesMO, 
                                 double const* atomicElectronPopulation, 
                                 const MolDS_base::Molecule& molecule) const;
-   virtual double GetFockDiagElement(MolDS_base_atoms::Atom* atomA, 
+   virtual double GetFockDiagElement(const MolDS_base_atoms::Atom& atomA, 
                                      int atomAIndex, 
                                      int mu, 
-                                     MolDS_base::Molecule* molecule, 
-                                     double** gammaAB,
-                                     double** orbitalElectronPopulation, 
-                                     double* atomicElectronPopulation,
-                                     double****** twoElecTwoCore,
-                                     bool isGuess);
-   virtual double GetFockOffDiagElement(MolDS_base_atoms::Atom* atomA, 
-                                        MolDS_base_atoms::Atom* atomB, 
+                                     const MolDS_base::Molecule& molecule, 
+                                     double const* const* gammaAB,
+                                     double const* const* orbitalElectronPopulation, 
+                                     double const* atomicElectronPopulation,
+                                     double const* const* const* const* const* const* twoElecTwoCore,
+                                     bool isGuess) const;
+   virtual double GetFockOffDiagElement(const MolDS_base_atoms::Atom& atomA, 
+                                        const MolDS_base_atoms::Atom& atomB, 
                                         int atomAIndex, 
                                         int atomBIndex, 
                                         int mu, int nu, 
-                                        MolDS_base::Molecule* molecule, 
-                                        double** gammaAB, 
-                                        double** overelap,
-                                        double** orbitalElectronPopulation, 
-                                        double****** twoElecTwoCore,
-                                        bool isGuess);
+                                        const MolDS_base::Molecule& molecule, 
+                                        double const* const* gammaAB, 
+                                        double const* const* overelap,
+                                        double const* const* orbitalElectronPopulation, 
+                                        double const* const* const* const* const* const* twoElecTwoCore,
+                                        bool isGuess) const;
    virtual void CalcDiatomicOverlapInDiatomicFrame(double** diatomicOverlap, 
                                                    MolDS_base_atoms::Atom* atomA, 
                                                    MolDS_base_atoms::Atom* atomB);
@@ -60,10 +60,10 @@ protected:
                                                 MolDS_base_atoms::Atom* atomA, MolDS_base_atoms::Atom* atomB);
    virtual double GetCoulombInt(MolDS_base::OrbitalType orbital1, 
                                 MolDS_base::OrbitalType orbital2, 
-                                MolDS_base_atoms::Atom* atom); 
+                                const MolDS_base_atoms::Atom& atom) const; 
    virtual double GetExchangeInt(MolDS_base::OrbitalType orbital1, 
                                  MolDS_base::OrbitalType orbital2, 
-                                 MolDS_base_atoms::Atom* atom); 
+                                 const MolDS_base_atoms::Atom& atom) const; 
    virtual void CalcTwoElecTwoCore(double****** twoElecTwoCore, MolDS_base::Molecule* molecule);
    virtual double GetMolecularIntegralElement(int moI, 
                                               int moJ, 
@@ -179,14 +179,17 @@ private:
    void CalcActiveSetVariablesQ(std::vector<MoIndexPair>* nonRedundantQIndeces, 
                                 std::vector<MoIndexPair>* redundantQIndeces);
    void CalcHeatsFormation(double* heatsFormation, MolDS_base::Molecule* molecule);
-   double GetElectronCoreAttraction(int atomAIndex, int atomBIndex, 
-                                    int mu, int nu, double****** twoElecTwoCore);
+   double GetElectronCoreAttraction(int atomAIndex, 
+                                    int atomBIndex, 
+                                    int mu, 
+                                    int nu, 
+                                    double const* const* const* const* const* const* twoElecTwoCore) const;
    double GetElectronCoreAttractionFirstDerivative(int atomAIndex, 
                                                    int atomBIndex, 
                                                    int mu, 
                                                    int nu, 
-                                                   double***** twoElecTwoCoreFirstDerivative,
-                                                   MolDS_base::CartesianType axisA);
+                                                   double const* const* const* const* const* twoElecTwoCoreFirstDerivative,
+                                                   MolDS_base::CartesianType axisA) const;
    void CalcTwoElecTwoCoreDiatomic(double**** matrix, int atomAIndex, int atomBIndex);
    void CalcTwoElecTwoCoreDiatomicFirstDerivatives(double***** matrix, 
                                                    int atomAIndex, 

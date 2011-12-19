@@ -418,7 +418,7 @@ void Cndo2::CalcHFProperties(){
                         this->coreRepulsionEnergy);
 }
 
-double Cndo2::GetBondingAdjustParameterK(ShellType shellA, ShellType shellB){
+double Cndo2::GetBondingAdjustParameterK(ShellType shellA, ShellType shellB) const{
    double value=1.0;
    if(shellA >= m || shellB >= m){
       return this->bondingAdjustParameterK[1];
@@ -867,10 +867,10 @@ void Cndo2::CalcFockMatrix(double** fockMatrix, Molecule* molecule, double** ove
 
                if(mu == nu){
                   // diagonal part
-                  fockMatrix[mu][mu] = this->GetFockDiagElement(atomA, 
+                  fockMatrix[mu][mu] = this->GetFockDiagElement(*atomA, 
                                                                 A, 
                                                                 mu, 
-                                                                molecule, 
+                                                                *molecule, 
                                                                 gammaAB,
                                                                 orbitalElectronPopulation, 
                                                                 atomicElectronPopulation,
@@ -879,13 +879,13 @@ void Cndo2::CalcFockMatrix(double** fockMatrix, Molecule* molecule, double** ove
                }
                else if(mu < nu){
                   // upper right part
-                  fockMatrix[mu][nu] = this->GetFockOffDiagElement(atomA, 
-                                                                   atomB,
+                  fockMatrix[mu][nu] = this->GetFockOffDiagElement(*atomA, 
+                                                                   *atomB,
                                                                    A, 
                                                                    B, 
                                                                    mu, 
                                                                    nu, 
-                                                                   molecule, 
+                                                                   *molecule, 
                                                                    gammaAB,
                                                                    overlap,
                                                                    orbitalElectronPopulation, 
@@ -912,24 +912,29 @@ void Cndo2::CalcFockMatrix(double** fockMatrix, Molecule* molecule, double** ove
    */
 }
 
-double Cndo2::GetFockDiagElement(Atom* atomA, int atomAIndex, int mu, 
-                                 Molecule* molecule, double** gammaAB,
-                                 double** orbitalElectronPopulation, double* atomicElectronPopulation,
-                                 double****** twoElecTwoCore, bool isGuess){
+double Cndo2::GetFockDiagElement(const Atom& atomA, 
+                                 int atomAIndex, 
+                                 int mu, 
+                                 const Molecule& molecule, 
+                                 double const* const* gammaAB,
+                                 double const* const* orbitalElectronPopulation, 
+                                 double const* atomicElectronPopulation,
+                                 double const* const* const* const* const* const* twoElecTwoCore, 
+                                 bool isGuess) const{
    double value;
-   int firstAOIndexA = atomA->GetFirstAOIndex();
-   value = atomA->GetCoreIntegral(atomA->GetValence()[mu-firstAOIndexA], 
-                                     gammaAB[atomAIndex][atomAIndex], 
-                                     isGuess, this->theory);
+   int firstAOIndexA = atomA.GetFirstAOIndex();
+   value = atomA.GetCoreIntegral(atomA.GetValence()[mu-firstAOIndexA], 
+                                 gammaAB[atomAIndex][atomAIndex], 
+                                 isGuess, this->theory);
    if(!isGuess){
       double temp = atomicElectronPopulation[atomAIndex] 
                    -0.5*orbitalElectronPopulation[mu][mu];
       value += temp*gammaAB[atomAIndex][atomAIndex];
 
       temp = 0.0;
-      for(int BB=0; BB<molecule->GetAtomVect()->size(); BB++){
+      for(int BB=0; BB<molecule.GetAtomVect()->size(); BB++){
          if(BB != atomAIndex){
-            Atom* atomBB = (*molecule->GetAtomVect())[BB];
+            Atom* atomBB = (*molecule.GetAtomVect())[BB];
             temp += ( atomicElectronPopulation[BB] - atomBB->GetCoreCharge()  )
                      *gammaAB[atomAIndex][BB];
          }
@@ -940,13 +945,21 @@ double Cndo2::GetFockDiagElement(Atom* atomA, int atomAIndex, int mu,
    return value;
 }
 
-double Cndo2::GetFockOffDiagElement(Atom* atomA, Atom* atomB, int atomAIndex, int atomBIndex, 
-                                    int mu, int nu, Molecule* molecule, double** gammaAB, double** overlap,
-                                    double** orbitalElectronPopulation, 
-                                    double****** twoElecTwoCore, bool isGuess){
+double Cndo2::GetFockOffDiagElement(const Atom& atomA, 
+                                    const Atom& atomB, 
+                                    int atomAIndex, 
+                                    int atomBIndex, 
+                                    int mu, 
+                                    int nu, 
+                                    const Molecule& molecule, 
+                                    double const* const* gammaAB, 
+                                    double const* const* overlap,
+                                    double const* const* orbitalElectronPopulation, 
+                                    double const* const* const* const* const* const* twoElecTwoCore, 
+                                    bool isGuess) const{
    double value;
-   double K = this->GetBondingAdjustParameterK(atomA->GetValenceShellType(), atomB->GetValenceShellType());
-   double bondParameter = 0.5*K*(atomA->GetBondingParameter() + atomB->GetBondingParameter()); 
+   double K = this->GetBondingAdjustParameterK(atomA.GetValenceShellType(), atomB.GetValenceShellType());
+   double bondParameter = 0.5*K*(atomA.GetBondingParameter() + atomB.GetBondingParameter()); 
    value =  bondParameter*overlap[mu][nu];
    if(!isGuess){
       value -= 0.5*orbitalElectronPopulation[mu][nu]*gammaAB[atomAIndex][atomBIndex];

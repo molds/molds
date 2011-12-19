@@ -57,7 +57,7 @@ protected:
    int matrixCISdimension;
    virtual void CalcHFProperties();
    double GetBondingAdjustParameterK(MolDS_base::ShellType shellA, 
-                                     MolDS_base::ShellType shellB);
+                                     MolDS_base::ShellType shellB) const;
    virtual double GetDiatomCoreRepulsionEnergy(int indexAtomA, int indexAtomB) const;
    virtual double GetDiatomCoreRepulsionFirstDerivative(int indexAtomA, 
                                                         int indexAtomB, 
@@ -83,27 +83,27 @@ protected:
    virtual void CalcGammaAB(double** gammaAB, MolDS_base::Molecule* molecule);
    virtual void SetMessages();
    virtual void SetEnableAtomTypes();
-   virtual double GetFockDiagElement(MolDS_base_atoms::Atom* atomA, 
+   virtual double GetFockDiagElement(const MolDS_base_atoms::Atom& atomA, 
                                      int atomAIndex, 
                                      int mu, 
-                                     MolDS_base::Molecule* molecule, 
-                                     double** gammaAB,
-                                     double** orbitalElectronPopulation, 
-                                     double* atomicElectronPopulation,
-                                     double****** twoElecTwoCore, 
-                                     bool isGuess);
-   virtual double GetFockOffDiagElement(MolDS_base_atoms::Atom* atomA, 
-                                        MolDS_base_atoms::Atom* atomB, 
+                                     const MolDS_base::Molecule& molecule, 
+                                     double const* const* gammaAB,
+                                     double const* const* orbitalElectronPopulation, 
+                                     double const* atomicElectronPopulation,
+                                     double const* const* const* const* const* const* twoElecTwoCore, 
+                                     bool isGuess) const;
+   virtual double GetFockOffDiagElement(const MolDS_base_atoms::Atom& atomA, 
+                                        const MolDS_base_atoms::Atom& atomB, 
                                         int atomAIndex, 
                                         int atomBIndex, 
                                         int mu, 
                                         int nu, 
-                                        MolDS_base::Molecule* molecule, 
-                                        double** gammaAB, 
-                                        double** overlap,
-                                        double** orbitalElectronPopulation, 
-                                        double****** twoElecTwoCore, 
-                                        bool isGuess);
+                                        const MolDS_base::Molecule& molecule, 
+                                        double const* const* gammaAB, 
+                                        double const* const* overlap,
+                                        double const* const* orbitalElectronPopulation, 
+                                        double const* const* const* const* const* const* twoElecTwoCore, 
+                                        bool isGuess) const;
    virtual void CalcDiatomicOverlapInDiatomicFrame(double** diatomicOverlap, 
                                                    MolDS_base_atoms::Atom* atomA, 
                                                    MolDS_base_atoms::Atom* atomB);

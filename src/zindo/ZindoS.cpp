@@ -121,36 +121,36 @@ void ZindoS::SetEnableAtomTypes(){
    this->enableAtomTypes.push_back(S);
 }
 
-double ZindoS::GetFockDiagElement(Atom* atomA, 
+double ZindoS::GetFockDiagElement(const Atom& atomA, 
                                   int atomAIndex, 
                                   int mu, 
-                                  Molecule* molecule, 
-                                  double** gammaAB,
-                                  double** orbitalElectronPopulation, 
-                                  double* atomicElectronPopulation,
-                                  double****** twoElecTwoCore, 
-                                  bool isGuess){
+                                  const Molecule& molecule, 
+                                  double const* const* gammaAB,
+                                  double const* const* orbitalElectronPopulation, 
+                                  double const* atomicElectronPopulation,
+                                  double const* const* const* const* const* const* twoElecTwoCore, 
+                                  bool isGuess) const{
    double value=0.0;
-   int firstAOIndexA = atomA->GetFirstAOIndex();
-   value = atomA->GetCoreIntegral(atomA->GetValence()[mu-firstAOIndexA], 
+   int firstAOIndexA = atomA.GetFirstAOIndex();
+   value = atomA.GetCoreIntegral(atomA.GetValence()[mu-firstAOIndexA], 
                                   isGuess, this->theory);
    if(!isGuess){
       double temp = 0.0;
       double coulomb = 0.0;
       double exchange = 0.0;
       int lammda = 0;
-      int totalNumberAOs = this->molecule->GetTotalNumberAOs();
+      int totalNumberAOs = molecule.GetTotalNumberAOs();
       double orbitalElectronPopulationDiagPart[totalNumberAOs];
 
       for(int i=0; i<totalNumberAOs; i++){
          orbitalElectronPopulationDiagPart[i] = orbitalElectronPopulation[i][i];
       }
 
-      OrbitalType orbitalMu = atomA->GetValence()[mu-firstAOIndexA];
+      OrbitalType orbitalMu = atomA.GetValence()[mu-firstAOIndexA];
       OrbitalType orbitalLam;
-      int atomANumberValence = atomA->GetValence().size();
+      int atomANumberValence = atomA.GetValence().size();
       for(int v=0; v<atomANumberValence; v++){
-         orbitalLam = atomA->GetValence()[v];
+         orbitalLam = atomA.GetValence()[v];
          coulomb  = this->GetCoulombInt(orbitalMu, orbitalLam, atomA);
          exchange = this->GetExchangeInt(orbitalMu, orbitalLam, atomA);
          lammda = v + firstAOIndexA;
@@ -159,10 +159,10 @@ double ZindoS::GetFockDiagElement(Atom* atomA,
       value += temp;
    
       temp = 0.0;
-      int totalNumberAtoms = molecule->GetAtomVect()->size();
+      int totalNumberAtoms = molecule.GetAtomVect()->size();
       for(int B=0; B<totalNumberAtoms; B++){
          if(B != atomAIndex){
-            Atom* atomB = (*molecule->GetAtomVect())[B];
+            Atom* atomB = (*molecule.GetAtomVect())[B];
             OrbitalType orbitalSigma;
             int sigma;
             int atomBNumberValence = atomB->GetValence().size();
@@ -172,11 +172,11 @@ double ZindoS::GetFockDiagElement(Atom* atomA,
                temp += orbitalElectronPopulationDiagPart[sigma]
                       *this->GetNishimotoMatagaTwoEleInt(atomA, 
                                                          orbitalMu, 
-                                                         atomB, 
+                                                         *atomB, 
                                                          orbitalSigma);
             }
             temp -= atomB->GetCoreCharge() 
-                   *this->GetNishimotoMatagaTwoEleInt(atomA, s, atomB, s);
+                   *this->GetNishimotoMatagaTwoEleInt(atomA, s, *atomB, s);
          }
       }
       value += temp;
@@ -185,23 +185,23 @@ double ZindoS::GetFockDiagElement(Atom* atomA,
    return value;
 }
 
-double ZindoS::GetFockOffDiagElement(Atom* atomA, 
-                                     Atom* atomB, 
+double ZindoS::GetFockOffDiagElement(const Atom& atomA, 
+                                     const Atom& atomB, 
                                      int atomAIndex, 
                                      int atomBIndex, 
                                      int mu, 
                                      int nu, 
-                                     Molecule* molecule, 
-                                     double** gammaAB, 
-                                     double** overlap,
-                                     double** orbitalElectronPopulation, 
-                                     double****** twoElecTwoCore, 
-                                     bool isGuess){
+                                     const Molecule& molecule, 
+                                     double const* const* gammaAB, 
+                                     double const* const* overlap,
+                                     double const* const* orbitalElectronPopulation, 
+                                     double const* const* const* const* const* const* twoElecTwoCore, 
+                                     bool isGuess) const{
    double value = 0.0;
-   OrbitalType orbitalMu = atomA->GetValence()[mu-atomA->GetFirstAOIndex()];
-   OrbitalType orbitalNu = atomB->GetValence()[nu-atomB->GetFirstAOIndex()];
-   double bondParameter = 0.5*(atomA->GetBondingParameter(this->theory, orbitalMu) 
-                              +atomB->GetBondingParameter(this->theory, orbitalNu)); 
+   OrbitalType orbitalMu = atomA.GetValence()[mu-atomA.GetFirstAOIndex()];
+   OrbitalType orbitalNu = atomB.GetValence()[nu-atomB.GetFirstAOIndex()];
+   double bondParameter = 0.5*(atomA.GetBondingParameter(this->theory, orbitalMu) 
+                              +atomB.GetBondingParameter(this->theory, orbitalNu)); 
 
    if(isGuess){
       value = bondParameter*overlap[mu][nu];
@@ -230,28 +230,28 @@ void ZindoS::CalcGammaAB(double** gammaAB, Molecule* molecule){
 
 // Apendix in [BZ_1972]
 // ZINDO Coulomb Interaction
-double ZindoS::GetCoulombInt(OrbitalType orbital1, OrbitalType orbital2, Atom* atom){
+double ZindoS::GetCoulombInt(OrbitalType orbital1, OrbitalType orbital2, const Atom& atom) const{
 
    double value=0.0;
    
    if( orbital1 == s && orbital2 == s){ 
-      value = atom->GetZindoF0ssLower();
+      value = atom.GetZindoF0ssLower();
    }   
    else if( orbital1 == s && ( orbital2 == px || orbital2 == py || orbital2 == pz )){ 
-      value = atom->GetZindoF0ssLower();
+      value = atom.GetZindoF0ssLower();
    }   
    else if( orbital2 == s && ( orbital1 == px || orbital1 == py || orbital1 == pz )){ 
-      value = atom->GetZindoF0ssLower();
+      value = atom.GetZindoF0ssLower();
    }   
    else if( (orbital1 == orbital2) && ( orbital1 == px || orbital1 == py || orbital1 == pz )){ 
-      value = atom->GetZindoF0ssLower()
-             +atom->GetZindoF2ppLower()*4.0;
+      value = atom.GetZindoF0ssLower()
+             +atom.GetZindoF2ppLower()*4.0;
    }   
    else if( (orbital1 != orbital2) 
          && ( orbital1 == px || orbital1 == py || orbital1 == pz )
          && ( orbital2 == px || orbital2 == py || orbital2 == pz ) ){
-      value = atom->GetZindoF0ssLower()
-             -atom->GetZindoF2ppLower()*2.0;
+      value = atom.GetZindoF0ssLower()
+             -atom.GetZindoF2ppLower()*2.0;
    }   
    // ToDo: There are bugs for d-orbitals.
    /*
@@ -260,36 +260,36 @@ double ZindoS::GetCoulombInt(OrbitalType orbital1, OrbitalType orbital2, Atom* a
                                orbital2 == dzz || 
                                orbital2 == dzx || 
                                orbital2 == dxxyy )){ 
-      value = atom->GetZindoF0sdLower();
+      value = atom.GetZindoF0sdLower();
    }   
    else if( orbital2 == s && ( orbital1 == dxy || 
                                orbital1 == dyz || 
                                orbital1 == dzz || 
                                orbital1 == dzx || 
                                orbital1 == dxxyy )){ 
-      value = atom->GetZindoF0sdLower();
+      value = atom.GetZindoF0sdLower();
    }
    else if( orbital1 == dzz && (orbital2 == px || orbital2==py) ){
-      value = atom->GetZindoF0sdLower()
-             -atom->GetZindoF2pdLower()*2.0;
+      value = atom.GetZindoF0sdLower()
+             -atom.GetZindoF2pdLower()*2.0;
    }
    else if( orbital2 == dzz && (orbital1 == px || orbital1==py) ){
-      value = atom->GetZindoF0sdLower()
-             -atom->GetZindoF2pdLower()*2.0;
+      value = atom.GetZindoF0sdLower()
+             -atom.GetZindoF2pdLower()*2.0;
    }
    else if( (orbital1 == dzz && orbital2 == pz) ||
             (orbital2 == dzz && orbital1 == pz) ){
-      value = atom->GetZindoF0sdLower()
-             +atom->GetZindoF2pdLower()*4.0;
+      value = atom.GetZindoF0sdLower()
+             +atom.GetZindoF2pdLower()*4.0;
    }
    else if( (orbital1 == orbital2) && ( orbital1 == dxy || 
                                         orbital1 == dyz || 
                                         orbital1 == dzz || 
                                         orbital1 == dzx || 
                                         orbital1 == dxxyy )){ 
-      value = atom->GetZindoF0ddLower()
-             +atom->GetZindoF2ddLower()*4.0
-             +atom->GetZindoF4ddLower()*36.0;
+      value = atom.GetZindoF0ddLower()
+             +atom.GetZindoF2ddLower()*4.0
+             +atom.GetZindoF4ddLower()*36.0;
    }
    else if( (orbital1 == dxxyy && orbital2 == px) ||
             (orbital2 == dxxyy && orbital1 == px) || 
@@ -307,8 +307,8 @@ double ZindoS::GetCoulombInt(OrbitalType orbital1, OrbitalType orbital2, Atom* a
             (orbital2 == dyz && orbital1 == py) || 
             (orbital1 == dyz && orbital2 == pz) ||
             (orbital2 == dyz && orbital1 == pz) ){
-      value = atom->GetZindoF0sdLower()
-             +atom->GetZindoF2pdLower()*2.0;
+      value = atom.GetZindoF0sdLower()
+             +atom.GetZindoF2pdLower()*2.0;
    }
    else if( (orbital1 == dxxyy && orbital2 == pz) ||
             (orbital2 == dxxyy && orbital1 == pz) || 
@@ -318,30 +318,30 @@ double ZindoS::GetCoulombInt(OrbitalType orbital1, OrbitalType orbital2, Atom* a
             (orbital2 == dzx && orbital1 == py) ||
             (orbital1 == dyz && orbital2 == px) ||
             (orbital2 == dyz && orbital1 == px)  ){
-      value = atom->GetZindoF0sdLower()
-             -atom->GetZindoF2pdLower()*4.0;
+      value = atom.GetZindoF0sdLower()
+             -atom.GetZindoF2pdLower()*4.0;
    }
    else if( (orbital1 == dxxyy && orbital2 == dzz) ||
             (orbital2 == dxxyy && orbital1 == dzz) || 
             (orbital1 == dxy && orbital2 == dzz) ||
             (orbital2 == dxy && orbital1 == dzz)  ){
-      value = atom->GetZindoF0ddLower()
-             -atom->GetZindoF2ddLower()*4.0
-             +atom->GetZindoF4ddLower()*6.0;
+      value = atom.GetZindoF0ddLower()
+             -atom.GetZindoF2ddLower()*4.0
+             +atom.GetZindoF4ddLower()*6.0;
    }
    else if( (orbital1 == dxy && orbital2 == dxxyy) ||
             (orbital2 == dxy && orbital1 == dxxyy)  ){
-      value = atom->GetZindoF0ddLower()
-             +atom->GetZindoF2ddLower()*4.0
-             -atom->GetZindoF4ddLower()*34.0;
+      value = atom.GetZindoF0ddLower()
+             +atom.GetZindoF2ddLower()*4.0
+             -atom.GetZindoF4ddLower()*34.0;
    }
    else if( (orbital1 == dzx && orbital2 == dzz) ||
             (orbital2 == dzx && orbital1 == dzz) || 
             (orbital1 == dyz && orbital2 == dzz) ||
             (orbital2 == dyz && orbital1 == dzz)  ){
-      value = atom->GetZindoF0ddLower()
-             +atom->GetZindoF2ddLower()*2.0
-             -atom->GetZindoF4ddLower()*24.0;
+      value = atom.GetZindoF0ddLower()
+             +atom.GetZindoF2ddLower()*2.0
+             -atom.GetZindoF4ddLower()*24.0;
    }
    else if( (orbital1 == dzx && orbital2 == dxxyy) ||
             (orbital2 == dzx && orbital1 == dxxyy) || 
@@ -353,15 +353,15 @@ double ZindoS::GetCoulombInt(OrbitalType orbital1, OrbitalType orbital2, Atom* a
             (orbital2 == dyz && orbital1 == dxy) || 
             (orbital1 == dyz && orbital2 == dzx) || 
             (orbital2 == dyz && orbital1 == dzx) ){
-      value = atom->GetZindoF0ddLower()
-             -atom->GetZindoF2ddLower()*2.0
-             -atom->GetZindoF4ddLower()*4.0;
+      value = atom.GetZindoF0ddLower()
+             -atom.GetZindoF2ddLower()*2.0
+             -atom.GetZindoF4ddLower()*4.0;
    }
    */
    else{
       stringstream ss;
       ss << this->errorMessageCoulombInt;
-      ss << this->errorMessageAtomType << AtomTypeStr(atom->GetAtomType()) << "\n";
+      ss << this->errorMessageAtomType << AtomTypeStr(atom.GetAtomType()) << "\n";
       ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbital1) << "\n";
       ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbital2) << "\n";
       throw MolDSException(ss.str());
@@ -373,7 +373,7 @@ double ZindoS::GetCoulombInt(OrbitalType orbital1, OrbitalType orbital2, Atom* a
 
 // Apendix in [BZ_1972]
 // ZINDO Exchange Interaction
-double ZindoS::GetExchangeInt(OrbitalType orbital1, OrbitalType orbital2, Atom* atom){
+double ZindoS::GetExchangeInt(OrbitalType orbital1, OrbitalType orbital2, const Atom& atom) const{
 
    double value=0.0;
 
@@ -381,15 +381,15 @@ double ZindoS::GetExchangeInt(OrbitalType orbital1, OrbitalType orbital2, Atom* 
       value = this->GetCoulombInt(orbital1, orbital2, atom);
    }   
    else if( orbital1 == s && (orbital2 == px || orbital2 == py || orbital2 == pz ) ){
-      value = atom->GetZindoG1spLower();
+      value = atom.GetZindoG1spLower();
    }   
    else if( orbital2 == s && (orbital1 == px || orbital1 == py || orbital1 == pz ) ){
-      value = atom->GetZindoG1spLower();
+      value = atom.GetZindoG1spLower();
    }   
    else if( (orbital1 != orbital2) 
          && ( orbital1 == px || orbital1 == py || orbital1 == pz )
          && ( orbital2 == px || orbital2 == py || orbital2 == pz ) ){
-      value = atom->GetZindoF2ppLower()*3.0;
+      value = atom.GetZindoF2ppLower()*3.0;
    }
    // ToDo: There are bugs for d-orbitals.
    /*
@@ -483,7 +483,7 @@ double ZindoS::GetExchangeInt(OrbitalType orbital1, OrbitalType orbital2, Atom* 
    else{
       stringstream ss;
       ss << this->errorMessageExchangeInt;
-      ss << this->errorMessageAtomType << AtomTypeStr(atom->GetAtomType()) << "\n";
+      ss << this->errorMessageAtomType << AtomTypeStr(atom.GetAtomType()) << "\n";
       ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbital1) << "\n";
       ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbital2) << "\n";
       throw MolDSException(ss.str());
@@ -493,15 +493,15 @@ double ZindoS::GetExchangeInt(OrbitalType orbital1, OrbitalType orbital2, Atom* 
 }
 
 // ref. [MN_1957] and (5a) in [AEZ_1986]
-double ZindoS::GetNishimotoMatagaTwoEleInt(Atom* atomA, OrbitalType orbitalA, 
-                                           Atom* atomB, OrbitalType orbitalB){
-   double r = this->molecule->GetDistanceAtoms(*atomA, *atomB);
+double ZindoS::GetNishimotoMatagaTwoEleInt(const Atom& atomA, OrbitalType orbitalA, 
+                                           const Atom& atomB, OrbitalType orbitalB) const{
+   double r = this->molecule->GetDistanceAtoms(atomA, atomB);
    double gammaAA;
    if(orbitalA == s || 
       orbitalA == px ||
       orbitalA == py ||
       orbitalA == pz ){
-      gammaAA = atomA->GetZindoF0ss();
+      gammaAA = atomA.GetZindoF0ss();
    }
    /*
    else if(orbitalA == dxy ||
@@ -515,7 +515,7 @@ double ZindoS::GetNishimotoMatagaTwoEleInt(Atom* atomA, OrbitalType orbitalA,
    else{
       stringstream ss;
       ss << this->errorMessageNishimotoMataga;
-      ss << this->errorMessageAtomType << AtomTypeStr(atomA->GetAtomType()) << "\n";
+      ss << this->errorMessageAtomType << AtomTypeStr(atomA.GetAtomType()) << "\n";
       ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbitalA) << "\n";
       throw MolDSException(ss.str());
    }   
@@ -525,7 +525,7 @@ double ZindoS::GetNishimotoMatagaTwoEleInt(Atom* atomA, OrbitalType orbitalA,
       orbitalB == px ||
       orbitalB == py ||
       orbitalB == pz ){
-      gammaBB = atomB->GetZindoF0ss();
+      gammaBB = atomB.GetZindoF0ss();
    }
    /*
    else if(orbitalB == dxy ||
@@ -539,7 +539,7 @@ double ZindoS::GetNishimotoMatagaTwoEleInt(Atom* atomA, OrbitalType orbitalA,
    else{
       stringstream ss;
       ss << this->errorMessageNishimotoMataga;
-      ss << this->errorMessageAtomType << AtomTypeStr(atomB->GetAtomType()) << "\n";
+      ss << this->errorMessageAtomType << AtomTypeStr(atomB.GetAtomType()) << "\n";
       ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbitalB) << "\n";
       throw MolDSException(ss.str());
    }  
@@ -551,9 +551,9 @@ double ZindoS::GetNishimotoMatagaTwoEleInt(Atom* atomA, OrbitalType orbitalA,
 // First derivative of Nishimoto-Mataga related to the coordinate of atom A.
 // For Nishimoto-Mataga, See ZindoS::GetNishimotoMatagaTwoEleInt 
 // or ref. [MN_1957] and (5a) in [AEZ_1986]
-double ZindoS::GetNishimotoMatagaTwoEleIntFirstDerivative(Atom* atomA, 
+double ZindoS::GetNishimotoMatagaTwoEleIntFirstDerivative(const Atom& atomA, 
                                                           OrbitalType orbitalA, 
-                                                          Atom* atomB, 
+                                                          const Atom& atomB, 
                                                           OrbitalType orbitalB,
                                                           CartesianType axisA){
    double gammaAA;
@@ -561,7 +561,7 @@ double ZindoS::GetNishimotoMatagaTwoEleIntFirstDerivative(Atom* atomA,
       orbitalA == px ||
       orbitalA == py ||
       orbitalA == pz ){
-      gammaAA = atomA->GetZindoF0ss();
+      gammaAA = atomA.GetZindoF0ss();
    }
    /*
    else if(orbitalA == dxy ||
@@ -569,13 +569,13 @@ double ZindoS::GetNishimotoMatagaTwoEleIntFirstDerivative(Atom* atomA,
            orbitalA == dzz ||
            orbitalA == dzx ||
            orbitalA == dxxyy ){
-      gammaAA = atomA->GetZindoF0dd();
+      gammaAA = atomA.GetZindoF0dd();
    }
    */
    else{
       stringstream ss;
       ss << this->errorMessageNishimotoMataga;
-      ss << this->errorMessageAtomType << AtomTypeStr(atomA->GetAtomType()) << "\n";
+      ss << this->errorMessageAtomType << AtomTypeStr(atomA.GetAtomType()) << "\n";
       ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbitalA) << "\n";
       throw MolDSException(ss.str());
    }   
@@ -585,7 +585,7 @@ double ZindoS::GetNishimotoMatagaTwoEleIntFirstDerivative(Atom* atomA,
       orbitalB == px ||
       orbitalB == py ||
       orbitalB == pz ){
-      gammaBB = atomB->GetZindoF0ss();
+      gammaBB = atomB.GetZindoF0ss();
    }
    /*
    else if(orbitalB == dxy ||
@@ -593,19 +593,19 @@ double ZindoS::GetNishimotoMatagaTwoEleIntFirstDerivative(Atom* atomA,
            orbitalB == dzz ||
            orbitalB == dzx ||
            orbitalB == dxxyy ){
-      gammaBB = atomB->GetZindoF0dd();
+      gammaBB = atomB.GetZindoF0dd();
    }
    */
    else{
       stringstream ss;
       ss << this->errorMessageNishimotoMataga;
-      ss << this->errorMessageAtomType << AtomTypeStr(atomB->GetAtomType()) << "\n";
+      ss << this->errorMessageAtomType << AtomTypeStr(atomB.GetAtomType()) << "\n";
       ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbitalB) << "\n";
       throw MolDSException(ss.str());
    }  
 
-   double r = this->molecule->GetDistanceAtoms(*atomA, *atomB);
-   double dCartesian = atomA->GetXyz()[axisA] - atomB->GetXyz()[axisA];
+   double r = this->molecule->GetDistanceAtoms(atomA, atomB);
+   double dCartesian = atomA.GetXyz()[axisA] - atomB.GetXyz()[axisA];
    double value = -1.0*dCartesian/r;
    value *= this->nishimotoMatagaParamA;
    value *= pow( r+this->nishimotoMatagaParamB/(gammaAA+gammaBB) ,-2.0);
@@ -680,9 +680,9 @@ double ZindoS::GetMolecularIntegralElement(int moI, int moJ, int moK, int moL,
                orbitalNu = atomB->GetValence()[nu-firstAOIndexB];
 
                if(A<B){
-                  gamma = this->GetNishimotoMatagaTwoEleInt(atomA, 
+                  gamma = this->GetNishimotoMatagaTwoEleInt(*atomA, 
                                                             orbitalMu, 
-                                                            atomB, 
+                                                            *atomB, 
                                                             orbitalNu);
                   value += gamma
                           *fockMatrix[moI][mu]
@@ -711,7 +711,7 @@ double ZindoS::GetMolecularIntegralElement(int moI, int moJ, int moK, int moL,
             orbitalNu = atomA->GetValence()[nu-firstAOIndexA];
 
             if(mu!=nu){
-               exchange = this->GetExchangeInt(orbitalMu, orbitalNu, atomA);
+               exchange = this->GetExchangeInt(orbitalMu, orbitalNu, *atomA);
                value += exchange
                        *fockMatrix[moI][mu]
                        *fockMatrix[moJ][nu]
@@ -724,7 +724,7 @@ double ZindoS::GetMolecularIntegralElement(int moI, int moJ, int moK, int moL,
                        *fockMatrix[moL][nu];
             }
 
-            coulomb = this->GetCoulombInt(orbitalMu, orbitalNu, atomA);
+            coulomb = this->GetCoulombInt(orbitalMu, orbitalNu, *atomA);
 
             if( (orbitalMu == s || orbitalMu == px || orbitalMu == py || orbitalMu == pz) &&
                 (orbitalNu == s || orbitalNu == px || orbitalNu == py || orbitalNu == pz) ){
@@ -1202,9 +1202,9 @@ void ZindoS::CalcCISMatrix(double** matrixCIS, int numberActiveOcc, int numberAc
                         orbitalNu = atomB->GetValence()[nu-firstAOIndexB];
 
                         if(A<B){
-                           gamma = this->GetNishimotoMatagaTwoEleInt(atomA, 
+                           gamma = this->GetNishimotoMatagaTwoEleInt(*atomA, 
                                                                      orbitalMu, 
-                                                                     atomB, 
+                                                                     *atomB, 
                                                                      orbitalNu);
                            value += 2.0*gamma*fockMatrix[moA][mu]
                                              *fockMatrix[moI][mu]
@@ -1242,7 +1242,7 @@ void ZindoS::CalcCISMatrix(double** matrixCIS, int numberActiveOcc, int numberAc
                      orbitalNu = atomA->GetValence()[nu-firstAOIndexA];
 
                      if(mu!=nu){
-                        exchange = this->GetExchangeInt(orbitalMu, orbitalNu, atomA);
+                        exchange = this->GetExchangeInt(orbitalMu, orbitalNu, *atomA);
                         value += 2.0*exchange*fockMatrix[moA][mu]
                                              *fockMatrix[moI][nu]
                                              *fockMatrix[moJ][nu]
@@ -1261,7 +1261,7 @@ void ZindoS::CalcCISMatrix(double** matrixCIS, int numberActiveOcc, int numberAc
                                              *fockMatrix[moJ][nu];
                      }
 
-                     coulomb = this->GetCoulombInt(orbitalMu, orbitalNu, atomA);
+                     coulomb = this->GetCoulombInt(orbitalMu, orbitalNu, *atomA);
 
                      if( (orbitalMu == s || orbitalMu == px || orbitalMu == py || orbitalMu == pz) &&
                          (orbitalNu == s || orbitalNu == px || orbitalNu == py || orbitalNu == pz) ){
@@ -1309,9 +1309,9 @@ void ZindoS::CalcCISMatrix(double** matrixCIS, int numberActiveOcc, int numberAc
                         orbitalNu = atomB->GetValence()[nu-firstAOIndexB];
 
                         if(A<B){
-                           gamma = this->GetNishimotoMatagaTwoEleInt(atomA, 
+                           gamma = this->GetNishimotoMatagaTwoEleInt(*atomA, 
                                                                      orbitalMu, 
-                                                                     atomB, 
+                                                                     *atomB, 
                                                                      orbitalNu);
                            value += 2.0*gamma*fockMatrix[moI][mu]
                                              *fockMatrix[moA][mu]
@@ -1349,7 +1349,7 @@ void ZindoS::CalcCISMatrix(double** matrixCIS, int numberActiveOcc, int numberAc
                      orbitalNu = atomA->GetValence()[nu-firstAOIndexA];
 
                      if(mu!=nu){
-                        exchange = this->GetExchangeInt(orbitalMu, orbitalNu, atomA);
+                        exchange = this->GetExchangeInt(orbitalMu, orbitalNu, *atomA);
                         value += 2.0*exchange*fockMatrix[moI][mu]
                                              *fockMatrix[moA][nu]
                                              *fockMatrix[moA][nu]
@@ -1368,7 +1368,7 @@ void ZindoS::CalcCISMatrix(double** matrixCIS, int numberActiveOcc, int numberAc
                                              *fockMatrix[moA][nu];
                      }
 
-                     coulomb = this->GetCoulombInt(orbitalMu, orbitalNu, atomA);
+                     coulomb = this->GetCoulombInt(orbitalMu, orbitalNu, *atomA);
 
                      if( (orbitalMu == s || orbitalMu == px || orbitalMu == py || orbitalMu == pz) &&
                          (orbitalNu == s || orbitalNu == px || orbitalNu == py || orbitalNu == pz) ){
@@ -1491,7 +1491,7 @@ void ZindoS::CalcForce(vector<int> elecStates){
                                              +atomB->GetCoreCharge()
                                              *atomicElectronPopulation[a])
                                              *this->GetNishimotoMatagaTwoEleIntFirstDerivative(
-                                                    atomA, s, atomB, s, (CartesianType)i);
+                                                    *atomA, s, *atomB, s, (CartesianType)i);
                   }
                   for(int mu=firstAOIndexA; mu<firstAOIndexA+numberAOsA; mu++){
                      OrbitalType orbitalMu = atomA->GetValence()[mu-firstAOIndexA];
@@ -1509,7 +1509,7 @@ void ZindoS::CalcForce(vector<int> elecStates){
                                                   *this->orbitalElectronPopulation[nu][nu]
                                                   -0.5*pow(this->orbitalElectronPopulation[mu][nu],2.0))
                                                   *this->GetNishimotoMatagaTwoEleIntFirstDerivative(
-                                                         atomA, orbitalMu, atomB, orbitalNu,
+                                                         *atomA, orbitalMu, *atomB, orbitalNu,
                                                          (CartesianType)i);
                         }
                      }
@@ -1564,7 +1564,7 @@ void ZindoS::CalcForce(vector<int> elecStates){
                electronicForce1 += ( atomA->GetCoreCharge()*atomicElectronPopulation[b]
                                     +atomB->GetCoreCharge()*atomicElectronPopulation[a])
                                     *this->GetNishimotoMatagaTwoEleIntFirstDerivative
-                                          (atomA, s, atomB, s, (CartesianType)i);
+                                          (*atomA, s, *atomB, s, (CartesianType)i);
 
                for(int mu=firstAOIndexA; mu<firstAOIndexA+numberAOsA; mu++){
                   OrbitalType orbitalMu = atomA->GetValence()[mu-firstAOIndexA];
@@ -1585,7 +1585,7 @@ void ZindoS::CalcForce(vector<int> elecStates){
                                          *this->orbitalElectronPopulation[nu][nu]
                                          -0.5*pow(this->orbitalElectronPopulation[mu][nu],2.0))
                                          *this->GetNishimotoMatagaTwoEleIntFirstDerivative
-                                                (atomA, orbitalMu, atomB, orbitalNu,
+                                                (*atomA, orbitalMu, *atomB, orbitalNu,
                                                 (CartesianType)i);
                   }
                }

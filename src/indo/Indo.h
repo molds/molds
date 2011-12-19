@@ -12,27 +12,27 @@ public:
 protected:
    virtual void SetMessages();
    virtual void SetEnableAtomTypes();
-   virtual double GetFockDiagElement(MolDS_base_atoms::Atom* atomA, 
+   virtual double GetFockDiagElement(const MolDS_base_atoms::Atom& atomA, 
                                      int atomAIndex, 
                                      int mu, 
-                                     MolDS_base::Molecule* molecule, 
-                                     double** gammaAB,
-                                     double** orbitalElectronPopulation, 
-                                     double* atomicElectronPopulation,
-                                     double****** twoElecTwoCore,
-                                     bool isGuess);
-   virtual double GetFockOffDiagElement(MolDS_base_atoms::Atom* atomA, 
-                                        MolDS_base_atoms::Atom* atomB, 
+                                     const MolDS_base::Molecule& molecule, 
+                                     double const* const* gammaAB,
+                                     double const* const* orbitalElectronPopulation, 
+                                     double const* atomicElectronPopulation,
+                                     double const* const* const* const* const* const* twoElecTwoCore,
+                                     bool isGuess) const;
+   virtual double GetFockOffDiagElement(const MolDS_base_atoms::Atom& atomA, 
+                                        const MolDS_base_atoms::Atom& atomB, 
                                         int atomAIndex, 
                                         int atomBIndex, 
                                         int mu, 
                                         int nu, 
-                                        MolDS_base::Molecule* molecule, 
-                                        double** gammaAB, 
-                                        double** overelap,
-                                        double** orbitalElectronPopulation,
-                                        double****** twoElecTwoCore,
-                                        bool isGuess);
+                                        const MolDS_base::Molecule& molecule, 
+                                        double const* const* gammaAB, 
+                                        double const* const* overelap,
+                                        double const* const* orbitalElectronPopulation,
+                                        double const* const* const* const* const* const* twoElecTwoCore,
+                                        bool isGuess) const;
    virtual double GetMolecularIntegralElement(int moI, int moJ, int moK, int moL, 
                                               MolDS_base::Molecule* molecule, 
                                               double** fockMatrix, 
@@ -41,11 +41,11 @@ private:
    double GetCoulombInt(MolDS_base::OrbitalType orbital1, 
                         MolDS_base::OrbitalType orbital2, 
                         double gamma, 
-                        MolDS_base_atoms::Atom* atom); // Indo Coulomb Interaction, (3.87) - (3.91) in J. A. Pople book.
+                        const MolDS_base_atoms::Atom& atom) const; // Indo Coulomb Interaction, (3.87) - (3.91) in J. A. Pople book.
    double GetExchangeInt(MolDS_base::OrbitalType orbital1, 
                          MolDS_base::OrbitalType orbital2, 
                          double gamma, 
-                         MolDS_base_atoms::Atom* atom); // Indo Exchange Interaction, (3.87) - (3.91) in J. A. Pople book.
+                         const MolDS_base_atoms::Atom& atom) const; // Indo Exchange Interaction, (3.87) - (3.91) in J. A. Pople book.
 };
 
 }

@@ -7,8 +7,8 @@ public:
    Atom();
    Atom(double x, double y, double z);
    ~Atom();
-   MolDS_base::AtomType GetAtomType();
-   double GetAtomicMass();
+   MolDS_base::AtomType GetAtomType() const;
+   double GetAtomicMass() const;
    double* GetXyz() const;
    void SetXyz(double x, double y, double z);
    double* GetPxyz() const;

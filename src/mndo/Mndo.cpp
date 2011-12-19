@@ -240,24 +240,24 @@ void Mndo::OutputHFResults(double const* const* fockMatrix,
                                                             GetKcalMolin2AU());
 }
 
-double Mndo::GetFockDiagElement(Atom* atomA, 
+double Mndo::GetFockDiagElement(const Atom& atomA, 
                                 int atomAIndex, 
                                 int mu, 
-                                Molecule* molecule, 
-                                double** gammaAB,
-                                double** orbitalElectronPopulation, 
-                                double* atomicElectronPopulation,
-                                double****** twoElecTwoCore, 
-                                bool isGuess){
+                                const Molecule& molecule, 
+                                double const* const* gammaAB,
+                                double const* const* orbitalElectronPopulation, 
+                                double const* atomicElectronPopulation,
+                                double const* const* const* const* const* const* twoElecTwoCore, 
+                                bool isGuess) const{
    double value=0.0;
-   int firstAOIndexA = atomA->GetFirstAOIndex();
+   int firstAOIndexA = atomA.GetFirstAOIndex();
    mu -= firstAOIndexA;
-   value = atomA->GetCoreIntegral(atomA->GetValence()[mu], isGuess, this->theory);
+   value = atomA.GetCoreIntegral(atomA.GetValence()[mu], isGuess, this->theory);
    if(!isGuess){
       double temp = 0.0;
-      OrbitalType orbitalMu = atomA->GetValence()[mu];
-      for(int nu=0; nu<atomA->GetValence().size(); nu++){
-         OrbitalType orbitalNu = atomA->GetValence()[nu];
+      OrbitalType orbitalMu = atomA.GetValence()[mu];
+      for(int nu=0; nu<atomA.GetValence().size(); nu++){
+         OrbitalType orbitalNu = atomA.GetValence()[nu];
          double coulomb  = this->GetCoulombInt(orbitalMu, orbitalNu, atomA);
          double exchange = this->GetExchangeInt(orbitalMu, orbitalNu, atomA);
          temp += orbitalElectronPopulation[nu+firstAOIndexA]
@@ -267,9 +267,9 @@ double Mndo::GetFockDiagElement(Atom* atomA,
       value += temp;
 
       temp = 0.0;
-      for(int B=0; B<molecule->GetAtomVect()->size(); B++){
+      for(int B=0; B<molecule.GetAtomVect()->size(); B++){
          if(B != atomAIndex){
-            Atom* atomB = (*molecule->GetAtomVect())[B];
+            Atom* atomB = (*molecule.GetAtomVect())[B];
             int firstAOIndexB = atomB->GetFirstAOIndex();
             for(int lambda=0; lambda<atomB->GetValence().size(); lambda++){
                for(int sigma=0; sigma<atomB->GetValence().size(); sigma++){
@@ -290,27 +290,27 @@ double Mndo::GetFockDiagElement(Atom* atomA,
    return value;
 }
 
-double Mndo::GetFockOffDiagElement(Atom* atomA, 
-                                   Atom* atomB, 
+double Mndo::GetFockOffDiagElement(const Atom& atomA, 
+                                   const Atom& atomB, 
                                    int atomAIndex, 
                                    int atomBIndex, 
                                    int mu, 
                                    int nu, 
-                                   Molecule* molecule, 
-                                   double** gammaAB, 
-                                   double** overlap,
-                                   double** orbitalElectronPopulation, 
-                                   double****** twoElecTwoCore, 
-                                   bool isGuess){
+                                   const Molecule& molecule, 
+                                   double const* const* gammaAB, 
+                                   double const* const* overlap,
+                                   double const* const* orbitalElectronPopulation, 
+                                   double const* const* const* const* const* const* twoElecTwoCore, 
+                                   bool isGuess) const{
    double value = 0.0;
-   int firstAOIndexA = atomA->GetFirstAOIndex();
-   int firstAOIndexB = atomB->GetFirstAOIndex();
+   int firstAOIndexA = atomA.GetFirstAOIndex();
+   int firstAOIndexB = atomB.GetFirstAOIndex();
    mu -= firstAOIndexA;
    nu -= firstAOIndexB;
-   OrbitalType orbitalMu = atomA->GetValence()[mu];
-   OrbitalType orbitalNu = atomB->GetValence()[nu];
-   double bondParameter = 0.5*(atomA->GetBondingParameter(this->theory, orbitalMu) 
-                              +atomB->GetBondingParameter(this->theory, orbitalNu)); 
+   OrbitalType orbitalMu = atomA.GetValence()[mu];
+   OrbitalType orbitalNu = atomB.GetValence()[nu];
+   double bondParameter = 0.5*(atomA.GetBondingParameter(this->theory, orbitalMu) 
+                              +atomB.GetBondingParameter(this->theory, orbitalNu)); 
    if(isGuess){
       value = bondParameter*overlap[mu+firstAOIndexA][nu+firstAOIndexB];
    }
@@ -323,9 +323,9 @@ double Mndo::GetFockOffDiagElement(Atom* atomA,
          exchange = this->GetExchangeInt(orbitalMu, orbitalNu, atomA); 
          temp = (1.5*exchange - 0.5*coulomb)
                *orbitalElectronPopulation[mu+firstAOIndexA][nu+firstAOIndexB];
-         for(int BB=0; BB<molecule->GetAtomVect()->size(); BB++){
+         for(int BB=0; BB<molecule.GetAtomVect()->size(); BB++){
             if(BB != atomAIndex){
-               Atom* atomBB = (*molecule->GetAtomVect())[BB];
+               Atom* atomBB = (*molecule.GetAtomVect())[BB];
                int firstAOIndexBB = atomBB->GetFirstAOIndex();
                for(int lambda=0; lambda<atomBB->GetValence().size(); lambda++){
                   for(int sigma=0; sigma<atomBB->GetValence().size(); sigma++){
@@ -344,8 +344,8 @@ double Mndo::GetFockOffDiagElement(Atom* atomA,
       }
       else{
          temp = bondParameter*overlap[mu+firstAOIndexA][nu+firstAOIndexB];
-         for(int sigma=0; sigma<atomA->GetValence().size(); sigma++){
-            for(int lambda=0; lambda<atomB->GetValence().size(); lambda++){
+         for(int sigma=0; sigma<atomA.GetValence().size(); sigma++){
+            for(int lambda=0; lambda<atomB.GetValence().size(); lambda++){
                temp -= 0.5*orbitalElectronPopulation[lambda+firstAOIndexB]
                                                     [sigma+firstAOIndexA]
                       *twoElecTwoCore[atomAIndex][atomBIndex][mu][sigma][nu][lambda];
@@ -358,29 +358,29 @@ double Mndo::GetFockOffDiagElement(Atom* atomA,
 }
 
 // NDDO Coulomb Interaction
-double Mndo::GetCoulombInt(OrbitalType orbital1, OrbitalType orbital2, Atom* atom){
+double Mndo::GetCoulombInt(OrbitalType orbital1, OrbitalType orbital2, const Atom& atom) const{
    double value=0.0;
    if( orbital1 == s && orbital2 == s){ 
-      value = atom->GetNddoGss(this->theory);
+      value = atom.GetNddoGss(this->theory);
    }   
    else if( orbital1 == s && ( orbital2 == px || orbital2 == py || orbital2 == pz )){ 
-      value = atom->GetNddoGsp(this->theory);
+      value = atom.GetNddoGsp(this->theory);
    }   
    else if( orbital2 == s && ( orbital1 == px || orbital1 == py || orbital1 == pz )){ 
       value = this->GetCoulombInt(orbital2, orbital1, atom);
    }   
    else if( (orbital1 == orbital2) && ( orbital1 == px || orbital1 == py || orbital1 == pz )){ 
-      value = atom->GetNddoGpp(this->theory);
+      value = atom.GetNddoGpp(this->theory);
    }   
    else if( (orbital1 != orbital2) 
          && ( orbital1 == px || orbital1 == py || orbital1 == pz )
          && ( orbital2 == px || orbital2 == py || orbital2 == pz ) ){
-      value = atom->GetNddoGpp2(this->theory);
+      value = atom.GetNddoGpp2(this->theory);
    }   
    else{
       stringstream ss;
       ss << this->errorMessageCoulombInt;
-      ss << this->errorMessageAtomType << AtomTypeStr(atom->GetAtomType()) << "\n";
+      ss << this->errorMessageAtomType << AtomTypeStr(atom.GetAtomType()) << "\n";
       ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbital1) << "\n";
       ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbital2) << "\n";
       throw MolDSException(ss.str());
@@ -389,13 +389,13 @@ double Mndo::GetCoulombInt(OrbitalType orbital1, OrbitalType orbital2, Atom* ato
 }
 
 // NDDO Exchange Interaction
-double Mndo::GetExchangeInt(OrbitalType orbital1, OrbitalType orbital2, Atom* atom){
+double Mndo::GetExchangeInt(OrbitalType orbital1, OrbitalType orbital2, const Atom& atom) const{
    double value=0.0;
    if( orbital1 == orbital2){
       value = this->GetCoulombInt(orbital1, orbital2, atom);
    }   
    else if( orbital1 == s && (orbital2 == px || orbital2 == py || orbital2 == pz ) ){
-      value = atom->GetNddoHsp(this->theory);
+      value = atom.GetNddoHsp(this->theory);
    }   
    else if( orbital2 == s && (orbital1 == px || orbital1 == py || orbital1 == pz ) ){
       value = this->GetExchangeInt(orbital2, orbital1, atom);
@@ -403,12 +403,12 @@ double Mndo::GetExchangeInt(OrbitalType orbital1, OrbitalType orbital2, Atom* at
    else if( (orbital1 != orbital2) 
          && ( orbital1 == px || orbital1 == py || orbital1 == pz )
          && ( orbital2 == px || orbital2 == py || orbital2 == pz ) ){
-      value = atom->GetNddoHpp(this->theory);
+      value = atom.GetNddoHpp(this->theory);
    }
    else{
       stringstream ss;
       ss << this->errorMessageExchangeInt;
-      ss << this->errorMessageAtomType << AtomTypeStr(atom->GetAtomType()) << "\n";
+      ss << this->errorMessageAtomType << AtomTypeStr(atom.GetAtomType()) << "\n";
       ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbital1) << "\n";
       ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbital2) << "\n";
       throw MolDSException(ss.str());
@@ -422,7 +422,7 @@ double Mndo::GetElectronCoreAttraction(int atomAIndex,
                                        int atomBIndex, 
                                        int mu, 
                                        int nu, 
-                                       double****** twoElecTwoCore){
+                                       double const* const* const* const* const* const* twoElecTwoCore) const{
    Atom* atomB = (*this->molecule->GetAtomVect())[atomBIndex];
    return -1.0*atomB->GetCoreCharge()*twoElecTwoCore[atomAIndex][atomBIndex][mu][nu][s][s];
 }
@@ -435,8 +435,8 @@ double Mndo::GetElectronCoreAttractionFirstDerivative(int atomAIndex,
                                                       int atomBIndex, 
                                                       int mu, 
                                                       int nu, 
-                                                      double***** twoElecTwoCoreFirstDerivative,
-                                                      CartesianType axisA){
+                                                      double const* const* const* const* const* twoElecTwoCoreFirstDerivative,
+                                                      CartesianType axisA) const{
    Atom* atomB = (*this->molecule->GetAtomVect())[atomBIndex];
    double value = -1.0*atomB->GetCoreCharge()
                   *twoElecTwoCoreFirstDerivative[mu][nu][s][s][axisA];
@@ -538,12 +538,12 @@ double Mndo::GetMolecularIntegralElement(int moI, int moJ, int moK, int moL,
                         if(mu==nu && lambda==sigma){
                            OrbitalType orbitalMu = atomA->GetValence()[mu-firstAOIndexA];
                            OrbitalType orbitalLambda = atomB->GetValence()[lambda-firstAOIndexB];
-                           gamma = this->GetCoulombInt(orbitalMu, orbitalLambda, atomA);
+                           gamma = this->GetCoulombInt(orbitalMu, orbitalLambda, *atomA);
                         }
                         else if((mu==lambda && nu==sigma) || (nu==lambda && mu==sigma) ){
                            OrbitalType orbitalMu = atomA->GetValence()[mu-firstAOIndexA];
                            OrbitalType orbitalNu = atomA->GetValence()[nu-firstAOIndexA];
-                           gamma = this->GetExchangeInt(orbitalMu, orbitalNu, atomA);
+                           gamma = this->GetExchangeInt(orbitalMu, orbitalNu, *atomA);
                         }
                         else{
                            gamma = 0.0;
@@ -687,12 +687,12 @@ void Mndo::CalcCISMatrix(double** matrixCIS, int numberActiveOcc, int numberActi
                               if(mu==nu && lambda==sigma){
                                  OrbitalType orbitalMu = atomA->GetValence()[mu-firstAOIndexA];
                                  OrbitalType orbitalLambda = atomB->GetValence()[lambda-firstAOIndexB];
-                                 gamma = this->GetCoulombInt(orbitalMu, orbitalLambda, atomA);
+                                 gamma = this->GetCoulombInt(orbitalMu, orbitalLambda, *atomA);
                               }
                               else if((mu==lambda && nu==sigma) || (nu==lambda && mu==sigma) ){
                                  OrbitalType orbitalMu = atomA->GetValence()[mu-firstAOIndexA];
                                  OrbitalType orbitalNu = atomA->GetValence()[nu-firstAOIndexA];
-                                 gamma = this->GetExchangeInt(orbitalMu, orbitalNu, atomA);
+                                 gamma = this->GetExchangeInt(orbitalMu, orbitalNu, *atomA);
                               }
                               else{
                                  gamma = 0.0;
@@ -1203,14 +1203,14 @@ double Mndo::GetSmallQElement(int moI,
                            OrbitalType orbitalLambda = atomB->GetValence()[lambda-firstAOIndexB];
                            twoElecInt = this->GetCoulombInt(orbitalMu, 
                                                             orbitalLambda, 
-                                                            atomA);
+                                                            *atomA);
                         }
                         else if((mu==lambda && nu==sigma) || (nu==lambda && mu==sigma) ){
                            OrbitalType orbitalMu = atomA->GetValence()[mu-firstAOIndexA];
                            OrbitalType orbitalNu = atomA->GetValence()[nu-firstAOIndexA];
                            twoElecInt = this->GetExchangeInt(orbitalMu, 
                                                              orbitalNu, 
-                                                             atomA);
+                                                             *atomA);
                         }
                         else{
                            twoElecInt = 0.0;

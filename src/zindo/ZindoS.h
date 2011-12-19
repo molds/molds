@@ -23,26 +23,26 @@ protected:
    virtual void CalcGammaAB(double** gammaAB, MolDS_base::Molecule* molecule);
    virtual void SetMessages();
    virtual void SetEnableAtomTypes();
-   virtual double GetFockDiagElement(MolDS_base_atoms::Atom* atomA, 
+   virtual double GetFockDiagElement(const MolDS_base_atoms::Atom& atomA, 
                                      int atomAIndex, 
                                      int mu, 
-                                     MolDS_base::Molecule* molecule, 
-                                     double** gammaAB,
-                                     double** orbitalElectronPopulation, 
-                                     double* atomicElectronPopulation,
-                                     double****** twoElecTwoCore,
-                                     bool isGuess);
-   virtual double GetFockOffDiagElement(MolDS_base_atoms::Atom* atomA, 
-                                        MolDS_base_atoms::Atom* atomB, 
+                                     const MolDS_base::Molecule& molecule, 
+                                     double const* const* gammaAB,
+                                     double const* const* orbitalElectronPopulation, 
+                                     double const* atomicElectronPopulation,
+                                     double const* const* const* const* const* const* twoElecTwoCore,
+                                     bool isGuess) const;
+   virtual double GetFockOffDiagElement(const MolDS_base_atoms::Atom& atomA, 
+                                        const MolDS_base_atoms::Atom& atomB, 
                                         int atomAIndex, 
                                         int atomBIndex, 
                                         int mu, int nu, 
-                                        MolDS_base::Molecule* molecule, 
-                                        double** gammaAB, 
-                                        double** overelap,
-                                        double** orbitalElectronPopulation, 
-                                        double****** twoElecTwoCore,
-                                        bool isGuess);
+                                        const MolDS_base::Molecule& molecule, 
+                                        double const* const* gammaAB, 
+                                        double const* const* overelap,
+                                        double const* const* orbitalElectronPopulation, 
+                                        double const* const* const* const* const* const* twoElecTwoCore,
+                                        bool isGuess) const;
    virtual void CalcDiatomicOverlapInDiatomicFrame(double** diatomicOverlap, 
                                                    MolDS_base_atoms::Atom* atomA, 
                                                    MolDS_base_atoms::Atom* atomB);
@@ -52,10 +52,10 @@ protected:
                                                 MolDS_base_atoms::Atom* atomB);
    virtual double GetCoulombInt(MolDS_base::OrbitalType orbital1, 
                                 MolDS_base::OrbitalType orbital2, 
-                                MolDS_base_atoms::Atom* atom); // Apendix in [BZ_1979]
+                                const MolDS_base_atoms::Atom& atom) const; // Apendix in [BZ_1979]
    virtual double GetExchangeInt(MolDS_base::OrbitalType orbital1, 
                                  MolDS_base::OrbitalType orbital2, 
-                                 MolDS_base_atoms::Atom* atom); // Apendix in [BZ_1979]
+                                 const MolDS_base_atoms::Atom& atom) const; // Apendix in [BZ_1979]
    virtual double GetMolecularIntegralElement(int moI, 
                                               int moJ, 
                                               int moK, 
@@ -84,13 +84,13 @@ private:
    std::string messageExcitedStatesEnergies;
    std::string messageExcitedStatesEnergiesTitle;
    int matrixForceElecStatesNum;
-   double GetNishimotoMatagaTwoEleInt(MolDS_base_atoms::Atom* atomA, 
+   double GetNishimotoMatagaTwoEleInt(const MolDS_base_atoms::Atom& atomA, 
                                       MolDS_base::OrbitalType orbitalA, 
-                                      MolDS_base_atoms::Atom* atomB, 
-                                      MolDS_base::OrbitalType orbitalB); // ref. [MN_1957] and (5a) in [AEZ_1986]
-   double GetNishimotoMatagaTwoEleIntFirstDerivative(MolDS_base_atoms::Atom* atomA, 
+                                      const MolDS_base_atoms::Atom& atomB, 
+                                      MolDS_base::OrbitalType orbitalB) const; // ref. [MN_1957] and (5a) in [AEZ_1986]
+   double GetNishimotoMatagaTwoEleIntFirstDerivative(const MolDS_base_atoms::Atom& atomA, 
                                                      MolDS_base::OrbitalType orbitalA, 
-                                                     MolDS_base_atoms::Atom* atomB, 
+                                                     const MolDS_base_atoms::Atom& atomB, 
                                                      MolDS_base::OrbitalType orbitalB,
                                                      MolDS_base::CartesianType axisA);// ref. [MN_1957] and (5a) in [AEZ_1986]
    double nishimotoMatagaParamA;
