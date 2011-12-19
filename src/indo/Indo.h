@@ -34,9 +34,9 @@ protected:
                                         double const* const* const* const* const* const* twoElecTwoCore,
                                         bool isGuess) const;
    virtual double GetMolecularIntegralElement(int moI, int moJ, int moK, int moL, 
-                                              MolDS_base::Molecule* molecule, 
-                                              double** fockMatrix, 
-                                              double** gammaAB);
+                                              const MolDS_base::Molecule& molecule, 
+                                              double const* const* fockMatrix, 
+                                              double const* const* gammaAB) const;
 private:
    double GetCoulombInt(MolDS_base::OrbitalType orbital1, 
                         MolDS_base::OrbitalType orbital2, 

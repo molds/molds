@@ -52,6 +52,8 @@ protected:
    double* energiesMO;
    double*** matrixForce;
    double****** twoElecTwoCore;
+   double** orbitalElectronPopulation; //P_{\mu\nu} of (2.50) in J. A. Pople book.
+   double*   atomicElectronPopulation; //P_{AB} of (3.21) in J. A. Pople book.
    double** matrixCIS;
    double* excitedEnergies;
    int matrixCISdimension;
@@ -62,25 +64,23 @@ protected:
    virtual double GetDiatomCoreRepulsionFirstDerivative(int indexAtomA, 
                                                         int indexAtomB, 
                                                         MolDS_base::CartesianType axisA) const;
-   double** orbitalElectronPopulation; //P_{\mu\nu} of (2.50) in J. A. Pople book.
-   double*   atomicElectronPopulation; //P_{AB} of (3.21) in J. A. Pople book.
    double GetReducedOverlap(int na, int la, int m, 
-                            int nb, int lb, double alpha, double beta);
-   double GetReducedOverlap(int na, int nb, double alpha, double beta);
+                            int nb, int lb, double alpha, double beta) const;
+   double GetReducedOverlap(int na, int nb, double alpha, double beta) const;
    double GetReducedOverlapFirstDerivativeAlpha(int na, int la, int m, 
-                                                int nb, int lb, double alpha, double beta);
+                                                int nb, int lb, double alpha, double beta) const;
    double GetReducedOverlapFirstDerivativeBeta(int na, int la, int m, 
-                                               int nb, int lb, double alpha, double beta);
-   double GetOverlapElementFirstDerivativeByGTOExpansion(MolDS_base_atoms::Atom* atomA, 
+                                               int nb, int lb, double alpha, double beta) const;
+   double GetOverlapElementFirstDerivativeByGTOExpansion(const MolDS_base_atoms::Atom& atomA, 
                                                          int valenceIndexA, 
-                                                         MolDS_base_atoms::Atom* atomB, 
+                                                         const MolDS_base_atoms::Atom& atomB, 
                                                          int valenceIndexB,
                                                          MolDS_base::STOnGType stonG, 
-                                                         MolDS_base::CartesianType axisA); // See [DY_1977].
+                                                         MolDS_base::CartesianType axisA) const; // See [DY_1977].
    void CalcRotatingMatrix(double** rotatingMatrix, 
-                           MolDS_base_atoms::Atom* atomA, 
-                           MolDS_base_atoms::Atom* atomB);
-   virtual void CalcGammaAB(double** gammaAB, MolDS_base::Molecule* molecule);
+                           const MolDS_base_atoms::Atom& atomA, 
+                           const MolDS_base_atoms::Atom& atomB) const;
+   virtual void CalcGammaAB(double** gammaAB, const MolDS_base::Molecule& molecule) const;
    virtual void SetMessages();
    virtual void SetEnableAtomTypes();
    virtual double GetFockDiagElement(const MolDS_base_atoms::Atom& atomA, 
@@ -105,12 +105,11 @@ protected:
                                         double const* const* const* const* const* const* twoElecTwoCore, 
                                         bool isGuess) const;
    virtual void CalcDiatomicOverlapInDiatomicFrame(double** diatomicOverlap, 
-                                                   MolDS_base_atoms::Atom* atomA, 
-                                                   MolDS_base_atoms::Atom* atomB);
-   virtual void CalcDiatomicOverlapFirstDerivativeInDiatomicFrame(
-                                                double** diatomicOverlapDeri, 
-                                                MolDS_base_atoms::Atom* atomA, 
-                                                MolDS_base_atoms::Atom* atomB);
+                                                   const MolDS_base_atoms::Atom& atomA, 
+                                                   const MolDS_base_atoms::Atom& atomB) const;
+   virtual void CalcDiatomicOverlapFirstDerivativeInDiatomicFrame(double** diatomicOverlapDeri, 
+                                                                  const MolDS_base_atoms::Atom& atomA, 
+                                                                  const MolDS_base_atoms::Atom& atomB) const;
    void CalcDiatomicOverlapFirstDerivative(double*** overlapFirstDeri, 
                                            MolDS_base_atoms::Atom* atomA, 
                                            MolDS_base_atoms::Atom* atomB);
@@ -119,9 +118,9 @@ protected:
                                      double*** diaOverlapDeriR,
                                      double**** rMatDeri);
    virtual double GetMolecularIntegralElement(int moI, int moJ, int moK, int moL, 
-                                              MolDS_base::Molecule* molecule, 
-                                              double** fockMatrix, 
-                                              double** gammaAB);
+                                              const MolDS_base::Molecule& molecule, 
+                                              double const* const* fockMatrix, 
+                                              double const* const* gammaAB) const;
    virtual void CalcTwoElecTwoCore(double****** twoElecTwoCore, 
                                    MolDS_base::Molecule* molecule);
    virtual void CalcForce(std::vector<int> elecStates);
@@ -207,7 +206,7 @@ private:
                              double Rab); // see [DY_1977]
    double GetGaussianOverlapSaSb(double gaussianExponentA, 
                                  double gaussianExponentB, 
-                                 double Rab); // see [DY_1977]
+                                 double Rab) const; // see [DY_1977]
    double GetGaussianOverlapFirstDerivative(MolDS_base::AtomType atomTypeA, 
                                             MolDS_base::OrbitalType valenceOrbitalA, 
                                             double gaussianExponentA, 
@@ -218,7 +217,7 @@ private:
                                             double dy, 
                                             double dz, 
                                             double Rab, 
-                                            MolDS_base::CartesianType axisA);// see [DY_1977]
+                                            MolDS_base::CartesianType axisA) const;// see [DY_1977]
    void CalcFockMatrix(double** fockMatrix, 
                        MolDS_base::Molecule* molecule, 
                        double** overlap, 
@@ -233,11 +232,11 @@ private:
                           double** diatomicOverlap, 
                           MolDS_base_atoms::Atom* atomA, 
                           MolDS_base_atoms::Atom* atomB);
-   double GetAuxiliaryA(int k, double rho);
-   double GetAuxiliaryB(int k, double rho);
-   double GetAuxiliaryD(int la, int lb, int m);
-   double GetAuxiliaryAFirstDerivative(int k, double rho);
-   double GetAuxiliaryBFirstDerivative(int k, double rho);
+   double GetAuxiliaryA(int k, double rho) const;
+   double GetAuxiliaryB(int k, double rho) const;
+   double GetAuxiliaryD(int la, int lb, int m) const;
+   double GetAuxiliaryAFirstDerivative(int k, double rho) const;
+   double GetAuxiliaryBFirstDerivative(int k, double rho) const;
    void DoesDamp(double rmsDensity, 
                  double** orbitalElectronPopulation, 
                  double** oldOrbitalElectronPopulation, 

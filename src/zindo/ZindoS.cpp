@@ -220,11 +220,10 @@ double ZindoS::GetFockOffDiagElement(const Atom& atomA,
                   *this->GetNishimotoMatagaTwoEleInt(atomA, orbitalMu, atomB, orbitalNu);
       }
    }
-   
    return value;
 }
 
-void ZindoS::CalcGammaAB(double** gammaAB, Molecule* molecule){
+void ZindoS::CalcGammaAB(double** gammaAB, const Molecule& molecule) const{
    // Do nothing;
 }
 
@@ -613,8 +612,8 @@ double ZindoS::GetNishimotoMatagaTwoEleIntFirstDerivative(const Atom& atomA,
 }
 
 void ZindoS::CalcDiatomicOverlapInDiatomicFrame(double** diatomicOverlap, 
-                                                Atom* atomA, 
-                                                Atom* atomB){
+                                                const Atom& atomA, 
+                                                const Atom& atomB) const{
    MolDS_cndo::Cndo2::CalcDiatomicOverlapInDiatomicFrame(diatomicOverlap, atomA, atomB);
 
    // see (4f) in [AEZ_1986]
@@ -632,11 +631,11 @@ void ZindoS::CalcDiatomicOverlapInDiatomicFrame(double** diatomicOverlap,
 
 void ZindoS::CalcDiatomicOverlapFirstDerivativeInDiatomicFrame(
                                                 double** diatomicOverlapDeri, 
-                                                Atom* atomA, 
-                                                Atom* atomB){
+                                                const Atom& atomA, 
+                                                const Atom& atomB) const{
 
    MolDS_cndo::Cndo2::CalcDiatomicOverlapFirstDerivativeInDiatomicFrame(
-                        diatomicOverlapDeri,atomA, atomB);
+                      diatomicOverlapDeri,atomA, atomB);
 
    // see (4f) in [AEZ_1986] like as overlap integlral
    diatomicOverlapDeri[pz][pz] *= this->overlapCorrectionSigma;
@@ -646,9 +645,9 @@ void ZindoS::CalcDiatomicOverlapFirstDerivativeInDiatomicFrame(
 }
 // The order of mol, moJ, moK, moL is consistent with Eq. (9) in [RZ_1973]
 double ZindoS::GetMolecularIntegralElement(int moI, int moJ, int moK, int moL, 
-                                           Molecule* molecule, 
-                                           double** fockMatrix, 
-                                           double** gammaAB){
+                                           const Molecule& molecule, 
+                                           double const* const* fockMatrix, 
+                                           double const* const* gammaAB) const{
    double value = 0.0;
    Atom* atomA = NULL;
    Atom* atomB = NULL;
@@ -662,8 +661,8 @@ double ZindoS::GetMolecularIntegralElement(int moI, int moJ, int moK, int moL,
    OrbitalType orbitalMu;
    OrbitalType orbitalNu;
 
-   for(int A=0; A<molecule->GetAtomVect()->size(); A++){
-      atomA = (*molecule->GetAtomVect())[A];
+   for(int A=0; A<molecule.GetAtomVect()->size(); A++){
+      atomA = (*molecule.GetAtomVect())[A];
       firstAOIndexA = atomA->GetFirstAOIndex();
       numberAOsA = atomA->GetValence().size();
 
@@ -671,8 +670,8 @@ double ZindoS::GetMolecularIntegralElement(int moI, int moJ, int moK, int moL,
          orbitalMu = atomA->GetValence()[mu-firstAOIndexA];
 
          // CNDO term
-         for(int B=A; B<molecule->GetAtomVect()->size(); B++){
-            atomB = (*molecule->GetAtomVect())[B];
+         for(int B=A; B<molecule.GetAtomVect()->size(); B++){
+            atomB = (*molecule.GetAtomVect())[B];
             firstAOIndexB = atomB->GetFirstAOIndex();
             numberAOsB = atomB->GetValence().size();
 

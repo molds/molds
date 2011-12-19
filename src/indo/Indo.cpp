@@ -157,7 +157,9 @@ double Indo::GetFockOffDiagElement(const Atom& atomA,
 
 // The order of mol, moJ, moK, moL is consistent with Eq. (9) in [RZ_1973]
 double Indo::GetMolecularIntegralElement(int moI, int moJ, int moK, int moL, 
-                                          Molecule* molecule, double** fockMatrix, double** gammaAB){
+                                         const Molecule& molecule, 
+                                         double const* const* fockMatrix, 
+                                         double const* const* gammaAB) const{
    double value = 0.0;
    Atom* atomA;
    Atom* atomB;;
@@ -172,8 +174,8 @@ double Indo::GetMolecularIntegralElement(int moI, int moJ, int moK, int moL,
    value = Cndo2::GetMolecularIntegralElement(moI, moJ, moK, moL, molecule, fockMatrix, gammaAB);
 
    // Aditional terms for INDO, see Eq. (10) in [RZ_1973]
-   for(int A=0; A<molecule->GetAtomVect()->size(); A++){
-      Atom* atomA = (*molecule->GetAtomVect())[A];
+   for(int A=0; A<molecule.GetAtomVect()->size(); A++){
+      Atom* atomA = (*molecule.GetAtomVect())[A];
       firstAOIndexA = atomA->GetFirstAOIndex();
       numberAOsA = atomA->GetValence().size();
 

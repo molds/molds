@@ -288,7 +288,7 @@ void Cndo2::DoesSCF(bool requiresGuess){
 
    try{
       // calculate electron integral
-      this->CalcGammaAB(this->gammaAB, this->molecule);
+      this->CalcGammaAB(this->gammaAB, *this->molecule);
       this->CalcOverlap(this->overlap, this->molecule);
       this->CalcTwoElecTwoCore(this->twoElecTwoCore, this->molecule);
 
@@ -775,7 +775,9 @@ void Cndo2::FreeElecEnergyMatrices(double*** fMatrix,
 
 // The order of mol, moJ, moK, moL is consistent with Eq. (9) in [RZ_1973]
 double Cndo2::GetMolecularIntegralElement(int moI, int moJ, int moK, int moL, 
-                                          Molecule* molecule, double** fockMatrix, double** gammaAB){
+                                          const Molecule& molecule, 
+                                          double const* const* fockMatrix, 
+                                          double const* const* gammaAB) const{
    double value = 0.0;
    Atom* atomA;
    Atom* atomB;
@@ -785,13 +787,13 @@ double Cndo2::GetMolecularIntegralElement(int moI, int moJ, int moK, int moL,
    int numberAOsB;
    double gamma;
 
-   for(int A=0; A<molecule->GetAtomVect()->size(); A++){
-      atomA = (*molecule->GetAtomVect())[A];
+   for(int A=0; A<molecule.GetAtomVect()->size(); A++){
+      atomA = (*molecule.GetAtomVect())[A];
       firstAOIndexA = atomA->GetFirstAOIndex();
       numberAOsA = atomA->GetValence().size();
 
-      for(int B=0; B<molecule->GetAtomVect()->size(); B++){
-         atomB = (*molecule->GetAtomVect())[B];
+      for(int B=0; B<molecule.GetAtomVect()->size(); B++){
+         atomB = (*molecule.GetAtomVect())[B];
          firstAOIndexB = atomB->GetFirstAOIndex();
          numberAOsB = atomB->GetValence().size();
          gamma = gammaAB[A][B];
@@ -1030,26 +1032,22 @@ void Cndo2::CalcAtomicElectronPopulation(double* atomicElectronPopulation,
 }
 
 // calculate gammaAB matrix. (B.56) and (B.62) in J. A. Pople book.
-void Cndo2::CalcGammaAB(double** gammaAB, Molecule* molecule){
-   int totalAtomNumber = molecule->GetAtomVect()->size();
+void Cndo2::CalcGammaAB(double** gammaAB, const Molecule& molecule) const{
+   int totalAtomNumber = molecule.GetAtomVect()->size();
    #pragma omp parallel for schedule(auto)
    for(int A=0; A<totalAtomNumber; A++){
-      Atom* atomA = (*(molecule->GetAtomVect()))[A];
+      Atom* atomA = (*(molecule.GetAtomVect()))[A];
       int na = atomA->GetValenceShellType() + 1;
       double orbitalExponentA = atomA->GetOrbitalExponent(
                                        atomA->GetValenceShellType(), s, this->theory);
       for(int B=A; B<totalAtomNumber; B++){
-         Atom* atomB = (*(molecule->GetAtomVect()))[B];
+         Atom* atomB = (*(molecule.GetAtomVect()))[B];
          int nb = atomB->GetValenceShellType() + 1;
          double orbitalExponentB = atomB->GetOrbitalExponent(
                                           atomB->GetValenceShellType(), s, this->theory);
 
          // inter nuclear distance
-         double R = sqrt( 
-                  pow( atomA->GetXyz()[0] - atomB->GetXyz()[0], 2.0)
-                 +pow( atomA->GetXyz()[1] - atomB->GetXyz()[1], 2.0)
-                 +pow( atomA->GetXyz()[2] - atomB->GetXyz()[2], 2.0)
-                  );
+         double R = molecule.GetDistanceAtoms(A, B);
 
          double value = 0.0;
          double temp = 0.0;
@@ -1154,8 +1152,8 @@ void Cndo2::CalcOverlap(double** overlap, Molecule* molecule){
             for(int B=A+1; B<totalAtomNumber; B++){
                Atom* atomB = (*(molecule->GetAtomVect()))[B];
 
-               this->CalcDiatomicOverlapInDiatomicFrame(diatomicOverlap, atomA, atomB);
-               this->CalcRotatingMatrix(rotatingMatrix, atomA, atomB);
+               this->CalcDiatomicOverlapInDiatomicFrame(diatomicOverlap, *atomA, *atomB);
+               this->CalcRotatingMatrix(rotatingMatrix, *atomA, *atomB);
                this->RotateDiatmicOverlapToSpaceFrame(diatomicOverlap, rotatingMatrix);
                this->SetOverlapElement(overlap, diatomicOverlap, atomA, atomB);
 
@@ -1204,10 +1202,9 @@ void Cndo2::CalcDiatomicOverlapFirstDerivative(double*** overlapFirstDeri,
                                    (OrbitalType_end, OrbitalType_end, CartesianType_end);
 
    try{
-      this->CalcDiatomicOverlapInDiatomicFrame(diatomicOverlap, atomA, atomB);
-      this->CalcRotatingMatrix(rotatingMatrix, atomA, atomB);
-      this->CalcDiatomicOverlapFirstDerivativeInDiatomicFrame
-                     (diaOverlapDeriR, atomA, atomB);
+      this->CalcDiatomicOverlapInDiatomicFrame(diatomicOverlap, *atomA, *atomB);
+      this->CalcRotatingMatrix(rotatingMatrix, *atomA, *atomB);
+      this->CalcDiatomicOverlapFirstDerivativeInDiatomicFrame(diaOverlapDeriR, *atomA, *atomB);
       this->CalcRotatingMatrixFirstDerivatives(rMatDeri, atomA, atomB);
 
       // rotate
@@ -1371,7 +1368,7 @@ double Cndo2::GetOverlapElementByGTOExpansion(Atom* atomA, int valenceIndexA,
 // That is, calculate (S_A|S_B). See Eq. (28) in [DY_1977].
 double Cndo2::GetGaussianOverlapSaSb(double gaussianExponentA, 
                                      double gaussianExponentB,
-                                     double Rab){
+                                     double Rab) const{
    double value;
    double temp1 = 0.0;
    double temp2 = 0.0;
@@ -1499,43 +1496,63 @@ double Cndo2::GetGaussianOverlap(AtomType atomTypeA,
 // calculate elements of analytic first derivative of the overlap matrix. 
 // The derivative is carried out related to the coordinate of atom A.
 // See Eqs. (34) - (44) in [DY_1977]
-double Cndo2::GetOverlapElementFirstDerivativeByGTOExpansion
-              (Atom* atomA, int valenceIndexA, Atom* atomB, int valenceIndexB,
-               STOnGType stonG, CartesianType axisA){
+double Cndo2::GetOverlapElementFirstDerivativeByGTOExpansion(const Atom& atomA, 
+                                                             int valenceIndexA, 
+                                                             const Atom& atomB, 
+                                                             int valenceIndexB,
+                                                             STOnGType stonG, 
+                                                             CartesianType axisA) const{
 
    double value = 0.0;
-   double dx = atomA->GetXyz()[XAxis] - atomB->GetXyz()[XAxis];
-   double dy = atomA->GetXyz()[YAxis] - atomB->GetXyz()[YAxis];
-   double dz = atomA->GetXyz()[ZAxis] - atomB->GetXyz()[ZAxis];
+   double dx = atomA.GetXyz()[XAxis] - atomB.GetXyz()[XAxis];
+   double dy = atomA.GetXyz()[YAxis] - atomB.GetXyz()[YAxis];
+   double dz = atomA.GetXyz()[ZAxis] - atomB.GetXyz()[ZAxis];
    double Rab = sqrt( pow(dx, 2.0) + pow(dy, 2.0) + pow(dz,2.0) );
-   ShellType shellTypeA = atomA->GetValenceShellType();
-   ShellType shellTypeB = atomB->GetValenceShellType();
-   OrbitalType valenceOrbitalA = atomA->GetValence()[valenceIndexA];
-   OrbitalType valenceOrbitalB = atomB->GetValence()[valenceIndexB];
-   double orbitalExponentA = atomA->GetOrbitalExponent(atomA->GetValenceShellType(), 
-                                                       valenceOrbitalA, this->theory);
-   double orbitalExponentB = atomB->GetOrbitalExponent(atomB->GetValenceShellType(), 
-                                                       valenceOrbitalB, this->theory);
+   ShellType shellTypeA = atomA.GetValenceShellType();
+   ShellType shellTypeB = atomB.GetValenceShellType();
+   OrbitalType valenceOrbitalA = atomA.GetValence()[valenceIndexA];
+   OrbitalType valenceOrbitalB = atomB.GetValence()[valenceIndexB];
+   double orbitalExponentA = atomA.GetOrbitalExponent(atomA.GetValenceShellType(), 
+                                                      valenceOrbitalA, 
+                                                      this->theory);
+   double orbitalExponentB = atomB.GetOrbitalExponent(atomB.GetValenceShellType(), 
+                                                      valenceOrbitalB, 
+                                                      this->theory);
    double gaussianExponentA = 0.0;
    double gaussianExponentB = 0.0;
 
    double temp = 0.0;
    for(int i=0; i<=stonG; i++){
       for(int j=0; j<=stonG; j++){
-         temp = GTOExpansionSTO::GetInstance()->GetCoefficient
-                  (stonG, shellTypeA, valenceOrbitalA, i); 
-         temp *= GTOExpansionSTO::GetInstance()->GetCoefficient
-                  (stonG, shellTypeB, valenceOrbitalB, j); 
-         gaussianExponentA = pow(orbitalExponentA, 2.0) *
-                             GTOExpansionSTO::GetInstance()->GetExponent
-                              (stonG, shellTypeA, valenceOrbitalA, i);
-         gaussianExponentB = pow(orbitalExponentB, 2.0) *
-                             GTOExpansionSTO::GetInstance()->GetExponent
-                              (stonG, shellTypeB, valenceOrbitalB, j);
-         temp *= this->GetGaussianOverlapFirstDerivative
-                       (atomA->GetAtomType(), valenceOrbitalA, gaussianExponentA, 
-                        atomB->GetAtomType(), valenceOrbitalB, gaussianExponentB,
-                        dx, dy, dz, Rab, axisA);
+         temp = GTOExpansionSTO::GetInstance()->GetCoefficient(stonG, 
+                                                               shellTypeA, 
+                                                               valenceOrbitalA, 
+                                                               i); 
+         temp *= GTOExpansionSTO::GetInstance()->GetCoefficient(stonG, 
+                                                                shellTypeB, 
+                                                                valenceOrbitalB, 
+                                                                j); 
+         gaussianExponentA = pow(orbitalExponentA, 2.0) 
+                            *GTOExpansionSTO::GetInstance()->GetExponent(stonG, 
+                                                                         shellTypeA, 
+                                                                         valenceOrbitalA, 
+                                                                         i);
+         gaussianExponentB = pow(orbitalExponentB, 2.0)
+                            *GTOExpansionSTO::GetInstance()->GetExponent(stonG, 
+                                                                         shellTypeB, 
+                                                                         valenceOrbitalB, 
+                                                                         j);
+         temp *= this->GetGaussianOverlapFirstDerivative(atomA.GetAtomType(), 
+                                                         valenceOrbitalA, 
+                                                         gaussianExponentA, 
+                                                         atomB.GetAtomType(), 
+                                                         valenceOrbitalB, 
+                                                         gaussianExponentB,
+                                                         dx, 
+                                                         dy, 
+                                                         dz, 
+                                                         Rab, 
+                                                         axisA);
          value += temp;
       }
    }
@@ -1552,7 +1569,7 @@ double Cndo2::GetGaussianOverlapFirstDerivative
                                  OrbitalType valenceOrbitalB, 
                                  double gaussianExponentB,
                                  double dx, double dy, double dz, double Rab, 
-                                 CartesianType axisA){
+                                 CartesianType axisA) const{
    double value = 0.0;
 
    if(valenceOrbitalA == s && valenceOrbitalB == s){
@@ -1814,13 +1831,15 @@ double Cndo2::GetGaussianOverlapFirstDerivative
 
 // see J. Mol. Struc. (Theochem), 419, 19 (1997) (ref. [BFB_1997])
 // we set gamma=0 always.
-void Cndo2::CalcRotatingMatrix(double** rotatingMatrix, Atom* atomA, Atom* atomB){
+void Cndo2::CalcRotatingMatrix(double** rotatingMatrix, 
+                               const Atom& atomA, 
+                               const Atom& atomB) const{
    MallocerFreer::GetInstance()->InitializeDoubleMatrix2d
                                  (rotatingMatrix,  OrbitalType_end, OrbitalType_end);
 
-   double x = atomB->GetXyz()[0] - atomA->GetXyz()[0];
-   double y = atomB->GetXyz()[1] - atomA->GetXyz()[1];
-   double z = atomB->GetXyz()[2] - atomA->GetXyz()[2];
+   double x = atomB.GetXyz()[0] - atomA.GetXyz()[0];
+   double y = atomB.GetXyz()[1] - atomA.GetXyz()[1];
+   double z = atomB.GetXyz()[2] - atomA.GetXyz()[2];
 
    EularAngle eularAngle(x, y, z);
    double alpha = eularAngle.GetAlpha();
@@ -1901,10 +1920,7 @@ void Cndo2::CalcRotatingMatrix(double** rotatingMatrix, Atom* atomA, Atom* atomB
 // This method can not calculate d-orbital yet.
 // For rotating matirxi, see J. Mol. Struc. (Theochem), 419, 19 (1997) (ref. [BFB_1997])
 // we set gamma=0 always.
-void Cndo2::CalcRotatingMatrixFirstDerivatives(
-            double*** rMatFirstDeri, 
-            Atom* atomA, 
-            Atom* atomB){
+void Cndo2::CalcRotatingMatrixFirstDerivatives(double*** rMatFirstDeri, Atom* atomA, Atom* atomB){
 
    MallocerFreer::GetInstance()->InitializeDoubleMatrix3d(
                                  rMatFirstDeri,  
@@ -1968,10 +1984,12 @@ void Cndo2::CalcRotatingMatrixFirstDerivatives(
 }
 
 // see (B.40) in J. A. Pople book.
-void Cndo2::CalcDiatomicOverlapInDiatomicFrame(double** diatomicOverlap, Atom* atomA, Atom* atomB){
+void Cndo2::CalcDiatomicOverlapInDiatomicFrame(double** diatomicOverlap, 
+                                               const Atom& atomA, 
+                                               const Atom& atomB) const{
 
-   int na = atomA->GetValenceShellType() + 1;
-   int nb = atomB->GetValenceShellType() + 1;
+   int na = atomA.GetValenceShellType() + 1;
+   int nb = atomB.GetValenceShellType() + 1;
    int m = 0;
    double alpha = 0.0;
    double beta = 0.0;
@@ -1984,26 +2002,26 @@ void Cndo2::CalcDiatomicOverlapInDiatomicFrame(double** diatomicOverlap, Atom* a
    MallocerFreer::GetInstance()->InitializeDoubleMatrix2d
                                  (diatomicOverlap, OrbitalType_end, OrbitalType_end);
    R = sqrt( 
-            pow( atomA->GetXyz()[0] - atomB->GetXyz()[0], 2.0)
-           +pow( atomA->GetXyz()[1] - atomB->GetXyz()[1], 2.0)
-           +pow( atomA->GetXyz()[2] - atomB->GetXyz()[2], 2.0)
+            pow( atomA.GetXyz()[0] - atomB.GetXyz()[0], 2.0)
+           +pow( atomA.GetXyz()[1] - atomB.GetXyz()[1], 2.0)
+           +pow( atomA.GetXyz()[2] - atomB.GetXyz()[2], 2.0)
            );
 
-   for(int a=0; a<atomA->GetValence().size(); a++){
-      OrbitalType valenceOrbitalA = atomA->GetValence()[a];
+   for(int a=0; a<atomA.GetValence().size(); a++){
+      OrbitalType valenceOrbitalA = atomA.GetValence()[a];
       RealSphericalHarmonicsIndex realShpericalHarmonicsA(valenceOrbitalA);
-      orbitalExponentA = atomA->GetOrbitalExponent(
-                                atomA->GetValenceShellType(), 
-                                valenceOrbitalA, 
-                                this->theory);
+      orbitalExponentA = atomA.GetOrbitalExponent(
+                               atomA.GetValenceShellType(), 
+                               valenceOrbitalA, 
+                               this->theory);
 
-      for(int b=0; b<atomB->GetValence().size(); b++){
-         OrbitalType valenceOrbitalB = atomB->GetValence()[b];
+      for(int b=0; b<atomB.GetValence().size(); b++){
+         OrbitalType valenceOrbitalB = atomB.GetValence()[b];
          RealSphericalHarmonicsIndex realShpericalHarmonicsB(valenceOrbitalB);
-         orbitalExponentB = atomB->GetOrbitalExponent(
-                                   atomB->GetValenceShellType(), 
-                                   valenceOrbitalB, 
-                                   this->theory);
+         orbitalExponentB = atomB.GetOrbitalExponent(
+                                  atomB.GetValenceShellType(), 
+                                  valenceOrbitalB, 
+                                  this->theory);
 
          if(realShpericalHarmonicsA.GetM() == realShpericalHarmonicsB.GetM()){
             m = abs(realShpericalHarmonicsA.GetM());
@@ -2037,12 +2055,12 @@ void Cndo2::CalcDiatomicOverlapInDiatomicFrame(double** diatomicOverlap, Atom* a
 }
 
 // First derivative of (B.40) in J. A. Pople book.
-void Cndo2::CalcDiatomicOverlapFirstDerivativeInDiatomicFrame(
-                                                double** diatomicOverlapDeri, 
-                                                Atom* atomA, Atom* atomB){
+void Cndo2::CalcDiatomicOverlapFirstDerivativeInDiatomicFrame(double** diatomicOverlapDeri, 
+                                                              const Atom& atomA, 
+                                                              const Atom& atomB) const{
 
-   int na = atomA->GetValenceShellType() + 1;
-   int nb = atomB->GetValenceShellType() + 1;
+   int na = atomA.GetValenceShellType() + 1;
+   int nb = atomB.GetValenceShellType() + 1;
    int m = 0;
    double alpha = 0.0;
    double beta = 0.0;
@@ -2052,34 +2070,29 @@ void Cndo2::CalcDiatomicOverlapFirstDerivativeInDiatomicFrame(
    double reducedOverlapFirstDerivBeta = 0.0;
    double orbitalExponentA = 0.0;
    double orbitalExponentB = 0.0;
-   double R = 0.0; // Inter nuclear distance between aton A and B.
    double temp1=0.0;
    double temp2=0.0;
 
+   MallocerFreer::GetInstance()->InitializeDoubleMatrix2d(diatomicOverlapDeri, 
+                                                          OrbitalType_end, 
+                                                          OrbitalType_end);
+   double R = this->molecule->GetDistanceAtoms(atomA, atomB);
 
-   MallocerFreer::GetInstance()->InitializeDoubleMatrix2d
-                                 (diatomicOverlapDeri, OrbitalType_end, OrbitalType_end);
-   R = sqrt( 
-            pow( atomA->GetXyz()[0] - atomB->GetXyz()[0], 2.0)
-           +pow( atomA->GetXyz()[1] - atomB->GetXyz()[1], 2.0)
-           +pow( atomA->GetXyz()[2] - atomB->GetXyz()[2], 2.0)
-           );
-
-   for(int a=0; a<atomA->GetValence().size(); a++){
-      OrbitalType valenceOrbitalA = atomA->GetValence()[a];
+   for(int a=0; a<atomA.GetValence().size(); a++){
+      OrbitalType valenceOrbitalA = atomA.GetValence()[a];
       RealSphericalHarmonicsIndex realShpericalHarmonicsA(valenceOrbitalA);
-      orbitalExponentA = atomA->GetOrbitalExponent(
-                                          atomA->GetValenceShellType(), 
-                                          valenceOrbitalA,
-                                          this->theory);
+      orbitalExponentA = atomA.GetOrbitalExponent(
+                               atomA.GetValenceShellType(), 
+                               valenceOrbitalA,
+                               this->theory);
 
-      for(int b=0; b<atomB->GetValence().size(); b++){
-         OrbitalType valenceOrbitalB = atomB->GetValence()[b];
+      for(int b=0; b<atomB.GetValence().size(); b++){
+         OrbitalType valenceOrbitalB = atomB.GetValence()[b];
          RealSphericalHarmonicsIndex realShpericalHarmonicsB(valenceOrbitalB);
-         orbitalExponentB = atomB->GetOrbitalExponent(
-                                             atomB->GetValenceShellType(), 
-                                             valenceOrbitalB,
-                                             this->theory);
+         orbitalExponentB = atomB.GetOrbitalExponent(
+                                  atomB.GetValenceShellType(), 
+                                  valenceOrbitalB,
+                                  this->theory);
 
          if(realShpericalHarmonicsA.GetM() == realShpericalHarmonicsB.GetM()){
             m = abs(realShpericalHarmonicsA.GetM());
@@ -2089,12 +2102,22 @@ void Cndo2::CalcDiatomicOverlapFirstDerivativeInDiatomicFrame(
             reducedOverlap = this->GetReducedOverlap
                                    (na, realShpericalHarmonicsA.GetL(), m,
                                     nb, realShpericalHarmonicsB.GetL(), alpha, beta);
-            reducedOverlapFirstDerivAlpha = this->GetReducedOverlapFirstDerivativeAlpha
-                                             (na, realShpericalHarmonicsA.GetL(), m,
-                                              nb, realShpericalHarmonicsB.GetL(), alpha, beta);
-            reducedOverlapFirstDerivBeta  = this->GetReducedOverlapFirstDerivativeBeta
-                                             (na, realShpericalHarmonicsA.GetL(), m,
-                                              nb, realShpericalHarmonicsB.GetL(), alpha, beta);
+            reducedOverlapFirstDerivAlpha = this->GetReducedOverlapFirstDerivativeAlpha(
+                                                  na, 
+                                                  realShpericalHarmonicsA.GetL(), 
+                                                  m,
+                                                  nb, 
+                                                  realShpericalHarmonicsB.GetL(), 
+                                                  alpha, 
+                                                  beta);
+            reducedOverlapFirstDerivBeta  = this->GetReducedOverlapFirstDerivativeBeta(
+                                                  na, 
+                                                  realShpericalHarmonicsA.GetL(), 
+                                                  m,
+                                                  nb, 
+                                                  realShpericalHarmonicsB.GetL(), 
+                                                  alpha, 
+                                                  beta);
 
             temp1 = ((double)(na+nb+1))*pow(R,na+nb)*reducedOverlap;
             temp2 = pow(R,na+nb+1)*(orbitalExponentA*reducedOverlapFirstDerivAlpha
@@ -2189,7 +2212,7 @@ void Cndo2::SetOverlapElement(double** overlap, double** diatomicOverlap, Atom* 
 }
 
 // see (B.24) in J. A. Pople book.
-double Cndo2::GetReducedOverlap(int na, int la, int m, int nb, int lb, double alpha, double beta){
+double Cndo2::GetReducedOverlap(int na, int la, int m, int nb, int lb, double alpha, double beta) const{
    double value = 0.0;
    double temp = 0.0;
    int I = 2*ShellType_end+1;
@@ -2209,7 +2232,7 @@ double Cndo2::GetReducedOverlap(int na, int la, int m, int nb, int lb, double al
 }
 
 // see (B.30) in J. A. Pople book.
-double Cndo2::GetReducedOverlap(int na, int nb, double alpha, double beta){
+double Cndo2::GetReducedOverlap(int na, int nb, double alpha, double beta) const{
    double value = 0.0;
    double temp = 0.0;
 
@@ -2226,7 +2249,7 @@ double Cndo2::GetReducedOverlap(int na, int nb, double alpha, double beta){
 // First derivative of (B.24) in J. A. Pople book.
 // This derivative is carried out by alpha.
 double Cndo2::GetReducedOverlapFirstDerivativeAlpha
-              (int na, int la, int m, int nb, int lb, double alpha, double beta){
+              (int na, int la, int m, int nb, int lb, double alpha, double beta) const{
    double value = 0.0;
    double temp1 = 0.0;
    double temp2 = 0.0;
@@ -2250,7 +2273,7 @@ double Cndo2::GetReducedOverlapFirstDerivativeAlpha
 // First derivative of (B.24) in J. A. Pople book.
 // This derivative is carried out by Beta.
 double Cndo2::GetReducedOverlapFirstDerivativeBeta
-              (int na, int la, int m, int nb, int lb, double alpha, double beta){
+              (int na, int la, int m, int nb, int lb, double alpha, double beta) const{
    double value = 0.0;
    double temp1 = 0.0;
    double temp2 = 0.0;
@@ -2272,7 +2295,7 @@ double Cndo2::GetReducedOverlapFirstDerivativeBeta
 }
 
 // see (B.22) in J. A. Pople book.
-double Cndo2::GetAuxiliaryA(int k, double rho){
+double Cndo2::GetAuxiliaryA(int k, double rho) const{
    double value = 0.0;
    double temp = 0.0;
 
@@ -2286,12 +2309,12 @@ double Cndo2::GetAuxiliaryA(int k, double rho){
 }
 
 // First derivative of (B.22) in J. A. Pople book.
-double Cndo2::GetAuxiliaryAFirstDerivative(int k, double rho){
+double Cndo2::GetAuxiliaryAFirstDerivative(int k, double rho) const{
    return -1.0*this->GetAuxiliaryA(k+1, rho);
 }
 
 // see (B.23) in J. A. Pople book.
-double Cndo2::GetAuxiliaryB(int k, double rho){
+double Cndo2::GetAuxiliaryB(int k, double rho) const{
    double value = 0.0;
    double pre1 = 0.0;
    double pre2 = 0.0;
@@ -2321,12 +2344,12 @@ double Cndo2::GetAuxiliaryB(int k, double rho){
 }
 
 // First derivative of (B.23) in J. A. Pople book.
-double Cndo2::GetAuxiliaryBFirstDerivative(int k, double rho){
+double Cndo2::GetAuxiliaryBFirstDerivative(int k, double rho) const{
    return -1.0*this->GetAuxiliaryB(k+1, rho);
 }
 
 // see (B.16) in J. A. Pople book.
-double Cndo2::GetAuxiliaryD(int la, int lb, int m){
+double Cndo2::GetAuxiliaryD(int la, int lb, int m) const{
    string errorMessageAuxiliaryDNegativeM = "Error in cndo::Cndo2::GetAuxiliaryD: m<0\n";
    double value = 0.0;
 

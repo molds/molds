@@ -20,7 +20,7 @@ protected:
    std::string messageOmpElapsedTimeCalcCISMarix;
    std::string messageOmpElapsedTimeCIS;
    std::string messageDoneCalcCISMatrix;
-   virtual void CalcGammaAB(double** gammaAB, MolDS_base::Molecule* molecule);
+   virtual void CalcGammaAB(double** gammaAB, const MolDS_base::Molecule& molecule) const;
    virtual void SetMessages();
    virtual void SetEnableAtomTypes();
    virtual double GetFockDiagElement(const MolDS_base_atoms::Atom& atomA, 
@@ -44,12 +44,11 @@ protected:
                                         double const* const* const* const* const* const* twoElecTwoCore,
                                         bool isGuess) const;
    virtual void CalcDiatomicOverlapInDiatomicFrame(double** diatomicOverlap, 
-                                                   MolDS_base_atoms::Atom* atomA, 
-                                                   MolDS_base_atoms::Atom* atomB);
-   virtual void CalcDiatomicOverlapFirstDerivativeInDiatomicFrame(
-                                                double** diatomicOverlapDeri, 
-                                                MolDS_base_atoms::Atom* atomA, 
-                                                MolDS_base_atoms::Atom* atomB);
+                                                   const MolDS_base_atoms::Atom& atomA, 
+                                                   const MolDS_base_atoms::Atom& atomB) const;
+   virtual void CalcDiatomicOverlapFirstDerivativeInDiatomicFrame(double** diatomicOverlapDeri, 
+                                                                  const MolDS_base_atoms::Atom& atomA, 
+                                                                  const MolDS_base_atoms::Atom& atomB) const;
    virtual double GetCoulombInt(MolDS_base::OrbitalType orbital1, 
                                 MolDS_base::OrbitalType orbital2, 
                                 const MolDS_base_atoms::Atom& atom) const; // Apendix in [BZ_1979]
@@ -60,9 +59,9 @@ protected:
                                               int moJ, 
                                               int moK, 
                                               int moL, 
-                                              MolDS_base::Molecule* molecule, 
-                                              double** fockMatrix, 
-                                              double** gammaAB);
+                                              const MolDS_base::Molecule& molecule, 
+                                              double const* const* fockMatrix, 
+                                              double const* const* gammaAB) const;
    virtual void CalcCISMatrix(double** matrixCIS, int numberActiveOcc, int numberActiveVir);
    virtual void CalcForce(std::vector<int> elecStates);
    int GetSlaterDeterminantIndex(int activeOccIndex, int activeVirIndex);

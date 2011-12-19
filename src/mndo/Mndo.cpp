@@ -444,32 +444,31 @@ double Mndo::GetElectronCoreAttractionFirstDerivative(int atomAIndex,
 }
 
 void Mndo::CalcDiatomicOverlapInDiatomicFrame(double** diatomicOverlap, 
-                                              Atom* atomA, 
-                                              Atom* atomB){
+                                              const Atom& atomA, 
+                                              const Atom& atomB) const{
    MolDS_cndo::Cndo2::CalcDiatomicOverlapInDiatomicFrame(diatomicOverlap, atomA, atomB);
 }
 
-void Mndo::CalcDiatomicOverlapFirstDerivativeInDiatomicFrame(
-                                          double** diatomicOverlapDeri, 
-                                          Atom* atomA, 
-                                          Atom* atomB){
+void Mndo::CalcDiatomicOverlapFirstDerivativeInDiatomicFrame(double** diatomicOverlapDeri, 
+                                                             const Atom& atomA, 
+                                                             const Atom& atomB) const{
    MolDS_cndo::Cndo2::CalcDiatomicOverlapFirstDerivativeInDiatomicFrame(
-                        diatomicOverlapDeri,atomA, atomB);
+                      diatomicOverlapDeri,atomA, atomB);
 }
 
 // The order of mol, moJ, moK, moL is consistent with Eq. (9) in [RZ_1973]
 double Mndo::GetMolecularIntegralElement(int moI, int moJ, int moK, int moL, 
-                                         Molecule* molecule, 
-                                         double** fockMatrix, 
-                                         double** gammaAB){
+                                         const Molecule& molecule, 
+                                         double const* const* fockMatrix, 
+                                         double const* const* gammaAB) const{
    double value = 0.0;
-   for(int A=0; A<molecule->GetAtomVect()->size(); A++){
-      Atom* atomA = (*molecule->GetAtomVect())[A];
+   for(int A=0; A<molecule.GetAtomVect()->size(); A++){
+      Atom* atomA = (*molecule.GetAtomVect())[A];
       int firstAOIndexA = atomA->GetFirstAOIndex();
       int numberAOsA = atomA->GetValence().size();
 
-      for(int B=A; B<molecule->GetAtomVect()->size(); B++){
-         Atom* atomB = (*molecule->GetAtomVect())[B];
+      for(int B=A; B<molecule.GetAtomVect()->size(); B++){
+         Atom* atomB = (*molecule.GetAtomVect())[B];
          int firstAOIndexB = atomB->GetFirstAOIndex();
          int numberAOsB = atomB->GetValence().size();
 
@@ -988,13 +987,13 @@ double Mndo::GetKNRElement(int moI, int moJ, int moK, int moL){
    int nL = moL<numberOcc ? 2 : 0;
    if(nI!=nJ && nK!=nL){
       value = 4.0*this->GetMolecularIntegralElement(moI, moJ, moK, moL, 
-                                                    this->molecule, 
+                                                    *this->molecule, 
                                                     this->fockMatrix, NULL)
              -1.0*this->GetMolecularIntegralElement(moI, moK, moJ, moL, 
-                                                    this->molecule, 
+                                                    *this->molecule, 
                                                     this->fockMatrix, NULL)
              -1.0*this->GetMolecularIntegralElement(moI, moL, moJ, moK, 
-                                                    this->molecule, 
+                                                    *this->molecule, 
                                                     this->fockMatrix, NULL);
    }
    return 0.5*value;
@@ -1015,13 +1014,13 @@ double Mndo::GetKRElement(int moI, int moJ, int moK, int moL){
    int nL = moL<numberOcc ? 2 : 0;
    if(nI==nJ && nK!=nL){
       value = 4.0*this->GetMolecularIntegralElement(moI, moJ, moK, moL, 
-                                                    this->molecule, 
+                                                    *this->molecule, 
                                                     this->fockMatrix, NULL)
              -1.0*this->GetMolecularIntegralElement(moI, moK, moJ, moL, 
-                                                    this->molecule, 
+                                                    *this->molecule, 
                                                     this->fockMatrix, NULL)
              -1.0*this->GetMolecularIntegralElement(moI, moL, moJ, moK, 
-                                                    this->molecule, 
+                                                    *this->molecule, 
                                                     this->fockMatrix, NULL);
    }
    return 0.5*value;
@@ -2071,7 +2070,7 @@ void Mndo::CalcTwoElecTwoCoreDiatomic(double**** matrix, int atomAIndex, int ato
    double** rotatingMatrix = MallocerFreer::GetInstance()->MallocDoubleMatrix2d(
                                             OrbitalType_end, OrbitalType_end);
    try{
-      this->CalcRotatingMatrix(rotatingMatrix, atomA, atomB);
+      this->CalcRotatingMatrix(rotatingMatrix, *atomA, *atomB);
       this->RotateTwoElecTwoCoreDiatomicToSpaceFramegc(matrix, rotatingMatrix);
    }
    catch(MolDSException ex){
@@ -2171,7 +2170,7 @@ void Mndo::CalcTwoElecTwoCoreDiatomicFirstDerivatives(double***** matrix,
       }
 
       // rotate matirix into the space frame
-      this->CalcRotatingMatrix(rotatingMatrix, atomA, atomB);
+      this->CalcRotatingMatrix(rotatingMatrix, *atomA, *atomB);
       this->CalcRotatingMatrixFirstDerivatives(rMatDeri, atomA, atomB);
       this->RotateTwoElecTwoCoreDiatomicFirstDerivativesToSpaceFramegc(matrix, 
                                                                        twoElecTwoCoreDiatomic,
