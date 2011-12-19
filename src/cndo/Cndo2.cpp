@@ -1280,9 +1280,11 @@ void Cndo2::FreeDiatomicOverlapDeriTemps(double*** diatomicOverlap,
 
 // calculate Overlap matrix. E.g. S_{\mu\nu} in (3.74) in J. A. Pople book by GTO expansion.
 // See Eqs. (28) - (32) in [DY_1977]
-void Cndo2::CalcOverlapByGTOExpansion(double** overlap, Molecule* molecule, STOnGType stonG){
-   int totalAONumber = molecule->GetTotalNumberAOs();
-   int totalAtomNumber = molecule->GetAtomVect()->size();
+void Cndo2::CalcOverlapByGTOExpansion(double** overlap, 
+                                      const Molecule& molecule, 
+                                      STOnGType stonG) const{
+   int totalAONumber = molecule.GetTotalNumberAOs();
+   int totalAtomNumber = molecule.GetAtomVect()->size();
 
    // calculation overlap matrix
    for(int mu=0; mu<totalAONumber; mu++){
@@ -1291,10 +1293,10 @@ void Cndo2::CalcOverlapByGTOExpansion(double** overlap, Molecule* molecule, STOn
 
    #pragma omp for schedule(auto)
    for(int A=0; A<totalAtomNumber; A++){
-      Atom* atomA = (*(molecule->GetAtomVect()))[A];
+      Atom* atomA = (*(molecule.GetAtomVect()))[A];
       int firstAOIndexAtomA = atomA->GetFirstAOIndex();
       for(int B=A+1; B<totalAtomNumber; B++){
-         Atom* atomB = (*(molecule->GetAtomVect()))[B];
+         Atom* atomB = (*(molecule.GetAtomVect()))[B];
          int firstAOIndexAtomB = atomB->GetFirstAOIndex();
 
          for(int a=0; a<atomA->GetValence().size(); a++){
@@ -1302,7 +1304,7 @@ void Cndo2::CalcOverlapByGTOExpansion(double** overlap, Molecule* molecule, STOn
          
                int mu = firstAOIndexAtomA + a;      
                int nu = firstAOIndexAtomB + b;      
-               double value = this->GetOverlapElementByGTOExpansion(atomA, a, atomB, b, stonG);
+               double value = this->GetOverlapElementByGTOExpansion(*atomA, a, *atomB, b, stonG);
                overlap[mu][nu] = value;
                overlap[nu][mu] = value;
             }
@@ -1325,40 +1327,54 @@ void Cndo2::CalcOverlapByGTOExpansion(double** overlap, Molecule* molecule, STOn
 // calculate elements of overlap matrix. 
 // E.g. S_{\mu\nu} in (3.74) in J. A. Pople book by GTO expansion.
 // See Eqs. (28) - (32) in [DY_1977]
-double Cndo2::GetOverlapElementByGTOExpansion(Atom* atomA, int valenceIndexA, 
-                                              Atom* atomB, int valenceIndexB,
-                                              STOnGType stonG){
+double Cndo2::GetOverlapElementByGTOExpansion(const Atom& atomA, int valenceIndexA, 
+                                              const Atom& atomB, int valenceIndexB,
+                                              STOnGType stonG) const{
    double value = 0.0;
-   double dx = atomA->GetXyz()[XAxis] - atomB->GetXyz()[XAxis];
-   double dy = atomA->GetXyz()[YAxis] - atomB->GetXyz()[YAxis];
-   double dz = atomA->GetXyz()[ZAxis] - atomB->GetXyz()[ZAxis];
+   double dx = atomA.GetXyz()[XAxis] - atomB.GetXyz()[XAxis];
+   double dy = atomA.GetXyz()[YAxis] - atomB.GetXyz()[YAxis];
+   double dz = atomA.GetXyz()[ZAxis] - atomB.GetXyz()[ZAxis];
    double Rab = sqrt( pow(dx, 2.0) + pow(dy, 2.0) + pow(dz,2.0) );
-   ShellType shellTypeA = atomA->GetValenceShellType();
-   ShellType shellTypeB = atomB->GetValenceShellType();
-   OrbitalType valenceOrbitalA = atomA->GetValence()[valenceIndexA];
-   OrbitalType valenceOrbitalB = atomB->GetValence()[valenceIndexB];
-   double orbitalExponentA = atomA->GetOrbitalExponent(atomA->GetValenceShellType(), 
-                                                       valenceOrbitalA, this->theory);
-   double orbitalExponentB = atomB->GetOrbitalExponent(atomB->GetValenceShellType(), 
-                                                       valenceOrbitalB, this->theory);
+   ShellType shellTypeA = atomA.GetValenceShellType();
+   ShellType shellTypeB = atomB.GetValenceShellType();
+   OrbitalType valenceOrbitalA = atomA.GetValence()[valenceIndexA];
+   OrbitalType valenceOrbitalB = atomB.GetValence()[valenceIndexB];
+   double orbitalExponentA = atomA.GetOrbitalExponent(atomA.GetValenceShellType(), 
+                                                      valenceOrbitalA, 
+                                                      this->theory);
+   double orbitalExponentB = atomB.GetOrbitalExponent(atomB.GetValenceShellType(), 
+                                                      valenceOrbitalB, 
+                                                      this->theory);
    double gaussianExponentA = 0.0;
    double gaussianExponentB = 0.0;
 
    double temp = 0.0;
    for(int i=0; i<=stonG; i++){
       for(int j=0; j<=stonG; j++){
-         temp = GTOExpansionSTO::GetInstance()->GetCoefficient
-                  (stonG, shellTypeA, valenceOrbitalA, i); 
-         temp *= GTOExpansionSTO::GetInstance()->GetCoefficient
-                  (stonG, shellTypeB, valenceOrbitalB, j); 
+         temp = GTOExpansionSTO::GetInstance()->GetCoefficient(stonG, 
+                                                               shellTypeA, 
+                                                               valenceOrbitalA, 
+                                                               i); 
+         temp *= GTOExpansionSTO::GetInstance()->GetCoefficient(stonG, 
+                                                                shellTypeB, 
+                                                                valenceOrbitalB, 
+                                                                j); 
          gaussianExponentA = pow(orbitalExponentA, 2.0) *
-                             GTOExpansionSTO::GetInstance()->GetExponent
-                              (stonG, shellTypeA, valenceOrbitalA, i);
+                             GTOExpansionSTO::GetInstance()->GetExponent(stonG, 
+                                                                         shellTypeA, 
+                                                                         valenceOrbitalA, 
+                                                                         i);
          gaussianExponentB = pow(orbitalExponentB, 2.0) *
-                             GTOExpansionSTO::GetInstance()->GetExponent
-                              (stonG, shellTypeB, valenceOrbitalB, j);
-         temp *= this->GetGaussianOverlap(atomA->GetAtomType(), valenceOrbitalA, gaussianExponentA, 
-                                          atomB->GetAtomType(), valenceOrbitalB, gaussianExponentB,
+                             GTOExpansionSTO::GetInstance()->GetExponent(stonG, 
+                                                                         shellTypeB, 
+                                                                         valenceOrbitalB, 
+                                                                         j);
+         temp *= this->GetGaussianOverlap(atomA.GetAtomType(), 
+                                          valenceOrbitalA, 
+                                          gaussianExponentA, 
+                                          atomB.GetAtomType(), 
+                                          valenceOrbitalB, 
+                                          gaussianExponentB,
                                           dx, dy, dz, Rab);
          value += temp;
       }
@@ -1390,7 +1406,7 @@ double Cndo2::GetGaussianOverlap(AtomType atomTypeA,
                                  AtomType atomTypeB, 
                                  OrbitalType valenceOrbitalB, 
                                  double gaussianExponentB,
-                                 double dx, double dy, double dz, double Rab){
+                                 double dx, double dy, double dz, double Rab) const{
 
    double value = 0.0;
    if(valenceOrbitalA == s && valenceOrbitalB == s){

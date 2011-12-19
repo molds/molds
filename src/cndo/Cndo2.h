@@ -187,13 +187,13 @@ private:
                                      const MolDS_base::Molecule& molecule) const;
    void CalcOverlap(double** overlap, const MolDS_base::Molecule& molecule) const;
    void CalcOverlapByGTOExpansion(double** overlap, 
-                                  MolDS_base::Molecule* molecule, 
-                                  MolDS_base::STOnGType stonG); //See [DY_1977]
-   double GetOverlapElementByGTOExpansion(MolDS_base_atoms::Atom* atomA, 
+                                  const MolDS_base::Molecule& molecule, 
+                                  MolDS_base::STOnGType stonG) const; //See [DY_1977]
+   double GetOverlapElementByGTOExpansion(const MolDS_base_atoms::Atom& atomA, 
                                           int valenceIndexA, 
-                                          MolDS_base_atoms::Atom* atomB, 
+                                          const MolDS_base_atoms::Atom& atomB, 
                                           int valenceIndexB,
-                                          MolDS_base::STOnGType stonG); // see [DY_1977]
+                                          MolDS_base::STOnGType stonG) const; // see [DY_1977]
    double GetGaussianOverlap(MolDS_base::AtomType atomTypeA, 
                              MolDS_base::OrbitalType valenceOrbitalA, 
                              double gaussianExponentA, 
@@ -203,7 +203,7 @@ private:
                              double dx, 
                              double dy, 
                              double dz, 
-                             double Rab); // see [DY_1977]
+                             double Rab) const; // see [DY_1977]
    double GetGaussianOverlapSaSb(double gaussianExponentA, 
                                  double gaussianExponentB, 
                                  double Rab) const; // see [DY_1977]
