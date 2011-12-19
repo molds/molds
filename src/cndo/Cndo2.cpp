@@ -289,7 +289,7 @@ void Cndo2::DoesSCF(bool requiresGuess){
    try{
       // calculate electron integral
       this->CalcGammaAB(this->gammaAB, *this->molecule);
-      this->CalcOverlap(this->overlap, this->molecule);
+      this->CalcOverlap(this->overlap, *this->molecule);
       this->CalcTwoElecTwoCore(this->twoElecTwoCore, this->molecule);
 
       // SCF
@@ -1015,7 +1015,7 @@ void Cndo2::CalcOrbitalElectronPopulation(double** orbitalElectronPopulation,
 
 void Cndo2::CalcAtomicElectronPopulation(double* atomicElectronPopulation,
                                          double const* const* orbitalElectronPopulation, 
-                                         const Molecule& molecule){
+                                         const Molecule& molecule) const{
    int totalNumberAtoms = molecule.GetAtomVect()->size();
    MallocerFreer::GetInstance()->InitializeDoubleMatrix1d
                                  (atomicElectronPopulation, totalNumberAtoms);
@@ -1117,7 +1117,7 @@ void Cndo2::CalcGammaAB(double** gammaAB, const Molecule& molecule) const{
 
 }
 
-void Cndo2::FreeDiatomicOverlapAndRotatingMatrix(double*** diatomicOverlap, double*** rotatingMatrix){
+void Cndo2::FreeDiatomicOverlapAndRotatingMatrix(double*** diatomicOverlap, double*** rotatingMatrix) const{
    // free
    if(*diatomicOverlap != NULL){
       MallocerFreer::GetInstance()->FreeDoubleMatrix2d(diatomicOverlap, OrbitalType_end);
@@ -1130,9 +1130,9 @@ void Cndo2::FreeDiatomicOverlapAndRotatingMatrix(double*** diatomicOverlap, doub
 }
 
 // calculate Overlap matrix. E.g. S_{\mu\nu} in (3.74) in J. A. Pople book.
-void Cndo2::CalcOverlap(double** overlap, Molecule* molecule){
-   int totalAONumber = molecule->GetTotalNumberAOs();
-   int totalAtomNumber = molecule->GetAtomVect()->size();
+void Cndo2::CalcOverlap(double** overlap, const Molecule& molecule) const{
+   int totalAONumber = molecule.GetTotalNumberAOs();
+   int totalAtomNumber = molecule.GetAtomVect()->size();
 
    #pragma omp parallel
    {
@@ -1150,14 +1150,14 @@ void Cndo2::CalcOverlap(double** overlap, Molecule* molecule){
 
          #pragma omp for schedule(auto)
          for(int A=0; A<totalAtomNumber; A++){
-            Atom* atomA = (*(molecule->GetAtomVect()))[A];
+            Atom* atomA = (*(molecule.GetAtomVect()))[A];
             for(int B=A+1; B<totalAtomNumber; B++){
-               Atom* atomB = (*(molecule->GetAtomVect()))[B];
+               Atom* atomB = (*(molecule.GetAtomVect()))[B];
 
                this->CalcDiatomicOverlapInDiatomicFrame(diatomicOverlap, *atomA, *atomB);
                this->CalcRotatingMatrix(rotatingMatrix, *atomA, *atomB);
                this->RotateDiatmicOverlapToSpaceFrame(diatomicOverlap, rotatingMatrix);
-               this->SetOverlapElement(overlap, diatomicOverlap, atomA, atomB);
+               this->SetOverlapElement(overlap, diatomicOverlap, *atomA, *atomB);
 
             }
          }
@@ -1170,8 +1170,8 @@ void Cndo2::CalcOverlap(double** overlap, Molecule* molecule){
    }
    /*
    printf("overlap matrix\n"); 
-   for(int o=0; o<this->molecule->GetTotalNumberAOs(); o++){
-      for(int p=0; p<this->molecule->GetTotalNumberAOs(); p++){
+   for(int o=0; o<this->molecule.GetTotalNumberAOs(); o++){
+      for(int p=0; p<this->molecule.GetTotalNumberAOs(); p++){
          printf("%lf\t",overlap[o][p]);
       }
       printf("\n");
@@ -2149,7 +2149,8 @@ void Cndo2::CalcDiatomicOverlapFirstDerivativeInDiatomicFrame(double** diatomicO
 }
 
 // see (B.63) in Pople book.
-void Cndo2::RotateDiatmicOverlapToSpaceFrame(double** diatomicOverlap, double** rotatingMatrix){
+void Cndo2::RotateDiatmicOverlapToSpaceFrame(double** diatomicOverlap, 
+                                             double const* const* rotatingMatrix) const{
    double** oldDiatomicOverlap = MallocerFreer::GetInstance()->MallocDoubleMatrix2d
                                  (OrbitalType_end, OrbitalType_end);
 
@@ -2191,19 +2192,22 @@ void Cndo2::RotateDiatmicOverlapToSpaceFrame(double** diatomicOverlap, double** 
 
 }
 
-void Cndo2::SetOverlapElement(double** overlap, double** diatomicOverlap, Atom* atomA, Atom* atomB){
+void Cndo2::SetOverlapElement(double** overlap, 
+                              double const* const* diatomicOverlap, 
+                              const Atom& atomA, 
+                              const Atom& atomB) const{
 
-   int firstAOIndexAtomA = atomA->GetFirstAOIndex();
-   int firstAOIndexAtomB = atomB->GetFirstAOIndex();
+   int firstAOIndexAtomA = atomA.GetFirstAOIndex();
+   int firstAOIndexAtomB = atomB.GetFirstAOIndex();
    OrbitalType orbitalA;
    OrbitalType orbitalB;
    int mu=0;
    int nu=0;
 
-   for(int i=0; i<atomA->GetValence().size(); i++){
-      orbitalA = atomA->GetValence()[i];
-      for(int j=0; j<atomB->GetValence().size(); j++){
-         orbitalB = atomB->GetValence()[j];
+   for(int i=0; i<atomA.GetValence().size(); i++){
+      orbitalA = atomA.GetValence()[i];
+      for(int j=0; j<atomB.GetValence().size(); j++){
+         orbitalB = atomB.GetValence()[j];
          mu = firstAOIndexAtomA + i;      
          nu = firstAOIndexAtomB + j;      
          overlap[mu][nu] = diatomicOverlap[orbitalA][orbitalB];

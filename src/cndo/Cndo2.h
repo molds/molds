@@ -184,8 +184,8 @@ private:
                                       double const* const* fockMatrix) const;
    void CalcAtomicElectronPopulation(double* atomicElectronPopulation,
                                      double const* const* orbitalElectronPopulation, 
-                                     const MolDS_base::Molecule& molecule);
-   void CalcOverlap(double** overlap, MolDS_base::Molecule* molecule);
+                                     const MolDS_base::Molecule& molecule) const;
+   void CalcOverlap(double** overlap, const MolDS_base::Molecule& molecule) const;
    void CalcOverlapByGTOExpansion(double** overlap, 
                                   MolDS_base::Molecule* molecule, 
                                   MolDS_base::STOnGType stonG); //See [DY_1977]
@@ -227,11 +227,11 @@ private:
                        double****** twoElecTwoCore,
                        bool isGuess);
    void RotateDiatmicOverlapToSpaceFrame(double** diatomicOverlap, 
-                                         double** rotatingMatrix);
+                                         double const* const* rotatingMatrix) const;
    void SetOverlapElement(double** overlap, 
-                          double** diatomicOverlap, 
-                          MolDS_base_atoms::Atom* atomA, 
-                          MolDS_base_atoms::Atom* atomB);
+                          double const* const* diatomicOverlap, 
+                          const MolDS_base_atoms::Atom& atomA, 
+                          const MolDS_base_atoms::Atom& atomB) const;
    double GetAuxiliaryA(int k, double rho) const;
    double GetAuxiliaryB(int k, double rho) const;
    double GetAuxiliaryD(int la, int lb, int m) const;
@@ -253,7 +253,7 @@ private:
    void CheckEnableAtomType(MolDS_base::Molecule* molecule);
    void CheckNumberValenceElectrons(MolDS_base::Molecule* molecule);
    void FreeDiatomicOverlapAndRotatingMatrix(double*** diatomicOverlap, 
-                                             double*** rotatingMatrix);
+                                             double*** rotatingMatrix) const;
    void CalcElecHFEnergy(double* elecHFEnergy, 
                        MolDS_base::Molecule* molecule, 
                        double* energiesMO, 
