@@ -57,6 +57,8 @@ protected:
    double** matrixCIS;
    double* excitedEnergies;
    int matrixCISdimension;
+   virtual void SetMessages();
+   virtual void SetEnableAtomTypes();
    virtual void CalcHFProperties();
    double GetBondingAdjustParameterK(MolDS_base::ShellType shellA, 
                                      MolDS_base::ShellType shellB) const;
@@ -81,8 +83,6 @@ protected:
                            const MolDS_base_atoms::Atom& atomA, 
                            const MolDS_base_atoms::Atom& atomB) const;
    virtual void CalcGammaAB(double** gammaAB, const MolDS_base::Molecule& molecule) const;
-   virtual void SetMessages();
-   virtual void SetEnableAtomTypes();
    virtual double GetFockDiagElement(const MolDS_base_atoms::Atom& atomA, 
                                      int atomAIndex, 
                                      int mu, 

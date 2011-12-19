@@ -20,9 +20,9 @@ protected:
    std::string messageOmpElapsedTimeCalcCISMarix;
    std::string messageOmpElapsedTimeCIS;
    std::string messageDoneCalcCISMatrix;
-   virtual void CalcGammaAB(double** gammaAB, const MolDS_base::Molecule& molecule) const;
    virtual void SetMessages();
    virtual void SetEnableAtomTypes();
+   virtual void CalcGammaAB(double** gammaAB, const MolDS_base::Molecule& molecule) const;
    virtual double GetFockDiagElement(const MolDS_base_atoms::Atom& atomA, 
                                      int atomAIndex, 
                                      int mu, 
@@ -89,6 +89,8 @@ private:
    double nishimotoMatagaParamB;
    double overlapCorrectionSigma;
    double overlapCorrectionPi;
+   void DoesCISDirect();
+   void DoesCISDavidson();
    double GetNishimotoMatagaTwoEleInt(const MolDS_base_atoms::Atom& atomA, 
                                       MolDS_base::OrbitalType orbitalA, 
                                       const MolDS_base_atoms::Atom& atomB, 
@@ -98,8 +100,6 @@ private:
                                                      const MolDS_base_atoms::Atom& atomB, 
                                                      MolDS_base::OrbitalType orbitalB,
                                                      MolDS_base::CartesianType axisA) const;// ref. [MN_1957] and (5a) in [AEZ_1986]
-   void DoesCISDirect();
-   void DoesCISDavidson();
    void CalcRitzVector(double* ritzVector, 
                        double const* const* expansionVectors, 
                        double const* const* interactionMatrix, 

@@ -23,11 +23,12 @@ protected:
    std::string errorMessageCalcZMatrixForceEtaNull;
    virtual void SetMessages();
    virtual void SetEnableAtomTypes();
+   virtual void CalcHFProperties();
+   virtual void CalcForce(std::vector<int> elecStates);
    virtual double GetDiatomCoreRepulsionEnergy(int indexAtomA, int indexAtomB) const;
    virtual double GetDiatomCoreRepulsionFirstDerivative(int atomAIndex,
                                                         int atomBIndex, 
                                                         MolDS_base::CartesianType axisA) const;
-   virtual void CalcHFProperties();
    virtual void OutputHFResults(double const* const* fockMatrix, 
                                 double const* energiesMO, 
                                 double const* atomicElectronPopulation, 
@@ -74,7 +75,6 @@ protected:
                                               double const* const* fockMatrix, 
                                               double const* const* gammaAB) const;
    virtual void CalcCISMatrix(double** matrixCIS, int numberActiveOcc, int numberActiveVir) const;
-   virtual void CalcForce(std::vector<int> elecStates);
    double GetNddoRepulsionIntegral(const MolDS_base_atoms::Atom& atomA, 
                                    MolDS_base::OrbitalType mu, 
                                    MolDS_base::OrbitalType nu,
