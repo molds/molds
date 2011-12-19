@@ -309,7 +309,7 @@ void Cndo2::DoesSCF(bool requiresGuess){
 
          (i==0 && requiresGuess) ? isGuess = true : isGuess = false;
          this->CalcFockMatrix(this->fockMatrix, 
-                              this->molecule, 
+                              *this->molecule, 
                               this->overlap, 
                               this->gammaAB,
                               this->orbitalElectronPopulation, 
@@ -686,7 +686,7 @@ void Cndo2::CalcElecHFEnergy(double* elecHFEnergy,
    try{
       bool isGuess = false;
       this->CalcFockMatrix(fMatrix, 
-                           this->molecule, 
+                           *this->molecule, 
                            this->overlap, 
                            this->gammaAB,
                            this->orbitalElectronPopulation, 
@@ -694,7 +694,7 @@ void Cndo2::CalcElecHFEnergy(double* elecHFEnergy,
                            this->twoElecTwoCore,
                            isGuess);
       this->CalcFockMatrix(hMatrix, 
-                           this->molecule, 
+                           *this->molecule, 
                            this->overlap, 
                            this->gammaAB,
                            dammyOrbitalElectronPopulation, 
@@ -847,20 +847,25 @@ bool Cndo2::SatisfyConvergenceCriterion(double const* const* oldOrbitalElectronP
  *
  *
  * ******/
-void Cndo2::CalcFockMatrix(double** fockMatrix, Molecule* molecule, double** overlap, double** gammaAB,
-                           double** orbitalElectronPopulation, double* atomicElectronPopulation,
-                           double****** twoElecTwoCore, bool isGuess){
+void Cndo2::CalcFockMatrix(double** fockMatrix, 
+                           const Molecule& molecule, 
+                           double const* const* overlap, 
+                           double const* const* gammaAB,
+                           double const* const* orbitalElectronPopulation, 
+                           double const* atomicElectronPopulation,
+                           double const* const* const* const* const* const* twoElecTwoCore, 
+                           bool isGuess) const{
    MallocerFreer::GetInstance()->InitializeDoubleMatrix2d(fockMatrix, 
-                                                          molecule->GetTotalNumberAOs(), 
-                                                          molecule->GetTotalNumberAOs());
+                                                          molecule.GetTotalNumberAOs(), 
+                                                          molecule.GetTotalNumberAOs());
    #pragma omp parallel for schedule(auto)
-   for(int A=0; A<molecule->GetAtomVect()->size(); A++){
-      Atom* atomA = (*molecule->GetAtomVect())[A];
+   for(int A=0; A<molecule.GetAtomVect()->size(); A++){
+      Atom* atomA = (*molecule.GetAtomVect())[A];
       int firstAOIndexA = atomA->GetFirstAOIndex();
       int numberAOsA = atomA->GetValence().size();
 
-      for(int B=A; B<molecule->GetAtomVect()->size(); B++){
-         Atom* atomB = (*molecule->GetAtomVect())[B];
+      for(int B=A; B<molecule.GetAtomVect()->size(); B++){
+         Atom* atomB = (*molecule.GetAtomVect())[B];
          int firstAOIndexB = atomB->GetFirstAOIndex();
          int numberAOsB = atomB->GetValence().size();
 
@@ -872,7 +877,7 @@ void Cndo2::CalcFockMatrix(double** fockMatrix, Molecule* molecule, double** ove
                   fockMatrix[mu][mu] = this->GetFockDiagElement(*atomA, 
                                                                 A, 
                                                                 mu, 
-                                                                *molecule, 
+                                                                molecule, 
                                                                 gammaAB,
                                                                 orbitalElectronPopulation, 
                                                                 atomicElectronPopulation,
@@ -887,7 +892,7 @@ void Cndo2::CalcFockMatrix(double** fockMatrix, Molecule* molecule, double** ove
                                                                    B, 
                                                                    mu, 
                                                                    nu, 
-                                                                   *molecule, 
+                                                                   molecule, 
                                                                    gammaAB,
                                                                    overlap,
                                                                    orbitalElectronPopulation, 
@@ -904,8 +909,8 @@ void Cndo2::CalcFockMatrix(double** fockMatrix, Molecule* molecule, double** ove
    }
    /*  
    printf("fock matrix\n"); 
-   for(int o=0; o<this->molecule->GetTotalNumberAOs(); o++){
-      for(int p=0; p<this->molecule->GetTotalNumberAOs(); p++){
+   for(int o=0; o<this->molecule.GetTotalNumberAOs(); o++){
+      for(int p=0; p<this->molecule.GetTotalNumberAOs(); p++){
          printf("%lf\t",fockMatrix[o][p]);
       }
       printf("\n");

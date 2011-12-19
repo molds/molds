@@ -219,13 +219,13 @@ private:
                                             double Rab, 
                                             MolDS_base::CartesianType axisA) const;// see [DY_1977]
    void CalcFockMatrix(double** fockMatrix, 
-                       MolDS_base::Molecule* molecule, 
-                       double** overlap, 
-                       double** gammaAB,
-                       double** orbitalElectronPopulation, 
-                       double* atomicElectronPopulation,
-                       double****** twoElecTwoCore,
-                       bool isGuess);
+                       const MolDS_base::Molecule& molecule, 
+                       double const* const* overlap, 
+                       double const* const* gammaAB,
+                       double const* const* orbitalElectronPopulation, 
+                       double const* atomicElectronPopulation,
+                       double const* const* const* const* const* const* twoElecTwoCore,
+                       bool isGuess) const;
    void RotateDiatmicOverlapToSpaceFrame(double** diatomicOverlap, 
                                          double const* const* rotatingMatrix) const;
    void SetOverlapElement(double** overlap, 
