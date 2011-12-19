@@ -554,7 +554,7 @@ double ZindoS::GetNishimotoMatagaTwoEleIntFirstDerivative(const Atom& atomA,
                                                           OrbitalType orbitalA, 
                                                           const Atom& atomB, 
                                                           OrbitalType orbitalB,
-                                                          CartesianType axisA){
+                                                          CartesianType axisA) const{
    double gammaAA;
    if(orbitalA == s || 
       orbitalA == px ||
@@ -803,7 +803,7 @@ void ZindoS::DoesCIS(){
    cout << this->messageDoneCIS;
 }
 
-void ZindoS::SortSingleExcitationSlaterDeterminants(vector<MoEnergyGap>* moEnergyGaps){
+void ZindoS::SortSingleExcitationSlaterDeterminants(vector<MoEnergyGap>* moEnergyGaps) const{
    int numberOcc = Parameters::GetInstance()->GetActiveOccCIS();
    int numberVir = Parameters::GetInstance()->GetActiveVirCIS();
    for(int k=0; k<numberOcc*numberVir; k++){
@@ -818,10 +818,10 @@ void ZindoS::SortSingleExcitationSlaterDeterminants(vector<MoEnergyGap>* moEnerg
 
 // This method is used for Davidson
 void ZindoS::CalcRitzVector(double* ritzVector, 
-                            double** expansionVectors, 
-                            double** interactionMatrix, 
+                            double const* const* expansionVectors, 
+                            double const* const* interactionMatrix, 
                             int interactionMatrixDimension, 
-                            int ritzVectorIndex){
+                            int ritzVectorIndex) const{
    for(int j=0; j<this->matrixCISdimension; j++){
       ritzVector[j] = 0.0;
       for(int k=0; k<interactionMatrixDimension; k++){
@@ -833,9 +833,9 @@ void ZindoS::CalcRitzVector(double* ritzVector,
 // This method is used for Davidson
 void ZindoS::CalcResidualVectorAndNorm(double* residualVector, 
                                        double* norm, 
-                                       double* ritzVector, 
-                                       double* interactionEigenEnergies, 
-                                       int residualVectorIndex){
+                                       double const* ritzVector, 
+                                       double const* interactionEigenEnergies, 
+                                       int residualVectorIndex) const{
    double sqNorm = 0.0;
    for(int j=0; j<this->matrixCISdimension; j++){
       residualVector[j] = interactionEigenEnergies[residualVectorIndex] * ritzVector[j];
@@ -850,11 +850,11 @@ void ZindoS::CalcResidualVectorAndNorm(double* residualVector,
 
 // This method is used for Davidson
 void ZindoS::UpdateExpansionVectors(double** expansionVectors, 
-                                    double* interactionEigenEnergies, 
-                                    double* residualVector,
-                                    int interactionMatrixDimension, 
                                     int* notConvergedStates, 
-                                    int residualVectorIndex){
+                                    double const* interactionEigenEnergies, 
+                                    double const* residualVector,
+                                    int interactionMatrixDimension, 
+                                    int residualVectorIndex) const{
    double newExpansionVector[this->matrixCISdimension];
    // calculate new expansion vector from residual vector
    for(int j=0; j<this->matrixCISdimension; j++){
@@ -892,8 +892,8 @@ void ZindoS::UpdateExpansionVectors(double** expansionVectors,
 
 // This method is used for Davidson
 void ZindoS::CalcInteractionMatrix(double** interactionMatrix, 
-                                   double** expansionVectors, 
-                                   int interactionMatrixDimension){
+                                   double const* const* expansionVectors, 
+                                   int interactionMatrixDimension) const{
    #pragma omp parallel for schedule(auto)
    for(int k=0; k<interactionMatrixDimension*interactionMatrixDimension; k++){
       int i = k/interactionMatrixDimension;
@@ -1033,10 +1033,10 @@ void ZindoS::DoesCISDavidson(){
             
                   // update expansion vectors
                   this->UpdateExpansionVectors(expansionVectors, 
+                                               &notConvergedStates, 
                                                interactionEigenEnergies, 
                                                residualVector,
                                                interactionMatrixDimension, 
-                                               &notConvergedStates, 
                                                i);
 
                }
@@ -1131,7 +1131,7 @@ void ZindoS::FreeDavidsonCISTemporaryMtrices(double*** expansionVectors,
 
 void ZindoS::FreeDavidsonRoopCISTemporaryMtrices(double*** interactionMatrix, 
                                                  double interactionMatrixDimension, 
-                                                 double** interactionEigenEnergies){
+                                                 double** interactionEigenEnergies) const{
    if(*interactionMatrix != NULL){
       MallocerFreer::GetInstance()->FreeDoubleMatrix2d(interactionMatrix, 
                                                        interactionMatrixDimension);
@@ -1153,7 +1153,7 @@ void ZindoS::DoesCISDirect(){
    cout << this->messageDoneDirectCIS;
 }
 
-void ZindoS::CalcCISMatrix(double** matrixCIS, int numberActiveOcc, int numberActiveVir){
+void ZindoS::CalcCISMatrix(double** matrixCIS, int numberActiveOcc, int numberActiveVir) const{
    cout << this->messageStartCalcCISMatrix;
    double ompStartTime = omp_get_wtime();
 
@@ -1437,7 +1437,7 @@ void ZindoS::CheckMatrixForce(vector<int> elecStates){
 // Note taht activeOccIndex and activeVirIndex are not MO's number.
 // activeOccIndex=0 means HOMO and activeVirIndex=0 means LUMO.
 int ZindoS::GetSlaterDeterminantIndex(int activeOccIndex, 
-                                      int activeVirIndex){
+                                      int activeVirIndex) const{
    return Parameters::GetInstance()->GetActiveVirCIS()
          *activeOccIndex
          +activeVirIndex; 

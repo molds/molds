@@ -62,9 +62,9 @@ protected:
                                               const MolDS_base::Molecule& molecule, 
                                               double const* const* fockMatrix, 
                                               double const* const* gammaAB) const;
-   virtual void CalcCISMatrix(double** matrixCIS, int numberActiveOcc, int numberActiveVir);
+   virtual void CalcCISMatrix(double** matrixCIS, int numberActiveOcc, int numberActiveVir) const;
    virtual void CalcForce(std::vector<int> elecStates);
-   int GetSlaterDeterminantIndex(int activeOccIndex, int activeVirIndex);
+   int GetSlaterDeterminantIndex(int activeOccIndex, int activeVirIndex) const;
    void CheckMatrixForce(std::vector<int> elecStates);
 private:
    std::string errorMessageCalcForceNotGroundState;
@@ -83,6 +83,10 @@ private:
    std::string messageExcitedStatesEnergies;
    std::string messageExcitedStatesEnergiesTitle;
    int matrixForceElecStatesNum;
+   double nishimotoMatagaParamA;
+   double nishimotoMatagaParamB;
+   double overlapCorrectionSigma;
+   double overlapCorrectionPi;
    double GetNishimotoMatagaTwoEleInt(const MolDS_base_atoms::Atom& atomA, 
                                       MolDS_base::OrbitalType orbitalA, 
                                       const MolDS_base_atoms::Atom& atomB, 
@@ -91,39 +95,35 @@ private:
                                                      MolDS_base::OrbitalType orbitalA, 
                                                      const MolDS_base_atoms::Atom& atomB, 
                                                      MolDS_base::OrbitalType orbitalB,
-                                                     MolDS_base::CartesianType axisA);// ref. [MN_1957] and (5a) in [AEZ_1986]
-   double nishimotoMatagaParamA;
-   double nishimotoMatagaParamB;
-   double overlapCorrectionSigma;
-   double overlapCorrectionPi;
+                                                     MolDS_base::CartesianType axisA) const;// ref. [MN_1957] and (5a) in [AEZ_1986]
    void DoesCISDirect();
    void DoesCISDavidson();
    void CalcRitzVector(double* ritzVector, 
-                       double** expansionVectors, 
-                       double** interactionMatrix, 
+                       double const* const* expansionVectors, 
+                       double const* const* interactionMatrix, 
                        int interactionMatrixDimension, 
-                       int ritzVectorIndex);
+                       int ritzVectorIndex) const;
    void CalcResidualVectorAndNorm(double* residualVector, 
                                   double* norm, 
-                                  double* ritzVector, 
-                                  double* interactionEigenEnergies, 
-                                  int residualVectorIndex);
-   void SortSingleExcitationSlaterDeterminants(std::vector<MoEnergyGap>* moEnergyGaps);
+                                  double const* ritzVector, 
+                                  double const* interactionEigenEnergies, 
+                                  int residualVectorIndex) const;
+   void SortSingleExcitationSlaterDeterminants(std::vector<MoEnergyGap>* moEnergyGaps) const;
    void UpdateExpansionVectors(double** expansionVectors, 
-                               double* interactionEigenEnergies, 
-                               double* residualVector,
-                               int interactionMatrixDimension, 
                                int* notConvergedStates, 
-                               int residualVectorIndex);
+                               double const* interactionEigenEnergies, 
+                               double const* residualVector,
+                               int interactionMatrixDimension, 
+                               int residualVectorIndex) const;
    void CalcInteractionMatrix(double** interactionMatrix, 
-                              double** expansionVectors, 
-                              int interactionMatrixDimension);
+                              double const* const* expansionVectors, 
+                              int interactionMatrixDimension) const;
    void FreeDavidsonCISTemporaryMtrices(double*** expansionVectors, 
                                         double** residualVector, 
                                         double** ritzVector);
    void FreeDavidsonRoopCISTemporaryMtrices(double*** interactionMatrix, 
                                             double interactionMatrixDimension, 
-                                            double** interactionEigenEnergies);
+                                            double** interactionEigenEnergies) const;
 };
 
 }

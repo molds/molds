@@ -301,7 +301,7 @@ void Cndo2::DoesSCF(bool requiresGuess){
          // calc. electron population in each atom.
          this->CalcAtomicElectronPopulation(this->atomicElectronPopulation, 
                                             this->orbitalElectronPopulation, 
-                                            this->molecule);
+                                            *this->molecule);
 
          this->UpdateOldOrbitalElectronPopulation(oldOrbitalElectronPopulation, 
                                                   this->orbitalElectronPopulation, 
@@ -326,7 +326,7 @@ void Cndo2::DoesSCF(bool requiresGuess){
 
          // calc. electron population in each orbital
          this->CalcOrbitalElectronPopulation(this->orbitalElectronPopulation, 
-                                             this->molecule, 
+                                             *this->molecule, 
                                              this->fockMatrix);
 
 
@@ -408,7 +408,7 @@ void Cndo2::DoesSCF(){
 void Cndo2::CalcHFProperties(){
    this->CalcAtomicElectronPopulation(this->atomicElectronPopulation, 
                                       this->orbitalElectronPopulation, 
-                                      this->molecule);
+                                      *this->molecule);
    this->CalcCoreRepulsionEnergy();
    this->CalcElecHFEnergy(&this->elecHFEnergy, 
                         this->molecule, 
@@ -811,8 +811,8 @@ double Cndo2::GetMolecularIntegralElement(int moI, int moJ, int moK, int moL,
 }
 
 void Cndo2::UpdateOldOrbitalElectronPopulation(double** oldOrbitalElectronPopulation, 
-                                               double** orbitalElectronPopulation,
-                                               int numberAOs){
+                                               double const* const* orbitalElectronPopulation,
+                                               int numberAOs) const{
    for(int i=0; i<numberAOs; i++){
       for(int j=0; j<numberAOs; j++){
          oldOrbitalElectronPopulation[i][j] = orbitalElectronPopulation[i][j];
@@ -820,9 +820,9 @@ void Cndo2::UpdateOldOrbitalElectronPopulation(double** oldOrbitalElectronPopula
    }
 }
 
-bool Cndo2::SatisfyConvergenceCriterion(double** oldOrbitalElectronPopulation, 
-                                        double** orbitalElectronPopulation,
-                                        int numberAOs, double* rmsDensity, int times){
+bool Cndo2::SatisfyConvergenceCriterion(double const* const* oldOrbitalElectronPopulation, 
+                                        double const* const* orbitalElectronPopulation,
+                                        int numberAOs, double* rmsDensity, int times) const{
    bool satisfy = false;
    double change = 0.0;
    for(int i=0; i<numberAOs; i++){
@@ -970,8 +970,9 @@ double Cndo2::GetFockOffDiagElement(const Atom& atomA,
 }
 
 void Cndo2::CalcOrbitalElectronPopulation(double** orbitalElectronPopulation, 
-                                          Molecule* molecule, double** fockMatrix){
-   int totalNumberAOs = molecule->GetTotalNumberAOs();
+                                          const Molecule& molecule, 
+                                          double const* const* fockMatrix) const{
+   int totalNumberAOs = molecule.GetTotalNumberAOs();
    MallocerFreer::GetInstance()->InitializeDoubleMatrix2d
                                  (orbitalElectronPopulation, totalNumberAOs, totalNumberAOs);
 
@@ -983,7 +984,7 @@ void Cndo2::CalcOrbitalElectronPopulation(double** orbitalElectronPopulation,
    }
    
    double value=0.0;
-   int numberTotalValenceElectrons = molecule->GetTotalNumberValenceElectrons();
+   int numberTotalValenceElectrons = molecule.GetTotalNumberValenceElectrons();
    for(int mu=0; mu<totalNumberAOs; mu++){
       for(int nu=mu; nu<totalNumberAOs; nu++){
          value = 0.0;
@@ -1013,16 +1014,17 @@ void Cndo2::CalcOrbitalElectronPopulation(double** orbitalElectronPopulation,
 }
 
 void Cndo2::CalcAtomicElectronPopulation(double* atomicElectronPopulation,
-                                         double** orbitalElectronPopulation, Molecule* molecule){
-   int totalNumberAtoms = molecule->GetAtomVect()->size();
+                                         double const* const* orbitalElectronPopulation, 
+                                         const Molecule& molecule){
+   int totalNumberAtoms = molecule.GetAtomVect()->size();
    MallocerFreer::GetInstance()->InitializeDoubleMatrix1d
                                  (atomicElectronPopulation, totalNumberAtoms);
 
    int firstAOIndex = 0;
    int numberAOs = 0;
    for(int A=0; A<totalNumberAtoms; A++){
-      firstAOIndex = (*molecule->GetAtomVect())[A]->GetFirstAOIndex();
-      numberAOs = (*molecule->GetAtomVect())[A]->GetValence().size();
+      firstAOIndex = (*molecule.GetAtomVect())[A]->GetFirstAOIndex();
+      numberAOs = (*molecule.GetAtomVect())[A]->GetValence().size();
       atomicElectronPopulation[A] = 0.0;
       for(int i=firstAOIndex; i<firstAOIndex+numberAOs; i++){
          atomicElectronPopulation[A] += orbitalElectronPopulation[i][i];

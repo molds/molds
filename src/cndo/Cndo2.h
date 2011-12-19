@@ -171,20 +171,20 @@ private:
                         [2*MolDS_base::ShellType_end]
                         [4*MolDS_base::ShellType_end-1];
    void CalcCoreRepulsionEnergy();
-   bool SatisfyConvergenceCriterion(double** oldOrbitalElectronPopulation, 
-                                    double** orbitalElectronPopulation,
+   bool SatisfyConvergenceCriterion(double const* const* oldOrbitalElectronPopulation, 
+                                    double const* const* orbitalElectronPopulation,
                                     int numberAOs, 
                                     double* rmsDensity, 
-                                    int times);
+                                    int times) const;
    void UpdateOldOrbitalElectronPopulation(double** oldOrbitalElectronPopulation, 
-                                           double** orbitalElectronPopulation,
-                                           int numberAOs);
+                                           double const* const* orbitalElectronPopulation,
+                                           int numberAOs) const;
    void CalcOrbitalElectronPopulation(double** orbitalElectronPopulation, 
-                                      MolDS_base::Molecule* molecule, 
-                                      double** fockMatrix);
+                                      const MolDS_base::Molecule& molecule, 
+                                      double const* const* fockMatrix) const;
    void CalcAtomicElectronPopulation(double* atomicElectronPopulation,
-                                     double** orbitalElectronPopulation, 
-                                     MolDS_base::Molecule* molecule);
+                                     double const* const* orbitalElectronPopulation, 
+                                     const MolDS_base::Molecule& molecule);
    void CalcOverlap(double** overlap, MolDS_base::Molecule* molecule);
    void CalcOverlapByGTOExpansion(double** overlap, 
                                   MolDS_base::Molecule* molecule, 

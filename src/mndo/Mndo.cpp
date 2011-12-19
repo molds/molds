@@ -562,7 +562,7 @@ double Mndo::GetMolecularIntegralElement(int moI, int moJ, int moK, int moL,
 }
 
 // right-upper part is only calculated by this method.
-void Mndo::CalcCISMatrix(double** matrixCIS, int numberActiveOcc, int numberActiveVir){
+void Mndo::CalcCISMatrix(double** matrixCIS, int numberActiveOcc, int numberActiveVir) const{
    cout << this->messageStartCalcCISMatrix;
    double ompStartTime = omp_get_wtime();
 
