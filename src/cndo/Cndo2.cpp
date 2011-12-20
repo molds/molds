@@ -123,6 +123,16 @@ void Cndo2::SetMessages(){
       = "Error in cndo::Cndo2::GetElectronicEnergy: Set electronic state is not calculated by CIS.\n";
    this->errorMessageGetElectronicEnergyNULLCISEnergy 
       = "Error in cndo::Cndo2::GetElectronicEnergy: excitedEnergies is NULL\n";
+   this->errorMessageCalDiaOverlapDiaFrameNullMatrix 
+      = "Error in cndo::Cndo2::CalcDiatomicOverlapInDiatomicFrame: diatomicOverlap is NULL.\n";
+   this->errorMessageCalcRotatingMatrixNullRotMatrix 
+      = "Error in cndo::Cndo2::CalcRotatingMatrix: rotatingMatrix is NULL.\n";
+   this->errorMessageRotDiaOverlapToSpaceFrameNullDiaMatrix 
+      = "Error in cndo::Cndo2::RotateDiatmicOverlapToSpaceFrame diatomicOverlap is NULL.\n";
+   this->errorMessageRotDiaOverlapToSpaceFrameNullRotMatrix 
+      = "Error in cndo::Cndo2::RotateDiatmicOverlapToSpaceFrame: rotatingMatrix is NULL.\n";
+   this->errorMessageSetOverlapElementNullDiaMatrix 
+      = "Error in cndo::Cndo2::SetOverlapElement: diatomicOverlap is NULL.\n";
    this->messageSCFMetConvergence = "\n\n\n\t\tCNDO/2-SCF met convergence criterion(^^b\n\n\n";
    this->messageStartSCF = "**********  START: CNDO/2-SCF  **********\n";
    this->messageDoneSCF = "**********  DONE: CNDO/2-SCF  **********\n\n\n";
@@ -860,54 +870,65 @@ void Cndo2::CalcFockMatrix(double** fockMatrix,
    MallocerFreer::GetInstance()->InitializeDoubleMatrix2d(fockMatrix, 
                                                           molecule.GetTotalNumberAOs(), 
                                                           molecule.GetTotalNumberAOs());
-   #pragma omp parallel for schedule(auto)
+   stringstream ompErrors;
+   #pragma omp parallel for schedule(auto) shared(ompErrors)
    for(int A=0; A<molecule.GetAtomVect()->size(); A++){
       const Atom& atomA = *(*molecule.GetAtomVect())[A];
       int firstAOIndexA = atomA.GetFirstAOIndex();
       int numberAOsA = atomA.GetValence().size();
-
       for(int B=A; B<molecule.GetAtomVect()->size(); B++){
          const Atom& atomB = *(*molecule.GetAtomVect())[B];
          int firstAOIndexB = atomB.GetFirstAOIndex();
          int numberAOsB = atomB.GetValence().size();
-
          for(int mu=firstAOIndexA; mu<firstAOIndexA+numberAOsA; mu++){
             for(int nu=firstAOIndexB; nu<firstAOIndexB+numberAOsB; nu++){
-
-               if(mu == nu){
-                  // diagonal part
-                  fockMatrix[mu][mu] = this->GetFockDiagElement(atomA, 
-                                                                A, 
-                                                                mu, 
-                                                                molecule, 
-                                                                gammaAB,
-                                                                orbitalElectronPopulation, 
-                                                                atomicElectronPopulation,
-                                                                twoElecTwoCore,
-                                                                isGuess);
-               }
-               else if(mu < nu){
-                  // upper right part
-                  fockMatrix[mu][nu] = this->GetFockOffDiagElement(atomA, 
-                                                                   atomB,
+   
+               try{
+                  if(mu == nu){
+                     // diagonal part
+                     fockMatrix[mu][mu] = this->GetFockDiagElement(atomA, 
                                                                    A, 
-                                                                   B, 
                                                                    mu, 
-                                                                   nu, 
                                                                    molecule, 
                                                                    gammaAB,
-                                                                   overlap,
                                                                    orbitalElectronPopulation, 
+                                                                   atomicElectronPopulation,
                                                                    twoElecTwoCore,
                                                                    isGuess);
+                  }
+                  else if(mu < nu){
+                     // upper right part
+                     fockMatrix[mu][nu] = this->GetFockOffDiagElement(atomA, 
+                                                                      atomB,
+                                                                      A, 
+                                                                      B, 
+                                                                      mu, 
+                                                                      nu, 
+                                                                      molecule, 
+                                                                      gammaAB,
+                                                                      overlap,
+                                                                      orbitalElectronPopulation, 
+                                                                      twoElecTwoCore,
+                                                                      isGuess);
+                  }
+                  else{
+                     // lower left part (not calculated)
+                  }
                }
-               else{
-                  // lower left part (not calculated)
+               catch(MolDSException ex){
+                  #pragma omp critical
+                  {
+                     ompErrors << ex.what() << endl ;
+                  }
                }
+
             }
          }
-                        
       }
+   }
+   // Exception throwing for omp-region
+   if(!ompErrors.str().empty()){
+      throw MolDSException(ompErrors.str());
    }
    /*  
    printf("fock matrix\n"); 
@@ -1043,7 +1064,8 @@ void Cndo2::CalcAtomicElectronPopulation(double* atomicElectronPopulation,
 // calculate gammaAB matrix. (B.56) and (B.62) in J. A. Pople book.
 void Cndo2::CalcGammaAB(double** gammaAB, const Molecule& molecule) const{
    int totalAtomNumber = molecule.GetAtomVect()->size();
-   #pragma omp parallel for schedule(auto)
+   stringstream ompErrors;
+   #pragma omp parallel for schedule(auto) shared(ompErrors)
    for(int A=0; A<totalAtomNumber; A++){
       const Atom& atomA = *(*molecule.GetAtomVect())[A];
       int na = atomA.GetValenceShellType() + 1;
@@ -1055,53 +1077,62 @@ void Cndo2::CalcGammaAB(double** gammaAB, const Molecule& molecule) const{
          double orbitalExponentB = atomB.GetOrbitalExponent(
                                          atomB.GetValenceShellType(), s, this->theory);
 
-         // inter nuclear distance
-         double R = molecule.GetDistanceAtoms(A, B);
-
          double value = 0.0;
-         double temp = 0.0;
-         if(R>0.0){
-            // (B.56)
-            value = pow(0.5*R, 2.0*na);
-            value *= this->GetReducedOverlap(2*na-1, 0, 2.0*orbitalExponentA*R, 0);
+         try{
+            double R = molecule.GetDistanceAtoms(A, B);
+            double temp = 0.0;
+            if(R>0.0){
+               // (B.56)
+               value = pow(0.5*R, 2.0*na);
+               value *= this->GetReducedOverlap(2*na-1, 0, 2.0*orbitalExponentA*R, 0);
 
-            for(int l=1; l<=2*nb; l++){
-               temp = 0.0;
-               temp = l;
-               temp *= pow(2.0*orbitalExponentB, 2*nb-l);
-               temp /= Factorial(2*nb-l)*2.0*nb;
-               temp *= pow(0.5*R, 2.0*nb-l+2.0*na);
-               temp *= this->GetReducedOverlap(2*na-1, 
-                                               2*nb-l, 
-                                               2.0*orbitalExponentA*R, 
-                                               2.0*orbitalExponentB*R);
-               value -= temp;
+               for(int l=1; l<=2*nb; l++){
+                  temp = 0.0;
+                  temp = l;
+                  temp *= pow(2.0*orbitalExponentB, 2*nb-l);
+                  temp /= Factorial(2*nb-l)*2.0*nb;
+                  temp *= pow(0.5*R, 2.0*nb-l+2.0*na);
+                  temp *= this->GetReducedOverlap(2*na-1, 
+                                                  2*nb-l, 
+                                                  2.0*orbitalExponentA*R, 
+                                                  2.0*orbitalExponentB*R);
+                  value -= temp;
+               }
+
+               value *= pow(2.0*orbitalExponentA, 2.0*na+1.0);
+               value /= Factorial(2*na);
             }
+            else{
+               // (B.62)
+               value =  Factorial(2*na-1);
+               value /= pow(2.0*orbitalExponentA, 2.0*na);
 
-            value *= pow(2.0*orbitalExponentA, 2.0*na+1.0);
-            value /= Factorial(2*na);
-         }
-         else{
-            // (B.62)
-            value =  Factorial(2*na-1);
-            value /= pow(2.0*orbitalExponentA, 2.0*na);
-
-            for(int l=1; l<=2*nb; l++){
-               temp = l;
-               temp *= pow(2.0*orbitalExponentB, 2*nb-l);
-               temp *= Factorial(2*na+2*nb-l-1);
-               temp /= Factorial(2*nb-l);
-               temp /= 2.0*nb;
-               temp /= pow( 2.0*orbitalExponentA + 2.0*orbitalExponentB, 2.0*(na+nb)-l );
-               value -= temp;
+               for(int l=1; l<=2*nb; l++){
+                  temp = l;
+                  temp *= pow(2.0*orbitalExponentB, 2*nb-l);
+                  temp *= Factorial(2*na+2*nb-l-1);
+                  temp /= Factorial(2*nb-l);
+                  temp /= 2.0*nb;
+                  temp /= pow( 2.0*orbitalExponentA + 2.0*orbitalExponentB, 2.0*(na+nb)-l );
+                  value -= temp;
+               }
+               value *= pow(2.0*orbitalExponentA, 2.0*na+1);
+               value /= Factorial(2*na);
             }
-
-            value *= pow(2.0*orbitalExponentA, 2.0*na+1);
-            value /= Factorial(2*na);
-
          }
+         catch(MolDSException ex){
+            #pragma omp critical
+            {
+               ompErrors << ex.what() << endl ;
+            }
+         }
+
          gammaAB[A][B] = value;
       }
+   }
+   // Exception throwing for omp-region
+   if(!ompErrors.str().empty()){
+      throw MolDSException(ompErrors.str());
    }
 
    #pragma omp parallel for schedule(auto)
@@ -1141,39 +1172,58 @@ void Cndo2::CalcOverlap(double** overlap, const Molecule& molecule) const{
    int totalAONumber = molecule.GetTotalNumberAOs();
    int totalAtomNumber = molecule.GetAtomVect()->size();
 
-   #pragma omp parallel
+   stringstream ompErrors;
+   #pragma omp parallel shared(ompErrors)
    {
+      double** diatomicOverlap = NULL;
+      double** rotatingMatrix = NULL;
       // malloc
-      double** diatomicOverlap =  MallocerFreer::GetInstance()->MallocDoubleMatrix2d
-                                   (OrbitalType_end, OrbitalType_end);
-      double** rotatingMatrix = MallocerFreer::GetInstance()->MallocDoubleMatrix2d
-                                   (OrbitalType_end, OrbitalType_end);
-
       try{
-         // calculation overlap matrix
-         for(int mu=0; mu<totalAONumber; mu++){
-            overlap[mu][mu] = 1.0;
+         diatomicOverlap =  MallocerFreer::GetInstance()->MallocDoubleMatrix2d(
+                                                          OrbitalType_end, 
+                                                          OrbitalType_end);
+         rotatingMatrix = MallocerFreer::GetInstance()->MallocDoubleMatrix2d(
+                                                        OrbitalType_end, 
+                                                        OrbitalType_end);
+      }
+      catch(MolDSException ex){
+         this->FreeDiatomicOverlapAndRotatingMatrix(&diatomicOverlap, &rotatingMatrix);
+         #pragma omp critical
+         {
+            ompErrors << ex.what() << endl ;
          }
+      }
 
-         #pragma omp for schedule(auto)
-         for(int A=0; A<totalAtomNumber; A++){
-            const Atom& atomA = *(*molecule.GetAtomVect())[A];
-            for(int B=A+1; B<totalAtomNumber; B++){
-               const Atom& atomB = *(*molecule.GetAtomVect())[B];
+      // calculation overlap matrix
+      for(int mu=0; mu<totalAONumber; mu++){
+         overlap[mu][mu] = 1.0;
+      }
 
+      #pragma omp for schedule(auto)
+      for(int A=0; A<totalAtomNumber; A++){
+         const Atom& atomA = *(*molecule.GetAtomVect())[A];
+         for(int B=A+1; B<totalAtomNumber; B++){
+            const Atom& atomB = *(*molecule.GetAtomVect())[B];
+            try{
                this->CalcDiatomicOverlapInDiatomicFrame(diatomicOverlap, atomA, atomB);
                this->CalcRotatingMatrix(rotatingMatrix, atomA, atomB);
                this->RotateDiatmicOverlapToSpaceFrame(diatomicOverlap, rotatingMatrix);
                this->SetOverlapElement(overlap, diatomicOverlap, atomA, atomB);
-
+            }
+            catch(MolDSException ex){
+               this->FreeDiatomicOverlapAndRotatingMatrix(&diatomicOverlap, &rotatingMatrix);
+               #pragma omp critical
+               {
+                  ompErrors << ex.what() << endl ;
+               }
             }
          }
       }
-      catch(MolDSException ex){
-         this->FreeDiatomicOverlapAndRotatingMatrix(&diatomicOverlap, &rotatingMatrix);
-         throw ex;
-      }
       this->FreeDiatomicOverlapAndRotatingMatrix(&diatomicOverlap, &rotatingMatrix);
+   }
+   // Exception throwing for omp-region
+   if(!ompErrors.str().empty()){
+      throw MolDSException(ompErrors.str());
    }
    /*
    printf("overlap matrix\n"); 
@@ -1860,6 +1910,11 @@ double Cndo2::GetGaussianOverlapFirstDerivative
 void Cndo2::CalcRotatingMatrix(double** rotatingMatrix, 
                                const Atom& atomA, 
                                const Atom& atomB) const{
+   if(rotatingMatrix==NULL){
+      stringstream ss;
+      ss << this->errorMessageCalcRotatingMatrixNullRotMatrix;
+      throw MolDSException(ss.str());
+   }
    MallocerFreer::GetInstance()->InitializeDoubleMatrix2d
                                  (rotatingMatrix,  OrbitalType_end, OrbitalType_end);
 
@@ -2015,7 +2070,11 @@ void Cndo2::CalcRotatingMatrixFirstDerivatives(double*** rMatFirstDeri,
 void Cndo2::CalcDiatomicOverlapInDiatomicFrame(double** diatomicOverlap, 
                                                const Atom& atomA, 
                                                const Atom& atomB) const{
-
+   if(diatomicOverlap==NULL){
+      stringstream ss;
+      ss << this->errorMessageCalDiaOverlapDiaFrameNullMatrix;
+      throw MolDSException(ss.str());
+   }
    int na = atomA.GetValenceShellType() + 1;
    int nb = atomB.GetValenceShellType() + 1;
    int m = 0;
@@ -2177,32 +2236,45 @@ void Cndo2::CalcDiatomicOverlapFirstDerivativeInDiatomicFrame(double** diatomicO
 // see (B.63) in Pople book.
 void Cndo2::RotateDiatmicOverlapToSpaceFrame(double** diatomicOverlap, 
                                              double const* const* rotatingMatrix) const{
+   if(diatomicOverlap==NULL){
+      stringstream ss;
+      ss << this->errorMessageRotDiaOverlapToSpaceFrameNullDiaMatrix;
+      throw MolDSException(ss.str());
+   }
+   if(rotatingMatrix==NULL){
+      stringstream ss;
+      ss << this->errorMessageRotDiaOverlapToSpaceFrameNullRotMatrix;
+      throw MolDSException(ss.str());
+   }
    double** oldDiatomicOverlap = MallocerFreer::GetInstance()->MallocDoubleMatrix2d
                                  (OrbitalType_end, OrbitalType_end);
 
-   for(int i=0; i<OrbitalType_end; i++){
-      for(int j=0; j<OrbitalType_end; j++){
-         oldDiatomicOverlap[i][j] = diatomicOverlap[i][j];
+   try{
+      for(int i=0; i<OrbitalType_end; i++){
+         for(int j=0; j<OrbitalType_end; j++){
+            oldDiatomicOverlap[i][j] = diatomicOverlap[i][j];
+         }
       }
-   }
-   
-   // rotate
-   for(int i=0; i<OrbitalType_end; i++){
-      for(int j=0; j<OrbitalType_end; j++){
-         diatomicOverlap[i][j] = 0.0;
-
-         for(int k=0; k<OrbitalType_end; k++){
-            for(int l=0; l<OrbitalType_end; l++){
-               diatomicOverlap[i][j] += oldDiatomicOverlap[k][l] 
-                                       *rotatingMatrix[i][k] 
-                                       *rotatingMatrix[j][l];
+      // rotate
+      for(int i=0; i<OrbitalType_end; i++){
+         for(int j=0; j<OrbitalType_end; j++){
+            diatomicOverlap[i][j] = 0.0;
+            for(int k=0; k<OrbitalType_end; k++){
+               for(int l=0; l<OrbitalType_end; l++){
+                  diatomicOverlap[i][j] += oldDiatomicOverlap[k][l] 
+                                          *rotatingMatrix[i][k] 
+                                          *rotatingMatrix[j][l];
+               }
             }
          }
-                                       
       }
    }
-
-
+   catch(MolDSException ex){
+      if(oldDiatomicOverlap != NULL){
+         MallocerFreer::GetInstance()->FreeDoubleMatrix2d(&oldDiatomicOverlap, OrbitalType_end);
+      }
+      throw ex;
+   }
    if(oldDiatomicOverlap != NULL){
       MallocerFreer::GetInstance()->FreeDoubleMatrix2d(&oldDiatomicOverlap, OrbitalType_end);
    }
@@ -2222,6 +2294,11 @@ void Cndo2::SetOverlapElement(double** overlap,
                               double const* const* diatomicOverlap, 
                               const Atom& atomA, 
                               const Atom& atomB) const{
+   if(diatomicOverlap==NULL){
+      stringstream ss;
+      ss << this->errorMessageSetOverlapElementNullDiaMatrix;
+      throw MolDSException(ss.str());
+   }
 
    int firstAOIndexAtomA = atomA.GetFirstAOIndex();
    int firstAOIndexAtomB = atomB.GetFirstAOIndex();

@@ -142,6 +142,11 @@ protected:
       const { return rLeft.energyGap < rRight.energyGap; } 
    };
 private:
+   std::string errorMessageCalDiaOverlapDiaFrameNullMatrix;
+   std::string errorMessageCalcRotatingMatrixNullRotMatrix;
+   std::string errorMessageRotDiaOverlapToSpaceFrameNullDiaMatrix;
+   std::string errorMessageRotDiaOverlapToSpaceFrameNullRotMatrix;
+   std::string errorMessageSetOverlapElementNullDiaMatrix;
    std::string messageEnergiesMOs;
    std::string messageEnergiesMOsTitle;
    std::string messageMullikenAtoms;
