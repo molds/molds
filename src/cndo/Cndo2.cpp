@@ -1349,25 +1349,38 @@ void Cndo2::CalcOverlapByGTOExpansion(double** overlap,
       overlap[mu][mu] = 1.0;
    }
 
-   #pragma omp for schedule(auto)
+   stringstream ompErrors;
+   #pragma omp parallel for schedule(auto) shared(ompErrors)
    for(int A=0; A<totalAtomNumber; A++){
       const Atom& atomA = *(*molecule.GetAtomVect())[A];
       int firstAOIndexAtomA = atomA.GetFirstAOIndex();
       for(int B=A+1; B<totalAtomNumber; B++){
          const Atom& atomB = *(*molecule.GetAtomVect())[B];
          int firstAOIndexAtomB = atomB.GetFirstAOIndex();
-
          for(int a=0; a<atomA.GetValence().size(); a++){
             for(int b=0; b<atomB.GetValence().size(); b++){
-         
-               int mu = firstAOIndexAtomA + a;      
-               int nu = firstAOIndexAtomB + b;      
-               double value = this->GetOverlapElementByGTOExpansion(atomA, a, atomB, b, stonG);
-               overlap[mu][nu] = value;
-               overlap[nu][mu] = value;
+        
+               try{
+                  int mu = firstAOIndexAtomA + a;      
+                  int nu = firstAOIndexAtomB + b;      
+                  double value = this->GetOverlapElementByGTOExpansion(atomA, a, atomB, b, stonG);
+                  overlap[mu][nu] = value;
+                  overlap[nu][mu] = value;
+               }
+               catch(MolDSException ex){
+                  #pragma omp critical
+                  {
+                     ompErrors << ex.what() << endl ;
+                  }
+               }
+
             }
          }
       }
+   }
+   // Exception throwing for omp-region
+   if(!ompErrors.str().empty()){
+      throw MolDSException(ompErrors.str());
    }
    /* 
    printf("overlap matrix by STOnG\n"); 
