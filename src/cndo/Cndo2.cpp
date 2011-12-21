@@ -873,17 +873,16 @@ void Cndo2::CalcFockMatrix(double** fockMatrix,
    stringstream ompErrors;
    #pragma omp parallel for schedule(auto) shared(ompErrors)
    for(int A=0; A<molecule.GetAtomVect()->size(); A++){
-      const Atom& atomA = *(*molecule.GetAtomVect())[A];
-      int firstAOIndexA = atomA.GetFirstAOIndex();
-      int numberAOsA = atomA.GetValenceSize();
-      for(int B=A; B<molecule.GetAtomVect()->size(); B++){
-         const Atom& atomB = *(*molecule.GetAtomVect())[B];
-         int firstAOIndexB = atomB.GetFirstAOIndex();
-         int numberAOsB = atomB.GetValenceSize();
-         for(int mu=firstAOIndexA; mu<firstAOIndexA+numberAOsA; mu++){
-            for(int nu=firstAOIndexB; nu<firstAOIndexB+numberAOsB; nu++){
-   
-               try{
+      try{
+        const Atom& atomA = *(*molecule.GetAtomVect())[A];
+         int firstAOIndexA = atomA.GetFirstAOIndex();
+         int numberAOsA = atomA.GetValenceSize();
+         for(int B=A; B<molecule.GetAtomVect()->size(); B++){
+            const Atom& atomB = *(*molecule.GetAtomVect())[B];
+            int firstAOIndexB = atomB.GetFirstAOIndex();
+            int numberAOsB = atomB.GetValenceSize();
+            for(int mu=firstAOIndexA; mu<firstAOIndexA+numberAOsA; mu++){
+               for(int nu=firstAOIndexB; nu<firstAOIndexB+numberAOsB; nu++){
                   if(mu == nu){
                      // diagonal part
                      fockMatrix[mu][mu] = this->GetFockDiagElement(atomA, 
@@ -914,14 +913,14 @@ void Cndo2::CalcFockMatrix(double** fockMatrix,
                   else{
                      // lower left part (not calculated)
                   }
-               }
-               catch(MolDSException ex){
-                  #pragma omp critical
-                  ompErrors << ex.what() << endl ;
-               }
 
+               }
             }
          }
+      }
+      catch(MolDSException ex){
+         #pragma omp critical
+         ompErrors << ex.what() << endl ;
       }
    }
    // Exception throwing for omp-region
@@ -1065,18 +1064,18 @@ void Cndo2::CalcGammaAB(double** gammaAB, const Molecule& molecule) const{
    stringstream ompErrors;
    #pragma omp parallel for schedule(auto) shared(ompErrors)
    for(int A=0; A<totalAtomNumber; A++){
-      const Atom& atomA = *(*molecule.GetAtomVect())[A];
-      int na = atomA.GetValenceShellType() + 1;
-      double orbitalExponentA = atomA.GetOrbitalExponent(
-                                      atomA.GetValenceShellType(), s, this->theory);
-      for(int B=A; B<totalAtomNumber; B++){
-         const Atom& atomB = *(*molecule.GetAtomVect())[B];
-         int nb = atomB.GetValenceShellType() + 1;
-         double orbitalExponentB = atomB.GetOrbitalExponent(
-                                         atomB.GetValenceShellType(), s, this->theory);
+      try{
+         const Atom& atomA = *(*molecule.GetAtomVect())[A];
+         int na = atomA.GetValenceShellType() + 1;
+         double orbitalExponentA = atomA.GetOrbitalExponent(
+                                         atomA.GetValenceShellType(), s, this->theory);
+         for(int B=A; B<totalAtomNumber; B++){
+            const Atom& atomB = *(*molecule.GetAtomVect())[B];
+            int nb = atomB.GetValenceShellType() + 1;
+            double orbitalExponentB = atomB.GetOrbitalExponent(
+                                            atomB.GetValenceShellType(), s, this->theory);
 
-         double value = 0.0;
-         try{
+            double value = 0.0;
             double R = molecule.GetDistanceAtoms(A, B);
             double temp = 0.0;
             if(R>0.0){
@@ -1117,13 +1116,12 @@ void Cndo2::CalcGammaAB(double** gammaAB, const Molecule& molecule) const{
                value *= pow(2.0*orbitalExponentA, 2.0*na+1);
                value /= Factorial(2*na);
             }
+            gammaAB[A][B] = value;
          }
-         catch(MolDSException ex){
-            #pragma omp critical
-            ompErrors << ex.what() << endl ;
-         }
-
-         gammaAB[A][B] = value;
+      }
+      catch(MolDSException ex){
+         #pragma omp critical
+         ompErrors << ex.what() << endl ;
       }
    }
    // Exception throwing for omp-region
@@ -1171,45 +1169,36 @@ void Cndo2::CalcOverlap(double** overlap, const Molecule& molecule) const{
    stringstream ompErrors;
    #pragma omp parallel shared(ompErrors)
    {
-      double** diatomicOverlap = NULL;
-      double** rotatingMatrix = NULL;
-      // malloc
+      double** diatomicOverlap;
+      double** rotatingMatrix; 
       try{
+         // malloc
          diatomicOverlap =  MallocerFreer::GetInstance()->MallocDoubleMatrix2d(
                                                           OrbitalType_end, 
                                                           OrbitalType_end);
          rotatingMatrix = MallocerFreer::GetInstance()->MallocDoubleMatrix2d(
                                                         OrbitalType_end, 
                                                         OrbitalType_end);
-      }
-      catch(MolDSException ex){
-         this->FreeDiatomicOverlapAndRotatingMatrix(&diatomicOverlap, &rotatingMatrix);
-         #pragma omp critical
-         ompErrors << ex.what() << endl ;
-      }
+         // calculation overlap matrix
+         for(int mu=0; mu<totalAONumber; mu++){
+            overlap[mu][mu] = 1.0;
+         }
 
-      // calculation overlap matrix
-      for(int mu=0; mu<totalAONumber; mu++){
-         overlap[mu][mu] = 1.0;
-      }
-
-      #pragma omp for schedule(auto)
-      for(int A=0; A<totalAtomNumber; A++){
-         const Atom& atomA = *(*molecule.GetAtomVect())[A];
-         for(int B=A+1; B<totalAtomNumber; B++){
-            const Atom& atomB = *(*molecule.GetAtomVect())[B];
-            try{
+         #pragma omp for schedule(auto)
+         for(int A=0; A<totalAtomNumber; A++){
+            const Atom& atomA = *(*molecule.GetAtomVect())[A];
+            for(int B=A+1; B<totalAtomNumber; B++){
+               const Atom& atomB = *(*molecule.GetAtomVect())[B];
                this->CalcDiatomicOverlapInDiatomicFrame(diatomicOverlap, atomA, atomB);
                this->CalcRotatingMatrix(rotatingMatrix, atomA, atomB);
                this->RotateDiatmicOverlapToSpaceFrame(diatomicOverlap, rotatingMatrix);
                this->SetOverlapElement(overlap, diatomicOverlap, atomA, atomB);
             }
-            catch(MolDSException ex){
-               this->FreeDiatomicOverlapAndRotatingMatrix(&diatomicOverlap, &rotatingMatrix);
-               #pragma omp critical
-               ompErrors << ex.what() << endl ;
-            }
          }
+      }
+      catch(MolDSException ex){
+         #pragma omp critical
+         ompErrors << ex.what() << endl ;
       }
       this->FreeDiatomicOverlapAndRotatingMatrix(&diatomicOverlap, &rotatingMatrix);
    }
@@ -1344,28 +1333,26 @@ void Cndo2::CalcOverlapByGTOExpansion(double** overlap,
    stringstream ompErrors;
    #pragma omp parallel for schedule(auto) shared(ompErrors)
    for(int A=0; A<totalAtomNumber; A++){
-      const Atom& atomA = *(*molecule.GetAtomVect())[A];
-      int firstAOIndexAtomA = atomA.GetFirstAOIndex();
-      for(int B=A+1; B<totalAtomNumber; B++){
-         const Atom& atomB = *(*molecule.GetAtomVect())[B];
-         int firstAOIndexAtomB = atomB.GetFirstAOIndex();
-         for(int a=0; a<atomA.GetValenceSize(); a++){
-            for(int b=0; b<atomB.GetValenceSize(); b++){
-        
-               try{
+      try{
+         const Atom& atomA = *(*molecule.GetAtomVect())[A];
+         int firstAOIndexAtomA = atomA.GetFirstAOIndex();
+         for(int B=A+1; B<totalAtomNumber; B++){
+            const Atom& atomB = *(*molecule.GetAtomVect())[B];
+            int firstAOIndexAtomB = atomB.GetFirstAOIndex();
+            for(int a=0; a<atomA.GetValenceSize(); a++){
+               for(int b=0; b<atomB.GetValenceSize(); b++){
                   int mu = firstAOIndexAtomA + a;      
                   int nu = firstAOIndexAtomB + b;      
                   double value = this->GetOverlapElementByGTOExpansion(atomA, a, atomB, b, stonG);
                   overlap[mu][nu] = value;
                   overlap[nu][mu] = value;
                }
-               catch(MolDSException ex){
-                  #pragma omp critical
-                  ompErrors << ex.what() << endl ;
-               }
-
             }
          }
+      }
+      catch(MolDSException ex){
+         #pragma omp critical
+         ompErrors << ex.what() << endl ;
       }
    }
    // Exception throwing for omp-region
