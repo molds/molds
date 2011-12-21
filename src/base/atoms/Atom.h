@@ -13,7 +13,8 @@ public:
    void SetXyz(double x, double y, double z);
    double* GetPxyz() const;
    void SetPxyz(double px, double py, double pz);
-   std::vector<MolDS_base::OrbitalType> GetValence() const;
+   int GetValenceSize() const;
+   MolDS_base::OrbitalType GetValence(int index) const;
    double GetAtomicBasisValue(double x, 
                               double y, 
                               double z, 

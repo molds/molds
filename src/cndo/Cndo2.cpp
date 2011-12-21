@@ -802,12 +802,12 @@ double Cndo2::GetMolecularIntegralElement(int moI, int moJ, int moK, int moL,
    for(int A=0; A<molecule.GetAtomVect()->size(); A++){
       const Atom& atomA = *(*molecule.GetAtomVect())[A];
       firstAOIndexA = atomA.GetFirstAOIndex();
-      numberAOsA = atomA.GetValence().size();
+      numberAOsA = atomA.GetValenceSize();
 
       for(int B=0; B<molecule.GetAtomVect()->size(); B++){
          const Atom& atomB = *(*molecule.GetAtomVect())[B];
          firstAOIndexB = atomB.GetFirstAOIndex();
-         numberAOsB = atomB.GetValence().size();
+         numberAOsB = atomB.GetValenceSize();
          gamma = gammaAB[A][B];
 
          for(int mu=firstAOIndexA; mu<firstAOIndexA+numberAOsA; mu++){
@@ -875,11 +875,11 @@ void Cndo2::CalcFockMatrix(double** fockMatrix,
    for(int A=0; A<molecule.GetAtomVect()->size(); A++){
       const Atom& atomA = *(*molecule.GetAtomVect())[A];
       int firstAOIndexA = atomA.GetFirstAOIndex();
-      int numberAOsA = atomA.GetValence().size();
+      int numberAOsA = atomA.GetValenceSize();
       for(int B=A; B<molecule.GetAtomVect()->size(); B++){
          const Atom& atomB = *(*molecule.GetAtomVect())[B];
          int firstAOIndexB = atomB.GetFirstAOIndex();
-         int numberAOsB = atomB.GetValence().size();
+         int numberAOsB = atomB.GetValenceSize();
          for(int mu=firstAOIndexA; mu<firstAOIndexA+numberAOsA; mu++){
             for(int nu=firstAOIndexB; nu<firstAOIndexB+numberAOsB; nu++){
    
@@ -953,7 +953,7 @@ double Cndo2::GetFockDiagElement(const Atom& atomA,
                                  bool isGuess) const{
    double value;
    int firstAOIndexA = atomA.GetFirstAOIndex();
-   value = atomA.GetCoreIntegral(atomA.GetValence()[mu-firstAOIndexA], 
+   value = atomA.GetCoreIntegral(atomA.GetValence(mu-firstAOIndexA), 
                                  gammaAB[atomAIndex][atomAIndex], 
                                  isGuess, this->theory);
    if(!isGuess){
@@ -1052,7 +1052,7 @@ void Cndo2::CalcAtomicElectronPopulation(double* atomicElectronPopulation,
    int numberAOs = 0;
    for(int A=0; A<totalNumberAtoms; A++){
       firstAOIndex = (*molecule.GetAtomVect())[A]->GetFirstAOIndex();
-      numberAOs = (*molecule.GetAtomVect())[A]->GetValence().size();
+      numberAOs = (*molecule.GetAtomVect())[A]->GetValenceSize();
       atomicElectronPopulation[A] = 0.0;
       for(int i=firstAOIndex; i<firstAOIndex+numberAOs; i++){
          atomicElectronPopulation[A] += orbitalElectronPopulation[i][i];
@@ -1357,8 +1357,8 @@ void Cndo2::CalcOverlapByGTOExpansion(double** overlap,
       for(int B=A+1; B<totalAtomNumber; B++){
          const Atom& atomB = *(*molecule.GetAtomVect())[B];
          int firstAOIndexAtomB = atomB.GetFirstAOIndex();
-         for(int a=0; a<atomA.GetValence().size(); a++){
-            for(int b=0; b<atomB.GetValence().size(); b++){
+         for(int a=0; a<atomA.GetValenceSize(); a++){
+            for(int b=0; b<atomB.GetValenceSize(); b++){
         
                try{
                   int mu = firstAOIndexAtomA + a;      
@@ -1408,8 +1408,8 @@ double Cndo2::GetOverlapElementByGTOExpansion(const Atom& atomA, int valenceInde
    double Rab = sqrt( pow(dx, 2.0) + pow(dy, 2.0) + pow(dz,2.0) );
    ShellType shellTypeA = atomA.GetValenceShellType();
    ShellType shellTypeB = atomB.GetValenceShellType();
-   OrbitalType valenceOrbitalA = atomA.GetValence()[valenceIndexA];
-   OrbitalType valenceOrbitalB = atomB.GetValence()[valenceIndexB];
+   OrbitalType valenceOrbitalA = atomA.GetValence(valenceIndexA);
+   OrbitalType valenceOrbitalB = atomB.GetValence(valenceIndexB);
    double orbitalExponentA = atomA.GetOrbitalExponent(atomA.GetValenceShellType(), 
                                                       valenceOrbitalA, 
                                                       this->theory);
@@ -1599,8 +1599,8 @@ double Cndo2::GetOverlapElementFirstDerivativeByGTOExpansion(const Atom& atomA,
    double Rab = sqrt( pow(dx, 2.0) + pow(dy, 2.0) + pow(dz,2.0) );
    ShellType shellTypeA = atomA.GetValenceShellType();
    ShellType shellTypeB = atomB.GetValenceShellType();
-   OrbitalType valenceOrbitalA = atomA.GetValence()[valenceIndexA];
-   OrbitalType valenceOrbitalB = atomB.GetValence()[valenceIndexB];
+   OrbitalType valenceOrbitalA = atomA.GetValence(valenceIndexA);
+   OrbitalType valenceOrbitalB = atomB.GetValence(valenceIndexB);
    double orbitalExponentA = atomA.GetOrbitalExponent(atomA.GetValenceShellType(), 
                                                       valenceOrbitalA, 
                                                       this->theory);
@@ -2107,16 +2107,16 @@ void Cndo2::CalcDiatomicOverlapInDiatomicFrame(double** diatomicOverlap,
            +pow( atomA.GetXyz()[2] - atomB.GetXyz()[2], 2.0)
            );
 
-   for(int a=0; a<atomA.GetValence().size(); a++){
-      OrbitalType valenceOrbitalA = atomA.GetValence()[a];
+   for(int a=0; a<atomA.GetValenceSize(); a++){
+      OrbitalType valenceOrbitalA = atomA.GetValence(a);
       RealSphericalHarmonicsIndex realShpericalHarmonicsA(valenceOrbitalA);
       orbitalExponentA = atomA.GetOrbitalExponent(
                                atomA.GetValenceShellType(), 
                                valenceOrbitalA, 
                                this->theory);
 
-      for(int b=0; b<atomB.GetValence().size(); b++){
-         OrbitalType valenceOrbitalB = atomB.GetValence()[b];
+      for(int b=0; b<atomB.GetValenceSize(); b++){
+         OrbitalType valenceOrbitalB = atomB.GetValence(b);
          RealSphericalHarmonicsIndex realShpericalHarmonicsB(valenceOrbitalB);
          orbitalExponentB = atomB.GetOrbitalExponent(
                                   atomB.GetValenceShellType(), 
@@ -2178,16 +2178,16 @@ void Cndo2::CalcDiatomicOverlapFirstDerivativeInDiatomicFrame(double** diatomicO
                                                           OrbitalType_end);
    double R = this->molecule->GetDistanceAtoms(atomA, atomB);
 
-   for(int a=0; a<atomA.GetValence().size(); a++){
-      OrbitalType valenceOrbitalA = atomA.GetValence()[a];
+   for(int a=0; a<atomA.GetValenceSize(); a++){
+      OrbitalType valenceOrbitalA = atomA.GetValence(a);
       RealSphericalHarmonicsIndex realShpericalHarmonicsA(valenceOrbitalA);
       orbitalExponentA = atomA.GetOrbitalExponent(
                                atomA.GetValenceShellType(), 
                                valenceOrbitalA,
                                this->theory);
 
-      for(int b=0; b<atomB.GetValence().size(); b++){
-         OrbitalType valenceOrbitalB = atomB.GetValence()[b];
+      for(int b=0; b<atomB.GetValenceSize(); b++){
+         OrbitalType valenceOrbitalB = atomB.GetValence(b);
          RealSphericalHarmonicsIndex realShpericalHarmonicsB(valenceOrbitalB);
          orbitalExponentB = atomB.GetOrbitalExponent(
                                   atomB.GetValenceShellType(), 
@@ -2320,10 +2320,10 @@ void Cndo2::SetOverlapElement(double** overlap,
    int mu=0;
    int nu=0;
 
-   for(int i=0; i<atomA.GetValence().size(); i++){
-      orbitalA = atomA.GetValence()[i];
-      for(int j=0; j<atomB.GetValence().size(); j++){
-         orbitalB = atomB.GetValence()[j];
+   for(int i=0; i<atomA.GetValenceSize(); i++){
+      orbitalA = atomA.GetValence(i);
+      for(int j=0; j<atomB.GetValenceSize(); j++){
+         orbitalB = atomB.GetValence(j);
          mu = firstAOIndexAtomA + i;      
          nu = firstAOIndexAtomB + j;      
          overlap[mu][nu] = diatomicOverlap[orbitalA][orbitalB];

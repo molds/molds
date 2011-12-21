@@ -132,7 +132,7 @@ double ZindoS::GetFockDiagElement(const Atom& atomA,
                                   bool isGuess) const{
    double value=0.0;
    int firstAOIndexA = atomA.GetFirstAOIndex();
-   value = atomA.GetCoreIntegral(atomA.GetValence()[mu-firstAOIndexA], 
+   value = atomA.GetCoreIntegral(atomA.GetValence(mu-firstAOIndexA), 
                                   isGuess, this->theory);
    if(!isGuess){
       double temp = 0.0;
@@ -146,11 +146,11 @@ double ZindoS::GetFockDiagElement(const Atom& atomA,
          orbitalElectronPopulationDiagPart[i] = orbitalElectronPopulation[i][i];
       }
 
-      OrbitalType orbitalMu = atomA.GetValence()[mu-firstAOIndexA];
+      OrbitalType orbitalMu = atomA.GetValence(mu-firstAOIndexA);
       OrbitalType orbitalLam;
-      int atomANumberValence = atomA.GetValence().size();
+      int atomANumberValence = atomA.GetValenceSize();
       for(int v=0; v<atomANumberValence; v++){
-         orbitalLam = atomA.GetValence()[v];
+         orbitalLam = atomA.GetValence(v);
          coulomb  = this->GetCoulombInt(orbitalMu, orbitalLam, atomA);
          exchange = this->GetExchangeInt(orbitalMu, orbitalLam, atomA);
          lammda = v + firstAOIndexA;
@@ -165,10 +165,10 @@ double ZindoS::GetFockDiagElement(const Atom& atomA,
             const Atom& atomB = *(*molecule.GetAtomVect())[B];
             OrbitalType orbitalSigma;
             int sigma;
-            int atomBNumberValence = atomB.GetValence().size();
+            int atomBNumberValence = atomB.GetValenceSize();
             for(int i=0; i<atomBNumberValence; i++){
                sigma = i + atomB.GetFirstAOIndex();
-               orbitalSigma = atomB.GetValence()[i];
+               orbitalSigma = atomB.GetValence(i);
                temp += orbitalElectronPopulationDiagPart[sigma]
                       *this->GetNishimotoMatagaTwoEleInt(atomA, 
                                                          orbitalMu, 
@@ -198,8 +198,8 @@ double ZindoS::GetFockOffDiagElement(const Atom& atomA,
                                      double const* const* const* const* const* const* twoElecTwoCore, 
                                      bool isGuess) const{
    double value = 0.0;
-   OrbitalType orbitalMu = atomA.GetValence()[mu-atomA.GetFirstAOIndex()];
-   OrbitalType orbitalNu = atomB.GetValence()[nu-atomB.GetFirstAOIndex()];
+   OrbitalType orbitalMu = atomA.GetValence(mu-atomA.GetFirstAOIndex());
+   OrbitalType orbitalNu = atomB.GetValence(nu-atomB.GetFirstAOIndex());
    double bondParameter = 0.5*(atomA.GetBondingParameter(this->theory, orbitalMu) 
                               +atomB.GetBondingParameter(this->theory, orbitalNu)); 
 
@@ -662,19 +662,19 @@ double ZindoS::GetMolecularIntegralElement(int moI, int moJ, int moK, int moL,
    for(int A=0; A<molecule.GetAtomVect()->size(); A++){
       const Atom& atomA = *(*molecule.GetAtomVect())[A];
       firstAOIndexA = atomA.GetFirstAOIndex();
-      numberAOsA = atomA.GetValence().size();
+      numberAOsA = atomA.GetValenceSize();
 
       for(int mu=firstAOIndexA; mu<firstAOIndexA+numberAOsA; mu++){
-         orbitalMu = atomA.GetValence()[mu-firstAOIndexA];
+         orbitalMu = atomA.GetValence(mu-firstAOIndexA);
 
          // CNDO term
          for(int B=A; B<molecule.GetAtomVect()->size(); B++){
             const Atom& atomB = *(*molecule.GetAtomVect())[B];
             firstAOIndexB = atomB.GetFirstAOIndex();
-            numberAOsB = atomB.GetValence().size();
+            numberAOsB = atomB.GetValenceSize();
 
             for(int nu=firstAOIndexB; nu<firstAOIndexB+numberAOsB; nu++){
-               orbitalNu = atomB.GetValence()[nu-firstAOIndexB];
+               orbitalNu = atomB.GetValence(nu-firstAOIndexB);
 
                if(A<B){
                   gamma = this->GetNishimotoMatagaTwoEleInt(atomA, 
@@ -705,7 +705,7 @@ double ZindoS::GetMolecularIntegralElement(int moI, int moJ, int moK, int moL,
 
          // Aditional term for INDO or ZIND/S, see Eq. (10) in [RZ_1973]
          for(int nu=firstAOIndexA; nu<firstAOIndexA+numberAOsA; nu++){
-            orbitalNu = atomA.GetValence()[nu-firstAOIndexA];
+            orbitalNu = atomA.GetValence(nu-firstAOIndexA);
 
             if(mu!=nu){
                exchange = this->GetExchangeInt(orbitalMu, orbitalNu, atomA);
@@ -1182,19 +1182,19 @@ void ZindoS::CalcCISMatrix(double** matrixCIS, int numberActiveOcc, int numberAc
             for(int A=0; A<molecule->GetAtomVect()->size(); A++){
                const Atom& atomA = *(*molecule->GetAtomVect())[A];
                firstAOIndexA = atomA.GetFirstAOIndex();
-               numberAOsA = atomA.GetValence().size();
+               numberAOsA = atomA.GetValenceSize();
 
                for(int mu=firstAOIndexA; mu<firstAOIndexA+numberAOsA; mu++){
-                  orbitalMu = atomA.GetValence()[mu-firstAOIndexA];
+                  orbitalMu = atomA.GetValence(mu-firstAOIndexA);
 
                   // CNDO term
                   for(int B=A; B<molecule->GetAtomVect()->size(); B++){
                      const Atom& atomB = *(*molecule->GetAtomVect())[B];
                      firstAOIndexB = atomB.GetFirstAOIndex();
-                     numberAOsB = atomB.GetValence().size();
+                     numberAOsB = atomB.GetValenceSize();
 
                      for(int nu=firstAOIndexB; nu<firstAOIndexB+numberAOsB; nu++){
-                        orbitalNu = atomB.GetValence()[nu-firstAOIndexB];
+                        orbitalNu = atomB.GetValence(nu-firstAOIndexB);
 
                         if(A<B){
                            gamma = this->GetNishimotoMatagaTwoEleInt(atomA, 
@@ -1234,7 +1234,7 @@ void ZindoS::CalcCISMatrix(double** matrixCIS, int numberActiveOcc, int numberAc
 
                   // Aditional term for INDO or ZIND/S, see Eq. (10) in [RZ_1973]
                   for(int nu=firstAOIndexA; nu<firstAOIndexA+numberAOsA; nu++){
-                     orbitalNu = atomA.GetValence()[nu-firstAOIndexA];
+                     orbitalNu = atomA.GetValence(nu-firstAOIndexA);
 
                      if(mu!=nu){
                         exchange = this->GetExchangeInt(orbitalMu, orbitalNu, atomA);
@@ -1289,19 +1289,19 @@ void ZindoS::CalcCISMatrix(double** matrixCIS, int numberActiveOcc, int numberAc
             for(int A=0; A<molecule->GetAtomVect()->size(); A++){
                const Atom& atomA = *(*molecule->GetAtomVect())[A];
                firstAOIndexA = atomA.GetFirstAOIndex();
-               numberAOsA = atomA.GetValence().size();
+               numberAOsA = atomA.GetValenceSize();
 
                for(int mu=firstAOIndexA; mu<firstAOIndexA+numberAOsA; mu++){
-                  orbitalMu = atomA.GetValence()[mu-firstAOIndexA];
+                  orbitalMu = atomA.GetValence(mu-firstAOIndexA);
 
                   // CNDO term
                   for(int B=A; B<molecule->GetAtomVect()->size(); B++){
                      const Atom& atomB = *(*molecule->GetAtomVect())[B];
                      firstAOIndexB = atomB.GetFirstAOIndex();
-                     numberAOsB = atomB.GetValence().size();
+                     numberAOsB = atomB.GetValenceSize();
 
                      for(int nu=firstAOIndexB; nu<firstAOIndexB+numberAOsB; nu++){
-                        orbitalNu = atomB.GetValence()[nu-firstAOIndexB];
+                        orbitalNu = atomB.GetValence(nu-firstAOIndexB);
 
                         if(A<B){
                            gamma = this->GetNishimotoMatagaTwoEleInt(atomA, 
@@ -1341,7 +1341,7 @@ void ZindoS::CalcCISMatrix(double** matrixCIS, int numberActiveOcc, int numberAc
 
                   // Aditional term for INDO or ZIND/S, see Eq. (10) in [RZ_1973]
                   for(int nu=firstAOIndexA; nu<firstAOIndexA+numberAOsA; nu++){
-                     orbitalNu = atomA.GetValence()[nu-firstAOIndexA];
+                     orbitalNu = atomA.GetValence(nu-firstAOIndexA);
 
                      if(mu!=nu){
                         exchange = this->GetExchangeInt(orbitalMu, orbitalNu, atomA);
@@ -1464,7 +1464,7 @@ void ZindoS::CalcForce(vector<int> elecStates){
          for(int a=0; a<this->molecule->GetAtomVect()->size(); a++){
             const Atom& atomA = *(*molecule->GetAtomVect())[a];
             int firstAOIndexA = atomA.GetFirstAOIndex();
-            int numberAOsA = atomA.GetValence().size();
+            int numberAOsA = atomA.GetValenceSize();
             double coreRepulsion[CartesianType_end] = {0.0,0.0,0.0};
             double electronicForce1[CartesianType_end] = {0.0,0.0,0.0};
             double electronicForce2[CartesianType_end] = {0.0,0.0,0.0};
@@ -1473,7 +1473,7 @@ void ZindoS::CalcForce(vector<int> elecStates){
                if(a != b){
                   const Atom& atomB = *(*molecule->GetAtomVect())[b];
                   int firstAOIndexB = atomB.GetFirstAOIndex();
-                  int numberAOsB = atomB.GetValence().size();
+                  int numberAOsB = atomB.GetValenceSize();
 
                   // calc. first derivative of overlap.
                   this->CalcDiatomicOverlapFirstDerivative(overlapDer, atomA, atomB);
@@ -1489,9 +1489,9 @@ void ZindoS::CalcForce(vector<int> elecStates){
                                                     atomA, s, atomB, s, (CartesianType)i);
                   }
                   for(int mu=firstAOIndexA; mu<firstAOIndexA+numberAOsA; mu++){
-                     OrbitalType orbitalMu = atomA.GetValence()[mu-firstAOIndexA];
+                     OrbitalType orbitalMu = atomA.GetValence(mu-firstAOIndexA);
                      for(int nu=firstAOIndexB; nu<firstAOIndexB+numberAOsB; nu++){
-                        OrbitalType orbitalNu = atomB.GetValence()[nu-firstAOIndexB];
+                        OrbitalType orbitalNu = atomB.GetValence(nu-firstAOIndexB);
                         double bondParameter = 0.5*(atomA.GetBondingParameter(
                                                            this->theory, orbitalMu) 
                                                    +atomB.GetBondingParameter(
@@ -1538,7 +1538,7 @@ void ZindoS::CalcForce(vector<int> elecStates){
    for(int a=0; a<this->molecule->GetAtomVect()->size(); a++){
       const Atom& atomA = *(*molecule->GetAtomVect())[a];
       int firstAOIndexA = atomA.GetFirstAOIndex();
-      int numberAOsA = atomA.GetValence().size();
+      int numberAOsA = atomA.GetValenceSize();
       for(int i=0; i<CartesianType_end; i++){
 
          double coreRepulsion = 0.0;
@@ -1549,7 +1549,7 @@ void ZindoS::CalcForce(vector<int> elecStates){
             if(a != b){
                const Atom& atomB = *(*molecule->GetAtomVect())[b];
                int firstAOIndexB = atomB.GetFirstAOIndex();
-               int numberAOsB = atomB.GetValence().size();
+               int numberAOsB = atomB.GetValenceSize();
 
                // Calculation of core repusion force
                coreRepulsion += this->GetDiatomCoreRepulsionFirstDerivative
@@ -1562,9 +1562,9 @@ void ZindoS::CalcForce(vector<int> elecStates){
                                           (atomA, s, atomB, s, (CartesianType)i);
 
                for(int mu=firstAOIndexA; mu<firstAOIndexA+numberAOsA; mu++){
-                  OrbitalType orbitalMu = atomA.GetValence()[mu-firstAOIndexA];
+                  OrbitalType orbitalMu = atomA.GetValence(mu-firstAOIndexA);
                   for(int nu=firstAOIndexB; nu<firstAOIndexB+numberAOsB; nu++){
-                     OrbitalType orbitalNu = atomB.GetValence()[nu-firstAOIndexB];
+                     OrbitalType orbitalNu = atomB.GetValence(nu-firstAOIndexB);
 
                      double bondParameter = 0.5*(atomA.GetBondingParameter(this->theory, orbitalMu) 
                                                 +atomB.GetBondingParameter(this->theory, orbitalNu)); 

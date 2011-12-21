@@ -121,7 +121,7 @@ void MOLogger::DrawMO(vector<int> moIndeces){
                for(int a=0; a<this->molecule->GetAtomVect()->size(); a++){
                   Atom* atomA = (*this->molecule->GetAtomVect())[a];
                   int firstAOIndexA = atomA->GetFirstAOIndex();
-                  int numberAOsA = atomA->GetValence().size();
+                  int numberAOsA = atomA->GetValenceSize();
                   for(int mu=firstAOIndexA; mu<firstAOIndexA+numberAOsA; mu++){
                      double aoValue = atomA->GetAtomicBasisValue(x,
                                                                  y,

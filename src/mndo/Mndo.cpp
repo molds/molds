@@ -253,12 +253,12 @@ double Mndo::GetFockDiagElement(const Atom& atomA,
    double value=0.0;
    int firstAOIndexA = atomA.GetFirstAOIndex();
    mu -= firstAOIndexA;
-   value = atomA.GetCoreIntegral(atomA.GetValence()[mu], isGuess, this->theory);
+   value = atomA.GetCoreIntegral(atomA.GetValence(mu), isGuess, this->theory);
    if(!isGuess){
       double temp = 0.0;
-      OrbitalType orbitalMu = atomA.GetValence()[mu];
-      for(int nu=0; nu<atomA.GetValence().size(); nu++){
-         OrbitalType orbitalNu = atomA.GetValence()[nu];
+      OrbitalType orbitalMu = atomA.GetValence(mu);
+      for(int nu=0; nu<atomA.GetValenceSize(); nu++){
+         OrbitalType orbitalNu = atomA.GetValence(nu);
          double coulomb  = this->GetCoulombInt(orbitalMu, orbitalNu, atomA);
          double exchange = this->GetExchangeInt(orbitalMu, orbitalNu, atomA);
          temp += orbitalElectronPopulation[nu+firstAOIndexA]
@@ -272,8 +272,8 @@ double Mndo::GetFockDiagElement(const Atom& atomA,
          if(B != atomAIndex){
             const Atom& atomB = *(*molecule.GetAtomVect())[B];
             int firstAOIndexB = atomB.GetFirstAOIndex();
-            for(int lambda=0; lambda<atomB.GetValence().size(); lambda++){
-               for(int sigma=0; sigma<atomB.GetValence().size(); sigma++){
+            for(int lambda=0; lambda<atomB.GetValenceSize(); lambda++){
+               for(int sigma=0; sigma<atomB.GetValenceSize(); sigma++){
                   temp += orbitalElectronPopulation[lambda+firstAOIndexB]
                                                    [sigma+firstAOIndexB]
                          *twoElecTwoCore[atomAIndex][B][mu][mu][lambda][sigma];
@@ -308,8 +308,8 @@ double Mndo::GetFockOffDiagElement(const Atom& atomA,
    int firstAOIndexB = atomB.GetFirstAOIndex();
    mu -= firstAOIndexA;
    nu -= firstAOIndexB;
-   OrbitalType orbitalMu = atomA.GetValence()[mu];
-   OrbitalType orbitalNu = atomB.GetValence()[nu];
+   OrbitalType orbitalMu = atomA.GetValence(mu);
+   OrbitalType orbitalNu = atomB.GetValence(nu);
    double bondParameter = 0.5*(atomA.GetBondingParameter(this->theory, orbitalMu) 
                               +atomB.GetBondingParameter(this->theory, orbitalNu)); 
    if(isGuess){
@@ -328,8 +328,8 @@ double Mndo::GetFockOffDiagElement(const Atom& atomA,
             if(BB != atomAIndex){
                const Atom& atomBB = *(*molecule.GetAtomVect())[BB];
                int firstAOIndexBB = atomBB.GetFirstAOIndex();
-               for(int lambda=0; lambda<atomBB.GetValence().size(); lambda++){
-                  for(int sigma=0; sigma<atomBB.GetValence().size(); sigma++){
+               for(int lambda=0; lambda<atomBB.GetValenceSize(); lambda++){
+                  for(int sigma=0; sigma<atomBB.GetValenceSize(); sigma++){
                      temp += orbitalElectronPopulation[lambda+firstAOIndexBB]
                                                       [sigma+firstAOIndexBB]
                             *twoElecTwoCore[atomAIndex][BB][mu][nu][lambda][sigma];
@@ -345,8 +345,8 @@ double Mndo::GetFockOffDiagElement(const Atom& atomA,
       }
       else{
          temp = bondParameter*overlap[mu+firstAOIndexA][nu+firstAOIndexB];
-         for(int sigma=0; sigma<atomA.GetValence().size(); sigma++){
-            for(int lambda=0; lambda<atomB.GetValence().size(); lambda++){
+         for(int sigma=0; sigma<atomA.GetValenceSize(); sigma++){
+            for(int lambda=0; lambda<atomB.GetValenceSize(); lambda++){
                temp -= 0.5*orbitalElectronPopulation[lambda+firstAOIndexB]
                                                     [sigma+firstAOIndexA]
                       *twoElecTwoCore[atomAIndex][atomBIndex][mu][sigma][nu][lambda];
@@ -466,12 +466,12 @@ double Mndo::GetMolecularIntegralElement(int moI, int moJ, int moK, int moL,
    for(int A=0; A<molecule.GetAtomVect()->size(); A++){
       const Atom& atomA = *(*molecule.GetAtomVect())[A];
       int firstAOIndexA = atomA.GetFirstAOIndex();
-      int numberAOsA = atomA.GetValence().size();
+      int numberAOsA = atomA.GetValenceSize();
 
       for(int B=A; B<molecule.GetAtomVect()->size(); B++){
          const Atom& atomB = *(*molecule.GetAtomVect())[B];
          int firstAOIndexB = atomB.GetFirstAOIndex();
-         int numberAOsB = atomB.GetValence().size();
+         int numberAOsB = atomB.GetValenceSize();
 
          double gamma = 0.0;
          if(A!=B){
@@ -479,7 +479,7 @@ double Mndo::GetMolecularIntegralElement(int moI, int moJ, int moK, int moL,
                for(int nu=mu; nu<firstAOIndexA+numberAOsA; nu++){
                   for(int lambda=firstAOIndexB; lambda<firstAOIndexB+numberAOsB; lambda++){
                      for(int sigma=lambda; sigma<firstAOIndexB+numberAOsB; sigma++){
-                        OrbitalType orbitalSigma = atomB.GetValence()[sigma-firstAOIndexB];
+                        OrbitalType orbitalSigma = atomB.GetValence(sigma-firstAOIndexB);
                         gamma = this->twoElecTwoCore[A]
                                                     [B]
                                                     [mu-firstAOIndexA]
@@ -536,13 +536,13 @@ double Mndo::GetMolecularIntegralElement(int moI, int moJ, int moK, int moL,
                   for(int lambda=firstAOIndexB; lambda<firstAOIndexB+numberAOsB; lambda++){
                      for(int sigma=firstAOIndexB; sigma<firstAOIndexB+numberAOsB; sigma++){
                         if(mu==nu && lambda==sigma){
-                           OrbitalType orbitalMu = atomA.GetValence()[mu-firstAOIndexA];
-                           OrbitalType orbitalLambda = atomB.GetValence()[lambda-firstAOIndexB];
+                           OrbitalType orbitalMu = atomA.GetValence(mu-firstAOIndexA);
+                           OrbitalType orbitalLambda = atomB.GetValence(lambda-firstAOIndexB);
                            gamma = this->GetCoulombInt(orbitalMu, orbitalLambda, atomA);
                         }
                         else if((mu==lambda && nu==sigma) || (nu==lambda && mu==sigma) ){
-                           OrbitalType orbitalMu = atomA.GetValence()[mu-firstAOIndexA];
-                           OrbitalType orbitalNu = atomA.GetValence()[nu-firstAOIndexA];
+                           OrbitalType orbitalMu = atomA.GetValence(mu-firstAOIndexA);
+                           OrbitalType orbitalNu = atomA.GetValence(nu-firstAOIndexA);
                            gamma = this->GetExchangeInt(orbitalMu, orbitalNu, atomA);
                         }
                         else{
@@ -583,12 +583,12 @@ void Mndo::CalcCISMatrix(double** matrixCIS, int numberActiveOcc, int numberActi
          for(int A=0; A<molecule->GetAtomVect()->size(); A++){
             const Atom& atomA = *(*molecule->GetAtomVect())[A];
             int firstAOIndexA = atomA.GetFirstAOIndex();
-            int numberAOsA = atomA.GetValence().size();
+            int numberAOsA = atomA.GetValenceSize();
 
             for(int B=A; B<molecule->GetAtomVect()->size(); B++){
                const Atom& atomB = *(*molecule->GetAtomVect())[B];
                int firstAOIndexB = atomB.GetFirstAOIndex();
-               int numberAOsB = atomB.GetValence().size();
+               int numberAOsB = atomB.GetValenceSize();
 
                double gamma = 0.0;
                if(A!=B){
@@ -596,7 +596,7 @@ void Mndo::CalcCISMatrix(double** matrixCIS, int numberActiveOcc, int numberActi
                      for(int nu=mu; nu<firstAOIndexA+numberAOsA; nu++){
                         for(int lambda=firstAOIndexB; lambda<firstAOIndexB+numberAOsB; lambda++){
                            for(int sigma=lambda; sigma<firstAOIndexB+numberAOsB; sigma++){
-                              OrbitalType orbitalSigma = atomB.GetValence()[sigma-firstAOIndexB];
+                              OrbitalType orbitalSigma = atomB.GetValence(sigma-firstAOIndexB);
                               gamma = this->twoElecTwoCore[A]
                                                           [B]
                                                           [mu-firstAOIndexA]
@@ -685,13 +685,13 @@ void Mndo::CalcCISMatrix(double** matrixCIS, int numberActiveOcc, int numberActi
                         for(int lambda=firstAOIndexB; lambda<firstAOIndexB+numberAOsB; lambda++){
                            for(int sigma=firstAOIndexB; sigma<firstAOIndexB+numberAOsB; sigma++){
                               if(mu==nu && lambda==sigma){
-                                 OrbitalType orbitalMu = atomA.GetValence()[mu-firstAOIndexA];
-                                 OrbitalType orbitalLambda = atomB.GetValence()[lambda-firstAOIndexB];
+                                 OrbitalType orbitalMu = atomA.GetValence(mu-firstAOIndexA);
+                                 OrbitalType orbitalLambda = atomB.GetValence(lambda-firstAOIndexB);
                                  gamma = this->GetCoulombInt(orbitalMu, orbitalLambda, atomA);
                               }
                               else if((mu==lambda && nu==sigma) || (nu==lambda && mu==sigma) ){
-                                 OrbitalType orbitalMu = atomA.GetValence()[mu-firstAOIndexA];
-                                 OrbitalType orbitalNu = atomA.GetValence()[nu-firstAOIndexA];
+                                 OrbitalType orbitalMu = atomA.GetValence(mu-firstAOIndexA);
+                                 OrbitalType orbitalNu = atomA.GetValence(nu-firstAOIndexA);
                                  gamma = this->GetExchangeInt(orbitalMu, orbitalNu, atomA);
                               }
                               else{
@@ -1069,12 +1069,12 @@ double Mndo::GetSmallQElement(int moI,
    for(int A=0; A<molecule->GetAtomVect()->size(); A++){
       const Atom& atomA = *(*molecule->GetAtomVect())[A];
       int firstAOIndexA = atomA.GetFirstAOIndex();
-      int numberAOsA = atomA.GetValence().size();
+      int numberAOsA = atomA.GetValenceSize();
 
       for(int B=A; B<molecule->GetAtomVect()->size(); B++){
          const Atom& atomB = *(*molecule->GetAtomVect())[B];
          int firstAOIndexB = atomB.GetFirstAOIndex();
-         int numberAOsB = atomB.GetValence().size();
+         int numberAOsB = atomB.GetValenceSize();
 
          if(A!=B){
             for(int mu=firstAOIndexA; mu<firstAOIndexA+numberAOsA; mu++){
@@ -1199,15 +1199,15 @@ double Mndo::GetSmallQElement(int moI,
                      for(int sigma=firstAOIndexB; sigma<firstAOIndexB+numberAOsB; sigma++){
                         double twoElecInt = 0.0;
                         if(mu==nu && lambda==sigma){
-                           OrbitalType orbitalMu = atomA.GetValence()[mu-firstAOIndexA];
-                           OrbitalType orbitalLambda = atomB.GetValence()[lambda-firstAOIndexB];
+                           OrbitalType orbitalMu = atomA.GetValence(mu-firstAOIndexA);
+                           OrbitalType orbitalLambda = atomB.GetValence(lambda-firstAOIndexB);
                            twoElecInt = this->GetCoulombInt(orbitalMu, 
                                                             orbitalLambda, 
                                                             atomA);
                         }
                         else if((mu==lambda && nu==sigma) || (nu==lambda && mu==sigma) ){
-                           OrbitalType orbitalMu = atomA.GetValence()[mu-firstAOIndexA];
-                           OrbitalType orbitalNu = atomA.GetValence()[nu-firstAOIndexA];
+                           OrbitalType orbitalMu = atomA.GetValence(mu-firstAOIndexA);
+                           OrbitalType orbitalNu = atomA.GetValence(nu-firstAOIndexA);
                            twoElecInt = this->GetExchangeInt(orbitalMu, 
                                                              orbitalNu, 
                                                              atomA);
@@ -1593,7 +1593,7 @@ void Mndo::CalcForceHFElecCoreAttractionPart(double* force,
                                              double const* const* const* const* const* twoElecTwoCoreFirstDeriv) const{
    const Atom& atomA = *(*this->molecule->GetAtomVect())[atomAIndex];
    int firstAOIndexA = atomA.GetFirstAOIndex();
-   int numberAOsA = atomA.GetValence().size();
+   int numberAOsA = atomA.GetValenceSize();
    for(int mu=firstAOIndexA; mu<firstAOIndexA+numberAOsA; mu++){
       for(int nu=firstAOIndexA; nu<firstAOIndexA+numberAOsA; nu++){
          for(int i=0; i<CartesianType_end; i++){
@@ -1619,16 +1619,16 @@ void Mndo::CalcForceHFOverlapPart(double* force,
    const Atom& atomB = *(*this->molecule->GetAtomVect())[atomBIndex];
    int firstAOIndexA = atomA.GetFirstAOIndex();
    int firstAOIndexB = atomB.GetFirstAOIndex();
-   int numberAOsA = atomA.GetValence().size();
-   int numberAOsB = atomB.GetValence().size();
+   int numberAOsA = atomA.GetValenceSize();
+   int numberAOsB = atomB.GetValenceSize();
    for(int mu=firstAOIndexA; mu<firstAOIndexA+numberAOsA; mu++){
       for(int nu=firstAOIndexB; nu<firstAOIndexB+numberAOsB; nu++){
          double bondParameter = atomA.GetBondingParameter(
                                       this->theory, 
-                                      atomA.GetValence()[mu-firstAOIndexA]) 
+                                      atomA.GetValence(mu-firstAOIndexA)) 
                                +atomB.GetBondingParameter(
                                       this->theory, 
-                                      atomB.GetValence()[nu-firstAOIndexB]); 
+                                      atomB.GetValence(nu-firstAOIndexB)); 
          bondParameter*=0.5;
          for(int i=0; i<CartesianType_end; i++){
             force[i] += -1.0
@@ -1648,8 +1648,8 @@ void Mndo::CalcForceHFTwoElecPart(double* force,
    const Atom& atomB = *(*this->molecule->GetAtomVect())[atomBIndex];
    int firstAOIndexA = atomA.GetFirstAOIndex();
    int firstAOIndexB = atomB.GetFirstAOIndex();
-   int numberAOsA = atomA.GetValence().size();
-   int numberAOsB = atomB.GetValence().size();
+   int numberAOsA = atomA.GetValenceSize();
+   int numberAOsB = atomB.GetValenceSize();
    for(int mu=firstAOIndexA; mu<firstAOIndexA+numberAOsA; mu++){
       for(int nu=firstAOIndexA; nu<firstAOIndexA+numberAOsA; nu++){
          for(int lambda=firstAOIndexB; lambda<firstAOIndexB+numberAOsB; lambda++){
@@ -1687,8 +1687,8 @@ void Mndo::CalcForceExcitedStaticPart(double* force,
    const Atom& atomB = *(*this->molecule->GetAtomVect())[atomBIndex];
    int firstAOIndexA = atomA.GetFirstAOIndex();
    int firstAOIndexB = atomB.GetFirstAOIndex();
-   int numberAOsA = atomA.GetValence().size();
-   int numberAOsB = atomB.GetValence().size();
+   int numberAOsA = atomA.GetValenceSize();
+   int numberAOsB = atomB.GetValenceSize();
    for(int mu=firstAOIndexA; mu<firstAOIndexA+numberAOsA; mu++){
       for(int nu=firstAOIndexA; nu<firstAOIndexA+numberAOsA; nu++){
          for(int lambda=firstAOIndexB; lambda<firstAOIndexB+numberAOsB; lambda++){
@@ -1718,7 +1718,7 @@ void Mndo::CalcForceExcitedElecCoreAttractionPart(double* force,
                                                   double const* const* const* const* const* twoElecTwoCoreFirstDeriv) const{
    const Atom& atomA = *(*this->molecule->GetAtomVect())[atomAIndex];
    int firstAOIndexA = atomA.GetFirstAOIndex();
-   int numberAOsA = atomA.GetValence().size();
+   int numberAOsA = atomA.GetValenceSize();
    for(int mu=firstAOIndexA; mu<firstAOIndexA+numberAOsA; mu++){
       for(int nu=firstAOIndexA; nu<firstAOIndexA+numberAOsA; nu++){
          for(int i=0; i<CartesianType_end; i++){
@@ -1745,16 +1745,16 @@ void Mndo::CalcForceExcitedOverlapPart(double* force,
    const Atom& atomB = *(*this->molecule->GetAtomVect())[atomBIndex];
    int firstAOIndexA = atomA.GetFirstAOIndex();
    int firstAOIndexB = atomB.GetFirstAOIndex();
-   int numberAOsA = atomA.GetValence().size();
-   int numberAOsB = atomB.GetValence().size();
+   int numberAOsA = atomA.GetValenceSize();
+   int numberAOsB = atomB.GetValenceSize();
    for(int mu=firstAOIndexA; mu<firstAOIndexA+numberAOsA; mu++){
       for(int nu=firstAOIndexB; nu<firstAOIndexB+numberAOsB; nu++){
          double bondParameter = atomA.GetBondingParameter(
                                       this->theory, 
-                                      atomA.GetValence()[mu-firstAOIndexA]) 
+                                      atomA.GetValence(mu-firstAOIndexA)) 
                                +atomB.GetBondingParameter(
                                       this->theory, 
-                                      atomB.GetValence()[nu-firstAOIndexB]); 
+                                      atomB.GetValence(nu-firstAOIndexB)); 
          bondParameter *= 0.5;
          for(int i=0; i<CartesianType_end; i++){
             force[i] += -1.0
@@ -1775,8 +1775,8 @@ void Mndo::CalcForceExcitedTwoElecPart(double* force,
    const Atom& atomB = *(*this->molecule->GetAtomVect())[atomBIndex];
    int firstAOIndexA = atomA.GetFirstAOIndex();
    int firstAOIndexB = atomB.GetFirstAOIndex();
-   int numberAOsA = atomA.GetValence().size();
-   int numberAOsB = atomB.GetValence().size();
+   int numberAOsA = atomA.GetValenceSize();
+   int numberAOsB = atomB.GetValenceSize();
    for(int mu=firstAOIndexA; mu<firstAOIndexA+numberAOsA; mu++){
       for(int nu=firstAOIndexA; nu<firstAOIndexA+numberAOsA; nu++){
          for(int lambda=firstAOIndexB; lambda<firstAOIndexB+numberAOsB; lambda++){
@@ -1829,12 +1829,12 @@ void Mndo::CalcForce(vector<int> elecStates){
          for(int a=0; a<this->molecule->GetAtomVect()->size(); a++){
             const Atom& atomA = *(*molecule->GetAtomVect())[a];
             int firstAOIndexA = atomA.GetFirstAOIndex();
-            int numberAOsA = atomA.GetValence().size();
+            int numberAOsA = atomA.GetValenceSize();
             for(int b=0; b<this->molecule->GetAtomVect()->size(); b++){
                if(a != b){
                   const Atom& atomB = *(*molecule->GetAtomVect())[b];
                   int firstAOIndexB = atomB.GetFirstAOIndex();
-                  int numberAOsB = atomB.GetValence().size();
+                  int numberAOsB = atomB.GetValenceSize();
 
                   // calc. first derivative of overlap.
                   this->CalcDiatomicOverlapFirstDerivative(overlapDer, atomA, atomB);
@@ -2047,17 +2047,17 @@ void Mndo::CalcTwoElecTwoCoreDiatomic(double**** matrix, int atomAIndex, int ato
    } 
 
    // calclation in diatomic frame
-   for(int mu=0; mu<atomA.GetValence().size(); mu++){
-      for(int nu=0; nu<atomA.GetValence().size(); nu++){
-         for(int lambda=0; lambda<atomB.GetValence().size(); lambda++){
-            for(int sigma=0; sigma<atomB.GetValence().size(); sigma++){
+   for(int mu=0; mu<atomA.GetValenceSize(); mu++){
+      for(int nu=0; nu<atomA.GetValenceSize(); nu++){
+         for(int lambda=0; lambda<atomB.GetValenceSize(); lambda++){
+            for(int sigma=0; sigma<atomB.GetValenceSize(); sigma++){
                matrix[mu][nu][lambda][sigma] = this->GetNddoRepulsionIntegral(
                                                      atomA, 
-                                                     atomA.GetValence()[mu],
-                                                     atomA.GetValence()[nu],
+                                                     atomA.GetValence(mu),
+                                                     atomA.GetValence(nu),
                                                      atomB, 
-                                                     atomB.GetValence()[lambda],
-                                                     atomB.GetValence()[sigma]);
+                                                     atomB.GetValence(lambda),
+                                                     atomB.GetValence(sigma));
                      
             }
          }
@@ -2135,29 +2135,29 @@ void Mndo::CalcTwoElecTwoCoreDiatomicFirstDerivatives(double***** matrix,
                                                                      dxy, dxy, dxy, dxy);
    try{
       // calclation in diatomic frame
-      for(int mu=0; mu<atomA.GetValence().size(); mu++){
-         for(int nu=0; nu<atomA.GetValence().size(); nu++){
-            for(int lambda=0; lambda<atomB.GetValence().size(); lambda++){
-               for(int sigma=0; sigma<atomB.GetValence().size(); sigma++){
+      for(int mu=0; mu<atomA.GetValenceSize(); mu++){
+         for(int nu=0; nu<atomA.GetValenceSize(); nu++){
+            for(int lambda=0; lambda<atomB.GetValenceSize(); lambda++){
+               for(int sigma=0; sigma<atomB.GetValenceSize(); sigma++){
                   for(int c=0; c<CartesianType_end; c++){
                      matrix[mu][nu][lambda][sigma][c] 
                         = this->GetNddoRepulsionIntegralFirstDerivative(
                                 atomA, 
-                                atomA.GetValence()[mu],
-                                atomA.GetValence()[nu],
+                                atomA.GetValence(mu),
+                                atomA.GetValence(nu),
                                 atomB, 
-                                atomB.GetValence()[lambda],
-                                atomB.GetValence()[sigma],
+                                atomB.GetValence(lambda),
+                                atomB.GetValence(sigma),
                                 (CartesianType)c);
                   }  
                   twoElecTwoCoreDiatomic[mu][nu][lambda][sigma] 
                      = this->GetNddoRepulsionIntegral(
                              atomA, 
-                             atomA.GetValence()[mu],
-                             atomA.GetValence()[nu],
+                             atomA.GetValence(mu),
+                             atomA.GetValence(nu),
                              atomB, 
-                             atomB.GetValence()[lambda],
-                             atomB.GetValence()[sigma]);
+                             atomB.GetValence(lambda),
+                             atomB.GetValence(sigma));
                }
             }
          }

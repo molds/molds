@@ -84,7 +84,7 @@ double Indo::GetFockDiagElement(const Atom& atomA,
                                 bool isGuess) const{
    double value;
    int firstAOIndexA = atomA.GetFirstAOIndex();
-   value = atomA.GetCoreIntegral(atomA.GetValence()[mu-firstAOIndexA], 
+   value = atomA.GetCoreIntegral(atomA.GetValence(mu-firstAOIndexA), 
                                  gammaAB[atomAIndex][atomAIndex], 
                                  isGuess, this->theory);
 
@@ -93,9 +93,9 @@ double Indo::GetFockDiagElement(const Atom& atomA,
       double coulomb = 0.0;
       double exchange = 0.0;
       int lammda = 0;
-      OrbitalType orbitalMu = atomA.GetValence()[mu-firstAOIndexA];
-      for(int v=0; v<atomA.GetValence().size(); v++){
-         OrbitalType orbitalLam = atomA.GetValence()[v];
+      OrbitalType orbitalMu = atomA.GetValence(mu-firstAOIndexA);
+      for(int v=0; v<atomA.GetValenceSize(); v++){
+         OrbitalType orbitalLam = atomA.GetValence(v);
          coulomb  = this->GetCoulombInt(orbitalMu, orbitalLam, gammaAB[atomAIndex][atomAIndex], atomA);
          exchange = this->GetExchangeInt(orbitalMu, orbitalLam, gammaAB[atomAIndex][atomAIndex], atomA);
          lammda = firstAOIndexA + v;
@@ -140,8 +140,8 @@ double Indo::GetFockOffDiagElement(const Atom& atomA,
       double coulomb = 0.0;
       double exchange = 0.0;
       if(atomAIndex == atomBIndex){
-         OrbitalType orbitalMu = atomA.GetValence()[mu-atomA.GetFirstAOIndex()];
-         OrbitalType orbitalNu = atomA.GetValence()[nu-atomA.GetFirstAOIndex()];
+         OrbitalType orbitalMu = atomA.GetValence(mu-atomA.GetFirstAOIndex());
+         OrbitalType orbitalNu = atomA.GetValence(nu-atomA.GetFirstAOIndex());
          coulomb  = this->GetCoulombInt(orbitalMu, orbitalNu, gammaAB[atomAIndex][atomAIndex], atomA); 
          exchange = this->GetExchangeInt(orbitalMu, orbitalNu, gammaAB[atomAIndex][atomAIndex], atomA); 
          value = (1.5*exchange - 0.5*coulomb)*orbitalElectronPopulation[mu][nu];
@@ -177,12 +177,12 @@ double Indo::GetMolecularIntegralElement(int moI, int moJ, int moK, int moL,
    for(int A=0; A<molecule.GetAtomVect()->size(); A++){
       const Atom& atomA = *(*molecule.GetAtomVect())[A];
       firstAOIndexA = atomA.GetFirstAOIndex();
-      numberAOsA = atomA.GetValence().size();
+      numberAOsA = atomA.GetValenceSize();
 
       for(int mu=firstAOIndexA; mu<firstAOIndexA+numberAOsA; mu++){
-         orbitalMu = atomA.GetValence()[mu-firstAOIndexA];
+         orbitalMu = atomA.GetValence(mu-firstAOIndexA);
          for(int nu=firstAOIndexA; nu<firstAOIndexA+numberAOsA; nu++){
-            orbitalNu = atomA.GetValence()[nu-firstAOIndexA];
+            orbitalNu = atomA.GetValence(nu-firstAOIndexA);
 
             if(mu!=nu){
                exchange = this->GetExchangeInt(orbitalMu, orbitalNu, gammaAB[A][A], atomA);

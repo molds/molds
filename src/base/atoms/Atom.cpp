@@ -140,8 +140,12 @@ void Atom::SetPxyz(double px, double py, double pz){
    pxyz[2]= pz;
 }
 
-vector<OrbitalType> Atom::GetValence() const{
-   return this->valence;
+int Atom::GetValenceSize() const{
+   return this->valence.size();
+}
+
+OrbitalType Atom::GetValence(int index) const{
+   return this->valence[index];
 }
 
 double Atom::GetAtomicBasisValue(double x, 

@@ -172,7 +172,7 @@ void Molecule::CalcTotalNumberAOs(){
    this->totalNumberAOs = 0; 
    for(int i=0; i<this->atomVect->size(); i++){
       (*this->atomVect)[i]->SetFirstAOIndex(totalNumberAOs);
-      this->totalNumberAOs += (*this->atomVect)[i]->GetValence().size();
+      this->totalNumberAOs += (*this->atomVect)[i]->GetValenceSize();
    }
 }
 
