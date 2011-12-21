@@ -65,9 +65,9 @@ protected:
    virtual void CalcCISMatrix(double** matrixCIS, 
                               int numberActiveOcc, 
                               int numberActiveVir) const;
-   virtual void CalcForce(std::vector<int> elecStates);
+   virtual void CalcForce(const std::vector<int>& elecStates);
    int GetSlaterDeterminantIndex(int activeOccIndex, int activeVirIndex) const;
-   void CheckMatrixForce(std::vector<int> elecStates);
+   void CheckMatrixForce(const std::vector<int>& elecStates);
 private:
    std::string errorMessageCalcForceNotGroundState;
    std::string errorMessageElecState;

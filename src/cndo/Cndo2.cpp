@@ -470,7 +470,7 @@ double Cndo2::GetCoreRepulsionEnergy() const{
    return this->coreRepulsionEnergy;
 }
 
-double*** Cndo2::GetForce(vector<int> elecStates){
+double*** Cndo2::GetForce(const vector<int>& elecStates){
    this->CalcForce(elecStates);
    return this->matrixForce;
 }
@@ -488,7 +488,7 @@ void Cndo2::CalcTwoElecTwoCore(double****** twoElecTwoCore,
    // two electron two core integrals are needed for CNDO, INDO, and ZINDO/S.
 }
 
-void Cndo2::CalcForce(vector<int> elecStates){
+void Cndo2::CalcForce(const vector<int>& elecStates){
    stringstream ss;
    ss << this->errorMessageCalcForceNotImplemented;
    throw MolDSException(ss.str());
@@ -871,7 +871,7 @@ void Cndo2::CalcFockMatrix(double** fockMatrix,
                                                           molecule.GetTotalNumberAOs(), 
                                                           molecule.GetTotalNumberAOs());
    stringstream ompErrors;
-   #pragma omp parallel for schedule(auto) shared(ompErrors)
+   #pragma omp parallel for schedule(auto) 
    for(int A=0; A<molecule.GetAtomVect()->size(); A++){
       try{
         const Atom& atomA = *(*molecule.GetAtomVect())[A];
@@ -1062,7 +1062,7 @@ void Cndo2::CalcAtomicElectronPopulation(double* atomicElectronPopulation,
 void Cndo2::CalcGammaAB(double** gammaAB, const Molecule& molecule) const{
    int totalAtomNumber = molecule.GetAtomVect()->size();
    stringstream ompErrors;
-   #pragma omp parallel for schedule(auto) shared(ompErrors)
+   #pragma omp parallel for schedule(auto) 
    for(int A=0; A<totalAtomNumber; A++){
       try{
          const Atom& atomA = *(*molecule.GetAtomVect())[A];
@@ -1167,7 +1167,7 @@ void Cndo2::CalcOverlap(double** overlap, const Molecule& molecule) const{
    int totalAtomNumber = molecule.GetAtomVect()->size();
 
    stringstream ompErrors;
-   #pragma omp parallel shared(ompErrors)
+   #pragma omp parallel 
    {
       double** diatomicOverlap;
       double** rotatingMatrix; 
@@ -1225,13 +1225,15 @@ void Cndo2::CalcOverlap(double** overlap, const Molecule& molecule) const{
 void Cndo2::CalcDiatomicOverlapFirstDerivative(double*** overlapFirstDeri, 
                                                const Atom& atomA, 
                                                const Atom& atomB) const{
+   if(overlapFirstDeri == NULL){
+      cout << "mikiya-NULL in Cndo2::CalcDiatomicOverlapFirstDerivative" << endl;
+   }
    double Cartesian[CartesianType_end] = {atomA.GetXyz()[XAxis] - atomB.GetXyz()[XAxis], 
                                           atomA.GetXyz()[YAxis] - atomB.GetXyz()[YAxis],
                                           atomA.GetXyz()[ZAxis] - atomB.GetXyz()[ZAxis]};
    double R = sqrt( pow(Cartesian[XAxis],2.0) + 
                     pow(Cartesian[YAxis],2.0) + 
                     pow(Cartesian[ZAxis],2.0) );
-
    // malloc
    double** diatomicOverlap =  MallocerFreer::GetInstance()->MallocDoubleMatrix2d
                                    (OrbitalType_end, OrbitalType_end);
@@ -1331,7 +1333,7 @@ void Cndo2::CalcOverlapByGTOExpansion(double** overlap,
    }
 
    stringstream ompErrors;
-   #pragma omp parallel for schedule(auto) shared(ompErrors)
+   #pragma omp parallel for schedule(auto) 
    for(int A=0; A<totalAtomNumber; A++){
       try{
          const Atom& atomA = *(*molecule.GetAtomVect())[A];

@@ -1,7 +1,7 @@
 CC = icpc
 LIBS32 = -lmkl_intel      -lmkl_intel_thread -lmkl_core -liomp5 -lpthread
 LIBS64 = -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread
-CFLAGS = -O0 -openmp -openmp-report2
+CFLAGS = -O2 -openmp -openmp-report2
 EXENAME = MolDS.out
 DEPFILE = obj/objfile.dep
 

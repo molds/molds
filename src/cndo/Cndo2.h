@@ -14,7 +14,7 @@ public:
    void DoesSCF(bool requiresGuess);
    virtual void DoesCIS();
    double** GetForce(int elecState);
-   double*** GetForce(std::vector<int> elecStates);
+   double*** GetForce(const std::vector<int>& elecStates);
    double GetElectronicEnergy(int elecState) const;
    double GetCoreRepulsionEnergy() const;
    MolDS_base::Molecule* GetMolecule();
@@ -123,7 +123,7 @@ protected:
                                               double const* const* gammaAB) const;
    virtual void CalcTwoElecTwoCore(double****** twoElecTwoCore, 
                                    const MolDS_base::Molecule& molecule) const;
-   virtual void CalcForce(std::vector<int> elecStates);
+   virtual void CalcForce(const std::vector<int>& elecStates);
    virtual void OutputHFResults(double const* const* fockMatrix, 
                                 double const* energiesMO, 
                                 double const* atomicElectronPopulation, 

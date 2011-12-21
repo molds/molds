@@ -567,167 +567,179 @@ void Mndo::CalcCISMatrix(double** matrixCIS, int numberActiveOcc, int numberActi
    cout << this->messageStartCalcCISMatrix;
    double ompStartTime = omp_get_wtime();
 
+   stringstream ompErrors;
    #pragma omp parallel for schedule(auto)
    for(int k=0; k<numberActiveOcc*numberActiveVir; k++){
-      // single excitation from I-th (occupied)MO to A-th (virtual)MO
-      int moI = this->molecule->GetTotalNumberValenceElectrons()/2 - (k/numberActiveVir) -1;
-      int moA = this->molecule->GetTotalNumberValenceElectrons()/2 + (k%numberActiveVir);
+      try{
+         // single excitation from I-th (occupied)MO to A-th (virtual)MO
+         int moI = this->molecule->GetTotalNumberValenceElectrons()/2 - (k/numberActiveVir) -1;
+         int moA = this->molecule->GetTotalNumberValenceElectrons()/2 + (k%numberActiveVir);
 
-      for(int l=k; l<numberActiveOcc*numberActiveVir; l++){
-         // single excitation from J-th (occupied)MO to B-th (virtual)MO
-         int moJ = this->molecule->GetTotalNumberValenceElectrons()/2 - (l/numberActiveVir) -1;
-         int moB = this->molecule->GetTotalNumberValenceElectrons()/2 + (l%numberActiveVir);
-         double value=0.0;
+         for(int l=k; l<numberActiveOcc*numberActiveVir; l++){
+            // single excitation from J-th (occupied)MO to B-th (virtual)MO
+            int moJ = this->molecule->GetTotalNumberValenceElectrons()/2 - (l/numberActiveVir) -1;
+            int moB = this->molecule->GetTotalNumberValenceElectrons()/2 + (l%numberActiveVir);
+            double value=0.0;
           
-         // Fast algorith, but this is not easy to read. Slow algorithm is alos written below.
-         for(int A=0; A<molecule->GetAtomVect()->size(); A++){
-            const Atom& atomA = *(*molecule->GetAtomVect())[A];
-            int firstAOIndexA = atomA.GetFirstAOIndex();
-            int numberAOsA = atomA.GetValenceSize();
+            // Fast algorith, but this is not easy to read. 
+            // Slow algorithm is alos written below.
+            for(int A=0; A<molecule->GetAtomVect()->size(); A++){
+               const Atom& atomA = *(*molecule->GetAtomVect())[A];
+               int firstAOIndexA = atomA.GetFirstAOIndex();
+               int numberAOsA = atomA.GetValenceSize();
 
-            for(int B=A; B<molecule->GetAtomVect()->size(); B++){
-               const Atom& atomB = *(*molecule->GetAtomVect())[B];
-               int firstAOIndexB = atomB.GetFirstAOIndex();
-               int numberAOsB = atomB.GetValenceSize();
+               for(int B=A; B<molecule->GetAtomVect()->size(); B++){
+                  const Atom& atomB = *(*molecule->GetAtomVect())[B];
+                  int firstAOIndexB = atomB.GetFirstAOIndex();
+                  int numberAOsB = atomB.GetValenceSize();
 
-               double gamma = 0.0;
-               if(A!=B){
-                  for(int mu=firstAOIndexA; mu<firstAOIndexA+numberAOsA; mu++){
-                     for(int nu=mu; nu<firstAOIndexA+numberAOsA; nu++){
-                        for(int lambda=firstAOIndexB; lambda<firstAOIndexB+numberAOsB; lambda++){
-                           for(int sigma=lambda; sigma<firstAOIndexB+numberAOsB; sigma++){
-                              OrbitalType orbitalSigma = atomB.GetValence(sigma-firstAOIndexB);
-                              gamma = this->twoElecTwoCore[A]
-                                                          [B]
-                                                          [mu-firstAOIndexA]
-                                                          [nu-firstAOIndexA]
-                                                          [lambda-firstAOIndexB]
-                                                          [sigma-firstAOIndexB];
-
-                              value += 2.0*gamma*fockMatrix[moA][mu]
-                                                *fockMatrix[moI][nu]
-                                                *fockMatrix[moJ][lambda]
-                                                *fockMatrix[moB][sigma];
-                              value += 2.0*gamma*fockMatrix[moA][lambda]
-                                                *fockMatrix[moI][sigma]
-                                                *fockMatrix[moJ][mu]
-                                                *fockMatrix[moB][nu];
-                              value -= gamma*fockMatrix[moA][mu]
-                                            *fockMatrix[moB][nu]
-                                            *fockMatrix[moI][lambda]
-                                            *fockMatrix[moJ][sigma];
-                              value -= gamma*fockMatrix[moA][lambda]
-                                            *fockMatrix[moB][sigma]
-                                            *fockMatrix[moI][mu]
-                                            *fockMatrix[moJ][nu];
-                              if(lambda != sigma){
+                  double gamma = 0.0;
+                  if(A!=B){
+                     for(int mu=firstAOIndexA; mu<firstAOIndexA+numberAOsA; mu++){
+                        for(int nu=mu; nu<firstAOIndexA+numberAOsA; nu++){
+                           for(int lambda=firstAOIndexB; lambda<firstAOIndexB+numberAOsB; lambda++){
+                              for(int sigma=lambda; sigma<firstAOIndexB+numberAOsB; sigma++){
+                                 OrbitalType orbitalSigma = atomB.GetValence(sigma-firstAOIndexB);
+                                 gamma = this->twoElecTwoCore[A]
+                                                             [B]
+                                                             [mu-firstAOIndexA]
+                                                             [nu-firstAOIndexA]
+                                                             [lambda-firstAOIndexB]
+                                                             [sigma-firstAOIndexB];
+   
                                  value += 2.0*gamma*fockMatrix[moA][mu]
                                                    *fockMatrix[moI][nu]
-                                                   *fockMatrix[moJ][sigma]
-                                                   *fockMatrix[moB][lambda];
-                                 value += 2.0*gamma*fockMatrix[moA][sigma]
-                                                   *fockMatrix[moI][lambda]
+                                                   *fockMatrix[moJ][lambda]
+                                                      *fockMatrix[moB][sigma];
+                                 value += 2.0*gamma*fockMatrix[moA][lambda]
+                                                   *fockMatrix[moI][sigma]
                                                    *fockMatrix[moJ][mu]
                                                    *fockMatrix[moB][nu];
                                  value -= gamma*fockMatrix[moA][mu]
                                                *fockMatrix[moB][nu]
-                                               *fockMatrix[moI][sigma]
-                                               *fockMatrix[moJ][lambda];
-                                 value -= gamma*fockMatrix[moA][sigma]
-                                               *fockMatrix[moB][lambda]
-                                               *fockMatrix[moI][mu]
-                                               *fockMatrix[moJ][nu];
-                              }
-                              if(mu != nu){
-                                 value += 2.0*gamma*fockMatrix[moA][nu]
-                                                   *fockMatrix[moI][mu]
-                                                   *fockMatrix[moJ][lambda]
-                                                   *fockMatrix[moB][sigma];
-                                 value += 2.0*gamma*fockMatrix[moA][lambda]
-                                                   *fockMatrix[moI][sigma]
-                                                   *fockMatrix[moJ][nu]
-                                                   *fockMatrix[moB][mu];
-                                 value -= gamma*fockMatrix[moA][nu]
-                                               *fockMatrix[moB][mu]
                                                *fockMatrix[moI][lambda]
                                                *fockMatrix[moJ][sigma];
                                  value -= gamma*fockMatrix[moA][lambda]
                                                *fockMatrix[moB][sigma]
-                                               *fockMatrix[moI][nu]
-                                               *fockMatrix[moJ][mu];
-                              }
-                              if(mu != nu && lambda != sigma){
-                                 value += 2.0*gamma*fockMatrix[moA][nu]
-                                                   *fockMatrix[moI][mu]
-                                                   *fockMatrix[moJ][sigma]
-                                                   *fockMatrix[moB][lambda];
-                                 value += 2.0*gamma*fockMatrix[moA][sigma]
-                                                   *fockMatrix[moI][lambda]
-                                                   *fockMatrix[moJ][nu]
-                                                   *fockMatrix[moB][mu];
-                                 value -= gamma*fockMatrix[moA][nu]
-                                               *fockMatrix[moB][mu]
-                                               *fockMatrix[moI][sigma]
-                                               *fockMatrix[moJ][lambda];
-                                 value -= gamma*fockMatrix[moA][sigma]
-                                               *fockMatrix[moB][lambda]
-                                               *fockMatrix[moI][nu]
-                                               *fockMatrix[moJ][mu];
+                                               *fockMatrix[moI][mu]
+                                               *fockMatrix[moJ][nu];
+                                 if(lambda != sigma){
+                                    value += 2.0*gamma*fockMatrix[moA][mu]
+                                                      *fockMatrix[moI][nu]
+                                                      *fockMatrix[moJ][sigma]
+                                                      *fockMatrix[moB][lambda];
+                                    value += 2.0*gamma*fockMatrix[moA][sigma]
+                                                      *fockMatrix[moI][lambda]
+                                                      *fockMatrix[moJ][mu]
+                                                      *fockMatrix[moB][nu];
+                                    value -= gamma*fockMatrix[moA][mu]
+                                                  *fockMatrix[moB][nu]
+                                                  *fockMatrix[moI][sigma]
+                                                  *fockMatrix[moJ][lambda];
+                                    value -= gamma*fockMatrix[moA][sigma]
+                                                  *fockMatrix[moB][lambda]
+                                                  *fockMatrix[moI][mu]
+                                                  *fockMatrix[moJ][nu];
+                                 }
+                                 if(mu != nu){
+                                    value += 2.0*gamma*fockMatrix[moA][nu]
+                                                      *fockMatrix[moI][mu]
+                                                      *fockMatrix[moJ][lambda]
+                                                      *fockMatrix[moB][sigma];
+                                    value += 2.0*gamma*fockMatrix[moA][lambda]
+                                                      *fockMatrix[moI][sigma]
+                                                      *fockMatrix[moJ][nu]
+                                                      *fockMatrix[moB][mu];
+                                    value -= gamma*fockMatrix[moA][nu]
+                                                  *fockMatrix[moB][mu]
+                                                  *fockMatrix[moI][lambda]
+                                                  *fockMatrix[moJ][sigma];
+                                    value -= gamma*fockMatrix[moA][lambda]
+                                                  *fockMatrix[moB][sigma]
+                                                  *fockMatrix[moI][nu]
+                                                  *fockMatrix[moJ][mu];
+                                 }
+                                 if(mu != nu && lambda != sigma){
+                                    value += 2.0*gamma*fockMatrix[moA][nu]
+                                                      *fockMatrix[moI][mu]
+                                                      *fockMatrix[moJ][sigma]
+                                                      *fockMatrix[moB][lambda];
+                                    value += 2.0*gamma*fockMatrix[moA][sigma]
+                                                      *fockMatrix[moI][lambda]
+                                                      *fockMatrix[moJ][nu]
+                                                      *fockMatrix[moB][mu];
+                                    value -= gamma*fockMatrix[moA][nu]
+                                                  *fockMatrix[moB][mu]
+                                                  *fockMatrix[moI][sigma]
+                                                  *fockMatrix[moJ][lambda];
+                                    value -= gamma*fockMatrix[moA][sigma]
+                                                  *fockMatrix[moB][lambda]
+                                                  *fockMatrix[moI][nu]
+                                                  *fockMatrix[moJ][mu];
+                                 }
                               }
                            }
                         }
                      }
                   }
-               }
-               else{
-                  for(int mu=firstAOIndexA; mu<firstAOIndexA+numberAOsA; mu++){
-                     for(int nu=firstAOIndexA; nu<firstAOIndexA+numberAOsA; nu++){
-                        for(int lambda=firstAOIndexB; lambda<firstAOIndexB+numberAOsB; lambda++){
-                           for(int sigma=firstAOIndexB; sigma<firstAOIndexB+numberAOsB; sigma++){
-                              if(mu==nu && lambda==sigma){
-                                 OrbitalType orbitalMu = atomA.GetValence(mu-firstAOIndexA);
-                                 OrbitalType orbitalLambda = atomB.GetValence(lambda-firstAOIndexB);
-                                 gamma = this->GetCoulombInt(orbitalMu, orbitalLambda, atomA);
-                              }
-                              else if((mu==lambda && nu==sigma) || (nu==lambda && mu==sigma) ){
-                                 OrbitalType orbitalMu = atomA.GetValence(mu-firstAOIndexA);
-                                 OrbitalType orbitalNu = atomA.GetValence(nu-firstAOIndexA);
-                                 gamma = this->GetExchangeInt(orbitalMu, orbitalNu, atomA);
-                              }
-                              else{
-                                 gamma = 0.0;
-                              }
-                              value += 2.0*gamma*fockMatrix[moA][mu]
-                                                *fockMatrix[moI][nu]
-                                                *fockMatrix[moJ][lambda]
-                                                *fockMatrix[moB][sigma];
-                              value -= gamma*fockMatrix[moA][mu]
-                                            *fockMatrix[moB][nu]
-                                            *fockMatrix[moI][lambda]
-                                            *fockMatrix[moJ][sigma];
-                           }  
+                  else{
+                     for(int mu=firstAOIndexA; mu<firstAOIndexA+numberAOsA; mu++){
+                        for(int nu=firstAOIndexA; nu<firstAOIndexA+numberAOsA; nu++){
+                           for(int lambda=firstAOIndexB; lambda<firstAOIndexB+numberAOsB; lambda++){
+                              for(int sigma=firstAOIndexB; sigma<firstAOIndexB+numberAOsB; sigma++){
+                                 if(mu==nu && lambda==sigma){
+                                    OrbitalType orbitalMu = atomA.GetValence(mu-firstAOIndexA);
+                                    OrbitalType orbitalLambda = atomB.GetValence(lambda-firstAOIndexB);
+                                    gamma = this->GetCoulombInt(orbitalMu, orbitalLambda, atomA);
+                                 }
+                                 else if((mu==lambda && nu==sigma) || (nu==lambda && mu==sigma) ){
+                                    OrbitalType orbitalMu = atomA.GetValence(mu-firstAOIndexA);
+                                    OrbitalType orbitalNu = atomA.GetValence(nu-firstAOIndexA);
+                                    gamma = this->GetExchangeInt(orbitalMu, orbitalNu, atomA);
+                                 }
+                                 else{
+                                    gamma = 0.0;
+                                 }
+                                 value += 2.0*gamma*fockMatrix[moA][mu]
+                                                   *fockMatrix[moI][nu]
+                                                   *fockMatrix[moJ][lambda]
+                                                   *fockMatrix[moB][sigma];
+                                 value -= gamma*fockMatrix[moA][mu]
+                                               *fockMatrix[moB][nu]
+                                               *fockMatrix[moI][lambda]
+                                               *fockMatrix[moJ][sigma];
+                              }  
+                           }
                         }
                      }
                   }
                }
             }
-         }
-         // End of the fast algorith.
+            // End of the fast algorith.
          
-         /* 
-         // Slow algorith, but this is easy to read. Fast altorithm is also written above.
-         value = 2.0*this->GetMolecularIntegralElement(moA, moI, moJ, moB, 
-                                                       this->molecule, this->fockMatrix, NULL)
-                    -this->GetMolecularIntegralElement(moA, moB, moI, moJ, 
-                                                       this->molecule, this->fockMatrix, NULL);
-         // End of the slow algorith.
-         */
-         // Diagonal term
-         if(k==l){
-            value += this->energiesMO[moA] - this->energiesMO[moI];
+            /* 
+            // Slow algorith, but this is easy to read. Fast altorithm is also written above.
+            value = 2.0*this->GetMolecularIntegralElement(moA, moI, moJ, moB, 
+                                                          this->molecule, this->fockMatrix, NULL)
+                       -this->GetMolecularIntegralElement(moA, moB, moI, moJ, 
+                                                          this->molecule, this->fockMatrix, NULL);
+            // End of the slow algorith.
+            */
+            // Diagonal term
+            if(k==l){
+               value += this->energiesMO[moA] - this->energiesMO[moI];
+            }
+            matrixCIS[k][l] = value;
          }
-         matrixCIS[k][l] = value;
       }
+      catch(MolDSException ex){
+         #pragma omp critical
+         ompErrors << ex.what() << endl ;
+      }
+   }
+   // Exception throwing for omp-region
+   if(!ompErrors.str().empty()){
+      throw MolDSException(ompErrors.str());
    }
    double ompEndTime = omp_get_wtime();
    cout << this->messageOmpElapsedTimeCalcCISMarix;
@@ -736,7 +748,7 @@ void Mndo::CalcCISMatrix(double** matrixCIS, int numberActiveOcc, int numberActi
    cout << this->messageDoneCalcCISMatrix;
 }
 
-void Mndo::CheckZMatrixForce(vector<int> elecStates){
+void Mndo::CheckZMatrixForce(const vector<int>& elecStates){
    // malloc or initialize Z matrix
    if(this->zMatrixForce == NULL){
       this->zMatrixForce = MallocerFreer::GetInstance()->
@@ -754,7 +766,7 @@ void Mndo::CheckZMatrixForce(vector<int> elecStates){
    }
 }
 
-void Mndo::CheckEtaMatrixForce(vector<int> elecStates){
+void Mndo::CheckEtaMatrixForce(const vector<int>& elecStates){
    // malloc or initialize eta matrix
    if(this->etaMatrixForce == NULL){
       this->etaMatrixForce = MallocerFreer::GetInstance()->
@@ -1033,26 +1045,37 @@ void Mndo::CalcDeltaVector(double* delta, int exciteState) const{
    int numberActiveVir = Parameters::GetInstance()->GetActiveVirCIS();
    int numberActiveMO = numberActiveOcc + numberActiveVir;
    MallocerFreer::GetInstance()->InitializeDoubleMatrix1d(delta, numberActiveMO);
+   stringstream ompErrors;
    #pragma omp parallel for schedule(auto)
    for(int r=0; r<numberActiveMO; r++){
-      double value = 0.0;
-      if(r<numberActiveOcc){
-         // r is active occupied MO
-         int rr=numberActiveOcc-(r+1);
-         for(int a=0; a<numberActiveVir; a++){
-            int slaterDeterminantIndex = this->GetSlaterDeterminantIndex(rr,a);
-            value -= pow(this->matrixCIS[exciteState][slaterDeterminantIndex],2.0);
+      try{
+         double value = 0.0;
+         if(r<numberActiveOcc){
+            // r is active occupied MO
+            int rr=numberActiveOcc-(r+1);
+            for(int a=0; a<numberActiveVir; a++){
+               int slaterDeterminantIndex = this->GetSlaterDeterminantIndex(rr,a);
+               value -= pow(this->matrixCIS[exciteState][slaterDeterminantIndex],2.0);
+            }
          }
-      }
-      else{
-         // r is active virtual MO
-         int rr=r-numberActiveOcc;
-         for(int i=0; i<numberActiveOcc; i++){
-            int slaterDeterminantIndex = this->GetSlaterDeterminantIndex(i,rr);
-            value += pow(this->matrixCIS[exciteState][slaterDeterminantIndex],2.0);
+         else{
+            // r is active virtual MO
+            int rr=r-numberActiveOcc;
+            for(int i=0; i<numberActiveOcc; i++){
+               int slaterDeterminantIndex = this->GetSlaterDeterminantIndex(i,rr);
+               value += pow(this->matrixCIS[exciteState][slaterDeterminantIndex],2.0);
+            }
          }
+         delta[r] = value;
       }
-      delta[r] = value;
+      catch(MolDSException ex){
+         #pragma omp critical
+         ompErrors << ex.what() << endl ;
+      }
+   }
+   // Exception throwing for omp-region
+   if(!ompErrors.str().empty()){
+      throw MolDSException(ompErrors.str());
    }
 }
 
@@ -1246,47 +1269,68 @@ void Mndo::CalcQVector(double* q,
                        double const* const* xiOcc,
                        double const* const* xiVir,
                        double const* const* eta,
-                       vector<MoIndexPair> nonRedundantQIndeces,
-                       vector<MoIndexPair> redundantQIndeces) const{
+                       const vector<MoIndexPair>& nonRedundantQIndeces,
+                       const vector<MoIndexPair>& redundantQIndeces) const{
    MallocerFreer::GetInstance()->InitializeDoubleMatrix1d(
                                  q,
                                  nonRedundantQIndeces.size()+redundantQIndeces.size());
 
    int numberOcc = this->molecule->GetTotalNumberValenceElectrons()/2;
    int numberActiveOcc = Parameters::GetInstance()->GetActiveOccCIS();
+   stringstream ompErrors;
    #pragma omp parallel for schedule(auto)
    for(int i=0; i<nonRedundantQIndeces.size(); i++){
-      int moI = nonRedundantQIndeces[i].moI;
-      int moJ = nonRedundantQIndeces[i].moJ;
-      bool isMoICIMO = nonRedundantQIndeces[i].isMoICIMO;
-      bool isMoJCIMO = nonRedundantQIndeces[i].isMoJCIMO;
-      if(!isMoICIMO && isMoJCIMO){
-         q[i] = this->GetSmallQElement(moI, moJ, xiOcc, xiVir, eta);
+      try{
+         int moI = nonRedundantQIndeces[i].moI;
+         int moJ = nonRedundantQIndeces[i].moJ;
+         bool isMoICIMO = nonRedundantQIndeces[i].isMoICIMO;
+         bool isMoJCIMO = nonRedundantQIndeces[i].isMoJCIMO;
+         if(!isMoICIMO && isMoJCIMO){
+            q[i] = this->GetSmallQElement(moI, moJ, xiOcc, xiVir, eta);
+         }
+         else if(isMoICIMO && !isMoJCIMO){
+            q[i] = -1.0*this->GetSmallQElement(moJ, moI, xiOcc, xiVir, eta);
+         }
+         else if(isMoICIMO && isMoJCIMO){
+            q[i] = this->GetSmallQElement(moI, moJ, xiOcc, xiVir, eta)
+                  -this->GetSmallQElement(moJ, moI, xiOcc, xiVir, eta);
+         }
+         else{
+            q[i] = 0.0;
+         }
       }
-      else if(isMoICIMO && !isMoJCIMO){
-         q[i] = -1.0*this->GetSmallQElement(moJ, moI, xiOcc, xiVir, eta);
+      catch(MolDSException ex){
+         #pragma omp critical
+         ompErrors << ex.what() << endl ;
       }
-      else if(isMoICIMO && isMoJCIMO){
-         q[i] = this->GetSmallQElement(moI, moJ, xiOcc, xiVir, eta)
-               -this->GetSmallQElement(moJ, moI, xiOcc, xiVir, eta);
-      }
-      else{
-         q[i] = 0.0;
-      }
+   }
+   // Exception throwing for omp-region
+   if(!ompErrors.str().empty()){
+      throw MolDSException(ompErrors.str());
    }
    #pragma omp parallel for schedule(auto)
    for(int i=0; i<redundantQIndeces.size(); i++){
-      int r = nonRedundantQIndeces.size() + i;
-      int moI = redundantQIndeces[i].moI;
-      int moJ = redundantQIndeces[i].moJ;
-      if(moI == moJ){
-         int rr = moI - (numberOcc-numberActiveOcc);
-         q[r] = delta[rr];
+      try{
+         int r = nonRedundantQIndeces.size() + i;
+         int moI = redundantQIndeces[i].moI;
+         int moJ = redundantQIndeces[i].moJ;
+         if(moI == moJ){
+            int rr = moI - (numberOcc-numberActiveOcc);
+            q[r] = delta[rr];
+         }
+         else{
+            q[r] = this->GetSmallQElement(moI, moJ, xiOcc, xiVir, eta)
+                  -this->GetSmallQElement(moJ, moI, xiOcc, xiVir, eta);
+         }
       }
-      else{
-         q[r] = this->GetSmallQElement(moI, moJ, xiOcc, xiVir, eta)
-               -this->GetSmallQElement(moJ, moI, xiOcc, xiVir, eta);
+      catch(MolDSException ex){
+         #pragma omp critical
+         ompErrors << ex.what() << endl ;
       }
+   }
+   // Exception throwing for omp-region
+   if(!ompErrors.str().empty()){
+      throw MolDSException(ompErrors.str());
    }
    /* 
    for(int i=0; i<nonRedundantQIndeces.size(); i++){
@@ -1302,17 +1346,28 @@ void Mndo::CalcQVector(double* q,
 // see (43) and (45) in [PT_1996].
 // This method calculates "\Gamma_{NR} - K_{NR}".
 // Note taht K_{NR} is not calculated.
-void Mndo::CalcKNRMatrix(double** kNR, vector<MoIndexPair> nonRedundantQIndeces) const{
+void Mndo::CalcKNRMatrix(double** kNR, const vector<MoIndexPair>& nonRedundantQIndeces) const{
+   stringstream ompErrors;
    #pragma omp parallel for schedule(auto)
    for(int i=0; i<nonRedundantQIndeces.size(); i++){
-      int moI = nonRedundantQIndeces[i].moI;
-      int moJ = nonRedundantQIndeces[i].moJ;
-      for(int j=i; j<nonRedundantQIndeces.size(); j++){
-         int moK = nonRedundantQIndeces[j].moI;
-         int moL = nonRedundantQIndeces[j].moJ;
-         kNR[i][j] = this->GetGammaNRElement(moI, moJ, moK, moL)
-                    -this->GetKNRElement(moI, moJ, moK, moL);
+      try{
+         int moI = nonRedundantQIndeces[i].moI;
+         int moJ = nonRedundantQIndeces[i].moJ;
+         for(int j=i; j<nonRedundantQIndeces.size(); j++){
+            int moK = nonRedundantQIndeces[j].moI;
+            int moL = nonRedundantQIndeces[j].moJ;
+            kNR[i][j] = this->GetGammaNRElement(moI, moJ, moK, moL)
+                       -this->GetKNRElement(moI, moJ, moK, moL);
+         }
       }
+      catch(MolDSException ex){
+         #pragma omp critical
+         ompErrors << ex.what() << endl ;
+      }
+   }
+   // Exception throwing for omp-region
+   if(!ompErrors.str().empty()){
+      throw MolDSException(ompErrors.str());
    }
 }
 
@@ -1320,18 +1375,29 @@ void Mndo::CalcKNRMatrix(double** kNR, vector<MoIndexPair> nonRedundantQIndeces)
 // This method calculates "K_{R}^{\dager} * \Gamma_{R}^{-1}".
 // Note taht K_{R}^{\dager} is not calculated.
 void Mndo::CalcKRDagerMatrix(double** kRDager, 
-                             vector<MoIndexPair> nonRedundantQIndeces,
-                             vector<MoIndexPair> redundantQIndeces) const{
+                             const vector<MoIndexPair>& nonRedundantQIndeces,
+                             const vector<MoIndexPair>& redundantQIndeces) const{
+   stringstream ompErrors;
    #pragma omp parallel for schedule(auto)
    for(int i=0; i<nonRedundantQIndeces.size(); i++){
-      int moI = nonRedundantQIndeces[i].moI;
-      int moJ = nonRedundantQIndeces[i].moJ;
-      for(int j=0; j<redundantQIndeces.size(); j++){
-         int moK = redundantQIndeces[j].moI;
-         int moL = redundantQIndeces[j].moJ;
-         kRDager[i][j] = this->GetKRDagerElement(moI, moJ, moK, moL)
-                        /this->GetGammaRElement(moK, moL, moK, moL);
+      try{
+         int moI = nonRedundantQIndeces[i].moI;
+         int moJ = nonRedundantQIndeces[i].moJ;
+         for(int j=0; j<redundantQIndeces.size(); j++){
+            int moK = redundantQIndeces[j].moI;
+            int moL = redundantQIndeces[j].moJ;
+            kRDager[i][j] = this->GetKRDagerElement(moI, moJ, moK, moL)
+                           /this->GetGammaRElement(moK, moL, moK, moL);
+         }
       }
+      catch(MolDSException ex){
+         #pragma omp critical
+         ompErrors << ex.what() << endl ;
+      }
+   }
+   // Exception throwing for omp-region
+   if(!ompErrors.str().empty()){
+      throw MolDSException(ompErrors.str());
    }
 }
 
@@ -1339,20 +1405,31 @@ void Mndo::CalcKRDagerMatrix(double** kRDager,
 void Mndo::CalcAuxiliaryVector(double* y, 
                                double const* q, 
                                double const* const* kRDager, 
-                               vector<MoIndexPair> nonRedundantQIndeces, 
-                               vector<MoIndexPair> redundantQIndeces) const{
+                               const vector<MoIndexPair>& nonRedundantQIndeces, 
+                               const vector<MoIndexPair>& redundantQIndeces) const{
    MallocerFreer::GetInstance()->InitializeDoubleMatrix1d(
                                  y,
                                  nonRedundantQIndeces.size());
+   stringstream ompErrors;
    #pragma omp parallel for schedule(auto)
    for(int i=0; i<nonRedundantQIndeces.size(); i++){
-      int moI = nonRedundantQIndeces[i].moI;
-      int moJ = nonRedundantQIndeces[i].moJ;
-      y[i] += q[i]/this->GetNNRElement(moI, moJ, moI, moJ);
-      for(int j=0; j<redundantQIndeces.size(); j++){
-         int k = nonRedundantQIndeces.size() + j; 
-         y[i] += kRDager[i][j]*q[k];
+      try{
+         int moI = nonRedundantQIndeces[i].moI;
+         int moJ = nonRedundantQIndeces[i].moJ;
+         y[i] += q[i]/this->GetNNRElement(moI, moJ, moI, moJ);
+         for(int j=0; j<redundantQIndeces.size(); j++){
+            int k = nonRedundantQIndeces.size() + j; 
+            y[i] += kRDager[i][j]*q[k];
+         }
       }
+      catch(MolDSException ex){
+         #pragma omp critical
+         ompErrors << ex.what() << endl ;
+      }
+   }
+   // Exception throwing for omp-region
+   if(!ompErrors.str().empty()){
+      throw MolDSException(ompErrors.str());
    }
 }
 
@@ -1369,8 +1446,8 @@ void Mndo::TransposeFockMatrixMatrix(double** transposedFockMatrix) const{
 double Mndo::GetZMatrixForceElement(double const* y,
                                     double const* q,
                                     double const* const* transposedFockMatrix,
-                                    vector<MoIndexPair> nonRedundantQIndeces,
-                                    vector<MoIndexPair> redundantQIndeces,
+                                    const vector<MoIndexPair>& nonRedundantQIndeces,
+                                    const vector<MoIndexPair>& redundantQIndeces,
                                     int mu,
                                     int nu) const{
    double value=0.0;
@@ -1404,34 +1481,55 @@ void Mndo::CalcXiMatrices(double** xiOcc,
                                  xiOcc, numberActiveOcc, numberAOs);
    MallocerFreer::GetInstance()->InitializeDoubleMatrix2d(
                                  xiVir, numberActiveVir, numberAOs);
+   stringstream ompErrors;
    // xiOcc
    #pragma omp parallel for schedule(auto)
    for(int p=0; p<numberActiveOcc; p++){
-      for(int mu=0; mu<numberAOs; mu++){
-         for(int a=0; a<numberActiveVir; a++){
-            int moA = numberOcc + a;
-            int slaterDeterminantIndex = this->GetSlaterDeterminantIndex(p,a);
-            xiOcc[p][mu] += this->matrixCIS[exciteState][slaterDeterminantIndex]
-                           *transposedFockMatrix[mu][moA];
+      try{
+         for(int mu=0; mu<numberAOs; mu++){
+            for(int a=0; a<numberActiveVir; a++){
+               int moA = numberOcc + a;
+               int slaterDeterminantIndex = this->GetSlaterDeterminantIndex(p,a);
+               xiOcc[p][mu] += this->matrixCIS[exciteState][slaterDeterminantIndex]
+                              *transposedFockMatrix[mu][moA];
+            }
          }
       }
+      catch(MolDSException ex){
+         #pragma omp critical
+         ompErrors << ex.what() << endl ;
+      }
+   }
+   // Exception throwing for omp-region
+   if(!ompErrors.str().empty()){
+      throw MolDSException(ompErrors.str());
    }
    // xiVir
    #pragma omp parallel for schedule(auto)
    for(int p=0; p<numberActiveVir; p++){
-      for(int mu=0; mu<numberAOs; mu++){
-         for(int i=0; i<numberActiveOcc; i++){
-            int moI = numberOcc - (i+1);
-            int slaterDeterminantIndex = this->GetSlaterDeterminantIndex(i,p);
-            xiVir[p][mu] += this->matrixCIS[exciteState][slaterDeterminantIndex]
-                           *transposedFockMatrix[mu][moI];
+      try{
+         for(int mu=0; mu<numberAOs; mu++){
+            for(int i=0; i<numberActiveOcc; i++){
+               int moI = numberOcc - (i+1);
+               int slaterDeterminantIndex = this->GetSlaterDeterminantIndex(i,p);
+               xiVir[p][mu] += this->matrixCIS[exciteState][slaterDeterminantIndex]
+                              *transposedFockMatrix[mu][moI];
+            }
          }
       }
+      catch(MolDSException ex){
+         #pragma omp critical
+         ompErrors << ex.what() << endl ;
+      }
+   }
+   // Exception throwing for omp-region
+   if(!ompErrors.str().empty()){
+      throw MolDSException(ompErrors.str());
    }
 }
 
 // see [PT_1996, PT_1997]
-void Mndo::CalcZMatrixForce(vector<int> elecStates){
+void Mndo::CalcZMatrixForce(const vector<int>& elecStates){
    if(this->etaMatrixForce == NULL){
       stringstream ss;
       ss << this->errorMessageCalcZMatrixForceEtaNull;
@@ -1486,19 +1584,30 @@ void Mndo::CalcZMatrixForce(vector<int> elecStates){
                                                                    y, 
                                                                    nonRedundantQIndeces.size());
             // calculate each element of Z matrix.
+            stringstream ompErrors;
             #pragma omp parallel for schedule(auto)
             for(int mu=0; mu<this->molecule->GetTotalNumberAOs(); mu++){
-               for(int nu=0; nu<this->molecule->GetTotalNumberAOs(); nu++){
-                  this->zMatrixForce[n][mu][nu] = this->GetZMatrixForceElement(
-                                                        y,
-                                                        q,
-                                                        transposedFockMatrix,
-                                                        nonRedundantQIndeces,
-                                                        redundantQIndeces,
-                                                        mu,
-                                                        nu);
+               try{
+                  for(int nu=0; nu<this->molecule->GetTotalNumberAOs(); nu++){
+                     this->zMatrixForce[n][mu][nu] = this->GetZMatrixForceElement(
+                                                           y,
+                                                           q,
+                                                           transposedFockMatrix,
+                                                           nonRedundantQIndeces,
+                                                           redundantQIndeces,
+                                                           mu,
+                                                           nu);
+                  }
                }
-            }  
+               catch(MolDSException ex){
+                  #pragma omp critical
+                  ompErrors << ex.what() << endl ;
+               }
+            }
+            // Exception throwing for omp-region
+            if(!ompErrors.str().empty()){
+               throw MolDSException(ompErrors.str());
+            }
 
          }
       }
@@ -1528,7 +1637,7 @@ void Mndo::CalcZMatrixForce(vector<int> elecStates){
                                   redundantQIndeces.size());
 }
 
-void Mndo::CalcEtaMatrixForce(vector<int> elecStates){
+void Mndo::CalcEtaMatrixForce(const vector<int>& elecStates){
    this->CheckEtaMatrixForce(elecStates); 
    int numberAOs = this->molecule->GetTotalNumberAOs();
    int numberOcc = this->molecule->GetTotalNumberValenceElectrons()/2;
@@ -1546,21 +1655,32 @@ void Mndo::CalcEtaMatrixForce(vector<int> elecStates){
             int exciteState = elecStates[n]-1;
 
             // calc each element
+            stringstream ompErrors;
             #pragma omp parallel for schedule(auto)
             for(int mu=0; mu<numberAOs; mu++){
-               for(int nu=0; nu<numberAOs; nu++){
-                  for(int i=0; i<numberActiveOcc; i++){
-                     int moI = numberOcc-(i+1);
-                     for(int a=0; a<numberActiveVir; a++){
-                        int moA = numberOcc+a;
-                        int slaterDeterminantIndex = this->GetSlaterDeterminantIndex(i,a);
-                        this->etaMatrixForce[n][mu][nu] 
-                                 += this->matrixCIS[exciteState][slaterDeterminantIndex]
-                                   *transposedFockMatrix[mu][moI]
-                                   *transposedFockMatrix[nu][moA];
+               try{
+                  for(int nu=0; nu<numberAOs; nu++){
+                     for(int i=0; i<numberActiveOcc; i++){
+                        int moI = numberOcc-(i+1);
+                        for(int a=0; a<numberActiveVir; a++){
+                           int moA = numberOcc+a;
+                           int slaterDeterminantIndex = this->GetSlaterDeterminantIndex(i,a);
+                           this->etaMatrixForce[n][mu][nu] 
+                                    += this->matrixCIS[exciteState][slaterDeterminantIndex]
+                                      *transposedFockMatrix[mu][moI]
+                                      *transposedFockMatrix[nu][moA];
+                        }
                      }
                   }
                }
+               catch(MolDSException ex){
+                  #pragma omp critical
+                  ompErrors << ex.what() << endl ;
+               }
+            }
+            // Exception throwing for omp-region
+            if(!ompErrors.str().empty()){
+               throw MolDSException(ompErrors.str());
             }
 
          }
@@ -1579,7 +1699,7 @@ void Mndo::CalcEtaMatrixForce(vector<int> elecStates){
    }
 }
 
-bool Mndo::RequiresExcitedStatesForce(vector<int> elecStates) const{
+bool Mndo::RequiresExcitedStatesForce(const vector<int>& elecStates) const{
    bool requires = true;
    if(elecStates.size()==1 && elecStates[0]==0){
       requires = false;
@@ -1806,25 +1926,28 @@ void Mndo::CalcForceExcitedTwoElecPart(double* force,
 
 // electronicStateIndex is index of the electroinc eigen state.
 // "electronicStateIndex = 0" means electronic ground state. 
-void Mndo::CalcForce(vector<int> elecStates){
+void Mndo::CalcForce(const vector<int>& elecStates){
    this->CheckMatrixForce(elecStates);
    if(this->RequiresExcitedStatesForce(elecStates)){
       this->CalcEtaMatrixForce(elecStates);
       this->CalcZMatrixForce(elecStates);
    }
+   stringstream ompErrors;
    #pragma omp parallel
    {
-      double***** twoElecTwoCoreFirstDeriv = MallocerFreer::GetInstance()->MallocDoubleMatrix5d(
-                                                                           dxy,
-                                                                           dxy,
-                                                                           dxy,
-                                                                           dxy,
-                                                                           CartesianType_end);
-      double*** overlapDer = MallocerFreer::GetInstance()->MallocDoubleMatrix3d(
-                                                           OrbitalType_end, 
-                                                           OrbitalType_end, 
-                                                           CartesianType_end);
+      double***** twoElecTwoCoreFirstDeriv=NULL;
+      double*** overlapDer=NULL;
       try{
+         twoElecTwoCoreFirstDeriv = MallocerFreer::GetInstance()->MallocDoubleMatrix5d(
+                                                                  dxy,
+                                                                  dxy,
+                                                                  dxy,
+                                                                  dxy,
+                                                                  CartesianType_end);
+         overlapDer = MallocerFreer::GetInstance()->MallocDoubleMatrix3d(
+                                                    OrbitalType_end, 
+                                                    OrbitalType_end, 
+                                                    CartesianType_end);
          #pragma omp for schedule(auto)
          for(int a=0; a<this->molecule->GetAtomVect()->size(); a++){
             const Atom& atomA = *(*molecule->GetAtomVect())[a];
@@ -1941,10 +2064,14 @@ void Mndo::CalcForce(vector<int> elecStates){
          }
       }
       catch(MolDSException ex){
-         this->FreeCalcForceTempMatrices(&overlapDer, &twoElecTwoCoreFirstDeriv);
-         throw ex;
+         #pragma omp critical
+         ompErrors << ex.what() << endl ;
       }
       this->FreeCalcForceTempMatrices(&overlapDer, &twoElecTwoCoreFirstDeriv);
+   }
+   // Exception throwing for omp-region
+   if(!ompErrors.str().empty()){
+      throw MolDSException(ompErrors.str());
    }
 }
 
@@ -1979,11 +2106,13 @@ void Mndo::CalcTwoElecTwoCore(double****** twoElecTwoCore,
                                                       dxy, dxy, dxy, dxy);
    } 
 
+   stringstream ompErrors;
    #pragma omp parallel
    {
-      double**** twoElecTwoCoreDiatomic = MallocerFreer::GetInstance()->MallocDoubleMatrix4d(
-                                                                        dxy, dxy, dxy, dxy);
+      double**** twoElecTwoCoreDiatomic;
       try{
+         twoElecTwoCoreDiatomic = MallocerFreer::GetInstance()->MallocDoubleMatrix4d(
+                                                                dxy, dxy, dxy, dxy);
          // note that terms with condition a==b are not needed to calculate. 
          #pragma omp for schedule(auto)
          for(int a=0; a<molecule.GetAtomVect()->size(); a++){
@@ -2010,12 +2139,15 @@ void Mndo::CalcTwoElecTwoCore(double****** twoElecTwoCore,
          }
       }
       catch(MolDSException ex){
-         MallocerFreer::GetInstance()->FreeDoubleMatrix4d(&twoElecTwoCoreDiatomic,
-                                                          dxy, dxy, dxy);
-         throw ex;
+         #pragma omp critical
+         ompErrors << ex.what() << endl ;
       }
       MallocerFreer::GetInstance()->FreeDoubleMatrix4d(&twoElecTwoCoreDiatomic,
                                                        dxy, dxy, dxy);
+   }
+   // Exception throwing for omp-region
+   if(!ompErrors.str().empty()){
+      throw MolDSException(ompErrors.str());
    }
 }
 

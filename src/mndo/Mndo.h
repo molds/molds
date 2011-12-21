@@ -24,7 +24,7 @@ protected:
    virtual void SetMessages();
    virtual void SetEnableAtomTypes();
    virtual void CalcHFProperties();
-   virtual void CalcForce(std::vector<int> elecStates);
+   virtual void CalcForce(const std::vector<int>& elecStates);
    virtual double GetDiatomCoreRepulsionEnergy(int indexAtomA, int indexAtomB) const;
    virtual double GetDiatomCoreRepulsionFirstDerivative(int atomAIndex,
                                                         int atomBIndex, 
@@ -137,19 +137,19 @@ private:
                     double const* const* xiOcc,
                     double const* const* xiVir,
                     double const* const* eta,
-                    std::vector<MoIndexPair> nonRedundantQIndeces,
-                    std::vector<MoIndexPair> redundantQIndeces) const;
+                    const std::vector<MoIndexPair>& nonRedundantQIndeces,
+                    const std::vector<MoIndexPair>& redundantQIndeces) const;
    void TransposeFockMatrixMatrix(double** transposedFockMatrix) const;
    void CalcKNRMatrix(double** kNR, 
-                      std::vector<MoIndexPair> nonRedundantQIndeces) const;
+                      const std::vector<MoIndexPair>& nonRedundantQIndeces) const;
    void CalcKRDagerMatrix(double** kRDager, 
-                          std::vector<MoIndexPair> nonRedundantQIndeces,
-                          std::vector<MoIndexPair> redundantQIndeces) const;
+                          const std::vector<MoIndexPair>& nonRedundantQIndeces,
+                          const std::vector<MoIndexPair>& redundantQIndeces) const;
    void CalcAuxiliaryVector(double* y,
                             double const* q,
                             double const* const* kRDager,
-                            std::vector<MoIndexPair> nonRedundantQIndeces,
-                            std::vector<MoIndexPair> redundantQIndeces) const;
+                            const std::vector<MoIndexPair>& nonRedundantQIndeces,
+                            const std::vector<MoIndexPair>& redundantQIndeces) const;
    void CalcXiMatrices(double** xiOcc, 
                        double** xiVir, 
                        int exciteState,
@@ -157,15 +157,15 @@ private:
    double GetZMatrixForceElement(double const* y,
                                  double const* q,
                                  double const* const* transposedFockMatrix,
-                                 std::vector<MoIndexPair> nonRedundantQIndeces,
-                                 std::vector<MoIndexPair> redundantQIndeces,
+                                 const std::vector<MoIndexPair>& nonRedundantQIndeces,
+                                 const std::vector<MoIndexPair>& redundantQIndeces,
                                  int mu, 
                                  int nu) const;
-   void CheckZMatrixForce(std::vector<int> elecStates);
-   void CheckEtaMatrixForce(std::vector<int> elecStates);
-   void CalcZMatrixForce(std::vector<int> elecStates);
-   void CalcEtaMatrixForce(std::vector<int> elecStates);
-   bool RequiresExcitedStatesForce(std::vector<int> elecStates) const;
+   void CheckZMatrixForce(const std::vector<int>& elecStates);
+   void CheckEtaMatrixForce(const std::vector<int>& elecStates);
+   void CalcZMatrixForce(const std::vector<int>& elecStates);
+   void CalcEtaMatrixForce(const std::vector<int>& elecStates);
+   bool RequiresExcitedStatesForce(const std::vector<int>& elecStates) const;
    double GetCISCoefficientMOEnergy(int k, 
                                     int l, 
                                     int r, 
