@@ -917,9 +917,7 @@ void Cndo2::CalcFockMatrix(double** fockMatrix,
                }
                catch(MolDSException ex){
                   #pragma omp critical
-                  {
-                     ompErrors << ex.what() << endl ;
-                  }
+                  ompErrors << ex.what() << endl ;
                }
 
             }
@@ -1122,9 +1120,7 @@ void Cndo2::CalcGammaAB(double** gammaAB, const Molecule& molecule) const{
          }
          catch(MolDSException ex){
             #pragma omp critical
-            {
-               ompErrors << ex.what() << endl ;
-            }
+            ompErrors << ex.what() << endl ;
          }
 
          gammaAB[A][B] = value;
@@ -1189,9 +1185,7 @@ void Cndo2::CalcOverlap(double** overlap, const Molecule& molecule) const{
       catch(MolDSException ex){
          this->FreeDiatomicOverlapAndRotatingMatrix(&diatomicOverlap, &rotatingMatrix);
          #pragma omp critical
-         {
-            ompErrors << ex.what() << endl ;
-         }
+         ompErrors << ex.what() << endl ;
       }
 
       // calculation overlap matrix
@@ -1213,9 +1207,7 @@ void Cndo2::CalcOverlap(double** overlap, const Molecule& molecule) const{
             catch(MolDSException ex){
                this->FreeDiatomicOverlapAndRotatingMatrix(&diatomicOverlap, &rotatingMatrix);
                #pragma omp critical
-               {
-                  ompErrors << ex.what() << endl ;
-               }
+               ompErrors << ex.what() << endl ;
             }
          }
       }
@@ -1369,9 +1361,7 @@ void Cndo2::CalcOverlapByGTOExpansion(double** overlap,
                }
                catch(MolDSException ex){
                   #pragma omp critical
-                  {
-                     ompErrors << ex.what() << endl ;
-                  }
+                  ompErrors << ex.what() << endl ;
                }
 
             }
