@@ -1,0 +1,112 @@
+
+
+     >>>>>  Welcome to the MolDS world at 2011/12/23 18:33:21  <<<<<
+
+
+**********  START: Parse input  **********
+	Total number of atoms: 5
+	Total number of valence AOs: 8
+	Total number of valence electrons: 8
+
+	Molecular configration:
+		| i-th | atom type | x[angst.] | y[angst.] | z[angst.] |
+		0	C	-2.983643e-01	2.576167e+00	0.000000e+00
+		1	H	5.829015e-02	1.567357e+00	0.000000e+00
+		2	H	5.830857e-02	3.080566e+00	8.736515e-01
+		3	H	5.830857e-02	3.080566e+00	-8.736515e-01
+		4	H	-1.368364e+00	2.576181e+00	0.000000e+00
+
+		| i-th | atom type | x[a.u.] | y[a.u.] | z[a.u.] |
+		0	C	-5.638268e-01	4.868251e+00	0.000000e+00
+		1	H	1.101524e-01	2.961876e+00	0.000000e+00
+		2	H	1.101872e-01	5.821426e+00	1.650962e+00
+		3	H	1.101872e-01	5.821426e+00	-1.650962e+00
+		4	H	-2.585834e+00	4.868276e+00	0.000000e+00
+
+	Center of Mass:
+		| x[angst.] | y[angst.] | z[angst.] |
+		-2.983643e-01	2.576167e+00	0.000000e+00
+
+		| x[a.u.] | y[a.u.] | z[a.u.] |
+		-5.638268e-01	4.868251e+00	0.000000e+00
+
+	Center of Core:
+		| x[angst.] | y[angst.] | z[angst.] |
+		-2.983643e-01	2.576167e+00	0.000000e+00
+
+		| x[a.u.] | y[a.u.] | z[a.u.] |
+		-5.638268e-01	4.868251e+00	0.000000e+00
+
+	SCF conditions:
+		Max iterations: 50
+		RMS density: 1.000000e-06
+		Damping threshold: 1.000000e+00
+		Damping weight: 0.000000e+00
+		DIIS number of error vectors: 5
+		DIIS starting error: 1.000000e-01
+		DIIS ending error: 2.000000e-08
+
+Input terms:
+theory | cndo/2 | theory_end | scf | max_iter | 50 | rms_density | 0.000001 | damping_thresh | 1.0 | 
+damping_weight | 0.0 | diis_num_error_vect | 5 | diis_start_error | 0.1 | diis_end_error | 0.00000002 | scf_end | geometry | 
+c | -0.29836427 | 2.57616749 | 0.00000000 | h | 0.05829015 | 1.56735749 | 0.00000000 | h | 0.05830857 | 
+3.08056568 | 0.87365150 | h | 0.05830857 | 3.08056568 | -0.87365150 | h | -1.36836427 | 2.57618068 | 0.00000000 | 
+geometry_end | 
+
+**********  DONE: Parse input  ***********
+
+
+**********  START: CNDO/2-SCF  **********
+SCF iter=0: RMS density=3.999999999999999 
+SCF iter=1: RMS density=0.012446303426798 
+SCF iter=2: RMS density=0.002189639028953 
+SCF iter=3: RMS density=0.000494294559953 
+SCF iter=4: RMS density=0.000137611656595 
+SCF iter=5: RMS density=0.000042009095381 
+SCF iter=6: RMS density=0.000000000044145 
+
+
+
+		CNDO/2-SCF met convergence criterion(^^b
+
+
+	Energies of MOs:
+		| i-th | occ/unocc | e[a.u.] | e[eV] | 
+		 0	occ	-1.288108e+00	-3.505149e+01 
+		 1	occ	-7.302897e-01	-1.987235e+01 
+		 2	occ	-7.302897e-01	-1.987235e+01 
+		 3	occ	-7.302896e-01	-1.987235e+01 
+		 4	unocc	3.215764e-01	8.750609e+00 
+		 5	unocc	3.386043e-01	9.213965e+00 
+		 6	unocc	3.386043e-01	9.213967e+00 
+		 7	unocc	3.386044e-01	9.213968e+00 
+
+	Electronic energy(including core-repulsions):
+		| [a.u.] | [eV] | 
+		-1.010390e+01	-2.749433e+02
+
+	Total core repulsion energy:
+		| [a.u.] | [eV] |
+		9.730053e+00	2.647703e+02
+
+	Mulliken charge on each Atom:
+		| i-th | atom type | core charge | Mulliken charge | 
+		0	C	4.000000e+00	-5.544662e-02
+		1	H	1.000000e+00	1.386164e-02
+		2	H	1.000000e+00	1.386166e-02
+		3	H	1.000000e+00	1.386166e-02
+		4	H	1.000000e+00	1.386166e-02
+
+	Elapsed time(omp) for the SCF = 0.0133381[s].
+**********  DONE: CNDO/2-SCF  **********
+
+
+
+
+     >>>>>  The MolDS finished normally!  <<<<<
+     >>>>>  CPU time: 0[s].  <<<<<
+     >>>>>  Elapsed time: 0[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 0.0154788[s].  <<<<<
+     >>>>>  See you.  <<<<<
+
+
