@@ -214,6 +214,33 @@ system("../src/MolDS.out < ch4_am1.in > temp.dat")
 system("diff ch4_am1.dat temp.dat")
 system("echo '\n\n'")
 
+system("echo '---------------------------------------------------'")
+system("echo '----------  Test of AM1/CIS-singlet       ---------'")
+system("echo '----------  Without Davidson for the CIS  ---------'")
+system("echo '---------------------------------------------------\n'")
+system("echo '\t\t\t>>> CH4 <<<\n'")
+system("echo MPI:no")
+ENV["MKL_NUM_THREADS"] = "1"
+system("echo MKL_NUM_THREADS:")
+system("echo $MKL_NUM_THREADS")
+ENV["OMP_NUM_THREADS"] = "1"
+system("echo OMP_NUM_THREADS:")
+system("echo $OMP_NUM_THREADS")
+system("../src/MolDS.out < ch4_am1_directCIS_singlet.in > temp.dat")
+system("diff ch4_am1_directCIS_singlet.dat temp.dat")
+system("echo '\n\n'")
+
+system("echo MPI:no")
+ENV["MKL_NUM_THREADS"] = "2"
+system("echo MKL_NUM_THREADS:")
+system("echo $MKL_NUM_THREADS")
+ENV["OMP_NUM_THREADS"] = "2"
+system("echo OMP_NUM_THREADS:")
+system("echo $OMP_NUM_THREADS")
+system("../src/MolDS.out < ch4_am1_directCIS_singlet.in > temp.dat")
+system("diff ch4_am1_directCIS_singlet.dat temp.dat")
+system("echo '\n\n'")
+
 system("echo '-------------------------------------------'")
 system("echo '----------   Test of PM3/HF    ------------'")
 system("echo '-------------------------------------------\n'")
