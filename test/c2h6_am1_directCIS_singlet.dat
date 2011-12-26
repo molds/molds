@@ -1,0 +1,206 @@
+
+
+     >>>>>  Welcome to the MolDS world at 2011/12/26 23:32:37  <<<<<
+
+
+**********  START: Parse input  **********
+	Total number of atoms: 8
+	Total number of valence AOs: 14
+	Total number of valence electrons: 14
+
+	Molecular configration:
+		| i-th | atom type | x[angst.] | y[angst.] | z[angst.] |
+		0	C	0.000000e+00	2.000000e-02	0.000000e+00
+		1	C	1.493800e+00	-1.500000e-02	2.000000e-03
+		2	H	-3.500000e-01	1.041100e+00	1.000000e-03
+		3	H	-3.681000e-01	-5.205000e-01	-9.200000e-01
+		4	H	-3.700000e-01	-5.208000e-01	9.016000e-01
+		5	H	1.851900e+00	5.200000e-01	-9.007000e-01
+		6	H	1.830000e+00	5.240000e-01	9.100000e-01
+		7	H	1.860000e+00	-1.040100e+00	0.000000e+00
+
+		| i-th | atom type | x[a.u.] | y[a.u.] | z[a.u.] |
+		0	C	0.000000e+00	3.779452e-02	0.000000e+00
+		1	C	2.822873e+00	-2.834589e-02	3.779452e-03
+		2	H	-6.614042e-01	1.967394e+00	1.889726e-03
+		3	H	-6.956082e-01	-9.836025e-01	-1.738548e+00
+		4	H	-6.991987e-01	-9.841694e-01	1.703777e+00
+		5	H	3.499584e+00	9.826576e-01	-1.702076e+00
+		6	H	3.458199e+00	9.902165e-01	1.719651e+00
+		7	H	3.514891e+00	-1.965504e+00	0.000000e+00
+
+	Center of Mass:
+		| x[angst.] | y[angst.] | z[angst.] |
+		7.459748e-01	2.121214e-03	5.273559e-04
+
+		| x[a.u.] | y[a.u.] | z[a.u.] |
+		1.409688e+00	4.008514e-03	9.965583e-04
+
+	Center of Core:
+		| x[angst.] | y[angst.] | z[angst.] |
+		7.459751e-01	2.121324e-03	5.274925e-04
+
+		| x[a.u.] | y[a.u.] | z[a.u.] |
+		1.409689e+00	4.008721e-03	9.968163e-04
+
+	SCF conditions:
+		Max iterations: 50
+		RMS density: 1.000000e-06
+		Damping threshold: 1.000000e+00
+		Damping weight: 0.000000e+00
+		DIIS number of error vectors: 5
+		DIIS starting error: 1.000000e-01
+		DIIS ending error: 2.000000e-08
+
+	CIS conditions:
+		Number of active Occ.: 7
+		Number of active Vir.: 7
+		Number of excited states: 49
+		CIS-Davidson: no
+
+Input terms:
+theory | am1 | theory_end | scf | max_iter | 50 | rms_density | 0.000001 | damping_thresh | 1.0 | 
+damping_weight | 0.0 | diis_num_error_vect | 5 | diis_start_error | 0.1 | diis_end_error | 0.00000002 | scf_end | cis | 
+davidson | no | active_occ | 7 | active_vir | 7 | nstates | 49 | cis_end | geometry | 
+c | 0.0000 | 0.0200 | 0.0000 | c | 1.4938 | -0.0150 | 0.0020 | h | -0.3500 | 
+1.0411 | 0.0010 | h | -0.3681 | -0.5205 | -0.9200 | h | -0.3700 | -0.5208 | 0.9016 | 
+h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 | 
+-1.0401 | 0.0000 | geometry_end | 
+
+**********  DONE: Parse input  ***********
+
+
+**********  START: AM1-SCF  **********
+SCF iter=0: RMS density=5.291502622129185 
+SCF iter=1: RMS density=2.251392923186925 
+SCF iter=2: RMS density=1.066360223936916 
+SCF iter=3: RMS density=0.485163652173428 
+SCF iter=4: RMS density=0.221525604336854 
+SCF iter=5: RMS density=0.101527699951395 
+SCF iter=6: RMS density=0.000475612652624 
+SCF iter=7: RMS density=0.000114151272325 
+SCF iter=8: RMS density=0.000045086399303 
+SCF iter=9: RMS density=0.000008220727834 
+SCF iter=10: RMS density=0.000002287341939 
+SCF iter=11: RMS density=0.000000372121780 
+
+
+
+		AM1-SCF met convergence criterion(^^b
+
+
+	Energies of MOs:
+		| i-th | occ/unocc | e[a.u.] | e[eV] | 
+		 0	occ	-1.235274e+00	-3.361377e+01 
+		 1	occ	-8.656520e-01	-2.355578e+01 
+		 2	occ	-5.571083e-01	-1.515981e+01 
+		 3	occ	-5.516949e-01	-1.501250e+01 
+		 4	occ	-4.786094e-01	-1.302373e+01 
+		 5	occ	-4.379984e-01	-1.191864e+01 
+		 6	occ	-4.317762e-01	-1.174932e+01 
+		 7	unocc	1.524681e-01	4.148902e+00 
+		 8	unocc	1.566514e-01	4.262735e+00 
+		 9	unocc	1.686440e-01	4.589074e+00 
+		 10	unocc	1.840913e-01	5.009419e+00 
+		 11	unocc	1.861132e-01	5.064438e+00 
+		 12	unocc	1.890156e-01	5.143418e+00 
+		 13	unocc	1.950753e-01	5.308311e+00 
+
+	Electronic energy(including core-repulsions):
+		| [a.u.] | [eV] | 
+		-1.246035e+01	-3.390661e+02
+
+	Total core repulsion energy:
+		| [a.u.] | [eV] |
+		2.193282e+01	5.968271e+02
+
+	Mulliken charge on each Atom:
+		| i-th | atom type | core charge | Mulliken charge | 
+		0	C	4.000000e+00	-2.164414e-01
+		1	C	4.000000e+00	-2.148205e-01
+		2	H	1.000000e+00	7.497916e-02
+		3	H	1.000000e+00	6.945058e-02
+		4	H	1.000000e+00	7.030679e-02
+		5	H	1.000000e+00	7.042860e-02
+		6	H	1.000000e+00	7.029841e-02
+		7	H	1.000000e+00	7.579838e-02
+
+	Elapsed time(omp) for the SCF = 0.124906[s].
+**********  DONE: AM1-SCF  **********
+
+
+**********  START: AM1-CIS  **********
+----------- START: Calculation of the CIS matrix -----------
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.07763[s].
+----------- DONE: Calculation of the CIS matrix -----------
+
+	======  START: Direct-CIS  =====
+
+	======  DONE: Direct-CIS  =====
+
+
+	Excitation energies:
+		| i-th | e[a.u.] | e[eV] | 
+		 1	2.909283e-01	7.916626e+00
+		 2	3.076108e-01	8.370584e+00
+		 3	3.114695e-01	8.475583e+00
+		 4	3.126553e-01	8.507851e+00
+		 5	3.179032e-01	8.650657e+00
+		 6	3.183353e-01	8.662413e+00
+		 7	3.240411e-01	8.817677e+00
+		 8	3.258242e-01	8.866198e+00
+		 9	3.279776e-01	8.924797e+00
+		 10	3.316427e-01	9.024530e+00
+		 11	3.426897e-01	9.325136e+00
+		 12	3.447306e-01	9.380671e+00
+		 13	3.472213e-01	9.448448e+00
+		 14	3.617882e-01	9.844837e+00
+		 15	3.643282e-01	9.913954e+00
+		 16	3.679829e-01	1.001340e+01
+		 17	3.757887e-01	1.022581e+01
+		 18	3.784486e-01	1.029819e+01
+		 19	3.823110e-01	1.040330e+01
+		 20	3.928235e-01	1.068936e+01
+		 21	4.089603e-01	1.112847e+01
+		 22	4.275107e-01	1.163325e+01
+		 23	4.326333e-01	1.177264e+01
+		 24	4.607692e-01	1.253827e+01
+		 25	4.644988e-01	1.263976e+01
+		 26	4.663033e-01	1.268886e+01
+		 27	4.715120e-01	1.283060e+01
+		 28	4.831793e-01	1.314808e+01
+		 29	4.870592e-01	1.325366e+01
+		 30	4.898235e-01	1.332888e+01
+		 31	4.946726e-01	1.346083e+01
+		 32	4.949308e-01	1.346786e+01
+		 33	5.002977e-01	1.361390e+01
+		 34	5.062212e-01	1.377509e+01
+		 35	5.094215e-01	1.386218e+01
+		 36	7.535734e-01	2.050594e+01
+		 37	7.563252e-01	2.058082e+01
+		 38	7.649021e-01	2.081421e+01
+		 39	7.833067e-01	2.131503e+01
+		 40	7.868528e-01	2.141153e+01
+		 41	7.887881e-01	2.146419e+01
+		 42	8.042386e-01	2.188462e+01
+		 43	1.073255e+00	2.920498e+01
+		 44	1.118295e+00	3.043061e+01
+		 45	1.122720e+00	3.055101e+01
+		 46	1.142700e+00	3.109470e+01
+		 47	1.147489e+00	3.122501e+01
+		 48	1.151917e+00	3.134550e+01
+		 49	1.166002e+00	3.172878e+01
+
+	Elapsed time(omp) for the CIS = 0.080117[s].
+**********  DONE: AM1-CIS  **********
+
+
+
+
+     >>>>>  The MolDS finished normally!  <<<<<
+     >>>>>  CPU time: 0.21[s].  <<<<<
+     >>>>>  Elapsed time: 0[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 0.225285[s].  <<<<<
+     >>>>>  See you.  <<<<<
+
+
