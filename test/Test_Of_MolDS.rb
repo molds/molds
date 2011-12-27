@@ -34,7 +34,7 @@ system("echo '***                                   ***'")
 system("echo '***                                   ***'")
 system("echo '***       Start Test for MolDS        ***'")
 system("echo '***                                   ***'")
-system("echo '***                power by ruby      ***'")
+system("echo '***                    Power by Ruby  ***'")
 system("echo '*****************************************\n\n'")
 
 testerOmp = TesterOmp.new
@@ -44,6 +44,45 @@ system("echo '----------   Test of CNDO2/HF     ---------'")
 system("echo '-------------------------------------------\n'")
 system("echo '\t\t\t>>> CH4 <<<\n'")
 prefix = "ch4_cndo2"
+mklNumThreads = "1"
+ompNumThreads = "1"
+testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
+mklNumThreads = "2"
+ompNumThreads = "2"
+testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
+
+system("echo '\t\t\t>>> C2H6 <<<\n'")
+prefix = "c2h6_cndo2"
+mklNumThreads = "1"
+ompNumThreads = "1"
+testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
+mklNumThreads = "2"
+ompNumThreads = "2"
+testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
+
+system("echo '\t\t\t>>> H2S <<<\n'")
+prefix = "h2s_cndo2"
+mklNumThreads = "1"
+ompNumThreads = "1"
+testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
+mklNumThreads = "2"
+ompNumThreads = "2"
+testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
+
+system("echo '-------------------------------------------'")
+system("echo '----------   Test of INDO/HF    -----------'")
+system("echo '-------------------------------------------\n'")
+system("echo '\t\t\t>>> CH4 <<<\n'")
+prefix = "ch4_indo"
+mklNumThreads = "1"
+ompNumThreads = "1"
+testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
+mklNumThreads = "2"
+ompNumThreads = "2"
+testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
+
+system("echo '\t\t\t>>> C2H6 <<<\n'")
+prefix = "c2h6_indo"
 mklNumThreads = "1"
 ompNumThreads = "1"
 testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
@@ -66,6 +105,24 @@ testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
 
 system("echo '\t\t\t>>> C2H6 <<<\n'")
 prefix = "c2h6_zindos_directCIS_singlet"
+mklNumThreads = "1"
+ompNumThreads = "1"
+testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
+mklNumThreads = "2"
+ompNumThreads = "2"
+testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
+
+system("echo '\t\t\t>>> H2S <<<\n'")
+prefix = "h2s_zindos_directCIS_singlet"
+mklNumThreads = "1"
+ompNumThreads = "1"
+testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
+mklNumThreads = "2"
+ompNumThreads = "2"
+testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
+
+system("echo '\t\t\t>>> H2O <<<\n'")
+prefix = "h2o_zindos_directCIS_singlet"
 mklNumThreads = "1"
 ompNumThreads = "1"
 testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)

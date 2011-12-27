@@ -1,0 +1,135 @@
+
+
+     >>>>>  Welcome to the MolDS world at 2011/12/27 21:05:27  <<<<<
+
+
+**********  START: Parse input  **********
+	Total number of atoms: 3
+	Total number of valence AOs: 6
+	Total number of valence electrons: 8
+
+	Molecular configration:
+		| i-th | atom type | x[angst.] | y[angst.] | z[angst.] |
+		0	O	8.692720e-01	7.600000e-01	2.010900e-02
+		1	H	1.829272e+00	7.679310e-01	2.510900e-02
+		2	H	5.488180e-01	1.672867e+00	1.510900e-02
+
+		| i-th | atom type | x[a.u.] | y[a.u.] | z[a.u.] |
+		0	O	1.642686e+00	1.436192e+00	3.800050e-02
+		1	H	3.456823e+00	1.451179e+00	4.744913e-02
+		2	H	1.037116e+00	3.161261e+00	2.855187e-02
+
+	Center of Mass:
+		| x[angst.] | y[angst.] | z[angst.] |
+		9.050541e-01	8.115179e-01	2.010900e-02
+
+		| x[a.u.] | y[a.u.] | z[a.u.] |
+		1.710304e+00	1.533547e+00	3.800050e-02
+
+	Center of Core:
+		| x[angst.] | y[angst.] | z[angst.] |
+		9.050433e-01	8.115024e-01	2.010900e-02
+
+		| x[a.u.] | y[a.u.] | z[a.u.] |
+		1.710284e+00	1.533517e+00	3.800050e-02
+
+	SCF conditions:
+		Max iterations: 50
+		RMS density: 1.000000e-06
+		Damping threshold: 1.000000e+00
+		Damping weight: 0.000000e+00
+		DIIS number of error vectors: 5
+		DIIS starting error: 1.000000e-01
+		DIIS ending error: 2.000000e-08
+
+	CIS conditions:
+		Number of active Occ.: 4
+		Number of active Vir.: 2
+		Number of excited states: 8
+		CIS-Davidson: no
+
+Input terms:
+theory | zindo/s | theory_end | scf | max_iter | 50 | rms_density | 0.000001 | damping_thresh | 1.0 | 
+damping_weight | 0.0 | diis_num_error_vect | 5 | diis_start_error | 0.1 | diis_end_error | 0.00000002 | scf_end | cis | 
+davidson | no | active_occ | 4 | active_vir | 2 | nstates | 8 | cis_end | geometry | 
+o | 0.869272 | 0.760000 | 0.020109 | h | 1.829272 | 0.767931 | 0.025109 | h | 0.548818 | 
+1.672867 | 0.015109 | geometry_end | 
+
+**********  DONE: Parse input  ***********
+
+
+**********  START: ZINDO/S-SCF  **********
+SCF iter=0: RMS density=4.000000000000000 
+SCF iter=1: RMS density=1.820469685866096 
+SCF iter=2: RMS density=0.051730180818298 
+SCF iter=3: RMS density=0.009085352363057 
+SCF iter=4: RMS density=0.001684274045779 
+SCF iter=5: RMS density=0.000313126337605 
+SCF iter=6: RMS density=0.000000632747141 
+
+
+
+		ZINDO/S-SCF met convergence criterion(^^b
+
+
+	Energies of MOs:
+		| i-th | occ/unocc | e[a.u.] | e[eV] | 
+		 0	occ	-1.497693e+00	-4.075463e+01 
+		 1	occ	-7.599206e-01	-2.067866e+01 
+		 2	occ	-5.640827e-01	-1.534959e+01 
+		 3	occ	-5.072245e-01	-1.380239e+01 
+		 4	unocc	2.129374e-01	5.794368e+00 
+		 5	unocc	2.810235e-01	7.647101e+00 
+
+	Electronic energy(including core-repulsions):
+		| [a.u.] | [eV] | 
+		-1.045092e+01	-2.843863e+02
+
+	Total core repulsion energy:
+		| [a.u.] | [eV] |
+		6.926433e+00	1.884793e+02
+
+	Mulliken charge on each Atom:
+		| i-th | atom type | core charge | Mulliken charge | 
+		0	O	6.000000e+00	-5.134878e-01
+		1	H	1.000000e+00	2.567713e-01
+		2	H	1.000000e+00	2.567165e-01
+
+	Elapsed time(omp) for the SCF = 0.012166[s].
+**********  DONE: ZINDO/S-SCF  **********
+
+
+**********  START: ZINDO/S-CIS  **********
+----------- START: Calculation of the CIS matrix -----------
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.00026989[s].
+----------- DONE: Calculation of the CIS matrix -----------
+
+	======  START: Direct-CIS  =====
+
+	======  DONE: Direct-CIS  =====
+
+
+	Excitation energies:
+		| i-th | e[a.u.] | e[eV] | 
+		 1	4.335909e-01	1.179870e+01
+		 2	4.671370e-01	1.271155e+01
+		 3	5.048253e-01	1.373711e+01
+		 4	5.496728e-01	1.495748e+01
+		 5	7.315911e-01	1.990777e+01
+		 6	8.383193e-01	2.281201e+01
+		 7	1.512905e+00	4.116856e+01
+		 8	1.558999e+00	4.242287e+01
+
+	Elapsed time(omp) for the CIS = 0.000387907[s].
+**********  DONE: ZINDO/S-CIS  **********
+
+
+
+
+     >>>>>  The MolDS finished normally!  <<<<<
+     >>>>>  CPU time: 0.02[s].  <<<<<
+     >>>>>  Elapsed time: 0[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 0.0151169[s].  <<<<<
+     >>>>>  See you.  <<<<<
+
+
