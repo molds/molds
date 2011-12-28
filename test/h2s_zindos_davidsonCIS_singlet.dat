@@ -1,0 +1,169 @@
+
+
+     >>>>>  Welcome to the MolDS world at 2011/12/28 17:36:33  <<<<<
+
+
+**********  START: Parse input  **********
+	Total number of atoms: 3
+	Total number of valence AOs: 6
+	Total number of valence electrons: 8
+
+	Molecular configration:
+		| i-th | atom type | x[angst.] | y[angst.] | z[angst.] |
+		0	S	-5.592990e-01	4.716980e-01	3.000000e-01
+		1	H	7.507010e-01	4.716980e-01	0.000000e+00
+		2	H	-9.965860e-01	1.706558e+00	-2.000000e-01
+
+		| i-th | atom type | x[a.u.] | y[a.u.] | z[a.u.] |
+		0	S	-1.056922e+00	8.913801e-01	5.669178e-01
+		1	H	1.418619e+00	8.913801e-01	0.000000e+00
+		2	H	-1.883275e+00	3.224927e+00	-3.779452e-01
+
+	Center of Mass:
+		| x[angst.] | y[angst.] | z[angst.] |
+		-5.334893e-01	5.082178e-01	2.763407e-01
+
+		| x[a.u.] | y[a.u.] | z[a.u.] |
+		-1.008149e+00	9.603925e-01	5.222083e-01
+
+	Center of Core:
+		| x[angst.] | y[angst.] | z[angst.] |
+		-5.335000e-01	5.082027e-01	2.763506e-01
+
+		| x[a.u.] | y[a.u.] | z[a.u.] |
+		-1.008169e+00	9.603639e-01	5.222269e-01
+
+	SCF conditions:
+		Max iterations: 50
+		RMS density: 1.000000e-06
+		Damping threshold: 1.000000e+00
+		Damping weight: 0.000000e+00
+		DIIS number of error vectors: 5
+		DIIS starting error: 1.000000e-01
+		DIIS ending error: 2.000000e-08
+
+	CIS conditions:
+		Number of active Occ.: 4
+		Number of active Vir.: 2
+		Number of excited states: 3
+		CIS-Davidson: yes
+		Max iterations for the Davidson: 200
+		Max dimensions for the Davidson: 8
+		Norm tolerance for the residual of the Davidson: 1.000000e-06
+
+Input terms:
+theory | zindo/s | theory_end | scf | max_iter | 50 | rms_density | 0.000001 | damping_thresh | 1.0 | 
+damping_weight | 0.0 | diis_num_error_vect | 5 | diis_start_error | 0.1 | diis_end_error | 0.00000002 | scf_end | cis | 
+davidson | yes | active_occ | 4 | active_vir | 2 | nstates | 3 | max_iter | 200 | 
+max_dim | 8 | norm_tol | 0.000001 | cis_end | geometry | s | -0.559299 | 0.471698 | 0.300000 | 
+h | 0.750701 | 0.471698 | 0.000000 | h | -0.996586 | 1.706558 | -0.200000 | geometry_end | 
+
+**********  DONE: Parse input  ***********
+
+
+**********  START: ZINDO/S-SCF  **********
+SCF iter=0: RMS density=3.999999999999999 
+SCF iter=1: RMS density=2.126608910317606 
+SCF iter=2: RMS density=0.063303954643740 
+SCF iter=3: RMS density=0.015492656584703 
+SCF iter=4: RMS density=0.005342799501634 
+SCF iter=5: RMS density=0.002043833050586 
+SCF iter=6: RMS density=0.000014110093365 
+SCF iter=7: RMS density=0.000001630559935 
+SCF iter=8: RMS density=0.000000521835813 
+
+
+
+		ZINDO/S-SCF met convergence criterion(^^b
+
+
+	Energies of MOs:
+		| i-th | occ/unocc | e[a.u.] | e[eV] | 
+		 0	occ	-9.187313e-01	-2.500015e+01 
+		 1	occ	-5.977392e-01	-1.626544e+01 
+		 2	occ	-4.897074e-01	-1.332572e+01 
+		 3	occ	-4.101380e-01	-1.116051e+01 
+		 4	unocc	7.255326e-02	1.974290e+00 
+		 5	unocc	1.038491e-01	2.825901e+00 
+
+	Electronic energy(including core-repulsions):
+		| [a.u.] | [eV] | 
+		-7.751809e+00	-2.109391e+02
+
+	Total core repulsion energy:
+		| [a.u.] | [eV] |
+		4.873186e+00	1.326072e+02
+
+	Mulliken charge on each Atom:
+		| i-th | atom type | core charge | Mulliken charge | 
+		0	S	6.000000e+00	-2.872872e-01
+		1	H	1.000000e+00	1.436080e-01
+		2	H	1.000000e+00	1.436792e-01
+
+	Elapsed time(omp) for the SCF = 0.012856[s].
+**********  DONE: ZINDO/S-SCF  **********
+
+
+**********  START: ZINDO/S-CIS  **********
+----------- START: Calculation of the CIS matrix -----------
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.000282049[s].
+----------- DONE: Calculation of the CIS matrix -----------
+
+	======  START: Davidson-CIS  =====
+	Davidson iter=0
+	  1-th excited: norm of the residual = 8.2848e-17
+	  2-th excited: norm of the residual = 5.93463e-17
+	  3-th excited: norm of the residual = 0.0575385
+
+	Davidson iter=1
+	  1-th excited: norm of the residual = 6.63689e-17
+	  2-th excited: norm of the residual = 4.19002e-17
+	  3-th excited: norm of the residual = 0.0011789
+
+	Davidson iter=2
+	  1-th excited: norm of the residual = 5.98139e-17
+	  2-th excited: norm of the residual = 4.3585e-17
+	  3-th excited: norm of the residual = 0.000244138
+
+	Davidson iter=3
+	  1-th excited: norm of the residual = 7.42953e-17
+	  2-th excited: norm of the residual = 1.4074e-16
+	  3-th excited: norm of the residual = 7.738e-05
+
+	Davidson iter=4
+	  1-th excited: norm of the residual = 5.54827e-17
+	  2-th excited: norm of the residual = 1.27397e-16
+	  3-th excited: norm of the residual = 1.92091e-06
+
+	Davidson iter=5
+	  1-th excited: norm of the residual = 3.49218e-17
+	  2-th excited: norm of the residual = 2.19551e-17
+	  3-th excited: norm of the residual = 3.70687e-17
+
+
+
+		Davidson for ZINDO/S-CIS met convergence criterion(^^b
+
+
+	======  DONE: Davidson-CIS  =====
+
+
+	Excitation energies:
+		| i-th | e[a.u.] | e[eV] | 
+		 1	2.448437e-01	6.662589e+00
+		 2	2.730712e-01	7.430705e+00
+		 3	3.424713e-01	9.319192e+00
+
+	Elapsed time(omp) for the CIS = 0.00138283[s].
+**********  DONE: ZINDO/S-CIS  **********
+
+
+
+
+     >>>>>  The MolDS finished normally!  <<<<<
+     >>>>>  CPU time: 0.01[s].  <<<<<
+     >>>>>  Elapsed time: 0[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 0.0163651[s].  <<<<<
+     >>>>>  See you.  <<<<<
+
+

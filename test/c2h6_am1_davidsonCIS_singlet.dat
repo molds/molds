@@ -1,0 +1,240 @@
+
+
+     >>>>>  Welcome to the MolDS world at 2011/12/28 18:02:38  <<<<<
+
+
+**********  START: Parse input  **********
+	Total number of atoms: 8
+	Total number of valence AOs: 14
+	Total number of valence electrons: 14
+
+	Molecular configration:
+		| i-th | atom type | x[angst.] | y[angst.] | z[angst.] |
+		0	C	0.000000e+00	2.000000e-02	0.000000e+00
+		1	C	1.493800e+00	-1.500000e-02	2.000000e-03
+		2	H	-3.500000e-01	1.041100e+00	1.000000e-03
+		3	H	-3.681000e-01	-5.205000e-01	-9.200000e-01
+		4	H	-3.700000e-01	-5.208000e-01	9.016000e-01
+		5	H	1.851900e+00	5.200000e-01	-9.007000e-01
+		6	H	1.830000e+00	5.240000e-01	9.100000e-01
+		7	H	1.860000e+00	-1.040100e+00	0.000000e+00
+
+		| i-th | atom type | x[a.u.] | y[a.u.] | z[a.u.] |
+		0	C	0.000000e+00	3.779452e-02	0.000000e+00
+		1	C	2.822873e+00	-2.834589e-02	3.779452e-03
+		2	H	-6.614042e-01	1.967394e+00	1.889726e-03
+		3	H	-6.956082e-01	-9.836025e-01	-1.738548e+00
+		4	H	-6.991987e-01	-9.841694e-01	1.703777e+00
+		5	H	3.499584e+00	9.826576e-01	-1.702076e+00
+		6	H	3.458199e+00	9.902165e-01	1.719651e+00
+		7	H	3.514891e+00	-1.965504e+00	0.000000e+00
+
+	Center of Mass:
+		| x[angst.] | y[angst.] | z[angst.] |
+		7.459748e-01	2.121214e-03	5.273559e-04
+
+		| x[a.u.] | y[a.u.] | z[a.u.] |
+		1.409688e+00	4.008514e-03	9.965583e-04
+
+	Center of Core:
+		| x[angst.] | y[angst.] | z[angst.] |
+		7.459751e-01	2.121324e-03	5.274925e-04
+
+		| x[a.u.] | y[a.u.] | z[a.u.] |
+		1.409689e+00	4.008721e-03	9.968163e-04
+
+	SCF conditions:
+		Max iterations: 50
+		RMS density: 1.000000e-06
+		Damping threshold: 1.000000e+00
+		Damping weight: 0.000000e+00
+		DIIS number of error vectors: 5
+		DIIS starting error: 1.000000e-01
+		DIIS ending error: 2.000000e-08
+
+	CIS conditions:
+		Number of active Occ.: 7
+		Number of active Vir.: 7
+		Number of excited states: 4
+		CIS-Davidson: yes
+		Max iterations for the Davidson: 200
+		Max dimensions for the Davidson: 49
+		Norm tolerance for the residual of the Davidson: 1.000000e-06
+
+Input terms:
+theory | am1 | theory_end | scf | max_iter | 50 | rms_density | 0.000001 | damping_thresh | 1.0 | 
+damping_weight | 0.0 | diis_num_error_vect | 5 | diis_start_error | 0.1 | diis_end_error | 0.00000002 | scf_end | cis | 
+davidson | yes | active_occ | 7 | active_vir | 7 | nstates | 4 | max_iter | 200 | 
+max_dim | 49 | norm_tol | 0.000001 | cis_end | geometry | c | 0.0000 | 0.0200 | 0.0000 | 
+c | 1.4938 | -0.0150 | 0.0020 | h | -0.3500 | 1.0411 | 0.0010 | h | -0.3681 | 
+-0.5205 | -0.9200 | h | -0.3700 | -0.5208 | 0.9016 | h | 1.8519 | 0.5200 | -0.9007 | 
+h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 | -1.0401 | 0.0000 | geometry_end | 
+
+**********  DONE: Parse input  ***********
+
+
+**********  START: AM1-SCF  **********
+SCF iter=0: RMS density=5.291502622129178 
+SCF iter=1: RMS density=2.251392923186922 
+SCF iter=2: RMS density=1.066360223936913 
+SCF iter=3: RMS density=0.485163652173431 
+SCF iter=4: RMS density=0.221525604336855 
+SCF iter=5: RMS density=0.101527699951394 
+SCF iter=6: RMS density=0.000475612652614 
+SCF iter=7: RMS density=0.000114151272532 
+SCF iter=8: RMS density=0.000045086399356 
+SCF iter=9: RMS density=0.000008220727852 
+SCF iter=10: RMS density=0.000002287341920 
+SCF iter=11: RMS density=0.000000372121783 
+
+
+
+		AM1-SCF met convergence criterion(^^b
+
+
+	Energies of MOs:
+		| i-th | occ/unocc | e[a.u.] | e[eV] | 
+		 0	occ	-1.235274e+00	-3.361377e+01 
+		 1	occ	-8.656520e-01	-2.355578e+01 
+		 2	occ	-5.571083e-01	-1.515981e+01 
+		 3	occ	-5.516949e-01	-1.501250e+01 
+		 4	occ	-4.786094e-01	-1.302373e+01 
+		 5	occ	-4.379984e-01	-1.191864e+01 
+		 6	occ	-4.317762e-01	-1.174932e+01 
+		 7	unocc	1.524681e-01	4.148902e+00 
+		 8	unocc	1.566514e-01	4.262735e+00 
+		 9	unocc	1.686440e-01	4.589074e+00 
+		 10	unocc	1.840913e-01	5.009419e+00 
+		 11	unocc	1.861132e-01	5.064438e+00 
+		 12	unocc	1.890156e-01	5.143418e+00 
+		 13	unocc	1.950753e-01	5.308311e+00 
+
+	Electronic energy(including core-repulsions):
+		| [a.u.] | [eV] | 
+		-1.246035e+01	-3.390661e+02
+
+	Total core repulsion energy:
+		| [a.u.] | [eV] |
+		2.193282e+01	5.968271e+02
+
+	Mulliken charge on each Atom:
+		| i-th | atom type | core charge | Mulliken charge | 
+		0	C	4.000000e+00	-2.164414e-01
+		1	C	4.000000e+00	-2.148205e-01
+		2	H	1.000000e+00	7.497916e-02
+		3	H	1.000000e+00	6.945058e-02
+		4	H	1.000000e+00	7.030679e-02
+		5	H	1.000000e+00	7.042860e-02
+		6	H	1.000000e+00	7.029841e-02
+		7	H	1.000000e+00	7.579838e-02
+
+	Elapsed time(omp) for the SCF = 0.053879[s].
+**********  DONE: AM1-SCF  **********
+
+
+**********  START: AM1-CIS  **********
+----------- START: Calculation of the CIS matrix -----------
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.055769[s].
+----------- DONE: Calculation of the CIS matrix -----------
+
+	======  START: Davidson-CIS  =====
+	Davidson iter=0
+	  1-th excited: norm of the residual = 0.0728378
+	  2-th excited: norm of the residual = 0.0416523
+	  3-th excited: norm of the residual = 0.0428708
+	  4-th excited: norm of the residual = 0.0520726
+
+	Davidson iter=1
+	  1-th excited: norm of the residual = 0.0229801
+	  2-th excited: norm of the residual = 0.0274605
+	  3-th excited: norm of the residual = 0.032779
+	  4-th excited: norm of the residual = 0.0545607
+
+	Davidson iter=2
+	  1-th excited: norm of the residual = 0.00525131
+	  2-th excited: norm of the residual = 0.0203323
+	  3-th excited: norm of the residual = 0.0205904
+	  4-th excited: norm of the residual = 0.0129594
+
+	Davidson iter=3
+	  1-th excited: norm of the residual = 0.00239178
+	  2-th excited: norm of the residual = 0.00939853
+	  3-th excited: norm of the residual = 0.0150366
+	  4-th excited: norm of the residual = 0.0127669
+
+	Davidson iter=4
+	  1-th excited: norm of the residual = 0.000734699
+	  2-th excited: norm of the residual = 0.00291876
+	  3-th excited: norm of the residual = 0.00803302
+	  4-th excited: norm of the residual = 0.00459575
+
+	Davidson iter=5
+	  1-th excited: norm of the residual = 0.000192212
+	  2-th excited: norm of the residual = 0.0024442
+	  3-th excited: norm of the residual = 0.00299628
+	  4-th excited: norm of the residual = 0.00365582
+
+	Davidson iter=6
+	  1-th excited: norm of the residual = 5.99631e-05
+	  2-th excited: norm of the residual = 0.00151372
+	  3-th excited: norm of the residual = 0.00137429
+	  4-th excited: norm of the residual = 0.0136229
+
+	Davidson iter=7
+	  1-th excited: norm of the residual = 2.50431e-05
+	  2-th excited: norm of the residual = 0.000929263
+	  3-th excited: norm of the residual = 0.000466912
+	  4-th excited: norm of the residual = 0.00383575
+
+	Davidson iter=8
+	  1-th excited: norm of the residual = 4.14873e-06
+	  2-th excited: norm of the residual = 0.000123915
+	  3-th excited: norm of the residual = 7.63119e-05
+	  4-th excited: norm of the residual = 0.000568239
+
+	Davidson iter=9
+	  1-th excited: norm of the residual = 3.98903e-07
+	  2-th excited: norm of the residual = 1.13943e-05
+	  3-th excited: norm of the residual = 1.20538e-05
+	  4-th excited: norm of the residual = 7.077e-05
+
+	Davidson iter=10
+	  1-th excited: norm of the residual = 8.27526e-08
+	  2-th excited: norm of the residual = 1.36275e-06
+	  3-th excited: norm of the residual = 6.6542e-07
+	  4-th excited: norm of the residual = 5.74631e-06
+
+	Davidson iter=11
+	  1-th excited: norm of the residual = 7.13171e-08
+	  2-th excited: norm of the residual = 2.45283e-08
+	  3-th excited: norm of the residual = 6.32279e-08
+	  4-th excited: norm of the residual = 2.72851e-07
+
+
+
+		Davidson for AM1-CIS met convergence criterion(^^b
+
+
+	======  DONE: Davidson-CIS  =====
+
+
+	Excitation energies:
+		| i-th | e[a.u.] | e[eV] | 
+		 1	2.909283e-01	7.916626e+00
+		 2	3.076108e-01	8.370584e+00
+		 3	3.114695e-01	8.475583e+00
+		 4	3.126553e-01	8.507851e+00
+
+	Elapsed time(omp) for the CIS = 0.238969[s].
+**********  DONE: AM1-CIS  **********
+
+
+
+
+     >>>>>  The MolDS finished normally!  <<<<<
+     >>>>>  CPU time: 0.29[s].  <<<<<
+     >>>>>  Elapsed time: 0[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 0.299825[s].  <<<<<
+     >>>>>  See you.  <<<<<
+
+

@@ -1,0 +1,244 @@
+
+
+     >>>>>  Welcome to the MolDS world at 2011/12/28 17:58:01  <<<<<
+
+
+**********  START: Parse input  **********
+	Total number of atoms: 8
+	Total number of valence AOs: 14
+	Total number of valence electrons: 14
+
+	Molecular configration:
+		| i-th | atom type | x[angst.] | y[angst.] | z[angst.] |
+		0	C	0.000000e+00	2.000000e-02	0.000000e+00
+		1	C	1.493800e+00	-1.500000e-02	2.000000e-03
+		2	H	-3.500000e-01	1.041100e+00	1.000000e-03
+		3	H	-3.681000e-01	-5.205000e-01	-9.200000e-01
+		4	H	-3.700000e-01	-5.208000e-01	9.016000e-01
+		5	H	1.851900e+00	5.200000e-01	-9.007000e-01
+		6	H	1.830000e+00	5.240000e-01	9.100000e-01
+		7	H	1.860000e+00	-1.040100e+00	0.000000e+00
+
+		| i-th | atom type | x[a.u.] | y[a.u.] | z[a.u.] |
+		0	C	0.000000e+00	3.779452e-02	0.000000e+00
+		1	C	2.822873e+00	-2.834589e-02	3.779452e-03
+		2	H	-6.614042e-01	1.967394e+00	1.889726e-03
+		3	H	-6.956082e-01	-9.836025e-01	-1.738548e+00
+		4	H	-6.991987e-01	-9.841694e-01	1.703777e+00
+		5	H	3.499584e+00	9.826576e-01	-1.702076e+00
+		6	H	3.458199e+00	9.902165e-01	1.719651e+00
+		7	H	3.514891e+00	-1.965504e+00	0.000000e+00
+
+	Center of Mass:
+		| x[angst.] | y[angst.] | z[angst.] |
+		7.459748e-01	2.121214e-03	5.273559e-04
+
+		| x[a.u.] | y[a.u.] | z[a.u.] |
+		1.409688e+00	4.008514e-03	9.965583e-04
+
+	Center of Core:
+		| x[angst.] | y[angst.] | z[angst.] |
+		7.459751e-01	2.121324e-03	5.274925e-04
+
+		| x[a.u.] | y[a.u.] | z[a.u.] |
+		1.409689e+00	4.008721e-03	9.968163e-04
+
+	SCF conditions:
+		Max iterations: 50
+		RMS density: 1.000000e-06
+		Damping threshold: 1.000000e+00
+		Damping weight: 0.000000e+00
+		DIIS number of error vectors: 5
+		DIIS starting error: 1.000000e-01
+		DIIS ending error: 2.000000e-08
+
+	CIS conditions:
+		Number of active Occ.: 7
+		Number of active Vir.: 7
+		Number of excited states: 4
+		CIS-Davidson: yes
+		Max iterations for the Davidson: 200
+		Max dimensions for the Davidson: 49
+		Norm tolerance for the residual of the Davidson: 1.000000e-06
+
+Input terms:
+theory | mndo | theory_end | scf | max_iter | 50 | rms_density | 0.000001 | damping_thresh | 1.0 | 
+damping_weight | 0.0 | diis_num_error_vect | 5 | diis_start_error | 0.1 | diis_end_error | 0.00000002 | scf_end | cis | 
+davidson | yes | active_occ | 7 | active_vir | 7 | nstates | 4 | max_iter | 200 | 
+max_dim | 49 | norm_tol | 0.000001 | cis_end | geometry | c | 0.0000 | 0.0200 | 0.0000 | 
+c | 1.4938 | -0.0150 | 0.0020 | h | -0.3500 | 1.0411 | 0.0010 | h | -0.3681 | 
+-0.5205 | -0.9200 | h | -0.3700 | -0.5208 | 0.9016 | h | 1.8519 | 0.5200 | -0.9007 | 
+h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 | -1.0401 | 0.0000 | geometry_end | 
+
+**********  DONE: Parse input  ***********
+
+
+**********  START: MNDO-SCF  **********
+SCF iter=0: RMS density=5.291502622129181 
+SCF iter=1: RMS density=2.406832383581161 
+SCF iter=2: RMS density=1.097693927705069 
+SCF iter=3: RMS density=0.485996526273502 
+SCF iter=4: RMS density=0.217393982341887 
+SCF iter=5: RMS density=0.097852276195715 
+SCF iter=6: RMS density=0.000404257452988 
+SCF iter=7: RMS density=0.000094990567886 
+SCF iter=8: RMS density=0.000036084327847 
+SCF iter=9: RMS density=0.000007701726064 
+SCF iter=10: RMS density=0.000002052101653 
+SCF iter=11: RMS density=0.000000358204693 
+
+
+
+		MNDO-SCF met convergence criterion(^^b
+
+
+	Energies of MOs:
+		| i-th | occ/unocc | e[a.u.] | e[eV] | 
+		 0	occ	-1.315630e+00	-3.580039e+01 
+		 1	occ	-9.012457e-01	-2.452434e+01 
+		 2	occ	-5.665114e-01	-1.541568e+01 
+		 3	occ	-5.600986e-01	-1.524118e+01 
+		 4	occ	-4.863006e-01	-1.323302e+01 
+		 5	occ	-4.692400e-01	-1.276877e+01 
+		 6	occ	-4.631584e-01	-1.260328e+01 
+		 7	unocc	1.376577e-01	3.745886e+00 
+		 8	unocc	1.425368e-01	3.878653e+00 
+		 9	unocc	1.581580e-01	4.303733e+00 
+		 10	unocc	1.722613e-01	4.687506e+00 
+		 11	unocc	1.780243e-01	4.844326e+00 
+		 12	unocc	2.129567e-01	5.794893e+00 
+		 13	unocc	2.198782e-01	5.983238e+00 
+
+	Electronic energy(including core-repulsions):
+		| [a.u.] | [eV] | 
+		-1.255203e+01	-3.415609e+02
+
+	Total core repulsion energy:
+		| [a.u.] | [eV] |
+		2.207380e+01	6.006635e+02
+
+	Mulliken charge on each Atom:
+		| i-th | atom type | core charge | Mulliken charge | 
+		0	C	4.000000e+00	1.051263e-02
+		1	C	4.000000e+00	1.158935e-02
+		2	H	1.000000e+00	9.430652e-04
+		3	H	1.000000e+00	-7.290803e-03
+		4	H	1.000000e+00	-5.763001e-03
+		5	H	1.000000e+00	-5.527947e-03
+		6	H	1.000000e+00	-5.927617e-03
+		7	H	1.000000e+00	1.464318e-03
+
+	Heats of formation:
+		| [a.u.] | [Kcal/mol] | 
+		-2.736798e-02	-1.717367e+01
+
+	Elapsed time(omp) for the SCF = 0.0539269[s].
+**********  DONE: MNDO-SCF  **********
+
+
+**********  START: MNDO-CIS  **********
+----------- START: Calculation of the CIS matrix -----------
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.0555131[s].
+----------- DONE: Calculation of the CIS matrix -----------
+
+	======  START: Davidson-CIS  =====
+	Davidson iter=0
+	  1-th excited: norm of the residual = 0.0733702
+	  2-th excited: norm of the residual = 0.0415167
+	  3-th excited: norm of the residual = 0.0407721
+	  4-th excited: norm of the residual = 0.052347
+
+	Davidson iter=1
+	  1-th excited: norm of the residual = 0.0299881
+	  2-th excited: norm of the residual = 0.0196358
+	  3-th excited: norm of the residual = 0.0243018
+	  4-th excited: norm of the residual = 0.036062
+
+	Davidson iter=2
+	  1-th excited: norm of the residual = 0.00688044
+	  2-th excited: norm of the residual = 0.00356385
+	  3-th excited: norm of the residual = 0.0167491
+	  4-th excited: norm of the residual = 0.0123441
+
+	Davidson iter=3
+	  1-th excited: norm of the residual = 0.00263412
+	  2-th excited: norm of the residual = 0.00302288
+	  3-th excited: norm of the residual = 0.0063209
+	  4-th excited: norm of the residual = 0.00729335
+
+	Davidson iter=4
+	  1-th excited: norm of the residual = 0.00032265
+	  2-th excited: norm of the residual = 0.00163996
+	  3-th excited: norm of the residual = 0.00944038
+	  4-th excited: norm of the residual = 0.00589975
+
+	Davidson iter=5
+	  1-th excited: norm of the residual = 0.000101219
+	  2-th excited: norm of the residual = 0.000374145
+	  3-th excited: norm of the residual = 0.0102346
+	  4-th excited: norm of the residual = 0.00501892
+
+	Davidson iter=6
+	  1-th excited: norm of the residual = 3.27698e-05
+	  2-th excited: norm of the residual = 0.000113355
+	  3-th excited: norm of the residual = 0.00222842
+	  4-th excited: norm of the residual = 0.00456649
+
+	Davidson iter=7
+	  1-th excited: norm of the residual = 7.49694e-06
+	  2-th excited: norm of the residual = 3.77374e-05
+	  3-th excited: norm of the residual = 0.00130108
+	  4-th excited: norm of the residual = 0.00164567
+
+	Davidson iter=8
+	  1-th excited: norm of the residual = 1.3923e-06
+	  2-th excited: norm of the residual = 8.62021e-06
+	  3-th excited: norm of the residual = 0.00036956
+	  4-th excited: norm of the residual = 0.000594174
+
+	Davidson iter=9
+	  1-th excited: norm of the residual = 1.67972e-07
+	  2-th excited: norm of the residual = 2.3568e-06
+	  3-th excited: norm of the residual = 0.00016842
+	  4-th excited: norm of the residual = 0.00027988
+
+	Davidson iter=10
+	  1-th excited: norm of the residual = 7.72965e-08
+	  2-th excited: norm of the residual = 1.45929e-07
+	  3-th excited: norm of the residual = 4.28075e-06
+	  4-th excited: norm of the residual = 8.94959e-06
+
+	Davidson iter=11
+	  1-th excited: norm of the residual = 6.44679e-08
+	  2-th excited: norm of the residual = 1.4148e-07
+	  3-th excited: norm of the residual = 3.55547e-07
+	  4-th excited: norm of the residual = 7.0229e-07
+
+
+
+		Davidson for MNDO-CIS met convergence criterion(^^b
+
+
+	======  DONE: Davidson-CIS  =====
+
+
+	Excitation energies:
+		| i-th | e[a.u.] | e[eV] | 
+		 1	3.011264e-01	8.194132e+00
+		 2	3.326267e-01	9.051306e+00
+		 3	3.369529e-01	9.169028e+00
+		 4	3.393673e-01	9.234729e+00
+
+	Elapsed time(omp) for the CIS = 0.240905[s].
+**********  DONE: MNDO-CIS  **********
+
+
+
+
+     >>>>>  The MolDS finished normally!  <<<<<
+     >>>>>  CPU time: 0.29[s].  <<<<<
+     >>>>>  Elapsed time: 1[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 0.301542[s].  <<<<<
+     >>>>>  See you.  <<<<<
+
+
