@@ -40,6 +40,7 @@ Mndo::Mndo() : MolDS_zindo::ZindoS(){
    this->zMatrixForceElecStatesNum = 0;
    this->etaMatrixForceElecStatesNum = 0;
    this->zMatrixForce = NULL;
+   this->etaMatrixForce = NULL;
    //cout << "Mndo created\n";
 }
 
