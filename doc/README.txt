@@ -53,6 +53,7 @@ Capabilities:
    MNDO     | H, C, N, O, and S 
    AM1      | H, C, N, O, and S 
    PM3      | H, C, N, O, and S 
+   PM3/PDDG | H, C, N, O, and S 
 
 ==============================================================================
 How to Write Input-files:
@@ -62,7 +63,8 @@ How to Write Input-files:
 
 
    SCF:
-      Write "cndo/2", "indo", "zindo/s", "mndo", "am1", or "pm3" in theory-directive.
+      Write "cndo/2", "indo", "zindo/s", "mndo", "am1", 
+      "pm3/pddg", or "pm3/pddg" in theory-directive.
       MNDO only supports (can calculate) Heats of formation.
 
       E.g. 
@@ -115,6 +117,15 @@ How to Write Input-files:
 
        "file_prefix" is a prefix of the file name to which the MO is written.
        Default values is "MO_".
+
+      E.g.
+         MOPLOT
+            mo 5
+            mo 8
+            grid_number 30 30 30
+            frame_length 10 10 10
+            file_prefix MOPlot_
+         MOPLOT_END
 
    CIS:
       Write CIS-directive.
