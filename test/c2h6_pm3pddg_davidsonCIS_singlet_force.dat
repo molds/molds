@@ -1,0 +1,1372 @@
+
+
+     >>>>>  Welcome to the MolDS world at 2011/12/31 16:22:59  <<<<<
+
+
+**********  START: Parse input  **********
+	Total number of atoms: 8
+	Total number of valence AOs: 14
+	Total number of valence electrons: 14
+
+	Molecular configration:
+		| i-th | atom type | x[angst.] | y[angst.] | z[angst.] |
+		0	C	0.000000e+00	2.000000e-02	0.000000e+00
+		1	C	1.493800e+00	-1.500000e-02	2.000000e-03
+		2	H	-3.500000e-01	1.041100e+00	1.000000e-03
+		3	H	-3.681000e-01	-5.205000e-01	-9.200000e-01
+		4	H	-3.700000e-01	-5.208000e-01	9.016000e-01
+		5	H	1.851900e+00	5.200000e-01	-9.007000e-01
+		6	H	1.830000e+00	5.240000e-01	9.100000e-01
+		7	H	1.860000e+00	-1.040100e+00	0.000000e+00
+
+		| i-th | atom type | x[a.u.] | y[a.u.] | z[a.u.] |
+		0	C	0.000000e+00	3.779452e-02	0.000000e+00
+		1	C	2.822873e+00	-2.834589e-02	3.779452e-03
+		2	H	-6.614042e-01	1.967394e+00	1.889726e-03
+		3	H	-6.956082e-01	-9.836025e-01	-1.738548e+00
+		4	H	-6.991987e-01	-9.841694e-01	1.703777e+00
+		5	H	3.499584e+00	9.826576e-01	-1.702076e+00
+		6	H	3.458199e+00	9.902165e-01	1.719651e+00
+		7	H	3.514891e+00	-1.965504e+00	0.000000e+00
+
+	Center of Mass:
+		| x[angst.] | y[angst.] | z[angst.] |
+		7.459748e-01	2.121214e-03	5.273559e-04
+
+		| x[a.u.] | y[a.u.] | z[a.u.] |
+		1.409688e+00	4.008514e-03	9.965583e-04
+
+	Center of Core:
+		| x[angst.] | y[angst.] | z[angst.] |
+		7.459751e-01	2.121324e-03	5.274925e-04
+
+		| x[a.u.] | y[a.u.] | z[a.u.] |
+		1.409689e+00	4.008721e-03	9.968163e-04
+
+	SCF conditions:
+		Max iterations: 50
+		RMS density: 1.000000e-06
+		Damping threshold: 1.000000e+00
+		Damping weight: 0.000000e+00
+		DIIS number of error vectors: 5
+		DIIS starting error: 1.000000e-01
+		DIIS ending error: 2.000000e-08
+
+	CIS conditions:
+		Number of active Occ.: 7
+		Number of active Vir.: 7
+		Number of excited states: 4
+		CIS-Davidson: yes
+		Max iterations for the Davidson: 200
+		Max dimensions for the Davidson: 49
+		Norm tolerance for the residual of the Davidson: 1.000000e-06
+
+	MD conditions:
+		Electronic eigen state: 1
+		Total steps: 5
+		Time width(dt): 0.050000[fs]
+
+Input terms:
+theory | pm3/pddg | theory_end | scf | max_iter | 50 | rms_density | 0.000001 | damping_thresh | 1.0 | 
+damping_weight | 0.0 | diis_num_error_vect | 5 | diis_start_error | 0.1 | diis_end_error | 0.00000002 | scf_end | md | 
+total_steps | 5 | electronic_state | 1 | dt | 0.05 | md_end | cis | davidson | yes | 
+active_occ | 7 | active_vir | 7 | nstates | 4 | max_iter | 200 | max_dim | 49 | 
+norm_tol | 0.000001 | cis_end | geometry | c | 0.0000 | 0.0200 | 0.0000 | c | 1.4938 | 
+-0.0150 | 0.0020 | h | -0.3500 | 1.0411 | 0.0010 | h | -0.3681 | -0.5205 | -0.9200 | 
+h | -0.3700 | -0.5208 | 0.9016 | h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 
+0.5240 | 0.9100 | h | 1.8600 | -1.0401 | 0.0000 | geometry_end | 
+
+**********  DONE: Parse input  ***********
+
+
+**********  START: PM3/PDDG-SCF  **********
+SCF iter=0: RMS density=5.291502622129185 
+SCF iter=1: RMS density=1.862872189503767 
+SCF iter=2: RMS density=0.993239189796955 
+SCF iter=3: RMS density=0.533349207055904 
+SCF iter=4: RMS density=0.285488533225346 
+SCF iter=5: RMS density=0.152407528472137 
+SCF iter=6: RMS density=0.000620521117900 
+SCF iter=7: RMS density=0.000181786594307 
+SCF iter=8: RMS density=0.000057887199750 
+SCF iter=9: RMS density=0.000021427661566 
+SCF iter=10: RMS density=0.000003665762845 
+SCF iter=11: RMS density=0.000001692271516 
+SCF iter=12: RMS density=0.000000190761142 
+
+
+
+		PM3/PDDG-SCF met convergence criterion(^^b
+
+
+	Energies of MOs:
+		| i-th | occ/unocc | e[a.u.] | e[eV] | 
+		 0	occ	-1.296600e+00	-3.528257e+01 
+		 1	occ	-8.489861e-01	-2.310227e+01 
+		 2	occ	-5.677530e-01	-1.544947e+01 
+		 3	occ	-5.624206e-01	-1.530437e+01 
+		 4	occ	-4.997217e-01	-1.359823e+01 
+		 5	occ	-4.381054e-01	-1.192155e+01 
+		 6	occ	-4.317510e-01	-1.174864e+01 
+		 7	unocc	1.407288e-01	3.829457e+00 
+		 8	unocc	1.509286e-01	4.107010e+00 
+		 9	unocc	1.615462e-01	4.395931e+00 
+		 10	unocc	1.659178e-01	4.514888e+00 
+		 11	unocc	1.792993e-01	4.879021e+00 
+		 12	unocc	1.903692e-01	5.180252e+00 
+		 13	unocc	1.963613e-01	5.343305e+00 
+
+	Electronic energy(including core-repulsions):
+		| [a.u.] | [eV] | 
+		-1.229616e+01	-3.345981e+02
+
+	Total core repulsion energy:
+		| [a.u.] | [eV] |
+		2.185547e+01	5.947222e+02
+
+	Mulliken charge on each Atom:
+		| i-th | atom type | core charge | Mulliken charge | 
+		0	C	4.000000e+00	-2.698941e-01
+		1	C	4.000000e+00	-2.685647e-01
+		2	H	1.000000e+00	9.258123e-02
+		3	H	1.000000e+00	8.741240e-02
+		4	H	1.000000e+00	8.820231e-02
+		5	H	1.000000e+00	8.838277e-02
+		6	H	1.000000e+00	8.849413e-02
+		7	H	1.000000e+00	9.338598e-02
+
+	Elapsed time(omp) for the SCF = 0.0682929[s].
+**********  DONE: PM3/PDDG-SCF  **********
+
+
+**********  START: PM3/PDDG-CIS  **********
+----------- START: Calculation of the CIS matrix -----------
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.082155[s].
+----------- DONE: Calculation of the CIS matrix -----------
+
+	======  START: Davidson-CIS  =====
+	Davidson iter=0
+	  1-th excited: norm of the residual = 0.0519578
+	  2-th excited: norm of the residual = 0.0533253
+	  3-th excited: norm of the residual = 0.0660474
+	  4-th excited: norm of the residual = 0.0656198
+
+	Davidson iter=1
+	  1-th excited: norm of the residual = 0.0208364
+	  2-th excited: norm of the residual = 0.0236653
+	  3-th excited: norm of the residual = 0.0252445
+	  4-th excited: norm of the residual = 0.0301366
+
+	Davidson iter=2
+	  1-th excited: norm of the residual = 0.006044
+	  2-th excited: norm of the residual = 0.00698638
+	  3-th excited: norm of the residual = 0.00330125
+	  4-th excited: norm of the residual = 0.00723137
+
+	Davidson iter=3
+	  1-th excited: norm of the residual = 0.00204321
+	  2-th excited: norm of the residual = 0.00239647
+	  3-th excited: norm of the residual = 0.00318002
+	  4-th excited: norm of the residual = 0.00685397
+
+	Davidson iter=4
+	  1-th excited: norm of the residual = 0.000406463
+	  2-th excited: norm of the residual = 0.0205586
+	  3-th excited: norm of the residual = 0.00455866
+	  4-th excited: norm of the residual = 0.00295743
+
+	Davidson iter=5
+	  1-th excited: norm of the residual = 0.00415019
+	  2-th excited: norm of the residual = 0.0103066
+	  3-th excited: norm of the residual = 0.0010051
+	  4-th excited: norm of the residual = 0.00163965
+
+	Davidson iter=6
+	  1-th excited: norm of the residual = 0.0043208
+	  2-th excited: norm of the residual = 0.000216139
+	  3-th excited: norm of the residual = 0.000401604
+	  4-th excited: norm of the residual = 0.000688086
+
+	Davidson iter=7
+	  1-th excited: norm of the residual = 0.000310037
+	  2-th excited: norm of the residual = 1.39486e-05
+	  3-th excited: norm of the residual = 3.16047e-05
+	  4-th excited: norm of the residual = 6.68739e-05
+
+	Davidson iter=8
+	  1-th excited: norm of the residual = 3.66882e-05
+	  2-th excited: norm of the residual = 1.68778e-06
+	  3-th excited: norm of the residual = 3.90807e-06
+	  4-th excited: norm of the residual = 7.70582e-06
+
+	Davidson iter=9
+	  1-th excited: norm of the residual = 1.46129e-06
+	  2-th excited: norm of the residual = 6.61962e-08
+	  3-th excited: norm of the residual = 1.88951e-07
+	  4-th excited: norm of the residual = 7.62463e-07
+
+	Davidson iter=10
+	  1-th excited: norm of the residual = 1.43491e-07
+	  2-th excited: norm of the residual = 8.1975e-09
+	  3-th excited: norm of the residual = 5.06692e-08
+	  4-th excited: norm of the residual = 5.62549e-07
+
+
+
+		Davidson for PM3/PDDG-CIS met convergence criterion(^^b
+
+
+	======  DONE: Davidson-CIS  =====
+
+
+	Excitation energies:
+		| i-th | e[a.u.] | e[eV] | 
+		 1	2.785984e-01	7.581109e+00
+		 2	2.791917e-01	7.597254e+00
+		 3	2.837531e-01	7.721377e+00
+		 4	2.901091e-01	7.894334e+00
+
+	Elapsed time(omp) for the CIS = 0.284953[s].
+**********  DONE: PM3/PDDG-CIS  **********
+
+
+**********  START: Molecular dynamics  **********
+
+	========= Initial conditions 
+	Energies:
+		|	kind			| [a.u.] | [eV] | 
+		Core kinetic     	0.000000e+00	0.000000e+00
+		Core repulsion   	2.185547e+01	5.947222e+02
+		Electronic
+		(inc. core rep.)	-1.201756e+01	-3.270170e+02
+		Total            	-1.201756e+01	-3.270170e+02
+
+	Molecular configration:
+		| i-th | atom type | x[angst.] | y[angst.] | z[angst.] |
+		0	C	0.000000e+00	2.000000e-02	0.000000e+00
+		1	C	1.493800e+00	-1.500000e-02	2.000000e-03
+		2	H	-3.500000e-01	1.041100e+00	1.000000e-03
+		3	H	-3.681000e-01	-5.205000e-01	-9.200000e-01
+		4	H	-3.700000e-01	-5.208000e-01	9.016000e-01
+		5	H	1.851900e+00	5.200000e-01	-9.007000e-01
+		6	H	1.830000e+00	5.240000e-01	9.100000e-01
+		7	H	1.860000e+00	-1.040100e+00	0.000000e+00
+
+		| i-th | atom type | x[a.u.] | y[a.u.] | z[a.u.] |
+		0	C	0.000000e+00	3.779452e-02	0.000000e+00
+		1	C	2.822873e+00	-2.834589e-02	3.779452e-03
+		2	H	-6.614042e-01	1.967394e+00	1.889726e-03
+		3	H	-6.956082e-01	-9.836025e-01	-1.738548e+00
+		4	H	-6.991987e-01	-9.841694e-01	1.703777e+00
+		5	H	3.499584e+00	9.826576e-01	-1.702076e+00
+		6	H	3.458199e+00	9.902165e-01	1.719651e+00
+		7	H	3.514891e+00	-1.965504e+00	0.000000e+00
+
+	Center of Mass:
+		| x[angst.] | y[angst.] | z[angst.] |
+		7.459748e-01	2.121214e-03	5.273559e-04
+
+		| x[a.u.] | y[a.u.] | z[a.u.] |
+		1.409688e+00	4.008514e-03	9.965583e-04
+
+	Center of Core:
+		| x[angst.] | y[angst.] | z[angst.] |
+		7.459751e-01	2.121324e-03	5.274925e-04
+
+		| x[a.u.] | y[a.u.] | z[a.u.] |
+		1.409689e+00	4.008721e-03	9.968163e-04
+
+	Momenta of each atom:
+		| i-th | atom type | px | py | pz | [(g/Mol)*(angst/fs)]
+ 		0	C	0.000000e+00	0.000000e+00	0.000000e+00
+		1	C	0.000000e+00	0.000000e+00	0.000000e+00
+		2	H	0.000000e+00	0.000000e+00	0.000000e+00
+		3	H	0.000000e+00	0.000000e+00	0.000000e+00
+		4	H	0.000000e+00	0.000000e+00	0.000000e+00
+		5	H	0.000000e+00	0.000000e+00	0.000000e+00
+		6	H	0.000000e+00	0.000000e+00	0.000000e+00
+		7	H	0.000000e+00	0.000000e+00	0.000000e+00
+
+		| i-th | atom type | px[a.u.] | py[a.u.] | pz[a.u.] |
+ 		0	C	0.000000e+00	0.000000e+00	0.000000e+00
+		1	C	0.000000e+00	0.000000e+00	0.000000e+00
+		2	H	0.000000e+00	0.000000e+00	0.000000e+00
+		3	H	0.000000e+00	0.000000e+00	0.000000e+00
+		4	H	0.000000e+00	0.000000e+00	0.000000e+00
+		5	H	0.000000e+00	0.000000e+00	0.000000e+00
+		6	H	0.000000e+00	0.000000e+00	0.000000e+00
+		7	H	0.000000e+00	0.000000e+00	0.000000e+00
+
+
+	========== START: MD step 1
+**********  START: PM3/PDDG-SCF  **********
+SCF iter=0: RMS density=0.000010227520481 
+SCF iter=1: RMS density=0.000003506977134 
+SCF iter=2: RMS density=0.000001319693809 
+SCF iter=3: RMS density=0.000000535987497 
+
+
+
+		PM3/PDDG-SCF met convergence criterion(^^b
+
+
+	Energies of MOs:
+		| i-th | occ/unocc | e[a.u.] | e[eV] | 
+		 0	occ	-1.296599e+00	-3.528253e+01 
+		 1	occ	-8.489857e-01	-2.310226e+01 
+		 2	occ	-5.677516e-01	-1.544943e+01 
+		 3	occ	-5.624202e-01	-1.530435e+01 
+		 4	occ	-4.997237e-01	-1.359828e+01 
+		 5	occ	-4.381037e-01	-1.192150e+01 
+		 6	occ	-4.317503e-01	-1.174862e+01 
+		 7	unocc	1.407285e-01	3.829449e+00 
+		 8	unocc	1.509289e-01	4.107018e+00 
+		 9	unocc	1.615458e-01	4.395921e+00 
+		 10	unocc	1.659166e-01	4.514856e+00 
+		 11	unocc	1.793000e-01	4.879039e+00 
+		 12	unocc	1.903695e-01	5.180259e+00 
+		 13	unocc	1.963602e-01	5.343275e+00 
+
+	Electronic energy(including core-repulsions):
+		| [a.u.] | [eV] | 
+		-1.229616e+01	-3.345982e+02
+
+	Total core repulsion energy:
+		| [a.u.] | [eV] |
+		2.185545e+01	5.947217e+02
+
+	Mulliken charge on each Atom:
+		| i-th | atom type | core charge | Mulliken charge | 
+		0	C	4.000000e+00	-2.698929e-01
+		1	C	4.000000e+00	-2.685633e-01
+		2	H	1.000000e+00	9.258090e-02
+		3	H	1.000000e+00	8.741199e-02
+		4	H	1.000000e+00	8.820194e-02
+		5	H	1.000000e+00	8.838230e-02
+		6	H	1.000000e+00	8.849370e-02
+		7	H	1.000000e+00	9.338540e-02
+
+	Elapsed time(omp) for the SCF = 0.057333[s].
+**********  DONE: PM3/PDDG-SCF  **********
+
+
+**********  START: PM3/PDDG-CIS  **********
+----------- START: Calculation of the CIS matrix -----------
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.0785789[s].
+----------- DONE: Calculation of the CIS matrix -----------
+
+	======  START: Davidson-CIS  =====
+	Davidson iter=0
+	  1-th excited: norm of the residual = 0.0519581
+	  2-th excited: norm of the residual = 0.0533258
+	  3-th excited: norm of the residual = 0.0660473
+	  4-th excited: norm of the residual = 0.06562
+
+	Davidson iter=1
+	  1-th excited: norm of the residual = 0.0208368
+	  2-th excited: norm of the residual = 0.0236647
+	  3-th excited: norm of the residual = 0.0252446
+	  4-th excited: norm of the residual = 0.0301349
+
+	Davidson iter=2
+	  1-th excited: norm of the residual = 0.00604394
+	  2-th excited: norm of the residual = 0.00698568
+	  3-th excited: norm of the residual = 0.00330073
+	  4-th excited: norm of the residual = 0.00722975
+
+	Davidson iter=3
+	  1-th excited: norm of the residual = 0.00204314
+	  2-th excited: norm of the residual = 0.00239585
+	  3-th excited: norm of the residual = 0.00317909
+	  4-th excited: norm of the residual = 0.00685076
+
+	Davidson iter=4
+	  1-th excited: norm of the residual = 0.000406325
+	  2-th excited: norm of the residual = 0.0205619
+	  3-th excited: norm of the residual = 0.00456047
+	  4-th excited: norm of the residual = 0.00295799
+
+	Davidson iter=5
+	  1-th excited: norm of the residual = 0.00414397
+	  2-th excited: norm of the residual = 0.0103113
+	  3-th excited: norm of the residual = 0.00100473
+	  4-th excited: norm of the residual = 0.00163962
+
+	Davidson iter=6
+	  1-th excited: norm of the residual = 0.00432047
+	  2-th excited: norm of the residual = 0.000215845
+	  3-th excited: norm of the residual = 0.000401341
+	  4-th excited: norm of the residual = 0.000687922
+
+	Davidson iter=7
+	  1-th excited: norm of the residual = 0.000310051
+	  2-th excited: norm of the residual = 1.39316e-05
+	  3-th excited: norm of the residual = 3.15881e-05
+	  4-th excited: norm of the residual = 6.68718e-05
+
+	Davidson iter=8
+	  1-th excited: norm of the residual = 3.67017e-05
+	  2-th excited: norm of the residual = 1.68631e-06
+	  3-th excited: norm of the residual = 3.90713e-06
+	  4-th excited: norm of the residual = 7.70576e-06
+
+	Davidson iter=9
+	  1-th excited: norm of the residual = 1.46054e-06
+	  2-th excited: norm of the residual = 6.6089e-08
+	  3-th excited: norm of the residual = 1.88723e-07
+	  4-th excited: norm of the residual = 7.61612e-07
+
+	Davidson iter=10
+	  1-th excited: norm of the residual = 1.43393e-07
+	  2-th excited: norm of the residual = 8.18962e-09
+	  3-th excited: norm of the residual = 5.06223e-08
+	  4-th excited: norm of the residual = 5.62142e-07
+
+
+
+		Davidson for PM3/PDDG-CIS met convergence criterion(^^b
+
+
+	======  DONE: Davidson-CIS  =====
+
+
+	Excitation energies:
+		| i-th | e[a.u.] | e[eV] | 
+		 1	2.785977e-01	7.581090e+00
+		 2	2.791911e-01	7.597236e+00
+		 3	2.837518e-01	7.721340e+00
+		 4	2.901089e-01	7.894328e+00
+
+	Elapsed time(omp) for the CIS = 0.271785[s].
+**********  DONE: PM3/PDDG-CIS  **********
+
+
+	Energies:
+		|	kind			| [a.u.] | [eV] | 
+		Core kinetic     	1.465098e-06	3.986767e-05
+		Core repulsion   	2.185545e+01	5.947217e+02
+		Electronic
+		(inc. core rep.)	-1.201756e+01	-3.270171e+02
+		Total            	-1.201756e+01	-3.270170e+02
+		Error            	-2.954494e-09	-8.039650e-08
+
+	Molecular configration:
+		| i-th | atom type | x[angst.] | y[angst.] | z[angst.] |
+		0	C	2.354944e-06	1.999882e-02	-1.429480e-07
+		1	C	1.493797e+00	-1.499927e-02	2.000034e-03
+		2	H	-3.500073e-01	1.041107e+00	9.997283e-04
+		3	H	-3.681043e-01	-5.204972e-01	-9.199961e-01
+		4	H	-3.700049e-01	-5.207985e-01	9.015976e-01
+		5	H	1.851906e+00	5.199991e-01	-9.006996e-01
+		6	H	1.830007e+00	5.239993e-01	9.099997e-01
+		7	H	1.860006e+00	-1.040104e+00	-1.206697e-08
+
+		| i-th | atom type | x[a.u.] | y[a.u.] | z[a.u.] |
+		0	C	4.450199e-06	3.779229e-02	-2.701325e-07
+		1	C	2.822868e+00	-2.834451e-02	3.779516e-03
+		2	H	-6.614179e-01	1.967407e+00	1.889213e-03
+		3	H	-6.956164e-01	-9.835973e-01	-1.738541e+00
+		4	H	-6.992079e-01	-9.841665e-01	1.703773e+00
+		5	H	3.499595e+00	9.826560e-01	-1.702076e+00
+		6	H	3.458211e+00	9.902151e-01	1.719650e+00
+		7	H	3.514903e+00	-1.965512e+00	-2.280328e-08
+
+	Center of Mass:
+		| x[angst.] | y[angst.] | z[angst.] |
+		7.459748e-01	2.121214e-03	5.273559e-04
+
+		| x[a.u.] | y[a.u.] | z[a.u.] |
+		1.409688e+00	4.008514e-03	9.965583e-04
+
+	Center of Core:
+		| x[angst.] | y[angst.] | z[angst.] |
+		7.459751e-01	2.121324e-03	5.274925e-04
+
+		| x[a.u.] | y[a.u.] | z[a.u.] |
+		1.409689e+00	4.008721e-03	9.968163e-04
+
+	Momenta of each atom:
+		| i-th | atom type | px | py | pz | [(g/Mol)*(angst/fs)]
+ 		0	C	1.131117e-03	-5.676799e-04	-6.867534e-05
+		1	C	-1.218792e-03	3.514730e-04	1.627947e-05
+		2	H	-2.935539e-04	2.788353e-04	-1.094023e-05
+		3	H	-1.751331e-04	1.111460e-04	1.557947e-04
+		4	H	-1.975234e-04	6.141981e-05	-9.618614e-05
+		5	H	2.332835e-04	-3.474633e-05	1.800423e-05
+		6	H	2.674764e-04	-2.940376e-05	-1.378700e-05
+		7	H	2.531247e-04	-1.710440e-04	-4.896820e-07
+
+		| i-th | atom type | px[a.u.] | py[a.u.] | pz[a.u.] |
+ 		0	C	9.424886e-02	-4.730119e-02	-5.722283e-03
+		1	C	-1.015542e-01	2.928603e-02	1.356465e-03
+		2	H	-2.445999e-02	2.323358e-02	-9.115799e-04
+		3	H	-1.459273e-02	9.261094e-03	1.298139e-02
+		4	H	-1.645838e-02	5.117725e-03	-8.014584e-03
+		5	H	1.943804e-02	-2.895193e-03	1.500179e-03
+		6	H	2.228712e-02	-2.450030e-03	-1.148784e-03
+		7	H	2.109128e-02	-1.425202e-02	-4.080211e-05
+
+	Time in [fs]: 0.05
+	========== DONE: MD step 1
+
+	========== START: MD step 2
+**********  START: PM3/PDDG-SCF  **********
+SCF iter=0: RMS density=0.000030772491049 
+SCF iter=1: RMS density=0.000010578204406 
+SCF iter=2: RMS density=0.000003995003329 
+SCF iter=3: RMS density=0.000001629980387 
+SCF iter=4: RMS density=0.000000718202391 
+
+
+
+		PM3/PDDG-SCF met convergence criterion(^^b
+
+
+	Energies of MOs:
+		| i-th | occ/unocc | e[a.u.] | e[eV] | 
+		 0	occ	-1.296595e+00	-3.528242e+01 
+		 1	occ	-8.489847e-01	-2.310223e+01 
+		 2	occ	-5.677472e-01	-1.544931e+01 
+		 3	occ	-5.624190e-01	-1.530432e+01 
+		 4	occ	-4.997299e-01	-1.359845e+01 
+		 5	occ	-4.380986e-01	-1.192136e+01 
+		 6	occ	-4.317483e-01	-1.174856e+01 
+		 7	unocc	1.407276e-01	3.829422e+00 
+		 8	unocc	1.509298e-01	4.107041e+00 
+		 9	unocc	1.615448e-01	4.395892e+00 
+		 10	unocc	1.659130e-01	4.514759e+00 
+		 11	unocc	1.793020e-01	4.879094e+00 
+		 12	unocc	1.903702e-01	5.180279e+00 
+		 13	unocc	1.963568e-01	5.343183e+00 
+
+	Electronic energy(including core-repulsions):
+		| [a.u.] | [eV] | 
+		-1.229616e+01	-3.345982e+02
+
+	Total core repulsion energy:
+		| [a.u.] | [eV] |
+		2.185539e+01	5.947201e+02
+
+	Mulliken charge on each Atom:
+		| i-th | atom type | core charge | Mulliken charge | 
+		0	C	4.000000e+00	-2.698885e-01
+		1	C	4.000000e+00	-2.685588e-01
+		2	H	1.000000e+00	9.257945e-02
+		3	H	1.000000e+00	8.741060e-02
+		4	H	1.000000e+00	8.820062e-02
+		5	H	1.000000e+00	8.838081e-02
+		6	H	1.000000e+00	8.849226e-02
+		7	H	1.000000e+00	9.338348e-02
+
+	Elapsed time(omp) for the SCF = 0.0604792[s].
+**********  DONE: PM3/PDDG-SCF  **********
+
+
+**********  START: PM3/PDDG-CIS  **********
+----------- START: Calculation of the CIS matrix -----------
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.0784419[s].
+----------- DONE: Calculation of the CIS matrix -----------
+
+	======  START: Davidson-CIS  =====
+	Davidson iter=0
+	  1-th excited: norm of the residual = 0.0519587
+	  2-th excited: norm of the residual = 0.0533273
+	  3-th excited: norm of the residual = 0.0660469
+	  4-th excited: norm of the residual = 0.0656204
+
+	Davidson iter=1
+	  1-th excited: norm of the residual = 0.0208379
+	  2-th excited: norm of the residual = 0.0236628
+	  3-th excited: norm of the residual = 0.0252448
+	  4-th excited: norm of the residual = 0.0301297
+
+	Davidson iter=2
+	  1-th excited: norm of the residual = 0.00604377
+	  2-th excited: norm of the residual = 0.00698357
+	  3-th excited: norm of the residual = 0.00329917
+	  4-th excited: norm of the residual = 0.0072249
+
+	Davidson iter=3
+	  1-th excited: norm of the residual = 0.00204295
+	  2-th excited: norm of the residual = 0.00239399
+	  3-th excited: norm of the residual = 0.00317631
+	  4-th excited: norm of the residual = 0.00684115
+
+	Davidson iter=4
+	  1-th excited: norm of the residual = 0.000405913
+	  2-th excited: norm of the residual = 0.0205717
+	  3-th excited: norm of the residual = 0.00456595
+	  4-th excited: norm of the residual = 0.00295966
+
+	Davidson iter=5
+	  1-th excited: norm of the residual = 0.00412549
+	  2-th excited: norm of the residual = 0.0103252
+	  3-th excited: norm of the residual = 0.00100361
+	  4-th excited: norm of the residual = 0.00163955
+
+	Davidson iter=6
+	  1-th excited: norm of the residual = 0.00431945
+	  2-th excited: norm of the residual = 0.000214966
+	  3-th excited: norm of the residual = 0.000400553
+	  4-th excited: norm of the residual = 0.00068743
+
+	Davidson iter=7
+	  1-th excited: norm of the residual = 0.000310093
+	  2-th excited: norm of the residual = 1.38808e-05
+	  3-th excited: norm of the residual = 3.15384e-05
+	  4-th excited: norm of the residual = 6.68653e-05
+
+	Davidson iter=8
+	  1-th excited: norm of the residual = 3.67423e-05
+	  2-th excited: norm of the residual = 1.68188e-06
+	  3-th excited: norm of the residual = 3.90432e-06
+	  4-th excited: norm of the residual = 7.70562e-06
+
+	Davidson iter=9
+	  1-th excited: norm of the residual = 1.45832e-06
+	  2-th excited: norm of the residual = 6.57685e-08
+	  3-th excited: norm of the residual = 1.88038e-07
+	  4-th excited: norm of the residual = 7.59059e-07
+
+	Davidson iter=10
+	  1-th excited: norm of the residual = 1.43098e-07
+	  2-th excited: norm of the residual = 8.16581e-09
+	  3-th excited: norm of the residual = 5.04816e-08
+	  4-th excited: norm of the residual = 5.60914e-07
+
+
+
+		Davidson for PM3/PDDG-CIS met convergence criterion(^^b
+
+
+	======  DONE: Davidson-CIS  =====
+
+
+	Excitation energies:
+		| i-th | e[a.u.] | e[eV] | 
+		 1	2.785956e-01	7.581032e+00
+		 2	2.791891e-01	7.597183e+00
+		 3	2.837477e-01	7.721229e+00
+		 4	2.901083e-01	7.894312e+00
+
+	Elapsed time(omp) for the CIS = 0.272381[s].
+**********  DONE: PM3/PDDG-CIS  **********
+
+
+	Energies:
+		|	kind			| [a.u.] | [eV] | 
+		Core kinetic     	5.858571e-06	1.594211e-04
+		Core repulsion   	2.185539e+01	5.947201e+02
+		Electronic
+		(inc. core rep.)	-1.201756e+01	-3.270172e+02
+		Total            	-1.201756e+01	-3.270170e+02
+		Error            	-3.190772e-09	-8.682602e-08
+
+	Molecular configration:
+		| i-th | atom type | x[angst.] | y[angst.] | z[angst.] |
+		0	C	9.419301e-06	1.999527e-02	-5.718892e-07
+		1	C	1.493790e+00	-1.499707e-02	2.000136e-03
+		2	H	-3.500291e-01	1.041128e+00	9.989140e-04
+		3	H	-3.681174e-01	-5.204890e-01	-9.199845e-01
+		4	H	-3.700196e-01	-5.207939e-01	9.015905e-01
+		5	H	1.851923e+00	5.199966e-01	-9.006982e-01
+		6	H	1.830027e+00	5.239971e-01	9.099986e-01
+		7	H	1.860025e+00	-1.040117e+00	-4.860892e-08
+
+		| i-th | atom type | x[a.u.] | y[a.u.] | z[a.u.] |
+		0	C	1.779990e-05	3.778559e-02	-1.080714e-06
+		1	C	2.822854e+00	-2.834036e-02	3.779709e-03
+		2	H	-6.614592e-01	1.967446e+00	1.887674e-03
+		3	H	-6.956411e-01	-9.835816e-01	-1.738519e+00
+		4	H	-6.992357e-01	-9.841579e-01	1.703759e+00
+		5	H	3.499628e+00	9.826511e-01	-1.702073e+00
+		6	H	3.458249e+00	9.902110e-01	1.719648e+00
+		7	H	3.514938e+00	-1.965536e+00	-9.185754e-08
+
+	Center of Mass:
+		| x[angst.] | y[angst.] | z[angst.] |
+		7.459748e-01	2.121215e-03	5.273560e-04
+
+		| x[a.u.] | y[a.u.] | z[a.u.] |
+		1.409688e+00	4.008515e-03	9.965584e-04
+
+	Center of Core:
+		| x[angst.] | y[angst.] | z[angst.] |
+		7.459751e-01	2.121324e-03	5.274925e-04
+
+		| x[a.u.] | y[a.u.] | z[a.u.] |
+		1.409689e+00	4.008721e-03	9.968163e-04
+
+	Momenta of each atom:
+		| i-th | atom type | px | py | pz | [(g/Mol)*(angst/fs)]
+ 		0	C	2.262008e-03	-1.135059e-03	-1.373973e-04
+		1	C	-2.437354e-03	7.027676e-04	3.256970e-05
+		2	H	-5.870142e-04	5.574222e-04	-2.185193e-05
+		3	H	-3.502076e-04	2.222876e-04	3.115935e-04
+		4	H	-3.950568e-04	1.228309e-04	-1.923090e-04
+		5	H	4.665621e-04	-6.950101e-05	3.600543e-05
+		6	H	5.348743e-04	-5.882910e-05	-2.761734e-05
+		7	H	5.061880e-04	-3.419192e-04	-9.930615e-07
+
+		| i-th | atom type | px[a.u.] | py[a.u.] | pz[a.u.] |
+ 		0	C	1.884789e-01	-9.457731e-02	-1.144845e-02
+		1	C	-2.030893e-01	5.855719e-02	2.713828e-03
+		2	H	-4.891218e-02	4.644648e-02	-1.820783e-03
+		3	H	-2.918059e-02	1.852182e-02	2.596312e-02
+		4	H	-3.291759e-02	1.023472e-02	-1.602390e-02
+		5	H	3.887568e-02	-5.791080e-03	3.000105e-03
+		6	H	4.456770e-02	-4.901858e-03	-2.301178e-03
+		7	H	4.217745e-02	-2.848996e-02	-8.274554e-05
+
+	Time in [fs]: 0.1
+	========== DONE: MD step 2
+
+	========== START: MD step 3
+**********  START: PM3/PDDG-SCF  **********
+SCF iter=0: RMS density=0.000051204068844 
+SCF iter=1: RMS density=0.000017599713515 
+SCF iter=2: RMS density=0.000006647279545 
+SCF iter=3: RMS density=0.000002712620893 
+SCF iter=4: RMS density=0.000001195494238 
+SCF iter=5: RMS density=0.000000563962507 
+
+
+
+		PM3/PDDG-SCF met convergence criterion(^^b
+
+
+	Energies of MOs:
+		| i-th | occ/unocc | e[a.u.] | e[eV] | 
+		 0	occ	-1.296588e+00	-3.528224e+01 
+		 1	occ	-8.489829e-01	-2.310219e+01 
+		 2	occ	-5.677399e-01	-1.544911e+01 
+		 3	occ	-5.624172e-01	-1.530427e+01 
+		 4	occ	-4.997401e-01	-1.359873e+01 
+		 5	occ	-4.380901e-01	-1.192113e+01 
+		 6	occ	-4.317449e-01	-1.174847e+01 
+		 7	unocc	1.407259e-01	3.829378e+00 
+		 8	unocc	1.509311e-01	4.107078e+00 
+		 9	unocc	1.615430e-01	4.395843e+00 
+		 10	unocc	1.659070e-01	4.514595e+00 
+		 11	unocc	1.793053e-01	4.879185e+00 
+		 12	unocc	1.903714e-01	5.180312e+00 
+		 13	unocc	1.963511e-01	5.343028e+00 
+
+	Electronic energy(including core-repulsions):
+		| [a.u.] | [eV] | 
+		-1.229616e+01	-3.345983e+02
+
+	Total core repulsion energy:
+		| [a.u.] | [eV] |
+		2.185529e+01	5.947173e+02
+
+	Mulliken charge on each Atom:
+		| i-th | atom type | core charge | Mulliken charge | 
+		0	C	4.000000e+00	-2.698807e-01
+		1	C	4.000000e+00	-2.685508e-01
+		2	H	1.000000e+00	9.257685e-02
+		3	H	1.000000e+00	8.740822e-02
+		4	H	1.000000e+00	8.819833e-02
+		5	H	1.000000e+00	8.837822e-02
+		6	H	1.000000e+00	8.848977e-02
+		7	H	1.000000e+00	9.338014e-02
+
+	Elapsed time(omp) for the SCF = 0.0563679[s].
+**********  DONE: PM3/PDDG-SCF  **********
+
+
+**********  START: PM3/PDDG-CIS  **********
+----------- START: Calculation of the CIS matrix -----------
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.079941[s].
+----------- DONE: Calculation of the CIS matrix -----------
+
+	======  START: Davidson-CIS  =====
+	Davidson iter=0
+	  1-th excited: norm of the residual = 0.0519599
+	  2-th excited: norm of the residual = 0.0533297
+	  3-th excited: norm of the residual = 0.0660464
+	  4-th excited: norm of the residual = 0.065621
+
+	Davidson iter=1
+	  1-th excited: norm of the residual = 0.0208397
+	  2-th excited: norm of the residual = 0.0236598
+	  3-th excited: norm of the residual = 0.025245
+	  4-th excited: norm of the residual = 0.0301211
+
+	Davidson iter=2
+	  1-th excited: norm of the residual = 0.00604349
+	  2-th excited: norm of the residual = 0.00698006
+	  3-th excited: norm of the residual = 0.00329658
+	  4-th excited: norm of the residual = 0.00721683
+
+	Davidson iter=3
+	  1-th excited: norm of the residual = 0.00204263
+	  2-th excited: norm of the residual = 0.0023909
+	  3-th excited: norm of the residual = 0.0031717
+	  4-th excited: norm of the residual = 0.00682515
+
+	Davidson iter=4
+	  1-th excited: norm of the residual = 0.00040523
+	  2-th excited: norm of the residual = 0.0205882
+	  3-th excited: norm of the residual = 0.00457518
+	  4-th excited: norm of the residual = 0.00296246
+
+	Davidson iter=5
+	  1-th excited: norm of the residual = 0.00409449
+	  2-th excited: norm of the residual = 0.0103483
+	  3-th excited: norm of the residual = 0.00100175
+	  4-th excited: norm of the residual = 0.00163943
+
+	Davidson iter=6
+	  1-th excited: norm of the residual = 0.00431776
+	  2-th excited: norm of the residual = 0.000213501
+	  3-th excited: norm of the residual = 0.000399243
+	  4-th excited: norm of the residual = 0.000686614
+
+	Davidson iter=7
+	  1-th excited: norm of the residual = 0.000310164
+	  2-th excited: norm of the residual = 1.37962e-05
+	  3-th excited: norm of the residual = 3.14557e-05
+	  4-th excited: norm of the residual = 6.68549e-05
+
+	Davidson iter=8
+	  1-th excited: norm of the residual = 3.68103e-05
+	  2-th excited: norm of the residual = 1.67448e-06
+	  3-th excited: norm of the residual = 3.89964e-06
+	  4-th excited: norm of the residual = 7.70551e-06
+
+	Davidson iter=9
+	  1-th excited: norm of the residual = 1.45466e-06
+	  2-th excited: norm of the residual = 6.52377e-08
+	  3-th excited: norm of the residual = 1.86906e-07
+	  4-th excited: norm of the residual = 7.54817e-07
+
+	Davidson iter=10
+	  1-th excited: norm of the residual = 1.4261e-07
+	  2-th excited: norm of the residual = 8.12552e-09
+	  3-th excited: norm of the residual = 5.02474e-08
+	  4-th excited: norm of the residual = 5.58857e-07
+
+
+
+		Davidson for PM3/PDDG-CIS met convergence criterion(^^b
+
+
+	======  DONE: Davidson-CIS  =====
+
+
+	Excitation energies:
+		| i-th | e[a.u.] | e[eV] | 
+		 1	2.785920e-01	7.580935e+00
+		 2	2.791858e-01	7.597094e+00
+		 3	2.837408e-01	7.721043e+00
+		 4	2.901073e-01	7.894285e+00
+
+	Elapsed time(omp) for the CIS = 0.275049[s].
+**********  DONE: PM3/PDDG-CIS  **********
+
+
+	Energies:
+		|	kind			| [a.u.] | [eV] | 
+		Core kinetic     	1.317496e-05	3.585118e-04
+		Core repulsion   	2.185529e+01	5.947173e+02
+		Electronic
+		(inc. core rep.)	-1.201757e+01	-3.270174e+02
+		Total            	-1.201756e+01	-3.270170e+02
+		Error            	-1.177947e-09	-3.205382e-08
+
+	Molecular configration:
+		| i-th | atom type | x[angst.] | y[angst.] | z[angst.] |
+		0	C	2.119166e-05	1.998937e-02	-1.287114e-06
+		1	C	1.493777e+00	-1.499342e-02	2.000305e-03
+		2	H	-3.500656e-01	1.041162e+00	9.975592e-04
+		3	H	-3.681391e-01	-5.204752e-01	-9.199652e-01
+		4	H	-3.700441e-01	-5.207863e-01	9.015785e-01
+		5	H	1.851952e+00	5.199922e-01	-9.006960e-01
+		6	H	1.830060e+00	5.239934e-01	9.099969e-01
+		7	H	1.860057e+00	-1.040138e+00	-1.106445e-07
+
+		| i-th | atom type | x[a.u.] | y[a.u.] | z[a.u.] |
+		0	C	4.004644e-05	3.777443e-02	-2.432294e-06
+		1	C	2.822830e+00	-2.833345e-02	3.780029e-03
+		2	H	-6.615280e-01	1.967512e+00	1.885114e-03
+		3	H	-6.956821e-01	-9.835556e-01	-1.738482e+00
+		4	H	-6.992821e-01	-9.841435e-01	1.703737e+00
+		5	H	3.499682e+00	9.826429e-01	-1.702069e+00
+		6	H	3.458312e+00	9.902041e-01	1.719645e+00
+		7	H	3.514997e+00	-1.965576e+00	-2.090878e-07
+
+	Center of Mass:
+		| x[angst.] | y[angst.] | z[angst.] |
+		7.459748e-01	2.121215e-03	5.273561e-04
+
+		| x[a.u.] | y[a.u.] | z[a.u.] |
+		1.409688e+00	4.008515e-03	9.965585e-04
+
+	Center of Core:
+		| x[angst.] | y[angst.] | z[angst.] |
+		7.459751e-01	2.121324e-03	5.274925e-04
+
+		| x[a.u.] | y[a.u.] | z[a.u.] |
+		1.409689e+00	4.008721e-03	9.968163e-04
+
+	Momenta of each atom:
+		| i-th | atom type | px | py | pz | [(g/Mol)*(angst/fs)]
+ 		0	C	3.392448e-03	-1.701837e-03	-2.062122e-04
+		1	C	-3.655460e-03	1.053706e-03	4.888144e-05
+		2	H	-8.802874e-04	8.355130e-04	-3.270664e-05
+		3	H	-5.251652e-04	3.334205e-04	4.674004e-04
+		4	H	-5.926104e-04	1.842247e-04	-2.883054e-04
+		5	H	6.998310e-04	-1.042724e-04	5.400056e-05
+		6	H	8.021158e-04	-8.829765e-05	-4.153433e-05
+		7	H	7.591289e-04	-5.124566e-04	-1.523799e-06
+
+		| i-th | atom type | px[a.u.] | py[a.u.] | pz[a.u.] |
+ 		0	C	2.826712e-01	-1.418034e-01	-1.718236e-02
+		1	C	-3.045864e-01	8.779866e-02	4.072982e-03
+		2	H	-7.334880e-02	6.961802e-02	-2.725238e-03
+		3	H	-4.375870e-02	2.778182e-02	3.894553e-02
+		4	H	-4.937849e-02	1.535028e-02	-2.402267e-02
+		5	H	5.831250e-02	-8.688364e-03	4.499526e-03
+		6	H	6.683524e-02	-7.357286e-03	-3.460794e-03
+		7	H	6.325342e-02	-4.269977e-02	-1.269685e-04
+
+	Time in [fs]: 0.15
+	========== DONE: MD step 3
+
+	========== START: MD step 4
+**********  START: PM3/PDDG-SCF  **********
+SCF iter=0: RMS density=0.000071519615800 
+SCF iter=1: RMS density=0.000024561726602 
+SCF iter=2: RMS density=0.000009267155713 
+SCF iter=3: RMS density=0.000003776850824 
+SCF iter=4: RMS density=0.000001662270152 
+SCF iter=5: RMS density=0.000000783281370 
+
+
+
+		PM3/PDDG-SCF met convergence criterion(^^b
+
+
+	Energies of MOs:
+		| i-th | occ/unocc | e[a.u.] | e[eV] | 
+		 0	occ	-1.296579e+00	-3.528198e+01 
+		 1	occ	-8.489805e-01	-2.310212e+01 
+		 2	occ	-5.677296e-01	-1.544883e+01 
+		 3	occ	-5.624145e-01	-1.530420e+01 
+		 4	occ	-4.997543e-01	-1.359912e+01 
+		 5	occ	-4.380782e-01	-1.192081e+01 
+		 6	occ	-4.317403e-01	-1.174834e+01 
+		 7	unocc	1.407237e-01	3.829317e+00 
+		 8	unocc	1.509331e-01	4.107130e+00 
+		 9	unocc	1.615404e-01	4.395774e+00 
+		 10	unocc	1.658986e-01	4.514367e+00 
+		 11	unocc	1.793100e-01	4.879312e+00 
+		 12	unocc	1.903731e-01	5.180358e+00 
+		 13	unocc	1.963432e-01	5.342813e+00 
+
+	Electronic energy(including core-repulsions):
+		| [a.u.] | [eV] | 
+		-1.229617e+01	-3.345985e+02
+
+	Total core repulsion energy:
+		| [a.u.] | [eV] |
+		2.185515e+01	5.947135e+02
+
+	Mulliken charge on each Atom:
+		| i-th | atom type | core charge | Mulliken charge | 
+		0	C	4.000000e+00	-2.698700e-01
+		1	C	4.000000e+00	-2.685400e-01
+		2	H	1.000000e+00	9.257332e-02
+		3	H	1.000000e+00	8.740494e-02
+		4	H	1.000000e+00	8.819517e-02
+		5	H	1.000000e+00	8.837467e-02
+		6	H	1.000000e+00	8.848635e-02
+		7	H	1.000000e+00	9.337555e-02
+
+	Elapsed time(omp) for the SCF = 0.0536079[s].
+**********  DONE: PM3/PDDG-SCF  **********
+
+
+**********  START: PM3/PDDG-CIS  **********
+----------- START: Calculation of the CIS matrix -----------
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.0789509[s].
+----------- DONE: Calculation of the CIS matrix -----------
+
+	======  START: Davidson-CIS  =====
+	Davidson iter=0
+	  1-th excited: norm of the residual = 0.0519615
+	  2-th excited: norm of the residual = 0.053333
+	  3-th excited: norm of the residual = 0.0660456
+	  4-th excited: norm of the residual = 0.0656219
+
+	Davidson iter=1
+	  1-th excited: norm of the residual = 0.0208423
+	  2-th excited: norm of the residual = 0.0236554
+	  3-th excited: norm of the residual = 0.0252454
+	  4-th excited: norm of the residual = 0.030109
+
+	Davidson iter=2
+	  1-th excited: norm of the residual = 0.00604308
+	  2-th excited: norm of the residual = 0.00697516
+	  3-th excited: norm of the residual = 0.00329295
+	  4-th excited: norm of the residual = 0.00720553
+
+	Davidson iter=3
+	  1-th excited: norm of the residual = 0.00204217
+	  2-th excited: norm of the residual = 0.00238658
+	  3-th excited: norm of the residual = 0.00316524
+	  4-th excited: norm of the residual = 0.0068028
+
+	Davidson iter=4
+	  1-th excited: norm of the residual = 0.00040428
+	  2-th excited: norm of the residual = 0.0206114
+	  3-th excited: norm of the residual = 0.0045883
+	  4-th excited: norm of the residual = 0.00296642
+
+	Davidson iter=5
+	  1-th excited: norm of the residual = 0.00405073
+	  2-th excited: norm of the residual = 0.0103806
+	  3-th excited: norm of the residual = 0.000999135
+	  4-th excited: norm of the residual = 0.00163926
+
+	Davidson iter=6
+	  1-th excited: norm of the residual = 0.00431546
+	  2-th excited: norm of the residual = 0.000211452
+	  3-th excited: norm of the residual = 0.000397412
+	  4-th excited: norm of the residual = 0.00068548
+
+	Davidson iter=7
+	  1-th excited: norm of the residual = 0.000310269
+	  2-th excited: norm of the residual = 1.36777e-05
+	  3-th excited: norm of the residual = 3.13401e-05
+	  4-th excited: norm of the residual = 6.68409e-05
+
+	Davidson iter=8
+	  1-th excited: norm of the residual = 3.69063e-05
+	  2-th excited: norm of the residual = 1.66406e-06
+	  3-th excited: norm of the residual = 3.89308e-06
+	  4-th excited: norm of the residual = 7.70566e-06
+
+	Davidson iter=9
+	  1-th excited: norm of the residual = 1.44967e-06
+	  2-th excited: norm of the residual = 6.45011e-08
+	  3-th excited: norm of the residual = 1.85339e-07
+	  4-th excited: norm of the residual = 7.48906e-07
+
+	Davidson iter=10
+	  1-th excited: norm of the residual = 1.41933e-07
+	  2-th excited: norm of the residual = 8.06785e-09
+	  3-th excited: norm of the residual = 4.99207e-08
+	  4-th excited: norm of the residual = 5.55953e-07
+
+
+
+		Davidson for PM3/PDDG-CIS met convergence criterion(^^b
+
+
+	======  DONE: Davidson-CIS  =====
+
+
+	Excitation energies:
+		| i-th | e[a.u.] | e[eV] | 
+		 1	2.785871e-01	7.580801e+00
+		 2	2.791812e-01	7.596969e+00
+		 3	2.837313e-01	7.720783e+00
+		 4	2.901059e-01	7.894246e+00
+
+	Elapsed time(omp) for the CIS = 0.274801[s].
+**********  DONE: PM3/PDDG-CIS  **********
+
+
+	Energies:
+		|	kind			| [a.u.] | [eV] | 
+		Core kinetic     	2.340520e-05	6.368929e-04
+		Core repulsion   	2.185515e+01	5.947135e+02
+		Electronic
+		(inc. core rep.)	-1.201758e+01	-3.270177e+02
+		Total            	-1.201756e+01	-3.270170e+02
+		Error            	-1.499812e-09	-4.081228e-08
+
+	Molecular configration:
+		| i-th | atom type | x[angst.] | y[angst.] | z[angst.] |
+		0	C	3.766967e-05	1.998110e-02	-2.289107e-06
+		1	C	1.493759e+00	-1.498830e-02	2.000543e-03
+		2	H	-3.501165e-01	1.041211e+00	9.956673e-04
+		3	H	-3.681695e-01	-5.204559e-01	-9.199381e-01
+		4	H	-3.700784e-01	-5.207756e-01	9.015618e-01
+		5	H	1.851993e+00	5.199862e-01	-9.006929e-01
+		6	H	1.830106e+00	5.239883e-01	9.099945e-01
+		7	H	1.860100e+00	-1.040168e+00	-1.998708e-07
+
+		| i-th | atom type | x[a.u.] | y[a.u.] | z[a.u.] |
+		0	C	7.118537e-05	3.775881e-02	-4.325786e-06
+		1	C	2.822796e+00	-2.832378e-02	3.780478e-03
+		2	H	-6.616244e-01	1.967603e+00	1.881539e-03
+		3	H	-6.957396e-01	-9.835191e-01	-1.738431e+00
+		4	H	-6.993469e-01	-9.841233e-01	1.703705e+00
+		5	H	3.499759e+00	9.826315e-01	-1.702063e+00
+		6	H	3.458400e+00	9.901944e-01	1.719640e+00
+		7	H	3.515081e+00	-1.965632e+00	-3.777010e-07
+
+	Center of Mass:
+		| x[angst.] | y[angst.] | z[angst.] |
+		7.459748e-01	2.121215e-03	5.273562e-04
+
+		| x[a.u.] | y[a.u.] | z[a.u.] |
+		1.409688e+00	4.008516e-03	9.965587e-04
+
+	Center of Core:
+		| x[angst.] | y[angst.] | z[angst.] |
+		7.459751e-01	2.121324e-03	5.274925e-04
+
+		| x[a.u.] | y[a.u.] | z[a.u.] |
+		1.409689e+00	4.008721e-03	9.968163e-04
+
+	Momenta of each atom:
+		| i-th | atom type | px | py | pz | [(g/Mol)*(angst/fs)]
+ 		0	C	4.522210e-03	-2.267715e-03	-2.751665e-04
+		1	C	-4.872881e-03	1.404110e-03	6.522546e-05
+		2	H	-1.173281e-03	1.112860e-03	-4.347587e-05
+		3	H	-6.999473e-04	4.445404e-04	6.232196e-04
+		4	H	-7.901945e-04	2.455926e-04	-3.841122e-04
+		5	H	9.330855e-04	-1.390690e-04	7.198656e-05
+		6	H	1.069122e-03	-1.178311e-04	-5.558147e-05
+		7	H	1.011886e-03	-6.824881e-04	-2.095601e-06
+
+		| i-th | atom type | px[a.u.] | py[a.u.] | pz[a.u.] |
+ 		0	C	3.768072e-01	-1.889544e-01	-2.292789e-02
+		1	C	-4.060264e-01	1.169956e-01	5.434826e-03
+		2	H	-9.776206e-02	9.272763e-02	-3.622570e-03
+		3	H	-5.832219e-02	3.704075e-02	5.192895e-02
+		4	H	-6.584192e-02	2.046368e-02	-3.200564e-02
+		5	H	7.774812e-02	-1.158774e-02	5.998186e-03
+		6	H	8.908322e-02	-9.818123e-03	-4.631253e-03
+		7	H	8.431409e-02	-5.686742e-02	-1.746132e-04
+
+	Time in [fs]: 0.2
+	========== DONE: MD step 4
+
+	========== START: MD step 5
+**********  START: PM3/PDDG-SCF  **********
+SCF iter=0: RMS density=0.000091936840787 
+SCF iter=1: RMS density=0.000031577938330 
+SCF iter=2: RMS density=0.000011916080457 
+SCF iter=3: RMS density=0.000004857252706 
+SCF iter=4: RMS density=0.000002138149017 
+SCF iter=5: RMS density=0.000001007658317 
+SCF iter=6: RMS density=0.000000006183158 
+
+
+
+		PM3/PDDG-SCF met convergence criterion(^^b
+
+
+	Energies of MOs:
+		| i-th | occ/unocc | e[a.u.] | e[eV] | 
+		 0	occ	-1.296567e+00	-3.528165e+01 
+		 1	occ	-8.489775e-01	-2.310204e+01 
+		 2	occ	-5.677165e-01	-1.544848e+01 
+		 3	occ	-5.624111e-01	-1.530411e+01 
+		 4	occ	-4.997727e-01	-1.359962e+01 
+		 5	occ	-4.380629e-01	-1.192039e+01 
+		 6	occ	-4.317343e-01	-1.174818e+01 
+		 7	unocc	1.407207e-01	3.829236e+00 
+		 8	unocc	1.509355e-01	4.107197e+00 
+		 9	unocc	1.615371e-01	4.395685e+00 
+		 10	unocc	1.658877e-01	4.514071e+00 
+		 11	unocc	1.793160e-01	4.879477e+00 
+		 12	unocc	1.903753e-01	5.180416e+00 
+		 13	unocc	1.963330e-01	5.342536e+00 
+
+	Electronic energy(including core-repulsions):
+		| [a.u.] | [eV] | 
+		-1.229618e+01	-3.345987e+02
+
+	Total core repulsion energy:
+		| [a.u.] | [eV] |
+		2.185497e+01	5.947087e+02
+
+	Mulliken charge on each Atom:
+		| i-th | atom type | core charge | Mulliken charge | 
+		0	C	4.000000e+00	-2.698556e-01
+		1	C	4.000000e+00	-2.685252e-01
+		2	H	1.000000e+00	9.256844e-02
+		3	H	1.000000e+00	8.740056e-02
+		4	H	1.000000e+00	8.819095e-02
+		5	H	1.000000e+00	8.836986e-02
+		6	H	1.000000e+00	8.848172e-02
+		7	H	1.000000e+00	9.336932e-02
+
+	Elapsed time(omp) for the SCF = 0.055531[s].
+**********  DONE: PM3/PDDG-SCF  **********
+
+
+**********  START: PM3/PDDG-CIS  **********
+----------- START: Calculation of the CIS matrix -----------
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.080205[s].
+----------- DONE: Calculation of the CIS matrix -----------
+
+	======  START: Davidson-CIS  =====
+	Davidson iter=0
+	  1-th excited: norm of the residual = 0.0519636
+	  2-th excited: norm of the residual = 0.0533374
+	  3-th excited: norm of the residual = 0.0660445
+	  4-th excited: norm of the residual = 0.065623
+
+	Davidson iter=1
+	  1-th excited: norm of the residual = 0.0208456
+	  2-th excited: norm of the residual = 0.0236499
+	  3-th excited: norm of the residual = 0.0252459
+	  4-th excited: norm of the residual = 0.0300936
+
+	Davidson iter=2
+	  1-th excited: norm of the residual = 0.00604256
+	  2-th excited: norm of the residual = 0.00696887
+	  3-th excited: norm of the residual = 0.00328831
+	  4-th excited: norm of the residual = 0.00719103
+
+	Davidson iter=3
+	  1-th excited: norm of the residual = 0.00204159
+	  2-th excited: norm of the residual = 0.00238107
+	  3-th excited: norm of the residual = 0.00315695
+	  4-th excited: norm of the residual = 0.00677412
+
+	Davidson iter=4
+	  1-th excited: norm of the residual = 0.000403068
+	  2-th excited: norm of the residual = 0.0206413
+	  3-th excited: norm of the residual = 0.00460555
+	  4-th excited: norm of the residual = 0.00297153
+
+	Davidson iter=5
+	  1-th excited: norm of the residual = 0.00399382
+	  2-th excited: norm of the residual = 0.0104219
+	  3-th excited: norm of the residual = 0.000995746
+	  4-th excited: norm of the residual = 0.00163903
+
+	Davidson iter=6
+	  1-th excited: norm of the residual = 0.00431255
+	  2-th excited: norm of the residual = 0.000208822
+	  3-th excited: norm of the residual = 0.000395064
+	  4-th excited: norm of the residual = 0.000684032
+
+	Davidson iter=7
+	  1-th excited: norm of the residual = 0.00031041
+	  2-th excited: norm of the residual = 1.35251e-05
+	  3-th excited: norm of the residual = 3.11918e-05
+	  4-th excited: norm of the residual = 6.68239e-05
+
+	Davidson iter=8
+	  1-th excited: norm of the residual = 3.70312e-05
+	  2-th excited: norm of the residual = 1.65057e-06
+	  3-th excited: norm of the residual = 3.88464e-06
+	  4-th excited: norm of the residual = 7.70632e-06
+
+	Davidson iter=9
+	  1-th excited: norm of the residual = 1.44345e-06
+	  2-th excited: norm of the residual = 6.35653e-08
+	  3-th excited: norm of the residual = 1.83355e-07
+	  4-th excited: norm of the residual = 7.41359e-07
+
+	Davidson iter=10
+	  1-th excited: norm of the residual = 1.41074e-07
+	  2-th excited: norm of the residual = 7.99168e-09
+	  3-th excited: norm of the residual = 4.9502e-08
+	  4-th excited: norm of the residual = 5.52182e-07
+
+
+
+		Davidson for PM3/PDDG-CIS met convergence criterion(^^b
+
+
+	======  DONE: Davidson-CIS  =====
+
+
+	Excitation energies:
+		| i-th | e[a.u.] | e[eV] | 
+		 1	2.785807e-01	7.580627e+00
+		 2	2.791753e-01	7.596809e+00
+		 3	2.837190e-01	7.720448e+00
+		 4	2.901041e-01	7.894197e+00
+
+	Elapsed time(omp) for the CIS = 0.27928[s].
+**********  DONE: PM3/PDDG-CIS  **********
+
+
+	Energies:
+		|	kind			| [a.u.] | [eV] | 
+		Core kinetic     	3.653660e-05	9.942195e-04
+		Core repulsion   	2.185497e+01	5.947087e+02
+		Electronic
+		(inc. core rep.)	-1.201760e+01	-3.270180e+02
+		Total            	-1.201756e+01	-3.270170e+02
+		Error            	3.476647e-09	9.460512e-08
+
+	Molecular configration:
+		| i-th | atom type | x[angst.] | y[angst.] | z[angst.] |
+		0	C	5.885005e-05	1.997048e-02	-3.578544e-06
+		1	C	1.493737e+00	-1.498172e-02	2.000848e-03
+		2	H	-3.501820e-01	1.041273e+00	9.932435e-04
+		3	H	-3.682086e-01	-5.204310e-01	-9.199033e-01
+		4	H	-3.701226e-01	-5.207619e-01	9.015404e-01
+		5	H	1.852045e+00	5.199784e-01	-9.006888e-01
+		6	H	1.830166e+00	5.239817e-01	9.099914e-01
+		7	H	1.860157e+00	-1.040206e+00	-3.186670e-07
+
+		| i-th | atom type | x[a.u.] | y[a.u.] | z[a.u.] |
+		0	C	1.112105e-04	3.773874e-02	-6.762469e-06
+		1	C	2.822753e+00	-2.831135e-02	3.781055e-03
+		2	H	-6.617481e-01	1.967720e+00	1.876958e-03
+		3	H	-6.958134e-01	-9.834722e-01	-1.738365e+00
+		4	H	-6.994303e-01	-9.840974e-01	1.703664e+00
+		5	H	3.499857e+00	9.826169e-01	-1.702055e+00
+		6	H	3.458512e+00	9.901820e-01	1.719635e+00
+		7	H	3.515187e+00	-1.965704e+00	-6.021933e-07
+
+	Center of Mass:
+		| x[angst.] | y[angst.] | z[angst.] |
+		7.459748e-01	2.121216e-03	5.273563e-04
+
+		| x[a.u.] | y[a.u.] | z[a.u.] |
+		1.409688e+00	4.008517e-03	9.965590e-04
+
+	Center of Core:
+		| x[angst.] | y[angst.] | z[angst.] |
+		7.459751e-01	2.121324e-03	5.274925e-04
+
+		| x[a.u.] | y[a.u.] | z[a.u.] |
+		1.409689e+00	4.008721e-03	9.968163e-04
+
+	Momenta of each atom:
+		| i-th | atom type | px | py | pz | [(g/Mol)*(angst/fs)]
+ 		0	C	5.651069e-03	-2.832394e-03	-3.443063e-04
+		1	C	-6.089389e-03	1.753803e-03	8.161256e-05
+		2	H	-1.465901e-03	1.389218e-03	-5.413119e-05
+		3	H	-8.744953e-04	5.556432e-04	7.790553e-04
+		4	H	-9.878192e-04	3.069260e-04	-4.796661e-04
+		5	H	1.166321e-03	-1.738991e-04	8.996030e-05
+		6	H	1.335815e-03	-1.474513e-04	-6.980240e-05
+		7	H	1.264399e-03	-8.518459e-04	-2.722190e-06
+
+		| i-th | atom type | px[a.u.] | py[a.u.] | pz[a.u.] |
+ 		0	C	4.708679e-01	-2.360055e-01	-2.868887e-02
+		1	C	-5.073903e-01	1.461334e-01	6.800259e-03
+		2	H	-1.221443e-01	1.157548e-01	-4.510410e-03
+		3	H	-7.286618e-02	4.629824e-02	6.491376e-02
+		4	H	-8.230874e-02	2.557421e-02	-3.996755e-02
+		5	H	9.718215e-02	-1.448992e-02	7.495824e-03
+		6	H	1.113051e-01	-1.228618e-02	-5.816193e-03
+		7	H	1.053544e-01	-7.097894e-02	-2.268229e-04
+
+	Time in [fs]: 0.25
+	========== DONE: MD step 5
+**********  DONE: Molecular dynamics  **********
+
+
+     >>>>>  The MolDS finished normally!  <<<<<
+     >>>>>  CPU time: 14.45[s].  <<<<<
+     >>>>>  Elapsed time: 15[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 14.4652[s].  <<<<<
+     >>>>>  See you.  <<<<<
+
+
