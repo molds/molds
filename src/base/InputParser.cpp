@@ -557,7 +557,7 @@ void InputParser::Parse(Molecule* molecule) const{
    if(Parameters::GetInstance()->RequiresMD()){
       this->OutputMdConditions();
    }
-   if(0<Parameters::GetInstance()->GetIndecesMOPlot().size()){
+   if(0<Parameters::GetInstance()->GetIndecesMOPlot()->size()){
       this->OutputMOPlotConditions();
    }
 
@@ -668,9 +668,9 @@ void InputParser::OutputMdConditions() const{
 
 void InputParser::OutputMOPlotConditions() const{
    cout << this->messageMOPlotConditions;
-   vector<int> moIndeces = Parameters::GetInstance()->GetIndecesMOPlot();
-   for(int i=0; i<moIndeces.size(); i++){
-      printf("%s%d\n", this->messageMOPlotIndex.c_str(), moIndeces[i]);
+   vector<int>* moIndeces = Parameters::GetInstance()->GetIndecesMOPlot();
+   for(int i=0; i<moIndeces->size(); i++){
+      printf("%s%d\n", this->messageMOPlotIndex.c_str(), (*moIndeces)[i]);
    }
    int* gridNum = Parameters::GetInstance()->GetGridNumberMOPlot();
    printf("%s%d %d %d\n", this->messageMOPlotGridNumber.c_str(), 

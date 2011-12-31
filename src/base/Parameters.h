@@ -29,7 +29,7 @@ public:
    void SetGridNumberMOPlot(int Nx, int Ny, int Nz);
    double* GetFrameLengthMOPlot() const;
    void SetFrameLengthMOPlot(double lx, double ly, double lz);
-   std::vector<int> GetIndecesMOPlot() const;
+   std::vector<int>* GetIndecesMOPlot() const;
    void AddIndexMOPlot(int moIndex);
    double GetEV2AU() const;
    double GetKcalMolin2AU() const;
@@ -103,7 +103,7 @@ private:
    std::string fileNamePrefixMOPlot;
    int gridNumberMOPlot[CartesianType_end];
    double frameLengthMOPlot[CartesianType_end];
-   std::vector<int> indecesMOPlot;
+   std::vector<int>* indecesMOPlot;
    TheoryType currentTheory;
    double translatingDifference[3];
    double* inertiaTensorOrigin;

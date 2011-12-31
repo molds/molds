@@ -23,6 +23,7 @@ const double Parameters::degree2Radian = M_PI / 180.0;
 
 Parameters::Parameters(){
    this->SetDefaultValues();
+   this->indecesMOPlot = new vector<int>;
 }
 
 Parameters::~Parameters(){
@@ -33,6 +34,11 @@ Parameters::~Parameters(){
    if(this->rotatingOrigin != NULL){
       MallocerFreer::GetInstance()->FreeDoubleMatrix1d(&this->rotatingOrigin);
       //cout << "rotatingOrigin deleted\n";
+   }
+   if(this->indecesMOPlot != NULL){
+      delete this->indecesMOPlot;
+      this->indecesMOPlot = NULL;
+      //cout << "indecesMOPlot deleted\n";
    }
 
 }
@@ -321,12 +327,12 @@ void Parameters::SetRequiresCIS(bool requiresCIS){
    this->requiresCIS = requiresCIS;
 }
 
-vector<int> Parameters::GetIndecesMOPlot() const{
+vector<int>* Parameters::GetIndecesMOPlot() const{
    return this->indecesMOPlot;
 }
 
 void Parameters::AddIndexMOPlot(int moIndex){
-   this->indecesMOPlot.push_back(moIndex);
+   this->indecesMOPlot->push_back(moIndex);
 }
 
 bool Parameters::IsDavidsonCIS() const{
