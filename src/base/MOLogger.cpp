@@ -84,7 +84,7 @@ void MOLogger::DrawMO(vector<int> moIndeces){
       // output cube file
       ofs << this->messageCubeHeaderComment1;
       ofs << this->messageCubeHeaderComment2;
-      sprintf(data,"\t%d\t%e\t%e\t%e\n", this->molecule->GetAtomVect()->size(),
+      sprintf(data,"\t%d\t%e\t%e\t%e\n", (int)this->molecule->GetAtomVect()->size(),
                                          origin[XAxis], 
                                          origin[YAxis], 
                                          origin[ZAxis]);
