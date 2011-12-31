@@ -250,6 +250,32 @@ mklNumThreads = "2"
 ompNumThreads = "2"
 testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
 
+system("echo '---------------------------------------------------'")
+system("echo '----------  Test of MNDO/CIS-singlet-force --------'")
+system("echo '----------  Without Davidson for the CIS   --------'")
+system("echo '---------------------------------------------------\n'")
+system("echo '\t\t\t>>> C2H6 <<<\n'")
+prefix = "c2h6_mndo_directCIS_singlet_force"
+mklNumThreads = "1"
+ompNumThreads = "1"
+testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
+mklNumThreads = "2"
+ompNumThreads = "2"
+testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
+
+system("echo '---------------------------------------------------'")
+system("echo '----------  Test of MNDO/CIS-singlet-force --------'")
+system("echo '----------  With Davidson for the CIS      --------'")
+system("echo '---------------------------------------------------\n'")
+system("echo '\t\t\t>>> C2H6 <<<\n'")
+prefix = "c2h6_mndo_davidsonCIS_singlet_force"
+mklNumThreads = "1"
+ompNumThreads = "1"
+testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
+mklNumThreads = "2"
+ompNumThreads = "2"
+testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
+
 system("echo '-------------------------------------------'")
 system("echo '----------   Test of AM1/HF    ------------'")
 system("echo '-------------------------------------------\n'")
@@ -327,6 +353,32 @@ mklNumThreads = "2"
 ompNumThreads = "2"
 testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
 
+system("echo '---------------------------------------------------'")
+system("echo '----------  Test of AM1/CIS-singlet-force  --------'")
+system("echo '----------  Without Davidson for the CIS   --------'")
+system("echo '---------------------------------------------------\n'")
+system("echo '\t\t\t>>> C2H6 <<<\n'")
+prefix = "c2h6_am1_directCIS_singlet_force"
+mklNumThreads = "1"
+ompNumThreads = "1"
+testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
+mklNumThreads = "2"
+ompNumThreads = "2"
+testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
+
+system("echo '---------------------------------------------------'")
+system("echo '----------  Test of AM1/CIS-singlet-force  --------'")
+system("echo '----------  With Davidson for the CIS      --------'")
+system("echo '---------------------------------------------------\n'")
+system("echo '\t\t\t>>> C2H6 <<<\n'")
+prefix = "c2h6_am1_davidsonCIS_singlet_force"
+mklNumThreads = "1"
+ompNumThreads = "1"
+testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
+mklNumThreads = "2"
+ompNumThreads = "2"
+testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
+
 system("echo '-------------------------------------------'")
 system("echo '----------   Test of PM3/HF    ------------'")
 system("echo '-------------------------------------------\n'")
@@ -397,6 +449,32 @@ system("echo '----------  Test of PM3/HF-Force  ------------'")
 system("echo '------------------------------------------------\n'")
 system("echo '\t\t\t>>> C2H6 <<<\n'")
 prefix = "c2h6_pm3_force"
+mklNumThreads = "1"
+ompNumThreads = "1"
+testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
+mklNumThreads = "2"
+ompNumThreads = "2"
+testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
+
+system("echo '---------------------------------------------------'")
+system("echo '----------  Test of PM3/CIS-singlet-force  --------'")
+system("echo '----------  Without Davidson for the CIS   --------'")
+system("echo '---------------------------------------------------\n'")
+system("echo '\t\t\t>>> C2H6 <<<\n'")
+prefix = "c2h6_pm3_directCIS_singlet_force"
+mklNumThreads = "1"
+ompNumThreads = "1"
+testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
+mklNumThreads = "2"
+ompNumThreads = "2"
+testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
+
+system("echo '---------------------------------------------------'")
+system("echo '----------  Test of PM3/CIS-singlet-force  --------'")
+system("echo '----------  With Davidson for the CIS      --------'")
+system("echo '---------------------------------------------------\n'")
+system("echo '\t\t\t>>> C2H6 <<<\n'")
+prefix = "c2h6_pm3_davidsonCIS_singlet_force"
 mklNumThreads = "1"
 ompNumThreads = "1"
 testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
