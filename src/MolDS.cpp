@@ -178,7 +178,7 @@ int main(){
       cout << "     >>>>>  See you.  <<<<<\n\n\n";
 
    }
-   catch(MolDSException ex){
+   catch(exception ex){
       cout << ex.what();
    }
 
