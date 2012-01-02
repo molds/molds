@@ -11,8 +11,8 @@ public:
 private:
    static InputParser* inputParser;
    InputParser();
-   InputParser(InputParser&);
-   void operator = (InputParser&);
+   InputParser(const InputParser&);
+   void operator = (const InputParser&);
    ~InputParser();
    void SetMessages();
    std::string messageStartParseInput;

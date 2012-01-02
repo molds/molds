@@ -19,8 +19,8 @@ public:
 private:
    static GTOExpansionSTO* gTOExpansionSTO;
    GTOExpansionSTO();
-   GTOExpansionSTO(GTOExpansionSTO&);
-   void operator = (GTOExpansionSTO&);
+   GTOExpansionSTO(const GTOExpansionSTO&);
+   void operator = (const GTOExpansionSTO&);
    ~GTOExpansionSTO();
 
    std::string errorMessageGetCoefficientNonValidOrbital;

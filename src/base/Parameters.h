@@ -81,8 +81,8 @@ public:
 private:
    static Parameters* parameters;
    Parameters();
-   Parameters(Parameters&);
-   void operator = (Parameters&);
+   Parameters(const Parameters&);
+   void operator = (const Parameters&);
    ~Parameters();
 
    void SetDefaultValues();

@@ -10,8 +10,8 @@ public:
    int Dsysv(double const* const* matrix, double* b, int size);
 private:
    LapackWrapper();
-   LapackWrapper(LapackWrapper&);
-   void operator = (LapackWrapper&);
+   LapackWrapper(const LapackWrapper&);
+   void operator = (const LapackWrapper&);
    ~LapackWrapper();
    static LapackWrapper* lapackWrapper;
    bool calculatedDsysvBlockSize;

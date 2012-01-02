@@ -47,8 +47,8 @@ public:
                                                  int size4, int size5);
 private:
    MallocerFreer();
-   MallocerFreer(MallocerFreer&);
-   void operator = (MallocerFreer&);
+   MallocerFreer(const MallocerFreer&);
+   void operator = (const MallocerFreer&);
    ~MallocerFreer();
    static MallocerFreer* mallocerFreer;
    std::string errorMessageMallocFailure;
