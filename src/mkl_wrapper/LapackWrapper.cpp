@@ -187,14 +187,16 @@ int LapackWrapper::Dsysv(double const* const* matrix, double* b, int size){
    }
 
    // calc. lwork
-   if(!this->calculatedDsysvBlockSize){
-      lwork = -1;
-      double tempWork[3]={0.0, 0.0, 0.0};
-      dsysv(&uplo, &size, &nrhs, convertedMatrix, &lda, ipiv, tempB, &ldb, tempWork, &lwork, &info);
-      this->calculatedDsysvBlockSize = true;
-      this->dsysvBlockSize = tempWork[0]/size;
+   #pragma omp critical
+   {
+      if(!this->calculatedDsysvBlockSize){
+         lwork = -1;
+         double tempWork[3]={0.0, 0.0, 0.0};
+         dsysv(&uplo, &size, &nrhs, convertedMatrix, &lda, ipiv, tempB, &ldb, tempWork, &lwork, &info);
+         this->calculatedDsysvBlockSize = true;
+         this->dsysvBlockSize = tempWork[0]/size;
+      }
    }
-
    info = 0;
    lwork = this->dsysvBlockSize*size;
    work = (double*)mkl_malloc( sizeof(double)*lwork, 16 );
