@@ -4,6 +4,7 @@
 #include<sstream>
 #include<math.h>
 #include<vector>
+#include"../Uncopyable.h"
 #include"../Enums.h"
 #include"../EularAngle.h"
 #include"../Parameters.h"

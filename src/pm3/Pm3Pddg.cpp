@@ -5,6 +5,7 @@
 #include<math.h>
 #include<string>
 #include<vector>
+#include"../base/Uncopyable.h"
 #include"../base/Enums.h"
 #include"../base/EularAngle.h"
 #include"../base/Parameters.h"

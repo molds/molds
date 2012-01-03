@@ -8,6 +8,7 @@
 #include<stdexcept>
 #include<omp.h>
 #include"../base/MolDSException.h"
+#include"../base/Uncopyable.h"
 #include"../mkl_wrapper/LapackWrapper.h"
 #include"../base/Enums.h"
 #include"../base/MathUtilities.h"

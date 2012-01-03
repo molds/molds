@@ -3,7 +3,7 @@
 namespace MolDS_base{
 
 // MallocerFreer is singleton
-class MallocerFreer{
+class MallocerFreer: private Uncopyable{
 public:
    static MallocerFreer* GetInstance();
    static void DeleteInstance();
@@ -47,8 +47,6 @@ public:
                                                  int size4, int size5);
 private:
    MallocerFreer();
-   MallocerFreer(const MallocerFreer&);
-   void operator = (const MallocerFreer&);
    ~MallocerFreer();
    static MallocerFreer* mallocerFreer;
    std::string errorMessageMallocFailure;

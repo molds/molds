@@ -6,6 +6,7 @@
 #include<string>
 #include<stdexcept>
 #include"MolDSException.h"
+#include"Uncopyable.h"
 #include"Enums.h"
 #include"GTOExpansionSTO.h"
 using namespace std;

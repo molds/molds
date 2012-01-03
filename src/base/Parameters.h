@@ -4,7 +4,7 @@
 namespace MolDS_base{
 
 // Parameters is singleton
-class Parameters{
+class Parameters: private Uncopyable{
 public:
    static Parameters* GetInstance();
    static void DeleteInstance();
@@ -81,8 +81,6 @@ public:
 private:
    static Parameters* parameters;
    Parameters();
-   Parameters(const Parameters&);
-   void operator = (const Parameters&);
    ~Parameters();
 
    void SetDefaultValues();

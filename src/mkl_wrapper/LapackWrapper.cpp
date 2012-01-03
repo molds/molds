@@ -7,6 +7,7 @@
 #include<stdexcept>
 #include"mkl.h"
 #include"../base/MolDSException.h"
+#include"../base/Uncopyable.h"
 #include"LapackWrapper.h"
 using namespace std;
 using namespace MolDS_base;

@@ -7,6 +7,7 @@
 #include<vector>
 #include<stdexcept>
 #include"../MolDSException.h"
+#include"../Uncopyable.h"
 #include"../Enums.h"
 #include"../MathUtilities.h"
 #include"../MallocerFreer.h"

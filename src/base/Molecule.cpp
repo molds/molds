@@ -8,6 +8,7 @@
 #include<stdexcept>
 #include"mkl.h"
 #include"MolDSException.h"
+#include"Uncopyable.h"
 #include"../mkl_wrapper/LapackWrapper.h"
 #include"Enums.h"
 #include"MathUtilities.h"

@@ -2,7 +2,7 @@
 #define INCLUDED_LAPACKWRAPPER
 namespace MolDS_mkl_wrapper{
 // LapackWrapper is singleton
-class LapackWrapper{
+class LapackWrapper: private MolDS_base::Uncopyable{
 public:
    static LapackWrapper* GetInstance();
    static void DeleteInstance();
@@ -10,8 +10,6 @@ public:
    int Dsysv(double const* const* matrix, double* b, int size);
 private:
    LapackWrapper();
-   LapackWrapper(const LapackWrapper&);
-   void operator = (const LapackWrapper&);
    ~LapackWrapper();
    static LapackWrapper* lapackWrapper;
    bool calculatedDsysvBlockSize;

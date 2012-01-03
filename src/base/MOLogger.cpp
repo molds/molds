@@ -8,6 +8,7 @@
 #include<vector>
 #include<stdexcept>
 #include"MolDSException.h"
+#include"Uncopyable.h"
 #include"Utilities.h"
 #include"Enums.h"
 #include"EularAngle.h"

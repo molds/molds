@@ -3,6 +3,7 @@
 #include<string>
 #include<stdexcept>
 #include"MolDSException.h"
+#include"Uncopyable.h"
 #include"MallocerFreer.h"
 using namespace std;
 

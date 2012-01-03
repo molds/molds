@@ -3,7 +3,7 @@
 namespace MolDS_base{
 
 // InputParser is singleton
-class InputParser{
+class InputParser: private Uncopyable{
 public:
    static InputParser* GetInstance();
    static void DeleteInstance();
@@ -11,8 +11,6 @@ public:
 private:
    static InputParser* inputParser;
    InputParser();
-   InputParser(const InputParser&);
-   void operator = (const InputParser&);
    ~InputParser();
    void SetMessages();
    std::string messageStartParseInput;

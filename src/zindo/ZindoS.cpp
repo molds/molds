@@ -9,6 +9,7 @@
 #include<omp.h>
 #include"mkl.h"
 #include"../base/MolDSException.h"
+#include"../base/Uncopyable.h"
 #include"../mkl_wrapper/LapackWrapper.h"
 #include"../base/Enums.h"
 #include"../base/MallocerFreer.h"

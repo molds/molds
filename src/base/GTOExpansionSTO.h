@@ -3,7 +3,7 @@
 namespace MolDS_base{
 
 // GTOExpansionSTO is singleton
-class GTOExpansionSTO{
+class GTOExpansionSTO: private Uncopyable{
 public:
    static GTOExpansionSTO* GetInstance();
    static void DeleteInstance();
@@ -19,8 +19,6 @@ public:
 private:
    static GTOExpansionSTO* gTOExpansionSTO;
    GTOExpansionSTO();
-   GTOExpansionSTO(const GTOExpansionSTO&);
-   void operator = (const GTOExpansionSTO&);
    ~GTOExpansionSTO();
 
    std::string errorMessageGetCoefficientNonValidOrbital;

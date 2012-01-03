@@ -7,6 +7,7 @@
 #include<vector>
 #include<stdexcept>
 #include"../base/MolDSException.h"
+#include"../base/Uncopyable.h"
 #include"../base/Enums.h"
 #include"../base/EularAngle.h"
 #include"../base/Parameters.h"
