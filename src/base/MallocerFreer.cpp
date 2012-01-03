@@ -46,7 +46,7 @@ void MallocerFreer::DeleteInstance(){
    mallocerFreer = NULL;
 }
 
-int* MallocerFreer::MallocIntMatrix1d(int size1){
+int* MallocerFreer::MallocIntMatrix1d(int size1) const{
    int* matrix;  
    matrix = new int[size1];
    MallocerFreer::AddCurrentMalloced((double)(size1*sizeof(int)));
@@ -54,19 +54,19 @@ int* MallocerFreer::MallocIntMatrix1d(int size1){
    return(matrix); 
 }
 
-void MallocerFreer::InitializeIntMatrix1d(int* matrix, int size1){
+void MallocerFreer::InitializeIntMatrix1d(int* matrix, int size1) const{
    for(int i=0;i<size1;i++){
       matrix[i] = 0;
    }
 }
 
-void MallocerFreer::FreeIntMatrix1d(int** matrix, int size1){
+void MallocerFreer::FreeIntMatrix1d(int** matrix, int size1) const{
    delete [] *matrix;
    MallocerFreer::SubtCurrentMalloced((double)(size1*sizeof(int)));
    *matrix = NULL;
 }
 
-double* MallocerFreer::MallocDoubleMatrix1d(int size1){
+double* MallocerFreer::MallocDoubleMatrix1d(int size1) const{
    double* matrix;  
    matrix = new double[size1];
    MallocerFreer::AddCurrentMalloced((double)(size1*sizeof(double)));
@@ -74,19 +74,19 @@ double* MallocerFreer::MallocDoubleMatrix1d(int size1){
    return(matrix); 
 }
 
-void MallocerFreer::InitializeDoubleMatrix1d(double* matrix, int size1){
+void MallocerFreer::InitializeDoubleMatrix1d(double* matrix, int size1) const{
    for(int i=0;i<size1;i++){
       matrix[i] = 0.0;
    }
 }
 
-void MallocerFreer::FreeDoubleMatrix1d(double** matrix, int size1){
+void MallocerFreer::FreeDoubleMatrix1d(double** matrix, int size1) const{
    delete [] *matrix;
    MallocerFreer::SubtCurrentMalloced((double)(size1*sizeof(double)));
    *matrix = NULL;
 }
 
-double** MallocerFreer::MallocDoubleMatrix2d(int size1, int size2){
+double** MallocerFreer::MallocDoubleMatrix2d(int size1, int size2) const{
    double** matrix;  
    matrix = new double*[size1];
    if(matrix==NULL){
@@ -103,7 +103,7 @@ double** MallocerFreer::MallocDoubleMatrix2d(int size1, int size2){
    return(matrix); 
 }
 
-void MallocerFreer::InitializeDoubleMatrix2d(double** matrix, int size1, int size2){
+void MallocerFreer::InitializeDoubleMatrix2d(double** matrix, int size1, int size2) const{
    for(int i=0;i<size1;i++){
       for(int j=0;j<size2;j++){
          matrix[i][j] = 0.0;
@@ -111,7 +111,7 @@ void MallocerFreer::InitializeDoubleMatrix2d(double** matrix, int size1, int siz
    }
 }
 
-void MallocerFreer::FreeDoubleMatrix2d(double*** matrix, int size1, int size2){
+void MallocerFreer::FreeDoubleMatrix2d(double*** matrix, int size1, int size2) const{
    int i=0;
    for(i=0;i<size1;i++){
       delete [] (*matrix)[i];
@@ -121,7 +121,7 @@ void MallocerFreer::FreeDoubleMatrix2d(double*** matrix, int size1, int size2){
    *matrix = NULL;
 }
 
-double*** MallocerFreer::MallocDoubleMatrix3d(int size1, int size2, int size3){
+double*** MallocerFreer::MallocDoubleMatrix3d(int size1, int size2, int size3) const{
    double*** matrix;  
    matrix = new double**[size1];
    if(matrix==NULL){
@@ -144,7 +144,7 @@ double*** MallocerFreer::MallocDoubleMatrix3d(int size1, int size2, int size3){
    return(matrix); 
 }
 
-void MallocerFreer::InitializeDoubleMatrix3d(double*** matrix, int size1, int size2, int size3){
+void MallocerFreer::InitializeDoubleMatrix3d(double*** matrix, int size1, int size2, int size3) const{
    for(int i=0;i<size1;i++) {
       for(int j=0;j<size2;j++){
          for(int k=0;k<size3;k++){
@@ -154,7 +154,7 @@ void MallocerFreer::InitializeDoubleMatrix3d(double*** matrix, int size1, int si
    }
 }
 
-void MallocerFreer::FreeDoubleMatrix3d(double**** matrix, int size1, int size2, int size3){
+void MallocerFreer::FreeDoubleMatrix3d(double**** matrix, int size1, int size2, int size3) const{
    int i=0, j=0;
    for (i=0;i<size1;i++) {
       for (j=0;j<size2;j++) {
@@ -167,7 +167,7 @@ void MallocerFreer::FreeDoubleMatrix3d(double**** matrix, int size1, int size2, 
    *matrix = NULL;
 }
 
-double**** MallocerFreer::MallocDoubleMatrix4d(int size1, int size2, int size3, int size4){
+double**** MallocerFreer::MallocDoubleMatrix4d(int size1, int size2, int size3, int size4) const{
    double**** matrix;  
    matrix = new double***[size1];
    if(matrix==NULL){
@@ -196,7 +196,7 @@ double**** MallocerFreer::MallocDoubleMatrix4d(int size1, int size2, int size3, 
    return(matrix); 
 }
 
-void MallocerFreer::InitializeDoubleMatrix4d(double**** matrix, int size1, int size2, int size3, int size4){
+void MallocerFreer::InitializeDoubleMatrix4d(double**** matrix, int size1, int size2, int size3, int size4) const{
    for(int i=0;i<size1;i++) {
       for(int j=0;j<size2;j++){
          for(int k=0;k<size3;k++){
@@ -208,7 +208,7 @@ void MallocerFreer::InitializeDoubleMatrix4d(double**** matrix, int size1, int s
    }
 }
 
-void MallocerFreer::FreeDoubleMatrix4d(double***** matrix, int size1, int size2, int size3, int size4){
+void MallocerFreer::FreeDoubleMatrix4d(double***** matrix, int size1, int size2, int size3, int size4) const{
    int i=0, j=0, k=0;
    for (i=0;i<size1;i++) {
       for (j=0;j<size2;j++) {
@@ -225,7 +225,7 @@ void MallocerFreer::FreeDoubleMatrix4d(double***** matrix, int size1, int size2,
 }
 
 double***** MallocerFreer::MallocDoubleMatrix5d(int size1, int size2, int size3, 
-                                                int size4, int size5){
+                                                int size4, int size5) const{
    double***** matrix;  
    matrix = new double****[size1];
    if(matrix==NULL){
@@ -261,7 +261,7 @@ double***** MallocerFreer::MallocDoubleMatrix5d(int size1, int size2, int size3,
 }
 
 void MallocerFreer::InitializeDoubleMatrix5d(double***** matrix, int size1, int size2, int size3, 
-                                                                 int size4, int size5){
+                                                                 int size4, int size5) const{
    for(int i=0;i<size1;i++) {
       for(int j=0;j<size2;j++){
          for(int k=0;k<size3;k++){
@@ -276,7 +276,7 @@ void MallocerFreer::InitializeDoubleMatrix5d(double***** matrix, int size1, int 
 }
 
 void MallocerFreer::FreeDoubleMatrix5d(double****** matrix, int size1, int size2, int size3,
-                                                            int size4, int size5){
+                                                            int size4, int size5) const{
    for (int i=0;i<size1;i++) {
       for (int j=0;j<size2;j++) {
          for (int k=0;k<size3;k++) {
@@ -295,7 +295,7 @@ void MallocerFreer::FreeDoubleMatrix5d(double****** matrix, int size1, int size2
 }
 
 double****** MallocerFreer::MallocDoubleMatrix6d(int size1, int size2, int size3, 
-                                                 int size4, int size5, int size6){
+                                                 int size4, int size5, int size6) const{
    double****** matrix;  
    matrix = new double*****[size1];
    if(matrix==NULL){
@@ -337,7 +337,7 @@ double****** MallocerFreer::MallocDoubleMatrix6d(int size1, int size2, int size3
 }
 
 void MallocerFreer::InitializeDoubleMatrix6d(double****** matrix, int size1, int size2, int size3, 
-                                                                  int size4, int size5, int size6){
+                                                                  int size4, int size5, int size6) const{
    for(int i=0;i<size1;i++) {
       for(int j=0;j<size2;j++){
          for(int k=0;k<size3;k++){
@@ -354,7 +354,7 @@ void MallocerFreer::InitializeDoubleMatrix6d(double****** matrix, int size1, int
 }
 
 void MallocerFreer::FreeDoubleMatrix6d(double******* matrix, int size1, int size2, int size3,
-                                                             int size4, int size5, int size6){
+                                                             int size4, int size5, int size6) const{
    for (int i=0;i<size1;i++) {
       for (int j=0;j<size2;j++) {
          for (int k=0;k<size3;k++) {
