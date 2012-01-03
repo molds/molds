@@ -49,9 +49,9 @@ int main(){
       cout << "\n\n     >>>>>  Welcome to the MolDS world at " << s << "  <<<<<\n\n\n";
 
       // declare
+      MallocerFreer::GetInstance();
       InputParser::GetInstance();
       Molecule* molecule = new Molecule();
-      MallocerFreer::GetInstance();
       Parameters::GetInstance();
       MolDS_mkl_wrapper::LapackWrapper::GetInstance();
       GTOExpansionSTO::GetInstance();
@@ -157,9 +157,9 @@ int main(){
       GTOExpansionSTO::DeleteInstance();
       MolDS_mkl_wrapper::LapackWrapper::DeleteInstance(); 
       Parameters::DeleteInstance();
-      MallocerFreer::DeleteInstance();
       delete molecule;
       InputParser::DeleteInstance();
+      MallocerFreer::DeleteInstance();
 
       // Farewell Messages
       time_t endTime;

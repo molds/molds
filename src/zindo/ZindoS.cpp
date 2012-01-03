@@ -49,17 +49,20 @@ ZindoS::ZindoS() : MolDS_cndo::Cndo2(){
 ZindoS::~ZindoS(){
    if(this->matrixCIS != NULL){
       MallocerFreer::GetInstance()->FreeDoubleMatrix2d(&this->matrixCIS, 
+                                                       this->matrixCISdimension,
                                                        this->matrixCISdimension);
       //cout << "matrixCIS deleted\n";
    }
    if(this->excitedEnergies != NULL){
-      MallocerFreer::GetInstance()->FreeDoubleMatrix1d(&this->excitedEnergies);
+      MallocerFreer::GetInstance()->FreeDoubleMatrix1d(&this->excitedEnergies, 
+                                                       this->matrixCISdimension);
       //cout << "exceitedEnergies deleted\n";
    }
    if(this->matrixForce != NULL){
       MallocerFreer::GetInstance()->FreeDoubleMatrix3d(&this->matrixForce, 
                                                        this->matrixForceElecStatesNum,
-                                                       this->molecule->GetAtomVect()->size());
+                                                       this->molecule->GetAtomVect()->size(),
+                                                       CartesianType_end);
       //cout << "matrixForce deleted\n";
    }
    //cout << "ZindoS deleted\n";
@@ -1123,32 +1126,35 @@ void ZindoS::DoesCISDavidson(){
 void ZindoS::FreeDavidsonCISTemporaryMtrices(double*** expansionVectors, 
                                              double** residualVector, 
                                              double** ritzVector) const{
+   int maxDim  = Parameters::GetInstance()->GetMaxDimensionsCIS();
    if(*expansionVectors != NULL){
       MallocerFreer::GetInstance()->FreeDoubleMatrix2d(expansionVectors, 
-                                                       this->matrixCISdimension);
+                                                       this->matrixCISdimension,
+                                                       maxDim);
       //cout << "expansion vectors deleted\n";
    }
    if(*residualVector != NULL){
-      MallocerFreer::GetInstance()->FreeDoubleMatrix1d(residualVector);
+      MallocerFreer::GetInstance()->FreeDoubleMatrix1d(residualVector, this->matrixCISdimension);
       //cout << "residual vector deleted\n";
    }
    if(*ritzVector != NULL){
-      MallocerFreer::GetInstance()->FreeDoubleMatrix1d(ritzVector);
+      MallocerFreer::GetInstance()->FreeDoubleMatrix1d(ritzVector, this->matrixCISdimension);
       //cout << "ritz vector deleted\n";
    }
 
 }
 
 void ZindoS::FreeDavidsonRoopCISTemporaryMtrices(double*** interactionMatrix, 
-                                                 double interactionMatrixDimension, 
+                                                 int interactionMatrixDimension, 
                                                  double** interactionEigenEnergies) const{
    if(*interactionMatrix != NULL){
       MallocerFreer::GetInstance()->FreeDoubleMatrix2d(interactionMatrix, 
+                                                       interactionMatrixDimension,
                                                        interactionMatrixDimension);
       //cout << "interactionMatrix deleted\n";
    }
    if(*interactionEigenEnergies != NULL){
-      MallocerFreer::GetInstance()->FreeDoubleMatrix1d(interactionEigenEnergies);
+      MallocerFreer::GetInstance()->FreeDoubleMatrix1d(interactionEigenEnergies, interactionMatrixDimension);
       //cout << "interactionEigenEnergies deleted\n";
    }
 }
@@ -1555,7 +1561,8 @@ void ZindoS::CalcForce(const vector<int>& elecStates){
       }
       MallocerFreer::GetInstance()->FreeDoubleMatrix3d(&overlapDer, 
                                                        OrbitalType_end,
-                                                       OrbitalType_end);
+                                                       OrbitalType_end,
+                                                       CartesianType_end);
    }
    // Exception throwing for omp-region
    if(!ompErrors.str().empty()){

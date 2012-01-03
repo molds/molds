@@ -23,8 +23,8 @@ namespace MolDS_base{
 
 Molecule::Molecule(){
    this->atomVect = new vector<Atom*>;
-   this->xyzCOM = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(3);
-   this->xyzCOC = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(3);
+   this->xyzCOM = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(CartesianType_end);
+   this->xyzCOC = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(CartesianType_end);
    this->wasCalculatedXyzCOM = false;
    this->wasCalculatedXyzCOC = false;
    this->SetMessages();
@@ -41,11 +41,11 @@ Molecule::~Molecule(){
       //cout << "atomVect deleted\n";
    }
    if(this->xyzCOM != NULL){
-      MallocerFreer::GetInstance()->FreeDoubleMatrix1d(&this->xyzCOM);
+      MallocerFreer::GetInstance()->FreeDoubleMatrix1d(&this->xyzCOM, CartesianType_end);
       //cout << "xyzCOM deleted\n";
    }
    if(this->xyzCOC != NULL){
-      MallocerFreer::GetInstance()->FreeDoubleMatrix1d(&this->xyzCOC);
+      MallocerFreer::GetInstance()->FreeDoubleMatrix1d(&this->xyzCOC, CartesianType_end);
       //cout << "xyzCOC deleted\n";
    }
 }
@@ -333,8 +333,8 @@ void Molecule::CalcPrincipalAxes(){
       inertiaTensorOrigin[2] = Parameters::GetInstance()->GetInertiaTensorOrigin()[2];
    }
 
-   double** inertiaTensor = MallocerFreer::GetInstance()->MallocDoubleMatrix2d(3, 3);
-   double*  inertiaMoments = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(3);
+   double** inertiaTensor = MallocerFreer::GetInstance()->MallocDoubleMatrix2d(CartesianType_end, CartesianType_end);
+   double*  inertiaMoments = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(CartesianType_end);
 
    try{
       this->CalcInertiaTensor(inertiaTensor, inertiaTensorOrigin);
@@ -389,12 +389,13 @@ void Molecule::CalcInertiaTensor(double** inertiaTensor, const double* inertiaTe
 void Molecule::FreeInertiaTensorMoments(double*** inertiaTensor, double** inertiaMoments){
 
    if(*inertiaTensor != NULL){
-      MallocerFreer::GetInstance()->FreeDoubleMatrix2d(inertiaTensor, 3);
+      MallocerFreer::GetInstance()->FreeDoubleMatrix2d(inertiaTensor, CartesianType_end, CartesianType_end);
       //cout << "inertiaTensor deleted\n";
    }
 
    if(*inertiaMoments != NULL){
-      MallocerFreer::GetInstance()->FreeDoubleMatrix1d(inertiaMoments);
+      MallocerFreer::GetInstance()->FreeDoubleMatrix1d(inertiaMoments, 
+                                                       CartesianType_end);
       //cout << "inertiaMoments deleted\n";
    }
 

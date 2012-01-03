@@ -18,25 +18,25 @@ using namespace MolDS_base;
 
 namespace MolDS_base_atoms{
 Atom::Atom(){
-   this->xyz = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(3);
-   this->pxyz = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(3);
+   this->xyz = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(CartesianType_end);
+   this->pxyz = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(CartesianType_end);
    this->SetMessages();
 }
 
 Atom::Atom(double x, double y, double z){
-   this->xyz = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(3);
-   this->pxyz = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(3);
+   this->xyz = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(CartesianType_end);
+   this->pxyz = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(CartesianType_end);
    this->SetMessages();
    this->SetXyz(x, y, z);
 }
 
 Atom::~Atom(){
    if(this->xyz != NULL){
-      MallocerFreer::GetInstance()->FreeDoubleMatrix1d(&this->xyz);
+      MallocerFreer::GetInstance()->FreeDoubleMatrix1d(&this->xyz, CartesianType_end);
       //cout << "xyz deleted\n";
    }
    if(this->pxyz != NULL){
-      MallocerFreer::GetInstance()->FreeDoubleMatrix1d(&this->pxyz);
+      MallocerFreer::GetInstance()->FreeDoubleMatrix1d(&this->pxyz, CartesianType_end);
       //cout << "pxyz (momenta) deleted\n";
    }
    //cout << "atom deleted\n";

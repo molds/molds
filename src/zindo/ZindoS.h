@@ -124,7 +124,7 @@ private:
                                         double** residualVector, 
                                         double** ritzVector) const;
    void FreeDavidsonRoopCISTemporaryMtrices(double*** interactionMatrix, 
-                                            double interactionMatrixDimension, 
+                                            int interactionMatrixDimension, 
                                             double** interactionEigenEnergies) const;
 };
 
