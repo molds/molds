@@ -16,7 +16,7 @@ double MallocerFreer::maxMalloced = 0.0;
 
 MallocerFreer::MallocerFreer(){
    this->errorMessageMallocFailure = "Error in base::MallocFreere: Malloc failure...\n";
-   this->messageMemoryUsage = "Memory summary related to temporary arraies in a node...\n";
+   this->messageMemoryUsage = "Memory summary related to temporary arraies (Heap reagion in a node).\n";
    this->messageMemoryUsageCurrent = "\tMax malloced: ";
    this->messageMemoryUsageMax = "\tCurrent malloced: ";
    this->messageKByte = " [kb].\n";
