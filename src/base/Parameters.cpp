@@ -29,13 +29,13 @@ Parameters::Parameters(){
 
 Parameters::~Parameters(){
    if(this->inertiaTensorOrigin != NULL){
-      MallocerFreer::GetInstance()->FreeDoubleMatrix1d(&this->inertiaTensorOrigin,
-                                                       CartesianType_end);
+      MallocerFreer::GetInstance()->Free<double>(&this->inertiaTensorOrigin,
+                                                 CartesianType_end);
       //cout << "inertiaTensorOrigin deleted\n";
    }
    if(this->rotatingOrigin != NULL){
-      MallocerFreer::GetInstance()->FreeDoubleMatrix1d(&this->rotatingOrigin,
-                                                       CartesianType_end);
+      MallocerFreer::GetInstance()->Free<double>(&this->rotatingOrigin,
+                                                 CartesianType_end);
       //cout << "rotatingOrigin deleted\n";
    }
    if(this->indecesMOPlot != NULL){
@@ -233,7 +233,7 @@ double* Parameters::GetTranslatingDifference() const{
 
 void Parameters::SetInertiaTensorOrigin(double x, double y, double z){
    if(this->inertiaTensorOrigin == NULL){
-      this->inertiaTensorOrigin = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(CartesianType_end);
+      this->inertiaTensorOrigin = MallocerFreer::GetInstance()->Malloc<double>(CartesianType_end);
    }
 
    this->inertiaTensorOrigin[0] = x;
@@ -248,7 +248,7 @@ double* Parameters::GetInertiaTensorOrigin() const{
 
 void Parameters::SetRotatingOrigin(double x, double y, double z){
    if(this->rotatingOrigin == NULL){
-      this->rotatingOrigin = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(CartesianType_end);
+      this->rotatingOrigin = MallocerFreer::GetInstance()->Malloc<double>(CartesianType_end);
    }
 
    this->rotatingOrigin[0] = x;

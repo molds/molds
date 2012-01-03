@@ -61,37 +61,37 @@ Cndo2::Cndo2(){
 
 Cndo2::~Cndo2(){
    if(this->gammaAB != NULL){
-      MallocerFreer::GetInstance()->FreeDoubleMatrix2d(&this->gammaAB, 
-                                                       this->molecule->GetAtomVect()->size(),
-                                                       this->molecule->GetAtomVect()->size());
+      MallocerFreer::GetInstance()->Free<double>(&this->gammaAB, 
+                                                 this->molecule->GetAtomVect()->size(),
+                                                 this->molecule->GetAtomVect()->size());
       //cout << "gammaAB deleted\n";
    }
    if(this->overlap != NULL){
-      MallocerFreer::GetInstance()->FreeDoubleMatrix2d(&this->overlap, 
-                                                       this->molecule->GetTotalNumberAOs(),
-                                                       this->molecule->GetTotalNumberAOs());
+      MallocerFreer::GetInstance()->Free<double>(&this->overlap, 
+                                                 this->molecule->GetTotalNumberAOs(),
+                                                 this->molecule->GetTotalNumberAOs());
       //cout << "overlap deleted\n";
    }
    if(this->orbitalElectronPopulation != NULL){
-      MallocerFreer::GetInstance()->FreeDoubleMatrix2d(&this->orbitalElectronPopulation, 
-                                                       this->molecule->GetTotalNumberAOs(),
-                                                       this->molecule->GetTotalNumberAOs());
+      MallocerFreer::GetInstance()->Free<double>(&this->orbitalElectronPopulation, 
+                                                 this->molecule->GetTotalNumberAOs(),
+                                                 this->molecule->GetTotalNumberAOs());
       //cout << "orbitalElectronPopulation deleted\n";
    }
    if(this->atomicElectronPopulation != NULL){
-      MallocerFreer::GetInstance()->FreeDoubleMatrix1d(&this->atomicElectronPopulation, 
-                                                       this->molecule->GetAtomVect()->size());
+      MallocerFreer::GetInstance()->Free<double>(&this->atomicElectronPopulation, 
+                                                 this->molecule->GetAtomVect()->size());
       //cout << "atiomiElectrionPopulation deleted\n";
    }
    if(this->fockMatrix != NULL){
-      MallocerFreer::GetInstance()->FreeDoubleMatrix2d(&this->fockMatrix, 
-                                                       this->molecule->GetTotalNumberAOs(),
-                                                       this->molecule->GetTotalNumberAOs());
+      MallocerFreer::GetInstance()->Free<double>(&this->fockMatrix, 
+                                                 this->molecule->GetTotalNumberAOs(),
+                                                 this->molecule->GetTotalNumberAOs());
       //cout << "fockMatrix deleted\n";
    }
    if(this->energiesMO != NULL){
-      MallocerFreer::GetInstance()->FreeDoubleMatrix1d(&this->energiesMO, 
-                                                       this->molecule->GetTotalNumberAOs());
+      MallocerFreer::GetInstance()->Free<double>(&this->energiesMO, 
+                                                   this->molecule->GetTotalNumberAOs());
       //cout << "energiesMO deleted\n";
    }
    //cout << "cndo deleted\n";
@@ -188,22 +188,22 @@ void Cndo2::SetMolecule(Molecule* molecule){
    // set molecule and malloc
    this->molecule = molecule;
    if(this->theory == CNDO2 || this->theory == INDO){
-      this->gammaAB = MallocerFreer::GetInstance()->MallocDoubleMatrix2d(
+      this->gammaAB = MallocerFreer::GetInstance()->Malloc<double>(
                                                     this->molecule->GetAtomVect()->size(), 
                                                     this->molecule->GetAtomVect()->size());
    }
-   this->overlap = MallocerFreer::GetInstance()->MallocDoubleMatrix2d(
+   this->overlap = MallocerFreer::GetInstance()->Malloc<double>(
                                                  this->molecule->GetTotalNumberAOs(), 
                                                  this->molecule->GetTotalNumberAOs());
-   this->orbitalElectronPopulation = MallocerFreer::GetInstance()->MallocDoubleMatrix2d(
+   this->orbitalElectronPopulation = MallocerFreer::GetInstance()->Malloc<double>(
                                                                    this->molecule->GetTotalNumberAOs(), 
                                                                    this->molecule->GetTotalNumberAOs());
-   this->atomicElectronPopulation = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(
+   this->atomicElectronPopulation = MallocerFreer::GetInstance()->Malloc<double>(
                                                                   this->molecule->GetAtomVect()->size());
-   this->fockMatrix = MallocerFreer::GetInstance()->MallocDoubleMatrix2d(
+   this->fockMatrix = MallocerFreer::GetInstance()->Malloc<double>(
                                                     this->molecule->GetTotalNumberAOs(), 
                                                     this->molecule->GetTotalNumberAOs());
-   this->energiesMO = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(
+   this->energiesMO = MallocerFreer::GetInstance()->Malloc<double>(
                                                     this->molecule->GetTotalNumberAOs());
 }
 
@@ -288,7 +288,7 @@ void Cndo2::DoesSCF(bool requiresGuess){
    int diisNumErrorVect = Parameters::GetInstance()->GetDiisNumErrorVectSCF();
 
    // malloc temporary matrices for scf
-   double** oldOrbitalElectronPopulation = MallocerFreer::GetInstance()->MallocDoubleMatrix2d
+   double** oldOrbitalElectronPopulation = MallocerFreer::GetInstance()->Malloc<double>
             (this->molecule->GetTotalNumberAOs(), this->molecule->GetTotalNumberAOs());
 
    // malloc temporary matrices for diis
@@ -297,16 +297,16 @@ void Cndo2::DoesSCF(bool requiresGuess){
    double** diisErrorProducts = NULL;
    double* diisErrorCoefficients = NULL;
    if(0<diisNumErrorVect){
-      diisStoredDensityMatrix = MallocerFreer::GetInstance()->MallocDoubleMatrix3d(
+      diisStoredDensityMatrix = MallocerFreer::GetInstance()->Malloc<double>(
                                                               diisNumErrorVect, 
                                                               this->molecule->GetTotalNumberAOs(), 
                                                               this->molecule->GetTotalNumberAOs());
-      diisStoredErrorVect = MallocerFreer::GetInstance()->MallocDoubleMatrix3d(
+      diisStoredErrorVect = MallocerFreer::GetInstance()->Malloc<double>(
                                                           diisNumErrorVect, 
                                                           this->molecule->GetTotalNumberAOs(), 
                                                           this->molecule->GetTotalNumberAOs());
-      diisErrorProducts = MallocerFreer::GetInstance()->MallocDoubleMatrix2d(diisNumErrorVect+1, diisNumErrorVect+1);
-      diisErrorCoefficients = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(diisNumErrorVect+1);
+      diisErrorProducts = MallocerFreer::GetInstance()->Malloc<double>(diisNumErrorVect+1, diisNumErrorVect+1);
+      diisErrorCoefficients = MallocerFreer::GetInstance()->Malloc<double>(diisNumErrorVect+1);
    }
 
    try{
@@ -515,35 +515,35 @@ void Cndo2::FreeSCFTemporaryMatrices(double*** oldOrbitalElectronPopulation,
 
    int diisNumErrorVect = Parameters::GetInstance()->GetDiisNumErrorVectSCF();
    if(*oldOrbitalElectronPopulation != NULL){
-      MallocerFreer::GetInstance()->FreeDoubleMatrix2d(oldOrbitalElectronPopulation, 
-                                                       this->molecule->GetTotalNumberAOs(),
-                                                       this->molecule->GetTotalNumberAOs());
+      MallocerFreer::GetInstance()->Free<double>(oldOrbitalElectronPopulation, 
+                                                 this->molecule->GetTotalNumberAOs(),
+                                                 this->molecule->GetTotalNumberAOs());
       //cout << "oldOrbitalElectronPopulation deleted\n";
    }
    if(*diisStoredDensityMatrix != NULL){
-      MallocerFreer::GetInstance()->FreeDoubleMatrix3d(diisStoredDensityMatrix, 
-                                                       diisNumErrorVect, 
-                                                       this->molecule->GetTotalNumberAOs(),
-                                                       this->molecule->GetTotalNumberAOs());
+      MallocerFreer::GetInstance()->Free<double>(diisStoredDensityMatrix, 
+                                                 diisNumErrorVect, 
+                                                 this->molecule->GetTotalNumberAOs(),
+                                                 this->molecule->GetTotalNumberAOs());
       //cout << "diisStoredDensityMatrix deleted\n";
    } 
    if(*diisStoredErrorVect != NULL){
-      MallocerFreer::GetInstance()->FreeDoubleMatrix3d(diisStoredErrorVect, 
-                                                       diisNumErrorVect, 
-                                                       this->molecule->GetTotalNumberAOs(),
-                                                       this->molecule->GetTotalNumberAOs());
+      MallocerFreer::GetInstance()->Free<double>(diisStoredErrorVect, 
+                                                 diisNumErrorVect, 
+                                                 this->molecule->GetTotalNumberAOs(),
+                                                 this->molecule->GetTotalNumberAOs());
       diisStoredErrorVect = NULL;
       //cout << "diisStoredErrorVect deleted\n";
    } 
    if(*diisErrorProducts != NULL){
-      MallocerFreer::GetInstance()->FreeDoubleMatrix2d(diisErrorProducts, 
-                                                       diisNumErrorVect+1,
-                                                       diisNumErrorVect+1);
+      MallocerFreer::GetInstance()->Free<double>(diisErrorProducts, 
+                                                 diisNumErrorVect+1,
+                                                 diisNumErrorVect+1);
       //cout << "diisErrorProducts deleted\n";
    } 
    if(*diisErrorCoefficients != NULL){
-      MallocerFreer::GetInstance()->FreeDoubleMatrix1d(diisErrorCoefficients,
-                                                       diisNumErrorVect+1);
+      MallocerFreer::GetInstance()->Free<double>(diisErrorCoefficients,
+                                                 diisNumErrorVect+1);
       //cout << "diisErrorCoefficients deleted\n";
    } 
 }
@@ -706,14 +706,14 @@ void Cndo2::CalcElecHFEnergy(double* elecHFEnergy,
    double electronicEnergy = 0.0;
    // use density matrix for electronic energy
    int totalNumberAOs = this->molecule->GetTotalNumberAOs();
-   double** fMatrix = MallocerFreer::GetInstance()->MallocDoubleMatrix2d(totalNumberAOs, 
-                                                                         totalNumberAOs);
-   double** hMatrix = MallocerFreer::GetInstance()->MallocDoubleMatrix2d(totalNumberAOs, 
-                                                                         totalNumberAOs);
-   double** dammyOrbitalElectronPopulation  = MallocerFreer::GetInstance()->MallocDoubleMatrix2d(
+   double** fMatrix = MallocerFreer::GetInstance()->Malloc<double>(totalNumberAOs, 
+                                                                   totalNumberAOs);
+   double** hMatrix = MallocerFreer::GetInstance()->Malloc<double>(totalNumberAOs, 
+                                                                   totalNumberAOs);
+   double** dammyOrbitalElectronPopulation  = MallocerFreer::GetInstance()->Malloc<double>(
                                                                             totalNumberAOs, 
                                                                             totalNumberAOs);
-   double* dammyAtomicElectronPopulation  = MallocerFreer::GetInstance()->MallocDoubleMatrix1d(
+   double* dammyAtomicElectronPopulation  = MallocerFreer::GetInstance()->Malloc<double>(
                                                                           molecule.GetAtomVect()->size());
 
    try{
@@ -788,22 +788,22 @@ void Cndo2::FreeElecEnergyMatrices(double*** fMatrix,
                                    double**  dammyAtomicElectronPopulation ) const{
    int totalNumberAOs = this->molecule->GetTotalNumberAOs();
    if(*fMatrix != NULL){
-      MallocerFreer::GetInstance()->FreeDoubleMatrix2d(fMatrix, totalNumberAOs, totalNumberAOs);
+      MallocerFreer::GetInstance()->Free<double>(fMatrix, totalNumberAOs, totalNumberAOs);
       //cout << "fMatrix deleted\n";
    }
    if(*hMatrix != NULL){
-      MallocerFreer::GetInstance()->FreeDoubleMatrix2d(hMatrix, totalNumberAOs, totalNumberAOs);
+      MallocerFreer::GetInstance()->Free<double>(hMatrix, totalNumberAOs, totalNumberAOs);
       //cout << "hMatrix deleted\n";
    }
    if(*dammyOrbitalElectronPopulation != NULL){
-      MallocerFreer::GetInstance()->FreeDoubleMatrix2d(dammyOrbitalElectronPopulation, 
-                                                       totalNumberAOs,
-                                                       totalNumberAOs);
+      MallocerFreer::GetInstance()->Free<double>(dammyOrbitalElectronPopulation, 
+                                                 totalNumberAOs,
+                                                 totalNumberAOs);
       //cout << "dammyOrbitalElectronPopulation deleted\n";
    }
    if(*dammyAtomicElectronPopulation != NULL){
-      MallocerFreer::GetInstance()->FreeDoubleMatrix1d(dammyAtomicElectronPopulation,
-                                                       this->molecule->GetAtomVect()->size());
+      MallocerFreer::GetInstance()->Free<double>(dammyAtomicElectronPopulation,
+                                                 this->molecule->GetAtomVect()->size());
       //cout << "dammyAtomicElectronPopulation deleted\n";
    }
 }
@@ -888,9 +888,9 @@ void Cndo2::CalcFockMatrix(double** fockMatrix,
                            double const* atomicElectronPopulation,
                            double const* const* const* const* const* const* twoElecTwoCore, 
                            bool isGuess) const{
-   MallocerFreer::GetInstance()->InitializeDoubleMatrix2d(fockMatrix, 
-                                                          molecule.GetTotalNumberAOs(), 
-                                                          molecule.GetTotalNumberAOs());
+   MallocerFreer::GetInstance()->Initialize<double>(fockMatrix, 
+                                                    molecule.GetTotalNumberAOs(), 
+                                                    molecule.GetTotalNumberAOs());
    stringstream ompErrors;
    #pragma omp parallel for schedule(auto) 
    for(int A=0; A<molecule.GetAtomVect()->size(); A++){
@@ -1019,8 +1019,7 @@ void Cndo2::CalcOrbitalElectronPopulation(double** orbitalElectronPopulation,
                                           const Molecule& molecule, 
                                           double const* const* fockMatrix) const{
    int totalNumberAOs = molecule.GetTotalNumberAOs();
-   MallocerFreer::GetInstance()->InitializeDoubleMatrix2d
-                                 (orbitalElectronPopulation, totalNumberAOs, totalNumberAOs);
+   MallocerFreer::GetInstance()->Initialize<double>(orbitalElectronPopulation, totalNumberAOs, totalNumberAOs);
 
    double transposedFockMatrix[totalNumberAOs][totalNumberAOs];
    for(int mu=0; mu<totalNumberAOs; mu++){
@@ -1063,8 +1062,7 @@ void Cndo2::CalcAtomicElectronPopulation(double* atomicElectronPopulation,
                                          double const* const* orbitalElectronPopulation, 
                                          const Molecule& molecule) const{
    int totalNumberAtoms = molecule.GetAtomVect()->size();
-   MallocerFreer::GetInstance()->InitializeDoubleMatrix1d
-                                 (atomicElectronPopulation, totalNumberAtoms);
+   MallocerFreer::GetInstance()->Initialize<double>(atomicElectronPopulation, totalNumberAtoms);
 
    int firstAOIndex = 0;
    int numberAOs = 0;
@@ -1173,11 +1171,11 @@ void Cndo2::CalcGammaAB(double** gammaAB, const Molecule& molecule) const{
 void Cndo2::FreeDiatomicOverlapAndRotatingMatrix(double*** diatomicOverlap, double*** rotatingMatrix) const{
    // free
    if(*diatomicOverlap != NULL){
-      MallocerFreer::GetInstance()->FreeDoubleMatrix2d(diatomicOverlap, OrbitalType_end, OrbitalType_end);
+      MallocerFreer::GetInstance()->Free<double>(diatomicOverlap, OrbitalType_end, OrbitalType_end);
       //cout << "diatomicOverlap deleted\n";
    }
    if(*rotatingMatrix != NULL){
-      MallocerFreer::GetInstance()->FreeDoubleMatrix2d(rotatingMatrix, OrbitalType_end, OrbitalType_end);
+      MallocerFreer::GetInstance()->Free<double>(rotatingMatrix, OrbitalType_end, OrbitalType_end);
       //cout << "rotatingMatrix deleted\n";
    }
 }
@@ -1194,10 +1192,10 @@ void Cndo2::CalcOverlap(double** overlap, const Molecule& molecule) const{
       double** rotatingMatrix; 
       try{
          // malloc
-         diatomicOverlap =  MallocerFreer::GetInstance()->MallocDoubleMatrix2d(
+         diatomicOverlap =  MallocerFreer::GetInstance()->Malloc<double>(
                                                           OrbitalType_end, 
                                                           OrbitalType_end);
-         rotatingMatrix = MallocerFreer::GetInstance()->MallocDoubleMatrix2d(
+         rotatingMatrix = MallocerFreer::GetInstance()->Malloc<double>(
                                                         OrbitalType_end, 
                                                         OrbitalType_end);
          // calculation overlap matrix
@@ -1256,15 +1254,15 @@ void Cndo2::CalcDiatomicOverlapFirstDerivative(double*** overlapFirstDeri,
                     pow(Cartesian[YAxis],2.0) + 
                     pow(Cartesian[ZAxis],2.0) );
    // malloc
-   double** diatomicOverlap = MallocerFreer::GetInstance()->MallocDoubleMatrix2d(OrbitalType_end, 
-                                                                                 OrbitalType_end);
-   double** rotatingMatrix = MallocerFreer::GetInstance()->MallocDoubleMatrix2d(OrbitalType_end, 
-                                                                                OrbitalType_end);
-   double** diaOverlapDeriR = MallocerFreer::GetInstance()->MallocDoubleMatrix2d(OrbitalType_end, 
-                                                                                 OrbitalType_end);
-   double*** rMatDeri = MallocerFreer::GetInstance()->MallocDoubleMatrix3d(OrbitalType_end, 
-                                                                           OrbitalType_end, 
-                                                                           CartesianType_end);
+   double** diatomicOverlap = MallocerFreer::GetInstance()->Malloc<double>(OrbitalType_end, 
+                                                                           OrbitalType_end);
+   double** rotatingMatrix = MallocerFreer::GetInstance()->Malloc<double>(OrbitalType_end, 
+                                                                          OrbitalType_end);
+   double** diaOverlapDeriR = MallocerFreer::GetInstance()->Malloc<double>(OrbitalType_end, 
+                                                                           OrbitalType_end);
+   double*** rMatDeri = MallocerFreer::GetInstance()->Malloc<double>(OrbitalType_end, 
+                                                                     OrbitalType_end, 
+                                                                     CartesianType_end);
 
    try{
       this->CalcDiatomicOverlapInDiatomicFrame(diatomicOverlap, atomA, atomB);
@@ -1321,22 +1319,22 @@ void Cndo2::FreeDiatomicOverlapDeriTemps(double*** diatomicOverlap,
 
    // free
    if(*diatomicOverlap != NULL){
-      MallocerFreer::GetInstance()->FreeDoubleMatrix2d(diatomicOverlap, OrbitalType_end, OrbitalType_end);
+      MallocerFreer::GetInstance()->Free<double>(diatomicOverlap, OrbitalType_end, OrbitalType_end);
       //cout << "diatomicOverlap deleted\n";
    }
    if(*rotatingMatrix != NULL){
-      MallocerFreer::GetInstance()->FreeDoubleMatrix2d(rotatingMatrix, OrbitalType_end, OrbitalType_end);
+      MallocerFreer::GetInstance()->Free<double>(rotatingMatrix, OrbitalType_end, OrbitalType_end);
       //cout << "rotatingMatrix deleted\n";
    }
    if(*diaOverlapDeriR != NULL){
-      MallocerFreer::GetInstance()->FreeDoubleMatrix2d(diaOverlapDeriR, OrbitalType_end, OrbitalType_end);
+      MallocerFreer::GetInstance()->Free<double>(diaOverlapDeriR, OrbitalType_end, OrbitalType_end);
       //cout << "diaOverlapDeriR deleted\n";
    }
    if(*rMatDeri != NULL){
-      MallocerFreer::GetInstance()->FreeDoubleMatrix3d(rMatDeri, 
-                                                       OrbitalType_end,
-                                                       OrbitalType_end,
-                                                       CartesianType_end);
+      MallocerFreer::GetInstance()->Free<double>(rMatDeri, 
+                                                 OrbitalType_end,
+                                                 OrbitalType_end,
+                                                 CartesianType_end);
       //cout << "rMatDeri deleted\n";
    }
 
@@ -1930,8 +1928,7 @@ void Cndo2::CalcRotatingMatrix(double** rotatingMatrix,
       ss << this->errorMessageCalcRotatingMatrixNullRotMatrix;
       throw MolDSException(ss.str());
    }
-   MallocerFreer::GetInstance()->InitializeDoubleMatrix2d
-                                 (rotatingMatrix,  OrbitalType_end, OrbitalType_end);
+   MallocerFreer::GetInstance()->Initialize<double>(rotatingMatrix,  OrbitalType_end, OrbitalType_end);
 
    double x = atomB.GetXyz()[0] - atomA.GetXyz()[0];
    double y = atomB.GetXyz()[1] - atomA.GetXyz()[1];
@@ -1961,7 +1958,7 @@ void Cndo2::CalcRotatingMatrix(double** rotatingMatrix,
    // rotating matrix for d-function
    // dMatrix is (37) in J. Mol. Strct. 419, 19(1997) (ref. [BFB_1997])
    double** dMatrix;
-   dMatrix =  MallocerFreer::GetInstance()->MallocDoubleMatrix2d(OrbitalType_end, OrbitalType_end);
+   dMatrix =  MallocerFreer::GetInstance()->Malloc<double>(OrbitalType_end, OrbitalType_end);
    try{
       dMatrix[dzz][dzz] = 0.5*(3.0*pow(cos(beta),2.0) - 1.0);
       dMatrix[dxxyy][dxxyy] = pow(cos(0.5*beta),4.0);
@@ -2005,13 +2002,13 @@ void Cndo2::CalcRotatingMatrix(double** rotatingMatrix,
    }
    catch(MolDSException ex){
       if(dMatrix != NULL){
-         MallocerFreer::GetInstance()->FreeDoubleMatrix2d(&dMatrix, OrbitalType_end, OrbitalType_end);
+         MallocerFreer::GetInstance()->Free<double>(&dMatrix, OrbitalType_end, OrbitalType_end);
          //cout << "dMatrix deleted\n";
       }
       throw ex;
    }
    if(dMatrix != NULL){
-      MallocerFreer::GetInstance()->FreeDoubleMatrix2d(&dMatrix, OrbitalType_end, OrbitalType_end);
+      MallocerFreer::GetInstance()->Free<double>(&dMatrix, OrbitalType_end, OrbitalType_end);
       //cout << "dMatrix deleted\n";
    }
 
@@ -2026,7 +2023,7 @@ void Cndo2::CalcRotatingMatrixFirstDerivatives(double*** rMatFirstDeri,
                                                const Atom& atomA, 
                                                const Atom& atomB) const{
 
-   MallocerFreer::GetInstance()->InitializeDoubleMatrix3d(
+   MallocerFreer::GetInstance()->Initialize<double>(
                                  rMatFirstDeri,  
                                  OrbitalType_end, 
                                  OrbitalType_end,
@@ -2107,8 +2104,7 @@ void Cndo2::CalcDiatomicOverlapInDiatomicFrame(double** diatomicOverlap,
    double orbitalExponentB = 0.0;
    double R = 0.0; // Inter nuclear distance between aton A and B.
 
-   MallocerFreer::GetInstance()->InitializeDoubleMatrix2d
-                                 (diatomicOverlap, OrbitalType_end, OrbitalType_end);
+   MallocerFreer::GetInstance()->Initialize<double>(diatomicOverlap, OrbitalType_end, OrbitalType_end);
    R = sqrt( 
             pow( atomA.GetXyz()[0] - atomB.GetXyz()[0], 2.0)
            +pow( atomA.GetXyz()[1] - atomB.GetXyz()[1], 2.0)
@@ -2181,9 +2177,9 @@ void Cndo2::CalcDiatomicOverlapFirstDerivativeInDiatomicFrame(double** diatomicO
    double temp1=0.0;
    double temp2=0.0;
 
-   MallocerFreer::GetInstance()->InitializeDoubleMatrix2d(diatomicOverlapDeri, 
-                                                          OrbitalType_end, 
-                                                          OrbitalType_end);
+   MallocerFreer::GetInstance()->Initialize<double>(diatomicOverlapDeri, 
+                                                    OrbitalType_end, 
+                                                    OrbitalType_end);
    double R = this->molecule->GetDistanceAtoms(atomA, atomB);
 
    for(int a=0; a<atomA.GetValenceSize(); a++){
@@ -2267,8 +2263,7 @@ void Cndo2::RotateDiatmicOverlapToSpaceFrame(double** diatomicOverlap,
       ss << this->errorMessageRotDiaOverlapToSpaceFrameNullRotMatrix;
       throw MolDSException(ss.str());
    }
-   double** oldDiatomicOverlap = MallocerFreer::GetInstance()->MallocDoubleMatrix2d
-                                 (OrbitalType_end, OrbitalType_end);
+   double** oldDiatomicOverlap = MallocerFreer::GetInstance()->Malloc<double>(OrbitalType_end, OrbitalType_end);
 
    try{
       for(int i=0; i<OrbitalType_end; i++){
@@ -2292,12 +2287,12 @@ void Cndo2::RotateDiatmicOverlapToSpaceFrame(double** diatomicOverlap,
    }
    catch(MolDSException ex){
       if(oldDiatomicOverlap != NULL){
-         MallocerFreer::GetInstance()->FreeDoubleMatrix2d(&oldDiatomicOverlap, OrbitalType_end, OrbitalType_end);
+         MallocerFreer::GetInstance()->Free<double>(&oldDiatomicOverlap, OrbitalType_end, OrbitalType_end);
       }
       throw ex;
    }
    if(oldDiatomicOverlap != NULL){
-      MallocerFreer::GetInstance()->FreeDoubleMatrix2d(&oldDiatomicOverlap, OrbitalType_end, OrbitalType_end);
+      MallocerFreer::GetInstance()->Free<double>(&oldDiatomicOverlap, OrbitalType_end, OrbitalType_end);
    }
 
    /*
