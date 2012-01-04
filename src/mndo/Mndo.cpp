@@ -75,10 +75,10 @@ Mndo::~Mndo(){
 
 void Mndo::SetMolecule(Molecule* molecule){
    Cndo2::SetMolecule(molecule);
-   this->twoElecTwoCore = MallocerFreer::GetInstance()->Malloc<double>(
-                                                         molecule->GetAtomVect()->size(),
-                                                         molecule->GetAtomVect()->size(),
-                                                         dxy, dxy, dxy, dxy);
+   MallocerFreer::GetInstance()->Malloc<double>(&this->twoElecTwoCore,
+                                                molecule->GetAtomVect()->size(),
+                                                molecule->GetAtomVect()->size(),
+                                                dxy, dxy, dxy, dxy);
 }
 void Mndo::SetMessages(){
    this->errorMessageSCFNotConverged 
@@ -756,10 +756,10 @@ void Mndo::CalcCISMatrix(double** matrixCIS, int numberActiveOcc, int numberActi
 void Mndo::CheckZMatrixForce(const vector<int>& elecStates){
    // malloc or initialize Z matrix
    if(this->zMatrixForce == NULL){
-      this->zMatrixForce = MallocerFreer::GetInstance()->
-                           Malloc<double>(elecStates.size(),
-                                          this->molecule->GetTotalNumberAOs(), 
-                                          this->molecule->GetTotalNumberAOs());
+      MallocerFreer::GetInstance()->Malloc<double>(&this->zMatrixForce, 
+                                                   elecStates.size(),
+                                                   this->molecule->GetTotalNumberAOs(), 
+                                                   this->molecule->GetTotalNumberAOs());
       this->zMatrixForceElecStatesNum = elecStates.size();
    }
    else{
@@ -774,10 +774,10 @@ void Mndo::CheckZMatrixForce(const vector<int>& elecStates){
 void Mndo::CheckEtaMatrixForce(const vector<int>& elecStates){
    // malloc or initialize eta matrix
    if(this->etaMatrixForce == NULL){
-      this->etaMatrixForce = MallocerFreer::GetInstance()->
-                             Malloc<double>(elecStates.size(),
-                                            this->molecule->GetTotalNumberAOs(), 
-                                            this->molecule->GetTotalNumberAOs());
+      MallocerFreer::GetInstance()->Malloc<double>(&this->etaMatrixForce, 
+                                                   elecStates.size(),
+                                                   this->molecule->GetTotalNumberAOs(), 
+                                                   this->molecule->GetTotalNumberAOs());
       this->etaMatrixForceElecStatesNum = elecStates.size();
    }
    else{
@@ -836,24 +836,16 @@ void Mndo::MallocTempMatrixForZMatrix(double** delta,
    int numberActiveVir = Parameters::GetInstance()->GetActiveVirCIS();
    int numberActiveMO = numberActiveOcc + numberActiveVir;
    int numberAOs = this->molecule->GetTotalNumberAOs();
-   *delta = MallocerFreer::GetInstance()->Malloc<double>(numberActiveMO);
-   *q = MallocerFreer::GetInstance()->Malloc<double>(sizeQNR+sizeQR);
-   *kNR = MallocerFreer::GetInstance()->Malloc<double>(
-                                        sizeQNR,
-                                        sizeQNR);
-   *kRDag = MallocerFreer::GetInstance()->Malloc<double>(
-                                          sizeQNR,
-                                          sizeQR);
-   *y = MallocerFreer::GetInstance()->Malloc<double>(sizeQNR);
-   *transposedFockMatrix = MallocerFreer::GetInstance()->Malloc<double>(
-                                                         numberAOs,
-                                                         numberAOs);
-   *xiOcc = MallocerFreer::GetInstance()->Malloc<double>(
-                                          numberActiveOcc,
-                                          numberAOs);
-   *xiVir = MallocerFreer::GetInstance()->Malloc<double>(
-                                          numberActiveVir,
-                                          numberAOs);
+   MallocerFreer::GetInstance()->Malloc<double>(delta, numberActiveMO);
+   MallocerFreer::GetInstance()->Malloc<double>(q, sizeQNR+sizeQR);
+   MallocerFreer::GetInstance()->Malloc<double>(kNR, sizeQNR, sizeQNR);
+   MallocerFreer::GetInstance()->Malloc<double>(kRDag, sizeQNR, sizeQR);
+   MallocerFreer::GetInstance()->Malloc<double>(y, sizeQNR);
+   MallocerFreer::GetInstance()->Malloc<double>(transposedFockMatrix,
+                                                numberAOs,
+                                                numberAOs);
+   MallocerFreer::GetInstance()->Malloc<double>(xiOcc, numberActiveOcc,numberAOs);
+   MallocerFreer::GetInstance()->Malloc<double>(xiVir,numberActiveVir,numberAOs);
 }
 
 void Mndo::FreeTempMatrixForZMatrix(double** delta,
@@ -1654,9 +1646,9 @@ void Mndo::CalcEtaMatrixForce(const vector<int>& elecStates){
    int numberActiveVir = Parameters::GetInstance()->GetActiveVirCIS();
    int groundState = 0;
    double** transposedFockMatrix = NULL; // transposed Fock matrix
-   transposedFockMatrix = MallocerFreer::GetInstance()->Malloc<double>(
-                                                        numberAOs,
-                                                        numberAOs);
+   MallocerFreer::GetInstance()->Malloc<double>(&transposedFockMatrix,
+                                                numberAOs,
+                                                numberAOs);
    try{
       this->TransposeFockMatrixMatrix(transposedFockMatrix);
       for(int n=0; n<elecStates.size(); n++){
@@ -1944,19 +1936,19 @@ void Mndo::CalcForce(const vector<int>& elecStates){
    stringstream ompErrors;
    #pragma omp parallel
    {
-      double***** twoElecTwoCoreFirstDeriv=NULL;
-      double*** overlapDer=NULL;
+      double***** twoElecTwoCoreFirstDeriv = NULL;
+      double*** overlapDer = NULL;
       try{
-         twoElecTwoCoreFirstDeriv = MallocerFreer::GetInstance()->Malloc<double>(
-                                                                  dxy,
-                                                                  dxy,
-                                                                  dxy,
-                                                                  dxy,
-                                                                  CartesianType_end);
-         overlapDer = MallocerFreer::GetInstance()->Malloc<double>(
-                                                    OrbitalType_end, 
-                                                    OrbitalType_end, 
-                                                    CartesianType_end);
+         MallocerFreer::GetInstance()->Malloc<double>(&twoElecTwoCoreFirstDeriv,
+                                                      dxy,
+                                                      dxy,
+                                                      dxy,
+                                                      dxy,
+                                                      CartesianType_end);
+         MallocerFreer::GetInstance()->Malloc<double>(&overlapDer,
+                                                      OrbitalType_end, 
+                                                      OrbitalType_end, 
+                                                      CartesianType_end);
          #pragma omp for schedule(auto)
          for(int a=0; a<this->molecule->GetAtomVect()->size(); a++){
             const Atom& atomA = *(*molecule->GetAtomVect())[a];
@@ -2120,9 +2112,9 @@ void Mndo::CalcTwoElecTwoCore(double****** twoElecTwoCore,
    stringstream ompErrors;
    #pragma omp parallel
    {
-      double**** twoElecTwoCoreDiatomic;
+      double**** twoElecTwoCoreDiatomic = NULL;
       try{
-         twoElecTwoCoreDiatomic = MallocerFreer::GetInstance()->Malloc<double>(dxy, dxy, dxy, dxy);
+         MallocerFreer::GetInstance()->Malloc<double>(&twoElecTwoCoreDiatomic, dxy, dxy, dxy, dxy);
          // note that terms with condition a==b are not needed to calculate. 
          #pragma omp for schedule(auto)
          for(int a=0; a<molecule.GetAtomVect()->size(); a++){
@@ -2206,8 +2198,9 @@ void Mndo::CalcTwoElecTwoCoreDiatomic(double**** matrix, int atomAIndex, int ato
    }
 
    // rotate matirix into the space frame
-   double** rotatingMatrix = MallocerFreer::GetInstance()->Malloc<double>(
-                                            OrbitalType_end, OrbitalType_end);
+   double** rotatingMatrix = NULL;
+   MallocerFreer::GetInstance()->Malloc<double>(&rotatingMatrix,
+                                                OrbitalType_end, OrbitalType_end);
    try{
       this->CalcRotatingMatrix(rotatingMatrix, atomA, atomB);
       this->RotateTwoElecTwoCoreDiatomicToSpaceFramegc(matrix, rotatingMatrix);
@@ -2268,11 +2261,16 @@ void Mndo::CalcTwoElecTwoCoreDiatomicFirstDerivatives(double***** matrix,
                                                        CartesianType_end);
    } 
 
-   double** rotatingMatrix = MallocerFreer::GetInstance()->Malloc<double>(
-                                             OrbitalType_end, OrbitalType_end);
-   double*** rMatDeri = MallocerFreer::GetInstance()->Malloc<double>
-                                   (OrbitalType_end, OrbitalType_end, CartesianType_end);
-   double**** twoElecTwoCoreDiatomic = MallocerFreer::GetInstance()->Malloc<double>(dxy, dxy, dxy, dxy);
+   double** rotatingMatrix = NULL;
+   double*** rMatDeri = NULL;
+   double**** twoElecTwoCoreDiatomic = NULL;
+   MallocerFreer::GetInstance()->Malloc<double>(&rotatingMatrix,
+                                                OrbitalType_end, OrbitalType_end);
+   MallocerFreer::GetInstance()->Malloc<double>(&rMatDeri, 
+                                                OrbitalType_end, 
+                                                OrbitalType_end, 
+                                                CartesianType_end);
+   MallocerFreer::GetInstance()->Malloc<double>(&twoElecTwoCoreDiatomic, dxy, dxy, dxy, dxy);
    try{
       // calclation in diatomic frame
       for(int mu=0; mu<atomA.GetValenceSize(); mu++){

@@ -23,8 +23,8 @@ namespace MolDS_base{
 
 Molecule::Molecule(){
    this->atomVect = new vector<Atom*>;
-   this->xyzCOM = MallocerFreer::GetInstance()->Malloc<double>(CartesianType_end);
-   this->xyzCOC = MallocerFreer::GetInstance()->Malloc<double>(CartesianType_end);
+   MallocerFreer::GetInstance()->Malloc<double>(&this->xyzCOM, CartesianType_end);
+   MallocerFreer::GetInstance()->Malloc<double>(&this->xyzCOC, CartesianType_end);
    this->wasCalculatedXyzCOM = false;
    this->wasCalculatedXyzCOC = false;
    this->SetMessages();
@@ -333,8 +333,10 @@ void Molecule::CalcPrincipalAxes(){
       inertiaTensorOrigin[2] = Parameters::GetInstance()->GetInertiaTensorOrigin()[2];
    }
 
-   double** inertiaTensor = MallocerFreer::GetInstance()->Malloc<double>(CartesianType_end, CartesianType_end);
-   double*  inertiaMoments = MallocerFreer::GetInstance()->Malloc<double>(CartesianType_end);
+   double** inertiaTensor = NULL;
+   double*  inertiaMoments = NULL;
+   MallocerFreer::GetInstance()->Malloc<double>(&inertiaTensor, CartesianType_end, CartesianType_end);
+   MallocerFreer::GetInstance()->Malloc<double>(&inertiaMoments, CartesianType_end);
 
    try{
       this->CalcInertiaTensor(inertiaTensor, inertiaTensorOrigin);

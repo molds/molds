@@ -761,9 +761,9 @@ void ZindoS::DoesCIS(){
    // malloc or initialize  CIS matrix
    if(this->matrixCIS == NULL){
       this->matrixCISdimension = numberActiveOcc*numberActiveVir;
-      this->matrixCIS = MallocerFreer::GetInstance()->Malloc<double>(
-                                                      this->matrixCISdimension, 
-                                                      this->matrixCISdimension);
+      MallocerFreer::GetInstance()->Malloc<double>(&this->matrixCIS, 
+                                                   this->matrixCISdimension, 
+                                                   this->matrixCISdimension);
    }
    else{
       MallocerFreer::GetInstance()->Initialize<double>(this->matrixCIS, 
@@ -772,8 +772,8 @@ void ZindoS::DoesCIS(){
    }
    // malloc or initialize CIS eigen vector
    if(this->excitedEnergies == NULL){
-      this->excitedEnergies = MallocerFreer::GetInstance()->Malloc<double>(
-                                                            this->matrixCISdimension);
+      MallocerFreer::GetInstance()->Malloc<double>(&this->excitedEnergies,
+                                                   this->matrixCISdimension);
    }
    else{
       MallocerFreer::GetInstance()->Initialize<double>(this->excitedEnergies, 
@@ -944,13 +944,11 @@ void ZindoS::DoesCISDavidson(){
    double*  residualVector = NULL;
 
    // malloc
-   expansionVectors = MallocerFreer::GetInstance()->
-                                     Malloc<double>(this->matrixCISdimension, 
-                                                      maxDim);
-   ritzVector = MallocerFreer::GetInstance()->
-                               Malloc<double>(this->matrixCISdimension);
-   residualVector = MallocerFreer::GetInstance()->
-                                   Malloc<double>(this->matrixCISdimension);
+   MallocerFreer::GetInstance()->Malloc<double>(&expansionVectors, 
+                                                this->matrixCISdimension, 
+                                                maxDim);
+   MallocerFreer::GetInstance()->Malloc<double>(&ritzVector, this->matrixCISdimension);
+   MallocerFreer::GetInstance()->Malloc<double>(&residualVector, this->matrixCISdimension);
 
    try{
       // sort single excitation slater determinants
@@ -981,13 +979,11 @@ void ZindoS::DoesCISDavidson(){
          // malloc interaction matrix and etc.
          double** interactionMatrix = NULL;
          double* interactionEigenEnergies = NULL;
-         interactionMatrix = MallocerFreer::GetInstance()->
-                                            Malloc<double>(
-                                            interactionMatrixDimension, 
-                                            interactionMatrixDimension);
-         interactionEigenEnergies = MallocerFreer::GetInstance()->
-                                                   Malloc<double>(
-                                                   interactionMatrixDimension);
+         MallocerFreer::GetInstance()->Malloc<double>(&interactionMatrix,
+                                                      interactionMatrixDimension, 
+                                                      interactionMatrixDimension);
+         MallocerFreer::GetInstance()->Malloc<double>(&interactionEigenEnergies,
+                                                      interactionMatrixDimension);
 
          try{
             // calculate interaction matrix
@@ -1449,10 +1445,10 @@ void ZindoS::CalcCISMatrix(double** matrixCIS, int numberActiveOcc, int numberAc
 void ZindoS::CheckMatrixForce(const vector<int>& elecStates){
    // malloc or initialize Force matrix
    if(this->matrixForce == NULL){
-      this->matrixForce = MallocerFreer::GetInstance()->
-                          Malloc<double>(elecStates.size(),
-                                         this->molecule->GetAtomVect()->size(), 
-                                         CartesianType_end);
+      MallocerFreer::GetInstance()->Malloc<double>(&this->matrixForce, 
+                                                   elecStates.size(),
+                                                   this->molecule->GetAtomVect()->size(), 
+                                                   CartesianType_end);
       this->matrixForceElecStatesNum = elecStates.size();
    }
    else{
@@ -1491,10 +1487,10 @@ void ZindoS::CalcForce(const vector<int>& elecStates){
    {
       double*** overlapDer=NULL;
       try{
-         overlapDer = MallocerFreer::GetInstance()->
-                                     Malloc<double>(OrbitalType_end, 
-                                                    OrbitalType_end, 
-                                                    CartesianType_end);
+         MallocerFreer::GetInstance()->Malloc<double>(&overlapDer,
+                                                      OrbitalType_end, 
+                                                      OrbitalType_end, 
+                                                      CartesianType_end);
 
          #pragma omp for schedule(auto)
          for(int a=0; a<this->molecule->GetAtomVect()->size(); a++){

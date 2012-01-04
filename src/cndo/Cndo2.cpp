@@ -188,23 +188,25 @@ void Cndo2::SetMolecule(Molecule* molecule){
    // set molecule and malloc
    this->molecule = molecule;
    if(this->theory == CNDO2 || this->theory == INDO){
-      this->gammaAB = MallocerFreer::GetInstance()->Malloc<double>(
-                                                    this->molecule->GetAtomVect()->size(), 
-                                                    this->molecule->GetAtomVect()->size());
+      if(this->gammaAB == NULL){
+      }
+      MallocerFreer::GetInstance()->Malloc<double>(&this->gammaAB,
+                                                   this->molecule->GetAtomVect()->size(), 
+                                                   this->molecule->GetAtomVect()->size());
    }
-   this->overlap = MallocerFreer::GetInstance()->Malloc<double>(
-                                                 this->molecule->GetTotalNumberAOs(), 
-                                                 this->molecule->GetTotalNumberAOs());
-   this->orbitalElectronPopulation = MallocerFreer::GetInstance()->Malloc<double>(
-                                                                   this->molecule->GetTotalNumberAOs(), 
-                                                                   this->molecule->GetTotalNumberAOs());
-   this->atomicElectronPopulation = MallocerFreer::GetInstance()->Malloc<double>(
-                                                                  this->molecule->GetAtomVect()->size());
-   this->fockMatrix = MallocerFreer::GetInstance()->Malloc<double>(
-                                                    this->molecule->GetTotalNumberAOs(), 
-                                                    this->molecule->GetTotalNumberAOs());
-   this->energiesMO = MallocerFreer::GetInstance()->Malloc<double>(
-                                                    this->molecule->GetTotalNumberAOs());
+   MallocerFreer::GetInstance()->Malloc<double>(&this->overlap, 
+                                                this->molecule->GetTotalNumberAOs(), 
+                                                this->molecule->GetTotalNumberAOs());
+   MallocerFreer::GetInstance()->Malloc<double>(&this->orbitalElectronPopulation,
+                                                this->molecule->GetTotalNumberAOs(), 
+                                                this->molecule->GetTotalNumberAOs());
+   MallocerFreer::GetInstance()->Malloc<double>(&this->atomicElectronPopulation,
+                                                this->molecule->GetAtomVect()->size());
+   MallocerFreer::GetInstance()->Malloc<double>(&this->fockMatrix,
+                                                this->molecule->GetTotalNumberAOs(), 
+                                                this->molecule->GetTotalNumberAOs());
+   MallocerFreer::GetInstance()->Malloc<double>(&this->energiesMO,
+                                                this->molecule->GetTotalNumberAOs());
 }
 
 Molecule* Cndo2::GetMolecule(){
@@ -286,27 +288,27 @@ void Cndo2::DoesSCF(bool requiresGuess){
 
    // diis parameters
    int diisNumErrorVect = Parameters::GetInstance()->GetDiisNumErrorVectSCF();
-
    // malloc temporary matrices for scf
-   double** oldOrbitalElectronPopulation = MallocerFreer::GetInstance()->Malloc<double>
-            (this->molecule->GetTotalNumberAOs(), this->molecule->GetTotalNumberAOs());
-
+   double** oldOrbitalElectronPopulation = NULL;
+   MallocerFreer::GetInstance()->Malloc<double>(&oldOrbitalElectronPopulation, 
+                                                this->molecule->GetTotalNumberAOs(), 
+                                                this->molecule->GetTotalNumberAOs());
    // malloc temporary matrices for diis
    double*** diisStoredDensityMatrix = NULL;
    double*** diisStoredErrorVect = NULL;
    double** diisErrorProducts = NULL;
    double* diisErrorCoefficients = NULL;
    if(0<diisNumErrorVect){
-      diisStoredDensityMatrix = MallocerFreer::GetInstance()->Malloc<double>(
-                                                              diisNumErrorVect, 
-                                                              this->molecule->GetTotalNumberAOs(), 
-                                                              this->molecule->GetTotalNumberAOs());
-      diisStoredErrorVect = MallocerFreer::GetInstance()->Malloc<double>(
-                                                          diisNumErrorVect, 
-                                                          this->molecule->GetTotalNumberAOs(), 
-                                                          this->molecule->GetTotalNumberAOs());
-      diisErrorProducts = MallocerFreer::GetInstance()->Malloc<double>(diisNumErrorVect+1, diisNumErrorVect+1);
-      diisErrorCoefficients = MallocerFreer::GetInstance()->Malloc<double>(diisNumErrorVect+1);
+      MallocerFreer::GetInstance()->Malloc<double>(&diisStoredDensityMatrix,
+                                                   diisNumErrorVect, 
+                                                   this->molecule->GetTotalNumberAOs(), 
+                                                   this->molecule->GetTotalNumberAOs());
+      MallocerFreer::GetInstance()->Malloc<double>(&diisStoredErrorVect,
+                                                   diisNumErrorVect, 
+                                                   this->molecule->GetTotalNumberAOs(), 
+                                                   this->molecule->GetTotalNumberAOs());
+      MallocerFreer::GetInstance()->Malloc<double>(&diisErrorProducts, diisNumErrorVect+1, diisNumErrorVect+1);
+      MallocerFreer::GetInstance()->Malloc<double>(&diisErrorCoefficients, diisNumErrorVect+1);
    }
 
    try{
@@ -706,15 +708,17 @@ void Cndo2::CalcElecHFEnergy(double* elecHFEnergy,
    double electronicEnergy = 0.0;
    // use density matrix for electronic energy
    int totalNumberAOs = this->molecule->GetTotalNumberAOs();
-   double** fMatrix = MallocerFreer::GetInstance()->Malloc<double>(totalNumberAOs, 
-                                                                   totalNumberAOs);
-   double** hMatrix = MallocerFreer::GetInstance()->Malloc<double>(totalNumberAOs, 
-                                                                   totalNumberAOs);
-   double** dammyOrbitalElectronPopulation  = MallocerFreer::GetInstance()->Malloc<double>(
-                                                                            totalNumberAOs, 
-                                                                            totalNumberAOs);
-   double* dammyAtomicElectronPopulation  = MallocerFreer::GetInstance()->Malloc<double>(
-                                                                          molecule.GetAtomVect()->size());
+   double** fMatrix = NULL;
+   double** hMatrix = NULL;
+   double** dammyOrbitalElectronPopulation = NULL;
+   double* dammyAtomicElectronPopulation = NULL;
+   MallocerFreer::GetInstance()->Malloc<double>(&fMatrix, totalNumberAOs, totalNumberAOs);
+   MallocerFreer::GetInstance()->Malloc<double>(&hMatrix, totalNumberAOs,totalNumberAOs);
+   MallocerFreer::GetInstance()->Malloc<double>(&dammyOrbitalElectronPopulation,
+                                                totalNumberAOs, 
+                                                totalNumberAOs);
+   MallocerFreer::GetInstance()->Malloc<double>(&dammyAtomicElectronPopulation,
+                                                molecule.GetAtomVect()->size());
 
    try{
       bool isGuess = false;
@@ -1188,16 +1192,16 @@ void Cndo2::CalcOverlap(double** overlap, const Molecule& molecule) const{
    stringstream ompErrors;
    #pragma omp parallel 
    {
-      double** diatomicOverlap;
-      double** rotatingMatrix; 
+      double** diatomicOverlap = NULL;
+      double** rotatingMatrix = NULL;
       try{
          // malloc
-         diatomicOverlap =  MallocerFreer::GetInstance()->Malloc<double>(
-                                                          OrbitalType_end, 
-                                                          OrbitalType_end);
-         rotatingMatrix = MallocerFreer::GetInstance()->Malloc<double>(
-                                                        OrbitalType_end, 
-                                                        OrbitalType_end);
+         MallocerFreer::GetInstance()->Malloc<double>(&diatomicOverlap,
+                                                      OrbitalType_end, 
+                                                      OrbitalType_end);
+         MallocerFreer::GetInstance()->Malloc<double>(&rotatingMatrix,
+                                                      OrbitalType_end, 
+                                                      OrbitalType_end);
          // calculation overlap matrix
          for(int mu=0; mu<totalAONumber; mu++){
             overlap[mu][mu] = 1.0;
@@ -1254,15 +1258,21 @@ void Cndo2::CalcDiatomicOverlapFirstDerivative(double*** overlapFirstDeri,
                     pow(Cartesian[YAxis],2.0) + 
                     pow(Cartesian[ZAxis],2.0) );
    // malloc
-   double** diatomicOverlap = MallocerFreer::GetInstance()->Malloc<double>(OrbitalType_end, 
-                                                                           OrbitalType_end);
-   double** rotatingMatrix = MallocerFreer::GetInstance()->Malloc<double>(OrbitalType_end, 
-                                                                          OrbitalType_end);
-   double** diaOverlapDeriR = MallocerFreer::GetInstance()->Malloc<double>(OrbitalType_end, 
-                                                                           OrbitalType_end);
-   double*** rMatDeri = MallocerFreer::GetInstance()->Malloc<double>(OrbitalType_end, 
-                                                                     OrbitalType_end, 
-                                                                     CartesianType_end);
+   double** diatomicOverlap = NULL;
+   double** rotatingMatrix = NULL;
+   double** diaOverlapDeriR = NULL;
+   MallocerFreer::GetInstance()->Malloc<double>(&diatomicOverlap, 
+                                                OrbitalType_end, 
+                                                OrbitalType_end);
+   MallocerFreer::GetInstance()->Malloc<double>(&rotatingMatrix, 
+                                                OrbitalType_end, 
+                                                OrbitalType_end);
+   MallocerFreer::GetInstance()->Malloc<double>(&diaOverlapDeriR, OrbitalType_end, OrbitalType_end);
+   double*** rMatDeri = NULL;
+   MallocerFreer::GetInstance()->Malloc<double>(&rMatDeri, 
+                                                OrbitalType_end, 
+                                                OrbitalType_end, 
+                                                CartesianType_end);
 
    try{
       this->CalcDiatomicOverlapInDiatomicFrame(diatomicOverlap, atomA, atomB);
@@ -1957,8 +1967,8 @@ void Cndo2::CalcRotatingMatrix(double** rotatingMatrix,
 
    // rotating matrix for d-function
    // dMatrix is (37) in J. Mol. Strct. 419, 19(1997) (ref. [BFB_1997])
-   double** dMatrix;
-   dMatrix =  MallocerFreer::GetInstance()->Malloc<double>(OrbitalType_end, OrbitalType_end);
+   double** dMatrix = NULL;
+   MallocerFreer::GetInstance()->Malloc<double>(&dMatrix, OrbitalType_end, OrbitalType_end);
    try{
       dMatrix[dzz][dzz] = 0.5*(3.0*pow(cos(beta),2.0) - 1.0);
       dMatrix[dxxyy][dxxyy] = pow(cos(0.5*beta),4.0);
@@ -2263,7 +2273,8 @@ void Cndo2::RotateDiatmicOverlapToSpaceFrame(double** diatomicOverlap,
       ss << this->errorMessageRotDiaOverlapToSpaceFrameNullRotMatrix;
       throw MolDSException(ss.str());
    }
-   double** oldDiatomicOverlap = MallocerFreer::GetInstance()->Malloc<double>(OrbitalType_end, OrbitalType_end);
+   double** oldDiatomicOverlap = NULL;
+   MallocerFreer::GetInstance()->Malloc<double>(&oldDiatomicOverlap, OrbitalType_end, OrbitalType_end);
 
    try{
       for(int i=0; i<OrbitalType_end; i++){

@@ -233,7 +233,7 @@ double* Parameters::GetTranslatingDifference() const{
 
 void Parameters::SetInertiaTensorOrigin(double x, double y, double z){
    if(this->inertiaTensorOrigin == NULL){
-      this->inertiaTensorOrigin = MallocerFreer::GetInstance()->Malloc<double>(CartesianType_end);
+      MallocerFreer::GetInstance()->Malloc<double>(&this->inertiaTensorOrigin, CartesianType_end);
    }
 
    this->inertiaTensorOrigin[0] = x;
@@ -248,7 +248,7 @@ double* Parameters::GetInertiaTensorOrigin() const{
 
 void Parameters::SetRotatingOrigin(double x, double y, double z){
    if(this->rotatingOrigin == NULL){
-      this->rotatingOrigin = MallocerFreer::GetInstance()->Malloc<double>(CartesianType_end);
+      MallocerFreer::GetInstance()->Malloc<double>(&this->rotatingOrigin, CartesianType_end);
    }
 
    this->rotatingOrigin[0] = x;

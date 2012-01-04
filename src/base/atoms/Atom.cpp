@@ -18,14 +18,14 @@ using namespace MolDS_base;
 
 namespace MolDS_base_atoms{
 Atom::Atom(){
-   this->xyz = MallocerFreer::GetInstance()->Malloc<double>(CartesianType_end);
-   this->pxyz = MallocerFreer::GetInstance()->Malloc<double>(CartesianType_end);
+   MallocerFreer::GetInstance()->Malloc<double>(&this->xyz, CartesianType_end);
+   MallocerFreer::GetInstance()->Malloc<double>(&this->pxyz, CartesianType_end);
    this->SetMessages();
 }
 
 Atom::Atom(double x, double y, double z){
-   this->xyz = MallocerFreer::GetInstance()->Malloc<double>(CartesianType_end);
-   this->pxyz = MallocerFreer::GetInstance()->Malloc<double>(CartesianType_end);
+   MallocerFreer::GetInstance()->Malloc<double>(&this->xyz, CartesianType_end);
+   MallocerFreer::GetInstance()->Malloc<double>(&this->pxyz, CartesianType_end);
    this->SetMessages();
    this->SetXyz(x, y, z);
 }
