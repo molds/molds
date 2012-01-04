@@ -588,19 +588,45 @@ void Cndo2::DoesDIIS(double** orbitalElectronPopulation,
 
    if( 0 < diisNumErrorVect){
       for(int m=0; m<diisNumErrorVect-1; m++){
+         stringstream ompErrors;
+         #pragma omp parallel for schedule(auto)
          for(int j=0; j<totalNumberAOs; j++){
-            for(int k=0; k<totalNumberAOs; k++){
-               diisStoredDensityMatrix[m][j][k] = diisStoredDensityMatrix[m+1][j][k];
-               diisStoredErrorVect[m][j][k] = diisStoredErrorVect[m+1][j][k];
+            try{
+               for(int k=0; k<totalNumberAOs; k++){
+                  diisStoredDensityMatrix[m][j][k] = diisStoredDensityMatrix[m+1][j][k];
+                  diisStoredErrorVect[m][j][k] = diisStoredErrorVect[m+1][j][k];
+               }
+            }
+            catch(MolDSException ex){
+               #pragma omp critical
+               ompErrors << ex.what() << endl ;
             }
          }
+         // Exception throwing for omp-region
+         if(!ompErrors.str().empty()){
+            throw MolDSException(ompErrors.str());
+         }
       }
-      for(int j=0; j<totalNumberAOs; j++){
-         for(int k=0; k<totalNumberAOs; k++){
-            diisStoredDensityMatrix[diisNumErrorVect-1][j][k] = orbitalElectronPopulation[j][k];
-            diisStoredErrorVect[diisNumErrorVect-1][j][k] = orbitalElectronPopulation[j][k] 
-                                                           -oldOrbitalElectronPopulation[j][k];
+      {
+         stringstream ompErrors;
+         #pragma omp parallel for schedule(auto)
+         for(int j=0; j<totalNumberAOs; j++){
+            try{
+               for(int k=0; k<totalNumberAOs; k++){
+                  diisStoredDensityMatrix[diisNumErrorVect-1][j][k] = orbitalElectronPopulation[j][k];
+                  diisStoredErrorVect[diisNumErrorVect-1][j][k] = orbitalElectronPopulation[j][k] 
+                                                                 -oldOrbitalElectronPopulation[j][k];
                      
+               }
+            }
+            catch(MolDSException ex){
+               #pragma omp critical
+               ompErrors << ex.what() << endl ;
+            }
+         }
+         // Exception throwing for omp-region
+         if(!ompErrors.str().empty()){
+            throw MolDSException(ompErrors.str());
          }
       }
       for(int mi=0; mi<diisNumErrorVect-1; mi++){
@@ -609,14 +635,25 @@ void Cndo2::DoesDIIS(double** orbitalElectronPopulation,
          }
       }
                
-      double tempErrorProduct=0.0;
       for(int mi=0; mi<diisNumErrorVect; mi++){
-         tempErrorProduct = 0.0;
+         double tempErrorProduct = 0.0;
+         stringstream ompErrors;
+         #pragma omp parallel for schedule(auto) reduction(+:tempErrorProduct)
          for(int j=0; j<totalNumberAOs; j++){
-            for(int k=0; k<totalNumberAOs; k++){
-               tempErrorProduct += diisStoredErrorVect[mi][j][k]
-                                  *diisStoredErrorVect[diisNumErrorVect-1][j][k];
+            try{
+               for(int k=0; k<totalNumberAOs; k++){
+                  tempErrorProduct += diisStoredErrorVect[mi][j][k]
+                                     *diisStoredErrorVect[diisNumErrorVect-1][j][k];
+               }
             }
+            catch(MolDSException ex){
+               #pragma omp critical
+               ompErrors << ex.what() << endl ;
+            }
+         }
+         // Exception throwing for omp-region
+         if(!ompErrors.str().empty()){
+            throw MolDSException(ompErrors.str());
          }
          diisErrorProducts[mi][diisNumErrorVect-1] = tempErrorProduct;
          diisErrorProducts[diisNumErrorVect-1][mi] = tempErrorProduct;
@@ -657,11 +694,23 @@ void Cndo2::DoesDamp(double rmsDensity,
    double dampingThresh = Parameters::GetInstance()->GetDampingThreshSCF();
    double dampingWeight = Parameters::GetInstance()->GetDampingWeightSCF();
    if(0.0 < dampingWeight && dampingThresh < rmsDensity){
+      stringstream ompErrors;
+      #pragma omp parallel for schedule(auto)
       for(int j=0; j<molecule.GetTotalNumberAOs(); j++){
-         for(int k=0; k<molecule.GetTotalNumberAOs(); k++){
-            orbitalElectronPopulation[j][k] *= (1.0 - dampingWeight);
-            orbitalElectronPopulation[j][k] += dampingWeight*oldOrbitalElectronPopulation[j][k];
+         try{
+            for(int k=0; k<molecule.GetTotalNumberAOs(); k++){
+               orbitalElectronPopulation[j][k] *= (1.0 - dampingWeight);
+               orbitalElectronPopulation[j][k] += dampingWeight*oldOrbitalElectronPopulation[j][k];
+            }
          }
+         catch(MolDSException ex){
+            #pragma omp critical
+            ompErrors << ex.what() << endl ;
+         }
+      }
+      // Exception throwing for omp-region
+      if(!ompErrors.str().empty()){
+         throw MolDSException(ompErrors.str());
       }
    } 
 
@@ -880,10 +929,22 @@ bool Cndo2::SatisfyConvergenceCriterion(double const* const* oldOrbitalElectronP
                                         int numberAOs, double* rmsDensity, int times) const{
    bool satisfy = false;
    double change = 0.0;
+   stringstream ompErrors;
+   #pragma omp parallel for schedule(auto) reduction(+:change)
    for(int i=0; i<numberAOs; i++){
-      for(int j=0; j<numberAOs; j++){
-         change += pow(oldOrbitalElectronPopulation[i][j] - orbitalElectronPopulation[i][j], 2.0);
+      try{
+         for(int j=0; j<numberAOs; j++){
+            change += pow(oldOrbitalElectronPopulation[i][j] - orbitalElectronPopulation[i][j], 2.0);
+         }
       }
+      catch(MolDSException ex){
+         #pragma omp critical
+         ompErrors << ex.what() << endl ;
+      }
+   }
+   // Exception throwing for omp-region
+   if(!ompErrors.str().empty()){
+      throw MolDSException(ompErrors.str());
    }
    *rmsDensity = sqrt(change);
   
@@ -1050,16 +1111,27 @@ void Cndo2::CalcOrbitalElectronPopulation(double** orbitalElectronPopulation,
       }
    }
    
-   double value=0.0;
    int numberTotalValenceElectrons = molecule.GetTotalNumberValenceElectrons();
+   stringstream ompErrors;
+   #pragma omp parallel for schedule(auto) 
    for(int mu=0; mu<totalNumberAOs; mu++){
-      for(int nu=mu; nu<totalNumberAOs; nu++){
-         value = 0.0;
-         for(int mo=0; mo<numberTotalValenceElectrons/2; mo++){
-            value += transposedFockMatrix[mu][mo]*transposedFockMatrix[nu][mo];
+      try{
+         for(int nu=mu; nu<totalNumberAOs; nu++){
+            double value = 0.0;
+            for(int mo=0; mo<numberTotalValenceElectrons/2; mo++){
+               value += transposedFockMatrix[mu][mo]*transposedFockMatrix[nu][mo];
+            }
+            orbitalElectronPopulation[mu][nu] = 2.0*value;
          }
-         orbitalElectronPopulation[mu][nu] = 2.0*value;
       }
+      catch(MolDSException ex){
+         #pragma omp critical
+         ompErrors << ex.what() << endl ;
+      }
+   }
+   // Exception throwing for omp-region
+   if(!ompErrors.str().empty()){
+      throw MolDSException(ompErrors.str());
    }
    
    for(int mu=0; mu<totalNumberAOs; mu++){
