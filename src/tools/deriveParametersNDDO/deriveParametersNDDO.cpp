@@ -9,6 +9,7 @@
 #include<vector>
 #include<stdexcept>
 #include"../../base/MolDSException.h"
+#include"../../base/Uncopyable.h"
 #include"../../base/Utilities.h"
 #include"../../base/Enums.h"
 #include"../../base/MathUtilities.h"
