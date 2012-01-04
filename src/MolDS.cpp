@@ -39,14 +39,10 @@ int main(){
       bool runingNormally = true;
       // Welcome Messages
       time_t startTime;
-      struct tm *ltm;
-      char s[50];
       clock_t startTick = clock();
       double ompStartTime = omp_get_wtime();
       time(&startTime);
-      ltm = localtime(&startTime);
-      fmttm(s, ltm);
-      cout << "\n\n     >>>>>  Welcome to the MolDS world at " << s << "  <<<<<\n\n\n";
+      cout << "\n\n     >>>>>  Welcome to the MolDS world at " << GetDateString() << "  <<<<<\n\n\n";
 
       // declare
       MallocerFreer::GetInstance();
