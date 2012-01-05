@@ -17,34 +17,47 @@
 // along with MolDS.  If not, see <http://www.gnu.org/licenses/>.         // 
 //************************************************************************//
 ==============================================================================
-Compile(using GNUmake): 
+COMPILE(using GNUmake): 
+   In the "src" directory in the MolDS package.
+
    for 32 bit
-   $make depend INTEL=32
-   $make INTEL=32
+   $ make depend INTEL=32
+   $ make INTEL=32
 
    for 64 bit
-   $make depend INTEL=64
-   $make INTEL=64
-   
-   (if you wanna clean the compilation, use "$make clean")
+   $ make depend INTEL=64
+   $ make INTEL=64
 
-Compile(primitive method): 
+   The compile succeeded if you could fine "MolDS.out" in the "src" directory. 
+   Use "$ make clean" when you wanna clean the compilation.
+
+COMPILE(primitive method): 
+   In the "src" directory in the MolDS package.
    for 32 bit
-   $icc <MolDS.cpp and all cpp-files> -lmkl_intel -lmkl_intel_thread -lmkl_core -liomp5 -lpthread -O3
-   $icc <MolDS.cpp and all cpp-files> -lmkl_intel -lmkl_intel_thread -lmkl_core -liomp5 -lpthread -O3 -openmp -openmp-report2
+   $ icc <MolDS.cpp and all cpp-files> -lmkl_intel -lmkl_intel_thread -lmkl_core -liomp5 -lpthread -O3 -openmp -openmp-report2
 
    for 64 bit
-   $icc <MolDS.cpp and all cpp-files> -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread
-   $icc <MolDS.cpp and all cpp-files> -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread -O3 -openmp -openmp-report2
+   $ icc <MolDS.cpp and all cpp-files> -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread -O3 -openmp -openmp-report2
 
 ==============================================================================
-Carring Out:
-   $./a.out < input.in
+CARRY OUT MolDS:
+   In the "src" directory in the MolDS package.
+   $ ./MolDS.out < input.in
 
 ==============================================================================
-Capabilities:
+SAMPLE and TEST
+   See files in "test" directories for sample files.
+   In the "test" directory, *.in files are input files, then *.dat files are
+   associated output files. For test calculations, carry out below ruby-script 
+   in the "test" directory. This scripb will finished in a few minutes with big 
+   output(a few thausands lines).
 
-   Electronic calculations:
+   $ ruby Test_Of_MolDS.rb
+
+==============================================================================
+CAPABILITIES:
+
+   Electronic state and molecular dynamics:
             | HF  | CIS | MD(gs) | MD(es) |
    ---------|-----|-----|--------|--------|
    CNDO2    | OK  | --  | --     | --     |
@@ -62,7 +75,7 @@ Capabilities:
    PM3/PDDG | OK  | OK  | OK     | OK     |
 
       "OK", "Sch", and "--" mean available, shceduled, and non-scheduled methods, respectively.
-      MD(gs) and MD(es) mean Molecular Dynamics on ground and excited states, respectively. 
+      MD(gs) and MD(es) mean Born-Oppenheimer Molecular Dynamics on ground and excited states, respectively. 
 
    Elements:
    CNDO2    | H, Li, C, N, O, and S
@@ -74,11 +87,10 @@ Capabilities:
    PM3/PDDG | H, C, N, O, and S 
 
 ==============================================================================
-How to Write Input-files:
+HOW TO WRITE INPUT:
 
    Comment Out:
       Lines starting with "//" or "#" in input-files are treated as comments.
-
 
    SCF:
       Write "cndo/2", "indo", "zindo/s", "mndo", "am1", 
