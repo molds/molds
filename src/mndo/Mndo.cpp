@@ -1570,17 +1570,17 @@ void Mndo::CalcZMatrixForce(const vector<int>& elecStates){
    double** transposedFockMatrix = NULL; // transposed Fock matrix
    double** xiOcc = NULL;
    double** xiVir = NULL;
-   this->MallocTempMatrixForZMatrix(&delta,
-                                    &q,
-                                    &kNR,
-                                    &kRDager,
-                                    &y,
-                                    &transposedFockMatrix,
-                                    &xiOcc,
-                                    &xiVir,
-                                    nonRedundantQIndeces.size(),
-                                    redundantQIndeces.size());
    try{
+      this->MallocTempMatrixForZMatrix(&delta,
+                                       &q,
+                                       &kNR,
+                                       &kRDager,
+                                       &y,
+                                       &transposedFockMatrix,
+                                       &xiOcc,
+                                       &xiVir,
+                                       nonRedundantQIndeces.size(),
+                                       redundantQIndeces.size());
       this->TransposeFockMatrixMatrix(transposedFockMatrix);
       this->CalcKNRMatrix(kNR, nonRedundantQIndeces);
       this->CalcKRDagerMatrix(kRDager, nonRedundantQIndeces,redundantQIndeces);
@@ -1664,10 +1664,10 @@ void Mndo::CalcEtaMatrixForce(const vector<int>& elecStates){
    int numberActiveVir = Parameters::GetInstance()->GetActiveVirCIS();
    int groundState = 0;
    double** transposedFockMatrix = NULL; // transposed Fock matrix
-   MallocerFreer::GetInstance()->Malloc<double>(&transposedFockMatrix,
-                                                numberAOs,
-                                                numberAOs);
    try{
+      MallocerFreer::GetInstance()->Malloc<double>(&transposedFockMatrix,
+                                                   numberAOs,
+                                                   numberAOs);
       this->TransposeFockMatrixMatrix(transposedFockMatrix);
       for(int n=0; n<elecStates.size(); n++){
          if(groundState < elecStates[n]){
@@ -2217,9 +2217,9 @@ void Mndo::CalcTwoElecTwoCoreDiatomic(double**** matrix, int atomAIndex, int ato
 
    // rotate matirix into the space frame
    double** rotatingMatrix = NULL;
-   MallocerFreer::GetInstance()->Malloc<double>(&rotatingMatrix,
-                                                OrbitalType_end, OrbitalType_end);
    try{
+      MallocerFreer::GetInstance()->Malloc<double>(&rotatingMatrix,
+                                                   OrbitalType_end, OrbitalType_end);
       this->CalcRotatingMatrix(rotatingMatrix, atomA, atomB);
       this->RotateTwoElecTwoCoreDiatomicToSpaceFramegc(matrix, rotatingMatrix);
    }
@@ -2282,14 +2282,14 @@ void Mndo::CalcTwoElecTwoCoreDiatomicFirstDerivatives(double***** matrix,
    double** rotatingMatrix = NULL;
    double*** rMatDeri = NULL;
    double**** twoElecTwoCoreDiatomic = NULL;
-   MallocerFreer::GetInstance()->Malloc<double>(&rotatingMatrix,
-                                                OrbitalType_end, OrbitalType_end);
-   MallocerFreer::GetInstance()->Malloc<double>(&rMatDeri, 
-                                                OrbitalType_end, 
-                                                OrbitalType_end, 
-                                                CartesianType_end);
-   MallocerFreer::GetInstance()->Malloc<double>(&twoElecTwoCoreDiatomic, dxy, dxy, dxy, dxy);
    try{
+      MallocerFreer::GetInstance()->Malloc<double>(&rotatingMatrix,
+                                                   OrbitalType_end, OrbitalType_end);
+      MallocerFreer::GetInstance()->Malloc<double>(&rMatDeri, 
+                                                   OrbitalType_end, 
+                                                   OrbitalType_end, 
+                                                   CartesianType_end);
+      MallocerFreer::GetInstance()->Malloc<double>(&twoElecTwoCoreDiatomic, dxy, dxy, dxy, dxy);
       // calclation in diatomic frame
       for(int mu=0; mu<atomA.GetValenceSize(); mu++){
          for(int nu=0; nu<atomA.GetValenceSize(); nu++){

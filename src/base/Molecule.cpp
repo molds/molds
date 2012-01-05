@@ -385,10 +385,9 @@ void Molecule::CalcPrincipalAxes(){
 
    double** inertiaTensor = NULL;
    double*  inertiaMoments = NULL;
-   MallocerFreer::GetInstance()->Malloc<double>(&inertiaTensor, CartesianType_end, CartesianType_end);
-   MallocerFreer::GetInstance()->Malloc<double>(&inertiaMoments, CartesianType_end);
-
    try{
+      MallocerFreer::GetInstance()->Malloc<double>(&inertiaTensor, CartesianType_end, CartesianType_end);
+      MallocerFreer::GetInstance()->Malloc<double>(&inertiaMoments, CartesianType_end);
       this->CalcInertiaTensor(inertiaTensor, inertiaTensorOrigin);
       
       bool calcEigenVectors = true;

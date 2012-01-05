@@ -961,14 +961,12 @@ void ZindoS::DoesCISDavidson(){
    double*  ritzVector = NULL;
    double*  residualVector = NULL;
 
-   // malloc
-   MallocerFreer::GetInstance()->Malloc<double>(&expansionVectors, 
-                                                this->matrixCISdimension, 
-                                                maxDim);
-   MallocerFreer::GetInstance()->Malloc<double>(&ritzVector, this->matrixCISdimension);
-   MallocerFreer::GetInstance()->Malloc<double>(&residualVector, this->matrixCISdimension);
-
    try{
+      MallocerFreer::GetInstance()->Malloc<double>(&expansionVectors, 
+                                                   this->matrixCISdimension, 
+                                                   maxDim);
+      MallocerFreer::GetInstance()->Malloc<double>(&ritzVector, this->matrixCISdimension);
+      MallocerFreer::GetInstance()->Malloc<double>(&residualVector, this->matrixCISdimension);
       // sort single excitation slater determinants
       vector<MoEnergyGap> moEnergyGaps;
       this->SortSingleExcitationSlaterDeterminants(&moEnergyGaps);
@@ -997,13 +995,13 @@ void ZindoS::DoesCISDavidson(){
          // malloc interaction matrix and etc.
          double** interactionMatrix = NULL;
          double* interactionEigenEnergies = NULL;
-         MallocerFreer::GetInstance()->Malloc<double>(&interactionMatrix,
-                                                      interactionMatrixDimension, 
-                                                      interactionMatrixDimension);
-         MallocerFreer::GetInstance()->Malloc<double>(&interactionEigenEnergies,
-                                                      interactionMatrixDimension);
 
          try{
+            MallocerFreer::GetInstance()->Malloc<double>(&interactionMatrix,
+                                                         interactionMatrixDimension, 
+                                                         interactionMatrixDimension);
+            MallocerFreer::GetInstance()->Malloc<double>(&interactionEigenEnergies,
+                                                         interactionMatrixDimension);
             // calculate interaction matrix
             this->CalcInteractionMatrix(interactionMatrix, 
                                         expansionVectors, 
