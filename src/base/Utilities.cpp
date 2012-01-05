@@ -18,13 +18,40 @@
 //************************************************************************//
 #include<stdio.h>
 #include<stdlib.h>
+#include<iostream>
 #include<sstream>
 #include<string>
 #include<math.h>
+#include<time.h>
+#include<omp.h>
 #include"Utilities.h"
 using namespace std;
 
 namespace MolDS_base{
+// output welcome message
+void OutputWelcomeMessage(){
+   cout << "\n\n     >>>>>  Welcome to the MolDS world at " << GetDateString() << "  <<<<<\n\n\n";
+}
+
+// output farewell message
+void OutputFarewellMessage(time_t startTime, clock_t startTick, double ompStartTime, bool runingNormally){
+   time_t endTime;
+   time(&endTime);
+   clock_t endTick = clock();
+   double consumedTime = (double)(endTick - startTick)/(double)CLOCKS_PER_SEC;
+   double ompEndTime = omp_get_wtime();
+   if(runingNormally){
+      cout << "\n\n     >>>>>  The MolDS finished normally!  <<<<<\n";
+   }
+   else{
+      cout << "\n\n     >>>>>  The MolDS finished abnormally..............  <<<<<\n";
+   }
+   cout << "     >>>>>  CPU time: " << consumedTime << "[s].  <<<<<\n";
+   cout << "     >>>>>  Elapsed time: " << endTime - startTime << "[s].  <<<<<\n";
+   cout << "     >>>>>  Elapsed time(OMP): " << ompEndTime - ompStartTime << "[s].  <<<<<\n";
+   cout << "     >>>>>  See you.  <<<<<\n\n\n";
+}
+
 // string of today
 string GetDateString(){
    time_t current;

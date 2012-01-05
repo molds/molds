@@ -19,6 +19,10 @@
 #ifndef INCLUDED_UTILITIES
 #define INCLUDED_UTILITIES
 namespace MolDS_base{
+// output welcome message
+void OutputWelcomeMessage();
+// output farewell message
+void OutputFarewellMessage(time_t startTime, clock_t startTick, double ompStartTime, bool runingNormally);
 // string for today.
 std::string GetDateString();
 // trim the string

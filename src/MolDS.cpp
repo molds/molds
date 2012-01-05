@@ -54,24 +54,26 @@ using namespace MolDS_base;
 int main(){
 
    try{
-      bool runingNormally = true;
       // Welcome Messages
+      OutputWelcomeMessage();
+      
+      //timer set
       time_t startTime;
+      time(&startTime);
       clock_t startTick = clock();
       double ompStartTime = omp_get_wtime();
-      time(&startTime);
-      cout << "\n\n     >>>>>  Welcome to the MolDS world at " << GetDateString() << "  <<<<<\n\n\n";
 
-      // declare
-      MallocerFreer::GetInstance();
-      InputParser::GetInstance();
-      Molecule* molecule = new Molecule();
-      Parameters::GetInstance();
-      MolDS_mkl_wrapper::LapackWrapper::GetInstance();
-      GTOExpansionSTO::GetInstance();
-
-      // Parse input
+      Molecule* molecule = NULL;
+      bool runingNormally = true;
       try{
+         // declare 
+         MallocerFreer::GetInstance();
+         InputParser::GetInstance();
+         molecule = new Molecule();
+         Parameters::GetInstance();
+         MolDS_mkl_wrapper::LapackWrapper::GetInstance();
+         GTOExpansionSTO::GetInstance();
+         // Parse input
          InputParser::GetInstance()->Parse(molecule);
       }
       catch(MolDSException ex){
@@ -176,22 +178,7 @@ int main(){
       MallocerFreer::DeleteInstance();
 
       // Farewell Messages
-      time_t endTime;
-      time(&endTime);
-      clock_t endTick = clock();
-      double consumedTime = (double)(endTick - startTick)/(double)CLOCKS_PER_SEC;
-      double ompEndTime = omp_get_wtime();
-      if(runingNormally){
-         cout << "\n\n     >>>>>  The MolDS finished normally!  <<<<<\n";
-      }
-      else{
-         cout << "\n\n     >>>>>  The MolDS finished abnormally..............  <<<<<\n";
-      }
-      cout << "     >>>>>  CPU time: " << consumedTime << "[s].  <<<<<\n";
-      cout << "     >>>>>  Elapsed time: " << endTime - startTime << "[s].  <<<<<\n";
-      cout << "     >>>>>  Elapsed time(OMP): " << ompEndTime - ompStartTime << "[s].  <<<<<\n";
-      cout << "     >>>>>  See you.  <<<<<\n\n\n";
-
+      OutputFarewellMessage(startTime, startTick, ompStartTime, runingNormally);
    }
    catch(exception ex){
       cout << ex.what();
