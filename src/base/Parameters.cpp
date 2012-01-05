@@ -357,6 +357,10 @@ void Parameters::AddIndexMOPlot(int moIndex){
    this->indecesMOPlot->push_back(moIndex);
 }
 
+bool Parameters::RequiresMOPlot() const{
+   return (this->indecesMOPlot!=NULL && 0<this->indecesMOPlot->size());
+}
+
 bool Parameters::IsDavidsonCIS() const{
    return this->isDavidsonCIS;
 }

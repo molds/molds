@@ -723,7 +723,7 @@ void Cndo2::OutputHFResults(double const* const* fockMatrix,
    cout << endl;
 
    // output MOs
-   if(0<Parameters::GetInstance()->GetIndecesMOPlot()->size()){
+   if(Parameters::GetInstance()->RequiresMOPlot()){
       MOLogger* moLogger = new MOLogger(molecule, fockMatrix, this->theory);
       moLogger->DrawMO(*(Parameters::GetInstance()->GetIndecesMOPlot()));
       delete moLogger;

@@ -90,6 +90,7 @@ public:
    void SetNormToleranceCIS(double normToleranceCIS);
    bool RequiresMD() const;
    void SetRequiresMD(bool requiresMD);
+   bool RequiresMOPlot() const;
    int GetElectronicStateIndexMD() const;
    void SetElectronicStateIndexMD(int electronicStateIndex);
    int GetTotalStepsMD() const;

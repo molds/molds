@@ -580,7 +580,7 @@ void InputParser::Parse(Molecule* molecule) const{
    if(Parameters::GetInstance()->RequiresMD()){
       this->OutputMdConditions();
    }
-   if(0<Parameters::GetInstance()->GetIndecesMOPlot()->size()){
+   if(Parameters::GetInstance()->RequiresMOPlot()){
       this->OutputMOPlotConditions();
    }
 
