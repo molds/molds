@@ -332,9 +332,9 @@ private:
    static void SubtCurrentMalloced(double amount);
    std::string errorMessageMallocFailure;
    std::string messageMemoryUsage;
-   std::string messageMemoryUsageCurrent;
-   std::string messageMemoryUsageMax;
-   std::string messageKByte;
+   std::string messageMemoryCurrentHeap;
+   std::string messageMemoryMaxHeap;
+   std::string messageMByte;
    void OutputMemoryUsage() const;
 };
 }

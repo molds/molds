@@ -19,6 +19,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<iostream>
+#include<math.h>
 #include<string>
 #include<stdexcept>
 #include"MolDSException.h"
@@ -34,10 +35,10 @@ double MallocerFreer::maxMalloced = 0.0;
 
 MallocerFreer::MallocerFreer(){
    this->errorMessageMallocFailure = "Error in base::MallocFreere: Malloc failure...\n";
-   this->messageMemoryUsage = "Memory summary related to temporary arraies (Heap reagion in a node).\n";
-   this->messageMemoryUsageCurrent = "\tMax malloced: ";
-   this->messageMemoryUsageMax = "\tCurrent malloced: ";
-   this->messageKByte = " [kb].\n";
+   this->messageMemoryUsage = "Summary for memory usage:\n";
+   this->messageMemoryCurrentHeap = "\tMax Heap: ";
+   this->messageMemoryMaxHeap = "\tCurrent Heap(Leaked): ";
+   this->messageMByte = " [MB].\n";
 }
 
 MallocerFreer::~MallocerFreer(){
@@ -46,8 +47,8 @@ MallocerFreer::~MallocerFreer(){
 
 void MallocerFreer::OutputMemoryUsage() const{
    cout << this->messageMemoryUsage;
-   cout << this->messageMemoryUsageCurrent << MallocerFreer::maxMalloced/1000.0 << this->messageKByte;
-   cout << this->messageMemoryUsageMax << MallocerFreer::currentMalloced/1000.0 << this->messageKByte;
+   cout << this->messageMemoryCurrentHeap << MallocerFreer::maxMalloced/pow(10.0,6.0) << this->messageMByte;
+   cout << this->messageMemoryMaxHeap << MallocerFreer::currentMalloced/pow(10.0,6.0) << this->messageMByte;
 }
 
 MallocerFreer* MallocerFreer::GetInstance(){
