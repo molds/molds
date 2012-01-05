@@ -64,31 +64,22 @@ Mndo::Mndo() : MolDS_zindo::ZindoS(){
 }
 
 Mndo::~Mndo(){
-   if(this->twoElecTwoCore != NULL){
-      MallocerFreer::GetInstance()->Free<double>(
-                                    &this->twoElecTwoCore, 
-                                    this->molecule->GetAtomVect()->size(),
-                                    this->molecule->GetAtomVect()->size(),
-                                    dxy,
-                                    dxy,
-                                    dxy,
-                                    dxy);
-      //cout << "twoElecTwoCore deleted\n";
-   }
-   if(this->zMatrixForce != NULL){
-      MallocerFreer::GetInstance()->Free<double>(&this->zMatrixForce, 
-                                                 this->zMatrixForceElecStatesNum,
-                                                 this->molecule->GetTotalNumberAOs(),
-                                                 this->molecule->GetTotalNumberAOs());
-      //cout << "zMatrixForce deleted\n";
-   }
-   if(this->etaMatrixForce != NULL){
-      MallocerFreer::GetInstance()->Free<double>(&this->etaMatrixForce, 
-                                                 this->etaMatrixForceElecStatesNum,
-                                                 this->molecule->GetTotalNumberAOs(),
-                                                 this->molecule->GetTotalNumberAOs());
-      //cout << "etaMatrixForce deleted\n";
-   }
+   MallocerFreer::GetInstance()->Free<double>(
+                                 &this->twoElecTwoCore, 
+                                 this->molecule->GetAtomVect()->size(),
+                                 this->molecule->GetAtomVect()->size(),
+                                 dxy,
+                                 dxy,
+                                 dxy,
+                                 dxy);
+   MallocerFreer::GetInstance()->Free<double>(&this->zMatrixForce, 
+                                              this->zMatrixForceElecStatesNum,
+                                              this->molecule->GetTotalNumberAOs(),
+                                              this->molecule->GetTotalNumberAOs());
+   MallocerFreer::GetInstance()->Free<double>(&this->etaMatrixForce, 
+                                              this->etaMatrixForceElecStatesNum,
+                                              this->molecule->GetTotalNumberAOs(),
+                                              this->molecule->GetTotalNumberAOs());
 }
 
 void Mndo::SetMolecule(Molecule* molecule){
@@ -880,47 +871,14 @@ void Mndo::FreeTempMatrixForZMatrix(double** delta,
    int numberActiveVir = Parameters::GetInstance()->GetActiveVirCIS();
    int numberActiveMO = numberActiveOcc + numberActiveVir;
    int numberAOs = this->molecule->GetTotalNumberAOs();
-   if(*delta != NULL){
-      MallocerFreer::GetInstance()->Free<double>(delta, numberActiveMO);
-      //cout << "delta  deleted" << endl;
-   }
-   if(*q != NULL){
-      MallocerFreer::GetInstance()->Free<double>(q, sizeQNR+sizeQR);
-      //cout << "q  deleted" << endl;
-   }
-   if(*kNR != NULL){
-      MallocerFreer::GetInstance()->Free<double>(kNR, sizeQNR, sizeQNR);
-      //cout << "kNR  deleted" << endl;
-   }
-   if(*kRDag != NULL){
-      MallocerFreer::GetInstance()->Free<double>(kRDag, sizeQNR, sizeQR);
-      //cout << "kRDag  deleted" << endl;
-   }
-   if(*y != NULL){
-      MallocerFreer::GetInstance()->Free<double>(y, sizeQNR);
-      //cout << "y  deleted" << endl;
-   }
-   if(*transposedFockMatrix != NULL){
-      int numberAOs = this->molecule->GetTotalNumberAOs();
-      MallocerFreer::GetInstance()->Free<double>(transposedFockMatrix,
-                                                       numberAOs,
-                                                       numberAOs);
-      //cout << "transposedFockMatrix  deleted" << endl;
-   }
-   if(*xiOcc != NULL){
-      int numberActiveOcc = Parameters::GetInstance()->GetActiveOccCIS();
-      MallocerFreer::GetInstance()->Free<double>(xiOcc,
-                                                       numberActiveOcc,
-                                                       numberAOs);
-      //cout << "xiOcc deleted" << endl;
-   }
-   if(*xiVir != NULL){
-      int numberActiveVir = Parameters::GetInstance()->GetActiveVirCIS();
-      MallocerFreer::GetInstance()->Free<double>(xiVir,
-                                                       numberActiveVir,
-                                                       numberAOs);
-      //cout << "xiVir deleted" << endl;
-   }
+   MallocerFreer::GetInstance()->Free<double>(delta, numberActiveMO);
+   MallocerFreer::GetInstance()->Free<double>(q, sizeQNR+sizeQR);
+   MallocerFreer::GetInstance()->Free<double>(kNR, sizeQNR, sizeQNR);
+   MallocerFreer::GetInstance()->Free<double>(kRDag, sizeQNR, sizeQR);
+   MallocerFreer::GetInstance()->Free<double>(y, sizeQNR);
+   MallocerFreer::GetInstance()->Free<double>(transposedFockMatrix, numberAOs, numberAOs);
+   MallocerFreer::GetInstance()->Free<double>(xiOcc, numberActiveOcc, numberAOs);
+   MallocerFreer::GetInstance()->Free<double>(xiVir, numberActiveVir, numberAOs);
 }
 
 // \epsilon_{r}^{kl} in (1) in [PT_1997].
@@ -1706,16 +1664,10 @@ void Mndo::CalcEtaMatrixForce(const vector<int>& elecStates){
       }
    }
    catch(MolDSException ex){
-      if(transposedFockMatrix != NULL){
-         MallocerFreer::GetInstance()->Free<double>(&transposedFockMatrix,numberAOs,numberAOs);
-         //cout << "transposedFockMatrix  deleted" << endl;
-      }
+      MallocerFreer::GetInstance()->Free<double>(&transposedFockMatrix,numberAOs,numberAOs);
       throw ex;
    }
-   if(transposedFockMatrix != NULL){
-      MallocerFreer::GetInstance()->Free<double>(&transposedFockMatrix,numberAOs, numberAOs);
-      //cout << "transposedFockMatrix  deleted" << endl;
-   }
+   MallocerFreer::GetInstance()->Free<double>(&transposedFockMatrix,numberAOs, numberAOs);
 }
 
 bool Mndo::RequiresExcitedStatesForce(const vector<int>& elecStates) const{
@@ -2095,22 +2047,16 @@ void Mndo::CalcForce(const vector<int>& elecStates){
 }
 
 void Mndo::FreeCalcForceTempMatrices(double**** overlapDer, double****** twoElecTwoCoreFirstDeriv) const{
-   if(*overlapDer != NULL){
-      MallocerFreer::GetInstance()->Free<double>(overlapDer, 
-                                                 OrbitalType_end,
-                                                 OrbitalType_end,
-                                                 CartesianType_end);
-      //cout << "overlapDer deleted\n";
-   }
-   if(*twoElecTwoCoreFirstDeriv != NULL){
-      MallocerFreer::GetInstance()->Free<double>(twoElecTwoCoreFirstDeriv,
-                                                 dxy,
-                                                 dxy,
-                                                 dxy,
-                                                 dxy,
-                                                 CartesianType_end);
-      //cout << "twoElecCoreFirstDeriv deleted\n";
-   }
+   MallocerFreer::GetInstance()->Free<double>(overlapDer, 
+                                              OrbitalType_end,
+                                              OrbitalType_end,
+                                              CartesianType_end);
+   MallocerFreer::GetInstance()->Free<double>(twoElecTwoCoreFirstDeriv,
+                                              dxy,
+                                              dxy,
+                                              dxy,
+                                              dxy,
+                                              CartesianType_end);
 }
 
 void Mndo::CalcTwoElecTwoCore(double****** twoElecTwoCore, 

@@ -65,24 +65,15 @@ ZindoS::ZindoS() : MolDS_cndo::Cndo2(){
 }
 
 ZindoS::~ZindoS(){
-   if(this->matrixCIS != NULL){
-      MallocerFreer::GetInstance()->Free<double>(&this->matrixCIS, 
-                                                 this->matrixCISdimension,
-                                                 this->matrixCISdimension);
-      //cout << "matrixCIS deleted\n";
-   }
-   if(this->excitedEnergies != NULL){
-      MallocerFreer::GetInstance()->Free<double>(&this->excitedEnergies, 
-                                                 this->matrixCISdimension);
-      //cout << "exceitedEnergies deleted\n";
-   }
-   if(this->matrixForce != NULL){
-      MallocerFreer::GetInstance()->Free<double>(&this->matrixForce, 
-                                                 this->matrixForceElecStatesNum,
-                                                 this->molecule->GetAtomVect()->size(),
-                                                 CartesianType_end);
-      //cout << "matrixForce deleted\n";
-   }
+   MallocerFreer::GetInstance()->Free<double>(&this->matrixCIS, 
+                                              this->matrixCISdimension,
+                                              this->matrixCISdimension);
+   MallocerFreer::GetInstance()->Free<double>(&this->excitedEnergies, 
+                                              this->matrixCISdimension);
+   MallocerFreer::GetInstance()->Free<double>(&this->matrixForce, 
+                                              this->matrixForceElecStatesNum,
+                                              this->molecule->GetAtomVect()->size(),
+                                              CartesianType_end);
    //cout << "ZindoS deleted\n";
 }
 
@@ -1139,36 +1130,20 @@ void ZindoS::FreeDavidsonCISTemporaryMtrices(double*** expansionVectors,
                                              double** residualVector, 
                                              double** ritzVector) const{
    int maxDim  = Parameters::GetInstance()->GetMaxDimensionsCIS();
-   if(*expansionVectors != NULL){
-      MallocerFreer::GetInstance()->Free<double>(expansionVectors, 
-                                                 this->matrixCISdimension,
-                                                 maxDim);
-      //cout << "expansion vectors deleted\n";
-   }
-   if(*residualVector != NULL){
-      MallocerFreer::GetInstance()->Free<double>(residualVector, this->matrixCISdimension);
-      //cout << "residual vector deleted\n";
-   }
-   if(*ritzVector != NULL){
-      MallocerFreer::GetInstance()->Free<double>(ritzVector, this->matrixCISdimension);
-      //cout << "ritz vector deleted\n";
-   }
-
+   MallocerFreer::GetInstance()->Free<double>(expansionVectors, 
+                                              this->matrixCISdimension,
+                                              maxDim);
+   MallocerFreer::GetInstance()->Free<double>(residualVector, this->matrixCISdimension);
+   MallocerFreer::GetInstance()->Free<double>(ritzVector, this->matrixCISdimension);
 }
 
 void ZindoS::FreeDavidsonRoopCISTemporaryMtrices(double*** interactionMatrix, 
                                                  int interactionMatrixDimension, 
                                                  double** interactionEigenEnergies) const{
-   if(*interactionMatrix != NULL){
-      MallocerFreer::GetInstance()->Free<double>(interactionMatrix, 
-                                                 interactionMatrixDimension,
-                                                   interactionMatrixDimension);
-      //cout << "interactionMatrix deleted\n";
-   }
-   if(*interactionEigenEnergies != NULL){
-      MallocerFreer::GetInstance()->Free<double>(interactionEigenEnergies, interactionMatrixDimension);
-      //cout << "interactionEigenEnergies deleted\n";
-   }
+   MallocerFreer::GetInstance()->Free<double>(interactionMatrix, 
+                                              interactionMatrixDimension,
+                                              interactionMatrixDimension);
+   MallocerFreer::GetInstance()->Free<double>(interactionEigenEnergies, interactionMatrixDimension);
 }
 
 void ZindoS::DoesCISDirect(){

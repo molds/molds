@@ -46,16 +46,10 @@ Parameters::Parameters(){
 }
 
 Parameters::~Parameters(){
-   if(this->inertiaTensorOrigin != NULL){
-      MallocerFreer::GetInstance()->Free<double>(&this->inertiaTensorOrigin,
-                                                 CartesianType_end);
-      //cout << "inertiaTensorOrigin deleted\n";
-   }
-   if(this->rotatingOrigin != NULL){
-      MallocerFreer::GetInstance()->Free<double>(&this->rotatingOrigin,
-                                                 CartesianType_end);
-      //cout << "rotatingOrigin deleted\n";
-   }
+   MallocerFreer::GetInstance()->Free<double>(&this->inertiaTensorOrigin,
+                                              CartesianType_end);
+   MallocerFreer::GetInstance()->Free<double>(&this->rotatingOrigin,
+                                              CartesianType_end);
    if(this->indecesMOPlot != NULL){
       delete this->indecesMOPlot;
       this->indecesMOPlot = NULL;
@@ -250,14 +244,10 @@ double* Parameters::GetTranslatingDifference() const{
 }
 
 void Parameters::SetInertiaTensorOrigin(double x, double y, double z){
-   if(this->inertiaTensorOrigin == NULL){
-      MallocerFreer::GetInstance()->Malloc<double>(&this->inertiaTensorOrigin, CartesianType_end);
-   }
-
+   MallocerFreer::GetInstance()->Malloc<double>(&this->inertiaTensorOrigin, CartesianType_end);
    this->inertiaTensorOrigin[0] = x;
    this->inertiaTensorOrigin[1] = y;
    this->inertiaTensorOrigin[2] = z;
-
 }
 
 double* Parameters::GetInertiaTensorOrigin() const{
@@ -265,14 +255,10 @@ double* Parameters::GetInertiaTensorOrigin() const{
 }
 
 void Parameters::SetRotatingOrigin(double x, double y, double z){
-   if(this->rotatingOrigin == NULL){
-      MallocerFreer::GetInstance()->Malloc<double>(&this->rotatingOrigin, CartesianType_end);
-   }
-
+   MallocerFreer::GetInstance()->Malloc<double>(&this->rotatingOrigin, CartesianType_end);
    this->rotatingOrigin[0] = x;
    this->rotatingOrigin[1] = y;
    this->rotatingOrigin[2] = z;
-
 }
 
 double* Parameters::GetRotatingOrigin() const{

@@ -28,6 +28,9 @@ public:
 
    //1d
    template<typename T> void Malloc(T** matrix, int size1) const{
+      if(*matrix!=NULL){
+         return;
+      }
       *matrix = new T[size1];
       MallocerFreer::AddCurrentMalloced((double)(size1*sizeof(T)));
       this->Initialize<T>(*matrix, size1);
@@ -40,6 +43,9 @@ public:
    }
 
    template<typename T> void Free(T** matrix, int size1) const{
+      if(*matrix==NULL){
+         return;
+      }
       delete [] *matrix;
       MallocerFreer::SubtCurrentMalloced((double)(size1*sizeof(T)));
       *matrix = NULL;
@@ -47,6 +53,9 @@ public:
 
    //2d
    template<typename T> void Malloc(T*** matrix, int size1, int size2) const{
+      if(*matrix!=NULL){
+         return;
+      }
       *matrix = new T*[size1];
       if(*matrix==NULL){
          throw MolDSException(this->errorMessageMallocFailure);
@@ -70,8 +79,10 @@ public:
    }
 
    template<typename T> void Free(T*** matrix, int size1, int size2) const{
-      int i=0;
-      for(i=0;i<size1;i++){
+      if(*matrix==NULL){
+         return;
+      }
+      for(int i=0;i<size1;i++){
          delete [] (*matrix)[i];
       }
       delete [] *matrix;
@@ -81,6 +92,9 @@ public:
 
    // 3d
    template<typename T> void Malloc(T**** matrix, int size1, int size2, int size3) const{
+      if(*matrix!=NULL){
+         return;
+      }
       *matrix = new T**[size1];
       if(*matrix==NULL){
          throw MolDSException(this->errorMessageMallocFailure);
@@ -112,9 +126,11 @@ public:
    }
 
    template<typename T> void Free(T**** matrix, int size1, int size2, int size3) const{
-      int i=0, j=0;
-      for (i=0;i<size1;i++) {
-         for (j=0;j<size2;j++) {
+      if(*matrix==NULL){
+         return;
+      }
+      for (int i=0;i<size1;i++) {
+         for (int j=0;j<size2;j++) {
             delete [] (*matrix)[i][j];
          }
          delete [] (*matrix)[i];
@@ -126,6 +142,9 @@ public:
 
    //4d
    template<typename T> void Malloc(T***** matrix, int size1, int size2, int size3, int size4) const{
+      if(*matrix!=NULL){
+         return;
+      }
       *matrix = new T***[size1];
       if(*matrix==NULL){
          throw MolDSException(this->errorMessageMallocFailure);
@@ -165,10 +184,12 @@ public:
    }
 
    template<typename T> void Free(T***** matrix, int size1, int size2, int size3, int size4) const{
-      int i=0, j=0, k=0;
-      for (i=0;i<size1;i++) {
-         for (j=0;j<size2;j++) {
-            for (k=0;k<size3;k++) {
+      if(*matrix==NULL){
+         return;
+      }
+      for (int i=0;i<size1;i++) {
+         for (int j=0;j<size2;j++) {
+            for (int k=0;k<size3;k++) {
                delete [] (*matrix)[i][j][k];
             }
             delete [] (*matrix)[i][j];
@@ -182,6 +203,9 @@ public:
 
    //5d
    template<typename T> void Malloc(T****** matrix, int size1, int size2, int size3, int size4, int size5) const{
+      if(*matrix!=NULL){
+         return;
+      }
       *matrix = new T****[size1];
       if(*matrix==NULL){
          throw MolDSException(this->errorMessageMallocFailure);
@@ -229,6 +253,9 @@ public:
    }
 
    template<typename T> void Free(T****** matrix, int size1, int size2, int size3, int size4, int size5) const{
+      if(*matrix==NULL){
+         return;
+      }
       for (int i=0;i<size1;i++) {
          for (int j=0;j<size2;j++) {
             for (int k=0;k<size3;k++) {
@@ -248,6 +275,9 @@ public:
 
    //6d
    template<typename T> void Malloc(T******* matrix, int size1, int size2, int size3, int size4, int size5, int size6) const{
+      if(*matrix!=NULL){
+         return;
+      }
       *matrix = new T*****[size1];
       if(*matrix==NULL){
          throw MolDSException(this->errorMessageMallocFailure);
@@ -303,6 +333,9 @@ public:
    }
 
    template<typename T> void Free(T******* matrix, int size1, int size2, int size3, int size4, int size5, int size6) const{
+      if(*matrix==NULL){
+         return;
+      }
       for (int i=0;i<size1;i++) {
          for (int j=0;j<size2;j++) {
             for (int k=0;k<size3;k++) {

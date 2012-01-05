@@ -42,14 +42,8 @@ Atom::Atom(){
 }
 
 Atom::~Atom(){
-   if(this->xyz != NULL){
-      MallocerFreer::GetInstance()->Free<double>(&this->xyz, CartesianType_end);
-      //cout << "xyz deleted\n";
-   }
-   if(this->pxyz != NULL){
-      MallocerFreer::GetInstance()->Free<double>(&this->pxyz, CartesianType_end);
-      //cout << "pxyz (momenta) deleted\n";
-   }
+   MallocerFreer::GetInstance()->Free<double>(&this->xyz, CartesianType_end);
+   MallocerFreer::GetInstance()->Free<double>(&this->pxyz, CartesianType_end);
    //cout << "atom deleted\n";
 }
 
@@ -153,18 +147,14 @@ double* Atom::GetPxyz() const{
 }
 
 void Atom::SetXyz(double x, double y, double z){
-   if(this->xyz==NULL){
-      MallocerFreer::GetInstance()->Malloc<double>(&this->xyz, CartesianType_end);
-   }
+   MallocerFreer::GetInstance()->Malloc<double>(&this->xyz, CartesianType_end);
    xyz[0]= x;
    xyz[1]= y;
    xyz[2]= z;
 }
 
 void Atom::SetPxyz(double px, double py, double pz){
-   if(this->pxyz==NULL){
-      MallocerFreer::GetInstance()->Malloc<double>(&this->pxyz, CartesianType_end);
-   }
+   MallocerFreer::GetInstance()->Malloc<double>(&this->pxyz, CartesianType_end);
    pxyz[0]= px;
    pxyz[1]= py;
    pxyz[2]= pz;

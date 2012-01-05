@@ -58,14 +58,8 @@ Molecule::~Molecule(){
       this->atomVect = NULL;
       //cout << "atomVect deleted\n";
    }
-   if(this->xyzCOM != NULL){
-      MallocerFreer::GetInstance()->Free<double>(&this->xyzCOM, CartesianType_end);
-      //cout << "xyzCOM deleted\n";
-   }
-   if(this->xyzCOC != NULL){
-      MallocerFreer::GetInstance()->Free<double>(&this->xyzCOC, CartesianType_end);
-      //cout << "xyzCOC deleted\n";
-   }
+   MallocerFreer::GetInstance()->Free<double>(&this->xyzCOM, CartesianType_end);
+   MallocerFreer::GetInstance()->Free<double>(&this->xyzCOC, CartesianType_end);
    //cout << "molecule deleted\n";
 }
 
@@ -162,9 +156,7 @@ double* Molecule::GetXyzCOC(){
 }
 
 void Molecule::CalcXyzCOM(){
-   if(this->xyzCOM==NULL){
-      MallocerFreer::GetInstance()->Malloc<double>(&this->xyzCOM, CartesianType_end);
-   }
+   MallocerFreer::GetInstance()->Malloc<double>(&this->xyzCOM, CartesianType_end);
    double totalAtomicMass = 0.0;
    double* atomicXyz;
    double atomicMass = 0.0;
@@ -189,9 +181,7 @@ void Molecule::CalcXyzCOM(){
 }
 
 void Molecule::CalcXyzCOC(){
-   if(this->xyzCOC==NULL){
-      MallocerFreer::GetInstance()->Malloc<double>(&this->xyzCOC, CartesianType_end);
-   }
+   MallocerFreer::GetInstance()->Malloc<double>(&this->xyzCOC, CartesianType_end);
    double totalCoreMass = 0.0;
    double* atomicXyz;
    double coreMass = 0.0;
@@ -434,22 +424,11 @@ void Molecule::CalcInertiaTensor(double** inertiaTensor, const double* inertiaTe
       inertiaTensor[2][2] += atomicMass*(x*x + y*y);
 
    }
-   
 }
 
 void Molecule::FreeInertiaTensorMoments(double*** inertiaTensor, double** inertiaMoments){
-
-   if(*inertiaTensor != NULL){
       MallocerFreer::GetInstance()->Free<double>(inertiaTensor, CartesianType_end, CartesianType_end);
-      //cout << "inertiaTensor deleted\n";
-   }
-
-   if(*inertiaMoments != NULL){
-      MallocerFreer::GetInstance()->Free<double>(inertiaMoments, 
-                                                   CartesianType_end);
-      //cout << "inertiaMoments deleted\n";
-   }
-
+      MallocerFreer::GetInstance()->Free<double>(inertiaMoments, CartesianType_end);
 }
 
 void Molecule::Rotate(){
