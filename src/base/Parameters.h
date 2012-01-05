@@ -100,8 +100,9 @@ private:
    static Parameters* parameters;
    Parameters();
    ~Parameters();
-
+   std::string errorMessageGetIndecesMOPlotNull;
    void SetDefaultValues();
+   void SetMessages();
    static const double eV2AU;
    static const double kcalMolin2AU;
    static const double angstrom2AU;

@@ -23,6 +23,8 @@
 #include<math.h>
 #include<string>
 #include<vector>
+#include<stdexcept>
+#include"MolDSException.h"
 #include"Uncopyable.h"
 #include"Enums.h"
 #include"MallocerFreer.h"
@@ -42,7 +44,8 @@ const double Parameters::degree2Radian = M_PI / 180.0;
 
 Parameters::Parameters(){
    this->SetDefaultValues();
-   this->indecesMOPlot = new vector<int>;
+   this->SetMessages();
+   this->indecesMOPlot = NULL;
 }
 
 Parameters::~Parameters(){
@@ -55,7 +58,6 @@ Parameters::~Parameters(){
       this->indecesMOPlot = NULL;
       //cout << "indecesMOPlot deleted\n";
    }
-
 }
 
 Parameters* Parameters::GetInstance(){
@@ -111,6 +113,11 @@ void Parameters::SetDefaultValues(){
    this->electronicStateIndexMD = 0;
    this->totalStepsMD = 10;
    this->timeWidthMD = 0.1*this->fs2AU;
+}
+
+void Parameters::SetMessages(){
+   this->errorMessageGetIndecesMOPlotNull
+      = "Error in base::Parameters::GetIndecesMOPlot: indecesMOPlot is NULL.\n";
 }
 
 double Parameters::GetThresholdSCF() const{
@@ -335,10 +342,18 @@ void Parameters::SetRequiresCIS(bool requiresCIS){
 }
 
 vector<int>* Parameters::GetIndecesMOPlot() const{
+   if(this->indecesMOPlot==NULL){
+      stringstream ss;
+      ss << this->errorMessageGetIndecesMOPlotNull; 
+      throw MolDSException(ss.str());
+   }
    return this->indecesMOPlot;
 }
 
 void Parameters::AddIndexMOPlot(int moIndex){
+   if(this->indecesMOPlot==NULL){
+      this->indecesMOPlot = new vector<int>;
+   }
    this->indecesMOPlot->push_back(moIndex);
 }
 
