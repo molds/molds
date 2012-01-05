@@ -32,7 +32,7 @@ using namespace std;
 using namespace MolDS_base;
 
 namespace MolDS_base_atoms{
-Liatom::Liatom(double x, double y, double z) : Atom(x, y, z){
+Liatom::Liatom() : Atom(){
    this->atomType = Li;
    this->atomicMass = 6.941*Parameters::GetInstance()->GetGMolin2AU();
    this->coreCharge = 1.0;

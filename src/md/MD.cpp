@@ -165,6 +165,7 @@ double MD::OutputEnergies(){
       Atom* atom = (*molecule->GetAtomVect())[a];
       double coreMass = atom->GetAtomicMass() - (double)atom->GetNumberValenceElectrons();
       for(int i=0; i<CartesianType_end; i++){
+      Atom* atom = (*molecule->GetAtomVect())[a];
          coreKineticEnergy += 0.5*pow(atom->GetPxyz()[i],2.0)/coreMass;
       }
    }  

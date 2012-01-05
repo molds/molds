@@ -23,7 +23,6 @@ namespace MolDS_base_atoms{
 class Atom{
 public:
    Atom();
-   Atom(double x, double y, double z);
    virtual ~Atom();
    MolDS_base::AtomType GetAtomType() const;
    double GetAtomicMass() const;
@@ -255,6 +254,8 @@ private:
    std::string errorMessageGetNddoGpp2BadTheory;
    std::string errorMessageGetNddoHspBadTheory;
    std::string errorMessageGetNddoHppBadTheory;
+   std::string errorMessageGetXyzCoordinatesNull;
+   std::string errorMessageGetPxyzMomentaNull;
    void SetMessages();
    double GetRealAnuglarPartAO(double theta, 
                                double phi, 

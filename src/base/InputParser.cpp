@@ -218,24 +218,28 @@ void InputParser::Parse(Molecule* molecule) const{
             double x = atof(inputTerms[j+1].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
             double y = atof(inputTerms[j+2].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
             double z = atof(inputTerms[j+3].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
+            Atom* atom=NULL;
             if(inputTerms[j] == "h"){
-               molecule->GetAtomVect()->push_back(new Hatom(x, y, z));
+               atom = new Hatom();
             }
             else if(inputTerms[j] == "li"){
-               molecule->GetAtomVect()->push_back(new Liatom(x, y, z));
+               atom = new Liatom();
             }
             else if(inputTerms[j] == "c"){
-               molecule->GetAtomVect()->push_back(new Catom(x, y, z));
+               atom = new Catom();
             }
             else if(inputTerms[j] == "n"){
-               molecule->GetAtomVect()->push_back(new Natom(x, y, z));
+               atom = new Natom();
             }
             else if(inputTerms[j] == "o"){
-               molecule->GetAtomVect()->push_back(new Oatom(x, y, z));
+               atom = new Oatom();
             }
             else if(inputTerms[j] == "s"){
-               molecule->GetAtomVect()->push_back(new Satom(x, y, z));
+               atom = new Satom();
             }
+            atom->SetXyz(x,y,z);
+            atom->SetPxyz(0.0,0.0,0.0);
+            molecule->GetAtomVect()->push_back(atom);
             j += 4;
          }
          i = j;

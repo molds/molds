@@ -25,6 +25,7 @@ public:
    Molecule();
    ~Molecule();
    std::vector<MolDS_base_atoms::Atom*>* GetAtomVect() const; 
+   std::vector<MolDS_base_atoms::Atom*>* GetAtomVect(); 
    double* GetXyzCOM() const;
    double* GetXyzCOM();
    double* GetXyzCOC() const;
@@ -71,6 +72,9 @@ private:
                                  double rotatingAngle, 
                                  MolDS_base::EularAngle rotatingEularAngles)const;
    void OutputTranslatingConditions(double const* translatingDifference) const;
+   std::string errorMessageGetAtomVectNull;
+   std::string errorMessageGetXyzCOCNull;
+   std::string errorMessageGetXyzCOMNull;
    std::string messageTotalNumberAOs;
    std::string messageTotalNumberAtoms;
    std::string messageTotalNumberValenceElectrons;

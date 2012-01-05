@@ -21,7 +21,7 @@
 namespace MolDS_base_atoms{
 class Catom : public Atom {
 public:
-   Catom(double x, double y, double z);
+   Catom();
 private:
 };
 }

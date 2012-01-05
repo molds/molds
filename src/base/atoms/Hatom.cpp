@@ -33,7 +33,7 @@ using namespace MolDS_base;
 
 namespace MolDS_base_atoms{
 
-Hatom::Hatom(double x, double y, double z) : Atom(x, y, z){
+Hatom::Hatom() : Atom(){
    this->atomType = H;
    this->atomicMass = 1.00794*Parameters::GetInstance()->GetGMolin2AU();
    this->coreCharge = 1.0;

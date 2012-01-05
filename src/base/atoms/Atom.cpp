@@ -36,16 +36,9 @@ using namespace MolDS_base;
 
 namespace MolDS_base_atoms{
 Atom::Atom(){
-   MallocerFreer::GetInstance()->Malloc<double>(&this->xyz, CartesianType_end);
-   MallocerFreer::GetInstance()->Malloc<double>(&this->pxyz, CartesianType_end);
+   this->xyz=NULL;
+   this->pxyz=NULL;
    this->SetMessages();
-}
-
-Atom::Atom(double x, double y, double z){
-   MallocerFreer::GetInstance()->Malloc<double>(&this->xyz, CartesianType_end);
-   MallocerFreer::GetInstance()->Malloc<double>(&this->pxyz, CartesianType_end);
-   this->SetMessages();
-   this->SetXyz(x, y, z);
 }
 
 Atom::~Atom(){
@@ -129,6 +122,8 @@ void Atom::SetMessages(){
    this->errorMessageGetPm3PddgParameterDaBadDaIndex 
       = "Error in base_atoms::Atom::GetPm3PddgParameterDa: Bad index for parameter Da(daIndex). Only 0, and 1 are permitted.\n";
    this->errorMessageDaIndex  = "daIndex = ";
+   this->errorMessageGetXyzCoordinatesNull = "Error in base_atoms::Atom::GetXyz: xyz is NULL\n";
+   this->errorMessageGetPxyzMomentaNull  = "Error in base_atoms::Atom::GetPxyz: pxyz is NULL\n";
 }
 
 AtomType Atom::GetAtomType() const{
@@ -140,20 +135,36 @@ double Atom::GetAtomicMass() const{
 }
 
 double* Atom::GetXyz() const{
+   if(this->xyz==NULL){
+      stringstream ss;
+      ss << this->errorMessageGetXyzCoordinatesNull;
+      throw MolDSException(ss.str());
+   }
    return this->xyz;
 }
 
 double* Atom::GetPxyz() const{
+   if(this->pxyz==NULL){
+      stringstream ss;
+      ss << this->errorMessageGetPxyzMomentaNull;
+      throw MolDSException(ss.str());
+   }
    return this->pxyz;
 }
 
 void Atom::SetXyz(double x, double y, double z){
+   if(this->xyz==NULL){
+      MallocerFreer::GetInstance()->Malloc<double>(&this->xyz, CartesianType_end);
+   }
    xyz[0]= x;
    xyz[1]= y;
    xyz[2]= z;
 }
 
 void Atom::SetPxyz(double px, double py, double pz){
+   if(this->pxyz==NULL){
+      MallocerFreer::GetInstance()->Malloc<double>(&this->pxyz, CartesianType_end);
+   }
    pxyz[0]= px;
    pxyz[1]= py;
    pxyz[2]= pz;

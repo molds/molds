@@ -31,7 +31,7 @@
 using namespace std;
 using namespace MolDS_base;
 namespace MolDS_base_atoms{
-Catom::Catom(double x, double y, double z) : Atom(x, y, z){
+Catom::Catom() : Atom(){
    this->atomType = C;
    this->atomicMass = 12.0107*Parameters::GetInstance()->GetGMolin2AU();
    this->coreCharge = 4.0;

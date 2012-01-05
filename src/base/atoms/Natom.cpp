@@ -31,7 +31,7 @@
 using namespace std;
 using namespace MolDS_base;
 namespace MolDS_base_atoms{
-Natom::Natom(double x, double y, double z) : Atom(x, y, z){
+Natom::Natom() : Atom(){
    this->atomType = N;
    this->atomicMass = 14.00674*Parameters::GetInstance()->GetGMolin2AU();
    this->coreCharge = 5.0;

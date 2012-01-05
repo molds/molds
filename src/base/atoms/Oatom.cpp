@@ -31,7 +31,7 @@
 using namespace std;
 using namespace MolDS_base;
 namespace MolDS_base_atoms{
-Oatom::Oatom(double x, double y, double z) : Atom(x, y, z){
+Oatom::Oatom() : Atom(){
    this->atomType = O;
    this->atomicMass = 15.9994*Parameters::GetInstance()->GetGMolin2AU();
    this->coreCharge = 6.0;
