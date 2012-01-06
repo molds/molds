@@ -87,6 +87,9 @@ void InputParser::SetMessages(){
    this->messageCisNormTolerance = "\t\tNorm tolerance for the residual of the Davidson: ";
    this->messageCisMaxIterations = "\t\tMax iterations for the Davidson: ";
    this->messageCisMaxDimensions = "\t\tMax dimensions for the Davidson: ";
+   this->messageMemoryConditions = "\tMemory conditions:\n";
+   this->messageMemoryLimitHeap = "\t\tHeap limit: ";
+   this->messageMemoryMB = "[MB]\n";
    this->messageMdConditions = "\tMD conditions:\n";
    this->messageMdTotalSteps = "\t\tTotal steps: ";
    this->messageMdElecState = "\t\tElectronic eigen state: ";
@@ -155,6 +158,9 @@ void InputParser::SetMessages(){
    this->stringCISMaxIter = "max_iter";
    this->stringCISMaxDimensions = "max_dim";
    this->stringCISNormTolerance = "norm_tol";
+   this->stringMemory = "memory";
+   this->stringMemoryEnd = "memory_end";
+   this->stringMemoryLimitHeap = "limit_heap";
    this->stringMD = "md";
    this->stringMDEnd = "md_end";
    this->stringMDTotalSteps = "total_steps";
@@ -411,6 +417,7 @@ void InputParser::Parse(Molecule* molecule) const{
          }
          i = j;
       }
+
       // cis condition
       if(inputTerms[i].compare(this->stringCIS) == 0){
          Parameters::GetInstance()->SetRequiresCIS(true);
@@ -460,6 +467,21 @@ void InputParser::Parse(Molecule* molecule) const{
             if(inputTerms[j].compare(this->stringCISNormTolerance) == 0){
                double normTol = atof(inputTerms[j+1].c_str());
                Parameters::GetInstance()->SetNormToleranceCIS(normTol);
+               j++;
+            }
+            j++;   
+         }
+         i = j;
+      }
+
+      // Memory
+      if(inputTerms[i].compare(this->stringMemory) == 0){
+         int j=i+1;
+         while(inputTerms[j].compare(this->stringMemoryEnd) != 0){
+            // max of heap
+            if(inputTerms[j].compare(this->stringMemoryLimitHeap) == 0){
+               double limitHeap = atof(inputTerms[j+1].c_str());
+               Parameters::GetInstance()->SetLimitHeapMemory(limitHeap);
                j++;
             }
             j++;   
@@ -574,6 +596,7 @@ void InputParser::Parse(Molecule* molecule) const{
    // output conditions
    this->OutputMolecularBasics(molecule);
    this->OutputScfConditions();
+   this->OutputMemoryConditions();
    if(Parameters::GetInstance()->RequiresCIS()){
       this->OutputCisConditions();
    }
@@ -657,6 +680,12 @@ void InputParser::OutputScfConditions() const{
    printf("%s%e\n",this->messageScfDiisEndError.c_str(),Parameters::GetInstance()->GetDiisEndErrorSCF());
    cout << "\n";
 
+}
+
+void InputParser::OutputMemoryConditions() const{
+   cout << this->messageMemoryConditions;
+   printf("%s%e%s",this->messageMemoryLimitHeap.c_str(), Parameters::GetInstance()->GetLimitHeapMemory(), this->messageMemoryMB.c_str());
+   cout << "\n";
 }
 
 void InputParser::OutputCisConditions() const{

@@ -31,8 +31,11 @@ public:
       if(*matrix!=NULL){
          return;
       }
+      double wannaMalloc = (double)(size1*sizeof(T));
+      this->CheckLimitHeap(wannaMalloc);
+
       *matrix = new T[size1];
-      MallocerFreer::AddCurrentMalloced((double)(size1*sizeof(T)));
+      MallocerFreer::AddCurrentMalloced(wannaMalloc);
       this->Initialize<T>(*matrix, size1);
    }
 
@@ -56,6 +59,9 @@ public:
       if(*matrix!=NULL){
          return;
       }
+      double wannaMalloc = (double)(size1*size2*sizeof(T));
+      this->CheckLimitHeap(wannaMalloc);
+
       *matrix = new T*[size1];
       if(*matrix==NULL){
          throw MolDSException(this->errorMessageMallocFailure);
@@ -66,7 +72,7 @@ public:
             throw MolDSException(this->errorMessageMallocFailure);
          }
       }
-      MallocerFreer::AddCurrentMalloced((double)(size1*size2*sizeof(T)));
+      MallocerFreer::AddCurrentMalloced(wannaMalloc);
       this->Initialize<T>(*matrix, size1, size2);
    }
 
@@ -95,6 +101,9 @@ public:
       if(*matrix!=NULL){
          return;
       }
+      double wannaMalloc = (double)(size1*size2*size3*sizeof(T));
+      this->CheckLimitHeap(wannaMalloc);
+
       *matrix = new T**[size1];
       if(*matrix==NULL){
          throw MolDSException(this->errorMessageMallocFailure);
@@ -111,7 +120,7 @@ public:
             }
          }
       }
-      MallocerFreer::AddCurrentMalloced((double)(size1*size2*size3*sizeof(T)));
+      MallocerFreer::AddCurrentMalloced(wannaMalloc);
       this->Initialize<T>(*matrix, size1, size2, size3);
    }
 
@@ -145,6 +154,9 @@ public:
       if(*matrix!=NULL){
          return;
       }
+      double wannaMalloc = (double)(size1*size2*size3*size4*sizeof(T));
+      this->CheckLimitHeap(wannaMalloc);
+
       *matrix = new T***[size1];
       if(*matrix==NULL){
          throw MolDSException(this->errorMessageMallocFailure);
@@ -167,7 +179,7 @@ public:
             }
          }
       }
-      MallocerFreer::AddCurrentMalloced((double)(size1*size2*size3*size4*sizeof(T)));
+      MallocerFreer::AddCurrentMalloced(wannaMalloc);
       this->Initialize<T>(*matrix, size1, size2, size3, size4);
    }
 
@@ -206,6 +218,9 @@ public:
       if(*matrix!=NULL){
          return;
       }
+      double wannaMalloc = (double)(size1*size2*size3*size4*size5*sizeof(T));
+      this->CheckLimitHeap(wannaMalloc);
+
       *matrix = new T****[size1];
       if(*matrix==NULL){
          throw MolDSException(this->errorMessageMallocFailure);
@@ -234,7 +249,7 @@ public:
             }
          }
       }
-      MallocerFreer::AddCurrentMalloced((double)(size1*size2*size3*size4*size5*sizeof(T)));
+      MallocerFreer::AddCurrentMalloced(wannaMalloc);
       this->Initialize<T>(*matrix, size1, size2, size3, size4, size5);
    }
 
@@ -278,6 +293,9 @@ public:
       if(*matrix!=NULL){
          return;
       }
+      double wannaMalloc = (double)(size1*size2*size3*size4*size5*size6*sizeof(T));
+      this->CheckLimitHeap(wannaMalloc);
+
       *matrix = new T*****[size1];
       if(*matrix==NULL){
          throw MolDSException(this->errorMessageMallocFailure);
@@ -312,7 +330,7 @@ public:
             }
          }
       }
-      MallocerFreer::AddCurrentMalloced((double)(size1*size2*size3*size4*size5*size6*sizeof(T)));
+      MallocerFreer::AddCurrentMalloced(wannaMalloc);
       this->Initialize<T>(*matrix, size1, size2, size3, size4, size5, size6);
    }
 
@@ -364,11 +382,13 @@ private:
    static void AddCurrentMalloced(double amount);
    static void SubtCurrentMalloced(double amount);
    std::string errorMessageMallocFailure;
+   std::string errorMessageReachHeapLimit;
    std::string messageMemoryUsage;
    std::string messageMemoryCurrentHeap;
    std::string messageMemoryMaxHeap;
    std::string messageMByte;
    void OutputMemoryUsage() const;
+   void CheckLimitHeap(double wannaMalloc) const;
 };
 }
 #endif

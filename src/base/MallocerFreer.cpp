@@ -21,10 +21,14 @@
 #include<iostream>
 #include<math.h>
 #include<string>
+#include<vector>
 #include<stdexcept>
 #include"MolDSException.h"
 #include"Uncopyable.h"
+#include"Enums.h"
 #include"MallocerFreer.h"
+#include"EularAngle.h"
+#include"Parameters.h"
 using namespace std;
 
 namespace MolDS_base{
@@ -34,15 +38,23 @@ double MallocerFreer::currentMalloced = 0.0;
 double MallocerFreer::maxMalloced = 0.0;
 
 MallocerFreer::MallocerFreer(){
-   this->errorMessageMallocFailure = "Error in base::MallocFreere: Malloc failure...\n";
-   this->messageMemoryUsage = "Summary for memory usage:\n";
-   this->messageMemoryCurrentHeap = "\tMax Heap: ";
-   this->messageMemoryMaxHeap = "\tCurrent Heap(Leaked): ";
-   this->messageMByte = " [MB].\n";
+   this->errorMessageMallocFailure = "Error in base::MallocFreer::Malloc: Malloc failure...\n";
+   this->errorMessageReachHeapLimit = "Error in base::MallocFreer::Malloc: Reaches limit of heap. Change the \"limit_heap\" option in the memory-directive, machine you using, or your study!!!\n";
+   this->messageMemoryUsage = "\tSummary for memory usage:\n";
+   this->messageMemoryCurrentHeap = "\t\tMax Heap: ";
+   this->messageMemoryMaxHeap = "\t\tCurrent Heap(Leaked): ";
+   this->messageMByte = "[MB].\n";
 }
 
 MallocerFreer::~MallocerFreer(){
    this->OutputMemoryUsage();
+}
+
+void MallocerFreer::CheckLimitHeap(double wannaMalloc) const{
+   double limit = Parameters::GetInstance()->GetLimitHeapMemory();
+   if(limit < (MallocerFreer::currentMalloced + wannaMalloc)/pow(10.0,6.0)){
+      throw MolDSException(this->errorMessageReachHeapLimit);
+   }
 }
 
 void MallocerFreer::OutputMemoryUsage() const{

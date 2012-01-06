@@ -53,6 +53,9 @@ private:
    std::string messageCisNormTolerance;
    std::string messageCisMaxIterations;
    std::string messageCisMaxDimensions;
+   std::string messageMemoryConditions;
+   std::string messageMemoryLimitHeap;
+   std::string messageMemoryMB;
    std::string messageMdConditions;
    std::string messageMdTotalSteps;
    std::string messageMdElecState;
@@ -121,6 +124,9 @@ private:
    std::string stringCISMaxIter;
    std::string stringCISMaxDimensions;
    std::string stringCISNormTolerance;
+   std::string stringMemory;
+   std::string stringMemoryEnd;
+   std::string stringMemoryLimitHeap;
    std::string stringMD;
    std::string stringMDEnd;
    std::string stringMDTotalSteps;
@@ -131,6 +137,7 @@ private:
    void CheckMdConditions() const;
    void OutputMolecularBasics(Molecule* molecule) const;
    void OutputScfConditions() const;
+   void OutputMemoryConditions() const;
    void OutputCisConditions() const;
    void OutputMdConditions() const;
    void OutputMOPlotConditions() const;

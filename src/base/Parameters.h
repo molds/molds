@@ -88,6 +88,8 @@ public:
    void SetMaxDimensionsCIS(int maxDimensionsCIS);
    double GetNormToleranceCIS() const;
    void SetNormToleranceCIS(double normToleranceCIS);
+   double GetLimitHeapMemory() const;
+   void SetLimitHeapMemory(double limitHeap);
    bool RequiresMD() const;
    void SetRequiresMD(bool requiresMD);
    bool RequiresMOPlot() const;
@@ -138,6 +140,7 @@ private:
    double normToleranceCIS;
    bool requiresCIS;
    bool isDavidsonCIS;
+   double limitHeapMemory;
    bool requiresMD;
    int electronicStateIndexMD;
    int totalStepsMD;

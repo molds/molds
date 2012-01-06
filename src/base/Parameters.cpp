@@ -110,6 +110,7 @@ void Parameters::SetDefaultValues(){
    this->maxIterationsCIS = 100;
    this->maxDimensionsCIS = 100;
    this->normToleranceCIS = pow(10.0, -6.0);
+   this->limitHeapMemory = 256;
    this->electronicStateIndexMD = 0;
    this->totalStepsMD = 10;
    this->timeWidthMD = 0.1*this->fs2AU;
@@ -391,6 +392,14 @@ double Parameters::GetNormToleranceCIS() const{
 
 void Parameters::SetNormToleranceCIS(double normToleranceCIS){
    this->normToleranceCIS = normToleranceCIS;
+}
+
+double Parameters::GetLimitHeapMemory() const{
+   return this->limitHeapMemory;
+}
+
+void Parameters::SetLimitHeapMemory(double limitHeapMemory){
+   this->limitHeapMemory = limitHeapMemory;
 }
 
 bool Parameters::RequiresMD() const{

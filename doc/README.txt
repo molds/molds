@@ -89,10 +89,10 @@ CAPABILITIES:
 ==============================================================================
 HOW TO WRITE INPUT:
 
-   Comment Out:
+   <Comment Out>
       Lines starting with "//" or "#" in input-files are treated as comments.
 
-   SCF:
+   <SCF>
       Write "cndo/2", "indo", "zindo/s", "mndo", "am1", 
       "pm3/pddg", or "pm3/pddg" in theory-directive.
       MNDO only supports (can calculate) Heats of formation.
@@ -106,13 +106,13 @@ HOW TO WRITE INPUT:
        "max_iter", "rms_density", "damping_thresh", "damping_weight", 
        "diis_num_error_vect", "diis_start_error", and "diis_end_error" are prepared as options.
 
-       Default value of "max_iter" is 100.
-       Default value of "rms_density" is 10**(-8.0).
-       Default value of "damping_thresh" is 1.
-       Default value of "damping_weight" is 0.8.
-       Default value of "diis_num_error_vect" is 5.
-       Default value of "diis_start_error" is 0.01.
-       Default value of "diis_end_error" is 10**(-8.0).
+       The default value of "max_iter" is 100.
+       The default value of "rms_density" is 10**(-8.0).
+       The default value of "damping_thresh" is 1.
+       The default value of "damping_weight" is 0.8.
+       The default value of "diis_num_error_vect" is 5.
+       The default value of "diis_start_error" is 0.01.
+       The default value of "diis_end_error" is 10**(-8.0).
 
        E.g.
          SCF
@@ -125,7 +125,26 @@ HOW TO WRITE INPUT:
             diis_end_error 0.00000001
          SCF_END
    
-   MO Plot:
+   <MEMORY>
+      For settings of memory usage, write options in memory-directive.
+
+      E.g.
+         MEMORY
+            (options)
+         MEMORY_END
+
+      -options
+       "limit_heap" is only prepared. Note that this limitation is not 
+       the exact limitation of heap usage. Please consider this option as a rough limitation.
+       The value of this option should be written with the MByte unit.
+       The default value is 256 [MB].
+
+      E.g.
+         MEMORY
+            limit_heap 512
+         MEMORY_END
+
+   <MO Plot>
       writ MO plot directive
 
       E.g.
@@ -137,16 +156,16 @@ HOW TO WRITE INPUT:
        "mo", "grid_number", "frame_length", and "file_prefix" are prepared.
 
        "mo" is index of the molcular orbital. mo=0 means the lowest energy MO.
-       Default value of "mo" is not set.
+       The default value of "mo" is not set.
 
        "grid_number" is the grid number of the frame in xyz-coordinates.
-       Default values are 25, 25, and 25 for x, y, and z coordinates, respectively.
+       The default values are 25, 25, and 25 for x, y, and z coordinates, respectively.
 
        "frame_length" is the length of the frame of each coordinate.
-       Default values are 10, 10, and 10[angst.] for x, y, and z coordinates.
+       The default values are 10, 10, and 10[angst.] for x, y, and z coordinates.
 
        "file_prefix" is a prefix of the file name to which the MO is written.
-       Default values is "MO_".
+       The default values is "MO_".
 
       E.g.
          MOPLOT
@@ -157,7 +176,7 @@ HOW TO WRITE INPUT:
             file_prefix MOPlot_
          MOPLOT_END
 
-   CIS:
+   <CIS>
       Write CIS-directive.
 
       E.g.
@@ -170,30 +189,30 @@ HOW TO WRITE INPUT:
        and "nstates" are prepared as options.
 
        "davidson" should be set as "yes" or "no". 
-       Default value of "davidson" is "yes".
+       The default value of "davidson" is "yes".
 
        "active_occ" ("active_vir") is set to the number of occupied (virtual) orbitals
        if user set "active_occ" ("active_vir") to be greater than 
        the number of occupied (virtual) orbitals. 
-       Default value of "active_occ" is 10. Default value of "active_vir" is 10.
+       The default value of "active_occ" is 10. The default value of "active_vir" is 10.
 
        "nstates" is valid for the Davidson algorithm only, 
        hence "nstates" is set to "active_occ*active_vir" 
        in direct CIS algorithm (without the Davidson algorithem). 
-       Default value of "nstates" is 5 for the Davidson algorithem.
+       The default value of "nstates" is 5 for the Davidson algorithem.
 
        "max_iter" is valid for the Davidson algorithm only. 
        This option means the number of times of Davidson roop. 
-       Default value of "max_iter" is 100.
+       The default value of "max_iter" is 100.
 
        "max_dim" is valid for the Davidson algorithm only. 
        This option means the number of slater determinans used by expansion of the excited states. 
        Note that Hartree-Fock state (groudn state) is not included in the "max_dim".
-       Default value of "max_dim" is 100.
+       The default value of "max_dim" is 100.
 
        "norm_tol" is valid for the Davidson algorithm only. 
        This option means the max tolerance for the norm of the residual vectors.
-       Default value of "norm_tol" is 10**(-6.0).
+       The default value of "norm_tol" is 10**(-6.0).
 
        E.g.
          CIS
@@ -207,7 +226,7 @@ HOW TO WRITE INPUT:
          CIS_END
 
 
-   MD (Molecular dynamics):
+   <MD (Molecular dynamics)>
       Write MD-directive.
 
       E.g.
@@ -221,13 +240,13 @@ HOW TO WRITE INPUT:
 
        "electronic_state" means the electronic eigen state 
        on which the system runs.
-       Default value of "electronic_state" is 0. That is, 
+       The default value of "electronic_state" is 0. That is, 
        electronic ground state is default.
 
-       Default value of "total_steps" is 10. 
+       The default value of "total_steps" is 10. 
 
        "dt" should be set in femto-second.
-       Default value of "dt" is 0.1[fs].
+       The default value of "dt" is 0.1[fs].
 
       E.g.
          MD
@@ -236,7 +255,7 @@ HOW TO WRITE INPUT:
             dt 0.05
          MD_END
 
-   Principal Axes (Diagonalizing the inertia tensor):
+   <Principal Axes (Diagonalizing the inertia tensor)>
       Write "principal_axes" in theory-directive.
 
       E.g. 
@@ -254,7 +273,7 @@ HOW TO WRITE INPUT:
             origin 1.2 2.3 3.4
          INERTIA_END
 
-   Rotate Molecule:
+   <Rotate Molecule>
       Write "rotate" in theory-directive.
 
       E.g. 
@@ -267,21 +286,21 @@ HOW TO WRITE INPUT:
        These options are written in rotate-directive. Examples are shown below.
 
        "type" indicates whether the rotating is carring out around a axis or acording to Euler angles.
-       Default value of "type" is axis.
+       The default value of "type" is axis.
 
        "origin" indicates the origin of the rotation in angstrom unit.
-       Default value of "origin" is center of mass.
+       The default value of "origin" is center of mass.
 
        "axis" indicates a axis around which the rotation is carried out in angstrom unit.
-       Default value of "axis" is z-axis.
+       The default value of "axis" is z-axis.
        This option is valid only for "type" set as axis.
 
        "angle" indicates angle for the rotation around the "axis" in degree unit.
-       Default value of "angle" is 0.
+       The default value of "angle" is 0.
        This option is valid only for "type" set as axis.
 
        "angles" indicates Euler angles for the rotation in degree unit.
-       Default values of "angles" are 0, 0, and 0.
+       The default values of "angles" are 0, 0, and 0.
        This option is valid only for "type" set as Euler angles.
    
 
@@ -300,7 +319,7 @@ HOW TO WRITE INPUT:
          ROTATE_END
 
 
-   Translate Molecule:
+   <Translate Molecule>
       Write "translate" in theory-directive.
 
       E.g. 
@@ -311,7 +330,7 @@ HOW TO WRITE INPUT:
       -options
        "difference" indicates difference for the translation in angstrom unit.
        This option is written in translate-directive.
-       Default values are 0, 0, and 0.
+       The default values are 0, 0, and 0.
 
        E.g. 
          TRANSLATE
