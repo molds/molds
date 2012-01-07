@@ -37,6 +37,7 @@
 #include"base/EularAngle.h"
 #include"base/Parameters.h"
 #include"base/atoms/Atom.h"
+#include"base/AtomFactory.h"
 #include"base/Molecule.h"
 #include"base/InputParser.h"
 #include"base/GTOExpansionSTO.h"
@@ -68,6 +69,7 @@ int main(){
       try{
          // declare 
          MallocerFreer::GetInstance();
+         AtomFactory::GetInstance();
          InputParser::GetInstance();
          molecule = new Molecule();
          Parameters::GetInstance();
@@ -175,6 +177,7 @@ int main(){
       Parameters::DeleteInstance();
       delete molecule;
       InputParser::DeleteInstance();
+      AtomFactory::DeleteInstance();
       MallocerFreer::DeleteInstance();
 
       // Farewell Messages

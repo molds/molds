@@ -35,6 +35,7 @@
 #include"atoms/Natom.h"
 #include"atoms/Oatom.h"
 #include"atoms/Satom.h"
+#include"AtomFactory.h"
 #include"Molecule.h"
 #include"InputParser.h"
 using namespace std;
@@ -224,27 +225,26 @@ void InputParser::Parse(Molecule* molecule) const{
             double x = atof(inputTerms[j+1].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
             double y = atof(inputTerms[j+2].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
             double z = atof(inputTerms[j+3].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
-            Atom* atom=NULL;
+            AtomType atomType = H;
             if(inputTerms[j] == "h"){
-               atom = new Hatom();
+               atomType = H;
             }
             else if(inputTerms[j] == "li"){
-               atom = new Liatom();
+               atomType = Li;
             }
             else if(inputTerms[j] == "c"){
-               atom = new Catom();
+               atomType = C;
             }
             else if(inputTerms[j] == "n"){
-               atom = new Natom();
+               atomType = N;
             }
             else if(inputTerms[j] == "o"){
-               atom = new Oatom();
+               atomType = O;
             }
             else if(inputTerms[j] == "s"){
-               atom = new Satom();
+               atomType = S;
             }
-            atom->SetXyz(x,y,z);
-            atom->SetPxyz(0.0,0.0,0.0);
+            Atom* atom = AtomFactory::GetInstance()->CreateAtom(atomType, x, y, z);
             molecule->GetAtomVect()->push_back(atom);
             j += 4;
          }
