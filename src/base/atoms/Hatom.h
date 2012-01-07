@@ -24,6 +24,7 @@ class Hatom : public Atom {
 public:
    Hatom();
 private:
+   void SetAtomicParameters();
 };
 
 }

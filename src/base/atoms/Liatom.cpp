@@ -33,6 +33,10 @@ using namespace MolDS_base;
 
 namespace MolDS_base_atoms{
 Liatom::Liatom() : Atom(){
+   this->SetAtomicParameters();
+}
+
+void Liatom::SetAtomicParameters(){
    this->atomType = Li;
    this->atomicMass = 6.941*Parameters::GetInstance()->GetGMolin2AU();
    this->coreCharge = 1.0;

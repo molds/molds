@@ -32,6 +32,10 @@ using namespace std;
 using namespace MolDS_base;
 namespace MolDS_base_atoms{
 Satom::Satom() : Atom(){
+   this->SetAtomicParameters();
+}
+
+void Satom::SetAtomicParameters(){
    this->atomType = S;
    this->atomicMass = 32.066*Parameters::GetInstance()->GetGMolin2AU();
    this->coreCharge = 6.0;

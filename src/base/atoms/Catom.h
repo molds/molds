@@ -23,6 +23,7 @@ class Catom : public Atom {
 public:
    Catom();
 private:
+   void SetAtomicParameters();
 };
 }
 #endif

@@ -23,6 +23,7 @@ class Satom : public Atom {
 public:
    Satom();
 private:
+   void SetAtomicParameters();
 };
 }
 #endif

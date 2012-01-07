@@ -23,6 +23,7 @@ class Natom : public Atom {
 public:
    Natom();
 private:
+   void SetAtomicParameters();
 };
 }
 #endif

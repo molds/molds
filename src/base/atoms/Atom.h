@@ -277,6 +277,7 @@ private:
    double GetAm1CoreIntegral(MolDS_base::OrbitalType orbital) const; 
    double GetPm3CoreIntegral(MolDS_base::OrbitalType orbital) const; 
    double GetPm3PddgCoreIntegral(MolDS_base::OrbitalType orbital) const; 
+   virtual void SetAtomicParameters() = 0;
 };
 }
 #endif

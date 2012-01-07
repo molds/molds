@@ -23,6 +23,7 @@ class Oatom : public Atom {
 public:
    Oatom();
 private:
+   void SetAtomicParameters();
 };
 }
 #endif

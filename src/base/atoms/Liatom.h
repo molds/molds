@@ -23,6 +23,7 @@ class Liatom : public Atom {
 public:
    Liatom();
 private:
+   void SetAtomicParameters();
 };
 }
 #endif

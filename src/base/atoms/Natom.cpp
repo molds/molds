@@ -32,6 +32,10 @@ using namespace std;
 using namespace MolDS_base;
 namespace MolDS_base_atoms{
 Natom::Natom() : Atom(){
+   this->SetAtomicParameters();
+}
+
+void Natom::SetAtomicParameters(){
    this->atomType = N;
    this->atomicMass = 14.00674*Parameters::GetInstance()->GetGMolin2AU();
    this->coreCharge = 5.0;
