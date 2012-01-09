@@ -27,9 +27,9 @@ public:
    MolDS_base::AtomType GetAtomType() const;
    double GetAtomicMass() const;
    double* GetXyz() const;
-   void SetXyz(double x, double y, double z);
+   void SetXyz(double x, double y, double z) const;
    double* GetPxyz() const;
-   void SetPxyz(double px, double py, double pz);
+   void SetPxyz(double px, double py, double pz) const;
    int GetValenceSize() const;
    MolDS_base::OrbitalType GetValence(int index) const;
    double GetAtomicBasisValue(double x, 

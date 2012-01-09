@@ -23,9 +23,10 @@ namespace MolDS_base{
 class Molecule{
 public:
    Molecule();
+   Molecule(const Molecule& rhs);
+   Molecule& operator=(const Molecule& rhs);
    ~Molecule();
    std::vector<MolDS_base_atoms::Atom*>* GetAtomVect() const; 
-   std::vector<MolDS_base_atoms::Atom*>* GetAtomVect(); 
    double* GetXyzCOM() const;
    double* GetXyzCOM();
    double* GetXyzCOC() const;
@@ -55,6 +56,8 @@ private:
    bool wasCalculatedXyzCOC;
    int totalNumberAOs;
    int totalNumberValenceElectrons;
+   void Initialize();
+   void Finalize();
    void SetMessages();
    void CalcInertiaTensor(double** inertiaTensor, 
                           double const* inertiaTensorOrigin);

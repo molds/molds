@@ -38,6 +38,8 @@ using namespace MolDS_base;
 namespace MolDS_base_atoms{
 Atom::Atom(){
    this->SetMessages();
+   this->xyz = NULL;
+   this->pxyz = NULL;
    try{
       MallocerFreer::GetInstance()->Malloc<double>(&this->xyz, CartesianType_end);
       MallocerFreer::GetInstance()->Malloc<double>(&this->pxyz, CartesianType_end);
@@ -154,15 +156,13 @@ double* Atom::GetPxyz() const{
    return this->pxyz;
 }
 
-void Atom::SetXyz(double x, double y, double z){
-   MallocerFreer::GetInstance()->Malloc<double>(&this->xyz, CartesianType_end);
+void Atom::SetXyz(double x, double y, double z) const{
    xyz[0]= x;
    xyz[1]= y;
    xyz[2]= z;
 }
 
-void Atom::SetPxyz(double px, double py, double pz){
-   MallocerFreer::GetInstance()->Malloc<double>(&this->pxyz, CartesianType_end);
+void Atom::SetPxyz(double px, double py, double pz) const{
    pxyz[0]= px;
    pxyz[1]= py;
    pxyz[2]= pz;

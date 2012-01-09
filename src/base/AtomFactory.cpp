@@ -77,8 +77,8 @@ Atom* AtomFactory::CreateAtom(AtomType atomType, double x, double y, double z, d
    else if(atomType == S){
       atom = new Satom();
    }
-   atom->SetXyz(x,y,z);
-   atom->SetPxyz(px,py,pz);
+   atom->SetXyz(x, y, z);
+   atom->SetPxyz(px, py, pz);
    return atom;
 }
 

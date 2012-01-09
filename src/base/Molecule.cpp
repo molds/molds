@@ -34,41 +34,80 @@
 #include"EularAngle.h"
 #include"Parameters.h"
 #include"atoms/Atom.h"
+#include"AtomFactory.h"
 #include"Molecule.h"
 using namespace std;
 using namespace MolDS_base_atoms;
 namespace MolDS_base{
 
 Molecule::Molecule(){
+   this->Initialize();
+}
+
+Molecule::Molecule(const Molecule& rhs){
+   this->Initialize();
+   for(int i=0; i<CartesianType_end; i++){
+      this->xyzCOM[i] = rhs.xyzCOM[i];
+      this->xyzCOC[i] = rhs.xyzCOC[i];
+   }
+   this->wasCalculatedXyzCOM = rhs.wasCalculatedXyzCOM;
+   this->wasCalculatedXyzCOC = rhs.wasCalculatedXyzCOC;
+   this->totalNumberAOs = rhs.totalNumberAOs;
+   this->totalNumberValenceElectrons = rhs.totalNumberValenceElectrons;
+   for(int i=0; i<rhs.atomVect->size(); i++){
+      Atom* atom = (*rhs.atomVect)[i];
+      this->atomVect->push_back(AtomFactory::GetInstance()->CreateAtom(atom->GetAtomType(),
+                                                                       atom->GetXyz()[XAxis],
+                                                                       atom->GetXyz()[YAxis],
+                                                                       atom->GetXyz()[ZAxis],
+                                                                       atom->GetPxyz()[XAxis],
+                                                                       atom->GetPxyz()[YAxis],
+                                                                       atom->GetPxyz()[ZAxis]));
+   }                                                                     
+}
+
+Molecule& Molecule::operator=(const Molecule& rhs){
+   this->Initialize();
+   return *this;
+}
+
+Molecule::~Molecule(){
+   this->Finalize();
+}
+
+void Molecule::Initialize(){
    this->SetMessages();
    this->wasCalculatedXyzCOM = false;
    this->wasCalculatedXyzCOC = false;
+   this->xyzCOM = NULL;
+   this->xyzCOC = NULL;
    try{
       this->atomVect = new vector<Atom*>;
       MallocerFreer::GetInstance()->Malloc<double>(&this->xyzCOM, CartesianType_end);
       MallocerFreer::GetInstance()->Malloc<double>(&this->xyzCOC, CartesianType_end);
    }
    catch(exception ex){
-      delete this->atomVect;
-      MallocerFreer::GetInstance()->Free<double>(&this->xyzCOM, CartesianType_end);
-      MallocerFreer::GetInstance()->Free<double>(&this->xyzCOC, CartesianType_end);
+      this->Finalize();
       throw MolDSException(ex.what());
    }
 }
 
-Molecule::~Molecule(){
+void Molecule::Finalize(){
    if(this->atomVect != NULL){
       for(int i=0; i<this->atomVect->size(); i++){
-         delete (*atomVect)[i];
-         (*atomVect)[i] = NULL;
+         if((*this->atomVect)[i] != NULL){
+            delete (*this->atomVect)[i];
+            (*this->atomVect)[i] = NULL;
+         }
       }
+      this->atomVect->clear();
       delete this->atomVect;
       this->atomVect = NULL;
-      //cout << "atomVect deleted\n";
+      //cout << "atomVect deleted" << endl;
    }
    MallocerFreer::GetInstance()->Free<double>(&this->xyzCOM, CartesianType_end);
    MallocerFreer::GetInstance()->Free<double>(&this->xyzCOC, CartesianType_end);
-   //cout << "molecule deleted\n";
+   //cout << "molecule deleted" << endl;
 }
 
 void Molecule::SetMessages(){
@@ -120,13 +159,6 @@ vector<Atom*>* Molecule::GetAtomVect() const{
       stringstream ss;
       ss << this->errorMessageGetAtomVectNull;
       throw MolDSException(ss.str());
-   }
-   return this->atomVect;
-}
-
-vector<Atom*>* Molecule::GetAtomVect(){
-   if(this->atomVect==NULL){
-      this->atomVect = new vector<Atom*>;
    }
    return this->atomVect;
 }
