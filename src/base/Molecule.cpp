@@ -40,12 +40,20 @@ using namespace MolDS_base_atoms;
 namespace MolDS_base{
 
 Molecule::Molecule(){
-   this->atomVect = NULL;
-   this->xyzCOM = NULL;
-   this->xyzCOC = NULL;
+   this->SetMessages();
    this->wasCalculatedXyzCOM = false;
    this->wasCalculatedXyzCOC = false;
-   this->SetMessages();
+   try{
+      this->atomVect = new vector<Atom*>;
+      MallocerFreer::GetInstance()->Malloc<double>(&this->xyzCOM, CartesianType_end);
+      MallocerFreer::GetInstance()->Malloc<double>(&this->xyzCOC, CartesianType_end);
+   }
+   catch(exception ex){
+      delete this->atomVect;
+      MallocerFreer::GetInstance()->Free<double>(&this->xyzCOM, CartesianType_end);
+      MallocerFreer::GetInstance()->Free<double>(&this->xyzCOC, CartesianType_end);
+      throw MolDSException(ex.what());
+   }
 }
 
 Molecule::~Molecule(){

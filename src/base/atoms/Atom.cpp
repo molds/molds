@@ -21,6 +21,7 @@
 #include<iostream>
 #include<sstream>
 #include<math.h>
+#include<new>
 #include<string>
 #include<vector>
 #include<stdexcept>
@@ -36,9 +37,16 @@ using namespace MolDS_base;
 
 namespace MolDS_base_atoms{
 Atom::Atom(){
-   this->xyz=NULL;
-   this->pxyz=NULL;
    this->SetMessages();
+   try{
+      MallocerFreer::GetInstance()->Malloc<double>(&this->xyz, CartesianType_end);
+      MallocerFreer::GetInstance()->Malloc<double>(&this->pxyz, CartesianType_end);
+   }
+   catch(exception ex){
+      MallocerFreer::GetInstance()->Free<double>(&this->xyz, CartesianType_end);
+      MallocerFreer::GetInstance()->Free<double>(&this->pxyz, CartesianType_end);
+      throw MolDSException(ex.what());
+   }
 }
 
 Atom::~Atom(){
