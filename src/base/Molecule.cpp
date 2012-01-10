@@ -45,6 +45,24 @@ Molecule::Molecule(){
 }
 
 Molecule::Molecule(const Molecule& rhs){
+   this->CopyInitialize(rhs);
+}
+
+Molecule& Molecule::operator=(const Molecule& rhs){
+   double* oldXyzCOM = this->xyzCOM;
+   double* oldXyzCOC = this->xyzCOC;
+   vector<Atom*>* oldAtomVect = this->atomVect;
+   this->CopyInitialize(rhs);
+   this->Finalize(&oldAtomVect, &oldXyzCOM, &oldXyzCOC);
+   return *this;
+}
+
+Molecule::~Molecule(){
+   this->Finalize(&this->atomVect, &this->xyzCOM, &this->xyzCOC);
+   //cout << "molecule deleted" << endl;
+}
+
+void Molecule::CopyInitialize(const Molecule& rhs){
    this->Initialize();
    for(int i=0; i<CartesianType_end; i++){
       this->xyzCOM[i] = rhs.xyzCOM[i];
@@ -66,15 +84,6 @@ Molecule::Molecule(const Molecule& rhs){
    }                                                                     
 }
 
-Molecule& Molecule::operator=(const Molecule& rhs){
-   this->Initialize();
-   return *this;
-}
-
-Molecule::~Molecule(){
-   this->Finalize();
-}
-
 void Molecule::Initialize(){
    this->SetMessages();
    this->wasCalculatedXyzCOM = false;
@@ -87,27 +96,26 @@ void Molecule::Initialize(){
       MallocerFreer::GetInstance()->Malloc<double>(&this->xyzCOC, CartesianType_end);
    }
    catch(exception ex){
-      this->Finalize();
+      this->Finalize(&this->atomVect, &this->xyzCOM, &this->xyzCOC);
       throw MolDSException(ex.what());
    }
 }
 
-void Molecule::Finalize(){
-   if(this->atomVect != NULL){
-      for(int i=0; i<this->atomVect->size(); i++){
-         if((*this->atomVect)[i] != NULL){
-            delete (*this->atomVect)[i];
-            (*this->atomVect)[i] = NULL;
+void Molecule::Finalize(vector<Atom*>** atomVect, double** xyzCOM, double**xyzCOC){
+   if(*atomVect != NULL){
+      for(int i=0; i<(*atomVect)->size(); i++){
+         if((**atomVect)[i] != NULL){
+            delete (**atomVect)[i];
+            (**atomVect)[i] = NULL;
          }
       }
-      this->atomVect->clear();
-      delete this->atomVect;
-      this->atomVect = NULL;
+      (*atomVect)->clear();
+      delete *atomVect;
+      *atomVect = NULL;
       //cout << "atomVect deleted" << endl;
    }
-   MallocerFreer::GetInstance()->Free<double>(&this->xyzCOM, CartesianType_end);
-   MallocerFreer::GetInstance()->Free<double>(&this->xyzCOC, CartesianType_end);
-   //cout << "molecule deleted" << endl;
+   MallocerFreer::GetInstance()->Free<double>(xyzCOM, CartesianType_end);
+   MallocerFreer::GetInstance()->Free<double>(xyzCOC, CartesianType_end);
 }
 
 void Molecule::SetMessages(){

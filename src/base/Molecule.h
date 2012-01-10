@@ -57,7 +57,8 @@ private:
    int totalNumberAOs;
    int totalNumberValenceElectrons;
    void Initialize();
-   void Finalize();
+   void CopyInitialize(const Molecule& rhs);
+   void Finalize(std::vector<MolDS_base_atoms::Atom*>** atomVect, double** xyzCOM, double**xyzCOC);
    void SetMessages();
    void CalcInertiaTensor(double** inertiaTensor, 
                           double const* inertiaTensorOrigin);
