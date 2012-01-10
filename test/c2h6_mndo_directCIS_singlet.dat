@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2011/12/26 23:29:21  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/1/10(Thu.) 15:13:55  <<<<<
 
 
 **********  START: Parse input  **********
@@ -52,6 +52,9 @@
 		DIIS starting error: 1.000000e-01
 		DIIS ending error: 2.000000e-08
 
+	Memory conditions:
+		Heap limit: 2.560000e+02[MB]
+
 	CIS conditions:
 		Number of active Occ.: 7
 		Number of active Vir.: 7
@@ -71,18 +74,18 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 
 
 **********  START: MNDO-SCF  **********
-SCF iter=0: RMS density=5.291502622129180 
+SCF iter=0: RMS density=5.291502622129181 
 SCF iter=1: RMS density=2.406832383581161 
-SCF iter=2: RMS density=1.097693927705070 
-SCF iter=3: RMS density=0.485996526273500 
-SCF iter=4: RMS density=0.217393982341885 
-SCF iter=5: RMS density=0.097852276195714 
-SCF iter=6: RMS density=0.000404257452990 
-SCF iter=7: RMS density=0.000094990568225 
-SCF iter=8: RMS density=0.000036084327940 
-SCF iter=9: RMS density=0.000007701726074 
-SCF iter=10: RMS density=0.000002052101685 
-SCF iter=11: RMS density=0.000000358204688 
+SCF iter=2: RMS density=1.097693927705069 
+SCF iter=3: RMS density=0.485996526273502 
+SCF iter=4: RMS density=0.217393982341887 
+SCF iter=5: RMS density=0.097852276195715 
+SCF iter=6: RMS density=0.000404257452988 
+SCF iter=7: RMS density=0.000094990567886 
+SCF iter=8: RMS density=0.000036084327847 
+SCF iter=9: RMS density=0.000007701726064 
+SCF iter=10: RMS density=0.000002052101653 
+SCF iter=11: RMS density=0.000000358204693 
 
 
 
@@ -129,13 +132,13 @@ SCF iter=11: RMS density=0.000000358204688
 		| [a.u.] | [Kcal/mol] | 
 		-2.736798e-02	-1.717367e+01
 
-	Elapsed time(omp) for the SCF = 0.08742[s].
+	Elapsed time(omp) for the SCF = 0.0467541[s].
 **********  DONE: MNDO-SCF  **********
 
 
 **********  START: MNDO-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.0984199[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.056098[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Direct-CIS  =====
@@ -195,16 +198,19 @@ SCF iter=11: RMS density=0.000000358204688
 		 48	1.251950e+00	3.406757e+01
 		 49	1.264508e+00	3.440928e+01
 
-	Elapsed time(omp) for the CIS = 0.100963[s].
+	Elapsed time(omp) for the CIS = 0.0577791[s].
 **********  DONE: MNDO-CIS  **********
 
 
+	Summary for memory usage:
+		Max Heap: 0.158736[MB].
+		Current Heap(Leaked): 0[MB].
 
 
      >>>>>  The MolDS finished normally!  <<<<<
-     >>>>>  CPU time: 0.19[s].  <<<<<
+     >>>>>  CPU time: 0.1[s].  <<<<<
      >>>>>  Elapsed time: 0[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 0.192609[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 0.107007[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

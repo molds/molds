@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2011/12/31 14:31:01  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/1/10(Thu.) 15:14:13  <<<<<
 
 
 **********  START: Parse input  **********
@@ -52,6 +52,9 @@
 		DIIS starting error: 1.000000e-01
 		DIIS ending error: 2.000000e-08
 
+	Memory conditions:
+		Heap limit: 2.560000e+02[MB]
+
 	CIS conditions:
 		Number of active Occ.: 7
 		Number of active Vir.: 7
@@ -80,18 +83,18 @@ h | -0.3700 | -0.5208 | 0.9016 | h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 |
 
 
 **********  START: MNDO-SCF  **********
-SCF iter=0: RMS density=5.291502622129180 
+SCF iter=0: RMS density=5.291502622129181 
 SCF iter=1: RMS density=2.406832383581161 
-SCF iter=2: RMS density=1.097693927705070 
-SCF iter=3: RMS density=0.485996526273500 
-SCF iter=4: RMS density=0.217393982341885 
-SCF iter=5: RMS density=0.097852276195714 
-SCF iter=6: RMS density=0.000404257452990 
-SCF iter=7: RMS density=0.000094990568225 
-SCF iter=8: RMS density=0.000036084327940 
-SCF iter=9: RMS density=0.000007701726074 
-SCF iter=10: RMS density=0.000002052101685 
-SCF iter=11: RMS density=0.000000358204688 
+SCF iter=2: RMS density=1.097693927705069 
+SCF iter=3: RMS density=0.485996526273502 
+SCF iter=4: RMS density=0.217393982341887 
+SCF iter=5: RMS density=0.097852276195715 
+SCF iter=6: RMS density=0.000404257452988 
+SCF iter=7: RMS density=0.000094990567886 
+SCF iter=8: RMS density=0.000036084327847 
+SCF iter=9: RMS density=0.000007701726064 
+SCF iter=10: RMS density=0.000002052101653 
+SCF iter=11: RMS density=0.000000358204693 
 
 
 
@@ -138,13 +141,13 @@ SCF iter=11: RMS density=0.000000358204688
 		| [a.u.] | [Kcal/mol] | 
 		-2.736798e-02	-1.717367e+01
 
-	Elapsed time(omp) for the SCF = 0.098449[s].
+	Elapsed time(omp) for the SCF = 0.0568101[s].
 **********  DONE: MNDO-SCF  **********
 
 
 **********  START: MNDO-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.070776[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.055577[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -235,7 +238,7 @@ SCF iter=11: RMS density=0.000000358204688
 		 3	3.369529e-01	9.169028e+00
 		 4	3.393673e-01	9.234729e+00
 
-	Elapsed time(omp) for the CIS = 0.297224[s].
+	Elapsed time(omp) for the CIS = 0.241085[s].
 **********  DONE: MNDO-CIS  **********
 
 
@@ -309,10 +312,10 @@ SCF iter=11: RMS density=0.000000358204688
 
 	========== START: MD step 1
 **********  START: MNDO-SCF  **********
-SCF iter=0: RMS density=0.000019883412560 
+SCF iter=0: RMS density=0.000019883412561 
 SCF iter=1: RMS density=0.000006027131273 
 SCF iter=2: RMS density=0.000002054138206 
-SCF iter=3: RMS density=0.000000754773562 
+SCF iter=3: RMS density=0.000000754773563 
 
 
 
@@ -359,13 +362,13 @@ SCF iter=3: RMS density=0.000000754773562
 		| [a.u.] | [Kcal/mol] | 
 		-2.736965e-02	-1.717471e+01
 
-	Elapsed time(omp) for the SCF = 0.0500779[s].
+	Elapsed time(omp) for the SCF = 0.037179[s].
 **********  DONE: MNDO-SCF  **********
 
 
 **********  START: MNDO-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.0731411[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.0556951[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -456,7 +459,7 @@ SCF iter=3: RMS density=0.000000754773562
 		 3	3.369504e-01	9.168961e+00
 		 4	3.393641e-01	9.234640e+00
 
-	Elapsed time(omp) for the CIS = 0.295143[s].
+	Elapsed time(omp) for the CIS = 0.236408[s].
 **********  DONE: MNDO-CIS  **********
 
 
@@ -467,7 +470,7 @@ SCF iter=3: RMS density=0.000000754773562
 		Electronic
 		(inc. core rep.)	-1.225091e+01	-3.333670e+02
 		Total            	-1.225091e+01	-3.333668e+02
-		Error            	-5.259546e-09	-1.431207e-07
+		Error            	-5.259540e-09	-1.431205e-07
 
 	Molecular configration:
 		| i-th | atom type | x[angst.] | y[angst.] | z[angst.] |
@@ -530,10 +533,10 @@ SCF iter=3: RMS density=0.000000754773562
 
 	========== START: MD step 2
 **********  START: MNDO-SCF  **********
-SCF iter=0: RMS density=0.000059688817609 
-SCF iter=1: RMS density=0.000018105242507 
+SCF iter=0: RMS density=0.000059688817610 
+SCF iter=1: RMS density=0.000018105242506 
 SCF iter=2: RMS density=0.000006173798047 
-SCF iter=3: RMS density=0.000002269190307 
+SCF iter=3: RMS density=0.000002269190308 
 SCF iter=4: RMS density=0.000000880710272 
 
 
@@ -581,13 +584,13 @@ SCF iter=4: RMS density=0.000000880710272
 		| [a.u.] | [Kcal/mol] | 
 		-2.737462e-02	-1.717783e+01
 
-	Elapsed time(omp) for the SCF = 0.047569[s].
+	Elapsed time(omp) for the SCF = 0.0729909[s].
 **********  DONE: MNDO-SCF  **********
 
 
 **********  START: MNDO-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.0703759[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.055994[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -678,7 +681,7 @@ SCF iter=4: RMS density=0.000000880710272
 		 3	3.369430e-01	9.168759e+00
 		 4	3.393542e-01	9.234373e+00
 
-	Elapsed time(omp) for the CIS = 0.29394[s].
+	Elapsed time(omp) for the CIS = 0.237082[s].
 **********  DONE: MNDO-CIS  **********
 
 
@@ -689,7 +692,7 @@ SCF iter=4: RMS density=0.000000880710272
 		Electronic
 		(inc. core rep.)	-1.225093e+01	-3.333674e+02
 		Total            	-1.225091e+01	-3.333668e+02
-		Error            	-2.812934e-09	-7.654444e-08
+		Error            	-2.812927e-09	-7.654425e-08
 
 	Molecular configration:
 		| i-th | atom type | x[angst.] | y[angst.] | z[angst.] |
@@ -753,7 +756,7 @@ SCF iter=4: RMS density=0.000000880710272
 	========== START: MD step 3
 **********  START: MNDO-SCF  **********
 SCF iter=0: RMS density=0.000099316546803 
-SCF iter=1: RMS density=0.000030114857256 
+SCF iter=1: RMS density=0.000030114857257 
 SCF iter=2: RMS density=0.000010266355949 
 SCF iter=3: RMS density=0.000003772624635 
 SCF iter=4: RMS density=0.000001463933794 
@@ -804,13 +807,13 @@ SCF iter=5: RMS density=0.000000593352744
 		| [a.u.] | [Kcal/mol] | 
 		-2.738286e-02	-1.718300e+01
 
-	Elapsed time(omp) for the SCF = 0.0479259[s].
+	Elapsed time(omp) for the SCF = 0.0378292[s].
 **********  DONE: MNDO-SCF  **********
 
 
 **********  START: MNDO-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.07355[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.0556569[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -907,7 +910,7 @@ SCF iter=5: RMS density=0.000000593352744
 		 3	3.369306e-01	9.168422e+00
 		 4	3.393378e-01	9.233926e+00
 
-	Elapsed time(omp) for the CIS = 0.344045[s].
+	Elapsed time(omp) for the CIS = 0.275827[s].
 **********  DONE: MNDO-CIS  **********
 
 
@@ -918,7 +921,7 @@ SCF iter=5: RMS density=0.000000593352744
 		Electronic
 		(inc. core rep.)	-1.225095e+01	-3.333681e+02
 		Total            	-1.225091e+01	-3.333668e+02
-		Error            	5.607571e-09	1.525910e-07
+		Error            	5.607564e-09	1.525908e-07
 
 	Molecular configration:
 		| i-th | atom type | x[angst.] | y[angst.] | z[angst.] |
@@ -984,9 +987,9 @@ SCF iter=5: RMS density=0.000000593352744
 SCF iter=0: RMS density=0.000138771218104 
 SCF iter=1: RMS density=0.000042052626365 
 SCF iter=2: RMS density=0.000014327427042 
-SCF iter=3: RMS density=0.000005261786285 
-SCF iter=4: RMS density=0.000002040544176 
-SCF iter=5: RMS density=0.000000826577855 
+SCF iter=3: RMS density=0.000005261786284 
+SCF iter=4: RMS density=0.000002040544177 
+SCF iter=5: RMS density=0.000000826577854 
 
 
 
@@ -1033,13 +1036,13 @@ SCF iter=5: RMS density=0.000000826577855
 		| [a.u.] | [Kcal/mol] | 
 		-2.739430e-02	-1.719018e+01
 
-	Elapsed time(omp) for the SCF = 0.0478759[s].
+	Elapsed time(omp) for the SCF = 0.0377312[s].
 **********  DONE: MNDO-SCF  **********
 
 
 **********  START: MNDO-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.0719569[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.0565131[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -1136,7 +1139,7 @@ SCF iter=5: RMS density=0.000000826577855
 		 3	3.369133e-01	9.167951e+00
 		 4	3.393147e-01	9.233298e+00
 
-	Elapsed time(omp) for the CIS = 0.340281[s].
+	Elapsed time(omp) for the CIS = 0.277026[s].
 **********  DONE: MNDO-CIS  **********
 
 
@@ -1147,7 +1150,7 @@ SCF iter=5: RMS density=0.000000826577855
 		Electronic
 		(inc. core rep.)	-1.225099e+01	-3.333690e+02
 		Total            	-1.225091e+01	-3.333668e+02
-		Error            	1.006526e-08	2.738920e-07
+		Error            	1.006524e-08	2.738914e-07
 
 	Molecular configration:
 		| i-th | atom type | x[angst.] | y[angst.] | z[angst.] |
@@ -1211,12 +1214,12 @@ SCF iter=5: RMS density=0.000000826577855
 	========== START: MD step 5
 **********  START: MNDO-SCF  **********
 SCF iter=0: RMS density=0.000178272450161 
-SCF iter=1: RMS density=0.000054029947733 
+SCF iter=1: RMS density=0.000054029947732 
 SCF iter=2: RMS density=0.000018409464669 
-SCF iter=3: RMS density=0.000006761007838 
-SCF iter=4: RMS density=0.000002621853540 
+SCF iter=3: RMS density=0.000006761007837 
+SCF iter=4: RMS density=0.000002621853543 
 SCF iter=5: RMS density=0.000001061977460 
-SCF iter=6: RMS density=0.000000004595326 
+SCF iter=6: RMS density=0.000000004595328 
 
 
 
@@ -1263,13 +1266,13 @@ SCF iter=6: RMS density=0.000000004595326
 		| [a.u.] | [Kcal/mol] | 
 		-2.740883e-02	-1.719930e+01
 
-	Elapsed time(omp) for the SCF = 0.047857[s].
+	Elapsed time(omp) for the SCF = 0.0378361[s].
 **********  DONE: MNDO-SCF  **********
 
 
 **********  START: MNDO-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.0738499[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.05603[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -1366,7 +1369,7 @@ SCF iter=6: RMS density=0.000000004595326
 		 3	3.368910e-01	9.167344e+00
 		 4	3.392849e-01	9.232487e+00
 
-	Elapsed time(omp) for the CIS = 0.340357[s].
+	Elapsed time(omp) for the CIS = 0.277504[s].
 **********  DONE: MNDO-CIS  **********
 
 
@@ -1377,7 +1380,7 @@ SCF iter=6: RMS density=0.000000004595326
 		Electronic
 		(inc. core rep.)	-1.225103e+01	-3.333703e+02
 		Total            	-1.225091e+01	-3.333668e+02
-		Error            	2.625167e-08	7.143500e-07
+		Error            	2.625166e-08	7.143497e-07
 
 	Molecular configration:
 		| i-th | atom type | x[angst.] | y[angst.] | z[angst.] |
@@ -1438,12 +1441,15 @@ SCF iter=6: RMS density=0.000000004595326
 	Time in [fs]: 0.25
 	========== DONE: MD step 5
 **********  DONE: Molecular dynamics  **********
+	Summary for memory usage:
+		Max Heap: 0.204952[MB].
+		Current Heap(Leaked): 0[MB].
 
 
      >>>>>  The MolDS finished normally!  <<<<<
-     >>>>>  CPU time: 13.52[s].  <<<<<
-     >>>>>  Elapsed time: 13[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 13.5292[s].  <<<<<
+     >>>>>  CPU time: 10.78[s].  <<<<<
+     >>>>>  Elapsed time: 11[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 10.8186[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

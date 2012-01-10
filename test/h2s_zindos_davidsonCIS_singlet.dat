@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2011/12/28 17:36:33  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/1/10(Thu.) 15:13:53  <<<<<
 
 
 **********  START: Parse input  **********
@@ -41,6 +41,9 @@
 		DIIS number of error vectors: 5
 		DIIS starting error: 1.000000e-01
 		DIIS ending error: 2.000000e-08
+
+	Memory conditions:
+		Heap limit: 2.560000e+02[MB]
 
 	CIS conditions:
 		Number of active Occ.: 4
@@ -100,13 +103,13 @@ SCF iter=8: RMS density=0.000000521835813
 		1	H	1.000000e+00	1.436080e-01
 		2	H	1.000000e+00	1.436792e-01
 
-	Elapsed time(omp) for the SCF = 0.012856[s].
+	Elapsed time(omp) for the SCF = 0.0117409[s].
 **********  DONE: ZINDO/S-SCF  **********
 
 
 **********  START: ZINDO/S-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.000282049[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.000245094[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -154,16 +157,19 @@ SCF iter=8: RMS density=0.000000521835813
 		 2	2.730712e-01	7.430705e+00
 		 3	3.424713e-01	9.319192e+00
 
-	Elapsed time(omp) for the CIS = 0.00138283[s].
+	Elapsed time(omp) for the CIS = 0.00112104[s].
 **********  DONE: ZINDO/S-CIS  **********
 
 
+	Summary for memory usage:
+		Max Heap: 0.006576[MB].
+		Current Heap(Leaked): 0[MB].
 
 
      >>>>>  The MolDS finished normally!  <<<<<
-     >>>>>  CPU time: 0.01[s].  <<<<<
+     >>>>>  CPU time: 0[s].  <<<<<
      >>>>>  Elapsed time: 0[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 0.0163651[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 0.0140641[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

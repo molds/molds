@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2011/12/24 22:43:37  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/1/10(Thu.) 15:13:53  <<<<<
 
 
 **********  START: Parse input  **********
@@ -46,6 +46,9 @@
 		DIIS starting error: 1.000000e-01
 		DIIS ending error: 2.000000e-08
 
+	Memory conditions:
+		Heap limit: 2.560000e+02[MB]
+
 	CIS conditions:
 		Number of active Occ.: 4
 		Number of active Vir.: 4
@@ -68,13 +71,13 @@ h | 1.004043 | -0.188679 | 0.000000 | h | 1.004062 | 1.324529 | 0.873652 | h | 1
 
 **********  START: ZINDO/S-SCF  **********
 SCF iter=0: RMS density=4.000000000000001 
-SCF iter=1: RMS density=3.097217959517269 
-SCF iter=2: RMS density=0.566569862085650 
-SCF iter=3: RMS density=0.100842032032174 
-SCF iter=4: RMS density=0.018517626285131 
-SCF iter=5: RMS density=0.003277687282699 
-SCF iter=6: RMS density=0.000006005767758 
-SCF iter=7: RMS density=0.000000025984002 
+SCF iter=1: RMS density=3.097217959517265 
+SCF iter=2: RMS density=0.566569862085649 
+SCF iter=3: RMS density=0.100842032032177 
+SCF iter=4: RMS density=0.018517626285137 
+SCF iter=5: RMS density=0.003277687282703 
+SCF iter=6: RMS density=0.000006005767757 
+SCF iter=7: RMS density=0.000000025983597 
 
 
 
@@ -108,13 +111,13 @@ SCF iter=7: RMS density=0.000000025984002
 		3	H	1.000000e+00	2.223536e-02
 		4	H	1.000000e+00	2.223536e-02
 
-	Elapsed time(omp) for the SCF = 0.0623281[s].
+	Elapsed time(omp) for the SCF = 0.010674[s].
 **********  DONE: ZINDO/S-SCF  **********
 
 
 **********  START: ZINDO/S-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.00650907[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.00150704[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -137,10 +140,10 @@ SCF iter=7: RMS density=0.000000025984002
 	  4-th excited: norm of the residual = 0.00489769
 
 	Davidson iter=3
-	  1-th excited: norm of the residual = 5.5861e-10
-	  2-th excited: norm of the residual = 2.64741e-10
-	  3-th excited: norm of the residual = 6.00402e-12
-	  4-th excited: norm of the residual = 1.47685e-08
+	  1-th excited: norm of the residual = 9.12551e-10
+	  2-th excited: norm of the residual = 1.09018e-09
+	  3-th excited: norm of the residual = 7.16478e-13
+	  4-th excited: norm of the residual = 1.70902e-09
 
 
 
@@ -157,16 +160,19 @@ SCF iter=7: RMS density=0.000000025984002
 		 3	5.274569e-01	1.435295e+01
 		 4	5.898275e-01	1.605015e+01
 
-	Elapsed time(omp) for the CIS = 0.01477[s].
+	Elapsed time(omp) for the CIS = 0.0159771[s].
 **********  DONE: ZINDO/S-CIS  **********
 
 
+	Summary for memory usage:
+		Max Heap: 0.00984[MB].
+		Current Heap(Leaked): 0[MB].
 
 
      >>>>>  The MolDS finished normally!  <<<<<
-     >>>>>  CPU time: 0.04[s].  <<<<<
+     >>>>>  CPU time: 0.01[s].  <<<<<
      >>>>>  Elapsed time: 0[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 0.0819919[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 0.028564[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

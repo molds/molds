@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2011/12/24 22:49:15  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/1/10(Thu.) 15:13:55  <<<<<
 
 
 **********  START: Parse input  **********
@@ -46,6 +46,9 @@
 		DIIS starting error: 1.000000e-01
 		DIIS ending error: 2.000000e-08
 
+	Memory conditions:
+		Heap limit: 2.560000e+02[MB]
+
 	CIS conditions:
 		Number of active Occ.: 4
 		Number of active Vir.: 4
@@ -64,16 +67,16 @@ geometry_end |
 
 
 **********  START: MNDO-SCF  **********
-SCF iter=0: RMS density=3.999999999999999 
-SCF iter=1: RMS density=1.791764664635557 
-SCF iter=2: RMS density=0.902974688872801 
-SCF iter=3: RMS density=0.450316453459357 
+SCF iter=0: RMS density=3.999999999999998 
+SCF iter=1: RMS density=1.791764664635559 
+SCF iter=2: RMS density=0.902974688872803 
+SCF iter=3: RMS density=0.450316453459356 
 SCF iter=4: RMS density=0.224939537319347 
-SCF iter=5: RMS density=0.112410119412687 
-SCF iter=6: RMS density=0.000026035855101 
-SCF iter=7: RMS density=0.000034473763687 
-SCF iter=8: RMS density=0.000007176245207 
-SCF iter=9: RMS density=0.000000388314291 
+SCF iter=5: RMS density=0.112410119412689 
+SCF iter=6: RMS density=0.000026035854761 
+SCF iter=7: RMS density=0.000034473764429 
+SCF iter=8: RMS density=0.000007176189205 
+SCF iter=9: RMS density=0.000000388310808 
 
 
 
@@ -111,13 +114,13 @@ SCF iter=9: RMS density=0.000000388314291
 		| [a.u.] | [Kcal/mol] | 
 		-1.520346e-02	-9.540316e+00
 
-	Elapsed time(omp) for the SCF = 0.0609639[s].
+	Elapsed time(omp) for the SCF = 0.0260451[s].
 **********  DONE: MNDO-SCF  **********
 
 
 **********  START: MNDO-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.00330591[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.00197291[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Direct-CIS  =====
@@ -144,16 +147,19 @@ SCF iter=9: RMS density=0.000000388314291
 		 15	1.001495e+00	2.725228e+01
 		 16	1.070738e+00	2.913650e+01
 
-	Elapsed time(omp) for the CIS = 0.00369191[s].
+	Elapsed time(omp) for the CIS = 0.00216389[s].
 **********  DONE: MNDO-CIS  **********
 
 
+	Summary for memory usage:
+		Max Heap: 0.06244[MB].
+		Current Heap(Leaked): 0[MB].
 
 
      >>>>>  The MolDS finished normally!  <<<<<
-     >>>>>  CPU time: 0.07[s].  <<<<<
+     >>>>>  CPU time: 0.03[s].  <<<<<
      >>>>>  Elapsed time: 0[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 0.0744519[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 0.030833[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2011/12/29 19:09:15  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/1/10(Thu.) 15:13:54  <<<<<
 
 
 **********  START: Parse input  **********
@@ -52,6 +52,9 @@
 		DIIS starting error: 1.000000e-01
 		DIIS ending error: 2.000000e-08
 
+	Memory conditions:
+		Heap limit: 2.560000e+02[MB]
+
 	MD conditions:
 		Electronic eigen state: 0
 		Total steps: 5
@@ -70,15 +73,15 @@ geometry_end |
 
 
 **********  START: ZINDO/S-SCF  **********
-SCF iter=0: RMS density=5.291502622129179 
-SCF iter=1: RMS density=3.838492151665707 
-SCF iter=2: RMS density=0.639670447585085 
-SCF iter=3: RMS density=0.104551025859923 
-SCF iter=4: RMS density=0.017838263308199 
-SCF iter=5: RMS density=0.002973046733473 
-SCF iter=6: RMS density=0.000074147072848 
-SCF iter=7: RMS density=0.000011993148170 
-SCF iter=8: RMS density=0.000000782384953 
+SCF iter=0: RMS density=5.291502622129184 
+SCF iter=1: RMS density=3.838492151665711 
+SCF iter=2: RMS density=0.639670447585092 
+SCF iter=3: RMS density=0.104551025859929 
+SCF iter=4: RMS density=0.017838263308206 
+SCF iter=5: RMS density=0.002973046733479 
+SCF iter=6: RMS density=0.000074147072849 
+SCF iter=7: RMS density=0.000011993148172 
+SCF iter=8: RMS density=0.000000782384959 
 
 
 
@@ -121,7 +124,7 @@ SCF iter=8: RMS density=0.000000782384953
 		6	H	1.000000e+00	1.599949e-02
 		7	H	1.000000e+00	2.221343e-02
 
-	Elapsed time(omp) for the SCF = 0.0247562[s].
+	Elapsed time(omp) for the SCF = 0.0231609[s].
 **********  DONE: ZINDO/S-SCF  **********
 
 
@@ -195,9 +198,9 @@ SCF iter=8: RMS density=0.000000782384953
 
 	========== START: MD step 1
 **********  START: ZINDO/S-SCF  **********
-SCF iter=0: RMS density=0.000399629201405 
-SCF iter=1: RMS density=0.000081736877334 
-SCF iter=2: RMS density=0.000018350514823 
+SCF iter=0: RMS density=0.000399629201404 
+SCF iter=1: RMS density=0.000081736877335 
+SCF iter=2: RMS density=0.000018350514825 
 SCF iter=3: RMS density=0.000004027773906 
 SCF iter=4: RMS density=0.000000916022614 
 
@@ -242,7 +245,7 @@ SCF iter=4: RMS density=0.000000916022614
 		6	H	1.000000e+00	1.597875e-02
 		7	H	1.000000e+00	2.219382e-02
 
-	Elapsed time(omp) for the SCF = 0.00895309[s].
+	Elapsed time(omp) for the SCF = 0.00571418[s].
 **********  DONE: ZINDO/S-SCF  **********
 
 
@@ -316,12 +319,12 @@ SCF iter=4: RMS density=0.000000916022614
 
 	========== START: MD step 2
 **********  START: ZINDO/S-SCF  **********
-SCF iter=0: RMS density=0.001197576731379 
-SCF iter=1: RMS density=0.000245066261715 
+SCF iter=0: RMS density=0.001197576731378 
+SCF iter=1: RMS density=0.000245066261714 
 SCF iter=2: RMS density=0.000055047292894 
-SCF iter=3: RMS density=0.000012086530015 
-SCF iter=4: RMS density=0.000002750216151 
-SCF iter=5: RMS density=0.000000616040325 
+SCF iter=3: RMS density=0.000012086530016 
+SCF iter=4: RMS density=0.000002750216149 
+SCF iter=5: RMS density=0.000000616040327 
 
 
 
@@ -364,7 +367,7 @@ SCF iter=5: RMS density=0.000000616040325
 		6	H	1.000000e+00	1.591669e-02
 		7	H	1.000000e+00	2.213515e-02
 
-	Elapsed time(omp) for the SCF = 0.019196[s].
+	Elapsed time(omp) for the SCF = 0.00594306[s].
 **********  DONE: ZINDO/S-SCF  **********
 
 
@@ -438,13 +441,13 @@ SCF iter=5: RMS density=0.000000616040325
 
 	========== START: MD step 3
 **********  START: ZINDO/S-SCF  **********
-SCF iter=0: RMS density=0.001991668552526 
-SCF iter=1: RMS density=0.000407959046497 
-SCF iter=2: RMS density=0.000091713202379 
-SCF iter=3: RMS density=0.000020149483814 
-SCF iter=4: RMS density=0.000004588760799 
-SCF iter=5: RMS density=0.000001028351502 
-SCF iter=6: RMS density=0.000000007274090 
+SCF iter=0: RMS density=0.001991668552523 
+SCF iter=1: RMS density=0.000407959046498 
+SCF iter=2: RMS density=0.000091713202377 
+SCF iter=3: RMS density=0.000020149483813 
+SCF iter=4: RMS density=0.000004588760801 
+SCF iter=5: RMS density=0.000001028351503 
+SCF iter=6: RMS density=0.000000007274088 
 
 
 
@@ -487,7 +490,7 @@ SCF iter=6: RMS density=0.000000007274090
 		6	H	1.000000e+00	1.581390e-02
 		7	H	1.000000e+00	2.203806e-02
 
-	Elapsed time(omp) for the SCF = 0.0098021[s].
+	Elapsed time(omp) for the SCF = 0.00618196[s].
 **********  DONE: ZINDO/S-SCF  **********
 
 
@@ -561,13 +564,13 @@ SCF iter=6: RMS density=0.000000007274090
 
 	========== START: MD step 4
 **********  START: ZINDO/S-SCF  **********
-SCF iter=0: RMS density=0.002779628410983 
-SCF iter=1: RMS density=0.000570162606598 
-SCF iter=2: RMS density=0.000128325918762 
-SCF iter=3: RMS density=0.000028218388926 
-SCF iter=4: RMS density=0.000006433878290 
-SCF iter=5: RMS density=0.000001442816920 
-SCF iter=6: RMS density=0.000000010198121 
+SCF iter=0: RMS density=0.002779628410982 
+SCF iter=1: RMS density=0.000570162606597 
+SCF iter=2: RMS density=0.000128325918763 
+SCF iter=3: RMS density=0.000028218388925 
+SCF iter=4: RMS density=0.000006433878292 
+SCF iter=5: RMS density=0.000001442816918 
+SCF iter=6: RMS density=0.000000010198127 
 
 
 
@@ -610,7 +613,7 @@ SCF iter=6: RMS density=0.000000010198121
 		6	H	1.000000e+00	1.567135e-02
 		7	H	1.000000e+00	2.190363e-02
 
-	Elapsed time(omp) for the SCF = 0.010107[s].
+	Elapsed time(omp) for the SCF = 0.00620794[s].
 **********  DONE: ZINDO/S-SCF  **********
 
 
@@ -684,13 +687,13 @@ SCF iter=6: RMS density=0.000000010198121
 
 	========== START: MD step 5
 **********  START: ZINDO/S-SCF  **********
-SCF iter=0: RMS density=0.003559360272667 
-SCF iter=1: RMS density=0.000731462985486 
+SCF iter=0: RMS density=0.003559360272668 
+SCF iter=1: RMS density=0.000731462985485 
 SCF iter=2: RMS density=0.000164872389223 
-SCF iter=3: RMS density=0.000036297384028 
-SCF iter=4: RMS density=0.000008288430740 
-SCF iter=5: RMS density=0.000001860366234 
-SCF iter=6: RMS density=0.000000013139600 
+SCF iter=3: RMS density=0.000036297384031 
+SCF iter=4: RMS density=0.000008288430738 
+SCF iter=5: RMS density=0.000001860366233 
+SCF iter=6: RMS density=0.000000013139607 
 
 
 
@@ -733,7 +736,7 @@ SCF iter=6: RMS density=0.000000013139600
 		6	H	1.000000e+00	1.549037e-02
 		7	H	1.000000e+00	2.173328e-02
 
-	Elapsed time(omp) for the SCF = 0.0101531[s].
+	Elapsed time(omp) for the SCF = 0.00613904[s].
 **********  DONE: ZINDO/S-SCF  **********
 
 
@@ -805,12 +808,15 @@ SCF iter=6: RMS density=0.000000013139600
 	Time in [fs]: 0.25
 	========== DONE: MD step 5
 **********  DONE: Molecular dynamics  **********
+	Summary for memory usage:
+		Max Heap: 0.027856[MB].
+		Current Heap(Leaked): 0[MB].
 
 
      >>>>>  The MolDS finished normally!  <<<<<
-     >>>>>  CPU time: 0.65[s].  <<<<<
-     >>>>>  Elapsed time: 1[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 0.674967[s].  <<<<<
+     >>>>>  CPU time: 0.4[s].  <<<<<
+     >>>>>  Elapsed time: 0[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 0.411381[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

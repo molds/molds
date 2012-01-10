@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2011/12/24 23:15:58  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/1/10(Thu.) 15:14:25  <<<<<
 
 
 **********  START: Parse input  **********
@@ -46,6 +46,9 @@
 		DIIS starting error: 1.000000e-01
 		DIIS ending error: 2.000000e-08
 
+	Memory conditions:
+		Heap limit: 2.560000e+02[MB]
+
 	CIS conditions:
 		Number of active Occ.: 4
 		Number of active Vir.: 4
@@ -64,17 +67,17 @@ geometry_end |
 
 
 **********  START: AM1-SCF  **********
-SCF iter=0: RMS density=4.000000000000001 
-SCF iter=1: RMS density=1.697713709469839 
+SCF iter=0: RMS density=3.999999999999998 
+SCF iter=1: RMS density=1.697713709469838 
 SCF iter=2: RMS density=0.860600764021104 
-SCF iter=3: RMS density=0.427636034234947 
+SCF iter=3: RMS density=0.427636034234946 
 SCF iter=4: RMS density=0.212526116765221 
-SCF iter=5: RMS density=0.105650622384616 
-SCF iter=6: RMS density=0.000938972213446 
-SCF iter=7: RMS density=0.000217809965997 
-SCF iter=8: RMS density=0.000041261330616 
-SCF iter=9: RMS density=0.000009908772182 
-SCF iter=10: RMS density=0.000000031136784 
+SCF iter=5: RMS density=0.105650622384615 
+SCF iter=6: RMS density=0.000938972216248 
+SCF iter=7: RMS density=0.000217809878450 
+SCF iter=8: RMS density=0.000041261336254 
+SCF iter=9: RMS density=0.000009908769035 
+SCF iter=10: RMS density=0.000000031138605 
 
 
 
@@ -108,13 +111,13 @@ SCF iter=10: RMS density=0.000000031136784
 		3	H	1.000000e+00	6.455701e-02
 		4	H	1.000000e+00	6.455694e-02
 
-	Elapsed time(omp) for the SCF = 0.0904419[s].
+	Elapsed time(omp) for the SCF = 0.025136[s].
 **********  DONE: AM1-SCF  **********
 
 
 **********  START: AM1-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.00918221[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.00197697[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Direct-CIS  =====
@@ -141,16 +144,19 @@ SCF iter=10: RMS density=0.000000031136784
 		 15	9.506272e-01	2.586809e+01
 		 16	9.813499e-01	2.670410e+01
 
-	Elapsed time(omp) for the CIS = 0.0158401[s].
+	Elapsed time(omp) for the CIS = 0.00219488[s].
 **********  DONE: AM1-CIS  **********
 
 
+	Summary for memory usage:
+		Max Heap: 0.06244[MB].
+		Current Heap(Leaked): 0[MB].
 
 
      >>>>>  The MolDS finished normally!  <<<<<
-     >>>>>  CPU time: 0.09[s].  <<<<<
+     >>>>>  CPU time: 0.03[s].  <<<<<
      >>>>>  Elapsed time: 0[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 0.112554[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 0.0298171[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

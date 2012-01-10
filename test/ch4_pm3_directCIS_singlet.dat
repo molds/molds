@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2011/12/24 23:30:14  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/1/10(Thu.) 15:14:55  <<<<<
 
 
 **********  START: Parse input  **********
@@ -46,6 +46,9 @@
 		DIIS starting error: 1.000000e-01
 		DIIS ending error: 2.000000e-08
 
+	Memory conditions:
+		Heap limit: 2.560000e+02[MB]
+
 	CIS conditions:
 		Number of active Occ.: 4
 		Number of active Vir.: 4
@@ -64,16 +67,16 @@ geometry_end |
 
 
 **********  START: PM3-SCF  **********
-SCF iter=0: RMS density=4.000000000000000 
-SCF iter=1: RMS density=1.405103361177601 
-SCF iter=2: RMS density=0.809124881151717 
+SCF iter=0: RMS density=4.000000000000001 
+SCF iter=1: RMS density=1.405103361177602 
+SCF iter=2: RMS density=0.809124881151720 
 SCF iter=3: RMS density=0.477900193297846 
 SCF iter=4: RMS density=0.283709320143399 
 SCF iter=5: RMS density=0.168522367704433 
-SCF iter=6: RMS density=0.000297732959493 
-SCF iter=7: RMS density=0.000089200630362 
-SCF iter=8: RMS density=0.000037274811599 
-SCF iter=9: RMS density=0.000000192418558 
+SCF iter=6: RMS density=0.000297732959278 
+SCF iter=7: RMS density=0.000089200630125 
+SCF iter=8: RMS density=0.000037274810111 
+SCF iter=9: RMS density=0.000000192433855 
 
 
 
@@ -107,13 +110,13 @@ SCF iter=9: RMS density=0.000000192418558
 		3	H	1.000000e+00	2.643250e-02
 		4	H	1.000000e+00	2.643241e-02
 
-	Elapsed time(omp) for the SCF = 0.076154[s].
+	Elapsed time(omp) for the SCF = 0.0221078[s].
 **********  DONE: PM3-SCF  **********
 
 
 **********  START: PM3-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.00750494[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.00198197[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Direct-CIS  =====
@@ -140,16 +143,19 @@ SCF iter=9: RMS density=0.000000192418558
 		 15	9.671719e-01	2.631830e+01
 		 16	9.671719e-01	2.631830e+01
 
-	Elapsed time(omp) for the CIS = 0.00813985[s].
+	Elapsed time(omp) for the CIS = 0.00216293[s].
 **********  DONE: PM3-CIS  **********
 
 
+	Summary for memory usage:
+		Max Heap: 0.06244[MB].
+		Current Heap(Leaked): 0[MB].
 
 
      >>>>>  The MolDS finished normally!  <<<<<
-     >>>>>  CPU time: 0.09[s].  <<<<<
+     >>>>>  CPU time: 0.02[s].  <<<<<
      >>>>>  Elapsed time: 0[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 0.089947[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 0.025933[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 
