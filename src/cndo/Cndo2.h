@@ -28,9 +28,9 @@ public:
    Cndo2();
    virtual ~Cndo2();
    virtual void SetMolecule(MolDS_base::Molecule* molecule);
-   void DoesSCF();
-   void DoesSCF(bool requiresGuess);
-   virtual void DoesCIS();
+   void DoSCF();
+   void DoSCF(bool requiresGuess);
+   virtual void DoCIS();
    double** GetForce(int elecState);
    double*** GetForce(const std::vector<int>& elecStates);
    double GetElectronicEnergy(int elecState) const;
@@ -260,19 +260,19 @@ private:
    double GetAuxiliaryD(int la, int lb, int m) const;
    double GetAuxiliaryAFirstDerivative(int k, double rho) const;
    double GetAuxiliaryBFirstDerivative(int k, double rho) const;
-   void DoesDamp(double rmsDensity, 
-                 double** orbitalElectronPopulation, 
-                 double const* const* oldOrbitalElectronPopulation, 
-                 const MolDS_base::Molecule& molecule) const;
-   void DoesDIIS(double** orbitalElectronPopulation,
-                 double const* const* oldOrbitalElectronPopulation,
-                 double*** diisStoredDensityMatrix,
-                 double*** diisStoredErrorVect,
-                 double** diisErrorProducts,
-                 double* diisErrorCoefficients,
-                 int diisNumErrorVect,
-                 const MolDS_base::Molecule& molecule, 
-                 int step) const;
+   void DoDamp(double rmsDensity, 
+               double** orbitalElectronPopulation, 
+               double const* const* oldOrbitalElectronPopulation, 
+               const MolDS_base::Molecule& molecule) const;
+   void DoDIIS(double** orbitalElectronPopulation,
+               double const* const* oldOrbitalElectronPopulation,
+               double*** diisStoredDensityMatrix,
+               double*** diisStoredErrorVect,
+               double** diisErrorProducts,
+               double* diisErrorCoefficients,
+               int diisNumErrorVect,
+               const MolDS_base::Molecule& molecule, 
+               int step) const;
    void CheckEnableAtomType(const MolDS_base::Molecule& molecule) const;
    void CheckNumberValenceElectrons(const MolDS_base::Molecule& molecule) const;
    void FreeDiatomicOverlapAndRotatingMatrix(double*** diatomicOverlap, 

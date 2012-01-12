@@ -27,7 +27,7 @@ class ZindoS : public MolDS_cndo::Cndo2{
 public:
    ZindoS();
    virtual ~ZindoS();
-   virtual void DoesCIS();
+   virtual void DoCIS();
 protected:
    std::string errorMessageDavidsonNotConverged;
    std::string errorMessageCalcCISMatrix;
@@ -107,8 +107,8 @@ private:
    double nishimotoMatagaParamB;
    double overlapCorrectionSigma;
    double overlapCorrectionPi;
-   void DoesCISDirect();
-   void DoesCISDavidson();
+   void DoCISDirect();
+   void DoCISDavidson();
    double GetNishimotoMatagaTwoEleInt(const MolDS_base_atoms::Atom& atomA, 
                                       MolDS_base::OrbitalType orbitalA, 
                                       const MolDS_base_atoms::Atom& atomB, 

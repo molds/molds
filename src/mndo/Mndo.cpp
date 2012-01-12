@@ -91,9 +91,9 @@ void Mndo::SetMolecule(Molecule* molecule){
 }
 void Mndo::SetMessages(){
    this->errorMessageSCFNotConverged 
-      = "Error in mndo::Mndo::DoesSCF: SCF did not met convergence criterion. maxIterationsSCF=";
+      = "Error in mndo::Mndo::DoSCF: SCF did not met convergence criterion. maxIterationsSCF=";
    this->errorMessageMoleculeNotSet 
-      = "Error in mndo::Mndo::DoesSCF: A molecule is not set.\n";
+      = "Error in mndo::Mndo::DoSCF: A molecule is not set.\n";
    this->errorMessageOddTotalValenceElectrions 
       = "Error in mndo::Mndo::SetMolecule: Total number of valence electrons is odd. totalNumberValenceElectrons=";
    this->errorMessageNotEnebleAtomType  
@@ -102,7 +102,7 @@ void Mndo::SetMessages(){
    this->errorMessageExchangeInt = "Error in base_mndo::Mndo::GetExchangeInt: Invalid orbitalType.\n";
    this->errorMessageCalcCISMatrix
       = "Error in mndo::Mndo::CalcCISMatrix: Non available orbital is contained.\n";
-   this->errorMessageDavidsonNotConverged =  "Error in mndo::Mndo::DoesCISDavidson: Davidson did not met convergence criterion. \n";
+   this->errorMessageDavidsonNotConverged =  "Error in mndo::Mndo::DoCISDavidson: Davidson did not met convergence criterion. \n";
    this->errorMessageGetSemiEmpiricalMultipoleInteractionBadMultipoles
       = "Error in mndo:: Mndo::GetSemiEmpiricalMultipoleInteraction: Bad multipole combintaion is set\n";
    this->errorMessageGetSemiEmpiricalMultipoleInteractionFirstDeriBadMultipoles

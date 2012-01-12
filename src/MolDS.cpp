@@ -117,14 +117,14 @@ int main(){
          }
          try{
             electronicStructure->SetMolecule(molecule);
-            electronicStructure->DoesSCF();
+            electronicStructure->DoSCF();
             if(Parameters::GetInstance()->RequiresCIS()){
-               electronicStructure->DoesCIS();
+               electronicStructure->DoCIS();
             }
             if(Parameters::GetInstance()->RequiresMD()){
                MolDS_md::MD* md = new MolDS_md::MD();
                md->SetTheory(electronicStructure);
-               md->DoesMD();
+               md->DoMD();
                delete md;
             }
          }

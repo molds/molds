@@ -55,9 +55,9 @@ Indo::~Indo(){
 
 void Indo::SetMessages(){
    this->errorMessageSCFNotConverged 
-      = "Error in indo::Indo::DoesSCF: SCF did not met convergence criterion. maxIterationsSCF=";
+      = "Error in indo::Indo::DoSCF: SCF did not met convergence criterion. maxIterationsSCF=";
    this->errorMessageMoleculeNotSet 
-      = "Error in indo::Indo::DoesSCF: A molecule is not set.\n";
+      = "Error in indo::Indo::DoSCF: A molecule is not set.\n";
    this->errorMessageOddTotalValenceElectrions 
       = "Error in indo::Indo::SetMolecule: Total number of valence electrons is odd. totalNumberValenceElectrons=";
    this->errorMessageNotEnebleAtomType  
@@ -67,7 +67,7 @@ void Indo::SetMessages(){
    this->errorMessageMolecularIntegralElement
       = "Error in indo::Indo::GetMolecularIntegralElement: Non available orbital is contained.\n";
    this->errorMessageCISNotImplemented 
-      = "Error in indo::Indo::DoesCIS: CIS is not implemented for INDO.\n";
+      = "Error in indo::Indo::DoCIS: CIS is not implemented for INDO.\n";
    this->errorMessageCalcForceNotImplemented
       = "Error in indo::Indo::CalcForce: Force is not available in INDO.\n";
    this->errorMessageGetElectronicEnergyEnergyNotCalculated

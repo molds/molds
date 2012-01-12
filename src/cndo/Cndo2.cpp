@@ -99,9 +99,9 @@ Cndo2::~Cndo2(){
 
 void Cndo2::SetMessages(){
    this->errorMessageSCFNotConverged 
-      = "Error in cndo::Cndo2::DoesSCF: SCF did not met convergence criterion. maxIterationsSCF=";
+      = "Error in cndo::Cndo2::DoSCF: SCF did not met convergence criterion. maxIterationsSCF=";
    this->errorMessageMoleculeNotSet 
-      = "Error in cndo::Cndo2::DoesSCF: A molecule is not set.\n";
+      = "Error in cndo::Cndo2::DoSCF: A molecule is not set.\n";
    this->errorMessageOddTotalValenceElectrions 
       = "Error in cndo::Cndo2::SetMolecule: Total number of valence electrons is odd. totalNumberValenceElectrons=";
    this->errorMessageNotEnebleAtomType  
@@ -117,7 +117,7 @@ void Cndo2::SetMessages(){
    this->errorMessageGetGaussianOverlapFirstDerivativeOrbitalD 
       = "Error in cndo::Cndo2::GetGaussiangOverlapFirstDerivative: d-orbital is not treatable. The d-orbital is contained in atom A or B.\n";
    this->errorMessageCISNotImplemented 
-      = "Error in cndo::Cndo2::DoesCIS: CIS is not implemented for CNDO2.\n";
+      = "Error in cndo::Cndo2::DoCIS: CIS is not implemented for CNDO2.\n";
    this->errorMessageCalcForceNotImplemented
       = "Error in cndo::Cndo2::CalcForce: Force is not available in CNDO2.\n";
    this->errorMessageGetElectronicEnergyNumberCISStates 
@@ -274,7 +274,7 @@ double Cndo2::GetDiatomCoreRepulsionFirstDerivative(int indexAtomA, int indexAto
  * before this function is called.
  *
  *****/
-void Cndo2::DoesSCF(bool requiresGuess){
+void Cndo2::DoSCF(bool requiresGuess){
    cout << this->messageStartSCF;
    double ompStartTime = omp_get_wtime();
 
@@ -374,21 +374,21 @@ void Cndo2::DoesSCF(bool requiresGuess){
          else{
             if(!isGuess){ 
                // damping
-               this->DoesDamp(rmsDensity, 
-                              this->orbitalElectronPopulation, 
-                              oldOrbitalElectronPopulation, 
-                              *this->molecule);
+               this->DoDamp(rmsDensity, 
+                            this->orbitalElectronPopulation, 
+                            oldOrbitalElectronPopulation, 
+                            *this->molecule);
            
                // diis 
-               this->DoesDIIS(this->orbitalElectronPopulation,
-                              oldOrbitalElectronPopulation,
-                              diisStoredDensityMatrix,
-                              diisStoredErrorVect,
-                              diisErrorProducts,
-                              diisErrorCoefficients,
-                              diisNumErrorVect,
-                              *this->molecule,
-                              i);
+               this->DoDIIS(this->orbitalElectronPopulation,
+                            oldOrbitalElectronPopulation,
+                            diisStoredDensityMatrix,
+                            diisStoredErrorVect,
+                            diisErrorProducts,
+                            diisErrorCoefficients,
+                            diisNumErrorVect,
+                            *this->molecule,
+                            i);
             }
          }
 
@@ -423,9 +423,9 @@ void Cndo2::DoesSCF(bool requiresGuess){
 
 }
 
-void Cndo2::DoesSCF(){
+void Cndo2::DoSCF(){
    bool requiresGuess = true;
-   this->DoesSCF(requiresGuess);
+   this->DoSCF(requiresGuess);
 }
 
 void Cndo2::CalcHFProperties(){
@@ -449,7 +449,7 @@ double Cndo2::GetBondingAdjustParameterK(ShellType shellA, ShellType shellB) con
    return value;
 }
 
-void Cndo2::DoesCIS(){
+void Cndo2::DoCIS(){
    stringstream ss;
    ss << this->errorMessageCISNotImplemented;
    throw MolDSException(ss.str());
@@ -537,15 +537,15 @@ void Cndo2::FreeSCFTemporaryMatrices(double*** oldOrbitalElectronPopulation,
  *  see ref. [P_1980] for diis methods.
  *
  */
-void Cndo2::DoesDIIS(double** orbitalElectronPopulation,
-                     double const* const* oldOrbitalElectronPopulation,
-                     double*** diisStoredDensityMatrix,
-                     double*** diisStoredErrorVect,
-                     double** diisErrorProducts,
-                     double* diisErrorCoefficients,
-                     int diisNumErrorVect,
-                     const Molecule& molecule,
-                     int step) const{
+void Cndo2::DoDIIS(double** orbitalElectronPopulation,
+                   double const* const* oldOrbitalElectronPopulation,
+                   double*** diisStoredDensityMatrix,
+                   double*** diisStoredErrorVect,
+                   double** diisErrorProducts,
+                   double* diisErrorCoefficients,
+                   int diisNumErrorVect,
+                   const Molecule& molecule,
+                   int step) const{
    int totalNumberAOs = molecule.GetTotalNumberAOs();
    double diisStartError = Parameters::GetInstance()->GetDiisStartErrorSCF();
    double diisEndError = Parameters::GetInstance()->GetDiisEndErrorSCF();
@@ -651,10 +651,10 @@ void Cndo2::DoesDIIS(double** orbitalElectronPopulation,
    }
 }
 
-void Cndo2::DoesDamp(double rmsDensity, 
-                     double** orbitalElectronPopulation, 
-                     double const* const* oldOrbitalElectronPopulation, 
-                     const Molecule& molecule) const{
+void Cndo2::DoDamp(double rmsDensity, 
+                   double** orbitalElectronPopulation, 
+                   double const* const* oldOrbitalElectronPopulation, 
+                   const Molecule& molecule) const{
    double dampingThresh = Parameters::GetInstance()->GetDampingThreshSCF();
    double dampingWeight = Parameters::GetInstance()->GetDampingWeightSCF();
    if(0.0 < dampingWeight && dampingThresh < rmsDensity){

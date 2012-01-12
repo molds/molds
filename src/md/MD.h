@@ -28,7 +28,7 @@ public:
    MD();
    ~MD();
    void SetTheory(MolDS_cndo::Cndo2* cndo);
-   void DoesMD();
+   void DoMD();
 private:
    std::string messageinitialConditionMD;
    std::string messageStartMD;

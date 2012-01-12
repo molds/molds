@@ -79,9 +79,9 @@ ZindoS::~ZindoS(){
 
 void ZindoS::SetMessages(){
    this->errorMessageSCFNotConverged 
-      = "Error in zindo::ZindoS::DoesSCF: SCF did not met convergence criterion. maxIterationsSCF=";
+      = "Error in zindo::ZindoS::DoSCF: SCF did not met convergence criterion. maxIterationsSCF=";
    this->errorMessageMoleculeNotSet 
-      = "Error in zindo::ZindoS::DoesSCF: A molecule is not set.\n";
+      = "Error in zindo::ZindoS::DoSCF: A molecule is not set.\n";
    this->errorMessageOddTotalValenceElectrions 
       = "Error in zindo::ZindoS::SetMolecule: Total number of valence electrons is odd. totalNumberValenceElectrons=";
    this->errorMessageNotEnebleAtomType  
@@ -93,7 +93,7 @@ void ZindoS::SetMessages(){
       = "Error in zindo::ZindoS::GetMolecularIntegralElement: Non available orbital is contained.\n";
    this->errorMessageCalcCISMatrix
       = "Error in zindo::ZindoS::CalcCISMatrix: Non available orbital is contained.\n";
-   this->errorMessageDavidsonNotConverged =  "Error in zindo::ZindoS::DoesCISDavidson: Davidson did not met convergence criterion. \n";
+   this->errorMessageDavidsonNotConverged =  "Error in zindo::ZindoS::DoCISDavidson: Davidson did not met convergence criterion. \n";
    this->errorMessageDavidsonMaxIter = "Davidson roop reaches max_iter=";
    this->errorMessageDavidsonMaxDim = "Dimension of the expansion vectors reaches max_dim=";
    this->errorMessageCalcForceNotGroundState 
@@ -761,7 +761,7 @@ double ZindoS::GetMolecularIntegralElement(int moI, int moJ, int moK, int moL,
    return value;
 }
 
-void ZindoS::DoesCIS(){
+void ZindoS::DoCIS(){
    cout << this->messageStartCIS;
    double ompStartTime = omp_get_wtime();
 
@@ -792,10 +792,10 @@ void ZindoS::DoesCIS(){
    this->CalcCISMatrix(matrixCIS, numberActiveOcc, numberActiveVir);
    // calculate excited energies
    if(Parameters::GetInstance()->IsDavidsonCIS()){
-      this->DoesCISDavidson();
+      this->DoCISDavidson();
    }
    else{
-      this->DoesCISDirect();
+      this->DoCISDirect();
    }
    // output eigen energies
    cout << this->messageExcitedStatesEnergies;
@@ -933,7 +933,7 @@ void ZindoS::CalcInteractionMatrix(double** interactionMatrix,
    }
 }
 
-void ZindoS::DoesCISDavidson(){
+void ZindoS::DoCISDavidson(){
    cout << this->messageStartDavidsonCIS;
 
    int numberOcc = Parameters::GetInstance()->GetActiveOccCIS();
@@ -1122,7 +1122,7 @@ void ZindoS::DoesCISDavidson(){
    cout << this->messageDoneDavidsonCIS;
    // change algorithm from Davidso to direct
    if(goToDirectCIS){
-      this->DoesCISDirect();
+      this->DoCISDirect();
    }
 }
 
@@ -1146,7 +1146,7 @@ void ZindoS::FreeDavidsonRoopCISTemporaryMtrices(double*** interactionMatrix,
    MallocerFreer::GetInstance()->Free<double>(interactionEigenEnergies, interactionMatrixDimension);
 }
 
-void ZindoS::DoesCISDirect(){
+void ZindoS::DoCISDirect(){
    cout << this->messageStartDirectCIS;
    bool calcEigenVectors = true;
    MolDS_mkl_wrapper::LapackWrapper::GetInstance()->Dsyevd(this->matrixCIS,

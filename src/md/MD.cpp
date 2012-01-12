@@ -60,7 +60,7 @@ void MD::SetTheory(MolDS_cndo::Cndo2* cndo){
    this->cndo = cndo;
 }
 
-void MD::DoesMD(){
+void MD::DoMD(){
    cout << this->messageStartMD;
 
    int totalSteps = Parameters::GetInstance()->GetTotalStepsMD();
@@ -106,9 +106,9 @@ void MD::DoesMD(){
       molecule->CalcXyzCOC();
 
       // update electronic structure
-      this->cndo->DoesSCF(requireGuess);
+      this->cndo->DoSCF(requireGuess);
       if(elecState > 0){
-         this->cndo->DoesCIS();
+         this->cndo->DoCIS();
       }
       else if(elecState < 0){
          // ToDo: Error

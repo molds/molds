@@ -63,9 +63,9 @@ Pm3Pddg::~Pm3Pddg(){
 
 void Pm3Pddg::SetMessages(){
    this->errorMessageSCFNotConverged 
-      = "Error in pm3::Pm3Pddg::DoesSCF: SCF did not met convergence criterion. maxIterationsSCF=";
+      = "Error in pm3::Pm3Pddg::DoSCF: SCF did not met convergence criterion. maxIterationsSCF=";
    this->errorMessageMoleculeNotSet 
-      = "Error in pm3::Pm3Pddg::DoesSCF: A molecule is not set.\n";
+      = "Error in pm3::Pm3Pddg::DoSCF: A molecule is not set.\n";
    this->errorMessageOddTotalValenceElectrions 
       = "Error in pm3::Pm3Pddg::SetMolecule: Total number of valence electrons is odd. totalNumberValenceElectrons=";
    this->errorMessageNotEnebleAtomType  
@@ -74,7 +74,7 @@ void Pm3Pddg::SetMessages(){
    this->errorMessageExchangeInt = "Error in base_pm3::Pm3Pddg::GetExchangeInt: Invalid orbitalType.\n";
    this->errorMessageCalcCISMatrix
       = "Error in pm3::Pm3Pddg::CalcCISMatrix: Non available orbital is contained.\n";
-   this->errorMessageDavidsonNotConverged =  "Error in pm3::Pm3Pddg::DoesCISDavidson: Davidson did not met convergence criterion. \n";
+   this->errorMessageDavidsonNotConverged =  "Error in pm3::Pm3Pddg::DoCISDavidson: Davidson did not met convergence criterion. \n";
    this->errorMessageGetSemiEmpiricalMultipoleInteractionBadMultipoles
       = "Error in pm3:: Pm3Pddg::GetSemiEmpiricalMultipoleInteraction: Bad multipole combintaion is set\n";
    this->errorMessageGetSemiEmpiricalMultipoleInteractionFirstDeriBadMultipoles
