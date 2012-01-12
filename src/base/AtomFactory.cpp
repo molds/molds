@@ -21,6 +21,8 @@
 #include<iostream>
 #include<sstream>
 #include<vector>
+#include<stdexcept>
+#include"MolDSException.h"
 #include"Uncopyable.h"
 #include"Enums.h"
 #include"atoms/Atom.h"
@@ -38,6 +40,8 @@ namespace MolDS_base{
 AtomFactory* AtomFactory::atomFactory = NULL;
 
 AtomFactory::AtomFactory(){
+   this->errorMessageNotEnableAtom = "Error in base::AtomFactory::CreateAtom: Not Enable AtomType is set.";
+   this->errorMessageAtomType = "\tatom type = ";
 }
 
 AtomFactory::~AtomFactory(){
@@ -76,6 +80,12 @@ Atom* AtomFactory::CreateAtom(AtomType atomType, double x, double y, double z, d
    }
    else if(atomType == S){
       atom = new Satom();
+   }
+   else{
+      stringstream ss;
+      ss << this->errorMessageNotEnableAtom << endl;
+      ss << this->errorMessageAtomType << AtomTypeStr(atomType) << endl;
+      throw MolDSException(ss.str());
    }
    atom->SetXyz(x, y, z);
    atom->SetPxyz(px, py, pz);
