@@ -90,15 +90,25 @@ public:
    void SetNormToleranceCIS(double normToleranceCIS);
    double GetLimitHeapMemory() const;
    void SetLimitHeapMemory(double limitHeap);
+   bool RequiresMOPlot() const;
    bool RequiresMD() const;
    void SetRequiresMD(bool requiresMD);
-   bool RequiresMOPlot() const;
    int GetElectronicStateIndexMD() const;
    void SetElectronicStateIndexMD(int electronicStateIndex);
    int GetTotalStepsMD() const;
    void SetTotalStepsMD(int totalSteps);
    double GetTimeWidthMD() const;
    void SetTimeWidthMD(double timeWidth);
+   bool RequiresMC() const;
+   void SetRequiresMC(bool requiresMC);
+   int GetElectronicStateIndexMC() const;
+   void SetElectronicStateIndexMC(int electronicStateIndex);
+   int GetTotalStepsMC() const;
+   void SetTotalStepsMC(int totalSteps);
+   double GetTemperatureMC() const;
+   void SetTemperatureMC(double temperature);
+   double GetStepWidthMC() const;
+   void SetStepWidthMC(double stepWidth);
 private:
    static Parameters* parameters;
    Parameters();
@@ -145,6 +155,11 @@ private:
    int electronicStateIndexMD;
    int totalStepsMD;
    double timeWidthMD;
+   bool requiresMC;
+   int electronicStateIndexMC;
+   int totalStepsMC;
+   double temperatureMC;
+   double stepWidthMC;
 };
 
 }

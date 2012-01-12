@@ -114,6 +114,10 @@ void Parameters::SetDefaultValues(){
    this->electronicStateIndexMD = 0;
    this->totalStepsMD = 10;
    this->timeWidthMD = 0.1*this->fs2AU;
+   this->electronicStateIndexMC = 0;
+   this->totalStepsMC = 10;
+   this->stepWidthMC = 0.1*this->angstrom2AU;
+   this->temperatureMC = 300;
 }
 
 void Parameters::SetMessages(){
@@ -432,6 +436,46 @@ double Parameters::GetTimeWidthMD() const{
 
 void Parameters::SetTimeWidthMD(double timeWidth){
    this->timeWidthMD = timeWidth;
+}
+
+bool Parameters::RequiresMC() const{
+   return this->requiresMC;
+}
+
+void Parameters::SetRequiresMC(bool requiresMC){
+   this->requiresMC = requiresMC;
+}
+
+int Parameters::GetElectronicStateIndexMC() const{
+   return this->electronicStateIndexMC;
+}
+
+void Parameters::SetElectronicStateIndexMC(int electronicStateIndex){
+   this->electronicStateIndexMC = electronicStateIndex;
+}
+
+int Parameters::GetTotalStepsMC() const{
+   return this->totalStepsMC;
+}
+
+void Parameters::SetTotalStepsMC(int totalSteps){
+   this->totalStepsMC = totalSteps;
+}
+
+double Parameters::GetTemperatureMC() const{
+   return this->temperatureMC;
+}
+
+void Parameters::SetTemperatureMC(double temperature){
+   this->temperatureMC = temperature;
+}
+
+double Parameters::GetStepWidthMC() const{
+   return this->stepWidthMC;
+}
+
+void Parameters::SetStepWidthMC(double stepWidth){
+   this->stepWidthMC = stepWidth;
 }
 
 }

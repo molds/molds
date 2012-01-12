@@ -95,12 +95,19 @@ void InputParser::SetMessages(){
    this->messageMdTotalSteps = "\t\tTotal steps: ";
    this->messageMdElecState = "\t\tElectronic eigen state: ";
    this->messageMdTimeWidth = "\t\tTime width(dt): ";
+   this->messageMcConditions = "\tMC conditions:\n";
+   this->messageMcTotalSteps = "\t\tTotal steps: ";
+   this->messageMcElecState = "\t\tElectronic eigen state: ";
+   this->messageMcStepWidth = "\t\tStep width(dr): ";
+   this->messageMcTemperature = "\t\tTemperature: ";
    this->messageMOPlotConditions = "\tMO plot conditions:\n";
    this->messageMOPlotIndex = "\t\tMO index: ";
    this->messageMOPlotGridNumber = "\t\tNumber of grid(x, y, z): ";
    this->messageMOPlotFrameLength = "\t\tFrame length[angst.](x, y, z): ";
    this->messageMOPlotFilePrefix = "\t\tFile name prefix: ";
    this->messageFs = "[fs]";
+   this->messageK = "[K]";
+   this->messageAngst = "[Angst.]";
    this->stringYES = "yes";
    this->stringNO = "no";
    this->stringSpace = " ";
@@ -167,6 +174,12 @@ void InputParser::SetMessages(){
    this->stringMDTotalSteps = "total_steps";
    this->stringMDElecState = "electronic_state";
    this->stringMDTimeWidth = "dt";
+   this->stringMC = "mc";
+   this->stringMCEnd = "mc_end";
+   this->stringMCTotalSteps = "total_steps";
+   this->stringMCElecState = "electronic_state";
+   this->stringMCStepWidth = "dr";
+   this->stringMCTemperature = "temperature";
 }
 
 vector<string> InputParser::GetInputTerms() const{
@@ -517,6 +530,40 @@ void InputParser::Parse(Molecule* molecule) const{
          i = j;
       }
 
+      // MC condition
+      if(inputTerms[i].compare(this->stringMC) == 0){
+         Parameters::GetInstance()->SetRequiresMC(true);
+         int j=i+1;
+         while(inputTerms[j].compare(this->stringMCEnd) != 0){
+            // number of total steps 
+            if(inputTerms[j].compare(this->stringMCTotalSteps) == 0){
+               int totalSteps = atoi(inputTerms[j+1].c_str());
+               Parameters::GetInstance()->SetTotalStepsMC(totalSteps);
+               j++;
+            }
+            // index of electronic eigen state on whichi MC runs. 
+            if(inputTerms[j].compare(this->stringMCElecState) == 0){
+               int elecStateIndex = atoi(inputTerms[j+1].c_str());
+               Parameters::GetInstance()->SetElectronicStateIndexMC(elecStateIndex);
+               j++;
+            }
+            // temperature for MC.
+            if(inputTerms[j].compare(this->stringMCTemperature) == 0){
+               double temperature = atof(inputTerms[j+1].c_str());
+               Parameters::GetInstance()->SetTemperatureMC(temperature);
+               j++;
+            }
+            // step width for MC.
+            if(inputTerms[j].compare(this->stringMCStepWidth) == 0){
+               double dr = atof(inputTerms[j+1].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
+               Parameters::GetInstance()->SetStepWidthMC(dr);
+               j++;
+            }
+            j++;   
+         }
+         i = j;
+      }
+
       // theory
       if(inputTerms[i].compare(this->stringTheory) == 0){
          int j=i+1;
@@ -592,6 +639,9 @@ void InputParser::Parse(Molecule* molecule) const{
    if(Parameters::GetInstance()->RequiresMD()){
       this->CheckMdConditions();
    }
+   if(Parameters::GetInstance()->RequiresMC()){
+      this->CheckMcConditions();
+   }
 
    // output conditions
    this->OutputMolecularBasics(molecule);
@@ -602,6 +652,9 @@ void InputParser::Parse(Molecule* molecule) const{
    }
    if(Parameters::GetInstance()->RequiresMD()){
       this->OutputMdConditions();
+   }
+   if(Parameters::GetInstance()->RequiresMC()){
+      this->OutputMcConditions();
    }
    if(Parameters::GetInstance()->RequiresMOPlot()){
       this->OutputMOPlotConditions();
@@ -660,6 +713,14 @@ void InputParser::CheckMdConditions() const{
    }
 }
 
+void InputParser::CheckMcConditions() const{
+   if(Parameters::GetInstance()->GetCurrentTheory() == CNDO2 || 
+      Parameters::GetInstance()->GetCurrentTheory() == INDO){
+      int groundStateIndex = 0;
+      Parameters::GetInstance()->SetElectronicStateIndexMC(groundStateIndex);
+   }
+}
+
 void InputParser::OutputMolecularBasics(Molecule* molecule) const{
 
    molecule->OutputTotalNumberAtomsAOsValenceelectrons();
@@ -714,6 +775,17 @@ void InputParser::OutputMdConditions() const{
    printf("%s%d\n",this->messageMdElecState.c_str(),Parameters::GetInstance()->GetElectronicStateIndexMD());
    printf("%s%d\n",this->messageMdTotalSteps.c_str(),Parameters::GetInstance()->GetTotalStepsMD());
    printf("%s%lf%s\n",this->messageMdTimeWidth.c_str(),Parameters::GetInstance()->GetTimeWidthMD()/Parameters::GetInstance()->GetFs2AU(),this->messageFs.c_str());
+
+   cout << "\n";
+}
+
+void InputParser::OutputMcConditions() const{
+   cout << this->messageMcConditions;
+
+   printf("%s%d\n",this->messageMcElecState.c_str(),Parameters::GetInstance()->GetElectronicStateIndexMC());
+   printf("%s%d\n",this->messageMcTotalSteps.c_str(),Parameters::GetInstance()->GetTotalStepsMC());
+   printf("%s%lf%s\n",this->messageMcTemperature.c_str(),Parameters::GetInstance()->GetTemperatureMC(),this->messageK.c_str());
+   printf("%s%lf%s\n",this->messageMcStepWidth.c_str(),Parameters::GetInstance()->GetStepWidthMC()/Parameters::GetInstance()->GetAngstrom2AU(),this->messageAngst.c_str());
 
    cout << "\n";
 }

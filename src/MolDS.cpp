@@ -49,6 +49,7 @@
 #include"pm3/Pm3.h"
 #include"pm3/Pm3Pddg.h"
 #include"md/MD.h"
+#include"mc/MC.h"
 using namespace std;
 using namespace MolDS_base;
 
@@ -126,6 +127,12 @@ int main(){
                md->SetTheory(electronicStructure);
                md->DoMD();
                delete md;
+            }
+            if(Parameters::GetInstance()->RequiresMC()){
+               MolDS_mc::MC* mc = new MolDS_mc::MC();
+               mc->SetTheory(electronicStructure);
+               mc->DoMC();
+               delete mc;
             }
          }
          catch(MolDSException ex){

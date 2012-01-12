@@ -58,21 +58,21 @@ SAMPLE and TEST
 CAPABILITIES:
 
    Electronic state and molecular dynamics:
-            | HF  | CIS | MD(gs) | MD(es) |
-   ---------|-----|-----|--------|--------|
-   CNDO2    | OK  | --  | --     | --     |
-   ---------|-----|-----|--------|--------|
-   INDO     | OK  | --  | --     | --     |
-   ---------|-----|-----|--------|--------|
-   ZINDO/S  | OK  | OK  | OK     | --     |
-   ---------|-----|-----|--------|--------|
-   MNDO     | OK  | OK  | OK     | OK     |
-   ---------|-----|-----|--------|--------|
-   AM1      | OK  | OK  | OK     | OK     |
-   ---------|-----|-----|--------|--------|
-   PM3      | OK  | OK  | OK     | OK     |
-   ---------|-----|-----|--------|--------|
-   PM3/PDDG | OK  | OK  | OK     | OK     |
+            | HF  | CIS | MD(gs) | MD(es) | MC(gs) | MC(es) | 
+   ---------|-----|-----|--------|--------|--------|--------|
+   CNDO2    | OK  | --  | --     | --     | Sch    | --     |
+   ---------|-----|-----|--------|--------|--------|--------|
+   INDO     | OK  | --  | --     | --     | Sch    | --     |
+   ---------|-----|-----|--------|--------|--------|--------|
+   ZINDO/S  | OK  | OK  | OK     | --     | Sch    | Sch    |
+   ---------|-----|-----|--------|--------|--------|--------|
+   MNDO     | OK  | OK  | OK     | OK     | Sch    | Sch    |
+   ---------|-----|-----|--------|--------|--------|--------|
+   AM1      | OK  | OK  | OK     | OK     | Sch    | Sch    |
+   ---------|-----|-----|--------|--------|--------|--------|
+   PM3      | OK  | OK  | OK     | OK     | Sch    | Sch    |
+   ---------|-----|-----|--------|--------|--------|--------|
+   PM3/PDDG | OK  | OK  | OK     | OK     | Sch    | Sch    |
 
       "OK", "Sch", and "--" mean available, shceduled, and non-scheduled methods, respectively.
       MD(gs) and MD(es) mean Born-Oppenheimer Molecular Dynamics on ground and excited states, respectively. 
@@ -245,6 +245,7 @@ HOW TO WRITE INPUT:
 
        The default value of "total_steps" is 10. 
 
+       "dt" means the time width of molecular dynamics.
        "dt" should be set in femto-second.
        The default value of "dt" is 0.1[fs].
 
@@ -254,6 +255,40 @@ HOW TO WRITE INPUT:
             electronic_state 0
             dt 0.05
          MD_END
+
+   <MC (Monte Carlo)>
+      Write MC-directive. The canonical sampling is only implemented.
+
+      E.g.
+         MC 
+            (options)
+         MC_END
+  
+      -options
+       "total_steps", "electronic_state", "temperature"
+       and "dr" are prepared as options.
+
+       The default value of "total_steps" is 10. 
+
+       "electronic_state" means the electronic eigen state 
+       on which the system walks.
+       The default value of "electronic_state" is 0. That is, 
+       electronic ground state is default.
+
+       "temperature" means the temperature in the MC sampling.
+       The default value of "temeprture" is 300[K].
+
+       "dr" means the max absolute displacement (step) width of each Cartesian coordinate.
+       Namely, the actual displacement in the MC is in the range [-dr, dr).
+       "dr" should be set in angstrom unit.
+       The default value of "dr" is 0.1[angstrom].
+
+      E.g.
+         MC
+            total_steps 50
+            electronic_state 0
+            dr 0.05
+         MC_END
 
    <Principal Axes (Diagonalizing the inertia tensor)>
       Write "principal_axes" in theory-directive.
