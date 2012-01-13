@@ -586,4 +586,22 @@ mklNumThreads = "2"
 ompNumThreads = "2"
 testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
 
+system("echo '---------------------------------------------------'")
+system("echo '-----------  Test of principal axes  --------------'")
+system("echo '---------------------------------------------------\n'")
+system("echo '\t\t\t>>> F8BT <<<\n'")
+prefix = "FNC1_principal"
+mklNumThreads = "1"
+ompNumThreads = "1"
+testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
+
+system("echo '---------------------------------------------------'")
+system("echo '-----------  Test of rotate  ----------------------'")
+system("echo '---------------------------------------------------\n'")
+system("echo '\t\t\t>>> F8BT <<<\n'")
+prefix = "FNC1_rot120"
+mklNumThreads = "1"
+ompNumThreads = "1"
+testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
+
 system("rm -rf temp.dat")
