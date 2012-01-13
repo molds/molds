@@ -27,7 +27,7 @@ class MC{
 public:
    MC();
    ~MC();
-   void SetTheory(MolDS_base::ElectronicStructure* electronicStructure);
+   void SetMolecule(MolDS_base::Molecule* molecule);
    void DoMC();
 private:
    std::string messageinitialConditionMC;
@@ -42,9 +42,9 @@ private:
    std::string messageTotalEnergy;
    std::string errorMessageNotEnebleExcitedTheoryType;
    std::string errorMessageTheoryType;
-   MolDS_base::ElectronicStructure* electronicStructure;
+   MolDS_base::Molecule* molecule;
    void SetMessages();
-   void OutputEnergies();
+   void OutputEnergies(boost::shared_ptr<MolDS_base::ElectronicStructure> electronicStructure);
 };
 
 }
