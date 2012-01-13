@@ -31,6 +31,8 @@ private:
    InputParser();
    ~InputParser();
    void SetMessages();
+   std::string errorMessageNonValidExcitedStatesMD;
+   std::string errorMessageNonValidExcitedStatesMC;
    std::string messageStartParseInput;
    std::string messageDoneParseInput;
    std::string messageTotalNumberAOs;
@@ -143,8 +145,8 @@ private:
    std::string stringMCTemperature;
    void CalcMolecularBasics(Molecule* molecule) const;
    void CheckCisConditions(const Molecule& molecule) const;
-   void CheckMdConditions() const;
-   void CheckMcConditions() const;
+   void CheckMdConditions(const Molecule& molecule) const;
+   void CheckMcConditions(const Molecule& molecule) const;
    void OutputMolecularBasics(Molecule* molecule) const;
    void OutputScfConditions() const;
    void OutputMemoryConditions() const;

@@ -23,6 +23,8 @@
 #include<math.h>
 #include<string>
 #include<vector>
+#include<stdexcept>
+#include"MolDSException.h"
 #include"Uncopyable.h"
 #include"Utilities.h"
 #include"Enums.h"
@@ -66,6 +68,10 @@ void InputParser::DeleteInstance(){
 }
 
 void InputParser::SetMessages(){
+   this->errorMessageNonValidExcitedStatesMD
+      = "Error in base::InputParser::CheckMdConditions: Excited state on which MD runs or CIS condition are wrong.\n";
+   this->errorMessageNonValidExcitedStatesMC
+      = "Error in base::InputParser::CheckMcConditions: Excited state on which MC runs or CIS condition are wrong.\n";
    this->messageStartParseInput = "**********  START: Parse input  **********\n";
    this->messageDoneParseInput =  "**********  DONE: Parse input  ***********\n\n\n";
    this->messageTotalNumberAOs = "\tTotal number of valence AOs: ";
@@ -616,10 +622,10 @@ void InputParser::Parse(Molecule* molecule) const{
       this->CheckCisConditions(*molecule);
    }
    if(Parameters::GetInstance()->GetCurrentSimulation()==MD){
-      this->CheckMdConditions();
+      this->CheckMdConditions(*molecule);
    }
    else if(Parameters::GetInstance()->GetCurrentSimulation()==MC){
-      this->CheckMcConditions();
+      this->CheckMcConditions(*molecule);
    }
 
    // output conditions
@@ -685,19 +691,47 @@ void InputParser::CheckCisConditions(const Molecule& molecule) const{
    
 }
 
-void InputParser::CheckMdConditions() const{
+void InputParser::CheckMdConditions(const Molecule& molecule) const{
+   int groundStateIndex = 0;
+   // ZINDO does not support excited states force.
    if(Parameters::GetInstance()->GetCurrentTheory() == ZINDOS){
-      int groundStateIndex = 0;
       Parameters::GetInstance()->SetElectronicStateIndexMD(groundStateIndex);
    }
+   // check for the excited states dynamics
+   int targetStateIndex = Parameters::GetInstance()->GetElectronicStateIndexMD();
+   if(groundStateIndex < targetStateIndex && !Parameters::GetInstance()->RequiresCIS()){
+      Parameters::GetInstance()->SetNumberExcitedStatesCIS(targetStateIndex);
+      Parameters::GetInstance()->SetRequiresCIS(true);
+      this->CheckCisConditions(molecule);
+   }
+   int numberExcitedStatesCIS = Parameters::GetInstance()->GetNumberExcitedStatesCIS();
+   if(numberExcitedStatesCIS < targetStateIndex){
+      stringstream ss;
+      ss << this->errorMessageNonValidExcitedStatesMD;
+      throw MolDSException(ss.str());
+   } 
 }
 
-void InputParser::CheckMcConditions() const{
+void InputParser::CheckMcConditions(const Molecule& molecule) const{
+   int groundStateIndex = 0;
+   // CNDO2 and INDO do not support excited states.
    if(Parameters::GetInstance()->GetCurrentTheory() == CNDO2 || 
       Parameters::GetInstance()->GetCurrentTheory() == INDO){
-      int groundStateIndex = 0;
       Parameters::GetInstance()->SetElectronicStateIndexMC(groundStateIndex);
    }
+   // check for the excited states dynamics
+   int targetStateIndex = Parameters::GetInstance()->GetElectronicStateIndexMC();
+   if(groundStateIndex < targetStateIndex && !Parameters::GetInstance()->RequiresCIS()){
+      Parameters::GetInstance()->SetNumberExcitedStatesCIS(targetStateIndex);
+      Parameters::GetInstance()->SetRequiresCIS(true);
+      this->CheckCisConditions(molecule);
+   }
+   int numberExcitedStatesCIS = Parameters::GetInstance()->GetNumberExcitedStatesCIS();
+   if(numberExcitedStatesCIS < targetStateIndex){
+      stringstream ss;
+      ss << this->errorMessageNonValidExcitedStatesMC;
+      throw MolDSException(ss.str());
+   } 
 }
 
 void InputParser::OutputMolecularBasics(Molecule* molecule) const{
