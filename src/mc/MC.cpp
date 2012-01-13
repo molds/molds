@@ -31,6 +31,7 @@
 #include"../base/Parameters.h"
 #include"../base/atoms/Atom.h"
 #include"../base/Molecule.h"
+#include"../base/ElectronicStructure.h"
 #include"../cndo/Cndo2.h"
 #include"../zindo/ZindoS.h"
 #include"../mndo/Mndo.h"

@@ -41,6 +41,7 @@
 #include"base/Molecule.h"
 #include"base/InputParser.h"
 #include"base/GTOExpansionSTO.h"
+#include"base/ElectronicStructure.h"
 #include"cndo/Cndo2.h"
 #include"indo/Indo.h"
 #include"zindo/ZindoS.h"
@@ -86,7 +87,7 @@ int main(){
       
       // once electronic structure calculation
       if(runingNormally && Parameters::GetInstance()->GetCurrentSimulation() == Once){
-         MolDS_cndo::Cndo2* electronicStructure = NULL;
+         ElectronicStructure* electronicStructure = NULL;
          if(Parameters::GetInstance()->GetCurrentTheory() == CNDO2 ){
             electronicStructure = new MolDS_cndo::Cndo2();
          }
@@ -127,7 +128,7 @@ int main(){
       }
       // MD
       else if(runingNormally && Parameters::GetInstance()->GetCurrentSimulation() == MD){
-         MolDS_cndo::Cndo2* electronicStructure = NULL;
+         ElectronicStructure* electronicStructure = NULL;
          MolDS_md::MD* md = new MolDS_md::MD();
          try{
             if(Parameters::GetInstance()->GetCurrentTheory() == CNDO2 ){

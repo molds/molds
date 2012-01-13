@@ -31,6 +31,7 @@
 #include"../base/Parameters.h"
 #include"../base/atoms/Atom.h"
 #include"../base/Molecule.h"
+#include"../base/ElectronicStructure.h"
 #include"../cndo/Cndo2.h"
 #include"../zindo/ZindoS.h"
 #include"../mndo/Mndo.h"
@@ -54,7 +55,7 @@ MD::~MD(){
    //cout << "MD deleted\n";
 }
 
-void MD::SetTheory(MolDS_cndo::Cndo2* electronicStructure){
+void MD::SetTheory(ElectronicStructure* electronicStructure){
    // check enable electonic theory
    this->CheckEnableTheoryType(electronicStructure->GetTheoryType());
    this->electronicStructure = electronicStructure;

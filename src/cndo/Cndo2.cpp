@@ -44,6 +44,7 @@
 #include"../base/GTOExpansionSTO.h"
 #include"../base/RealSphericalHarmonicsIndex.h"
 #include"../base/MOLogger.h"
+#include"../base/ElectronicStructure.h"
 #include"Cndo2.h"
 using namespace std;
 using namespace MolDS_base;

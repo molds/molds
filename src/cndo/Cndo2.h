@@ -23,7 +23,7 @@ namespace MolDS_cndo{
 /***
  *  Refferences for Cndo2 are [PB_1970], [PSS_1965], and [PS_1965].
  */
-class Cndo2{
+class Cndo2 : public MolDS_base::ElectronicStructure{
 public:
    Cndo2();
    virtual ~Cndo2();

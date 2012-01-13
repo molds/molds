@@ -16,42 +16,23 @@
 // You should have received a copy of the GNU General Public License      // 
 // along with MolDS.  If not, see <http://www.gnu.org/licenses/>.         // 
 //************************************************************************//
-#ifndef INCLUDED_MD
-#define INCLUDED_MD
-namespace MolDS_md{
+#ifndef INCLUDED_ELECTRONICSTRUCTURE
+#define INCLUDED_ELECTRONICSTRUCTURE
+namespace MolDS_base{
 
-/***
- *  Velocty Verlet is used here.
- */
-class MD{
+class ElectronicStructure {
 public:
-   MD();
-   ~MD();
-   void SetTheory(MolDS_base::ElectronicStructure* electronicStructure);
-   void DoMD();
-private:
-   std::string messageinitialConditionMD;
-   std::string messageStartMD;
-   std::string messageEndMD;
-   std::string messageStartStepMD;
-   std::string messageEndStepMD;
-   std::string messageEnergies;
-   std::string messageEnergiesTitle;
-   std::string messageCoreKineticEnergy;
-   std::string messageCoreRepulsionEnergy;
-   std::string messageElectronicEnergy;
-   std::string messageTotalEnergy;
-   std::string messageErrorEnergy;
-   std::string messageTime;
-   std::string errorMessageNotEnebleTheoryType;
-   std::string errorMessageTheoryType;
-   MolDS_base::ElectronicStructure* electronicStructure;
-   std::vector<MolDS_base::TheoryType> enableTheoryTypes;
-   void CheckEnableTheoryType(MolDS_base::TheoryType theoryType);
-   void SetMessages();
-   void SetEnableTheoryTypes();
-   void OutputEnergies(double initialEnergy);
-   double OutputEnergies();
+   virtual ~ElectronicStructure(){};
+   virtual void SetMolecule(MolDS_base::Molecule* molecule) = 0;
+   virtual void DoSCF() = 0;
+   virtual void DoSCF(bool requiresGuess) = 0;
+   virtual void DoCIS() = 0;
+   virtual double** GetForce(int elecState) = 0;
+   virtual double*** GetForce(const std::vector<int>& elecStates) = 0;
+   virtual double GetElectronicEnergy(int elecState) const = 0;
+   virtual double GetCoreRepulsionEnergy() const = 0;
+   virtual MolDS_base::Molecule* GetMolecule() = 0;
+   virtual MolDS_base::TheoryType GetTheoryType() const = 0;
 };
 
 }

@@ -40,6 +40,7 @@
 #include"../base/atoms/Oatom.h"
 #include"../base/atoms/Satom.h"
 #include"../base/Molecule.h"
+#include"../base/ElectronicStructure.h"
 #include"../cndo/Cndo2.h"
 #include"../zindo/ZindoS.h"
 #include"Mndo.h"
