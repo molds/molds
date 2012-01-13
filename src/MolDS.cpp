@@ -42,13 +42,7 @@
 #include"base/InputParser.h"
 #include"base/GTOExpansionSTO.h"
 #include"base/ElectronicStructure.h"
-#include"cndo/Cndo2.h"
-#include"indo/Indo.h"
-#include"zindo/ZindoS.h"
-#include"mndo/Mndo.h"
-#include"am1/Am1.h"
-#include"pm3/Pm3.h"
-#include"pm3/Pm3Pddg.h"
+#include"base/ElectronicStructureFactory.h"
 #include"md/MD.h"
 #include"mc/MC.h"
 using namespace std;
@@ -88,30 +82,8 @@ int main(){
       // once electronic structure calculation
       if(runingNormally && Parameters::GetInstance()->GetCurrentSimulation() == Once){
          ElectronicStructure* electronicStructure = NULL;
-         if(Parameters::GetInstance()->GetCurrentTheory() == CNDO2 ){
-            electronicStructure = new MolDS_cndo::Cndo2();
-         }
-         else if(Parameters::GetInstance()->GetCurrentTheory() == INDO ){
-            electronicStructure = new MolDS_indo::Indo();
-         }
-         else if(Parameters::GetInstance()->GetCurrentTheory() == ZINDOS ){
-            electronicStructure = new MolDS_zindo::ZindoS();
-         }
-         else if(Parameters::GetInstance()->GetCurrentTheory() == MNDO ){
-            electronicStructure = new MolDS_mndo::Mndo();
-         }
-         else if(Parameters::GetInstance()->GetCurrentTheory() == AM1 ){
-            electronicStructure = new MolDS_am1::Am1();
-         }
-         else if(Parameters::GetInstance()->GetCurrentTheory() == PM3 ){
-            electronicStructure = new MolDS_pm3::Pm3();
-         }
-         else if(Parameters::GetInstance()->GetCurrentTheory() == PM3PDDG ){
-            electronicStructure = new MolDS_pm3::Pm3Pddg();
-         }
-         else{
-         }
          try{
+            electronicStructure = ElectronicStructureFactory::GetInstance()->Create();
             electronicStructure->SetMolecule(molecule);
             electronicStructure->DoSCF();
             if(Parameters::GetInstance()->RequiresCIS()){
@@ -129,31 +101,10 @@ int main(){
       // MD
       else if(runingNormally && Parameters::GetInstance()->GetCurrentSimulation() == MD){
          ElectronicStructure* electronicStructure = NULL;
-         MolDS_md::MD* md = new MolDS_md::MD();
+         MolDS_md::MD* md = NULL;
          try{
-            if(Parameters::GetInstance()->GetCurrentTheory() == CNDO2 ){
-               electronicStructure = new MolDS_cndo::Cndo2();
-            }
-            else if(Parameters::GetInstance()->GetCurrentTheory() == INDO ){
-               electronicStructure = new MolDS_indo::Indo();
-            }
-            else if(Parameters::GetInstance()->GetCurrentTheory() == ZINDOS ){
-               electronicStructure = new MolDS_zindo::ZindoS();
-            }
-            else if(Parameters::GetInstance()->GetCurrentTheory() == MNDO ){
-               electronicStructure = new MolDS_mndo::Mndo();
-            }
-            else if(Parameters::GetInstance()->GetCurrentTheory() == AM1 ){
-               electronicStructure = new MolDS_am1::Am1();
-            }
-            else if(Parameters::GetInstance()->GetCurrentTheory() == PM3 ){
-               electronicStructure = new MolDS_pm3::Pm3();
-            }
-            else if(Parameters::GetInstance()->GetCurrentTheory() == PM3PDDG ){
-               electronicStructure = new MolDS_pm3::Pm3Pddg();
-            }
-            else{
-            }
+            md = new MolDS_md::MD();
+            electronicStructure = ElectronicStructureFactory::GetInstance()->Create();
             electronicStructure->SetMolecule(molecule);
             md->SetTheory(electronicStructure);
             md->DoMD();
