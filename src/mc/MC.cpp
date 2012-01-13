@@ -32,12 +32,6 @@
 #include"../base/atoms/Atom.h"
 #include"../base/Molecule.h"
 #include"../base/ElectronicStructure.h"
-#include"../cndo/Cndo2.h"
-#include"../zindo/ZindoS.h"
-#include"../mndo/Mndo.h"
-#include"../am1/Am1.h"
-#include"../pm3/Pm3.h"
-#include"../pm3/Pm3Pddg.h"
 #include"MC.h"
 using namespace std;
 using namespace MolDS_base;
@@ -45,7 +39,7 @@ using namespace MolDS_base_atoms;
 
 namespace MolDS_mc{
 MC::MC(){
-   this->cndo = NULL;
+   this->electronicStructure = NULL;
    this->SetMessages();
    //cout << "MC created \n";
 }
@@ -54,9 +48,9 @@ MC::~MC(){
    //cout << "MC deleted\n";
 }
 
-void MC::SetTheory(MolDS_cndo::Cndo2* cndo){
+void MC::SetTheory(ElectronicStructure* electronicStructure){
    // check enable electonic theory
-   this->cndo = cndo;
+   this->electronicStructure = electronicStructure;
 }
 
 void MC::DoMC(){
@@ -67,7 +61,7 @@ void MC::DoMC(){
    double dr = Parameters::GetInstance()->GetStepWidthMC();
    double temperatur = Parameters::GetInstance()->GetTemperatureMC();
    bool requireGuess = false;
-   Molecule* molecule = this->cndo->GetMolecule();
+   Molecule* molecule = this->electronicStructure->GetMolecule();
 
    // output initial conditions
    cout << this->messageinitialConditionMC;
@@ -82,7 +76,8 @@ void MC::DoMC(){
 /*
       // create candidate
       Molecule candidate(*molecule);
-      Atom* atom = (*candidate.GetAtomVect())[0];
+      for(int a=0; a<molecule->GetAtomVect()->size(); a++){
+         Atom* atom = (*candidate.GetAtomVect())[0];
          for(int i=0; i<CartesianType_end; i++){
             atom->GetXyz()[i] += dr;
          }
@@ -91,14 +86,13 @@ void MC::DoMC(){
       candidate.CalcXyzCOC();
 
       // calculate electronic structure of the candidate
-      this->cndo->DoSCF(requireGuess);
+      this->electronicStructure->DoSCF(requireGuess);
       if(elecState > 0){
-         this->cndo->DoCIS();
+         this->electronicStructure->DoCIS();
       }
       else if(elecState < 0){
          // ToDo: Error
       }
-
 
       delete molecule;
       molecule = &candidate;
@@ -106,8 +100,6 @@ void MC::DoMC(){
       // update molecular basics
       molecule->CalcXyzCOM();
       molecule->CalcXyzCOC();
-
-
 
       // output results
       this->OutputEnergies();
@@ -135,17 +127,17 @@ void MC::SetMessages(){
 
 void MC::OutputEnergies(){
    int elecState = Parameters::GetInstance()->GetElectronicStateIndexMC();
-   Molecule* molecule = this->cndo->GetMolecule();
+   Molecule* molecule = this->electronicStructure->GetMolecule();
    // output energies:
    cout << this->messageEnergies;
    cout << this->messageEnergiesTitle;
    printf("\t\t%s\t%e\t%e\n",this->messageCoreRepulsionEnergy.c_str(), 
-                             this->cndo->GetCoreRepulsionEnergy(),
-                             this->cndo->GetCoreRepulsionEnergy()
+                             this->electronicStructure->GetCoreRepulsionEnergy(),
+                             this->electronicStructure->GetCoreRepulsionEnergy()
                              /Parameters::GetInstance()->GetEV2AU());
    printf("\t\t%s\t%e\t%e\n",this->messageElectronicEnergy.c_str(), 
-                             this->cndo->GetElectronicEnergy(elecState),
-                             this->cndo->GetElectronicEnergy(elecState)
+                             this->electronicStructure->GetElectronicEnergy(elecState),
+                             this->electronicStructure->GetElectronicEnergy(elecState)
                              /Parameters::GetInstance()->GetEV2AU());
 }
 

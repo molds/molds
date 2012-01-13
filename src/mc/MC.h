@@ -27,7 +27,7 @@ class MC{
 public:
    MC();
    ~MC();
-   void SetTheory(MolDS_cndo::Cndo2* cndo);
+   void SetTheory(MolDS_base::ElectronicStructure* electronicStructure);
    void DoMC();
 private:
    std::string messageinitialConditionMC;
@@ -42,7 +42,7 @@ private:
    std::string messageTotalEnergy;
    std::string errorMessageNotEnebleExcitedTheoryType;
    std::string errorMessageTheoryType;
-   MolDS_cndo::Cndo2* cndo;
+   MolDS_base::ElectronicStructure* electronicStructure;
    void SetMessages();
    void OutputEnergies();
 };
