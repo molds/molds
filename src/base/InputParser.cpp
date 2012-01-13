@@ -253,7 +253,7 @@ void InputParser::Parse(Molecule* molecule) const{
             else if(inputTerms[j] == "s"){
                atomType = S;
             }
-            Atom* atom = AtomFactory::GetInstance()->CreateAtom(atomType, x, y, z);
+            Atom* atom = AtomFactory::GetInstance()->Create(atomType, x, y, z);
             molecule->GetAtomVect()->push_back(atom);
             j += 4;
          }

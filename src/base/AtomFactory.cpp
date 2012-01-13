@@ -40,7 +40,7 @@ namespace MolDS_base{
 AtomFactory* AtomFactory::atomFactory = NULL;
 
 AtomFactory::AtomFactory(){
-   this->errorMessageNotEnableAtom = "Error in base::AtomFactory::CreateAtom: Not Enable AtomType is set.";
+   this->errorMessageNotEnableAtom = "Error in base::AtomFactory::Create: Not Enable AtomType is set.";
    this->errorMessageAtomType = "\tatom type = ";
 }
 
@@ -61,7 +61,7 @@ void AtomFactory::DeleteInstance(){
    atomFactory = NULL;
 }
 
-Atom* AtomFactory::CreateAtom(AtomType atomType, double x, double y, double z, double px, double py, double pz){
+Atom* AtomFactory::Create(AtomType atomType, double x, double y, double z, double px, double py, double pz){
    Atom* atom=NULL;
    if(atomType == H){
       atom = new Hatom();
@@ -92,11 +92,11 @@ Atom* AtomFactory::CreateAtom(AtomType atomType, double x, double y, double z, d
    return atom;
 }
 
-Atom* AtomFactory::CreateAtom(AtomType atomType, double x, double y, double z){
+Atom* AtomFactory::Create(AtomType atomType, double x, double y, double z){
    double px=0.0;
    double py=0.0;
    double pz=0.0;
-   return AtomFactory::CreateAtom(atomType, x, y, z, px, py, pz);
+   return AtomFactory::Create(atomType, x, y, z, px, py, pz);
 }
 }
 

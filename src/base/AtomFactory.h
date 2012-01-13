@@ -25,17 +25,17 @@ class AtomFactory: private Uncopyable{
 public:
    static AtomFactory* GetInstance();
    static void DeleteInstance();
-   MolDS_base_atoms::Atom* CreateAtom(MolDS_base::AtomType atomType,
-                                      double x,
-                                      double y,
-                                      double z,
-                                      double px,
-                                      double py,
-                                      double pz);
-   MolDS_base_atoms::Atom* CreateAtom(MolDS_base::AtomType atomType,
-                                      double x,
-                                      double y,
-                                      double z);
+   MolDS_base_atoms::Atom* Create(MolDS_base::AtomType atomType,
+                                  double x,
+                                  double y,
+                                  double z,
+                                  double px,
+                                  double py,
+                                  double pz);
+   MolDS_base_atoms::Atom* Create(MolDS_base::AtomType atomType,
+                                  double x,
+                                  double y,
+                                  double z);
 private:
    static AtomFactory* atomFactory;
    AtomFactory();
