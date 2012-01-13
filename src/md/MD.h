@@ -27,7 +27,7 @@ class MD{
 public:
    MD();
    ~MD();
-   void SetTheory(MolDS_cndo::Cndo2* cndo);
+   void SetTheory(MolDS_cndo::Cndo2* electronicStructure);
    void DoMD();
 private:
    std::string messageinitialConditionMD;
@@ -45,7 +45,7 @@ private:
    std::string messageTime;
    std::string errorMessageNotEnebleTheoryType;
    std::string errorMessageTheoryType;
-   MolDS_cndo::Cndo2* cndo;
+   MolDS_cndo::Cndo2* electronicStructure;
    std::vector<MolDS_base::TheoryType> enableTheoryTypes;
    void CheckEnableTheoryType(MolDS_base::TheoryType theoryType);
    void SetMessages();

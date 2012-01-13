@@ -121,41 +121,39 @@ int main(){
             cout << ex.what() << endl;
             runingNormally = false;
          }
-         delete electronicStructure;
+         if(electronicStructure != NULL){
+            delete electronicStructure;
+         }
       }
       // MD
       else if(runingNormally && Parameters::GetInstance()->GetCurrentSimulation() == MD){
          MolDS_cndo::Cndo2* electronicStructure = NULL;
          MolDS_md::MD* md = new MolDS_md::MD();
-         if(Parameters::GetInstance()->GetCurrentTheory() == CNDO2 ){
-            electronicStructure = new MolDS_cndo::Cndo2();
-         }
-         else if(Parameters::GetInstance()->GetCurrentTheory() == INDO ){
-            electronicStructure = new MolDS_indo::Indo();
-         }
-         else if(Parameters::GetInstance()->GetCurrentTheory() == ZINDOS ){
-            electronicStructure = new MolDS_zindo::ZindoS();
-         }
-         else if(Parameters::GetInstance()->GetCurrentTheory() == MNDO ){
-            electronicStructure = new MolDS_mndo::Mndo();
-         }
-         else if(Parameters::GetInstance()->GetCurrentTheory() == AM1 ){
-            electronicStructure = new MolDS_am1::Am1();
-         }
-         else if(Parameters::GetInstance()->GetCurrentTheory() == PM3 ){
-            electronicStructure = new MolDS_pm3::Pm3();
-         }
-         else if(Parameters::GetInstance()->GetCurrentTheory() == PM3PDDG ){
-            electronicStructure = new MolDS_pm3::Pm3Pddg();
-         }
-         else{
-         }
          try{
-            electronicStructure->SetMolecule(molecule);
-            electronicStructure->DoSCF();
-            if(Parameters::GetInstance()->RequiresCIS()){
-               electronicStructure->DoCIS();
+            if(Parameters::GetInstance()->GetCurrentTheory() == CNDO2 ){
+               electronicStructure = new MolDS_cndo::Cndo2();
             }
+            else if(Parameters::GetInstance()->GetCurrentTheory() == INDO ){
+               electronicStructure = new MolDS_indo::Indo();
+            }
+            else if(Parameters::GetInstance()->GetCurrentTheory() == ZINDOS ){
+               electronicStructure = new MolDS_zindo::ZindoS();
+            }
+            else if(Parameters::GetInstance()->GetCurrentTheory() == MNDO ){
+               electronicStructure = new MolDS_mndo::Mndo();
+            }
+            else if(Parameters::GetInstance()->GetCurrentTheory() == AM1 ){
+               electronicStructure = new MolDS_am1::Am1();
+            }
+            else if(Parameters::GetInstance()->GetCurrentTheory() == PM3 ){
+               electronicStructure = new MolDS_pm3::Pm3();
+            }
+            else if(Parameters::GetInstance()->GetCurrentTheory() == PM3PDDG ){
+               electronicStructure = new MolDS_pm3::Pm3Pddg();
+            }
+            else{
+            }
+            electronicStructure->SetMolecule(molecule);
             md->SetTheory(electronicStructure);
             md->DoMD();
          }
@@ -163,8 +161,12 @@ int main(){
             cout << ex.what() << endl;
             runingNormally = false;
          }
-         delete md;
-         delete electronicStructure;
+         if(md != NULL){
+            delete md;
+         }
+         if(electronicStructure != NULL){
+            delete electronicStructure;
+         }
       }
 
       // Diagonalize Inertia Tensor
