@@ -27,6 +27,10 @@ public:
    static Parameters* GetInstance();
    static void DeleteInstance();
 
+   SimulationType GetCurrentSimulation() const;
+   void SetCurrentSimulation(SimulationType simulation);
+   TheoryType GetCurrentTheory() const;
+   void SetCurrentTheory(TheoryType theory);
    double GetThresholdSCF() const;
    void SetThresholdSCF(double thresholdSCF);
    int GetMaxIterationsSCF() const;
@@ -56,8 +60,6 @@ public:
    double GetGMolin2AU() const;
    double GetDegree2Radian() const;
    double GetFs2AU() const;
-   TheoryType GetCurrentTheory() const;
-   void SetCurrentTheory(TheoryType theory);
    void SetTranslatingDifference(double x, double y, double z);
    double* GetTranslatingDifference() const;
    void SetInertiaTensorOrigin(double x, double y, double z);
@@ -91,16 +93,12 @@ public:
    double GetLimitHeapMemory() const;
    void SetLimitHeapMemory(double limitHeap);
    bool RequiresMOPlot() const;
-   bool RequiresMD() const;
-   void SetRequiresMD(bool requiresMD);
    int GetElectronicStateIndexMD() const;
    void SetElectronicStateIndexMD(int electronicStateIndex);
    int GetTotalStepsMD() const;
    void SetTotalStepsMD(int totalSteps);
    double GetTimeWidthMD() const;
    void SetTimeWidthMD(double timeWidth);
-   bool RequiresMC() const;
-   void SetRequiresMC(bool requiresMC);
    int GetElectronicStateIndexMC() const;
    void SetElectronicStateIndexMC(int electronicStateIndex);
    int GetTotalStepsMC() const;
@@ -114,8 +112,8 @@ private:
    Parameters();
    ~Parameters();
    std::string errorMessageGetIndecesMOPlotNull;
-   void SetDefaultValues();
-   void SetMessages();
+   SimulationType currentSimulation;
+   TheoryType currentTheory;
    static const double eV2AU;
    static const double kcalMolin2AU;
    static const double angstrom2AU;
@@ -134,7 +132,6 @@ private:
    int gridNumberMOPlot[CartesianType_end];
    double frameLengthMOPlot[CartesianType_end];
    std::vector<int>* indecesMOPlot;
-   TheoryType currentTheory;
    double translatingDifference[3];
    double* inertiaTensorOrigin;
    double* rotatingOrigin;
@@ -151,15 +148,15 @@ private:
    bool requiresCIS;
    bool isDavidsonCIS;
    double limitHeapMemory;
-   bool requiresMD;
    int electronicStateIndexMD;
    int totalStepsMD;
    double timeWidthMD;
-   bool requiresMC;
    int electronicStateIndexMC;
    int totalStepsMC;
    double temperatureMC;
    double stepWidthMC;
+   void SetDefaultValues();
+   void SetMessages();
 };
 
 }

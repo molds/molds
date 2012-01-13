@@ -1,10 +1,6 @@
-THEORY
-   principal_axes
-THEORY_END
-
-//INERTIA
-//   origin 1.0 2.0 30.0
-//INERTIA_END
+INERTIA
+   origin 1.0 2.0 3.0
+INERTIA_END
 
 
 GEOMETRY

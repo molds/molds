@@ -86,10 +86,6 @@ private:
    std::string stringTheoryAM1;
    std::string stringTheoryPM3;
    std::string stringTheoryPM3PDDG;
-   std::string stringTheoryPrincipalAxes;
-   std::string stringTheoryTranslate;
-   std::string stringTheoryRotate;
-   std::string stringTheoryNONE;
    std::string stringGeometry;
    std::string stringGeometryEnd;
    std::string stringScf;

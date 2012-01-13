@@ -1,8 +1,3 @@
-THEORY
-   rotate
-THEORY_END
-
-
 ROTATE
    type axis
    axis 0.4628049  -0.8838772  -0.06762147

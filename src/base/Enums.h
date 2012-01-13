@@ -25,6 +25,16 @@
 
 namespace MolDS_base{
 
+RENUMSTR_BEGIN( SimulationType, SimulationTypeStr )
+   RENUMSTR( Once,  "Once" )
+   RENUMSTR( MD,    "MD" )
+   RENUMSTR( MC,    "MC" )
+   RENUMSTR( PrincipalAxes, "PrincipalAxes" )
+   RENUMSTR( Translate, "Translate" )
+   RENUMSTR( Rotate, "Rotate" )
+   RENUMSTR( SimulationType_end,  "SimulationType_end" )
+RENUMSTR_END()
+
 RENUMSTR_BEGIN( TheoryType, TheoryTypeStr )
    RENUMSTR( CNDO2,  "CNDO/2" )
    RENUMSTR( INDO,   "INDO" )
@@ -33,10 +43,6 @@ RENUMSTR_BEGIN( TheoryType, TheoryTypeStr )
    RENUMSTR( AM1,    "AM1" )
    RENUMSTR( PM3,    "PM3" )
    RENUMSTR( PM3PDDG,    "PM3/PDDG" )
-   RENUMSTR( PrincipalAxes, "PrincipalAxes" )
-   RENUMSTR( Translate, "Translate" )
-   RENUMSTR( Rotate, "Rotate" )
-   RENUMSTR( NONE, "NONE" )
    RENUMSTR( TheoryType_end,  "TheoryType_end" )
 RENUMSTR_END()
 

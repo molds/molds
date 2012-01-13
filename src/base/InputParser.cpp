@@ -119,10 +119,6 @@ void InputParser::SetMessages(){
    this->stringTheoryAM1 = "am1";
    this->stringTheoryPM3 = "pm3";
    this->stringTheoryPM3PDDG = "pm3/pddg";
-   this->stringTheoryPrincipalAxes = "principal_axes";
-   this->stringTheoryTranslate = "translate";
-   this->stringTheoryRotate = "rotate";
-   this->stringTheoryNONE = "none";
    this->stringGeometry =    "geometry";
    this->stringGeometryEnd = "geometry_end";
    this->stringTheory = "theory";
@@ -310,6 +306,7 @@ void InputParser::Parse(Molecule* molecule) const{
       
       // inertia tensor condition
       if(inputTerms[i].compare(this->stringInertiaTensor) == 0){
+         Parameters::GetInstance()->SetCurrentSimulation(PrincipalAxes);
          int j=i+1;
          while(inputTerms[j].compare(this->stringInertiaTensorEnd) != 0){
             // origin
@@ -327,6 +324,7 @@ void InputParser::Parse(Molecule* molecule) const{
       
       // translating condition
       if(inputTerms[i].compare(this->stringTranslate) == 0){
+         Parameters::GetInstance()->SetCurrentSimulation(Translate);
          int j=i+1;
          while(inputTerms[j].compare(this->stringTranslateEnd) != 0){
             // origin
@@ -344,6 +342,7 @@ void InputParser::Parse(Molecule* molecule) const{
       
       // rotating condition
       if(inputTerms[i].compare(this->stringRotate) == 0){
+         Parameters::GetInstance()->SetCurrentSimulation(Rotate);
          int j=i+1;
          while(inputTerms[j].compare(this->stringRotateEnd) != 0){
             // origin
@@ -504,7 +503,7 @@ void InputParser::Parse(Molecule* molecule) const{
 
       // MD condition
       if(inputTerms[i].compare(this->stringMD) == 0){
-         Parameters::GetInstance()->SetRequiresMD(true);
+         Parameters::GetInstance()->SetCurrentSimulation(MD);
          int j=i+1;
          while(inputTerms[j].compare(this->stringMDEnd) != 0){
             // number of total steps 
@@ -532,7 +531,7 @@ void InputParser::Parse(Molecule* molecule) const{
 
       // MC condition
       if(inputTerms[i].compare(this->stringMC) == 0){
-         Parameters::GetInstance()->SetRequiresMC(true);
+         Parameters::GetInstance()->SetCurrentSimulation(MC);
          int j=i+1;
          while(inputTerms[j].compare(this->stringMCEnd) != 0){
             // number of total steps 
@@ -604,26 +603,6 @@ void InputParser::Parse(Molecule* molecule) const{
                Parameters::GetInstance()->SetCurrentTheory(PM3PDDG);
             }
 
-            // Princepal axes
-            else if(inputTerms[j].compare(this->stringTheoryPrincipalAxes) == 0){
-               Parameters::GetInstance()->SetCurrentTheory(PrincipalAxes);
-            }
-
-            // Translate
-            else if(inputTerms[j].compare(this->stringTheoryTranslate) == 0){
-               Parameters::GetInstance()->SetCurrentTheory(Translate);
-            }
-
-            // Rotate
-            else if(inputTerms[j].compare(this->stringTheoryRotate) == 0){
-               Parameters::GetInstance()->SetCurrentTheory(Rotate);
-            }
-
-            // NONE 
-            else if(inputTerms[j].compare(this->stringTheoryNONE) == 0){
-               Parameters::GetInstance()->SetCurrentTheory(NONE);
-            }
-
             j++;
          }
          i = j;
@@ -636,10 +615,10 @@ void InputParser::Parse(Molecule* molecule) const{
    if(Parameters::GetInstance()->RequiresCIS()){
       this->CheckCisConditions(*molecule);
    }
-   if(Parameters::GetInstance()->RequiresMD()){
+   if(Parameters::GetInstance()->GetCurrentSimulation()==MD){
       this->CheckMdConditions();
    }
-   if(Parameters::GetInstance()->RequiresMC()){
+   else if(Parameters::GetInstance()->GetCurrentSimulation()==MC){
       this->CheckMcConditions();
    }
 
@@ -650,14 +629,14 @@ void InputParser::Parse(Molecule* molecule) const{
    if(Parameters::GetInstance()->RequiresCIS()){
       this->OutputCisConditions();
    }
-   if(Parameters::GetInstance()->RequiresMD()){
-      this->OutputMdConditions();
-   }
-   if(Parameters::GetInstance()->RequiresMC()){
-      this->OutputMcConditions();
-   }
    if(Parameters::GetInstance()->RequiresMOPlot()){
       this->OutputMOPlotConditions();
+   }
+   if(Parameters::GetInstance()->GetCurrentSimulation()==MD){
+      this->OutputMdConditions();
+   }
+   if(Parameters::GetInstance()->GetCurrentSimulation()==MC){
+      this->OutputMcConditions();
    }
 
    // output inputs

@@ -291,30 +291,30 @@ HOW TO WRITE INPUT:
          MC_END
 
    <Principal Axes (Diagonalizing the inertia tensor)>
-      Write "principal_axes" in theory-directive.
+      Write inertia-directive.
 
-      E.g. 
-         THEORY
-            principal-axes
-         THEORY_END
-   
+      E.g.
+        INERTIA
+           (options)
+        INERTIA_END
+
       -options
        option is "origin" only for setting the origin of the inertia tensor.
        options are written in inertia-directive in angstrom unit.
        Center of mass is used as origin when the "origin" is not set.
 
-       E.g.
-         INERTIA
-            origin 1.2 2.3 3.4
-         INERTIA_END
+      E.g.
+        INERTIA
+           origin 1.2 2.3 3.4
+        INERTIA_END
 
    <Rotate Molecule>
-      Write "rotate" in theory-directive.
+      Write rotate-directive.
 
       E.g. 
-         THEORY
-            rotate
-         THEORY_END
+         ROTATE
+            (options) 
+         ROTATE_END
 
       -options
        "type", "origin", "axis", "angle" and "angles" are prepared as options.
@@ -355,12 +355,12 @@ HOW TO WRITE INPUT:
 
 
    <Translate Molecule>
-      Write "translate" in theory-directive.
+      Write translate-directive.
 
       E.g. 
-         THEORY
-            translate 
-         THEORY_END
+         TRANSLATE
+            (options)
+         TRANSLATE_END
 
       -options
        "difference" indicates difference for the translation in angstrom unit.

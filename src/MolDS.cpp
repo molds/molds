@@ -84,14 +84,8 @@ int main(){
          runingNormally = false;
       }
       
-      // electronic structure calculation
-      if(runingNormally && (Parameters::GetInstance()->GetCurrentTheory() == CNDO2 ||
-                            Parameters::GetInstance()->GetCurrentTheory() == INDO || 
-                            Parameters::GetInstance()->GetCurrentTheory() == ZINDOS ||
-                            Parameters::GetInstance()->GetCurrentTheory() == MNDO ||
-                            Parameters::GetInstance()->GetCurrentTheory() == AM1 ||
-                            Parameters::GetInstance()->GetCurrentTheory() == PM3 ||
-                            Parameters::GetInstance()->GetCurrentTheory() == PM3PDDG)){
+      // once electronic structure calculation
+      if(runingNormally && Parameters::GetInstance()->GetCurrentSimulation() == Once){
          MolDS_cndo::Cndo2* electronicStructure = NULL;
          if(Parameters::GetInstance()->GetCurrentTheory() == CNDO2 ){
             electronicStructure = new MolDS_cndo::Cndo2();
@@ -122,18 +116,6 @@ int main(){
             if(Parameters::GetInstance()->RequiresCIS()){
                electronicStructure->DoCIS();
             }
-            if(Parameters::GetInstance()->RequiresMD()){
-               MolDS_md::MD* md = new MolDS_md::MD();
-               md->SetTheory(electronicStructure);
-               md->DoMD();
-               delete md;
-            }
-            if(Parameters::GetInstance()->RequiresMC()){
-               MolDS_mc::MC* mc = new MolDS_mc::MC();
-               mc->SetTheory(electronicStructure);
-               mc->DoMC();
-               delete mc;
-            }
          }
          catch(MolDSException ex){
             cout << ex.what() << endl;
@@ -141,9 +123,52 @@ int main(){
          }
          delete electronicStructure;
       }
+      // MD
+      else if(runingNormally && Parameters::GetInstance()->GetCurrentSimulation() == MD){
+         MolDS_cndo::Cndo2* electronicStructure = NULL;
+         MolDS_md::MD* md = new MolDS_md::MD();
+         if(Parameters::GetInstance()->GetCurrentTheory() == CNDO2 ){
+            electronicStructure = new MolDS_cndo::Cndo2();
+         }
+         else if(Parameters::GetInstance()->GetCurrentTheory() == INDO ){
+            electronicStructure = new MolDS_indo::Indo();
+         }
+         else if(Parameters::GetInstance()->GetCurrentTheory() == ZINDOS ){
+            electronicStructure = new MolDS_zindo::ZindoS();
+         }
+         else if(Parameters::GetInstance()->GetCurrentTheory() == MNDO ){
+            electronicStructure = new MolDS_mndo::Mndo();
+         }
+         else if(Parameters::GetInstance()->GetCurrentTheory() == AM1 ){
+            electronicStructure = new MolDS_am1::Am1();
+         }
+         else if(Parameters::GetInstance()->GetCurrentTheory() == PM3 ){
+            electronicStructure = new MolDS_pm3::Pm3();
+         }
+         else if(Parameters::GetInstance()->GetCurrentTheory() == PM3PDDG ){
+            electronicStructure = new MolDS_pm3::Pm3Pddg();
+         }
+         else{
+         }
+         try{
+            electronicStructure->SetMolecule(molecule);
+            electronicStructure->DoSCF();
+            if(Parameters::GetInstance()->RequiresCIS()){
+               electronicStructure->DoCIS();
+            }
+            md->SetTheory(electronicStructure);
+            md->DoMD();
+         }
+         catch(MolDSException ex){
+            cout << ex.what() << endl;
+            runingNormally = false;
+         }
+         delete md;
+         delete electronicStructure;
+      }
 
       // Diagonalize Inertia Tensor
-      else if(Parameters::GetInstance()->GetCurrentTheory() == PrincipalAxes && runingNormally){
+      else if(runingNormally && Parameters::GetInstance()->GetCurrentSimulation() == PrincipalAxes ){
          try{
             molecule->CalcPrincipalAxes();
          }
@@ -155,7 +180,7 @@ int main(){
       }
 
       // Translate molecule
-      else if(Parameters::GetInstance()->GetCurrentTheory() == Translate && runingNormally){
+      else if(runingNormally && Parameters::GetInstance()->GetCurrentSimulation() == Translate){
          try{
             molecule->Translate();
          }
@@ -167,7 +192,7 @@ int main(){
       }
 
       // Rotate molecule
-      else if(Parameters::GetInstance()->GetCurrentTheory() == Rotate && runingNormally){
+      else if(runingNormally && Parameters::GetInstance()->GetCurrentSimulation() == Rotate){
          try{
             molecule->Rotate();
          }

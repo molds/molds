@@ -75,6 +75,8 @@ void Parameters::DeleteInstance(){
 }
 
 void Parameters::SetDefaultValues(){
+   this->currentSimulation = Once;
+   this->currentTheory = CNDO2;
    this->thresholdSCF = pow(10.0, -8.0);
    this->maxIterationsSCF = 100;
    this->dampingThreshSCF = 1.0;
@@ -89,7 +91,6 @@ void Parameters::SetDefaultValues(){
    this->frameLengthMOPlot[XAxis] = 20.0;
    this->frameLengthMOPlot[YAxis] = 20.0;
    this->frameLengthMOPlot[ZAxis] = 20.0;
-   this->currentTheory = CNDO2;
    this->translatingDifference[0] = 0.0;
    this->translatingDifference[1] = 0.0;
    this->translatingDifference[2] = 0.0;
@@ -123,6 +124,22 @@ void Parameters::SetDefaultValues(){
 void Parameters::SetMessages(){
    this->errorMessageGetIndecesMOPlotNull
       = "Error in base::Parameters::GetIndecesMOPlot: indecesMOPlot is NULL.\n";
+}
+
+SimulationType Parameters::GetCurrentSimulation() const{
+   return this->currentSimulation;
+}
+
+void Parameters::SetCurrentSimulation(SimulationType simulation){
+   this->currentSimulation = simulation;
+}
+
+TheoryType Parameters::GetCurrentTheory() const{
+   return this->currentTheory;
+}
+
+void Parameters::SetCurrentTheory(TheoryType theory){
+   this->currentTheory = theory;
 }
 
 double Parameters::GetThresholdSCF() const{
@@ -235,14 +252,6 @@ double Parameters::GetDegree2Radian() const{
 
 double Parameters::GetFs2AU() const{
    return this->fs2AU;
-}
-
-TheoryType Parameters::GetCurrentTheory() const{
-   return this->currentTheory;
-}
-
-void Parameters::SetCurrentTheory(TheoryType theory){
-   this->currentTheory = theory;
 }
 
 void Parameters::SetTranslatingDifference(double x, double y, double z){
@@ -406,14 +415,6 @@ void Parameters::SetLimitHeapMemory(double limitHeapMemory){
    this->limitHeapMemory = limitHeapMemory;
 }
 
-bool Parameters::RequiresMD() const{
-   return this->requiresMD;
-}
-
-void Parameters::SetRequiresMD(bool requiresMD){
-   this->requiresMD = requiresMD;
-}
-
 int Parameters::GetElectronicStateIndexMD() const{
    return this->electronicStateIndexMD;
 }
@@ -436,14 +437,6 @@ double Parameters::GetTimeWidthMD() const{
 
 void Parameters::SetTimeWidthMD(double timeWidth){
    this->timeWidthMD = timeWidth;
-}
-
-bool Parameters::RequiresMC() const{
-   return this->requiresMC;
-}
-
-void Parameters::SetRequiresMC(bool requiresMC){
-   this->requiresMC = requiresMC;
 }
 
 int Parameters::GetElectronicStateIndexMC() const{
