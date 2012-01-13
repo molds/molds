@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/1/10(Thu.) 15:14:26  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/1/13(Fri.) 13:34:55  <<<<<
 
 
 **********  START: Parse input  **********
@@ -72,6 +72,7 @@ geometry_end |
 **********  DONE: Parse input  ***********
 
 
+**********  START: Molecular dynamics  **********
 **********  START: AM1-SCF  **********
 SCF iter=0: RMS density=5.291502622129178 
 SCF iter=1: RMS density=2.251392923186922 
@@ -127,11 +128,10 @@ SCF iter=11: RMS density=0.000000372121783
 		6	H	1.000000e+00	7.029841e-02
 		7	H	1.000000e+00	7.579838e-02
 
-	Elapsed time(omp) for the SCF = 0.069036[s].
+	Elapsed time(omp) for the SCF = 0.0498891[s].
 **********  DONE: AM1-SCF  **********
 
 
-**********  START: Molecular dynamics  **********
 
 	========= Initial conditions 
 	Energies:
@@ -247,7 +247,7 @@ SCF iter=3: RMS density=0.000000402147136
 		6	H	1.000000e+00	7.029851e-02
 		7	H	1.000000e+00	7.579821e-02
 
-	Elapsed time(omp) for the SCF = 0.0374801[s].
+	Elapsed time(omp) for the SCF = 0.0382161[s].
 **********  DONE: AM1-SCF  **********
 
 
@@ -368,7 +368,7 @@ SCF iter=4: RMS density=0.000000508928945
 		6	H	1.000000e+00	7.029888e-02
 		7	H	1.000000e+00	7.579780e-02
 
-	Elapsed time(omp) for the SCF = 0.0374811[s].
+	Elapsed time(omp) for the SCF = 0.0374732[s].
 **********  DONE: AM1-SCF  **********
 
 
@@ -489,7 +489,7 @@ SCF iter=4: RMS density=0.000000845998916
 		6	H	1.000000e+00	7.029951e-02
 		7	H	1.000000e+00	7.579714e-02
 
-	Elapsed time(omp) for the SCF = 0.0373611[s].
+	Elapsed time(omp) for the SCF = 0.037528[s].
 **********  DONE: AM1-SCF  **********
 
 
@@ -611,7 +611,7 @@ SCF iter=5: RMS density=0.000000522797385
 		6	H	1.000000e+00	7.030033e-02
 		7	H	1.000000e+00	7.579602e-02
 
-	Elapsed time(omp) for the SCF = 0.038142[s].
+	Elapsed time(omp) for the SCF = 0.0415678[s].
 **********  DONE: AM1-SCF  **********
 
 
@@ -733,7 +733,7 @@ SCF iter=5: RMS density=0.000000666775873
 		6	H	1.000000e+00	7.030143e-02
 		7	H	1.000000e+00	7.579471e-02
 
-	Elapsed time(omp) for the SCF = 0.0377419[s].
+	Elapsed time(omp) for the SCF = 0.0380092[s].
 **********  DONE: AM1-SCF  **********
 
 
@@ -811,9 +811,9 @@ SCF iter=5: RMS density=0.000000666775873
 
 
      >>>>>  The MolDS finished normally!  <<<<<
-     >>>>>  CPU time: 7.04[s].  <<<<<
+     >>>>>  CPU time: 7.03[s].  <<<<<
      >>>>>  Elapsed time: 7[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 7.08823[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 7.04954[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

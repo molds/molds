@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/1/10(Thu.) 15:15:4  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/1/13(Fri.) 13:41:35  <<<<<
 
 
 **********  START: Parse input  **********
@@ -79,6 +79,7 @@ geometry_end |
 **********  DONE: Parse input  ***********
 
 
+**********  START: Molecular dynamics  **********
 **********  START: PM3-SCF  **********
 SCF iter=0: RMS density=5.291502622129178 
 SCF iter=1: RMS density=1.910456125626945 
@@ -135,13 +136,13 @@ SCF iter=12: RMS density=0.000000169506350
 		6	H	1.000000e+00	3.744313e-02
 		7	H	1.000000e+00	4.258006e-02
 
-	Elapsed time(omp) for the SCF = 0.0548708[s].
+	Elapsed time(omp) for the SCF = 0.049113[s].
 **********  DONE: PM3-SCF  **********
 
 
 **********  START: PM3-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.05637[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.0563381[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Direct-CIS  =====
@@ -201,11 +202,10 @@ SCF iter=12: RMS density=0.000000169506350
 		 48	1.176330e+00	3.200982e+01
 		 49	1.181425e+00	3.214846e+01
 
-	Elapsed time(omp) for the CIS = 0.0585821[s].
+	Elapsed time(omp) for the CIS = 0.058661[s].
 **********  DONE: PM3-CIS  **********
 
 
-**********  START: Molecular dynamics  **********
 
 	========= Initial conditions 
 	Energies:
@@ -321,13 +321,13 @@ SCF iter=3: RMS density=0.000000510246816
 		6	H	1.000000e+00	3.744291e-02
 		7	H	1.000000e+00	4.257972e-02
 
-	Elapsed time(omp) for the SCF = 0.0680571[s].
+	Elapsed time(omp) for the SCF = 0.0376408[s].
 **********  DONE: PM3-SCF  **********
 
 
 **********  START: PM3-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.056098[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.0562661[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Direct-CIS  =====
@@ -387,7 +387,7 @@ SCF iter=3: RMS density=0.000000510246816
 		 48	1.176328e+00	3.200978e+01
 		 49	1.181422e+00	3.214839e+01
 
-	Elapsed time(omp) for the CIS = 0.057096[s].
+	Elapsed time(omp) for the CIS = 0.0573599[s].
 **********  DONE: PM3-CIS  **********
 
 
@@ -508,13 +508,13 @@ SCF iter=4: RMS density=0.000000665623086
 		6	H	1.000000e+00	3.744212e-02
 		7	H	1.000000e+00	4.257853e-02
 
-	Elapsed time(omp) for the SCF = 0.0375078[s].
+	Elapsed time(omp) for the SCF = 0.037251[s].
 **********  DONE: PM3-SCF  **********
 
 
 **********  START: PM3-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.0560019[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.0568521[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Direct-CIS  =====
@@ -574,7 +574,7 @@ SCF iter=4: RMS density=0.000000665623086
 		 48	1.176325e+00	3.200968e+01
 		 49	1.181415e+00	3.214820e+01
 
-	Elapsed time(omp) for the CIS = 0.0570149[s].
+	Elapsed time(omp) for the CIS = 0.0578761[s].
 **********  DONE: PM3-CIS  **********
 
 
@@ -696,13 +696,13 @@ SCF iter=5: RMS density=0.000000514146355
 		6	H	1.000000e+00	3.744072e-02
 		7	H	1.000000e+00	4.257640e-02
 
-	Elapsed time(omp) for the SCF = 0.0378458[s].
+	Elapsed time(omp) for the SCF = 0.0375271[s].
 **********  DONE: PM3-SCF  **********
 
 
 **********  START: PM3-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.0564971[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.056438[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Direct-CIS  =====
@@ -762,7 +762,7 @@ SCF iter=5: RMS density=0.000000514146355
 		 48	1.176318e+00	3.200951e+01
 		 49	1.181403e+00	3.214788e+01
 
-	Elapsed time(omp) for the CIS = 0.0575621[s].
+	Elapsed time(omp) for the CIS = 0.0574131[s].
 **********  DONE: PM3-CIS  **********
 
 
@@ -884,13 +884,13 @@ SCF iter=5: RMS density=0.000000714157803
 		6	H	1.000000e+00	3.743881e-02
 		7	H	1.000000e+00	4.257351e-02
 
-	Elapsed time(omp) for the SCF = 0.037992[s].
+	Elapsed time(omp) for the SCF = 0.03776[s].
 **********  DONE: PM3-SCF  **********
 
 
 **********  START: PM3-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.0556369[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.05671[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Direct-CIS  =====
@@ -950,7 +950,7 @@ SCF iter=5: RMS density=0.000000714157803
 		 48	1.176310e+00	3.200927e+01
 		 49	1.181387e+00	3.214743e+01
 
-	Elapsed time(omp) for the CIS = 0.0566549[s].
+	Elapsed time(omp) for the CIS = 0.05779[s].
 **********  DONE: PM3-CIS  **********
 
 
@@ -1072,13 +1072,13 @@ SCF iter=5: RMS density=0.000000918730777
 		6	H	1.000000e+00	3.743634e-02
 		7	H	1.000000e+00	4.256977e-02
 
-	Elapsed time(omp) for the SCF = 0.0376861[s].
+	Elapsed time(omp) for the SCF = 0.0374229[s].
 **********  DONE: PM3-SCF  **********
 
 
 **********  START: PM3-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.055989[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.0566568[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Direct-CIS  =====
@@ -1138,7 +1138,7 @@ SCF iter=5: RMS density=0.000000918730777
 		 48	1.176299e+00	3.200897e+01
 		 49	1.181366e+00	3.214686e+01
 
-	Elapsed time(omp) for the CIS = 0.0569739[s].
+	Elapsed time(omp) for the CIS = 0.057734[s].
 **********  DONE: PM3-CIS  **********
 
 
@@ -1216,9 +1216,9 @@ SCF iter=5: RMS density=0.000000918730777
 
 
      >>>>>  The MolDS finished normally!  <<<<<
-     >>>>>  CPU time: 9.57[s].  <<<<<
+     >>>>>  CPU time: 9.52[s].  <<<<<
      >>>>>  Elapsed time: 10[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 9.61639[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 9.52989[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

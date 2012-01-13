@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/1/10(Thu.) 15:14:13  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/1/13(Fri.) 13:34:26  <<<<<
 
 
 **********  START: Parse input  **********
@@ -82,6 +82,7 @@ h | -0.3700 | -0.5208 | 0.9016 | h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 |
 **********  DONE: Parse input  ***********
 
 
+**********  START: Molecular dynamics  **********
 **********  START: MNDO-SCF  **********
 SCF iter=0: RMS density=5.291502622129181 
 SCF iter=1: RMS density=2.406832383581161 
@@ -141,13 +142,13 @@ SCF iter=11: RMS density=0.000000358204693
 		| [a.u.] | [Kcal/mol] | 
 		-2.736798e-02	-1.717367e+01
 
-	Elapsed time(omp) for the SCF = 0.0568101[s].
+	Elapsed time(omp) for the SCF = 0.048481[s].
 **********  DONE: MNDO-SCF  **********
 
 
 **********  START: MNDO-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.055577[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.0563278[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -238,11 +239,10 @@ SCF iter=11: RMS density=0.000000358204693
 		 3	3.369529e-01	9.169028e+00
 		 4	3.393673e-01	9.234729e+00
 
-	Elapsed time(omp) for the CIS = 0.241085[s].
+	Elapsed time(omp) for the CIS = 0.236735[s].
 **********  DONE: MNDO-CIS  **********
 
 
-**********  START: Molecular dynamics  **********
 
 	========= Initial conditions 
 	Energies:
@@ -362,13 +362,13 @@ SCF iter=3: RMS density=0.000000754773563
 		| [a.u.] | [Kcal/mol] | 
 		-2.736965e-02	-1.717471e+01
 
-	Elapsed time(omp) for the SCF = 0.037179[s].
+	Elapsed time(omp) for the SCF = 0.0370481[s].
 **********  DONE: MNDO-SCF  **********
 
 
 **********  START: MNDO-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.0556951[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.05621[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -459,7 +459,7 @@ SCF iter=3: RMS density=0.000000754773563
 		 3	3.369504e-01	9.168961e+00
 		 4	3.393641e-01	9.234640e+00
 
-	Elapsed time(omp) for the CIS = 0.236408[s].
+	Elapsed time(omp) for the CIS = 0.235914[s].
 **********  DONE: MNDO-CIS  **********
 
 
@@ -584,13 +584,13 @@ SCF iter=4: RMS density=0.000000880710272
 		| [a.u.] | [Kcal/mol] | 
 		-2.737462e-02	-1.717783e+01
 
-	Elapsed time(omp) for the SCF = 0.0729909[s].
+	Elapsed time(omp) for the SCF = 0.0376439[s].
 **********  DONE: MNDO-SCF  **********
 
 
 **********  START: MNDO-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.055994[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.0564711[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -681,7 +681,7 @@ SCF iter=4: RMS density=0.000000880710272
 		 3	3.369430e-01	9.168759e+00
 		 4	3.393542e-01	9.234373e+00
 
-	Elapsed time(omp) for the CIS = 0.237082[s].
+	Elapsed time(omp) for the CIS = 0.236303[s].
 **********  DONE: MNDO-CIS  **********
 
 
@@ -807,13 +807,13 @@ SCF iter=5: RMS density=0.000000593352744
 		| [a.u.] | [Kcal/mol] | 
 		-2.738286e-02	-1.718300e+01
 
-	Elapsed time(omp) for the SCF = 0.0378292[s].
+	Elapsed time(omp) for the SCF = 0.0375021[s].
 **********  DONE: MNDO-SCF  **********
 
 
 **********  START: MNDO-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.0556569[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.0558529[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -910,7 +910,7 @@ SCF iter=5: RMS density=0.000000593352744
 		 3	3.369306e-01	9.168422e+00
 		 4	3.393378e-01	9.233926e+00
 
-	Elapsed time(omp) for the CIS = 0.275827[s].
+	Elapsed time(omp) for the CIS = 0.272496[s].
 **********  DONE: MNDO-CIS  **********
 
 
@@ -1036,13 +1036,13 @@ SCF iter=5: RMS density=0.000000826577854
 		| [a.u.] | [Kcal/mol] | 
 		-2.739430e-02	-1.719018e+01
 
-	Elapsed time(omp) for the SCF = 0.0377312[s].
+	Elapsed time(omp) for the SCF = 0.037401[s].
 **********  DONE: MNDO-SCF  **********
 
 
 **********  START: MNDO-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.0565131[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.0559371[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -1139,7 +1139,7 @@ SCF iter=5: RMS density=0.000000826577854
 		 3	3.369133e-01	9.167951e+00
 		 4	3.393147e-01	9.233298e+00
 
-	Elapsed time(omp) for the CIS = 0.277026[s].
+	Elapsed time(omp) for the CIS = 0.271989[s].
 **********  DONE: MNDO-CIS  **********
 
 
@@ -1266,13 +1266,13 @@ SCF iter=6: RMS density=0.000000004595328
 		| [a.u.] | [Kcal/mol] | 
 		-2.740883e-02	-1.719930e+01
 
-	Elapsed time(omp) for the SCF = 0.0378361[s].
+	Elapsed time(omp) for the SCF = 0.0378621[s].
 **********  DONE: MNDO-SCF  **********
 
 
 **********  START: MNDO-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.05603[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.0562899[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -1369,7 +1369,7 @@ SCF iter=6: RMS density=0.000000004595328
 		 3	3.368910e-01	9.167344e+00
 		 4	3.392849e-01	9.232487e+00
 
-	Elapsed time(omp) for the CIS = 0.277504[s].
+	Elapsed time(omp) for the CIS = 0.273105[s].
 **********  DONE: MNDO-CIS  **********
 
 
@@ -1447,9 +1447,9 @@ SCF iter=6: RMS density=0.000000004595328
 
 
      >>>>>  The MolDS finished normally!  <<<<<
-     >>>>>  CPU time: 10.78[s].  <<<<<
-     >>>>>  Elapsed time: 11[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 10.8186[s].  <<<<<
+     >>>>>  CPU time: 10.66[s].  <<<<<
+     >>>>>  Elapsed time: 10[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 10.678[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

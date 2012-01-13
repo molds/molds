@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/1/10(Thu.) 15:15:33  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/1/13(Fri.) 13:44:56  <<<<<
 
 
 **********  START: Parse input  **********
@@ -79,6 +79,7 @@ geometry_end |
 **********  DONE: Parse input  ***********
 
 
+**********  START: Molecular dynamics  **********
 **********  START: PM3/PDDG-SCF  **********
 SCF iter=0: RMS density=5.291502622129178 
 SCF iter=1: RMS density=1.862872189503768 
@@ -135,13 +136,13 @@ SCF iter=12: RMS density=0.000000190761140
 		6	H	1.000000e+00	8.849413e-02
 		7	H	1.000000e+00	9.338598e-02
 
-	Elapsed time(omp) for the SCF = 0.0606451[s].
+	Elapsed time(omp) for the SCF = 0.0477459[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.0573919[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.0568211[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Direct-CIS  =====
@@ -201,11 +202,10 @@ SCF iter=12: RMS density=0.000000190761140
 		 48	1.218160e+00	3.314809e+01
 		 49	1.223486e+00	3.329300e+01
 
-	Elapsed time(omp) for the CIS = 0.0600441[s].
+	Elapsed time(omp) for the CIS = 0.0589881[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
-**********  START: Molecular dynamics  **********
 
 	========= Initial conditions 
 	Energies:
@@ -321,13 +321,13 @@ SCF iter=3: RMS density=0.000000535987390
 		6	H	1.000000e+00	8.849370e-02
 		7	H	1.000000e+00	9.338540e-02
 
-	Elapsed time(omp) for the SCF = 0.037585[s].
+	Elapsed time(omp) for the SCF = 0.0381148[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.056004[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.0562799[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Direct-CIS  =====
@@ -387,7 +387,7 @@ SCF iter=3: RMS density=0.000000535987390
 		 48	1.218159e+00	3.314806e+01
 		 49	1.223483e+00	3.329294e+01
 
-	Elapsed time(omp) for the CIS = 0.057075[s].
+	Elapsed time(omp) for the CIS = 0.0572889[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
@@ -508,13 +508,13 @@ SCF iter=4: RMS density=0.000000718202248
 		6	H	1.000000e+00	8.849226e-02
 		7	H	1.000000e+00	9.338348e-02
 
-	Elapsed time(omp) for the SCF = 0.0377579[s].
+	Elapsed time(omp) for the SCF = 0.038069[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.055918[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.0562201[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Direct-CIS  =====
@@ -574,7 +574,7 @@ SCF iter=4: RMS density=0.000000718202248
 		 48	1.218156e+00	3.314798e+01
 		 49	1.223477e+00	3.329277e+01
 
-	Elapsed time(omp) for the CIS = 0.056921[s].
+	Elapsed time(omp) for the CIS = 0.057225[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
@@ -696,13 +696,13 @@ SCF iter=5: RMS density=0.000000563962390
 		6	H	1.000000e+00	8.848977e-02
 		7	H	1.000000e+00	9.338014e-02
 
-	Elapsed time(omp) for the SCF = 0.0728061[s].
+	Elapsed time(omp) for the SCF = 0.0394988[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.0561781[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.0562088[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Direct-CIS  =====
@@ -762,7 +762,7 @@ SCF iter=5: RMS density=0.000000563962390
 		 48	1.218151e+00	3.314783e+01
 		 49	1.223466e+00	3.329248e+01
 
-	Elapsed time(omp) for the CIS = 0.057404[s].
+	Elapsed time(omp) for the CIS = 0.0571949[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
@@ -884,13 +884,13 @@ SCF iter=5: RMS density=0.000000783281214
 		6	H	1.000000e+00	8.848635e-02
 		7	H	1.000000e+00	9.337555e-02
 
-	Elapsed time(omp) for the SCF = 0.0381389[s].
+	Elapsed time(omp) for the SCF = 0.038096[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.0561571[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.056525[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Direct-CIS  =====
@@ -950,7 +950,7 @@ SCF iter=5: RMS density=0.000000783281214
 		 48	1.218143e+00	3.314763e+01
 		 49	1.223451e+00	3.329207e+01
 
-	Elapsed time(omp) for the CIS = 0.0572071[s].
+	Elapsed time(omp) for the CIS = 0.0576279[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
@@ -1073,13 +1073,13 @@ SCF iter=6: RMS density=0.000000006183137
 		6	H	1.000000e+00	8.848172e-02
 		7	H	1.000000e+00	9.336932e-02
 
-	Elapsed time(omp) for the SCF = 0.0379431[s].
+	Elapsed time(omp) for the SCF = 0.0378311[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.0571289[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.056196[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Direct-CIS  =====
@@ -1139,7 +1139,7 @@ SCF iter=6: RMS density=0.000000006183137
 		 48	1.218133e+00	3.314736e+01
 		 49	1.223432e+00	3.329155e+01
 
-	Elapsed time(omp) for the CIS = 0.058392[s].
+	Elapsed time(omp) for the CIS = 0.0571671[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
@@ -1217,9 +1217,9 @@ SCF iter=6: RMS density=0.000000006183137
 
 
      >>>>>  The MolDS finished normally!  <<<<<
-     >>>>>  CPU time: 9.64[s].  <<<<<
-     >>>>>  Elapsed time: 10[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 9.66787[s].  <<<<<
+     >>>>>  CPU time: 9.53[s].  <<<<<
+     >>>>>  Elapsed time: 9[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 9.55654[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 
