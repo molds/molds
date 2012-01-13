@@ -27,7 +27,7 @@ class MD{
 public:
    MD();
    ~MD();
-   void SetTheory(MolDS_base::ElectronicStructure* electronicStructure);
+   void SetMolecule(MolDS_base::Molecule* molecule);
    void DoMD();
 private:
    std::string messageinitialConditionMD;
@@ -45,13 +45,13 @@ private:
    std::string messageTime;
    std::string errorMessageNotEnebleTheoryType;
    std::string errorMessageTheoryType;
-   MolDS_base::ElectronicStructure* electronicStructure;
+   MolDS_base::Molecule* molecule;
    std::vector<MolDS_base::TheoryType> enableTheoryTypes;
    void CheckEnableTheoryType(MolDS_base::TheoryType theoryType);
    void SetMessages();
    void SetEnableTheoryTypes();
-   void OutputEnergies(double initialEnergy);
-   double OutputEnergies();
+   void OutputEnergies(boost::shared_ptr<MolDS_base::ElectronicStructure> electronicStructure, double initialEnergy);
+   double OutputEnergies(boost::shared_ptr<MolDS_base::ElectronicStructure> electronicStructure);
 };
 
 }

@@ -20,6 +20,7 @@ CC = icpc
 LIBS32 = -lmkl_intel      -lmkl_intel_thread -lmkl_core -liomp5 -lpthread
 LIBS64 = -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread
 CFLAGS = -O0 -openmp -openmp-report2
+BOOSTINC = /usr/local/boost1.48.0_intel11.1.073/include/
 EXENAME = MolDS.out
 DEPFILE = obj/objfile.dep
 
@@ -42,7 +43,7 @@ depend: $(ALL_HEAD_FILES) $(ALL_CPP_FILES)
 ifeq ($(INTEL), 64)
 	$(CC) -MM $(ALL_CPP_FILES) | sed 's/^\([^ ]\)/obj\/\1/g' | sed 's/\($$*\)\.o[ :]*/\1.o : /g' | sed 's/h$$/h\n\t$$(CC) -o $$@ $$< $$(LIBS64) $$(CFLAGS) -c /g' > $(DEPFILE)
 else
-	$(CC) -MM $(ALL_CPP_FILES) | sed 's/^\([^ ]\)/obj\/\1/g' | sed 's/\($$*\)\.o[ :]*/\1.o : /g' | sed 's/h$$/h\n\t$$(CC) -o $$@ $$< $$(LIBS32) $$(CFLAGS) -c /g' > $(DEPFILE)
+	$(CC) -MM $(ALL_CPP_FILES) -I$(BOOSTINC) | sed 's/^\([^ ]\)/obj\/\1/g' | sed 's/\($$*\)\.o[ :]*/\1.o : /g' | sed 's/h$$/h\n\t$$(CC) -I$$(BOOSTINC) -o $$@ $$< $$(LIBS32) $$(CFLAGS) -c /g' > $(DEPFILE)
 endif
 
 .PHONY: clean

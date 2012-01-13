@@ -208,10 +208,6 @@ void Cndo2::SetMolecule(Molecule* molecule){
                                                 this->molecule->GetTotalNumberAOs());
 }
 
-Molecule* Cndo2::GetMolecule(){
-   return this->molecule;
-}
-
 void Cndo2::CheckNumberValenceElectrons(const Molecule& molecule) const{
    if(molecule.GetTotalNumberValenceElectrons() % 2 == 1){
       stringstream ss;

@@ -35,7 +35,6 @@ public:
    double*** GetForce(const std::vector<int>& elecStates);
    double GetElectronicEnergy(int elecState) const;
    double GetCoreRepulsionEnergy() const;
-   MolDS_base::Molecule* GetMolecule();
    MolDS_base::TheoryType GetTheoryType() const;
 protected:
    std::string errorMessageAtomA;

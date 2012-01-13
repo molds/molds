@@ -61,15 +61,17 @@ void MC::DoMC(){
    double dr = Parameters::GetInstance()->GetStepWidthMC();
    double temperatur = Parameters::GetInstance()->GetTemperatureMC();
    bool requireGuess = false;
-   Molecule* molecule = this->electronicStructure->GetMolecule();
+   //Molecule* molecule = this->electronicStructure->GetMolecule();
 
    // output initial conditions
+   /*
    cout << this->messageinitialConditionMC;
    this->OutputEnergies();
    molecule->OutputConfiguration();
    molecule->OutputXyzCOM();
    molecule->OutputXyzCOC();
    molecule->OutputMomenta();
+   */
 
    for(int s=0; s<totalSteps; s++){
       cout << this->messageStartStepMC << s+1 << endl;
@@ -127,7 +129,7 @@ void MC::SetMessages(){
 
 void MC::OutputEnergies(){
    int elecState = Parameters::GetInstance()->GetElectronicStateIndexMC();
-   Molecule* molecule = this->electronicStructure->GetMolecule();
+   //Molecule* molecule = this->electronicStructure->GetMolecule();
    // output energies:
    cout << this->messageEnergies;
    cout << this->messageEnergiesTitle;

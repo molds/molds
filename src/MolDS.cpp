@@ -27,6 +27,7 @@
 #include<vector>
 #include<stdexcept>
 #include<omp.h>
+#include<boost/shared_ptr.hpp>
 #include"mkl.h"
 #include"base/MolDSException.h"
 #include"base/Uncopyable.h"
@@ -100,13 +101,10 @@ int main(){
       }
       // MD
       else if(runingNormally && Parameters::GetInstance()->GetCurrentSimulation() == MD){
-         ElectronicStructure* electronicStructure = NULL;
          MolDS_md::MD* md = NULL;
          try{
             md = new MolDS_md::MD();
-            electronicStructure = ElectronicStructureFactory::GetInstance()->Create();
-            electronicStructure->SetMolecule(molecule);
-            md->SetTheory(electronicStructure);
+            md->SetMolecule(molecule);
             md->DoMD();
          }
          catch(MolDSException ex){
@@ -115,9 +113,6 @@ int main(){
          }
          if(md != NULL){
             delete md;
-         }
-         if(electronicStructure != NULL){
-            delete electronicStructure;
          }
       }
 

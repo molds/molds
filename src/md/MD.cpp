@@ -24,6 +24,7 @@
 #include<string>
 #include<vector>
 #include<stdexcept>
+#include<boost/shared_ptr.hpp>
 #include"../base/MolDSException.h"
 #include"../base/Uncopyable.h"
 #include"../base/Enums.h"
@@ -32,6 +33,7 @@
 #include"../base/atoms/Atom.h"
 #include"../base/Molecule.h"
 #include"../base/ElectronicStructure.h"
+#include"../base/ElectronicStructureFactory.h"
 #include"MD.h"
 using namespace std;
 using namespace MolDS_base;
@@ -39,9 +41,9 @@ using namespace MolDS_base_atoms;
 
 namespace MolDS_md{
 MD::MD(){
-   this->electronicStructure = NULL;
-   this->SetEnableTheoryTypes();
+   this->molecule = NULL;
    this->SetMessages();
+   this->SetEnableTheoryTypes();
    //cout << "MD created \n";
 }
 
@@ -49,85 +51,89 @@ MD::~MD(){
    //cout << "MD deleted\n";
 }
 
-void MD::SetTheory(ElectronicStructure* electronicStructure){
+void MD::SetMolecule(Molecule* molecule){
    // check enable electonic theory
-   this->CheckEnableTheoryType(electronicStructure->GetTheoryType());
-   this->electronicStructure = electronicStructure;
+   this->molecule = molecule;
 }
 
 void MD::DoMD(){
    cout << this->messageStartMD;
+
+   // malloc electornic structure
+   TheoryType theory = Parameters::GetInstance()->GetCurrentTheory();
+   this->CheckEnableTheoryType(theory);
+   boost::shared_ptr<ElectronicStructure> electronicStructure(ElectronicStructureFactory::GetInstance()->Create());
+   electronicStructure->SetMolecule(this->molecule);
 
    int totalSteps = Parameters::GetInstance()->GetTotalStepsMD();
    int elecState = Parameters::GetInstance()->GetElectronicStateIndexMD();
    double dt = Parameters::GetInstance()->GetTimeWidthMD();
    double time = 0.0;
    bool requireGuess = false;
-   Molecule* molecule = this->electronicStructure->GetMolecule();
    double** matrixForce = NULL;
    double initialEnergy;
 
    // initial calculation
-   this->electronicStructure->DoSCF();
+   electronicStructure->DoSCF();
    if(Parameters::GetInstance()->RequiresCIS()){
-      this->electronicStructure->DoCIS();
+      electronicStructure->DoCIS();
    }
-   matrixForce = this->electronicStructure->GetForce(elecState);
+   matrixForce = electronicStructure->GetForce(elecState);
 
    // output initial conditions
    cout << this->messageinitialConditionMD;
-   initialEnergy = this->OutputEnergies();
+   initialEnergy = this->OutputEnergies(electronicStructure);
    cout << endl;
-   molecule->OutputConfiguration();
-   molecule->OutputXyzCOM();
-   molecule->OutputXyzCOC();
-   molecule->OutputMomenta();
+   this->molecule->OutputConfiguration();
+   this->molecule->OutputXyzCOM();
+   this->molecule->OutputXyzCOC();
+   this->molecule->OutputMomenta();
 
    for(int s=0; s<totalSteps; s++){
       cout << this->messageStartStepMD << s+1 << endl;
 
       // update momenta
-      for(int a=0; a<molecule->GetAtomVect()->size(); a++){
-         Atom* atom = (*molecule->GetAtomVect())[a];
+      for(int a=0; a<this->molecule->GetAtomVect()->size(); a++){
+         Atom* atom = (*this->molecule->GetAtomVect())[a];
          for(int i=0; i<CartesianType_end; i++){
             atom->GetPxyz()[i] += 0.5*dt*(matrixForce[a][i]);
          }
       }
 
       // update coordinates
-      for(int a=0; a<molecule->GetAtomVect()->size(); a++){
-         Atom* atom = (*molecule->GetAtomVect())[a];
+      for(int a=0; a<this->molecule->GetAtomVect()->size(); a++){
+         Atom* atom = (*this->molecule->GetAtomVect())[a];
          double coreMass = atom->GetAtomicMass() - (double)atom->GetNumberValenceElectrons();
          for(int i=0; i<CartesianType_end; i++){
             atom->GetXyz()[i] += dt*atom->GetPxyz()[i]/coreMass;
          }
       }
-      molecule->CalcXyzCOM();
-      molecule->CalcXyzCOC();
+      this->molecule->CalcXyzCOM();
+      this->molecule->CalcXyzCOC();
 
       // update electronic structure
-      this->electronicStructure->DoSCF(requireGuess);
+      electronicStructure->DoSCF(requireGuess);
       if(Parameters::GetInstance()->RequiresCIS()){
-         this->electronicStructure->DoCIS();
+         electronicStructure->DoCIS();
       }
 
       // update force
-      matrixForce = this->electronicStructure->GetForce(elecState);
+      matrixForce = electronicStructure->GetForce(elecState);
 
       // update momenta
-      for(int a=0; a<molecule->GetAtomVect()->size(); a++){
-         Atom* atom = (*molecule->GetAtomVect())[a];
+      for(int a=0; a<this->molecule->GetAtomVect()->size(); a++){
+         Atom* atom = (*this->molecule->GetAtomVect())[a];
          for(int i=0; i<CartesianType_end; i++){
             atom->GetPxyz()[i] += 0.5*dt*(matrixForce[a][i]);
          }
       }
 
       // output results
-      this->OutputEnergies(initialEnergy);
-      molecule->OutputConfiguration();
-      molecule->OutputXyzCOM();
-      molecule->OutputXyzCOC();
-      molecule->OutputMomenta();
+      this->OutputEnergies(electronicStructure, initialEnergy);
+      this->molecule->OutputConfiguration();
+      this->molecule->OutputXyzCOM();
+      this->molecule->OutputXyzCOC();
+      this->molecule->OutputMomenta();
       cout << this->messageTime << dt*((double)s+1)/Parameters::GetInstance()->GetFs2AU() << endl;
       cout << this->messageEndStepMD << s+1 << endl;
    }
@@ -154,15 +160,14 @@ void MD::SetMessages(){
    this->messageTime = "\tTime in [fs]: ";
 }
 
-double MD::OutputEnergies(){
+double MD::OutputEnergies(boost::shared_ptr<ElectronicStructure> electronicStructure){
    int elecState = Parameters::GetInstance()->GetElectronicStateIndexMD();
-   Molecule* molecule = this->electronicStructure->GetMolecule();
    double coreKineticEnergy = 0.0;
-   for(int a=0; a<molecule->GetAtomVect()->size(); a++){
-      Atom* atom = (*molecule->GetAtomVect())[a];
+   for(int a=0; a<this->molecule->GetAtomVect()->size(); a++){
+      Atom* atom = (*this->molecule->GetAtomVect())[a];
       double coreMass = atom->GetAtomicMass() - (double)atom->GetNumberValenceElectrons();
       for(int i=0; i<CartesianType_end; i++){
-      Atom* atom = (*molecule->GetAtomVect())[a];
+      Atom* atom = (*this->molecule->GetAtomVect())[a];
          coreKineticEnergy += 0.5*pow(atom->GetPxyz()[i],2.0)/coreMass;
       }
    }  
@@ -173,23 +178,24 @@ double MD::OutputEnergies(){
                              coreKineticEnergy,
                              coreKineticEnergy/Parameters::GetInstance()->GetEV2AU());
    printf("\t\t%s\t%e\t%e\n",this->messageCoreRepulsionEnergy.c_str(), 
-                             this->electronicStructure->GetCoreRepulsionEnergy(),
-                             this->electronicStructure->GetCoreRepulsionEnergy()
+                             electronicStructure->GetCoreRepulsionEnergy(),
+                             electronicStructure->GetCoreRepulsionEnergy()
                              /Parameters::GetInstance()->GetEV2AU());
    printf("\t\t%s\t%e\t%e\n",this->messageElectronicEnergy.c_str(), 
-                             this->electronicStructure->GetElectronicEnergy(elecState),
-                             this->electronicStructure->GetElectronicEnergy(elecState)
+                             electronicStructure->GetElectronicEnergy(elecState),
+                             electronicStructure->GetElectronicEnergy(elecState)
                              /Parameters::GetInstance()->GetEV2AU());
    printf("\t\t%s\t%e\t%e\n",this->messageTotalEnergy.c_str(), 
-                             (coreKineticEnergy + this->electronicStructure->GetElectronicEnergy(elecState)),
-                             (coreKineticEnergy + this->electronicStructure->GetElectronicEnergy(elecState))
+                             (coreKineticEnergy + electronicStructure->GetElectronicEnergy(elecState)),
+                             (coreKineticEnergy + electronicStructure->GetElectronicEnergy(elecState))
                              /Parameters::GetInstance()->GetEV2AU());
 
-   return (coreKineticEnergy + this->electronicStructure->GetElectronicEnergy(elecState));
+   return (coreKineticEnergy + electronicStructure->GetElectronicEnergy(elecState));
 }
 
-void MD::OutputEnergies(double initialEnergy){
-   double energy = this->OutputEnergies();
+void MD::OutputEnergies(boost::shared_ptr<ElectronicStructure> electronicStructure, 
+                        double initialEnergy){
+   double energy = this->OutputEnergies(electronicStructure);
    printf("\t\t%s\t%e\t%e\n\n",this->messageErrorEnergy.c_str(), 
                              (initialEnergy - energy),
                              (initialEnergy - energy)
