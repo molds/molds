@@ -49,11 +49,7 @@ private:
                                  boost::random::variate_generator<
                                     boost::random::mt19937&,
                                     boost::uniform_real<>
-                                 > (*realRand),
-                                 boost::random::variate_generator<
-                                    boost::random::mt19937&,
-                                    boost::uniform_smallint<>
-                                 > (*intRand));
+                                 > (*realRand)) const;
    void SynchronousMolecularConfiguration(MolDS_base::Molecule* target, 
                                           MolDS_base::Molecule* refference) const;
    bool UsesTrial(MolDS_base::ElectronicStructure* currentES, 
