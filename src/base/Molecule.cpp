@@ -126,7 +126,7 @@ void Molecule::SetMessages(){
    this->messageTotalNumberAOs = "\tTotal number of valence AOs: ";
    this->messageTotalNumberAtoms = "\tTotal number of atoms: ";
    this->messageTotalNumberValenceElectrons = "\tTotal number of valence electrons: ";
-   this->messageConfiguration = "\tMolecular configration:\n";
+   this->messageConfiguration = "\tMolecular configuration:\n";
    this->messageConfigurationTitleAU = "\t\t| i-th | atom type | x[a.u.] | y[a.u.] | z[a.u.] |\n";
    this->messageConfigurationTitleAng = "\t\t| i-th | atom type | x[angst.] | y[angst.] | z[angst.] |\n";
    this->messageMomenta = "\tMomenta of each atom:\n";
