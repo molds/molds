@@ -28,6 +28,7 @@
 #include<stdexcept>
 #include<omp.h>
 #include<boost/shared_ptr.hpp>
+#include<boost/random.hpp>
 #include"mkl.h"
 #include"base/MolDSException.h"
 #include"base/Uncopyable.h"
@@ -99,6 +100,7 @@ int main(){
             delete electronicStructure;
          }
       }
+
       // MD
       else if(runingNormally && Parameters::GetInstance()->GetCurrentSimulation() == MD){
          MolDS_md::MD* md = NULL;
@@ -113,6 +115,23 @@ int main(){
          }
          if(md != NULL){
             delete md;
+         }
+      }
+
+      // MC
+      else if(runingNormally && Parameters::GetInstance()->GetCurrentSimulation() == MC){
+         MolDS_mc::MC* mc = NULL;
+         try{
+            mc = new MolDS_mc::MC();
+            mc->SetMolecule(molecule);
+            mc->DoMC();
+         }
+         catch(MolDSException ex){
+            cout << ex.what() << endl;
+            runingNormally = false;
+         }
+         if(mc != NULL){
+            delete mc;
          }
       }
 

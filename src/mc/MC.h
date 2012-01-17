@@ -44,7 +44,21 @@ private:
    std::string errorMessageTheoryType;
    MolDS_base::Molecule* molecule;
    void SetMessages();
-   void OutputEnergies(boost::shared_ptr<MolDS_base::ElectronicStructure> electronicStructure);
+   void CreateTrialConfiguration(MolDS_base::Molecule* trial,
+                                 MolDS_base::Molecule* current,
+                                 boost::random::variate_generator<
+                                    boost::random::mt19937&,
+                                    boost::uniform_real<>
+                                 > (*realRand),
+                                 boost::random::variate_generator<
+                                    boost::random::mt19937&,
+                                    boost::uniform_smallint<>
+                                 > (*intRand));
+   void SynchronousMolecularConfiguration(MolDS_base::Molecule* target, 
+                                          MolDS_base::Molecule* refference) const;
+   bool UsesTrial(MolDS_base::ElectronicStructure* currentES, 
+                  MolDS_base::ElectronicStructure* trialES) const;
+   void OutputEnergies(MolDS_base::ElectronicStructure* electronicStructure) const;
 };
 
 }

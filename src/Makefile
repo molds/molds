@@ -20,7 +20,10 @@ CC = icpc
 LIBS32 = -lmkl_intel      -lmkl_intel_thread -lmkl_core -liomp5 -lpthread
 LIBS64 = -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread
 CFLAGS = -O0 -openmp -openmp-report2
-BOOSTINC = /usr/local/boost1.48.0_intel11.1.073/include/
+BOOST_TOP_DIR = /usr/local/boost1.48.0_intel12.0.0/
+BOOST_INC_DIR = $(BOOST_TOP_DIR)include/
+BOOST_LIB_DIR = $(BOOST_TOP_DIR)lib/
+BOOST_LIBS = -lboost_random
 EXENAME = MolDS.out
 DEPFILE = obj/objfile.dep
 
@@ -30,9 +33,9 @@ ALL_OBJ_FILES = obj/MolDS.o obj/MolDSException.o obj/LapackWrapper.o obj/Utiliti
 
 $(EXENAME): depend $(ALL_OBJ_FILES)
 ifeq ($(INTEL), 64)
-	$(CC) -o $@ $(ALL_OBJ_FILES) $(LIBS64) $(CFLAGS) 
+	$(CC) -o $@ -Wl,-rpath=$(BOOST_LIB_DIR) $(ALL_OBJ_FILES) -L$(BOOST_LIB_DIR) $(LIBS64) $(CFLAGS) $(BOOST_LIBS)
 else
-	$(CC) -o $@ $(ALL_OBJ_FILES) $(LIBS32) $(CFLAGS) 
+	$(CC) -o $@ -Wl,-rpath=$(BOOST_LIB_DIR) $(ALL_OBJ_FILES) -L$(BOOST_LIB_DIR) $(LIBS32) $(CFLAGS) $(BOOST_LIBS)
 endif
 
 ifeq ($(wildcard $(DEPFILE)), $(DEPFILE))
@@ -41,9 +44,9 @@ endif
 
 depend: $(ALL_HEAD_FILES) $(ALL_CPP_FILES)
 ifeq ($(INTEL), 64)
-	$(CC) -MM $(ALL_CPP_FILES) -I$(BOOSTINC) | sed 's/^\([^ ]\)/obj\/\1/g' | sed 's/\($$*\)\.o[ :]*/\1.o : /g' | sed 's/h$$/h\n\t$$(CC) -I$$(BOOSTINC) -o $$@ $$< $$(LIBS64) $$(CFLAGS) -c /g' > $(DEPFILE)
+	$(CC) -MM $(ALL_CPP_FILES) -I$(BOOST_INC_DIR) | sed 's/^\([^ ]\)/obj\/\1/g' | sed 's/\($$*\)\.o[ :]*/\1.o : /g' | sed 's/h$$/h\n\t$$(CC) -I$$(BOOST_INC_DIR) -L$$(BOOST_LIB_DIR) -o $$@ $$< $$(LIBS64) $$(CFLAGS) $$(BOOST_LIBS) -c /g' > $(DEPFILE)
 else
-	$(CC) -MM $(ALL_CPP_FILES) -I$(BOOSTINC) | sed 's/^\([^ ]\)/obj\/\1/g' | sed 's/\($$*\)\.o[ :]*/\1.o : /g' | sed 's/h$$/h\n\t$$(CC) -I$$(BOOSTINC) -o $$@ $$< $$(LIBS32) $$(CFLAGS) -c /g' > $(DEPFILE)
+	$(CC) -MM $(ALL_CPP_FILES) -I$(BOOST_INC_DIR) | sed 's/^\([^ ]\)/obj\/\1/g' | sed 's/\($$*\)\.o[ :]*/\1.o : /g' | sed 's/h$$/h\n\t$$(CC) -I$$(BOOST_INC_DIR) -L$$(BOOST_LIB_DIR) -o $$@ $$< $$(LIBS32) $$(CFLAGS) $$(BOOST_LIBS) -c /g' > $(DEPFILE)
 endif
 
 .PHONY: clean

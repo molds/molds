@@ -25,6 +25,7 @@
 #include<vector>
 #include<stdexcept>
 #include<boost/shared_ptr.hpp>
+#include<boost/random.hpp>
 #include"../base/MolDSException.h"
 #include"../base/Uncopyable.h"
 #include"../base/Enums.h"
@@ -57,57 +58,85 @@ void MC::SetMolecule(Molecule* molecule){
 void MC::DoMC(){
    cout << this->messageStartMC;
 
-   // malloc electornic structure
-   boost::shared_ptr<ElectronicStructure> electronicStructure(ElectronicStructureFactory::GetInstance()->Create());
-   electronicStructure->SetMolecule(this->molecule);
-
    int totalSteps = Parameters::GetInstance()->GetTotalStepsMC();
    int elecState = Parameters::GetInstance()->GetElectronicStateIndexMC();
    double dr = Parameters::GetInstance()->GetStepWidthMC();
    double temperatur = Parameters::GetInstance()->GetTemperatureMC();
-   bool requireGuess = false;
+  
+   // create real random generator
+   unsigned long seed=100;
+	boost::mt19937 realGenerator(seed);
+	boost::uniform_real<> range(0, 1);
+	boost::variate_generator<boost::mt19937&, boost::uniform_real<> > realRand( realGenerator, range );
+
+   // create integer random generator
+	boost::mt19937 intGenerator(seed);
+   boost::uniform_smallint<> dst( 1, this->molecule->GetAtomVect()->size() );
+	boost::variate_generator<boost::mt19937&, boost::uniform_smallint<> > intRand( intGenerator, dst );
+
+   ElectronicStructure* currentES = NULL;
+   ElectronicStructure* trialES = NULL;
+   Molecule trialMolecule(*this->molecule);
+
+   // malloc electornic structure
+   //boost::shared_ptr<ElectronicStructure> electronicStructure1(ElectronicStructureFactory::GetInstance()->Create());
+   //boost::shared_ptr<ElectronicStructure> electronicStructure2(ElectronicStructureFactory::GetInstance()->Create());
 
    // initial calculation
-   electronicStructure->DoSCF();
+   /*
+   currentES = electronicStructure1.get();
+   currentES->SetMolecule(this->molecule);
+   currentES->DoSCF();
    if(Parameters::GetInstance()->RequiresCIS()){
-      electronicStructure->DoCIS();
+      currentES->DoCIS();
    }
-
+   
    // output initial conditions
    cout << this->messageinitialConditionMC;
-   this->OutputEnergies(electronicStructure);
+   this->OutputEnergies(currentES);
    this->molecule->OutputConfiguration();
    this->molecule->OutputXyzCOM();
    this->molecule->OutputXyzCOC();
    this->molecule->OutputMomenta();
+   */
 
    for(int s=0; s<totalSteps; s++){
-      requireGuess = (s==0) ? true : false;
       cout << this->messageStartStepMC << s+1 << endl;
+      this->CreateTrialConfiguration(&trialMolecule, this->molecule, &realRand, &intRand);
+
 /*
       // create candidate
-      Molecule candidate(*this->molecule);
       for(int a=0; a<this->molecule->GetAtomVect()->size(); a++){
-         Atom* atom = (*candidate.GetAtomVect())[0];
+         Atom* trialAtom = (*trialMolecule.GetAtomVect())[a];
+         Atom* atom = (*this->molecule->GetAtomVect())[a];
          for(int i=0; i<CartesianType_end; i++){
-            atom->GetXyz()[i] += dr;
+            trialAtom->GetXyz()[i] = atom->GetXyz()[i] + dr;
          }
       }
-      candidate.CalcXyzCOM();
-      candidate.CalcXyzCOC();
-*/
+      trialMolecule.CalcXyzCOM();
+      trialMolecule.CalcXyzCOC();
+      
       // calculate electronic structure of the candidate
-      electronicStructure->DoSCF();
+      bool requireGuess = (s==0) ? true : false;
+      trialES->SetMolecule(&trialMolecule);
+      trialES->DoSCF(requireGuess);
       if(Parameters::GetInstance()->RequiresCIS()){
-         electronicStructure->DoCIS();
+         trialES->DoCIS();
       }
 
+      // which Electronic Structure is used?
+      if(UsesTrial(currentES, trialES)){
+         swap(currentES, trialES);
+         // synchronous molecule
+         this->SynchronousMolecularConfiguration(this->molecule, &trialMolecule);
+      }
+      
       // output results
-      this->OutputEnergies(electronicStructure);
+      this->OutputEnergies(currentES);
       this->molecule->OutputConfiguration();
       this->molecule->OutputXyzCOM();
       this->molecule->OutputXyzCOC();
-
+*/
       cout << this->messageEndStepMC << s+1 << endl;
    }
 
@@ -126,7 +155,39 @@ void MC::SetMessages(){
    this->messageElectronicEnergy = "Electronic\n\t\t(inc. core rep.)";
 }
 
-void MC::OutputEnergies(boost::shared_ptr<MolDS_base::ElectronicStructure> electronicStructure){
+void MC::CreateTrialConfiguration(Molecule* trial,
+                                  Molecule* current,
+                                  boost::random::variate_generator<
+                                     boost::random::mt19937&,
+                                     boost::uniform_real<>
+                                  > (*realRand),
+                                  boost::random::variate_generator<
+                                     boost::random::mt19937&,
+                                     boost::uniform_smallint<>
+                                  > (*intRand)){
+   int changedAtomIndex = (*intRand)();
+   double changedDistance = (*realRand)();
+   cout << "atom: " << changedAtomIndex << "   dist: " << changedDistance << endl;
+}
+
+bool MC::UsesTrial(ElectronicStructure* currentES, ElectronicStructure* trialES) const {
+   return true;
+}
+
+void MC::SynchronousMolecularConfiguration(Molecule* target, 
+                                           Molecule* refference) const{
+   for(int a=0; a<target->GetAtomVect()->size(); a++){
+      Atom* targetAtom = (*target->GetAtomVect())[a];
+      Atom* refferenceAtom = (*refference->GetAtomVect())[a];
+      for(int i=0; i<CartesianType_end; i++){
+         targetAtom->GetXyz()[i] = refferenceAtom->GetXyz()[i];
+      }
+   }
+   target->CalcXyzCOM();
+   target->CalcXyzCOC();
+}
+
+void MC::OutputEnergies(MolDS_base::ElectronicStructure* electronicStructure) const{
    int elecState = Parameters::GetInstance()->GetElectronicStateIndexMC();
    // output energies:
    cout << this->messageEnergies;
@@ -144,4 +205,27 @@ void MC::OutputEnergies(boost::shared_ptr<MolDS_base::ElectronicStructure> elect
 }
 
 
+/*
+#include <iostream>
+using namespace std;
+
+void CallRand(boost::random::variate_generator<
+               boost::random::mt19937&, 
+               boost::uniform_real<> 
+              > (*randFunction)){
+   cout << (*randFunction)() << endl;
+}
+
+int main()
+{
+
+	for( int i=0; i<10; ++i ){
+		//cout << rand() << endl;
+      CallRand(&rand);
+	}
+	cout << endl;
+
+	return 0;
+}
+*/
 
