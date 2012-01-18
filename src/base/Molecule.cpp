@@ -72,6 +72,7 @@ void Molecule::CopyInitialize(const Molecule& rhs){
    this->wasCalculatedXyzCOC = rhs.wasCalculatedXyzCOC;
    this->totalNumberAOs = rhs.totalNumberAOs;
    this->totalNumberValenceElectrons = rhs.totalNumberValenceElectrons;
+   this->totalCoreMass = rhs.totalCoreMass;
    for(int i=0; i<rhs.atomVect->size(); i++){
       Atom* atom = (*rhs.atomVect)[i];
       this->atomVect->push_back(AtomFactory::GetInstance()->Create(atom->GetAtomType(),
@@ -242,7 +243,7 @@ void Molecule::CalcXyzCOC(){
    for(int i=0; i<this->atomVect->size(); i++){
       const Atom& atom = *(*this->atomVect)[i]; 
       atomicXyz = atom.GetXyz();
-      coreMass = atom.GetAtomicMass() - (double)atom.GetNumberValenceElectrons();
+      coreMass = atom.GetCoreMass();
       totalCoreMass += coreMass;
       for(int j=0; j<3; j++){
          this->xyzCOC[j] += atomicXyz[j] * coreMass;
@@ -256,6 +257,14 @@ void Molecule::CalcXyzCOC(){
 
 int Molecule::GetTotalNumberAOs() const{
    return this->totalNumberAOs;
+}
+
+void Molecule::CalcBasics(){
+   this->CalcTotalNumberAOs();
+   this->CalcTotalNumberValenceElectrons();
+   this->CalcTotalCoreMass();
+   this->CalcXyzCOM();
+   this->CalcXyzCOC();
 }
 
 void Molecule::CalcTotalNumberAOs(){
@@ -274,6 +283,19 @@ void Molecule::CalcTotalNumberValenceElectrons(){
    this->totalNumberValenceElectrons = 0; 
    for(int i=0; i<this->atomVect->size(); i++){
       this->totalNumberValenceElectrons += (*this->atomVect)[i]->GetNumberValenceElectrons();
+   }
+}
+
+double Molecule::GetTotalCoreMass() const{
+   return this->totalCoreMass;
+}
+
+void Molecule::CalcTotalCoreMass(){
+   this->totalCoreMass = 0; 
+   for(int i=0; i<this->atomVect->size(); i++){
+      const Atom& atom = *(*this->atomVect)[i]; 
+      double coreMass = atom.GetAtomicMass() - (double)atom.GetNumberValenceElectrons();
+      this->totalCoreMass += coreMass;
    }
 }
 

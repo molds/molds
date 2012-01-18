@@ -33,10 +33,10 @@ public:
    double* GetXyzCOC();
    void CalcXyzCOM();
    void CalcXyzCOC();
+   void CalcBasics();
    int GetTotalNumberAOs() const;
-   void CalcTotalNumberAOs();
    int GetTotalNumberValenceElectrons() const;
-   void CalcTotalNumberValenceElectrons();
+   double GetTotalCoreMass() const;
    void OutputXyzCOM() const;
    void OutputXyzCOC() const;
    void OutputTotalNumberAtomsAOsValenceelectrons() const;
@@ -56,10 +56,14 @@ private:
    bool wasCalculatedXyzCOC;
    int totalNumberAOs;
    int totalNumberValenceElectrons;
+   double totalCoreMass;
    void Initialize();
    void CopyInitialize(const Molecule& rhs);
    void Finalize(std::vector<MolDS_base_atoms::Atom*>** atomVect, double** xyzCOM, double**xyzCOC);
    void SetMessages();
+   void CalcTotalNumberValenceElectrons();
+   void CalcTotalNumberAOs();
+   void CalcTotalCoreMass();
    void CalcInertiaTensor(double** inertiaTensor, 
                           double const* inertiaTensorOrigin);
    void FreeInertiaTensorMoments(double*** inertiaTensor, 

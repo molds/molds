@@ -26,6 +26,7 @@ public:
    virtual ~Atom();
    MolDS_base::AtomType GetAtomType() const;
    double GetAtomicMass() const;
+   double GetCoreMass() const;
    double* GetXyz() const;
    void SetXyz(double x, double y, double z) const;
    double* GetPxyz() const;

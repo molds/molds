@@ -29,6 +29,7 @@ public:
    ~MC();
    void SetMolecule(MolDS_base::Molecule* molecule);
    void DoMC();
+   void DoMC(int totalSteps, int elecState, double temperature, double stepWidth, unsigned long seed);
 private:
    std::string messageinitialConditionMC;
    std::string messageStartMC;
@@ -45,16 +46,27 @@ private:
    MolDS_base::Molecule* molecule;
    void SetMessages();
    void CreateTrialConfiguration(MolDS_base::Molecule* trial,
-                                 MolDS_base::Molecule* current,
+                                 const MolDS_base::Molecule& current,
                                  boost::random::variate_generator<
                                     boost::random::mt19937&,
                                     boost::uniform_real<>
-                                 > (*realRand)) const;
+                                 > (*realRand),
+                                 double dr) const;
    void SynchronousMolecularConfiguration(MolDS_base::Molecule* target, 
-                                          MolDS_base::Molecule* refference) const;
-   bool UsesTrial(MolDS_base::ElectronicStructure* currentES, 
-                  MolDS_base::ElectronicStructure* trialES) const;
-   void OutputEnergies(MolDS_base::ElectronicStructure* electronicStructure) const;
+                                          const MolDS_base::Molecule& refference) const;
+   bool UsesTrial(const MolDS_base::ElectronicStructure& currentES, 
+                  const MolDS_base::ElectronicStructure& trialES,
+                  int elecState,
+                  boost::random::variate_generator<
+                     boost::random::mt19937&,
+                     boost::uniform_real<>
+                  > (*realRand),
+                  double temperature) const;
+   void OutputMolecule(const MolDS_base::ElectronicStructure& electronicStructure,
+                       const MolDS_base::Molecule& molecule,
+                       int elecState) const;
+   void OutputEnergies(const MolDS_base::ElectronicStructure& electronicStructure,
+                       int elecState) const;
 };
 
 }

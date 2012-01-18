@@ -138,6 +138,10 @@ double Atom::GetAtomicMass() const{
    return this->atomicMass;
 }
 
+double Atom::GetCoreMass() const{
+   return this->atomicMass - (double)this->numberValenceElectrons;
+}
+
 double* Atom::GetXyz() const{
    if(this->xyz==NULL){
       stringstream ss;

@@ -67,6 +67,7 @@ private:
    std::string messageMcElecState;
    std::string messageMcStepWidth;
    std::string messageMcTemperature;
+   std::string messageMcSeed;
    std::string messageMOPlotConditions;
    std::string messageMOPlotIndex;
    std::string messageMOPlotGridNumber;
@@ -143,6 +144,7 @@ private:
    std::string stringMCElecState;
    std::string stringMCStepWidth;
    std::string stringMCTemperature;
+   std::string stringMCSeed;
    void CalcMolecularBasics(Molecule* molecule) const;
    void CheckCisConditions(const Molecule& molecule) const;
    void CheckMdConditions(const Molecule& molecule) const;

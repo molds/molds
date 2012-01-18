@@ -55,72 +55,6 @@ void MC::SetMolecule(Molecule* molecule){
    this->molecule = molecule;
 }
 
-void MC::DoMC(){
-   cout << this->messageStartMC;
-
-   int totalSteps = Parameters::GetInstance()->GetTotalStepsMC();
-   int elecState = Parameters::GetInstance()->GetElectronicStateIndexMC();
-   double temperatur = Parameters::GetInstance()->GetTemperatureMC();
-  
-   // create real random generator
-   unsigned long seed=100;
-	boost::mt19937 realGenerator(seed);
-	boost::uniform_real<> range(0, 1);
-	boost::variate_generator<boost::mt19937&, boost::uniform_real<> > realRand( realGenerator, range );
-
-   // initial calculation
-   boost::shared_ptr<ElectronicStructure> electronicStructure1(ElectronicStructureFactory::GetInstance()->Create());
-   ElectronicStructure* currentES = electronicStructure1.get();
-   currentES->SetMolecule(this->molecule);
-   currentES->DoSCF();
-   if(Parameters::GetInstance()->RequiresCIS()){
-      currentES->DoCIS();
-   }
-
-   // output initial conditions
-   cout << this->messageinitialConditionMC;
-   this->OutputEnergies(currentES);
-   this->molecule->OutputConfiguration();
-   this->molecule->OutputXyzCOM();
-   this->molecule->OutputXyzCOC();
-  
-   // prepare trial molecule and electronic structure pointa
-   Molecule trialMolecule(*this->molecule);
-   boost::shared_ptr<ElectronicStructure> electronicStructure2(ElectronicStructureFactory::GetInstance()->Create());
-   ElectronicStructure* trialES = electronicStructure2.get();
-   trialES->SetMolecule(&trialMolecule);
-
-   for(int s=0; s<totalSteps; s++){
-      cout << this->messageStartStepMC << s+1 << endl;
-      // create trial molecule
-      this->CreateTrialConfiguration(&trialMolecule, this->molecule, &realRand);
-     
-      // calculate trilal electronic structure
-      bool requireGuess = (s==0) ? true : false;
-      trialES->DoSCF(requireGuess);
-      if(Parameters::GetInstance()->RequiresCIS()){
-         trialES->DoCIS();
-      }
-
-      // which Electronic Structure is used?
-      if(UsesTrial(currentES, trialES)){
-         this->SynchronousMolecularConfiguration(this->molecule, &trialMolecule);
-         swap(currentES, trialES);
-         currentES->SetMolecule(this->molecule);
-         trialES->SetMolecule(&trialMolecule);
-      }
-      
-      // output results
-      this->OutputEnergies(currentES);
-      this->molecule->OutputConfiguration();
-      this->molecule->OutputXyzCOM();
-      this->molecule->OutputXyzCOC();
-
-      cout << this->messageEndStepMC << s+1 << endl;
-   }
-   cout << this->messageEndMC;
-}
-
 void MC::SetMessages(){
    this->messageStartMC = "**********  START: Monte Carlo  **********\n";
    this->messageEndMC = "**********  DONE: Monte Carlo  **********\n";
@@ -133,52 +67,167 @@ void MC::SetMessages(){
    this->messageElectronicEnergy = "Electronic\n\t\t(inc. core rep.)";
 }
 
+void MC::DoMC(){
+   int totalSteps = Parameters::GetInstance()->GetTotalStepsMC();
+   int elecState = Parameters::GetInstance()->GetElectronicStateIndexMC();
+   double temperature = Parameters::GetInstance()->GetTemperatureMC();
+   double stepWidth = Parameters::GetInstance()->GetStepWidthMC();
+   unsigned long seed = Parameters::GetInstance()->GetSeedMC();
+   this->DoMC(totalSteps, elecState, temperature, stepWidth, seed);
+}
+
+void MC::DoMC(int totalSteps, int elecState, double temperature, double stepWidth, unsigned long seed){
+   cout << this->messageStartMC;
+   double transitionRate = 0.0;
+   // create real random generator
+	boost::mt19937 realGenerator(seed);
+	boost::uniform_real<> range(0, 1);
+	boost::variate_generator<boost::mt19937&, boost::uniform_real<> > realRand( realGenerator, range );
+
+   // prepare trial molecule and electronic structure pointa
+   Molecule trialMolecule(*this->molecule);
+   boost::shared_ptr<ElectronicStructure> electronicStructure2(ElectronicStructureFactory::GetInstance()->Create());
+   ElectronicStructure* trialES = electronicStructure2.get();
+   trialES->SetMolecule(&trialMolecule);
+
+   // initial calculation
+   boost::shared_ptr<ElectronicStructure> electronicStructure1(ElectronicStructureFactory::GetInstance()->Create());
+   ElectronicStructure* currentES = electronicStructure1.get();
+   currentES->SetMolecule(this->molecule);
+   currentES->DoSCF();
+   if(Parameters::GetInstance()->RequiresCIS()){
+      currentES->DoCIS();
+   }
+   cout << this->messageinitialConditionMC;
+   this->OutputMolecule(*currentES, *this->molecule, elecState);
+
+   // Monte Carlo roop 
+   for(int s=0; s<totalSteps; s++){
+      cout << this->messageStartStepMC << s+1 << endl << endl;
+      // create trial molecule
+      this->CreateTrialConfiguration(&trialMolecule, *this->molecule, &realRand, stepWidth);
+     
+      // calculate trilal electronic structure
+      bool requireGuess = (s==0) ? true : false;
+      trialES->DoSCF(requireGuess);
+      if(Parameters::GetInstance()->RequiresCIS()){
+         trialES->DoCIS();
+      }
+
+      // which Electronic Structure is used?
+      if(UsesTrial(*currentES, *trialES, elecState, &realRand, temperature)){
+         this->SynchronousMolecularConfiguration(this->molecule, trialMolecule);
+         swap(currentES, trialES);
+         currentES->SetMolecule(this->molecule);
+         trialES->SetMolecule(&trialMolecule);
+         transitionRate += 1.0;
+      }
+      else{
+         this->SynchronousMolecularConfiguration(&trialMolecule, *this->molecule);
+      }
+      
+      // output molecular states
+      this->OutputMolecule(*currentES, *this->molecule, elecState);
+      cout << this->messageEndStepMC << s+1 << endl;
+   }
+   cout << "transitionRate: " << transitionRate/(double)totalSteps << endl;
+   cout << this->messageEndMC;
+}
+
 void MC::CreateTrialConfiguration(Molecule* trial,
-                                  Molecule* current,
+                                  const Molecule& current,
                                   boost::random::variate_generator<
                                      boost::random::mt19937&,
                                      boost::uniform_real<>
-                                  > (*realRand)) const{
-   double dr = Parameters::GetInstance()->GetStepWidthMC();
+                                  > (*realRand),
+                                  double stepWidth) const{
+   // disturb an atom in trial molecule
    int movedAtomIndex = (int)((*realRand)()*this->molecule->GetAtomVect()->size());
+   const Atom& reffAtom = *(*current.GetAtomVect())[movedAtomIndex];
    Atom* trialAtom = (*trial->GetAtomVect())[movedAtomIndex];
-   Atom* reffAtom = (*current->GetAtomVect())[movedAtomIndex];
+   double dr[CartesianType_end] = {0.0, 0.0, 0.0};
    for(int i=0; i<CartesianType_end; i++){
-      trialAtom->GetXyz()[i] = reffAtom->GetXyz()[i] + dr*(2.0*(*realRand)() -1.0);
+      dr[i] = stepWidth*(2.0*(*realRand)() -1.0);
+      trialAtom->GetXyz()[i] = reffAtom.GetXyz()[i] + dr[i];
+   }
+
+   // shift all atoms in trial molecule, namely shift the center of core.
+   double trialAtomCoreMass = reffAtom.GetCoreMass();
+   double totalCoreMass = current.GetTotalCoreMass();
+   double coreCenterShift[CartesianType_end] = {0.0, 0.0, 0.0};
+   for(int i=0; i<CartesianType_end; i++){
+      coreCenterShift[i] = dr[i]*trialAtomCoreMass/totalCoreMass;
+   }
+   for(int a=0; a<current.GetAtomVect()->size(); a++){
+      Atom* trialAtom = (*trial->GetAtomVect())[a];
+      for(int i=0; i<CartesianType_end; i++){
+         trialAtom->GetXyz()[i] -= coreCenterShift[i];
+      }
    }
    trial->CalcXyzCOM();
    trial->CalcXyzCOC();
 }
 
-bool MC::UsesTrial(ElectronicStructure* currentES, ElectronicStructure* trialES) const {
-   return true;
+bool MC::UsesTrial(const ElectronicStructure& currentES, 
+                   const ElectronicStructure& trialES,
+                   int elecState,
+                   boost::random::variate_generator<
+                     boost::random::mt19937&,
+                     boost::uniform_real<>
+                   > (*realRand),
+                   double temperature) const{
+   double currentElecEne = currentES.GetElectronicEnergy(elecState);
+   double trialElecEne = trialES.GetElectronicEnergy(elecState);
+   double deltaElecEne = trialElecEne - currentElecEne;
+   if(deltaElecEne <= 0.0){
+      return true;
+   }
+   else{
+      double kB = Parameters::GetInstance()->GetBoltzmann();
+      double p = exp(-1.0*deltaElecEne/(kB*temperature));
+      double random = (*realRand)();
+      if(p>random){
+         return true;
+      }
+      else{
+         return false;
+      }
+   }
 }
 
 void MC::SynchronousMolecularConfiguration(Molecule* target, 
-                                           Molecule* refference) const{
+                                           const Molecule& refference) const{
    for(int a=0; a<target->GetAtomVect()->size(); a++){
       Atom* targetAtom = (*target->GetAtomVect())[a];
-      Atom* refferenceAtom = (*refference->GetAtomVect())[a];
+      const Atom& refferenceAtom = *(*refference.GetAtomVect())[a];
       for(int i=0; i<CartesianType_end; i++){
-         targetAtom->GetXyz()[i] = refferenceAtom->GetXyz()[i];
+         targetAtom->GetXyz()[i] = refferenceAtom.GetXyz()[i];
       }
    }
    target->CalcXyzCOM();
    target->CalcXyzCOC();
 }
 
-void MC::OutputEnergies(MolDS_base::ElectronicStructure* electronicStructure) const{
-   int elecState = Parameters::GetInstance()->GetElectronicStateIndexMC();
-   // output energies:
+void MC::OutputMolecule(const ElectronicStructure& electronicStructure,
+                        const Molecule& molecule,
+                        int elecState) const{
+   this->OutputEnergies(electronicStructure, elecState);
+   molecule.OutputConfiguration();
+   molecule.OutputXyzCOM();
+   molecule.OutputXyzCOC();
+}
+
+void MC::OutputEnergies(const MolDS_base::ElectronicStructure& electronicStructure,
+                        int elecState) const{
    cout << this->messageEnergies;
    cout << this->messageEnergiesTitle;
    printf("\t\t%s\t%e\t%e\n",this->messageCoreRepulsionEnergy.c_str(), 
-                             electronicStructure->GetCoreRepulsionEnergy(),
-                             electronicStructure->GetCoreRepulsionEnergy()
+                             electronicStructure.GetCoreRepulsionEnergy(),
+                             electronicStructure.GetCoreRepulsionEnergy()
                              /Parameters::GetInstance()->GetEV2AU());
    printf("\t\t%s\t%e\t%e\n",this->messageElectronicEnergy.c_str(), 
-                             electronicStructure->GetElectronicEnergy(elecState),
-                             electronicStructure->GetElectronicEnergy(elecState)
+                             electronicStructure.GetElectronicEnergy(elecState),
+                             electronicStructure.GetElectronicEnergy(elecState)
                              /Parameters::GetInstance()->GetEV2AU());
    cout << endl;
 }

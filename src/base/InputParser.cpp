@@ -104,8 +104,9 @@ void InputParser::SetMessages(){
    this->messageMcConditions = "\tMC conditions:\n";
    this->messageMcTotalSteps = "\t\tTotal steps: ";
    this->messageMcElecState = "\t\tElectronic eigen state: ";
-   this->messageMcStepWidth = "\t\tStep width(dr): ";
+   this->messageMcStepWidth = "\t\tStep width: ";
    this->messageMcTemperature = "\t\tTemperature: ";
+   this->messageMcSeed = "\t\tSeed: ";
    this->messageMOPlotConditions = "\tMO plot conditions:\n";
    this->messageMOPlotIndex = "\t\tMO index: ";
    this->messageMOPlotGridNumber = "\t\tNumber of grid(x, y, z): ";
@@ -180,8 +181,9 @@ void InputParser::SetMessages(){
    this->stringMCEnd = "mc_end";
    this->stringMCTotalSteps = "total_steps";
    this->stringMCElecState = "electronic_state";
-   this->stringMCStepWidth = "dr";
+   this->stringMCStepWidth = "step_width";
    this->stringMCTemperature = "temperature";
+   this->stringMCSeed = "seed";
 }
 
 vector<string> InputParser::GetInputTerms() const{
@@ -560,8 +562,14 @@ void InputParser::Parse(Molecule* molecule) const{
             }
             // step width for MC.
             if(inputTerms[j].compare(this->stringMCStepWidth) == 0){
-               double dr = atof(inputTerms[j+1].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
-               Parameters::GetInstance()->SetStepWidthMC(dr);
+               double stepWidth = atof(inputTerms[j+1].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
+               Parameters::GetInstance()->SetStepWidthMC(stepWidth);
+               j++;
+            }
+            // seed for MC.
+            if(inputTerms[j].compare(this->stringMCSeed) == 0){
+               unsigned long seed = atol(inputTerms[j+1].c_str());
+               Parameters::GetInstance()->SetSeedMC(seed);
                j++;
             }
             j++;   
@@ -652,10 +660,7 @@ void InputParser::Parse(Molecule* molecule) const{
 }
 
 void InputParser::CalcMolecularBasics(Molecule* molecule) const{
-   molecule->CalcTotalNumberAOs();
-   molecule->CalcTotalNumberValenceElectrons();
-   molecule->CalcXyzCOM();
-   molecule->CalcXyzCOC();
+   molecule->CalcBasics();
 }
 
 void InputParser::CheckCisConditions(const Molecule& molecule) const{
@@ -731,7 +736,11 @@ void InputParser::CheckMcConditions(const Molecule& molecule) const{
       stringstream ss;
       ss << this->errorMessageNonValidExcitedStatesMC;
       throw MolDSException(ss.str());
-   } 
+   }
+   // check the seed
+   if(Parameters::GetInstance()->GetSeedMC()==0){
+      Parameters::GetInstance()->SetSeedMC(static_cast<unsigned long>(time(0)));
+   }
 }
 
 void InputParser::OutputMolecularBasics(Molecule* molecule) const{
@@ -799,6 +808,7 @@ void InputParser::OutputMcConditions() const{
    printf("%s%d\n",this->messageMcTotalSteps.c_str(),Parameters::GetInstance()->GetTotalStepsMC());
    printf("%s%lf%s\n",this->messageMcTemperature.c_str(),Parameters::GetInstance()->GetTemperatureMC(),this->messageK.c_str());
    printf("%s%lf%s\n",this->messageMcStepWidth.c_str(),Parameters::GetInstance()->GetStepWidthMC()/Parameters::GetInstance()->GetAngstrom2AU(),this->messageAngst.c_str());
+   printf("%s%lu\n",this->messageMcSeed.c_str(),Parameters::GetInstance()->GetSeedMC());
 
    cout << "\n";
 }

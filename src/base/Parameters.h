@@ -60,6 +60,7 @@ public:
    double GetGMolin2AU() const;
    double GetDegree2Radian() const;
    double GetFs2AU() const;
+   double GetBoltzmann() const;
    void SetTranslatingDifference(double x, double y, double z);
    double* GetTranslatingDifference() const;
    void SetInertiaTensorOrigin(double x, double y, double z);
@@ -107,6 +108,8 @@ public:
    void SetTemperatureMC(double temperature);
    double GetStepWidthMC() const;
    void SetStepWidthMC(double stepWidth);
+   unsigned long GetSeedMC() const;
+   void SetSeedMC(unsigned long seed);
 private:
    static Parameters* parameters;
    Parameters();
@@ -121,6 +124,7 @@ private:
    static const double gMolin2AU;
    static const double degree2Radian;
    static const double fs2AU;
+   static const double boltzmann;
    double thresholdSCF;
    int maxIterationsSCF;
    double dampingThreshSCF;
@@ -155,6 +159,7 @@ private:
    int totalStepsMC;
    double temperatureMC;
    double stepWidthMC;
+   unsigned long seedMC;
    void SetDefaultValues();
    void SetMessages();
 };

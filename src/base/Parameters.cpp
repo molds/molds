@@ -41,6 +41,7 @@ const double Parameters::kayser2AU = 4.556336*pow(10.0,-6.0);
 const double Parameters::fs2AU = 1.0/(2.418884326505*pow(10.0,-2.0));
 const double Parameters::gMolin2AU = pow(10.0,5.0)/(6.0221415*9.1095);
 const double Parameters::degree2Radian = M_PI / 180.0;
+const double Parameters::boltzmann = 3.166791*pow(10.0,-6.0);
 
 Parameters::Parameters(){
    this->SetDefaultValues();
@@ -117,8 +118,9 @@ void Parameters::SetDefaultValues(){
    this->timeWidthMD = 0.1*this->fs2AU;
    this->electronicStateIndexMC = 0;
    this->totalStepsMC = 10;
-   this->stepWidthMC = 0.1*this->angstrom2AU;
+   this->stepWidthMC = 0.05*this->angstrom2AU;
    this->temperatureMC = 300;
+   this->seedMC = 0;
 }
 
 void Parameters::SetMessages(){
@@ -252,6 +254,10 @@ double Parameters::GetDegree2Radian() const{
 
 double Parameters::GetFs2AU() const{
    return this->fs2AU;
+}
+
+double Parameters::GetBoltzmann() const{
+   return this->boltzmann;
 }
 
 void Parameters::SetTranslatingDifference(double x, double y, double z){
@@ -469,6 +475,14 @@ double Parameters::GetStepWidthMC() const{
 
 void Parameters::SetStepWidthMC(double stepWidth){
    this->stepWidthMC = stepWidth;
+}
+
+unsigned long Parameters::GetSeedMC() const{
+   return this->seedMC;
+}
+
+void Parameters::SetSeedMC(unsigned long seed){
+   this->seedMC = seed;
 }
 
 }
