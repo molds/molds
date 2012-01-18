@@ -737,10 +737,6 @@ void InputParser::CheckMcConditions(const Molecule& molecule) const{
       ss << this->errorMessageNonValidExcitedStatesMC;
       throw MolDSException(ss.str());
    }
-   // check the seed
-   if(Parameters::GetInstance()->GetSeedMC()==0){
-      Parameters::GetInstance()->SetSeedMC(static_cast<unsigned long>(time(0)));
-   }
 }
 
 void InputParser::OutputMolecularBasics(Molecule* molecule) const{

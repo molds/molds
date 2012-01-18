@@ -65,6 +65,7 @@ void MC::SetMessages(){
    this->messageEnergiesTitle = "\t\t|\tkind\t\t\t| [a.u.] | [eV] | \n";
    this->messageCoreRepulsionEnergy = "Core repulsion   ";
    this->messageElectronicEnergy = "Electronic\n\t\t(inc. core rep.)";
+   this->messageTransitionRate = "\tTransition Rate: ";
 }
 
 void MC::DoMC(){
@@ -130,8 +131,8 @@ void MC::DoMC(int totalSteps, int elecState, double temperature, double stepWidt
       this->OutputMolecule(*currentES, *this->molecule, elecState);
       cout << this->messageEndStepMC << s+1 << endl;
    }
-   cout << "transitionRate: " << transitionRate/(double)totalSteps << endl;
-   cout << this->messageEndMC;
+   cout << this->messageTransitionRate << transitionRate/(double)totalSteps << endl << endl;
+   cout << this->messageEndMC << endl;
 }
 
 void MC::CreateTrialConfiguration(Molecule* trial,
@@ -164,8 +165,8 @@ void MC::CreateTrialConfiguration(Molecule* trial,
          trialAtom->GetXyz()[i] -= coreCenterShift[i];
       }
    }
-   trial->CalcXyzCOM();
    trial->CalcXyzCOC();
+   trial->CalcXyzCOM();
 }
 
 bool MC::UsesTrial(const ElectronicStructure& currentES, 
@@ -204,8 +205,8 @@ void MC::SynchronousMolecularConfiguration(Molecule* target,
          targetAtom->GetXyz()[i] = refferenceAtom.GetXyz()[i];
       }
    }
-   target->CalcXyzCOM();
    target->CalcXyzCOC();
+   target->CalcXyzCOM();
 }
 
 void MC::OutputMolecule(const ElectronicStructure& electronicStructure,
@@ -213,7 +214,6 @@ void MC::OutputMolecule(const ElectronicStructure& electronicStructure,
                         int elecState) const{
    this->OutputEnergies(electronicStructure, elecState);
    molecule.OutputConfiguration();
-   molecule.OutputXyzCOM();
    molecule.OutputXyzCOC();
 }
 

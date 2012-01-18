@@ -41,6 +41,7 @@ private:
    std::string messageCoreRepulsionEnergy;
    std::string messageElectronicEnergy;
    std::string messageTotalEnergy;
+   std::string messageTransitionRate;
    std::string errorMessageNotEnebleExcitedTheoryType;
    std::string errorMessageTheoryType;
    MolDS_base::Molecule* molecule;

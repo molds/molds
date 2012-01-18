@@ -120,7 +120,7 @@ void Parameters::SetDefaultValues(){
    this->totalStepsMC = 10;
    this->stepWidthMC = 0.05*this->angstrom2AU;
    this->temperatureMC = 300;
-   this->seedMC = 0;
+   this->seedMC = static_cast<unsigned long>(time(0));
 }
 
 void Parameters::SetMessages(){
