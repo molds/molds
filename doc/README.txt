@@ -60,19 +60,19 @@ CAPABILITIES:
    Electronic state and molecular dynamics:
             | HF  | CIS | MD(gs) | MD(es) | MC(gs) | MC(es) | 
    ---------|-----|-----|--------|--------|--------|--------|
-   CNDO2    | OK  | --  | --     | --     | Sch    | --     |
+   CNDO2    | OK  | --  | --     | --     | OK     | --     |
    ---------|-----|-----|--------|--------|--------|--------|
-   INDO     | OK  | --  | --     | --     | Sch    | --     |
+   INDO     | OK  | --  | --     | --     | OK     | --     |
    ---------|-----|-----|--------|--------|--------|--------|
-   ZINDO/S  | OK  | OK  | OK     | --     | Sch    | Sch    |
+   ZINDO/S  | OK  | OK  | OK     | --     | OK     | OK     |
    ---------|-----|-----|--------|--------|--------|--------|
-   MNDO     | OK  | OK  | OK     | OK     | Sch    | Sch    |
+   MNDO     | OK  | OK  | OK     | OK     | OK     | OK     |
    ---------|-----|-----|--------|--------|--------|--------|
-   AM1      | OK  | OK  | OK     | OK     | Sch    | Sch    |
+   AM1      | OK  | OK  | OK     | OK     | OK     | OK     |
    ---------|-----|-----|--------|--------|--------|--------|
-   PM3      | OK  | OK  | OK     | OK     | Sch    | Sch    |
+   PM3      | OK  | OK  | OK     | OK     | OK     | OK     |
    ---------|-----|-----|--------|--------|--------|--------|
-   PM3/PDDG | OK  | OK  | OK     | OK     | Sch    | Sch    |
+   PM3/PDDG | OK  | OK  | OK     | OK     | OK     | OK     |
 
       "OK", "Sch", and "--" mean available, shceduled, and non-scheduled methods, respectively.
       MD(gs) and MD(es) mean Born-Oppenheimer Molecular Dynamics on ground and excited states, respectively. 
@@ -95,6 +95,7 @@ HOW TO WRITE INPUT:
    <SCF>
       Write "cndo/2", "indo", "zindo/s", "mndo", "am1", 
       "pm3/pddg", or "pm3/pddg" in theory-directive.
+      This theory-directive indicate a electronic structure theory used in your simulations.
       MNDO only supports (can calculate) Heats of formation.
 
       E.g. 
@@ -106,13 +107,13 @@ HOW TO WRITE INPUT:
        "max_iter", "rms_density", "damping_thresh", "damping_weight", 
        "diis_num_error_vect", "diis_start_error", and "diis_end_error" are prepared as options.
 
-       The default value of "max_iter" is 100.
-       The default value of "rms_density" is 10**(-8.0).
-       The default value of "damping_thresh" is 1.
-       The default value of "damping_weight" is 0.8.
-       The default value of "diis_num_error_vect" is 5.
-       The default value of "diis_start_error" is 0.01.
-       The default value of "diis_end_error" is 10**(-8.0).
+       The default value of the "max_iter" is 100.
+       The default value of the "rms_density" is 10**(-8.0).
+       The default value of the "damping_thresh" is 1.
+       The default value of the "damping_weight" is 0.8.
+       The default value of the "diis_num_error_vect" is 5.
+       The default value of the "diis_start_error" is 0.01.
+       The default value of the "diis_end_error" is 10**(-8.0).
 
        E.g.
          SCF
@@ -137,7 +138,7 @@ HOW TO WRITE INPUT:
        "limit_heap" is only prepared. Note that this limitation is not 
        the exact limitation of heap usage. Please consider this option as a rough limitation.
        The value of this option should be written with the MByte unit.
-       The default value is 256 [MB].
+       The default value is 256[MB].
 
       E.g.
          MEMORY
@@ -156,7 +157,7 @@ HOW TO WRITE INPUT:
        "mo", "grid_number", "frame_length", and "file_prefix" are prepared.
 
        "mo" is index of the molcular orbital. mo=0 means the lowest energy MO.
-       The default value of "mo" is not set.
+       The default value of the "mo" is not set.
 
        "grid_number" is the grid number of the frame in xyz-coordinates.
        The default values are 25, 25, and 25 for x, y, and z coordinates, respectively.
@@ -189,30 +190,31 @@ HOW TO WRITE INPUT:
        and "nstates" are prepared as options.
 
        "davidson" should be set as "yes" or "no". 
-       The default value of "davidson" is "yes".
+       The default value of the "davidson" is "yes".
 
        "active_occ" ("active_vir") is set to the number of occupied (virtual) orbitals
        if user set "active_occ" ("active_vir") to be greater than 
        the number of occupied (virtual) orbitals. 
-       The default value of "active_occ" is 10. The default value of "active_vir" is 10.
+       The default value of the "active_occ" is 10. The default value of the "active_vir" is 10.
 
+       "nstates" means the number of the target electronic excited stetes.
        "nstates" is valid for the Davidson algorithm only, 
        hence "nstates" is set to "active_occ*active_vir" 
        in direct CIS algorithm (without the Davidson algorithem). 
-       The default value of "nstates" is 5 for the Davidson algorithem.
+       The default value of the "nstates" is 5 for the Davidson algorithem.
 
        "max_iter" is valid for the Davidson algorithm only. 
-       This option means the number of times of Davidson roop. 
-       The default value of "max_iter" is 100.
+       This option means the number of times of the maximum Davidson roop. 
+       The default value of the "max_iter" is 100.
 
        "max_dim" is valid for the Davidson algorithm only. 
        This option means the number of slater determinans used by expansion of the excited states. 
        Note that Hartree-Fock state (groudn state) is not included in the "max_dim".
-       The default value of "max_dim" is 100.
+       The default value of the "max_dim" is 100.
 
        "norm_tol" is valid for the Davidson algorithm only. 
        This option means the max tolerance for the norm of the residual vectors.
-       The default value of "norm_tol" is 10**(-6.0).
+       The default value of the "norm_tol" is 10**(-6.0).
 
        E.g.
          CIS
@@ -238,16 +240,16 @@ HOW TO WRITE INPUT:
        "total_steps", "electronic_state", 
        and "dt" are prepared as options.
 
-       "electronic_state" means the electronic eigen state 
+       "electronic_state" means the electronic eigenstate 
        on which the system runs.
-       The default value of "electronic_state" is 0. That is, 
+       The default value of the "electronic_state" is 0. That is, 
        electronic ground state is default.
 
-       The default value of "total_steps" is 10. 
+       The default value of the "total_steps" is 10. 
 
        "dt" means the time width of molecular dynamics.
        "dt" should be set in femto-second.
-       The default value of "dt" is 0.1[fs].
+       The default value of the "dt" is 0.1[fs].
 
       E.g.
          MD
@@ -268,15 +270,15 @@ HOW TO WRITE INPUT:
        "total_steps", "electronic_state", "temperature", "seed"
        and "step_width" are prepared as options.
 
-       The default value of "total_steps" is 10. 
+       The default value of the "total_steps" is 10. 
 
-       "electronic_state" means the electronic eigen state 
+       "electronic_state" means the electronic eigenstate 
        on which the system walks.
-       The default value of "electronic_state" is 0. That is, 
+       The default value of the "electronic_state" is 0. That is, 
        electronic ground state is default.
 
        "temperature" means the temperature in the MC sampling.
-       The default value of "temeprture" is 300[K].
+       The default value of the "temeprture" is 300[K].
 
        "seed" means the seed of the random-number-generator.
        The random numbers are used during MC sampling.
@@ -287,7 +289,7 @@ HOW TO WRITE INPUT:
        "step_width" means the max absolute displacement (step) width of each Cartesian coordinate.
        Namely, the actual displacement in the MC is in the range [-step_width, step_width).
        "step_width" should be set in angstrom unit.
-       The default value of "step_width" is 0.05[angstrom].
+       The default value of the "step_width" is 0.05[angstrom].
 
       E.g.
          MC
@@ -296,6 +298,53 @@ HOW TO WRITE INPUT:
             step_width 0.08
             seed 398
          MC_END
+
+   <RPMD (Ring Polymer Molecular Dynamics)>
+      Write RPMD-directive. 
+
+      E.g.
+         RPMD 
+            (options)
+         RPMD_END
+  
+      -options
+       "total_steps", "electronic_state", "num_electonic_states", "temperature", 
+       "seed", and "dt" are prepared as options.
+
+       The default value of the "total_steps" is 10. 
+
+       "electronic_state" means the electronic eigenstate 
+       on which the system walks.
+       The default value of the "electronic_state" is 0. 
+       That is, electronic ground state is default.
+
+       "num_electronic_states" means the number of the electronic eigenstate used in RPMD simulation.
+       This option is used only for multisurface RPMD only.
+       For the single surface RPMD, this "num_electronic_states" is automatically set to 1.
+       The default value of the "num_electronic_states" is 1. 
+
+       "temperature" means the temperature in the RPMD.
+       The default value of the "temeprture" is 300[K].
+
+       "seed" means the seed of the random-number-generator.
+       The random numbers are used during initial condition sampling.
+       Default seed is generated by the time. 
+       When you want to carry out many time jobs with same condition,
+       "seed" should be set to an identic positive integer in each job.
+
+       "dt" means the time width of molecular dynamics.
+       "dt" should be set in femto-second.
+       The default value of the "dt" is 0.1[fs].
+
+      E.g.
+         RPMD 
+            total_steps 20
+            electronic_state 0
+            num_electronic_state 10
+            temperature 100
+            seed 398
+            dt 0.5
+         RPMD_END
 
    <Principal Axes (Diagonalizing the inertia tensor)>
       Write inertia-directive.
@@ -328,17 +377,17 @@ HOW TO WRITE INPUT:
        These options are written in rotate-directive. Examples are shown below.
 
        "type" indicates whether the rotating is carring out around a axis or acording to Euler angles.
-       The default value of "type" is axis.
+       The default value of the "type" is axis.
 
        "origin" indicates the origin of the rotation in angstrom unit.
-       The default value of "origin" is center of mass.
+       The default value of the "origin" is center of mass.
 
        "axis" indicates a axis around which the rotation is carried out in angstrom unit.
-       The default value of "axis" is z-axis.
+       The default value of the "axis" is z-axis.
        This option is valid only for "type" set as axis.
 
        "angle" indicates angle for the rotation around the "axis" in degree unit.
-       The default value of "angle" is 0.
+       The default value of the "angle" is 0.
        This option is valid only for "type" set as axis.
 
        "angles" indicates Euler angles for the rotation in degree unit.
