@@ -121,6 +121,12 @@ void Parameters::SetDefaultValues(){
    this->stepWidthMC = 0.05*this->angstrom2AU;
    this->temperatureMC = 300;
    this->seedMC = static_cast<unsigned long>(time(0));
+   this->electronicStateIndexRPMD = 0;
+   this->numberElectronicStatesRPMD = 1;
+   this->totalStepsRPMD = 10;
+   this->timeWidthRPMD = 0.1*this->fs2AU;
+   this->temperatureRPMD = 300;
+   this->seedRPMD = static_cast<unsigned long>(time(0));
 }
 
 void Parameters::SetMessages(){
@@ -144,6 +150,7 @@ void Parameters::SetCurrentTheory(TheoryType theory){
    this->currentTheory = theory;
 }
 
+// methods for SCF
 double Parameters::GetThresholdSCF() const{
    return this->thresholdSCF;
 }
@@ -200,34 +207,7 @@ void Parameters::SetDiisEndErrorSCF(double diisEndErrorSCF){
    this->diisEndErrorSCF = diisEndErrorSCF;
 }
 
-string Parameters::GetFileNamePrefixMOPlot() const{
-   return this->fileNamePrefixMOPlot;
-}
-
-void Parameters::SetFileNamePrefixMOPlot(string fileNamePrefixMOPlot){
-   this->fileNamePrefixMOPlot = fileNamePrefixMOPlot;
-}
-
-int* Parameters::GetGridNumberMOPlot() const{
-   return (int*)this->gridNumberMOPlot;
-}
-
-void Parameters::SetGridNumberMOPlot(int Nx, int Ny, int Nz){
-   this->gridNumberMOPlot[XAxis] = Nx;
-   this->gridNumberMOPlot[YAxis] = Ny;
-   this->gridNumberMOPlot[ZAxis] = Nz;
-}
-
-double* Parameters::GetFrameLengthMOPlot() const{
-   return (double*)this->frameLengthMOPlot;
-}
-
-void Parameters::SetFrameLengthMOPlot(double lx, double ly, double lz){
-   this->frameLengthMOPlot[XAxis] = lx;
-   this->frameLengthMOPlot[YAxis] = ly;
-   this->frameLengthMOPlot[ZAxis] = lz;
-}
-
+// methods for parameters
 double Parameters::GetEV2AU() const{
    return this->eV2AU;
 }
@@ -260,6 +240,7 @@ double Parameters::GetBoltzmann() const{
    return this->boltzmann;
 }
 
+// methods for translation
 void Parameters::SetTranslatingDifference(double x, double y, double z){
    this->translatingDifference[0] = x;
    this->translatingDifference[1] = y;
@@ -270,6 +251,7 @@ double* Parameters::GetTranslatingDifference() const{
    return (double*)this->translatingDifference;
 }
 
+// methods for principal axes
 void Parameters::SetInertiaTensorOrigin(double x, double y, double z){
    MallocerFreer::GetInstance()->Malloc<double>(&this->inertiaTensorOrigin, CartesianType_end);
    this->inertiaTensorOrigin[0] = x;
@@ -281,6 +263,7 @@ double* Parameters::GetInertiaTensorOrigin() const{
    return (double*)this->inertiaTensorOrigin;
 }
 
+// methods for rotation
 void Parameters::SetRotatingOrigin(double x, double y, double z){
    MallocerFreer::GetInstance()->Malloc<double>(&this->rotatingOrigin, CartesianType_end);
    this->rotatingOrigin[0] = x;
@@ -329,6 +312,56 @@ EularAngle Parameters::GetRotatingEularAngles() const{
    return this->rotatingEularAngles;
 }
 
+// methods for MOPlot
+vector<int>* Parameters::GetIndecesMOPlot() const{
+   if(this->indecesMOPlot==NULL){
+      stringstream ss;
+      ss << this->errorMessageGetIndecesMOPlotNull; 
+      throw MolDSException(ss.str());
+   }
+   return this->indecesMOPlot;
+}
+
+void Parameters::AddIndexMOPlot(int moIndex){
+   if(this->indecesMOPlot==NULL){
+      this->indecesMOPlot = new vector<int>;
+   }
+   this->indecesMOPlot->push_back(moIndex);
+}
+
+bool Parameters::RequiresMOPlot() const{
+   return (this->indecesMOPlot!=NULL && 0<this->indecesMOPlot->size());
+}
+
+string Parameters::GetFileNamePrefixMOPlot() const{
+   return this->fileNamePrefixMOPlot;
+}
+
+void Parameters::SetFileNamePrefixMOPlot(string fileNamePrefixMOPlot){
+   this->fileNamePrefixMOPlot = fileNamePrefixMOPlot;
+}
+
+int* Parameters::GetGridNumberMOPlot() const{
+   return (int*)this->gridNumberMOPlot;
+}
+
+void Parameters::SetGridNumberMOPlot(int Nx, int Ny, int Nz){
+   this->gridNumberMOPlot[XAxis] = Nx;
+   this->gridNumberMOPlot[YAxis] = Ny;
+   this->gridNumberMOPlot[ZAxis] = Nz;
+}
+
+double* Parameters::GetFrameLengthMOPlot() const{
+   return (double*)this->frameLengthMOPlot;
+}
+
+void Parameters::SetFrameLengthMOPlot(double lx, double ly, double lz){
+   this->frameLengthMOPlot[XAxis] = lx;
+   this->frameLengthMOPlot[YAxis] = ly;
+   this->frameLengthMOPlot[ZAxis] = lz;
+}
+
+// methods for CIS
 int Parameters::GetActiveOccCIS() const{
    return this->activeOccCIS;
 }
@@ -359,26 +392,6 @@ bool Parameters::RequiresCIS() const{
 
 void Parameters::SetRequiresCIS(bool requiresCIS){
    this->requiresCIS = requiresCIS;
-}
-
-vector<int>* Parameters::GetIndecesMOPlot() const{
-   if(this->indecesMOPlot==NULL){
-      stringstream ss;
-      ss << this->errorMessageGetIndecesMOPlotNull; 
-      throw MolDSException(ss.str());
-   }
-   return this->indecesMOPlot;
-}
-
-void Parameters::AddIndexMOPlot(int moIndex){
-   if(this->indecesMOPlot==NULL){
-      this->indecesMOPlot = new vector<int>;
-   }
-   this->indecesMOPlot->push_back(moIndex);
-}
-
-bool Parameters::RequiresMOPlot() const{
-   return (this->indecesMOPlot!=NULL && 0<this->indecesMOPlot->size());
 }
 
 bool Parameters::IsDavidsonCIS() const{
@@ -413,6 +426,7 @@ void Parameters::SetNormToleranceCIS(double normToleranceCIS){
    this->normToleranceCIS = normToleranceCIS;
 }
 
+// methods for Memory
 double Parameters::GetLimitHeapMemory() const{
    return this->limitHeapMemory;
 }
@@ -421,6 +435,7 @@ void Parameters::SetLimitHeapMemory(double limitHeapMemory){
    this->limitHeapMemory = limitHeapMemory;
 }
 
+// methods for MC
 int Parameters::GetElectronicStateIndexMD() const{
    return this->electronicStateIndexMD;
 }
@@ -445,6 +460,7 @@ void Parameters::SetTimeWidthMD(double timeWidth){
    this->timeWidthMD = timeWidth;
 }
 
+// methods for MC
 int Parameters::GetElectronicStateIndexMC() const{
    return this->electronicStateIndexMC;
 }
@@ -483,6 +499,55 @@ unsigned long Parameters::GetSeedMC() const{
 
 void Parameters::SetSeedMC(unsigned long seed){
    this->seedMC = seed;
+}
+
+// methods for RPMD
+int Parameters::GetElectronicStateIndexRPMD() const{
+   return this->electronicStateIndexRPMD;
+}
+
+void Parameters::SetElectronicStateIndexRPMD(int electronicStateIndex){
+   this->electronicStateIndexRPMD = electronicStateIndex;
+}
+
+int Parameters::GetNumberElectronicStatesRPMD() const{
+   return this->numberElectronicStatesRPMD;
+}
+
+void Parameters::SetNumberElectronicStatesRPMD(int numberElectronicStates){
+   this->numberElectronicStatesRPMD = numberElectronicStates;
+}
+
+int Parameters::GetTotalStepsRPMD() const{
+   return this->totalStepsRPMD;
+}
+
+void Parameters::SetTotalStepsRPMD(int totalSteps){
+   this->totalStepsRPMD = totalSteps;
+}
+
+double Parameters::GetTemperatureRPMD() const{
+   return this->temperatureRPMD;
+}
+
+void Parameters::SetTemperatureRPMD(double temperature){
+   this->temperatureRPMD = temperature;
+}
+
+double Parameters::GetTimeWidthRPMD() const{
+   return this->timeWidthRPMD;
+}
+
+void Parameters::SetTimeWidthRPMD(double timeWidth){
+   this->timeWidthRPMD = timeWidth;
+}
+
+unsigned long Parameters::GetSeedRPMD() const{
+   return this->seedRPMD;
+}
+
+void Parameters::SetSeedRPMD(unsigned long seed){
+   this->seedRPMD = seed;
 }
 
 }

@@ -110,6 +110,18 @@ public:
    void SetStepWidthMC(double stepWidth);
    unsigned long GetSeedMC() const;
    void SetSeedMC(unsigned long seed);
+   int GetElectronicStateIndexRPMD() const;
+   void SetElectronicStateIndexRPMD(int electronicStateIndex);
+   int GetNumberElectronicStatesRPMD() const;
+   void SetNumberElectronicStatesRPMD(int NumberElectronicStates);
+   int GetTotalStepsRPMD() const;
+   void SetTotalStepsRPMD(int totalSteps);
+   double GetTemperatureRPMD() const;
+   void SetTemperatureRPMD(double temperature);
+   double GetTimeWidthRPMD() const;
+   void SetTimeWidthRPMD(double stepWidth);
+   unsigned long GetSeedRPMD() const;
+   void SetSeedRPMD(unsigned long seed);
 private:
    static Parameters* parameters;
    Parameters();
@@ -160,6 +172,12 @@ private:
    double temperatureMC;
    double stepWidthMC;
    unsigned long seedMC;
+   int electronicStateIndexRPMD;
+   int numberElectronicStatesRPMD;
+   int totalStepsRPMD;
+   double temperatureRPMD;
+   double timeWidthRPMD;
+   unsigned long seedRPMD;
    void SetDefaultValues();
    void SetMessages();
 };

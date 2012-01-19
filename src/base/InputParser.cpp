@@ -72,12 +72,16 @@ void InputParser::SetMessages(){
       = "Error in base::InputParser::CheckMdConditions: Excited state on which MD runs or CIS condition are wrong.\n";
    this->errorMessageNonValidExcitedStatesMC
       = "Error in base::InputParser::CheckMcConditions: Excited state on which MC runs or CIS condition are wrong.\n";
+   this->errorMessageNonValidExcitedStatesRPMD
+      = "Error in base::InputParser::CheckRpmdConditions: Excited state on which RPMD runs or CIS condition are wrong.\n";
    this->messageStartParseInput = "**********  START: Parse input  **********\n";
    this->messageDoneParseInput =  "**********  DONE: Parse input  ***********\n\n\n";
    this->messageTotalNumberAOs = "\tTotal number of valence AOs: ";
    this->messageTotalNumberAtoms = "\tTotal number of atoms: ";
    this->messageTotalNumberValenceElectrons = "\tTotal number of valence electrons: ";
    this->messageInputTerms = "Input terms:\n";
+
+   // SCF
    this->messageScfConditions = "\tSCF conditions:\n";
    this->messageScfMaxIterations = "\t\tMax iterations: ";
    this->messageScfRmsDensity = "\t\tRMS density: ";
@@ -86,6 +90,8 @@ void InputParser::SetMessages(){
    this->messageScfDiisNumErrorVect = "\t\tDIIS number of error vectors: ";
    this->messageScfDiisStartError = "\t\tDIIS starting error: ";
    this->messageScfDiisEndError = "\t\tDIIS ending error: ";
+
+   // CIS
    this->messageCisConditions = "\tCIS conditions:\n";
    this->messageCisNumberActiveOcc = "\t\tNumber of active Occ.: ";
    this->messageCisNumberActiveVir = "\t\tNumber of active Vir.: ";
@@ -94,19 +100,34 @@ void InputParser::SetMessages(){
    this->messageCisNormTolerance = "\t\tNorm tolerance for the residual of the Davidson: ";
    this->messageCisMaxIterations = "\t\tMax iterations for the Davidson: ";
    this->messageCisMaxDimensions = "\t\tMax dimensions for the Davidson: ";
+
+   // memory
    this->messageMemoryConditions = "\tMemory conditions:\n";
    this->messageMemoryLimitHeap = "\t\tHeap limit: ";
    this->messageMemoryMB = "[MB]\n";
+
+   // MD
    this->messageMdConditions = "\tMD conditions:\n";
    this->messageMdTotalSteps = "\t\tTotal steps: ";
-   this->messageMdElecState = "\t\tElectronic eigen state: ";
+   this->messageMdElecState = "\t\tElectronic eigenstate: ";
    this->messageMdTimeWidth = "\t\tTime width(dt): ";
+
+   // MC
    this->messageMcConditions = "\tMC conditions:\n";
    this->messageMcTotalSteps = "\t\tTotal steps: ";
-   this->messageMcElecState = "\t\tElectronic eigen state: ";
+   this->messageMcElecState = "\t\tElectronic eigenstate: ";
    this->messageMcStepWidth = "\t\tStep width: ";
    this->messageMcTemperature = "\t\tTemperature: ";
    this->messageMcSeed = "\t\tSeed: ";
+
+   // RPMD
+   this->messageRpmdConditions = "\tRPMD conditions:\n";
+   this->messageRpmdTotalSteps = "\t\tTotal steps: ";
+   this->messageRpmdElecState = "\t\tElectronic eigenstate: ";
+   this->messageRpmdNumElecStates = "\t\tNumber of the electronic eigenstates: ";
+   this->messageRpmdTimeWidth = "\t\tTime width: ";
+   this->messageRpmdTemperature = "\t\tTemperature: ";
+   this->messageRpmdSeed = "\t\tSeed: ";
    this->messageMOPlotConditions = "\tMO plot conditions:\n";
    this->messageMOPlotIndex = "\t\tMO index: ";
    this->messageMOPlotGridNumber = "\t\tNumber of grid(x, y, z): ";
@@ -130,6 +151,8 @@ void InputParser::SetMessages(){
    this->stringGeometryEnd = "geometry_end";
    this->stringTheory = "theory";
    this->stringTheoryEnd = "theory_end";
+
+   // SCF
    this->stringScf = "scf";
    this->stringScfEnd = "scf_end";
    this->stringScfMaxIter = "max_iter";
@@ -139,15 +162,21 @@ void InputParser::SetMessages(){
    this->stringScfDiisNumErrorVect = "diis_num_error_vect";
    this->stringScfDiisStartError = "diis_start_error";
    this->stringScfDiisEndError = "diis_end_error";
+
+   // MO plot
    this->stringMO = "mo";
    this->stringMOPlot = "moplot";
    this->stringMOPlotEnd = "moplot_end";
    this->stringMOPlotGridNumber = "grid_number";
    this->stringMOPlotFrameLength = "frame_length";
    this->stringMOPlotFilePrefix = "file_prefix";
+
+   // Principal axes
    this->stringInertiaTensor = "inertia";
    this->stringInertiaTensorEnd = "inertia_end";
    this->stringInertiaTensorOrigin = "origin";
+
+   // Rotate
    this->stringRotate = "rotate";
    this->stringRotateEnd = "rotate_end";
    this->stringRotatingOrigin = "origin";
@@ -157,9 +186,13 @@ void InputParser::SetMessages(){
    this->stringRotatingType = "type";
    this->stringRotatingTypeAxis = "axis";
    this->stringRotatingTypeEularAngle = "eular_angle";
+
+   // Translate
    this->stringTranslate = "translate";
    this->stringTranslateEnd = "translate_end";
    this->stringTranslatingDifference = "difference";
+
+   // CIS
    this->stringCIS = "cis";
    this->stringCISEnd = "cis_end";
    this->stringCISActiveOcc = "active_occ";
@@ -169,14 +202,20 @@ void InputParser::SetMessages(){
    this->stringCISMaxIter = "max_iter";
    this->stringCISMaxDimensions = "max_dim";
    this->stringCISNormTolerance = "norm_tol";
+
+   // Memory
    this->stringMemory = "memory";
    this->stringMemoryEnd = "memory_end";
    this->stringMemoryLimitHeap = "limit_heap";
+
+   // MD
    this->stringMD = "md";
    this->stringMDEnd = "md_end";
    this->stringMDTotalSteps = "total_steps";
    this->stringMDElecState = "electronic_state";
    this->stringMDTimeWidth = "dt";
+
+   // MC
    this->stringMC = "mc";
    this->stringMCEnd = "mc_end";
    this->stringMCTotalSteps = "total_steps";
@@ -184,6 +223,16 @@ void InputParser::SetMessages(){
    this->stringMCStepWidth = "step_width";
    this->stringMCTemperature = "temperature";
    this->stringMCSeed = "seed";
+
+   // RPMD
+   this->stringRPMD = "rpmd";
+   this->stringRPMDEnd = "rpmd_end";
+   this->stringRPMDTotalSteps = "total_steps";
+   this->stringRPMDElecState = "electronic_state";
+   this->stringRPMDNumElecStates = "num_electronic_states";
+   this->stringRPMDTimeWidth = "dt";
+   this->stringRPMDTemperature = "temperature";
+   this->stringRPMDSeed = "seed";
 }
 
 vector<string> InputParser::GetInputTerms() const{
@@ -577,6 +626,52 @@ void InputParser::Parse(Molecule* molecule) const{
          i = j;
       }
 
+      // RPMD condition
+      if(inputTerms[i].compare(this->stringRPMD) == 0){
+         Parameters::GetInstance()->SetCurrentSimulation(RPMD);
+         int j=i+1;
+         while(inputTerms[j].compare(this->stringRPMDEnd) != 0){
+            // number of total steps 
+            if(inputTerms[j].compare(this->stringRPMDTotalSteps) == 0){
+               int totalSteps = atoi(inputTerms[j+1].c_str());
+               Parameters::GetInstance()->SetTotalStepsRPMD(totalSteps);
+               j++;
+            }
+            // index of electronic eigen state on whichi RPMD runs. 
+            if(inputTerms[j].compare(this->stringRPMDElecState) == 0){
+               int elecStateIndex = atoi(inputTerms[j+1].c_str());
+               Parameters::GetInstance()->SetElectronicStateIndexRPMD(elecStateIndex);
+               j++;
+            }
+            // number of the electronic eigenstates on whichi RPMD runs. 
+            if(inputTerms[j].compare(this->stringRPMDNumElecStates) == 0){
+               int numElecStates = atoi(inputTerms[j+1].c_str());
+               Parameters::GetInstance()->SetNumberElectronicStatesRPMD(numElecStates);
+               j++;
+            }
+            // temperature for RPMD.
+            if(inputTerms[j].compare(this->stringRPMDTemperature) == 0){
+               double temperature = atof(inputTerms[j+1].c_str());
+               Parameters::GetInstance()->SetTemperatureRPMD(temperature);
+               j++;
+            }
+            // time width for RPMD.
+            if(inputTerms[j].compare(this->stringRPMDTimeWidth) == 0){
+               double timeWidth = atof(inputTerms[j+1].c_str()) * Parameters::GetInstance()->GetFs2AU();
+               Parameters::GetInstance()->SetTimeWidthRPMD(timeWidth);
+               j++;
+            }
+            // seed for RPMD.
+            if(inputTerms[j].compare(this->stringRPMDSeed) == 0){
+               unsigned long seed = atol(inputTerms[j+1].c_str());
+               Parameters::GetInstance()->SetSeedRPMD(seed);
+               j++;
+            }
+            j++;   
+         }
+         i = j;
+      }
+
       // theory
       if(inputTerms[i].compare(this->stringTheory) == 0){
          int j=i+1;
@@ -635,6 +730,9 @@ void InputParser::Parse(Molecule* molecule) const{
    else if(Parameters::GetInstance()->GetCurrentSimulation()==MC){
       this->CheckMcConditions(*molecule);
    }
+   else if(Parameters::GetInstance()->GetCurrentSimulation()==RPMD){
+      this->CheckRpmdConditions(*molecule);
+   }
 
    // output conditions
    this->OutputMolecularBasics(molecule);
@@ -649,8 +747,11 @@ void InputParser::Parse(Molecule* molecule) const{
    if(Parameters::GetInstance()->GetCurrentSimulation()==MD){
       this->OutputMdConditions();
    }
-   if(Parameters::GetInstance()->GetCurrentSimulation()==MC){
+   else if(Parameters::GetInstance()->GetCurrentSimulation()==MC){
       this->OutputMcConditions();
+   }
+   else if(Parameters::GetInstance()->GetCurrentSimulation()==RPMD){
+      this->OutputRpmdConditions();
    }
 
    // output inputs
@@ -739,6 +840,10 @@ void InputParser::CheckMcConditions(const Molecule& molecule) const{
    }
 }
 
+void InputParser::CheckRpmdConditions(const Molecule& molecule) const{
+   // ToDo: check rpmd conditions
+}
+
 void InputParser::OutputMolecularBasics(Molecule* molecule) const{
 
    molecule->OutputTotalNumberAtomsAOsValenceelectrons();
@@ -805,6 +910,19 @@ void InputParser::OutputMcConditions() const{
    printf("%s%lf%s\n",this->messageMcTemperature.c_str(),Parameters::GetInstance()->GetTemperatureMC(),this->messageK.c_str());
    printf("%s%lf%s\n",this->messageMcStepWidth.c_str(),Parameters::GetInstance()->GetStepWidthMC()/Parameters::GetInstance()->GetAngstrom2AU(),this->messageAngst.c_str());
    printf("%s%lu\n",this->messageMcSeed.c_str(),Parameters::GetInstance()->GetSeedMC());
+
+   cout << "\n";
+}
+
+void InputParser::OutputRpmdConditions() const{
+   cout << this->messageRpmdConditions;
+
+   printf("%s%d\n",this->messageRpmdElecState.c_str(),Parameters::GetInstance()->GetElectronicStateIndexRPMD());
+   printf("%s%d\n",this->messageRpmdNumElecStates.c_str(),Parameters::GetInstance()->GetNumberElectronicStatesRPMD());
+   printf("%s%d\n",this->messageRpmdTotalSteps.c_str(),Parameters::GetInstance()->GetTotalStepsRPMD());
+   printf("%s%lf%s\n",this->messageRpmdTemperature.c_str(),Parameters::GetInstance()->GetTemperatureRPMD(),this->messageK.c_str());
+   printf("%s%lf%s\n",this->messageRpmdTimeWidth.c_str(),Parameters::GetInstance()->GetTimeWidthRPMD()/Parameters::GetInstance()->GetFs2AU(),this->messageFs.c_str());
+   printf("%s%lu\n",this->messageRpmdSeed.c_str(),Parameters::GetInstance()->GetSeedRPMD());
 
    cout << "\n";
 }
