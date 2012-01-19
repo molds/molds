@@ -177,6 +177,18 @@ private:
    void OutputInputTerms(std::vector<std::string> inputTerms) const;
    bool IsCommentOut(std::string str) const;
    std::vector<std::string> GetInputTerms() const;
+   int ParseMolecularGeometry(Molecule* molecule, std::vector<std::string>* inputTerms, int parseIndex) const;
+   int ParseTheory(std::vector<std::string>* inputTerms, int parseIndex) const;
+   int ParseConditionsSCF(std::vector<std::string>* inputTerms, int parseIndex) const;
+   int ParseConditionsPrincipalAxes(std::vector<std::string>* inputTerms, int parseIndex) const;
+   int ParseConditionsTranslation(std::vector<std::string>* inputTerms, int parseIndex) const;
+   int ParseConditionsRotation(std::vector<std::string>* inputTerms, int parseIndex) const;
+   int ParseConditionsMOPlot(std::vector<std::string>* inputTerms, int parseIndex) const;
+   int ParseConditionsCIS(std::vector<std::string>* inputTerms, int parseIndex) const;
+   int ParseConditionsMC(std::vector<std::string>* inputTerms, int parseIndex) const;
+   int ParseConditionsMD(std::vector<std::string>* inputTerms, int parseIndex) const;
+   int ParseConditionsRPMD(std::vector<std::string>* inputTerms, int parseIndex) const;
+   int ParseConditionsMemory(std::vector<std::string>* inputTerms, int parseIndex) const;
 };
 
 }

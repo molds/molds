@@ -274,6 +274,419 @@ vector<string> InputParser::GetInputTerms() const{
 
 }
 
+int InputParser::ParseMolecularGeometry(Molecule* molecule, vector<string>* inputTerms, int parseIndex) const{
+   parseIndex++;
+   while((*inputTerms)[parseIndex].compare(this->stringGeometryEnd) != 0){
+      double x = atof((*inputTerms)[parseIndex+1].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
+      double y = atof((*inputTerms)[parseIndex+2].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
+      double z = atof((*inputTerms)[parseIndex+3].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
+      AtomType atomType = H;
+      if((*inputTerms)[parseIndex] == "h"){
+        atomType = H;
+      }
+      else if((*inputTerms)[parseIndex] == "li"){
+         atomType = Li;
+      }
+      else if((*inputTerms)[parseIndex] == "c"){
+         atomType = C;
+      }
+      else if((*inputTerms)[parseIndex] == "n"){
+         atomType = N;
+      }
+      else if((*inputTerms)[parseIndex] == "o"){
+         atomType = O;
+      }
+      else if((*inputTerms)[parseIndex] == "s"){
+         atomType = S;
+      }
+      Atom* atom = AtomFactory::GetInstance()->Create(atomType, x, y, z);
+      molecule->GetAtomVect()->push_back(atom);
+      parseIndex += 4;
+   }
+   return parseIndex;
+}
+
+int InputParser::ParseConditionsSCF(vector<string>* inputTerms, int parseIndex) const{
+   parseIndex++;
+   while((*inputTerms)[parseIndex].compare(this->stringScfEnd) != 0){
+      // max iterations
+      if((*inputTerms)[parseIndex].compare(this->stringScfMaxIter) == 0){
+         Parameters::GetInstance()->SetMaxIterationsSCF(atoi((*inputTerms)[parseIndex+1].c_str()));
+         parseIndex++;
+      }
+      // RMS density 
+      if((*inputTerms)[parseIndex].compare(this->stringScfRmsDensity) == 0){
+         Parameters::GetInstance()->SetThresholdSCF(atof((*inputTerms)[parseIndex+1].c_str()));
+         parseIndex++;
+      }
+      // Damping Threshold 
+      if((*inputTerms)[parseIndex].compare(this->stringScfDampingThresh) == 0){
+         Parameters::GetInstance()->SetDampingThreshSCF(atof((*inputTerms)[parseIndex+1].c_str()));
+         parseIndex++;
+      }
+      // Damping Weight
+      if((*inputTerms)[parseIndex].compare(this->stringScfDampingWeight) == 0){
+         Parameters::GetInstance()->SetDampingWeightSCF(atof((*inputTerms)[parseIndex+1].c_str()));
+         parseIndex++;
+      }
+      // DIIS number of stored error vectors
+      if((*inputTerms)[parseIndex].compare(this->stringScfDiisNumErrorVect) == 0){
+         Parameters::GetInstance()->SetDiisNumErrorVectSCF(atoi((*inputTerms)[parseIndex+1].c_str()));
+         parseIndex++;
+      }
+      // DIIS starting error
+      if((*inputTerms)[parseIndex].compare(this->stringScfDiisStartError) == 0){
+         Parameters::GetInstance()->SetDiisStartErrorSCF(atof((*inputTerms)[parseIndex+1].c_str()));
+         parseIndex++;
+      }
+      // DIIS ending error
+      if((*inputTerms)[parseIndex].compare(this->stringScfDiisEndError) == 0){
+         Parameters::GetInstance()->SetDiisEndErrorSCF(atof((*inputTerms)[parseIndex+1].c_str()));
+         parseIndex++;
+      }
+      parseIndex++;   
+   }
+   return parseIndex;
+}
+
+int InputParser::ParseConditionsPrincipalAxes(vector<string>* inputTerms, int parseIndex) const{
+   Parameters::GetInstance()->SetCurrentSimulation(PrincipalAxes);
+   parseIndex++;
+   while((*inputTerms)[parseIndex].compare(this->stringInertiaTensorEnd) != 0){
+      // origin
+      if((*inputTerms)[parseIndex].compare(this->stringInertiaTensorOrigin) == 0){
+         double x = atof((*inputTerms)[parseIndex+1].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
+         double y = atof((*inputTerms)[parseIndex+2].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
+         double z = atof((*inputTerms)[parseIndex+3].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
+         Parameters::GetInstance()->SetInertiaTensorOrigin(x, y, z);
+         parseIndex+=3;
+      }
+      parseIndex++;   
+   }
+   return parseIndex;
+}
+
+int InputParser::ParseConditionsTranslation(vector<string>* inputTerms, int parseIndex) const{
+   Parameters::GetInstance()->SetCurrentSimulation(Translate);
+   parseIndex++;
+   while((*inputTerms)[parseIndex].compare(this->stringTranslateEnd) != 0){
+      // origin
+      if((*inputTerms)[parseIndex].compare(this->stringTranslatingDifference) == 0){
+         double x = atof((*inputTerms)[parseIndex+1].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
+         double y = atof((*inputTerms)[parseIndex+2].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
+         double z = atof((*inputTerms)[parseIndex+3].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
+         Parameters::GetInstance()->SetTranslatingDifference(x, y, z);
+         parseIndex+=3;
+      }
+      parseIndex++;   
+   }
+   return parseIndex;
+}
+
+int InputParser::ParseConditionsRotation(vector<string>* inputTerms, int parseIndex) const{
+   Parameters::GetInstance()->SetCurrentSimulation(Rotate);
+   parseIndex++;
+   while((*inputTerms)[parseIndex].compare(this->stringRotateEnd) != 0){
+      // origin
+      if((*inputTerms)[parseIndex].compare(this->stringRotatingOrigin) == 0){
+         double x = atof((*inputTerms)[parseIndex+1].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
+         double y = atof((*inputTerms)[parseIndex+2].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
+         double z = atof((*inputTerms)[parseIndex+3].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
+         Parameters::GetInstance()->SetRotatingOrigin(x, y, z);
+         parseIndex+=3;
+      }
+      // axis
+      else if((*inputTerms)[parseIndex].compare(this->stringRotatingAxis) == 0){
+         double x = atof((*inputTerms)[parseIndex+1].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
+         double y = atof((*inputTerms)[parseIndex+2].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
+         double z = atof((*inputTerms)[parseIndex+3].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
+         Parameters::GetInstance()->SetRotatingAxis(x, y, z);
+         parseIndex+=3;
+      }
+      // angle 
+      else if((*inputTerms)[parseIndex].compare(this->stringRotatingAngle) == 0){
+         double angle = atof((*inputTerms)[parseIndex+1].c_str()) * Parameters::GetInstance()->GetDegree2Radian();
+         Parameters::GetInstance()->SetRotatingAngle(angle);
+         parseIndex++;
+      }
+      // angles (EularAngle)
+      else if((*inputTerms)[parseIndex].compare(this->stringRotatingAngles) == 0){
+         double alpha = atof((*inputTerms)[parseIndex+1].c_str()) * Parameters::GetInstance()->GetDegree2Radian();
+         double beta  = atof((*inputTerms)[parseIndex+2].c_str()) * Parameters::GetInstance()->GetDegree2Radian();
+         double gamma = atof((*inputTerms)[parseIndex+3].c_str()) * Parameters::GetInstance()->GetDegree2Radian();
+         Parameters::GetInstance()->SetRotatingEularAngles(alpha, beta, gamma);
+         parseIndex += 3;
+      }
+      // type
+      else if((*inputTerms)[parseIndex].compare(this->stringRotatingType) == 0){
+         if((*inputTerms)[parseIndex+1].compare(this->stringRotatingTypeAxis) == 0){
+            Parameters::GetInstance()->SetRotatingType(Axis);
+         }
+         else if((*inputTerms)[parseIndex+1].compare(this->stringRotatingTypeEularAngle) == 0){
+            Parameters::GetInstance()->SetRotatingType(Eular);
+         }
+         parseIndex++;
+      }
+      parseIndex++;   
+   }
+   return parseIndex;
+}
+
+int InputParser::ParseConditionsMOPlot(vector<string>* inputTerms, int parseIndex) const{
+   parseIndex++;
+   while((*inputTerms)[parseIndex].compare(this->stringMOPlotEnd) != 0){
+      // Frame length
+      if((*inputTerms)[parseIndex].compare(this->stringMOPlotFrameLength) == 0){
+         double lx = atof((*inputTerms)[parseIndex+1].c_str()) 
+                    *Parameters::GetInstance()->GetAngstrom2AU();
+         double ly = atof((*inputTerms)[parseIndex+2].c_str()) 
+                    *Parameters::GetInstance()->GetAngstrom2AU();
+         double lz = atof((*inputTerms)[parseIndex+3].c_str()) 
+                    *Parameters::GetInstance()->GetAngstrom2AU();
+         Parameters::GetInstance()->SetFrameLengthMOPlot(lx, ly, lz);
+         parseIndex += 3;
+      }
+      // Grid number
+      if((*inputTerms)[parseIndex].compare(this->stringMOPlotGridNumber) == 0){
+         int nx = atof((*inputTerms)[parseIndex+1].c_str());
+         int ny = atof((*inputTerms)[parseIndex+2].c_str());
+         int nz = atof((*inputTerms)[parseIndex+3].c_str());
+         Parameters::GetInstance()->SetGridNumberMOPlot(nx, ny, nz);
+         parseIndex += 3;
+      }
+      // mo index
+      if((*inputTerms)[parseIndex].compare(this->stringMO) == 0){
+         int moIndex = atoi((*inputTerms)[parseIndex+1].c_str());
+         Parameters::GetInstance()->AddIndexMOPlot(moIndex);
+         parseIndex++;
+      }
+      // file prefix
+      if((*inputTerms)[parseIndex].compare(this->stringMOPlotFilePrefix) == 0){
+         string filePrefix((*inputTerms)[parseIndex+1].c_str());
+         Parameters::GetInstance()->SetFileNamePrefixMOPlot(filePrefix);
+         parseIndex++;
+      }
+      parseIndex++;   
+   }
+   return parseIndex;
+}
+
+int InputParser::ParseConditionsCIS(vector<string>* inputTerms, int parseIndex) const{
+   Parameters::GetInstance()->SetRequiresCIS(true);
+   parseIndex++;
+   while((*inputTerms)[parseIndex].compare(this->stringCISEnd) != 0){
+      // number of active occupied orbitals
+      if((*inputTerms)[parseIndex].compare(this->stringCISActiveOcc) == 0){
+         int activeOccCIS = atoi((*inputTerms)[parseIndex+1].c_str());
+         Parameters::GetInstance()->SetActiveOccCIS(activeOccCIS);
+         parseIndex++;
+      }
+      // number of active virtual orbitals
+      if((*inputTerms)[parseIndex].compare(this->stringCISActiveVir) == 0){
+         int activeVirCIS = atoi((*inputTerms)[parseIndex+1].c_str());
+         Parameters::GetInstance()->SetActiveVirCIS(activeVirCIS);
+         parseIndex++;
+      }
+      // number of excited states
+      if((*inputTerms)[parseIndex].compare(this->stringCISNStates) == 0){
+         int nStates = atoi((*inputTerms)[parseIndex+1].c_str());
+         Parameters::GetInstance()->SetNumberExcitedStatesCIS(nStates);
+         parseIndex++;
+      }
+      // Davidson is used or not
+      if((*inputTerms)[parseIndex].compare(this->stringCISDavidson) == 0){
+         if((*inputTerms)[parseIndex+1].compare(this->stringYES) == 0){
+            Parameters::GetInstance()->SetIsDavidsonCIS(true);
+         }
+         else{
+            Parameters::GetInstance()->SetIsDavidsonCIS(false);
+         }
+         parseIndex++;
+      }
+      // max iterations for the Davidson roop
+      if((*inputTerms)[parseIndex].compare(this->stringCISMaxIter) == 0){
+         int maxIter = atoi((*inputTerms)[parseIndex+1].c_str());
+         Parameters::GetInstance()->SetMaxIterationsCIS(maxIter);
+         parseIndex++;
+      }
+      // max dimensions for the Davidson expansion
+      if((*inputTerms)[parseIndex].compare(this->stringCISMaxDimensions) == 0){
+         int maxDim = atoi((*inputTerms)[parseIndex+1].c_str());
+         Parameters::GetInstance()->SetMaxDimensionsCIS(maxDim);
+         parseIndex++;
+      }
+      // nolm tolerance for the norm of the resiudal vectors of the Davidson.
+      if((*inputTerms)[parseIndex].compare(this->stringCISNormTolerance) == 0){
+         double normTol = atof((*inputTerms)[parseIndex+1].c_str());
+         Parameters::GetInstance()->SetNormToleranceCIS(normTol);
+         parseIndex++;
+      }
+      parseIndex++;   
+   }
+   return parseIndex;
+}
+
+int InputParser::ParseConditionsMC(vector<string>* inputTerms, int parseIndex) const{
+   Parameters::GetInstance()->SetCurrentSimulation(MC);
+   parseIndex++;
+   while((*inputTerms)[parseIndex].compare(this->stringMCEnd) != 0){
+      // number of total steps 
+      if((*inputTerms)[parseIndex].compare(this->stringMCTotalSteps) == 0){
+         int totalSteps = atoi((*inputTerms)[parseIndex+1].c_str());
+         Parameters::GetInstance()->SetTotalStepsMC(totalSteps);
+         parseIndex++;
+      }
+      // index of electronic eigen state on whichi MC runs. 
+      if((*inputTerms)[parseIndex].compare(this->stringMCElecState) == 0){
+         int elecStateIndex = atoi((*inputTerms)[parseIndex+1].c_str());
+         Parameters::GetInstance()->SetElectronicStateIndexMC(elecStateIndex);
+         parseIndex++;
+      }
+      // temperature for MC.
+      if((*inputTerms)[parseIndex].compare(this->stringMCTemperature) == 0){
+         double temperature = atof((*inputTerms)[parseIndex+1].c_str());
+         Parameters::GetInstance()->SetTemperatureMC(temperature);
+         parseIndex++;
+      }
+      // step width for MC.
+      if((*inputTerms)[parseIndex].compare(this->stringMCStepWidth) == 0){
+         double stepWidth = atof((*inputTerms)[parseIndex+1].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
+         Parameters::GetInstance()->SetStepWidthMC(stepWidth);
+         parseIndex++;
+      }
+      // seed for MC.
+      if((*inputTerms)[parseIndex].compare(this->stringMCSeed) == 0){
+         unsigned long seed = atol((*inputTerms)[parseIndex+1].c_str());
+         Parameters::GetInstance()->SetSeedMC(seed);
+         parseIndex++;
+      }
+      parseIndex++;   
+   }
+   return parseIndex;
+}
+
+int InputParser::ParseConditionsMD(vector<string>* inputTerms, int parseIndex) const{
+   Parameters::GetInstance()->SetCurrentSimulation(MD);
+   parseIndex++;
+   while((*inputTerms)[parseIndex].compare(this->stringMDEnd) != 0){
+      // number of total steps 
+      if((*inputTerms)[parseIndex].compare(this->stringMDTotalSteps) == 0){
+         int totalSteps = atoi((*inputTerms)[parseIndex+1].c_str());
+         Parameters::GetInstance()->SetTotalStepsMD(totalSteps);
+         parseIndex++;
+      }
+      // index of electronic eigen state on whichi MD runs. 
+      if((*inputTerms)[parseIndex].compare(this->stringMDElecState) == 0){
+         int elecStateIndex = atoi((*inputTerms)[parseIndex+1].c_str());
+         Parameters::GetInstance()->SetElectronicStateIndexMD(elecStateIndex);
+         parseIndex++;
+      }
+      // time width for MD.
+      if((*inputTerms)[parseIndex].compare(this->stringMDTimeWidth) == 0){
+         double dt = atof((*inputTerms)[parseIndex+1].c_str()) * Parameters::GetInstance()->GetFs2AU();
+         Parameters::GetInstance()->SetTimeWidthMD(dt);
+         parseIndex++;
+      }
+      parseIndex++;   
+   }
+   return parseIndex;
+}
+
+int InputParser::ParseConditionsRPMD(vector<string>* inputTerms, int parseIndex) const{
+   Parameters::GetInstance()->SetCurrentSimulation(RPMD);
+   parseIndex++;
+   while((*inputTerms)[parseIndex].compare(this->stringRPMDEnd) != 0){
+      // number of total steps 
+      if((*inputTerms)[parseIndex].compare(this->stringRPMDTotalSteps) == 0){
+         int totalSteps = atoi((*inputTerms)[parseIndex+1].c_str());
+         Parameters::GetInstance()->SetTotalStepsRPMD(totalSteps);
+         parseIndex++;
+      }
+      // index of electronic eigen state on whichi RPMD runs. 
+      if((*inputTerms)[parseIndex].compare(this->stringRPMDElecState) == 0){
+         int elecStateIndex = atoi((*inputTerms)[parseIndex+1].c_str());
+         Parameters::GetInstance()->SetElectronicStateIndexRPMD(elecStateIndex);
+         parseIndex++;
+      }
+      // number of the electronic eigenstates on whichi RPMD runs. 
+      if((*inputTerms)[parseIndex].compare(this->stringRPMDNumElecStates) == 0){
+         int numElecStates = atoi((*inputTerms)[parseIndex+1].c_str());
+         Parameters::GetInstance()->SetNumberElectronicStatesRPMD(numElecStates);
+         parseIndex++;
+      }
+      // temperature for RPMD.
+      if((*inputTerms)[parseIndex].compare(this->stringRPMDTemperature) == 0){
+         double temperature = atof((*inputTerms)[parseIndex+1].c_str());
+         Parameters::GetInstance()->SetTemperatureRPMD(temperature);
+         parseIndex++;
+      }
+      // time width for RPMD.
+      if((*inputTerms)[parseIndex].compare(this->stringRPMDTimeWidth) == 0){
+         double timeWidth = atof((*inputTerms)[parseIndex+1].c_str()) * Parameters::GetInstance()->GetFs2AU();
+         Parameters::GetInstance()->SetTimeWidthRPMD(timeWidth);
+         parseIndex++;
+      }
+      // seed for RPMD.
+      if((*inputTerms)[parseIndex].compare(this->stringRPMDSeed) == 0){
+         unsigned long seed = atol((*inputTerms)[parseIndex+1].c_str());
+         Parameters::GetInstance()->SetSeedRPMD(seed);
+         parseIndex++;
+      }
+      parseIndex++;   
+   }
+   return parseIndex;
+}
+
+int InputParser::ParseTheory(vector<string>* inputTerms, int parseIndex) const{
+   parseIndex++;
+   while((*inputTerms)[parseIndex].compare(this->stringTheoryEnd) != 0){
+      // CNDO/2
+      if((*inputTerms)[parseIndex].compare(this->stringTheoryCNDO2) == 0){
+         Parameters::GetInstance()->SetCurrentTheory(CNDO2);
+      }
+      // INDO
+      else if((*inputTerms)[parseIndex].compare(this->stringTheoryINDO) == 0){
+         Parameters::GetInstance()->SetCurrentTheory(INDO);
+      }
+      // ZINDO/S
+      else if((*inputTerms)[parseIndex].compare(this->stringTheoryZINDOS) == 0){
+         Parameters::GetInstance()->SetCurrentTheory(ZINDOS);
+      }
+      // MNDO
+      else if((*inputTerms)[parseIndex].compare(this->stringTheoryMNDO) == 0){
+         Parameters::GetInstance()->SetCurrentTheory(MNDO);
+      }
+      // AM1
+      else if((*inputTerms)[parseIndex].compare(this->stringTheoryAM1) == 0){
+         Parameters::GetInstance()->SetCurrentTheory(AM1);
+      }
+      // PM3
+      else if((*inputTerms)[parseIndex].compare(this->stringTheoryPM3) == 0){
+         Parameters::GetInstance()->SetCurrentTheory(PM3);
+      }
+      // PM3/PDG
+      else if((*inputTerms)[parseIndex].compare(this->stringTheoryPM3PDDG) == 0){
+         Parameters::GetInstance()->SetCurrentTheory(PM3PDDG);
+      }
+      parseIndex++;
+   }
+   return parseIndex;
+}
+
+int InputParser::ParseConditionsMemory(vector<string>* inputTerms, int parseIndex) const{
+   parseIndex++;
+   while((*inputTerms)[parseIndex].compare(this->stringMemoryEnd) != 0){
+      // max of heap
+      if((*inputTerms)[parseIndex].compare(this->stringMemoryLimitHeap) == 0){
+         double limitHeap = atof((*inputTerms)[parseIndex+1].c_str());
+         Parameters::GetInstance()->SetLimitHeapMemory(limitHeap);
+         parseIndex++;
+      }
+      parseIndex++;   
+   }
+   return parseIndex;
+}
+
 void InputParser::Parse(Molecule* molecule) const{
 
    cout << messageStartParseInput;
@@ -284,437 +697,64 @@ void InputParser::Parse(Molecule* molecule) const{
    // parse input
    for(int i=0; i<inputTerms.size();i++){
 
+      // theory
+      if(inputTerms[i].compare(this->stringTheory) == 0){
+         i = this->ParseTheory(&inputTerms, i);
+      }
+
       // molecular geometry
       if(inputTerms[i].compare(this->stringGeometry) == 0){
-         int j=i+1;
-         while(inputTerms[j].compare(this->stringGeometryEnd) != 0){
-            double x = atof(inputTerms[j+1].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
-            double y = atof(inputTerms[j+2].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
-            double z = atof(inputTerms[j+3].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
-            AtomType atomType = H;
-            if(inputTerms[j] == "h"){
-               atomType = H;
-            }
-            else if(inputTerms[j] == "li"){
-               atomType = Li;
-            }
-            else if(inputTerms[j] == "c"){
-               atomType = C;
-            }
-            else if(inputTerms[j] == "n"){
-               atomType = N;
-            }
-            else if(inputTerms[j] == "o"){
-               atomType = O;
-            }
-            else if(inputTerms[j] == "s"){
-               atomType = S;
-            }
-            Atom* atom = AtomFactory::GetInstance()->Create(atomType, x, y, z);
-            molecule->GetAtomVect()->push_back(atom);
-            j += 4;
-         }
-         i = j;
+         i = this->ParseMolecularGeometry(molecule, &inputTerms, i);
       }
 
       // scf condition
       if(inputTerms[i].compare(this->stringScf) == 0){
-         int j=i+1;
-         while(inputTerms[j].compare(this->stringScfEnd) != 0){
-            // max iterations
-            if(inputTerms[j].compare(this->stringScfMaxIter) == 0){
-               Parameters::GetInstance()->SetMaxIterationsSCF(atoi(inputTerms[j+1].c_str()));
-               j++;
-            }
-            // RMS density 
-            if(inputTerms[j].compare(this->stringScfRmsDensity) == 0){
-               Parameters::GetInstance()->SetThresholdSCF(atof(inputTerms[j+1].c_str()));
-               j++;
-            }
-            // Damping Threshold 
-            if(inputTerms[j].compare(this->stringScfDampingThresh) == 0){
-               Parameters::GetInstance()->SetDampingThreshSCF(atof(inputTerms[j+1].c_str()));
-               j++;
-            }
-            // Damping Weight
-            if(inputTerms[j].compare(this->stringScfDampingWeight) == 0){
-               Parameters::GetInstance()->SetDampingWeightSCF(atof(inputTerms[j+1].c_str()));
-               j++;
-            }
-            // DIIS number of stored error vectors
-            if(inputTerms[j].compare(this->stringScfDiisNumErrorVect) == 0){
-               Parameters::GetInstance()->SetDiisNumErrorVectSCF(atoi(inputTerms[j+1].c_str()));
-               j++;
-            }
-            // DIIS starting error
-            if(inputTerms[j].compare(this->stringScfDiisStartError) == 0){
-               Parameters::GetInstance()->SetDiisStartErrorSCF(atof(inputTerms[j+1].c_str()));
-               j++;
-            }
-            // DIIS ending error
-            if(inputTerms[j].compare(this->stringScfDiisEndError) == 0){
-               Parameters::GetInstance()->SetDiisEndErrorSCF(atof(inputTerms[j+1].c_str()));
-               j++;
-            }
-            j++;   
-         }
-         i = j;
+         i = this->ParseConditionsSCF(&inputTerms, i);
       }
       
       // inertia tensor condition
       if(inputTerms[i].compare(this->stringInertiaTensor) == 0){
-         Parameters::GetInstance()->SetCurrentSimulation(PrincipalAxes);
-         int j=i+1;
-         while(inputTerms[j].compare(this->stringInertiaTensorEnd) != 0){
-            // origin
-            if(inputTerms[j].compare(this->stringInertiaTensorOrigin) == 0){
-               double x = atof(inputTerms[j+1].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
-               double y = atof(inputTerms[j+2].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
-               double z = atof(inputTerms[j+3].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
-               Parameters::GetInstance()->SetInertiaTensorOrigin(x, y, z);
-               j+=3;
-            }
-            j++;   
-         }
-         i = j;
+         i = this->ParseConditionsPrincipalAxes(&inputTerms, i);
       }
       
       // translating condition
       if(inputTerms[i].compare(this->stringTranslate) == 0){
-         Parameters::GetInstance()->SetCurrentSimulation(Translate);
-         int j=i+1;
-         while(inputTerms[j].compare(this->stringTranslateEnd) != 0){
-            // origin
-            if(inputTerms[j].compare(this->stringTranslatingDifference) == 0){
-               double x = atof(inputTerms[j+1].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
-               double y = atof(inputTerms[j+2].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
-               double z = atof(inputTerms[j+3].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
-               Parameters::GetInstance()->SetTranslatingDifference(x, y, z);
-               j+=3;
-            }
-            j++;   
-         }
-         i = j;
+         i = this->ParseConditionsTranslation(&inputTerms, i);
       }
       
       // rotating condition
       if(inputTerms[i].compare(this->stringRotate) == 0){
-         Parameters::GetInstance()->SetCurrentSimulation(Rotate);
-         int j=i+1;
-         while(inputTerms[j].compare(this->stringRotateEnd) != 0){
-            // origin
-            if(inputTerms[j].compare(this->stringRotatingOrigin) == 0){
-               double x = atof(inputTerms[j+1].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
-               double y = atof(inputTerms[j+2].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
-               double z = atof(inputTerms[j+3].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
-               Parameters::GetInstance()->SetRotatingOrigin(x, y, z);
-               j+=3;
-            }
-            // axis
-            else if(inputTerms[j].compare(this->stringRotatingAxis) == 0){
-               double x = atof(inputTerms[j+1].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
-               double y = atof(inputTerms[j+2].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
-               double z = atof(inputTerms[j+3].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
-               Parameters::GetInstance()->SetRotatingAxis(x, y, z);
-               j+=3;
-            }
-            // angle 
-            else if(inputTerms[j].compare(this->stringRotatingAngle) == 0){
-               double angle = atof(inputTerms[j+1].c_str()) * Parameters::GetInstance()->GetDegree2Radian();
-               Parameters::GetInstance()->SetRotatingAngle(angle);
-               j++;
-            }
-            // angles (EularAngle)
-            else if(inputTerms[j].compare(this->stringRotatingAngles) == 0){
-               double alpha = atof(inputTerms[j+1].c_str()) * Parameters::GetInstance()->GetDegree2Radian();
-               double beta  = atof(inputTerms[j+2].c_str()) * Parameters::GetInstance()->GetDegree2Radian();
-               double gamma = atof(inputTerms[j+3].c_str()) * Parameters::GetInstance()->GetDegree2Radian();
-               Parameters::GetInstance()->SetRotatingEularAngles(alpha, beta, gamma);
-               j += 3;
-            }
-            // type
-            else if(inputTerms[j].compare(this->stringRotatingType) == 0){
-               if(inputTerms[j+1].compare(this->stringRotatingTypeAxis) == 0){
-                  Parameters::GetInstance()->SetRotatingType(Axis);
-               }
-               else if(inputTerms[j+1].compare(this->stringRotatingTypeEularAngle) == 0){
-                  Parameters::GetInstance()->SetRotatingType(Eular);
-               }
-               j++;
-            }
-            j++;   
-         }
-         i = j;
+         i = this->ParseConditionsRotation(&inputTerms, i);
       }
       
       // mo plot condition
       if(inputTerms[i].compare(this->stringMOPlot) == 0){
-         int j=i+1;
-         while(inputTerms[j].compare(this->stringMOPlotEnd) != 0){
-            // Frame length
-            if(inputTerms[j].compare(this->stringMOPlotFrameLength) == 0){
-               double lx = atof(inputTerms[j+1].c_str()) 
-                          *Parameters::GetInstance()->GetAngstrom2AU();
-               double ly = atof(inputTerms[j+2].c_str()) 
-                          *Parameters::GetInstance()->GetAngstrom2AU();
-               double lz = atof(inputTerms[j+3].c_str()) 
-                          *Parameters::GetInstance()->GetAngstrom2AU();
-               Parameters::GetInstance()->SetFrameLengthMOPlot(lx, ly, lz);
-               j += 3;
-            }
-            // Grid number
-            if(inputTerms[j].compare(this->stringMOPlotGridNumber) == 0){
-               int nx = atof(inputTerms[j+1].c_str());
-               int ny = atof(inputTerms[j+2].c_str());
-               int nz = atof(inputTerms[j+3].c_str());
-               Parameters::GetInstance()->SetGridNumberMOPlot(nx, ny, nz);
-               j += 3;
-            }
-            // mo index
-            if(inputTerms[j].compare(this->stringMO) == 0){
-               int moIndex = atoi(inputTerms[j+1].c_str());
-               Parameters::GetInstance()->AddIndexMOPlot(moIndex);
-               j++;
-            }
-            // file prefix
-            if(inputTerms[j].compare(this->stringMOPlotFilePrefix) == 0){
-               string filePrefix(inputTerms[j+1].c_str());
-               Parameters::GetInstance()->SetFileNamePrefixMOPlot(filePrefix);
-               j++;
-            }
-            j++;   
-         }
-         i = j;
+         i = this->ParseConditionsMOPlot(&inputTerms, i);
       }
 
       // cis condition
       if(inputTerms[i].compare(this->stringCIS) == 0){
-         Parameters::GetInstance()->SetRequiresCIS(true);
-         int j=i+1;
-         while(inputTerms[j].compare(this->stringCISEnd) != 0){
-            // number of active occupied orbitals
-            if(inputTerms[j].compare(this->stringCISActiveOcc) == 0){
-               int activeOccCIS = atoi(inputTerms[j+1].c_str());
-               Parameters::GetInstance()->SetActiveOccCIS(activeOccCIS);
-               j++;
-            }
-            // number of active virtual orbitals
-            if(inputTerms[j].compare(this->stringCISActiveVir) == 0){
-               int activeVirCIS = atoi(inputTerms[j+1].c_str());
-               Parameters::GetInstance()->SetActiveVirCIS(activeVirCIS);
-               j++;
-            }
-            // number of excited states
-            if(inputTerms[j].compare(this->stringCISNStates) == 0){
-               int nStates = atoi(inputTerms[j+1].c_str());
-               Parameters::GetInstance()->SetNumberExcitedStatesCIS(nStates);
-               j++;
-            }
-            // Davidson is used or not
-            if(inputTerms[j].compare(this->stringCISDavidson) == 0){
-               if(inputTerms[j+1].compare(this->stringYES) == 0){
-                  Parameters::GetInstance()->SetIsDavidsonCIS(true);
-               }
-               else{
-                  Parameters::GetInstance()->SetIsDavidsonCIS(false);
-               }
-               j++;
-            }
-            // max iterations for the Davidson roop
-            if(inputTerms[j].compare(this->stringCISMaxIter) == 0){
-               int maxIter = atoi(inputTerms[j+1].c_str());
-               Parameters::GetInstance()->SetMaxIterationsCIS(maxIter);
-               j++;
-            }
-            // max dimensions for the Davidson expansion
-            if(inputTerms[j].compare(this->stringCISMaxDimensions) == 0){
-               int maxDim = atoi(inputTerms[j+1].c_str());
-               Parameters::GetInstance()->SetMaxDimensionsCIS(maxDim);
-               j++;
-            }
-            // nolm tolerance for the norm of the resiudal vectors of the Davidson.
-            if(inputTerms[j].compare(this->stringCISNormTolerance) == 0){
-               double normTol = atof(inputTerms[j+1].c_str());
-               Parameters::GetInstance()->SetNormToleranceCIS(normTol);
-               j++;
-            }
-            j++;   
-         }
-         i = j;
+         i = this->ParseConditionsCIS(&inputTerms, i);
       }
 
       // Memory
       if(inputTerms[i].compare(this->stringMemory) == 0){
-         int j=i+1;
-         while(inputTerms[j].compare(this->stringMemoryEnd) != 0){
-            // max of heap
-            if(inputTerms[j].compare(this->stringMemoryLimitHeap) == 0){
-               double limitHeap = atof(inputTerms[j+1].c_str());
-               Parameters::GetInstance()->SetLimitHeapMemory(limitHeap);
-               j++;
-            }
-            j++;   
-         }
-         i = j;
+         i = this->ParseConditionsMemory(&inputTerms, i);
       }
 
       // MD condition
       if(inputTerms[i].compare(this->stringMD) == 0){
-         Parameters::GetInstance()->SetCurrentSimulation(MD);
-         int j=i+1;
-         while(inputTerms[j].compare(this->stringMDEnd) != 0){
-            // number of total steps 
-            if(inputTerms[j].compare(this->stringMDTotalSteps) == 0){
-               int totalSteps = atoi(inputTerms[j+1].c_str());
-               Parameters::GetInstance()->SetTotalStepsMD(totalSteps);
-               j++;
-            }
-            // index of electronic eigen state on whichi MD runs. 
-            if(inputTerms[j].compare(this->stringMDElecState) == 0){
-               int elecStateIndex = atoi(inputTerms[j+1].c_str());
-               Parameters::GetInstance()->SetElectronicStateIndexMD(elecStateIndex);
-               j++;
-            }
-            // time width for MD.
-            if(inputTerms[j].compare(this->stringMDTimeWidth) == 0){
-               double dt = atof(inputTerms[j+1].c_str()) * Parameters::GetInstance()->GetFs2AU();
-               Parameters::GetInstance()->SetTimeWidthMD(dt);
-               j++;
-            }
-            j++;   
-         }
-         i = j;
+         i = this->ParseConditionsMD(&inputTerms, i);
       }
 
       // MC condition
       if(inputTerms[i].compare(this->stringMC) == 0){
-         Parameters::GetInstance()->SetCurrentSimulation(MC);
-         int j=i+1;
-         while(inputTerms[j].compare(this->stringMCEnd) != 0){
-            // number of total steps 
-            if(inputTerms[j].compare(this->stringMCTotalSteps) == 0){
-               int totalSteps = atoi(inputTerms[j+1].c_str());
-               Parameters::GetInstance()->SetTotalStepsMC(totalSteps);
-               j++;
-            }
-            // index of electronic eigen state on whichi MC runs. 
-            if(inputTerms[j].compare(this->stringMCElecState) == 0){
-               int elecStateIndex = atoi(inputTerms[j+1].c_str());
-               Parameters::GetInstance()->SetElectronicStateIndexMC(elecStateIndex);
-               j++;
-            }
-            // temperature for MC.
-            if(inputTerms[j].compare(this->stringMCTemperature) == 0){
-               double temperature = atof(inputTerms[j+1].c_str());
-               Parameters::GetInstance()->SetTemperatureMC(temperature);
-               j++;
-            }
-            // step width for MC.
-            if(inputTerms[j].compare(this->stringMCStepWidth) == 0){
-               double stepWidth = atof(inputTerms[j+1].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
-               Parameters::GetInstance()->SetStepWidthMC(stepWidth);
-               j++;
-            }
-            // seed for MC.
-            if(inputTerms[j].compare(this->stringMCSeed) == 0){
-               unsigned long seed = atol(inputTerms[j+1].c_str());
-               Parameters::GetInstance()->SetSeedMC(seed);
-               j++;
-            }
-            j++;   
-         }
-         i = j;
+         i = this->ParseConditionsMC(&inputTerms, i);
       }
 
       // RPMD condition
       if(inputTerms[i].compare(this->stringRPMD) == 0){
-         Parameters::GetInstance()->SetCurrentSimulation(RPMD);
-         int j=i+1;
-         while(inputTerms[j].compare(this->stringRPMDEnd) != 0){
-            // number of total steps 
-            if(inputTerms[j].compare(this->stringRPMDTotalSteps) == 0){
-               int totalSteps = atoi(inputTerms[j+1].c_str());
-               Parameters::GetInstance()->SetTotalStepsRPMD(totalSteps);
-               j++;
-            }
-            // index of electronic eigen state on whichi RPMD runs. 
-            if(inputTerms[j].compare(this->stringRPMDElecState) == 0){
-               int elecStateIndex = atoi(inputTerms[j+1].c_str());
-               Parameters::GetInstance()->SetElectronicStateIndexRPMD(elecStateIndex);
-               j++;
-            }
-            // number of the electronic eigenstates on whichi RPMD runs. 
-            if(inputTerms[j].compare(this->stringRPMDNumElecStates) == 0){
-               int numElecStates = atoi(inputTerms[j+1].c_str());
-               Parameters::GetInstance()->SetNumberElectronicStatesRPMD(numElecStates);
-               j++;
-            }
-            // temperature for RPMD.
-            if(inputTerms[j].compare(this->stringRPMDTemperature) == 0){
-               double temperature = atof(inputTerms[j+1].c_str());
-               Parameters::GetInstance()->SetTemperatureRPMD(temperature);
-               j++;
-            }
-            // time width for RPMD.
-            if(inputTerms[j].compare(this->stringRPMDTimeWidth) == 0){
-               double timeWidth = atof(inputTerms[j+1].c_str()) * Parameters::GetInstance()->GetFs2AU();
-               Parameters::GetInstance()->SetTimeWidthRPMD(timeWidth);
-               j++;
-            }
-            // seed for RPMD.
-            if(inputTerms[j].compare(this->stringRPMDSeed) == 0){
-               unsigned long seed = atol(inputTerms[j+1].c_str());
-               Parameters::GetInstance()->SetSeedRPMD(seed);
-               j++;
-            }
-            j++;   
-         }
-         i = j;
-      }
-
-      // theory
-      if(inputTerms[i].compare(this->stringTheory) == 0){
-         int j=i+1;
-         while(inputTerms[j].compare(this->stringTheoryEnd) != 0){
-
-            // CNDO/2
-            if(inputTerms[j].compare(this->stringTheoryCNDO2) == 0){
-               Parameters::GetInstance()->SetCurrentTheory(CNDO2);
-            }
-
-            // INDO
-            else if(inputTerms[j].compare(this->stringTheoryINDO) == 0){
-               Parameters::GetInstance()->SetCurrentTheory(INDO);
-            }
-
-            // ZINDO/S
-            else if(inputTerms[j].compare(this->stringTheoryZINDOS) == 0){
-               Parameters::GetInstance()->SetCurrentTheory(ZINDOS);
-            }
-
-            // MNDO
-            else if(inputTerms[j].compare(this->stringTheoryMNDO) == 0){
-               Parameters::GetInstance()->SetCurrentTheory(MNDO);
-            }
-
-            // AM1
-            else if(inputTerms[j].compare(this->stringTheoryAM1) == 0){
-               Parameters::GetInstance()->SetCurrentTheory(AM1);
-            }
-
-            // PM3
-            else if(inputTerms[j].compare(this->stringTheoryPM3) == 0){
-               Parameters::GetInstance()->SetCurrentTheory(PM3);
-            }
-
-            // PM3/PDG
-            else if(inputTerms[j].compare(this->stringTheoryPM3PDDG) == 0){
-               Parameters::GetInstance()->SetCurrentTheory(PM3PDDG);
-            }
-
-            j++;
-         }
-         i = j;
+         i = this->ParseConditionsRPMD(&inputTerms, i);
       }
 
    }
@@ -845,7 +885,6 @@ void InputParser::CheckRpmdConditions(const Molecule& molecule) const{
 }
 
 void InputParser::OutputMolecularBasics(Molecule* molecule) const{
-
    molecule->OutputTotalNumberAtomsAOsValenceelectrons();
    molecule->OutputConfiguration();
    molecule->OutputXyzCOM();
@@ -853,7 +892,6 @@ void InputParser::OutputMolecularBasics(Molecule* molecule) const{
 }
 
 void InputParser::OutputScfConditions() const{
-
    cout << this->messageScfConditions;
    printf("%s%d\n",this->messageScfMaxIterations.c_str(),Parameters::GetInstance()->GetMaxIterationsSCF());
    printf("%s%e\n",this->messageScfRmsDensity.c_str(),Parameters::GetInstance()->GetThresholdSCF());
@@ -863,7 +901,6 @@ void InputParser::OutputScfConditions() const{
    printf("%s%e\n",this->messageScfDiisStartError.c_str(),Parameters::GetInstance()->GetDiisStartErrorSCF());
    printf("%s%e\n",this->messageScfDiisEndError.c_str(),Parameters::GetInstance()->GetDiisEndErrorSCF());
    cout << "\n";
-
 }
 
 void InputParser::OutputMemoryConditions() const{
@@ -951,7 +988,6 @@ void InputParser::OutputMOPlotConditions() const{
 }
 
 void InputParser::OutputInputTerms(vector<string> inputTerms) const{
-   
    // output input terms
    cout << this->messageInputTerms;
    for(int i=0; i<inputTerms.size();i++){
@@ -961,7 +997,6 @@ void InputParser::OutputInputTerms(vector<string> inputTerms) const{
       }
    }
    cout << endl << endl;
-
 }
 
 /****
@@ -970,7 +1005,6 @@ void InputParser::OutputInputTerms(vector<string> inputTerms) const{
  *
  ****/
 bool InputParser::IsCommentOut(string tempStr) const{
-
    string str = TrimString(tempStr);
 
    string commentPrefix1 = "#";
@@ -987,7 +1021,6 @@ bool InputParser::IsCommentOut(string tempStr) const{
    }
 
    return 0==prefix1.compare(commentPrefix1) || 0==prefix2.compare(commentPrefix2) ;
-
 }
 
 }
