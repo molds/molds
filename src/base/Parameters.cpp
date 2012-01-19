@@ -126,6 +126,7 @@ void Parameters::SetDefaultValues(){
    this->totalStepsRPMD = 10;
    this->timeWidthRPMD = 0.1*this->fs2AU;
    this->temperatureRPMD = 300;
+   this->numberBeadsRPMD = 10;
    this->seedRPMD = static_cast<unsigned long>(time(0));
 }
 
@@ -540,6 +541,14 @@ double Parameters::GetTimeWidthRPMD() const{
 
 void Parameters::SetTimeWidthRPMD(double timeWidth){
    this->timeWidthRPMD = timeWidth;
+}
+
+int Parameters::GetNumberBeadsRPMD() const{
+   return this->numberBeadsRPMD;
+}
+
+void Parameters::SetNumberBeadsRPMD(int numberBeads){
+   this->numberBeadsRPMD = numberBeads;
 }
 
 unsigned long Parameters::GetSeedRPMD() const{

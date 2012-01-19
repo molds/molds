@@ -309,7 +309,7 @@ HOW TO WRITE INPUT:
   
       -options
        "total_steps", "electronic_state", "num_electonic_states", "temperature", 
-       "seed", and "dt" are prepared as options.
+       "num_beads", "seed", and "dt" are prepared as options.
 
        The default value of the "total_steps" is 10. 
 
@@ -325,6 +325,9 @@ HOW TO WRITE INPUT:
 
        "temperature" means the temperature in the RPMD.
        The default value of the "temeprture" is 300[K].
+
+       "num_beads" means the number of beads for the ring polymer.
+       The default value of the "num_beads" is 10.
 
        "seed" means the seed of the random-number-generator.
        The random numbers are used during initial condition sampling.
@@ -343,6 +346,7 @@ HOW TO WRITE INPUT:
             num_electronic_state 10
             temperature 100
             seed 398
+            num_beads 20
             dt 0.5
          RPMD_END
 

@@ -120,6 +120,8 @@ public:
    void SetTemperatureRPMD(double temperature);
    double GetTimeWidthRPMD() const;
    void SetTimeWidthRPMD(double stepWidth);
+   int GetNumberBeadsRPMD() const;
+   void SetNumberBeadsRPMD(int numberBeads);
    unsigned long GetSeedRPMD() const;
    void SetSeedRPMD(unsigned long seed);
 private:
@@ -177,6 +179,7 @@ private:
    int totalStepsRPMD;
    double temperatureRPMD;
    double timeWidthRPMD;
+   int numberBeadsRPMD;
    unsigned long seedRPMD;
    void SetDefaultValues();
    void SetMessages();

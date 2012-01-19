@@ -75,6 +75,7 @@ private:
    std::string messageRpmdNumElecStates;
    std::string messageRpmdTimeWidth;
    std::string messageRpmdTemperature;
+   std::string messageRpmdNumBeads;
    std::string messageRpmdSeed;
    std::string messageMOPlotConditions;
    std::string messageMOPlotIndex;
@@ -160,6 +161,7 @@ private:
    std::string stringRPMDNumElecStates;
    std::string stringRPMDTimeWidth;
    std::string stringRPMDTemperature;
+   std::string stringRPMDNumBeads;
    std::string stringRPMDSeed;
    void CalcMolecularBasics(Molecule* molecule) const;
    void CheckCisConditions(const Molecule& molecule) const;

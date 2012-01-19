@@ -47,6 +47,7 @@
 #include"base/ElectronicStructureFactory.h"
 #include"md/MD.h"
 #include"mc/MC.h"
+#include"rpmd/RPMD.h"
 using namespace std;
 using namespace MolDS_base;
 
@@ -132,6 +133,23 @@ int main(){
          }
          if(mc != NULL){
             delete mc;
+         }
+      }
+
+      // RPMD
+      else if(runingNormally && Parameters::GetInstance()->GetCurrentSimulation() == RPMD){
+         MolDS_rpmd::RPMD* rpmd = NULL;
+         try{
+            rpmd = new MolDS_rpmd::RPMD();
+            //rpmd->SetMolecule(molecule);
+            rpmd->DoRPMD(*molecule);
+         }
+         catch(MolDSException ex){
+            cout << ex.what() << endl;
+            runingNormally = false;
+         }
+         if(rpmd != NULL){
+            delete rpmd;
          }
       }
 

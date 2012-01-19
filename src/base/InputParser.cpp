@@ -127,6 +127,7 @@ void InputParser::SetMessages(){
    this->messageRpmdNumElecStates = "\t\tNumber of the electronic eigenstates: ";
    this->messageRpmdTimeWidth = "\t\tTime width: ";
    this->messageRpmdTemperature = "\t\tTemperature: ";
+   this->messageRpmdNumBeads = "\t\tNumber of the beads in the Ring Polymer: ";
    this->messageRpmdSeed = "\t\tSeed: ";
    this->messageMOPlotConditions = "\tMO plot conditions:\n";
    this->messageMOPlotIndex = "\t\tMO index: ";
@@ -232,6 +233,7 @@ void InputParser::SetMessages(){
    this->stringRPMDNumElecStates = "num_electronic_states";
    this->stringRPMDTimeWidth = "dt";
    this->stringRPMDTemperature = "temperature";
+   this->stringRPMDNumBeads = "num_beads";
    this->stringRPMDSeed = "seed";
 }
 
@@ -602,13 +604,13 @@ int InputParser::ParseConditionsRPMD(vector<string>* inputTerms, int parseIndex)
          Parameters::GetInstance()->SetTotalStepsRPMD(totalSteps);
          parseIndex++;
       }
-      // index of electronic eigen state on whichi RPMD runs. 
+      // index of electronic eigen state on which RPMD runs. 
       if((*inputTerms)[parseIndex].compare(this->stringRPMDElecState) == 0){
          int elecStateIndex = atoi((*inputTerms)[parseIndex+1].c_str());
          Parameters::GetInstance()->SetElectronicStateIndexRPMD(elecStateIndex);
          parseIndex++;
       }
-      // number of the electronic eigenstates on whichi RPMD runs. 
+      // number of the electronic eigenstates for nonadiabatic RPMD.
       if((*inputTerms)[parseIndex].compare(this->stringRPMDNumElecStates) == 0){
          int numElecStates = atoi((*inputTerms)[parseIndex+1].c_str());
          Parameters::GetInstance()->SetNumberElectronicStatesRPMD(numElecStates);
@@ -624,6 +626,12 @@ int InputParser::ParseConditionsRPMD(vector<string>* inputTerms, int parseIndex)
       if((*inputTerms)[parseIndex].compare(this->stringRPMDTimeWidth) == 0){
          double timeWidth = atof((*inputTerms)[parseIndex+1].c_str()) * Parameters::GetInstance()->GetFs2AU();
          Parameters::GetInstance()->SetTimeWidthRPMD(timeWidth);
+         parseIndex++;
+      }
+      // number of the beads in Ring Polymer.
+      if((*inputTerms)[parseIndex].compare(this->stringRPMDNumBeads) == 0){
+         int numBeads = atoi((*inputTerms)[parseIndex+1].c_str());
+         Parameters::GetInstance()->SetNumberBeadsRPMD(numBeads);
          parseIndex++;
       }
       // seed for RPMD.
@@ -959,6 +967,7 @@ void InputParser::OutputRpmdConditions() const{
    printf("%s%d\n",this->messageRpmdTotalSteps.c_str(),Parameters::GetInstance()->GetTotalStepsRPMD());
    printf("%s%lf%s\n",this->messageRpmdTemperature.c_str(),Parameters::GetInstance()->GetTemperatureRPMD(),this->messageK.c_str());
    printf("%s%lf%s\n",this->messageRpmdTimeWidth.c_str(),Parameters::GetInstance()->GetTimeWidthRPMD()/Parameters::GetInstance()->GetFs2AU(),this->messageFs.c_str());
+   printf("%s%d\n",this->messageRpmdNumBeads.c_str(),Parameters::GetInstance()->GetNumberBeadsRPMD());
    printf("%s%lu\n",this->messageRpmdSeed.c_str(),Parameters::GetInstance()->GetSeedRPMD());
 
    cout << "\n";
