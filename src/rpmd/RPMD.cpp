@@ -25,6 +25,7 @@
 #include<vector>
 #include<stdexcept>
 #include<boost/shared_ptr.hpp>
+#include<boost/random.hpp>
 #include"../base/MolDSException.h"
 #include"../base/Uncopyable.h"
 #include"../base/Enums.h"
@@ -34,6 +35,7 @@
 #include"../base/Molecule.h"
 #include"../base/ElectronicStructure.h"
 #include"../base/ElectronicStructureFactory.h"
+#include"../mc/MC.h"
 #include"RPMD.h"
 using namespace std;
 using namespace MolDS_base;
@@ -58,11 +60,18 @@ void RPMD::DoRPMD(const Molecule& refferenceMolecule){
    int elecState = Parameters::GetInstance()->GetElectronicStateIndexRPMD();
    this->CheckEnableTheoryType(theory, elecState);
 
-   // create Beads
+   double temperature = Parameters::GetInstance()->GetTemperatureRPMD();
+   unsigned long seed = Parameters::GetInstance()->GetSeedRPMD();
+   int totalSteps = Parameters::GetInstance()->GetTotalStepsRPMD();
    int numBeads = Parameters::GetInstance()->GetNumberBeadsRPMD();
+   double dt = Parameters::GetInstance()->GetTimeWidthRPMD();
+   double kB = Parameters::GetInstance()->GetBoltzmann();
+   int numAtom = refferenceMolecule.GetAtomVect()->size();
+
+   // create Beads
    vector<boost::shared_ptr<Molecule> > molecularBeads;
    vector<boost::shared_ptr<ElectronicStructure> > electronicStructureBeads;
-   for(int i=0; i<numBeads; i++){
+   for(int b=0; b<numBeads; b++){
       // create molecular beads
       boost::shared_ptr<Molecule> molecule(new Molecule());
       *molecule = refferenceMolecule;
@@ -73,6 +82,38 @@ void RPMD::DoRPMD(const Molecule& refferenceMolecule){
       electronicStructureBeads.push_back(electronicStructure);
    }
 
+   // initialize Beads
+   for(int b=0; b<numBeads; b++){
+      double stepWidth = 0.05;
+      boost::shared_ptr<MolDS_mc::MC> mc(new MolDS_mc::MC());
+      Molecule* molecule = molecularBeads[b].get();
+      mc->SetMolecule(molecule);
+      mc->DoMC(molecule->GetAtomVect()->size(), elecState, temperature, stepWidth, seed+b);
+   }
+
+   for(int s=0; s<totalSteps; s++){
+      cout << this->messageStartStepRPMD << s+1 << endl;
+
+      // update momenta
+      for(int b=0; b<numBeads; b++){
+         int preB  = b==0 ? numBeads-1 : b-1;
+         int postB = b==numBeads-1 ? 0 : b+1;
+         double** electronicForceMatrix = electronicStructureBeads[b]->GetForce(elecState);;
+         for(int a=0; a<numAtom; a++){
+            Atom* atom = (*molecularBeads[b]->GetAtomVect())[a];
+            Atom* preAtom = (*molecularBeads[preB]->GetAtomVect())[a];
+            Atom* postAtom = (*molecularBeads[postB]->GetAtomVect())[a];
+            double coreMass = atom->GetAtomicMass() - (double)atom->GetNumberValenceElectrons();
+            for(int i=0; i<CartesianType_end; i++){
+               double beadsForce = -1.0*coreMass*pow(kB*temperature*(double)numBeads,2.0)
+                                  *(2.0*atom->GetXyz()[i] - preAtom->GetXyz()[i] - postAtom->GetXyz()[i]);
+               double force = beadsForce + electronicForceMatrix[a][i];
+               atom->GetPxyz()[i] += 0.5*dt*(force);
+            }
+         }
+      }
+
+   }
 /*
    for(int i=0; i<numBeads; i++){
       Molecule* bead = molecularBeads[i];
