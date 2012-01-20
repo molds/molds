@@ -27,7 +27,7 @@ class RPMD{
 public:
    RPMD();
    ~RPMD();
-   void DoRPMD(const MolDS_base::Molecule&);
+   void DoRPMD(const MolDS_base::Molecule& refferenceMolecule);
 private:
    std::string messageinitialConditionRPMD;
    std::string messageStartRPMD;
@@ -36,9 +36,9 @@ private:
    std::string messageEndStepRPMD;
    std::string messageEnergies;
    std::string messageEnergiesTitle;
-   std::string messageCoreKineticEnergy;
-   std::string messageCoreRepulsionEnergy;
-   std::string messageElectronicEnergy;
+   std::string messageBeadsKineticEnergy;
+   std::string messageBeadsHarmonicEnergy;
+   std::string messageElecStateEnergy;
    std::string messageTotalEnergy;
    std::string messageErrorEnergy;
    std::string messageTime;
@@ -50,8 +50,33 @@ private:
    void SetMessages();
    void SetEnableTheoryTypes();
    void CheckEnableTheoryType(MolDS_base::TheoryType theoryType, int elecState);
+   void CreateBeads(std::vector<boost::shared_ptr<MolDS_base::Molecule> >& molecularBeads, 
+                    std::vector<boost::shared_ptr<MolDS_base::ElectronicStructure> >& electronicStructureBeads,
+                    const MolDS_base::Molecule& refferenceMolecule,
+                    int numBeads);
+   void UpdateMomenta(const std::vector<boost::shared_ptr<MolDS_base::Molecule> >& molecularBeads, 
+                      const std::vector<boost::shared_ptr<MolDS_base::ElectronicStructure> >& electronicStructureBeads,
+                      int elecState,
+                      double dt,
+                      double templerature);
+   void UpdateCoordinates(const std::vector<boost::shared_ptr<MolDS_base::Molecule> >& molecularBeads,
+                          double dt);
+   void UpdateElectronicStructure(const std::vector<boost::shared_ptr<MolDS_base::ElectronicStructure> >& electronicStructureBeads);
+   void FluctuateBeads(const std::vector<boost::shared_ptr<MolDS_base::Molecule> >& molecularBeads,
+                       int elecState,
+                       double temperature,
+                       unsigned long seed);
    //void OutputEnergies(boost::shared_ptr<MolDS_base::ElectronicStructure> electronicStructure, double initialEnergy);
    //double OutputEnergies(boost::shared_ptr<MolDS_base::ElectronicStructure> electronicStructure);
+   double OutputEnergies(const std::vector<boost::shared_ptr<MolDS_base::Molecule> >& molecularBeads, 
+                         const std::vector<boost::shared_ptr<MolDS_base::ElectronicStructure> >& electronicStructureBeads,
+                         int elecState,
+                         double temperature);
+   void OutputEnergies(const std::vector<boost::shared_ptr<MolDS_base::Molecule> >& molecularBeads, 
+                       const std::vector<boost::shared_ptr<MolDS_base::ElectronicStructure> >& electronicStructureBeads,
+                       int elecState,
+                       double temperature,
+                       double initialEnergy);
 };
 
 }

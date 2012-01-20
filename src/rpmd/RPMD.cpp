@@ -52,25 +52,10 @@ RPMD::~RPMD(){
    //cout << "RPMD deleted\n";
 }
 
-void RPMD::DoRPMD(const Molecule& refferenceMolecule){
-   cout << this->messageStartRPMD;
-
-   // check
-   TheoryType theory = Parameters::GetInstance()->GetCurrentTheory();
-   int elecState = Parameters::GetInstance()->GetElectronicStateIndexRPMD();
-   this->CheckEnableTheoryType(theory, elecState);
-
-   double temperature = Parameters::GetInstance()->GetTemperatureRPMD();
-   unsigned long seed = Parameters::GetInstance()->GetSeedRPMD();
-   int totalSteps = Parameters::GetInstance()->GetTotalStepsRPMD();
-   int numBeads = Parameters::GetInstance()->GetNumberBeadsRPMD();
-   double dt = Parameters::GetInstance()->GetTimeWidthRPMD();
-   double kB = Parameters::GetInstance()->GetBoltzmann();
-   int numAtom = refferenceMolecule.GetAtomVect()->size();
-
-   // create Beads
-   vector<boost::shared_ptr<Molecule> > molecularBeads;
-   vector<boost::shared_ptr<ElectronicStructure> > electronicStructureBeads;
+void RPMD::CreateBeads(vector<boost::shared_ptr<Molecule> >& molecularBeads,
+                       vector<boost::shared_ptr<ElectronicStructure> >& electronicStructureBeads,
+                       const Molecule& refferenceMolecule,
+                       int numBeads){
    for(int b=0; b<numBeads; b++){
       // create molecular beads
       boost::shared_ptr<Molecule> molecule(new Molecule());
@@ -81,122 +66,133 @@ void RPMD::DoRPMD(const Molecule& refferenceMolecule){
       electronicStructure->SetMolecule(molecule.get());
       electronicStructureBeads.push_back(electronicStructure);
    }
+}
 
-   // initialize Beads
+void RPMD::UpdateElectronicStructure(const std::vector<boost::shared_ptr<ElectronicStructure> >& electronicStructureBeads){
+   int numBeads = electronicStructureBeads.size();
    for(int b=0; b<numBeads; b++){
-      double stepWidth = 0.05;
-      boost::shared_ptr<MolDS_mc::MC> mc(new MolDS_mc::MC());
-      Molecule* molecule = molecularBeads[b].get();
-      mc->SetMolecule(molecule);
-      mc->DoMC(molecule->GetAtomVect()->size(), elecState, temperature, stepWidth, seed+b);
-   }
-
-   for(int s=0; s<totalSteps; s++){
-      cout << this->messageStartStepRPMD << s+1 << endl;
-
-      // update momenta
-      for(int b=0; b<numBeads; b++){
-         int preB  = b==0 ? numBeads-1 : b-1;
-         int postB = b==numBeads-1 ? 0 : b+1;
-         double** electronicForceMatrix = electronicStructureBeads[b]->GetForce(elecState);;
-         for(int a=0; a<numAtom; a++){
-            Atom* atom = (*molecularBeads[b]->GetAtomVect())[a];
-            Atom* preAtom = (*molecularBeads[preB]->GetAtomVect())[a];
-            Atom* postAtom = (*molecularBeads[postB]->GetAtomVect())[a];
-            double coreMass = atom->GetAtomicMass() - (double)atom->GetNumberValenceElectrons();
-            for(int i=0; i<CartesianType_end; i++){
-               double beadsForce = -1.0*coreMass*pow(kB*temperature*(double)numBeads,2.0)
-                                  *(2.0*atom->GetXyz()[i] - preAtom->GetXyz()[i] - postAtom->GetXyz()[i]);
-               double force = beadsForce + electronicForceMatrix[a][i];
-               atom->GetPxyz()[i] += 0.5*dt*(force);
-            }
-         }
+      electronicStructureBeads[b]->DoSCF();
+      if(Parameters::GetInstance()->RequiresCIS()){
+         electronicStructureBeads[b]->DoCIS();
       }
-
    }
-/*
-   for(int i=0; i<numBeads; i++){
-      Molecule* bead = molecularBeads[i];
-      delete bead;
-   }
-*/
+}
 
-/*
-   //Molecule trialMolecule(*this->molecule);
-   // malloc electornic structure
-   boost::shared_ptr<ElectronicStructure> electronicStructure(ElectronicStructureFactory::GetInstance()->Create());
-   electronicStructure->SetMolecule(this->molecule);
-
-   int totalSteps = Parameters::GetInstance()->GetTotalStepsRPMD();
-   double dt = Parameters::GetInstance()->GetTimeWidthRPMD();
-   double time = 0.0;
-   bool requireGuess = false;
-   double** matrixForce = NULL;
-   double initialEnergy;
-
-   // initial calculation
-   electronicStructure->DoSCF();
-   if(Parameters::GetInstance()->RequiresCIS()){
-      electronicStructure->DoCIS();
-   }
-   matrixForce = electronicStructure->GetForce(elecState);
-
-   // output initial conditions
-   cout << this->messageinitialConditionRPMD;
-   initialEnergy = this->OutputEnergies(electronicStructure);
-   cout << endl;
-   this->molecule->OutputConfiguration();
-   this->molecule->OutputXyzCOC();
-   this->molecule->OutputMomenta();
-
-   for(int s=0; s<totalSteps; s++){
-      cout << this->messageStartStepRPMD << s+1 << endl;
-
-      // update momenta
-      for(int a=0; a<this->molecule->GetAtomVect()->size(); a++){
-         Atom* atom = (*this->molecule->GetAtomVect())[a];
+// elecState=0 means ground state.
+void RPMD::UpdateMomenta(const vector<boost::shared_ptr<Molecule> >& molecularBeads,
+                         const std::vector<boost::shared_ptr<ElectronicStructure> >& electronicStructureBeads,
+                         int elecState,
+                         double dt,
+                         double temperature){
+   double kB = Parameters::GetInstance()->GetBoltzmann();
+   int numBeads = molecularBeads.size();
+   int numAtom = molecularBeads[0]->GetAtomVect()->size();
+   for(int b=0; b<numBeads; b++){
+      int preB  = b==0 ? numBeads-1 : b-1;
+      int postB = b==numBeads-1 ? 0 : b+1;
+      double** electronicForceMatrix = electronicStructureBeads[b]->GetForce(elecState);;
+      for(int a=0; a<numAtom; a++){
+         Atom* atom = (*molecularBeads[b]->GetAtomVect())[a];
+         Atom* preAtom = (*molecularBeads[preB]->GetAtomVect())[a];
+         Atom* postAtom = (*molecularBeads[postB]->GetAtomVect())[a];
+         double coreMass = atom->GetAtomicMass() - (double)atom->GetNumberValenceElectrons();
          for(int i=0; i<CartesianType_end; i++){
-            atom->GetPxyz()[i] += 0.5*dt*(matrixForce[a][i]);
+            double beadsForce = -1.0*coreMass*pow(kB*temperature*(double)numBeads,2.0)
+                               *(2.0*atom->GetXyz()[i] - preAtom->GetXyz()[i] - postAtom->GetXyz()[i]);
+            double force = beadsForce + electronicForceMatrix[a][i];
+            atom->GetPxyz()[i] += 0.5*dt*(force);
          }
       }
+   }
+}
 
-      // update coordinates
-      for(int a=0; a<this->molecule->GetAtomVect()->size(); a++){
-         Atom* atom = (*this->molecule->GetAtomVect())[a];
+void RPMD::UpdateCoordinates(const vector<boost::shared_ptr<Molecule> >& molecularBeads,
+                             double dt){
+   int numBeads = molecularBeads.size();
+   int numAtom = molecularBeads[0]->GetAtomVect()->size();
+   for(int b=0; b<numBeads; b++){
+      for(int a=0; a<numAtom; a++){
+         Atom* atom = (*molecularBeads[b]->GetAtomVect())[a];
          double coreMass = atom->GetAtomicMass() - (double)atom->GetNumberValenceElectrons();
          for(int i=0; i<CartesianType_end; i++){
             atom->GetXyz()[i] += dt*atom->GetPxyz()[i]/coreMass;
          }
       }
-      this->molecule->CalcXyzCOM();
-      this->molecule->CalcXyzCOC();
+      molecularBeads[b]->CalcXyzCOM();
+      molecularBeads[b]->CalcXyzCOC();
+   }
+}
 
+void RPMD::FluctuateBeads(const vector<boost::shared_ptr<Molecule> >& molecularBeads,
+                          int elecState,
+                          double temperature,
+                          unsigned long seed){
+   int numBeads = molecularBeads.size();
+   double stepWidth = 0.01;
+   for(int b=0; b<numBeads; b++){
+      boost::shared_ptr<MolDS_mc::MC> mc(new MolDS_mc::MC());
+      Molecule* molecule = molecularBeads[b].get();
+      mc->SetMolecule(molecule);
+      mc->DoMC(molecule->GetAtomVect()->size(), elecState, temperature, stepWidth, seed+b);
+   }
+}
+
+void RPMD::DoRPMD(const Molecule& refferenceMolecule){
+   cout << this->messageStartRPMD;
+
+   // validate theory
+   TheoryType theory = Parameters::GetInstance()->GetCurrentTheory();
+   int elecState = Parameters::GetInstance()->GetElectronicStateIndexRPMD();
+   this->CheckEnableTheoryType(theory, elecState);
+
+   double temperature = Parameters::GetInstance()->GetTemperatureRPMD();
+   unsigned long seed = Parameters::GetInstance()->GetSeedRPMD();
+   int totalSteps = Parameters::GetInstance()->GetTotalStepsRPMD();
+   double dt = Parameters::GetInstance()->GetTimeWidthRPMD();
+   int numAtom = refferenceMolecule.GetAtomVect()->size();
+   int numBeads = Parameters::GetInstance()->GetNumberBeadsRPMD();
+   double kB = Parameters::GetInstance()->GetBoltzmann();
+
+   // create Beads
+   vector<boost::shared_ptr<Molecule> > molecularBeads;
+   vector<boost::shared_ptr<ElectronicStructure> > electronicStructureBeads;
+   this->CreateBeads(molecularBeads, electronicStructureBeads, refferenceMolecule, numBeads);
+
+   // initialize Beads fluctuations (quantum fluctuations)
+   this->FluctuateBeads(molecularBeads, elecState, temperature, seed);
+
+   // initialize Beads electronic states
+   this->UpdateElectronicStructure(electronicStructureBeads);
+   cout << this->messageinitialConditionRPMD << endl;
+   double initialEnergy = this->OutputEnergies(molecularBeads,
+                                               electronicStructureBeads,
+                                               elecState,
+                                               temperature);
+
+   // time step roop
+   for(int s=0; s<totalSteps; s++){
+      cout << this->messageStartStepRPMD << s+1 << endl;
+      // update momenta
+      this->UpdateMomenta(molecularBeads, electronicStructureBeads, elecState, dt, temperature);
+
+      // update coordinates
+      this->UpdateCoordinates(molecularBeads, dt);
+      
       // update electronic structure
-      electronicStructure->DoSCF(requireGuess);
-      if(Parameters::GetInstance()->RequiresCIS()){
-         electronicStructure->DoCIS();
-      }
-
-      // update force
-      matrixForce = electronicStructure->GetForce(elecState);
+      this->UpdateElectronicStructure(electronicStructureBeads);
 
       // update momenta
-      for(int a=0; a<this->molecule->GetAtomVect()->size(); a++){
-         Atom* atom = (*this->molecule->GetAtomVect())[a];
-         for(int i=0; i<CartesianType_end; i++){
-            atom->GetPxyz()[i] += 0.5*dt*(matrixForce[a][i]);
-         }
-      }
+      this->UpdateMomenta(molecularBeads, electronicStructureBeads, elecState, dt, temperature);
 
-      // output results
-      this->OutputEnergies(electronicStructure, initialEnergy);
-      this->molecule->OutputConfiguration();
-      this->molecule->OutputXyzCOC();
-      this->molecule->OutputMomenta();
-      cout << this->messageTime << dt*((double)s+1)/Parameters::GetInstance()->GetFs2AU() << endl;
+      // output energy
+      this->OutputEnergies(molecularBeads, 
+                           electronicStructureBeads,
+                           elecState,
+                           temperature,
+                           initialEnergy);
+
       cout << this->messageEndStepRPMD << s+1 << endl;
    }
-*/
    cout << this->messageEndRPMD;
 }
 
@@ -214,57 +210,88 @@ void RPMD::SetMessages(){
    this->messageEndStepRPMD =     "\t========== DONE: RPMD step ";
    this->messageEnergies = "\tEnergies:\n";
    this->messageEnergiesTitle = "\t\t|\tkind\t\t\t| [a.u.] | [eV] | \n";
-   this->messageCoreKineticEnergy =   "Core kinetic     ";
-   this->messageCoreRepulsionEnergy = "Core repulsion   ";
-   this->messageElectronicEnergy = "Electronic\n\t\t(inc. core rep.)";
+   this->messageBeadsKineticEnergy =   "Beads kinetic     ";
+   this->messageBeadsHarmonicEnergy = "Beads harmonic   ";
+   this->messageElecStateEnergy = "Electronic\n\t\t(inc. core rep.)";
    this->messageTotalEnergy =         "Total            ";
    this->messageErrorEnergy =         "Error            ";
    this->messageTime = "\tTime in [fs]: ";
 }
 
-/*
-double RPMD::OutputEnergies(boost::shared_ptr<ElectronicStructure> electronicStructure){
-   int elecState = Parameters::GetInstance()->GetElectronicStateIndexRPMD();
-   double coreKineticEnergy = 0.0;
-   for(int a=0; a<this->molecule->GetAtomVect()->size(); a++){
-      Atom* atom = (*this->molecule->GetAtomVect())[a];
-      double coreMass = atom->GetAtomicMass() - (double)atom->GetNumberValenceElectrons();
-      for(int i=0; i<CartesianType_end; i++){
-      Atom* atom = (*this->molecule->GetAtomVect())[a];
-         coreKineticEnergy += 0.5*pow(atom->GetPxyz()[i],2.0)/coreMass;
+double RPMD::OutputEnergies(const vector<boost::shared_ptr<Molecule> >& molecularBeads,
+                            const std::vector<boost::shared_ptr<ElectronicStructure> >& electronicStructureBeads,
+                            int elecState,
+                            double temperature){
+   int numBeads = molecularBeads.size();
+   int numAtom = molecularBeads[0]->GetAtomVect()->size();
+   double beadsKineticEnergy = 0.0;;
+   for(int b=0; b<numBeads; b++){
+      double coreKineticEnergy = 0.0;
+      for(int a=0; a<numAtom; a++){
+         Atom* atom = (*molecularBeads[b]->GetAtomVect())[a];
+         double coreMass = atom->GetAtomicMass() - (double)atom->GetNumberValenceElectrons();
+         for(int i=0; i<CartesianType_end; i++){
+            coreKineticEnergy += 0.5*pow(atom->GetPxyz()[i],2.0)/coreMass;
+         }
       }
+      beadsKineticEnergy += coreKineticEnergy;
    }  
+
+   double kB = Parameters::GetInstance()->GetBoltzmann();
+   double beadsHarmonicEnergy = 0.0;
+   for(int b=0; b<numBeads; b++){
+      double harmonicEnergy = 0.0;
+      int preB = b==0 ? numBeads-1 : b-1;
+      for(int a=0; a<numAtom; a++){
+         Atom* atom = (*molecularBeads[b]->GetAtomVect())[a];
+         Atom* preAtom = (*molecularBeads[preB]->GetAtomVect())[a];
+         double coreMass = atom->GetAtomicMass() - (double)atom->GetNumberValenceElectrons();
+         double dx = atom->GetXyz()[XAxis] - preAtom->GetXyz()[XAxis];
+         double dy = atom->GetXyz()[YAxis] - preAtom->GetXyz()[YAxis];
+         double dz = atom->GetXyz()[ZAxis] - preAtom->GetXyz()[ZAxis];
+         harmonicEnergy += coreMass*(pow(dx,2.0)+pow(dy,2.0)+pow(dz,2.0));
+      }
+      harmonicEnergy *= 0.5*pow(kB*temperature*(double)numBeads,2.0);
+      beadsHarmonicEnergy += harmonicEnergy;
+   }
+
+   double elecStateEnergy = 0.0;
+   for(int b=0; b<numBeads; b++){
+      elecStateEnergy += electronicStructureBeads[b]->GetElectronicEnergy(elecState);
+   }
+
+   double totalEnergy = beadsKineticEnergy + beadsHarmonicEnergy + elecStateEnergy;
+
    // output energies:
    cout << this->messageEnergies;
    cout << this->messageEnergiesTitle;
-   printf("\t\t%s\t%e\t%e\n",this->messageCoreKineticEnergy.c_str(), 
-                             coreKineticEnergy,
-                             coreKineticEnergy/Parameters::GetInstance()->GetEV2AU());
-   printf("\t\t%s\t%e\t%e\n",this->messageCoreRepulsionEnergy.c_str(), 
-                             electronicStructure->GetCoreRepulsionEnergy(),
-                             electronicStructure->GetCoreRepulsionEnergy()
-                             /Parameters::GetInstance()->GetEV2AU());
-   printf("\t\t%s\t%e\t%e\n",this->messageElectronicEnergy.c_str(), 
-                             electronicStructure->GetElectronicEnergy(elecState),
-                             electronicStructure->GetElectronicEnergy(elecState)
-                             /Parameters::GetInstance()->GetEV2AU());
+   printf("\t\t%s\t%e\t%e\n",this->messageBeadsKineticEnergy.c_str(), 
+                             beadsKineticEnergy,
+                             beadsKineticEnergy/Parameters::GetInstance()->GetEV2AU());
+   printf("\t\t%s\t%e\t%e\n",this->messageBeadsHarmonicEnergy.c_str(), 
+                             beadsHarmonicEnergy,
+                             beadsHarmonicEnergy/Parameters::GetInstance()->GetEV2AU());
+   printf("\t\t%s\t%e\t%e\n",this->messageElecStateEnergy.c_str(), 
+                             elecStateEnergy,
+                             elecStateEnergy/Parameters::GetInstance()->GetEV2AU());
    printf("\t\t%s\t%e\t%e\n",this->messageTotalEnergy.c_str(), 
-                             (coreKineticEnergy + electronicStructure->GetElectronicEnergy(elecState)),
-                             (coreKineticEnergy + electronicStructure->GetElectronicEnergy(elecState))
-                             /Parameters::GetInstance()->GetEV2AU());
+                             totalEnergy,
+                             totalEnergy/Parameters::GetInstance()->GetEV2AU());
 
-   return (coreKineticEnergy + electronicStructure->GetElectronicEnergy(elecState));
+   return totalEnergy;
 }
 
-void RPMD::OutputEnergies(boost::shared_ptr<ElectronicStructure> electronicStructure, 
-                        double initialEnergy){
-   double energy = this->OutputEnergies(electronicStructure);
+void RPMD::OutputEnergies(const vector<boost::shared_ptr<Molecule> >& molecularBeads,
+                          const std::vector<boost::shared_ptr<ElectronicStructure> >& electronicStructureBeads,
+                          int elecState,
+                          double temperature,
+                          double initialEnergy){
+   double energy = this->OutputEnergies(molecularBeads, electronicStructureBeads, elecState, temperature);
    printf("\t\t%s\t%e\t%e\n\n",this->messageErrorEnergy.c_str(), 
                              (initialEnergy - energy),
                              (initialEnergy - energy)
                              /Parameters::GetInstance()->GetEV2AU());
 }
-*/
 
 void RPMD::SetEnableTheoryTypes(){
    // ground state
