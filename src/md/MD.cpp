@@ -167,7 +167,6 @@ double MD::OutputEnergies(boost::shared_ptr<ElectronicStructure> electronicStruc
       Atom* atom = (*this->molecule->GetAtomVect())[a];
       double coreMass = atom->GetAtomicMass() - (double)atom->GetNumberValenceElectrons();
       for(int i=0; i<CartesianType_end; i++){
-      Atom* atom = (*this->molecule->GetAtomVect())[a];
          coreKineticEnergy += 0.5*pow(atom->GetPxyz()[i],2.0)/coreMass;
       }
    }  
