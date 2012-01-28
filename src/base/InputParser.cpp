@@ -963,13 +963,17 @@ void InputParser::ValidateMdConditions(const Molecule& molecule) const{
 
 void InputParser::ValidateMcConditions(const Molecule& molecule) const{
    int groundStateIndex = 0;
+   int targetStateIndex = Parameters::GetInstance()->GetElectronicStateIndexMC();
+   TheoryType theory = Parameters::GetInstance()->GetCurrentTheory();
    // CNDO2 and INDO do not support excited states.
-   if(Parameters::GetInstance()->GetCurrentTheory() == CNDO2 || 
-      Parameters::GetInstance()->GetCurrentTheory() == INDO){
-      Parameters::GetInstance()->SetElectronicStateIndexMC(groundStateIndex);
+   if((theory == CNDO2 || theory == INDO) && groundStateIndex < targetStateIndex){
+      stringstream ss;
+      ss << this->errorMessageNonValidExcitedStatesMC;
+      ss << this->errorMessageElecState << targetStateIndex << endl;
+      ss << this->errorMessageTheory << TheoryTypeStr(theory) << endl;
+      throw MolDSException(ss.str());
    }
    // Validate for the excited states dynamics
-   int targetStateIndex = Parameters::GetInstance()->GetElectronicStateIndexMC();
    if(groundStateIndex < targetStateIndex && !Parameters::GetInstance()->RequiresCIS()){
       Parameters::GetInstance()->SetNumberExcitedStatesCIS(targetStateIndex);
       Parameters::GetInstance()->SetRequiresCIS(true);
