@@ -23,6 +23,7 @@
 #include<math.h>
 #include<string>
 #include<vector>
+#include"../base/PrintController.h"
 #include"../base/Uncopyable.h"
 #include"../base/Enums.h"
 #include"../base/EularAngle.h"

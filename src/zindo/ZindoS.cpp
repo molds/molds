@@ -26,6 +26,7 @@
 #include<stdexcept>
 #include<omp.h>
 #include"mkl.h"
+#include"../base/PrintController.h"
 #include"../base/MolDSException.h"
 #include"../base/Uncopyable.h"
 #include"../mkl_wrapper/LapackWrapper.h"
@@ -763,7 +764,9 @@ double ZindoS::GetMolecularIntegralElement(int moI, int moJ, int moK, int moL,
 }
 
 void ZindoS::DoCIS(){
-   cout << this->messageStartCIS;
+   if(this->PrintsLogs()){
+      cout << this->messageStartCIS;
+   }
    double ompStartTime = omp_get_wtime();
 
    int numberActiveOcc = Parameters::GetInstance()->GetActiveOccCIS();
@@ -799,20 +802,24 @@ void ZindoS::DoCIS(){
       this->DoCISDirect();
    }
    // output eigen energies
-   cout << this->messageExcitedStatesEnergies;
-   cout << this->messageExcitedStatesEnergiesTitle;
-   double eV2AU = Parameters::GetInstance()->GetEV2AU();
-   for(int k=0; k<Parameters::GetInstance()->GetNumberExcitedStatesCIS(); k++){
-      printf("\t\t %d\t%e\t%e\n",k+1, 
-                                 this->excitedEnergies[k], 
-                                 this->excitedEnergies[k]/eV2AU);
+   if(this->PrintsLogs()){
+      cout << this->messageExcitedStatesEnergies;
+      cout << this->messageExcitedStatesEnergiesTitle;
+      double eV2AU = Parameters::GetInstance()->GetEV2AU();
+      for(int k=0; k<Parameters::GetInstance()->GetNumberExcitedStatesCIS(); k++){
+         printf("\t\t %d\t%e\t%e\n",k+1, 
+                                    this->excitedEnergies[k], 
+                                    this->excitedEnergies[k]/eV2AU);
+      }
+      cout << endl;
    }
-   cout << endl;
-   double ompEndTime = omp_get_wtime();
-   cout << this->messageOmpElapsedTimeCIS;
-   cout << ompEndTime - ompStartTime;
-   cout << this->messageUnitSec << endl;
-   cout << this->messageDoneCIS;
+   if(this->PrintsLogs()){
+      double ompEndTime = omp_get_wtime();
+      cout << this->messageOmpElapsedTimeCIS;
+      cout << ompEndTime - ompStartTime;
+      cout << this->messageUnitSec << endl;
+      cout << this->messageDoneCIS;
+   }
 }
 
 void ZindoS::SortSingleExcitationSlaterDeterminants(vector<MoEnergyGap>* moEnergyGaps) const{
@@ -935,8 +942,9 @@ void ZindoS::CalcInteractionMatrix(double** interactionMatrix,
 }
 
 void ZindoS::DoCISDavidson(){
-   cout << this->messageStartDavidsonCIS;
-
+   if(this->PrintsLogs()){
+      cout << this->messageStartDavidsonCIS;
+   }
    int numberOcc = Parameters::GetInstance()->GetActiveOccCIS();
    int numberVir = Parameters::GetInstance()->GetActiveVirCIS();
    int numberExcitedStates = Parameters::GetInstance()->GetNumberExcitedStatesCIS();
@@ -974,8 +982,9 @@ void ZindoS::DoCISDavidson(){
       goToDirectCIS = false;
       // Davidson roop
       for(int k=0; k<maxIter; k++){
-         cout << messageNumIterCIS << k << endl;
-
+         if(this->PrintsLogs()){
+            cout << messageNumIterCIS << k << endl;
+         }
          // calculate dimension of the interaction matrix 
          // (= number of the expansion vectors).
          for(int i=0; i<numberExcitedStates; i++){
@@ -1027,11 +1036,13 @@ void ZindoS::DoCISDavidson(){
                                                interactionEigenEnergies, i);
 
                // output norm of residual vector
-               cout << "\t  " << i+1 << this->messageResidualNorm << norm << endl;
-               if(i == numberExcitedStates-1){
-                  cout << endl;
+               if(this->PrintsLogs()){
+                  cout << "\t  " << i+1 << this->messageResidualNorm << norm << endl;
+                  if(i == numberExcitedStates-1){
+                     cout << endl;
+                  }
                }
-        
+
                // check tolerance for the norm of the residual vector.
                if(norm < normTol){
                   convergeExcitedStates[i] = true;
@@ -1086,12 +1097,16 @@ void ZindoS::DoCISDavidson(){
 
          // stop the Davidson roop
          if(allConverged){
-            cout << this->messageDavidsonConverge;
+            if(this->PrintsLogs()){
+               cout << this->messageDavidsonConverge;
+            }
             break;
          }
          else if(!allConverged && goToDirectCIS){
-            cout << this->messageDavidsonReachCISMatrix;
-            cout << this->messageDavidsonGoToDirect;
+            if(this->PrintsLogs()){
+               cout << this->messageDavidsonReachCISMatrix;
+               cout << this->messageDavidsonGoToDirect;
+            }
             break;
          }
          else if(!allConverged && reachMaxDim){
@@ -1120,7 +1135,9 @@ void ZindoS::DoCISDavidson(){
                                          &residualVector, 
                                          &ritzVector);
 
-   cout << this->messageDoneDavidsonCIS;
+   if(this->PrintsLogs()){
+      cout << this->messageDoneDavidsonCIS;
+   }
    // change algorithm from Davidso to direct
    if(goToDirectCIS){
       this->DoCISDirect();
@@ -1148,17 +1165,23 @@ void ZindoS::FreeDavidsonRoopCISTemporaryMtrices(double*** interactionMatrix,
 }
 
 void ZindoS::DoCISDirect(){
-   cout << this->messageStartDirectCIS;
+   if(this->PrintsLogs()){
+      cout << this->messageStartDirectCIS;
+   }
    bool calcEigenVectors = true;
    MolDS_mkl_wrapper::LapackWrapper::GetInstance()->Dsyevd(this->matrixCIS,
                                                            this->excitedEnergies, 
                                                            this->matrixCISdimension, 
                                                            calcEigenVectors);
-   cout << this->messageDoneDirectCIS;
+   if(this->PrintsLogs()){
+      cout << this->messageDoneDirectCIS;
+   }
 }
 
 void ZindoS::CalcCISMatrix(double** matrixCIS, int numberActiveOcc, int numberActiveVir) const{
-   cout << this->messageStartCalcCISMatrix;
+   if(this->PrintsLogs()){
+      cout << this->messageStartCalcCISMatrix;
+   }
    double ompStartTime = omp_get_wtime();
 
    stringstream ompErrors;
@@ -1428,10 +1451,12 @@ void ZindoS::CalcCISMatrix(double** matrixCIS, int numberActiveOcc, int numberAc
       throw MolDSException(ompErrors.str());
    }
    double ompEndTime = omp_get_wtime();
-   cout << this->messageOmpElapsedTimeCalcCISMarix;
-   cout << ompEndTime - ompStartTime;
-   cout << this->messageUnitSec << endl;
-   cout << this->messageDoneCalcCISMatrix;
+   if(this->PrintsLogs()){
+      cout << this->messageOmpElapsedTimeCalcCISMarix;
+      cout << ompEndTime - ompStartTime;
+      cout << this->messageUnitSec << endl;
+      cout << this->messageDoneCalcCISMatrix;
+   }
 }
 
 void ZindoS::CheckMatrixForce(const vector<int>& elecStates){

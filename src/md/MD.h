@@ -23,7 +23,7 @@ namespace MolDS_md{
 /***
  *  Velocty Verlet is used here.
  */
-class MD{
+class MD : public MolDS_base::PrintController{
 public:
    MD();
    ~MD();

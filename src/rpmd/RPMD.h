@@ -23,17 +23,20 @@ namespace MolDS_rpmd{
 /***
  *  Velocty Verlet is used here.
  */
-class RPMD{
+class RPMD : public MolDS_base::PrintController{
 public:
    RPMD();
    ~RPMD();
    void DoRPMD(const MolDS_base::Molecule& refferenceMolecule);
 private:
+   std::string messageStartInitialRPMD;
+   std::string messageEndInitialRPMD;
    std::string messageinitialConditionRPMD;
    std::string messageStartRPMD;
    std::string messageEndRPMD;
    std::string messageStartStepRPMD;
    std::string messageEndStepRPMD;
+   std::string messageBeadsNum;
    std::string messageEnergies;
    std::string messageEnergiesTitle;
    std::string messageBeadsKineticEnergy;

@@ -25,6 +25,7 @@
 #include<vector>
 #include<stdexcept>
 #include<boost/shared_ptr.hpp>
+#include"../base/PrintController.h"
 #include"../base/MolDSException.h"
 #include"../base/Uncopyable.h"
 #include"../base/Enums.h"
@@ -57,13 +58,16 @@ void MD::SetMolecule(Molecule* molecule){
 }
 
 void MD::DoMD(){
-   cout << this->messageStartMD;
+   if(this->PrintsLogs()){
+      cout << this->messageStartMD;
+   }
 
    // malloc electornic structure
    TheoryType theory = Parameters::GetInstance()->GetCurrentTheory();
    this->CheckEnableTheoryType(theory);
    boost::shared_ptr<ElectronicStructure> electronicStructure(ElectronicStructureFactory::GetInstance()->Create());
    electronicStructure->SetMolecule(this->molecule);
+   electronicStructure->SetPrintsLogs(this->PrintsLogs());
 
    int totalSteps = Parameters::GetInstance()->GetTotalStepsMD();
    int elecState = Parameters::GetInstance()->GetElectronicStateIndexMD();
@@ -81,16 +85,22 @@ void MD::DoMD(){
    matrixForce = electronicStructure->GetForce(elecState);
 
    // output initial conditions
-   cout << this->messageinitialConditionMD;
+   if(this->PrintsLogs()){
+      cout << this->messageinitialConditionMD;
+   }
    initialEnergy = this->OutputEnergies(electronicStructure);
-   cout << endl;
-   this->molecule->OutputConfiguration();
-   this->molecule->OutputXyzCOM();
-   this->molecule->OutputXyzCOC();
-   this->molecule->OutputMomenta();
+   if(this->PrintsLogs()){
+      cout << endl;
+      this->molecule->OutputConfiguration();
+      this->molecule->OutputXyzCOM();
+      this->molecule->OutputXyzCOC();
+      this->molecule->OutputMomenta();
+   }
 
    for(int s=0; s<totalSteps; s++){
-      cout << this->messageStartStepMD << s+1 << endl;
+      if(this->PrintsLogs()){
+         cout << this->messageStartStepMD << s+1 << endl;
+      }
 
       // update momenta
       for(int a=0; a<this->molecule->GetAtomVect()->size(); a++){
@@ -130,15 +140,19 @@ void MD::DoMD(){
 
       // output results
       this->OutputEnergies(electronicStructure, initialEnergy);
-      this->molecule->OutputConfiguration();
-      this->molecule->OutputXyzCOM();
-      this->molecule->OutputXyzCOC();
-      this->molecule->OutputMomenta();
-      cout << this->messageTime << dt*((double)s+1)/Parameters::GetInstance()->GetFs2AU() << endl;
-      cout << this->messageEndStepMD << s+1 << endl;
+      if(this->PrintsLogs()){
+         this->molecule->OutputConfiguration();
+         this->molecule->OutputXyzCOM();
+         this->molecule->OutputXyzCOC();
+         this->molecule->OutputMomenta();
+         cout << this->messageTime << dt*((double)s+1)/Parameters::GetInstance()->GetFs2AU() << endl;
+         cout << this->messageEndStepMD << s+1 << endl;
+      }
    }
 
-   cout << this->messageEndMD;
+   if(this->PrintsLogs()){
+      cout << this->messageEndMD;
+   }
 }
 
 void MD::SetMessages(){
@@ -171,34 +185,37 @@ double MD::OutputEnergies(boost::shared_ptr<ElectronicStructure> electronicStruc
       }
    }  
    // output energies:
-   cout << this->messageEnergies;
-   cout << this->messageEnergiesTitle;
-   printf("\t\t%s\t%e\t%e\n",this->messageCoreKineticEnergy.c_str(), 
-                             coreKineticEnergy,
-                             coreKineticEnergy/Parameters::GetInstance()->GetEV2AU());
-   printf("\t\t%s\t%e\t%e\n",this->messageCoreRepulsionEnergy.c_str(), 
-                             electronicStructure->GetCoreRepulsionEnergy(),
-                             electronicStructure->GetCoreRepulsionEnergy()
-                             /Parameters::GetInstance()->GetEV2AU());
-   printf("\t\t%s\t%e\t%e\n",this->messageElectronicEnergy.c_str(), 
-                             electronicStructure->GetElectronicEnergy(elecState),
-                             electronicStructure->GetElectronicEnergy(elecState)
-                             /Parameters::GetInstance()->GetEV2AU());
-   printf("\t\t%s\t%e\t%e\n",this->messageTotalEnergy.c_str(), 
-                             (coreKineticEnergy + electronicStructure->GetElectronicEnergy(elecState)),
-                             (coreKineticEnergy + electronicStructure->GetElectronicEnergy(elecState))
-                             /Parameters::GetInstance()->GetEV2AU());
-
+   if(this->PrintsLogs()){
+      cout << this->messageEnergies;
+      cout << this->messageEnergiesTitle;
+      printf("\t\t%s\t%e\t%e\n",this->messageCoreKineticEnergy.c_str(), 
+                                coreKineticEnergy,
+                                coreKineticEnergy/Parameters::GetInstance()->GetEV2AU());
+      printf("\t\t%s\t%e\t%e\n",this->messageCoreRepulsionEnergy.c_str(), 
+                                electronicStructure->GetCoreRepulsionEnergy(),
+                                electronicStructure->GetCoreRepulsionEnergy()
+                                /Parameters::GetInstance()->GetEV2AU());
+      printf("\t\t%s\t%e\t%e\n",this->messageElectronicEnergy.c_str(), 
+                                electronicStructure->GetElectronicEnergy(elecState),
+                                electronicStructure->GetElectronicEnergy(elecState)
+                                /Parameters::GetInstance()->GetEV2AU());
+      printf("\t\t%s\t%e\t%e\n",this->messageTotalEnergy.c_str(), 
+                                (coreKineticEnergy + electronicStructure->GetElectronicEnergy(elecState)),
+                                (coreKineticEnergy + electronicStructure->GetElectronicEnergy(elecState))
+                                /Parameters::GetInstance()->GetEV2AU());
+   }
    return (coreKineticEnergy + electronicStructure->GetElectronicEnergy(elecState));
 }
 
 void MD::OutputEnergies(boost::shared_ptr<ElectronicStructure> electronicStructure, 
                         double initialEnergy){
    double energy = this->OutputEnergies(electronicStructure);
-   printf("\t\t%s\t%e\t%e\n\n",this->messageErrorEnergy.c_str(), 
-                             (initialEnergy - energy),
-                             (initialEnergy - energy)
-                             /Parameters::GetInstance()->GetEV2AU());
+   if(this->PrintsLogs()){
+      printf("\t\t%s\t%e\t%e\n\n",this->messageErrorEnergy.c_str(), 
+                                (initialEnergy - energy),
+                                (initialEnergy - energy)
+                                /Parameters::GetInstance()->GetEV2AU());
+   }
 }
 
 void MD::SetEnableTheoryTypes(){

@@ -227,6 +227,39 @@ HOW TO WRITE INPUT:
             norm_tol 0.000001
          CIS_END
 
+   <OPT (geometry optimization)>
+      Write OPT-directive. This module uses line search and steepest descent algorythms.
+      In the early stage the line search algorythm is used, 
+      then the algorythm used in this module is switched to steepest descent algorythm.
+
+      E.g.
+         OPTIMIZE
+            (options)
+         OPTIMIZE_END
+  
+      -options
+       "line_return_times", "steep_step", "electronic_state", 
+       "max_gradient", "rms_gradient", 
+       and "dt" are prepared as options.
+
+       "electronic_state" means the electronic eigenstate 
+       on which the system runs.
+       The default value of the "electronic_state" is 0. That is, 
+       electronic ground state is default.
+
+      "line_return_times" means the times of turnback of the line-search.
+      The default value of the "line_return_times" is 10.
+
+      "steep_step" means the number of steps of the steepest descent.
+      The default value of the "steep_step" is 50.
+
+      "max_gradient" and "rms_gradient" are threshold of the steepest descent.
+      The "max_gradient" and "rms_gradient" means maximum and root-mean-squre of the gradient, respectively.
+      The default value of the "max_gradient" is 0.00045.
+      The default value of the "rms_gradient" is 0.00030.
+
+      "dt" is initial fictious time steps for the steepest descent algorythms.
+      The defaul value of the "dt" is 0.5[fs]
 
    <MD (Molecular dynamics)>
       Write MD-directive.

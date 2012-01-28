@@ -25,6 +25,7 @@
 #include<vector>
 #include<stdexcept>
 #include<omp.h>
+#include"../base/PrintController.h"
 #include"../base/MolDSException.h"
 #include"../base/Uncopyable.h"
 #include"../mkl_wrapper/LapackWrapper.h"
@@ -272,7 +273,9 @@ double Cndo2::GetDiatomCoreRepulsionFirstDerivative(int indexAtomA, int indexAto
  *
  *****/
 void Cndo2::DoSCF(bool requiresGuess){
-   cout << this->messageStartSCF;
+   if(this->PrintsLogs()){
+      cout << this->messageStartSCF;
+   }
    double ompStartTime = omp_get_wtime();
 
    if(this->molecule == NULL){
@@ -357,7 +360,9 @@ void Cndo2::DoSCF(bool requiresGuess){
                                               &rmsDensity, 
                                               i)){
             // converged!!!!!
-            cout << this->messageSCFMetConvergence;
+            if(this->PrintsLogs()){
+               cout << this->messageSCFMetConvergence;
+            }
 
             // calc. some properties.
             // e.g. electronic energy, electron population in each atom, and core replsion.
@@ -413,10 +418,12 @@ void Cndo2::DoSCF(bool requiresGuess){
                                   &diisErrorCoefficients);
 
    double ompEndTime = omp_get_wtime();
-   cout << this->messageOmpElapsedTimeSCF;
-   cout << ompEndTime - ompStartTime;
-   cout << this->messageUnitSec << endl;
-   cout << this->messageDoneSCF;
+   if(this->PrintsLogs()){
+      cout << this->messageOmpElapsedTimeSCF;
+      cout << ompEndTime - ompStartTime;
+      cout << this->messageUnitSec << endl;
+      cout << this->messageDoneSCF;
+   }
 
 }
 
@@ -681,43 +688,45 @@ void Cndo2::OutputHFResults(double const* const* fockMatrix,
                             double const* energiesMO, 
                             double const* atomicElectronPopulation, 
                             const Molecule& molecule) const{
-   // output MO energy
-   cout << this->messageEnergiesMOs;
-   cout << this->messageEnergiesMOsTitle;
-   double eV2AU = Parameters::GetInstance()->GetEV2AU();
-   for(int mo=0; mo<molecule.GetTotalNumberAOs(); mo++){
-      if(mo < molecule.GetTotalNumberValenceElectrons()/2){
-         printf("\t\t %d\t%s\t%e\t%e \n",
-         mo, this->messageOcc.c_str(), energiesMO[mo], energiesMO[mo]/eV2AU);
+   if(this->PrintsLogs()){
+      // output MO energy
+      cout << this->messageEnergiesMOs;
+      cout << this->messageEnergiesMOsTitle;
+      double eV2AU = Parameters::GetInstance()->GetEV2AU();
+      for(int mo=0; mo<molecule.GetTotalNumberAOs(); mo++){
+         if(mo < molecule.GetTotalNumberValenceElectrons()/2){
+            printf("\t\t %d\t%s\t%e\t%e \n",
+            mo, this->messageOcc.c_str(), energiesMO[mo], energiesMO[mo]/eV2AU);
+         }
+         else{
+            printf("\t\t %d\t%s\t%e\t%e \n",
+            mo, this->messageUnOcc.c_str(), energiesMO[mo], energiesMO[mo]/eV2AU);
+         }
       }
-      else{
-         printf("\t\t %d\t%s\t%e\t%e \n",
-         mo, this->messageUnOcc.c_str(), energiesMO[mo], energiesMO[mo]/eV2AU);
-      }
-   }
-   cout << endl;
+      cout << endl;
 
-   // output total energy
-   cout << this->messageElecEnergy;
-   cout << this->messageElecEnergyTitle;
-   printf("\t\t%e\t%e\n\n",this->elecHFEnergy, 
-                           this->elecHFEnergy / Parameters::GetInstance()->GetEV2AU());
+      // output total energy
+      cout << this->messageElecEnergy;
+      cout << this->messageElecEnergyTitle;
+      printf("\t\t%e\t%e\n\n",this->elecHFEnergy, 
+                              this->elecHFEnergy / Parameters::GetInstance()->GetEV2AU());
 
-   // output core repulsion energy
-   cout << this->messageCoreRepulsion;
-   cout << this->messageCoreRepulsionTitle;
-   printf("\t\t%e\t%e\n\n",this->coreRepulsionEnergy, this->coreRepulsionEnergy/eV2AU);
+      // output core repulsion energy
+      cout << this->messageCoreRepulsion;
+      cout << this->messageCoreRepulsionTitle;
+      printf("\t\t%e\t%e\n\n",this->coreRepulsionEnergy, this->coreRepulsionEnergy/eV2AU);
 
-   // ToDo: output eigen-vectors of the Hartree Fock matrix
+      // ToDo: output eigen-vectors of the Hartree Fock matrix
   
-   // output Mulliken charge
-   cout << messageMullikenAtoms;
-   cout << messageMullikenAtomsTitle;
-   for(int a=0; a<molecule.GetAtomVect()->size(); a++){
-      Atom* atom = (*molecule.GetAtomVect())[a];
-      printf("\t\t%d\t%s\t%e\t%e\n",a,AtomTypeStr(atom->GetAtomType()),atom->GetCoreCharge(),atom->GetCoreCharge()-atomicElectronPopulation[a]);
+      // output Mulliken charge
+      cout << messageMullikenAtoms;
+      cout << messageMullikenAtomsTitle;
+      for(int a=0; a<molecule.GetAtomVect()->size(); a++){
+         Atom* atom = (*molecule.GetAtomVect())[a];
+         printf("\t\t%d\t%s\t%e\t%e\n",a,AtomTypeStr(atom->GetAtomType()),atom->GetCoreCharge(),atom->GetCoreCharge()-atomicElectronPopulation[a]);
+      }
+      cout << endl;
    }
-   cout << endl;
 
    // output MOs
    if(Parameters::GetInstance()->RequiresMOPlot()){
@@ -897,7 +906,9 @@ bool Cndo2::SatisfyConvergenceCriterion(double const* const* oldOrbitalElectronP
    }
    *rmsDensity = sqrt(change);
   
-   printf("SCF iter=%d: RMS density=%.15lf \n",times,*rmsDensity);
+   if(this->PrintsLogs()){
+      printf("SCF iter=%d: RMS density=%.15lf \n",times,*rmsDensity);
+   }
    if(*rmsDensity < Parameters::GetInstance()->GetThresholdSCF()){
       satisfy = true;
    }
@@ -1281,9 +1292,6 @@ void Cndo2::CalcOverlap(double** overlap, const Molecule& molecule) const{
 void Cndo2::CalcDiatomicOverlapFirstDerivative(double*** overlapFirstDeri, 
                                                const Atom& atomA, 
                                                const Atom& atomB) const{
-   if(overlapFirstDeri == NULL){
-      cout << "mikiya-NULL in Cndo2::CalcDiatomicOverlapFirstDerivative" << endl;
-   }
    double Cartesian[CartesianType_end] = {atomA.GetXyz()[XAxis] - atomB.GetXyz()[XAxis], 
                                           atomA.GetXyz()[YAxis] - atomB.GetXyz()[YAxis],
                                           atomA.GetXyz()[ZAxis] - atomB.GetXyz()[ZAxis]};

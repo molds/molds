@@ -26,6 +26,7 @@
 #include<stdexcept>
 #include<boost/shared_ptr.hpp>
 #include<boost/random.hpp>
+#include"../base/PrintController.h"
 #include"../base/MolDSException.h"
 #include"../base/Uncopyable.h"
 #include"../base/Enums.h"
@@ -78,7 +79,9 @@ void MC::DoMC(){
 }
 
 void MC::DoMC(int totalSteps, int elecState, double temperature, double stepWidth, unsigned long seed){
-   cout << this->messageStartMC;
+   if(this->PrintsLogs()){
+      cout << this->messageStartMC;
+   }
    double transitionRate = 0.0;
    // create real random generator
 	boost::mt19937 realGenerator(seed);
@@ -90,21 +93,27 @@ void MC::DoMC(int totalSteps, int elecState, double temperature, double stepWidt
    boost::shared_ptr<ElectronicStructure> electronicStructure2(ElectronicStructureFactory::GetInstance()->Create());
    ElectronicStructure* trialES = electronicStructure2.get();
    trialES->SetMolecule(&trialMolecule);
+   trialES->SetPrintsLogs(this->PrintsLogs());
 
    // initial calculation
    boost::shared_ptr<ElectronicStructure> electronicStructure1(ElectronicStructureFactory::GetInstance()->Create());
    ElectronicStructure* currentES = electronicStructure1.get();
    currentES->SetMolecule(this->molecule);
+   currentES->SetPrintsLogs(this->PrintsLogs());
    currentES->DoSCF();
    if(Parameters::GetInstance()->RequiresCIS()){
       currentES->DoCIS();
    }
-   cout << this->messageinitialConditionMC;
+   if(this->PrintsLogs()){
+      cout << this->messageinitialConditionMC;
+   }
    this->OutputMolecule(*currentES, *this->molecule, elecState);
 
    // Monte Carlo roop 
    for(int s=0; s<totalSteps; s++){
-      cout << this->messageStartStepMC << s+1 << endl << endl;
+      if(this->PrintsLogs()){
+         cout << this->messageStartStepMC << s+1 << endl << endl;
+      }
       // create trial molecule
       this->CreateTrialConfiguration(&trialMolecule, *this->molecule, &realRand, stepWidth);
      
@@ -129,10 +138,14 @@ void MC::DoMC(int totalSteps, int elecState, double temperature, double stepWidt
       
       // output molecular states
       this->OutputMolecule(*currentES, *this->molecule, elecState);
-      cout << this->messageEndStepMC << s+1 << endl;
+      if(this->PrintsLogs()){
+         cout << this->messageEndStepMC << s+1 << endl;
+      }
    }
-   cout << this->messageTransitionRate << transitionRate/(double)totalSteps << endl << endl;
-   cout << this->messageEndMC << endl;
+   if(this->PrintsLogs()){
+      cout << this->messageTransitionRate << transitionRate/(double)totalSteps << endl << endl;
+      cout << this->messageEndMC << endl;
+   }
 }
 
 void MC::CreateTrialConfiguration(Molecule* trial,
@@ -213,23 +226,27 @@ void MC::OutputMolecule(const ElectronicStructure& electronicStructure,
                         const Molecule& molecule,
                         int elecState) const{
    this->OutputEnergies(electronicStructure, elecState);
-   molecule.OutputConfiguration();
-   molecule.OutputXyzCOC();
+   if(this->PrintsLogs()){
+      molecule.OutputConfiguration();
+      molecule.OutputXyzCOC();
+   }
 }
 
 void MC::OutputEnergies(const MolDS_base::ElectronicStructure& electronicStructure,
                         int elecState) const{
-   cout << this->messageEnergies;
-   cout << this->messageEnergiesTitle;
-   printf("\t\t%s\t%e\t%e\n",this->messageCoreRepulsionEnergy.c_str(), 
-                             electronicStructure.GetCoreRepulsionEnergy(),
-                             electronicStructure.GetCoreRepulsionEnergy()
-                             /Parameters::GetInstance()->GetEV2AU());
-   printf("\t\t%s\t%e\t%e\n",this->messageElectronicEnergy.c_str(), 
-                             electronicStructure.GetElectronicEnergy(elecState),
-                             electronicStructure.GetElectronicEnergy(elecState)
-                             /Parameters::GetInstance()->GetEV2AU());
-   cout << endl;
+   if(this->PrintsLogs()){
+      cout << this->messageEnergies;
+      cout << this->messageEnergiesTitle;
+      printf("\t\t%s\t%e\t%e\n",this->messageCoreRepulsionEnergy.c_str(), 
+                                electronicStructure.GetCoreRepulsionEnergy(),
+                                electronicStructure.GetCoreRepulsionEnergy()
+                                /Parameters::GetInstance()->GetEV2AU());
+      printf("\t\t%s\t%e\t%e\n",this->messageElectronicEnergy.c_str(), 
+                                electronicStructure.GetElectronicEnergy(elecState),
+                                electronicStructure.GetElectronicEnergy(elecState)
+                                /Parameters::GetInstance()->GetEV2AU());
+      cout << endl;
+   }
 }
 
 }

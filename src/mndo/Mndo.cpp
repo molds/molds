@@ -25,6 +25,7 @@
 #include<vector>
 #include<stdexcept>
 #include<omp.h>
+#include"../base/PrintController.h"
 #include"../base/MolDSException.h"
 #include"../base/Uncopyable.h"
 #include"../mkl_wrapper/LapackWrapper.h"
@@ -249,11 +250,13 @@ void Mndo::OutputHFResults(double const* const* fockMatrix,
                                       atomicElectronPopulation, 
                                       molecule);
    // output heats of formation
-   cout << this->messageHeatsFormation;
-   cout << this->messageHeatsFormationTitle;
-   printf("\t\t%e\t%e\n\n",this->heatsFormation,
-                           this->heatsFormation/Parameters::GetInstance()->
-                                                            GetKcalMolin2AU());
+   if(this->PrintsLogs()){
+      cout << this->messageHeatsFormation;
+      cout << this->messageHeatsFormationTitle;
+      printf("\t\t%e\t%e\n\n",this->heatsFormation,
+                              this->heatsFormation/Parameters::GetInstance()->
+                                                               GetKcalMolin2AU());
+   }
 }
 
 double Mndo::GetFockDiagElement(const Atom& atomA, 
@@ -579,7 +582,9 @@ double Mndo::GetMolecularIntegralElement(int moI, int moJ, int moK, int moL,
 
 // right-upper part is only calculated by this method.
 void Mndo::CalcCISMatrix(double** matrixCIS, int numberActiveOcc, int numberActiveVir) const{
-   cout << this->messageStartCalcCISMatrix;
+   if(this->PrintsLogs()){
+      cout << this->messageStartCalcCISMatrix;
+   }
    double ompStartTime = omp_get_wtime();
 
    stringstream ompErrors;
@@ -757,10 +762,12 @@ void Mndo::CalcCISMatrix(double** matrixCIS, int numberActiveOcc, int numberActi
       throw MolDSException(ompErrors.str());
    }
    double ompEndTime = omp_get_wtime();
-   cout << this->messageOmpElapsedTimeCalcCISMarix;
-   cout << ompEndTime - ompStartTime;
-   cout << this->messageUnitSec << endl;
-   cout << this->messageDoneCalcCISMatrix;
+   if(this->PrintsLogs()){
+      cout << this->messageOmpElapsedTimeCalcCISMarix;
+      cout << ompEndTime - ompStartTime;
+      cout << this->messageUnitSec << endl;
+      cout << this->messageDoneCalcCISMatrix;
+   }
 }
 
 void Mndo::CheckZMatrixForce(const vector<int>& elecStates){

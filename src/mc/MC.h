@@ -21,9 +21,9 @@
 namespace MolDS_mc{
 
 /***
- *  Velocty Verlet is used here.
+ *  Canonical MC is only implemented
  */
-class MC{
+class MC : public MolDS_base::PrintController{
 public:
    MC();
    ~MC();

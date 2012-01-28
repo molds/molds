@@ -30,6 +30,7 @@
 #include<boost/shared_ptr.hpp>
 #include<boost/random.hpp>
 #include"mkl.h"
+#include"base/PrintController.h"
 #include"base/MolDSException.h"
 #include"base/Uncopyable.h"
 #include"mkl_wrapper/LapackWrapper.h"

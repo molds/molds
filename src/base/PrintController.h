@@ -16,26 +16,18 @@
 // You should have received a copy of the GNU General Public License      // 
 // along with MolDS.  If not, see <http://www.gnu.org/licenses/>.         // 
 //************************************************************************//
-#ifndef INCLUDED_ELECTRONICSTRUCTURE
-#define INCLUDED_ELECTRONICSTRUCTURE
+#ifndef INCLUDED_PRINTCONTROLLER
+#define INCLUDED_PRINTCONTROLLER
 namespace MolDS_base{
 
-class ElectronicStructure : public MolDS_base::PrintController{
+class PrintController{
 public:
-   virtual ~ElectronicStructure(){};
-   virtual void SetMolecule(MolDS_base::Molecule* molecule) = 0;
-   virtual void DoSCF() = 0;
-   virtual void DoSCF(bool requiresGuess) = 0;
-   virtual void DoCIS() = 0;
-   virtual double** GetForce(int elecState) = 0;
-   virtual double*** GetForce(const std::vector<int>& elecStates) = 0;
-   virtual double GetElectronicEnergy(int elecState) const = 0;
-   virtual double GetCoreRepulsionEnergy() const = 0;
-   virtual MolDS_base::TheoryType GetTheoryType() const = 0;
+   PrintController();
+   virtual ~PrintController();
+   bool PrintsLogs() const;
+   void SetPrintsLogs(bool printsLogs);
+private:
+   bool printsLogs;
 };
-
 }
 #endif
-
-
-
