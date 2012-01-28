@@ -129,17 +129,25 @@ void InputParser::SetMessages(){
    this->messageRpmdTemperature = "\t\tTemperature: ";
    this->messageRpmdNumBeads = "\t\tNumber of the beads in the Ring Polymer: ";
    this->messageRpmdSeed = "\t\tSeed: ";
+
+   // MOPlot
    this->messageMOPlotConditions = "\tMO plot conditions:\n";
    this->messageMOPlotIndex = "\t\tMO index: ";
    this->messageMOPlotGridNumber = "\t\tNumber of grid(x, y, z): ";
    this->messageMOPlotFrameLength = "\t\tFrame length[angst.](x, y, z): ";
    this->messageMOPlotFilePrefix = "\t\tFile name prefix: ";
+
+   // unit
    this->messageFs = "[fs]";
    this->messageK = "[K]";
    this->messageAngst = "[Angst.]";
+
+   // others
    this->stringYES = "yes";
    this->stringNO = "no";
    this->stringSpace = " ";
+
+   // theory
    this->stringCommentOut = "//";
    this->stringTheoryCNDO2 = "cndo/2";
    this->stringTheoryINDO = "indo";

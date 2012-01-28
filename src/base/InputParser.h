@@ -40,6 +40,7 @@ private:
    std::string messageTotalNumberAtoms;
    std::string messageTotalNumberValenceElectrons;
    std::string messageInputTerms;
+   // SCF
    std::string messageScfConditions;
    std::string messageScfMaxIterations;
    std::string messageScfRmsDensity;
@@ -48,6 +49,7 @@ private:
    std::string messageScfDiisNumErrorVect;
    std::string messageScfDiisStartError;
    std::string messageScfDiisEndError;
+   // CIS
    std::string messageCisConditions;
    std::string messageCisNumberActiveOcc;
    std::string messageCisNumberActiveVir;
@@ -56,19 +58,23 @@ private:
    std::string messageCisNormTolerance;
    std::string messageCisMaxIterations;
    std::string messageCisMaxDimensions;
+   // Memory
    std::string messageMemoryConditions;
    std::string messageMemoryLimitHeap;
    std::string messageMemoryMB;
+   // MD
    std::string messageMdConditions;
    std::string messageMdTotalSteps;
    std::string messageMdElecState;
    std::string messageMdTimeWidth;
+   // MC
    std::string messageMcConditions;
    std::string messageMcTotalSteps;
    std::string messageMcElecState;
    std::string messageMcStepWidth;
    std::string messageMcTemperature;
    std::string messageMcSeed;
+   // RPMD
    std::string messageRpmdConditions;
    std::string messageRpmdTotalSteps;
    std::string messageRpmdElecState;
@@ -77,18 +83,22 @@ private:
    std::string messageRpmdTemperature;
    std::string messageRpmdNumBeads;
    std::string messageRpmdSeed;
+   // MOPlot
    std::string messageMOPlotConditions;
    std::string messageMOPlotIndex;
    std::string messageMOPlotGridNumber;
    std::string messageMOPlotFrameLength;
    std::string messageMOPlotFilePrefix;
+   // unit 
    std::string messageFs;
    std::string messageK;
    std::string messageAngst;
+   // others
    std::string stringYES;
    std::string stringNO;
    std::string stringSpace;
    std::string stringCommentOut;
+   // Theory
    std::string stringTheory;
    std::string stringTheoryEnd;
    std::string stringTheoryCNDO2;
@@ -100,6 +110,7 @@ private:
    std::string stringTheoryPM3PDDG;
    std::string stringGeometry;
    std::string stringGeometryEnd;
+   // SCF
    std::string stringScf;
    std::string stringScfEnd;
    std::string stringScfMaxIter;
@@ -109,15 +120,18 @@ private:
    std::string stringScfDiisNumErrorVect;
    std::string stringScfDiisStartError;
    std::string stringScfDiisEndError;
+   // MOPlot
    std::string stringMO;
    std::string stringMOPlot;
    std::string stringMOPlotEnd;
    std::string stringMOPlotGridNumber;
    std::string stringMOPlotFrameLength;
    std::string stringMOPlotFilePrefix;
+   // Principal axes
    std::string stringInertiaTensor;
    std::string stringInertiaTensorEnd;
    std::string stringInertiaTensorOrigin;
+   // Rotation
    std::string stringRotate;
    std::string stringRotateEnd;
    std::string stringRotatingOrigin;
@@ -127,9 +141,11 @@ private:
    std::string stringRotatingType;
    std::string stringRotatingTypeAxis;
    std::string stringRotatingTypeEularAngle;
+   // Translation
    std::string stringTranslate;
    std::string stringTranslateEnd;
    std::string stringTranslatingDifference;
+   // CIS
    std::string stringCIS;
    std::string stringCISEnd;
    std::string stringCISActiveOcc;
@@ -139,14 +155,17 @@ private:
    std::string stringCISMaxIter;
    std::string stringCISMaxDimensions;
    std::string stringCISNormTolerance;
+   // Memory
    std::string stringMemory;
    std::string stringMemoryEnd;
    std::string stringMemoryLimitHeap;
+   // MD
    std::string stringMD;
    std::string stringMDEnd;
    std::string stringMDTotalSteps;
    std::string stringMDElecState;
    std::string stringMDTimeWidth;
+   // MC
    std::string stringMC;
    std::string stringMCEnd;
    std::string stringMCTotalSteps;
@@ -154,6 +173,7 @@ private:
    std::string stringMCStepWidth;
    std::string stringMCTemperature;
    std::string stringMCSeed;
+   // RPMD
    std::string stringRPMD;
    std::string stringRPMDEnd;
    std::string stringRPMDTotalSteps;
