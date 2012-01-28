@@ -31,6 +31,16 @@ public:
    void SetCurrentSimulation(SimulationType simulation);
    TheoryType GetCurrentTheory() const;
    void SetCurrentTheory(TheoryType theory);
+   // Pysical constants
+   double GetEV2AU() const;
+   double GetKcalMolin2AU() const;
+   double GetAngstrom2AU() const;
+   double GetKayser2AU() const;
+   double GetGMolin2AU() const;
+   double GetDegree2Radian() const;
+   double GetFs2AU() const;
+   double GetBoltzmann() const;
+   // SCF
    double GetThresholdSCF() const;
    void SetThresholdSCF(double thresholdSCF);
    int GetMaxIterationsSCF() const;
@@ -45,6 +55,7 @@ public:
    void SetDiisStartErrorSCF(double diisStartErrorSCF);
    double GetDiisEndErrorSCF() const;
    void SetDiisEndErrorSCF(double diisEndErrorSCF);
+   // MOPlot
    std::string GetFileNamePrefixMOPlot() const;
    void SetFileNamePrefixMOPlot(std::string fileNamePrefixMOPlot);
    int* GetGridNumberMOPlot() const;
@@ -53,18 +64,14 @@ public:
    void SetFrameLengthMOPlot(double lx, double ly, double lz);
    std::vector<int>* GetIndecesMOPlot() const;
    void AddIndexMOPlot(int moIndex);
-   double GetEV2AU() const;
-   double GetKcalMolin2AU() const;
-   double GetAngstrom2AU() const;
-   double GetKayser2AU() const;
-   double GetGMolin2AU() const;
-   double GetDegree2Radian() const;
-   double GetFs2AU() const;
-   double GetBoltzmann() const;
+   bool RequiresMOPlot() const;
+   // Translation
    void SetTranslatingDifference(double x, double y, double z);
    double* GetTranslatingDifference() const;
+   // Principal axes
    void SetInertiaTensorOrigin(double x, double y, double z);
    double* GetInertiaTensorOrigin() const;
+   // Rotation
    void SetRotatingOrigin(double x, double y, double z);
    double* GetRotatingOrigin() const;
    void SetRotatingType(RotatingType rotatingType);
@@ -75,6 +82,7 @@ public:
    double GetRotatingAngle() const;
    void SetRotatingEularAngles(double alpha, double beta, double gamma);
    EularAngle GetRotatingEularAngles() const;
+   // CIS
    int GetActiveOccCIS() const;
    void SetActiveOccCIS(int activeOccCIS);
    int GetActiveVirCIS() const;
@@ -91,15 +99,17 @@ public:
    void SetMaxDimensionsCIS(int maxDimensionsCIS);
    double GetNormToleranceCIS() const;
    void SetNormToleranceCIS(double normToleranceCIS);
+   // Memory
    double GetLimitHeapMemory() const;
    void SetLimitHeapMemory(double limitHeap);
-   bool RequiresMOPlot() const;
+   // MD
    int GetElectronicStateIndexMD() const;
    void SetElectronicStateIndexMD(int electronicStateIndex);
    int GetTotalStepsMD() const;
    void SetTotalStepsMD(int totalSteps);
    double GetTimeWidthMD() const;
    void SetTimeWidthMD(double timeWidth);
+   // MC
    int GetElectronicStateIndexMC() const;
    void SetElectronicStateIndexMC(int electronicStateIndex);
    int GetTotalStepsMC() const;
@@ -110,6 +120,7 @@ public:
    void SetStepWidthMC(double stepWidth);
    unsigned long GetSeedMC() const;
    void SetSeedMC(unsigned long seed);
+   // RPMD
    int GetElectronicStateIndexRPMD() const;
    void SetElectronicStateIndexRPMD(int electronicStateIndex);
    int GetNumberElectronicStatesRPMD() const;
@@ -131,6 +142,7 @@ private:
    std::string errorMessageGetIndecesMOPlotNull;
    SimulationType currentSimulation;
    TheoryType currentTheory;
+   // Physical constants
    static const double eV2AU;
    static const double kcalMolin2AU;
    static const double angstrom2AU;
@@ -139,6 +151,7 @@ private:
    static const double degree2Radian;
    static const double fs2AU;
    static const double boltzmann;
+   // SCF
    double thresholdSCF;
    int maxIterationsSCF;
    double dampingThreshSCF;
@@ -146,17 +159,22 @@ private:
    int diisNumErrorVectSCF;
    double diisStartErrorSCF;
    double diisEndErrorSCF;
+   // MOPlot
    std::string fileNamePrefixMOPlot;
    int gridNumberMOPlot[CartesianType_end];
    double frameLengthMOPlot[CartesianType_end];
    std::vector<int>* indecesMOPlot;
+   // Translation
    double translatingDifference[3];
+   // Principal axes
    double* inertiaTensorOrigin;
+   // Rotation
    double* rotatingOrigin;
    double rotatingAxis[3];
    double rotatingAngle;
    RotatingType rotatingType;
    EularAngle rotatingEularAngles;
+   // CIS
    int activeOccCIS;
    int activeVirCIS;
    int numberExcitedStatesCIS;
@@ -165,15 +183,19 @@ private:
    double normToleranceCIS;
    bool requiresCIS;
    bool isDavidsonCIS;
+   // Memory
    double limitHeapMemory;
+   // MD
    int electronicStateIndexMD;
    int totalStepsMD;
    double timeWidthMD;
+   // MC
    int electronicStateIndexMC;
    int totalStepsMC;
    double temperatureMC;
    double stepWidthMC;
    unsigned long seedMC;
+   // RPMD
    int electronicStateIndexRPMD;
    int numberElectronicStatesRPMD;
    int totalStepsRPMD;
@@ -181,6 +203,7 @@ private:
    double timeWidthRPMD;
    int numberBeadsRPMD;
    unsigned long seedRPMD;
+   // Other
    void SetDefaultValues();
    void SetMessages();
 };

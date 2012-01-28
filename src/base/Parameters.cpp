@@ -34,6 +34,7 @@ using namespace std;
 namespace MolDS_base{
 
 Parameters* Parameters::parameters = NULL;
+// Physical constsnts
 const double Parameters::Parameters::eV2AU = 0.03674903;
 const double Parameters::kcalMolin2AU = 0.00159360175;
 const double Parameters::angstrom2AU = 1.0/0.5291772;
@@ -78,6 +79,7 @@ void Parameters::DeleteInstance(){
 void Parameters::SetDefaultValues(){
    this->currentSimulation = Once;
    this->currentTheory = CNDO2;
+   // SCF
    this->thresholdSCF = pow(10.0, -8.0);
    this->maxIterationsSCF = 100;
    this->dampingThreshSCF = 1.0;
@@ -85,6 +87,7 @@ void Parameters::SetDefaultValues(){
    this->diisNumErrorVectSCF = 5;
    this->diisStartErrorSCF = pow(10.0, -2.0);
    this->diisEndErrorSCF = pow(10.0, -8.0);
+   // MOPlot
    this->fileNamePrefixMOPlot = "MO_";
    this->gridNumberMOPlot[XAxis] = 25;
    this->gridNumberMOPlot[YAxis] = 25;
@@ -92,10 +95,13 @@ void Parameters::SetDefaultValues(){
    this->frameLengthMOPlot[XAxis] = 20.0;
    this->frameLengthMOPlot[YAxis] = 20.0;
    this->frameLengthMOPlot[ZAxis] = 20.0;
+   // Translation
    this->translatingDifference[0] = 0.0;
    this->translatingDifference[1] = 0.0;
    this->translatingDifference[2] = 0.0;
+   // Principal axes
    this->inertiaTensorOrigin = NULL;
+   // Rotation
    this->rotatingOrigin = NULL;
    this->rotatingAxis[0] = 0.0;
    this->rotatingAxis[1] = 0.0;
@@ -104,6 +110,7 @@ void Parameters::SetDefaultValues(){
    this->rotatingEularAngles.SetAlpha(0.0);
    this->rotatingEularAngles.SetBeta(0.0);
    this->rotatingEularAngles.SetGamma(0.0);
+   // CIS
    this->activeOccCIS = 10;
    this->activeVirCIS = 10;
    this->numberExcitedStatesCIS = 5;
@@ -112,15 +119,19 @@ void Parameters::SetDefaultValues(){
    this->maxIterationsCIS = 100;
    this->maxDimensionsCIS = 100;
    this->normToleranceCIS = pow(10.0, -6.0);
+   // Memory
    this->limitHeapMemory = 256;
+   // MD
    this->electronicStateIndexMD = 0;
    this->totalStepsMD = 10;
    this->timeWidthMD = 0.1*this->fs2AU;
+   // MC
    this->electronicStateIndexMC = 0;
    this->totalStepsMC = 10;
    this->stepWidthMC = 0.05*this->angstrom2AU;
    this->temperatureMC = 300;
    this->seedMC = static_cast<unsigned long>(time(0));
+   // RPMD
    this->electronicStateIndexRPMD = 0;
    this->numberElectronicStatesRPMD = 1;
    this->totalStepsRPMD = 10;
@@ -208,7 +219,7 @@ void Parameters::SetDiisEndErrorSCF(double diisEndErrorSCF){
    this->diisEndErrorSCF = diisEndErrorSCF;
 }
 
-// methods for parameters
+// methods for physical constants
 double Parameters::GetEV2AU() const{
    return this->eV2AU;
 }
@@ -436,7 +447,7 @@ void Parameters::SetLimitHeapMemory(double limitHeapMemory){
    this->limitHeapMemory = limitHeapMemory;
 }
 
-// methods for MC
+// methods for MD
 int Parameters::GetElectronicStateIndexMD() const{
    return this->electronicStateIndexMD;
 }
