@@ -570,6 +570,55 @@ void Parameters::SetSeedRPMD(unsigned long seed){
    this->seedRPMD = seed;
 }
 
+// Opt (steepest descent)
+int Parameters::GetLineReturnTimesSteepestDescent(){
+   return this->lineReturnTimesSteepestDescent;
+}
+
+void Parameters::SetLineReturnTimesSteepestDescent(int lineReturnTimes){
+   this->lineReturnTimesSteepestDescent = lineReturnTimes;
+}
+
+int Parameters::GetStepsSteepestDescent() const{
+   return this->stepsSteepestDescent;
+}
+
+void Parameters::SetStepsSteepestDescent(int steps){
+   this->stepsSteepestDescent = steps;
+}
+
+int Parameters::GetElectronicStateIndexSteepestDescent() const{
+   return this->electronicStateIndexSteepestDescent;
+}
+
+void Parameters::SetElectronicStateIndexSteepestDescent(int electronicStateIndex){
+   this->electronicStateIndexSteepestDescent = electronicStateIndex;
+}
+
+double Parameters::GetMaxGradientSteepestDescent() const{
+   return this->maxGradientSteepestDescent;
+}
+
+void Parameters::SetMaxGradientSteepestDescent(double maxGradient){
+   this->maxGradientSteepestDescent = maxGradient;
+}
+
+double Parameters::GetRmsGradientSteepestDescent() const{
+   return this->rmsGradientSteepestDescent;
+}
+
+void Parameters::SetRmsGradientSteepestDescent(double rmsGradient){
+   this->rmsGradientSteepestDescent = rmsGradient;
+}
+
+double Parameters::GetTimeWidthSteepestDescent() const{
+   return this->timeWidthSteepestDescent;
+}
+
+void Parameters::SetTimeWidthSteepestDescent(double timeWidth){
+   this->timeWidthSteepestDescent = timeWidth;
+}
+
 }
 
 

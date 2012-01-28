@@ -135,6 +135,19 @@ public:
    void SetNumberBeadsRPMD(int numberBeads);
    unsigned long GetSeedRPMD() const;
    void SetSeedRPMD(unsigned long seed);
+   // Opt (steepest descent)
+   int GetLineReturnTimesSteepestDescent();
+   void SetLineReturnTimesSteepestDescent(int lineReturnTimes);
+   int GetStepsSteepestDescent() const;
+   void SetStepsSteepestDescent(int steps);
+   int GetElectronicStateIndexSteepestDescent() const;
+   void SetElectronicStateIndexSteepestDescent(int electronicStateIndex);
+   double GetMaxGradientSteepestDescent() const;
+   void SetMaxGradientSteepestDescent(double maxGradient);
+   double GetRmsGradientSteepestDescent() const;
+   void SetRmsGradientSteepestDescent(double rmsGradient);
+   double GetTimeWidthSteepestDescent() const;
+   void SetTimeWidthSteepestDescent(double timeWidth);
 private:
    static Parameters* parameters;
    Parameters();
@@ -203,6 +216,13 @@ private:
    double timeWidthRPMD;
    int numberBeadsRPMD;
    unsigned long seedRPMD;
+   // Opt (steepest descent)
+   int lineReturnTimesSteepestDescent;
+   int stepsSteepestDescent;
+   int electronicStateIndexSteepestDescent;
+   double maxGradientSteepestDescent;
+   double rmsGradientSteepestDescent;
+   double timeWidthSteepestDescent;
    // Other
    void SetDefaultValues();
    void SetMessages();
