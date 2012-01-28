@@ -984,7 +984,29 @@ void InputParser::ValidateMcConditions(const Molecule& molecule) const{
 }
 
 void InputParser::ValidateRpmdConditions(const Molecule& molecule) const{
-   // ToDo: Validate rpmd conditions
+   int groundStateIndex = 0;
+   int targetStateIndex = Parameters::GetInstance()->GetElectronicStateIndexRPMD();
+   TheoryType theory = Parameters::GetInstance()->GetCurrentTheory();
+   // Validate theory
+   if(theory == CNDO2 || theory == INDO || (theory == ZINDOS && groundStateIndex < targetStateIndex)){
+      stringstream ss;
+      ss << this->errorMessageNonValidExcitedStatesRPMD;
+      ss << this->errorMessageElecState << targetStateIndex << endl;
+      ss << this->errorMessageTheory << TheoryTypeStr(theory) << endl;
+      throw MolDSException(ss.str());
+   }
+   // Validate for the excited states dynamics
+   if(groundStateIndex < targetStateIndex && !Parameters::GetInstance()->RequiresCIS()){
+      Parameters::GetInstance()->SetNumberExcitedStatesCIS(targetStateIndex);
+      Parameters::GetInstance()->SetRequiresCIS(true);
+      this->ValidateCisConditions(molecule);
+   }
+   int numberExcitedStatesCIS = Parameters::GetInstance()->GetNumberExcitedStatesCIS();
+   if(numberExcitedStatesCIS < targetStateIndex){
+      stringstream ss;
+      ss << this->errorMessageNonValidExcitedStatesRPMD;
+      throw MolDSException(ss.str());
+   } 
 }
 
 void InputParser::ValidateOptimizeConditions(const Molecule& molecule) const{
