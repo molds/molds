@@ -76,6 +76,9 @@ void InputParser::SetMessages(){
       = "Error in base::InputParser::ValidateRpmdConditions: Excited state on which RPMD runs or CIS condition are wrong.\n";
    this->errorMessageNonValidExcitedStatesOptimize
       = "Error in base::InputParser::ValidateOptimizeConditions: Excited state on which optimization is carried out or CIS condition are wrong.\n";
+   this->errorMessageElecState = "Electronic eigenstate: ";
+   this->errorMessageTheory = "Theory: ";
+
    this->messageStartParseInput = "**********  START: Parse input  **********\n";
    this->messageDoneParseInput =  "**********  DONE: Parse input  ***********\n\n\n";
    this->messageTotalNumberAOs = "\tTotal number of valence AOs: ";
@@ -934,12 +937,17 @@ void InputParser::ValidateCisConditions(const Molecule& molecule) const{
 
 void InputParser::ValidateMdConditions(const Molecule& molecule) const{
    int groundStateIndex = 0;
+   int targetStateIndex = Parameters::GetInstance()->GetElectronicStateIndexMD();
+   TheoryType theory = Parameters::GetInstance()->GetCurrentTheory();
    // ZINDO does not support excited states force.
-   if(Parameters::GetInstance()->GetCurrentTheory() == ZINDOS){
-      Parameters::GetInstance()->SetElectronicStateIndexMD(groundStateIndex);
+   if(theory == CNDO2 || theory == INDO || (theory == ZINDOS && groundStateIndex < targetStateIndex)){
+      stringstream ss;
+      ss << this->errorMessageNonValidExcitedStatesMD;
+      ss << this->errorMessageElecState << targetStateIndex << endl;
+      ss << this->errorMessageTheory << TheoryTypeStr(theory) << endl;
+      throw MolDSException(ss.str());
    }
    // Validate for the excited states dynamics
-   int targetStateIndex = Parameters::GetInstance()->GetElectronicStateIndexMD();
    if(groundStateIndex < targetStateIndex && !Parameters::GetInstance()->RequiresCIS()){
       Parameters::GetInstance()->SetNumberExcitedStatesCIS(targetStateIndex);
       Parameters::GetInstance()->SetRequiresCIS(true);

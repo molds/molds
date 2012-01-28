@@ -35,6 +35,8 @@ private:
    std::string errorMessageNonValidExcitedStatesMC;
    std::string errorMessageNonValidExcitedStatesRPMD;
    std::string errorMessageNonValidExcitedStatesOptimize;
+   std::string errorMessageElecState;
+   std::string errorMessageTheory;
    std::string messageStartParseInput;
    std::string messageDoneParseInput;
    std::string messageTotalNumberAOs;
