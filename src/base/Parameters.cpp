@@ -139,6 +139,13 @@ void Parameters::SetDefaultValues(){
    this->temperatureRPMD = 300;
    this->numberBeadsRPMD = 10;
    this->seedRPMD = static_cast<unsigned long>(time(0));
+   // Optimization (Steepest Descent)
+   this->lineReturnTimesSteepestDescent = 10;
+   this->stepsSteepestDescent = 50;
+   this->electronicStateIndexSteepestDescent = 0;
+   this->maxGradientSteepestDescent = 0.00045;
+   this->rmsGradientSteepestDescent = 0.00030;
+   this->timeWidthSteepestDescent = 0.5*this->fs2AU;
 }
 
 void Parameters::SetMessages(){
