@@ -78,7 +78,7 @@ void InputParser::SetMessages(){
       = "Error in base::InputParser::ValidateOptimizeConditions: Excited state on which optimization is carried out or CIS condition are wrong.\n";
    this->errorMessageElecState = "Electronic eigenstate: ";
    this->errorMessageTheory = "Theory: ";
-
+   this->errorMessageNumberExcitedStateCIS = "Number of CIS excited states: ";
    this->messageStartParseInput = "**********  START: Parse input  **********\n";
    this->messageDoneParseInput =  "**********  DONE: Parse input  ***********\n\n\n";
    this->messageTotalNumberAOs = "\tTotal number of valence AOs: ";
@@ -957,6 +957,8 @@ void InputParser::ValidateMdConditions(const Molecule& molecule) const{
    if(numberExcitedStatesCIS < targetStateIndex){
       stringstream ss;
       ss << this->errorMessageNonValidExcitedStatesMD;
+      ss << this->errorMessageElecState << targetStateIndex << endl;
+      ss << this->errorMessageNumberExcitedStateCIS << numberExcitedStatesCIS << endl;
       throw MolDSException(ss.str());
    } 
 }
@@ -983,6 +985,8 @@ void InputParser::ValidateMcConditions(const Molecule& molecule) const{
    if(numberExcitedStatesCIS < targetStateIndex){
       stringstream ss;
       ss << this->errorMessageNonValidExcitedStatesMC;
+      ss << this->errorMessageElecState << targetStateIndex << endl;
+      ss << this->errorMessageNumberExcitedStateCIS << numberExcitedStatesCIS << endl;
       throw MolDSException(ss.str());
    }
 }
@@ -1009,6 +1013,8 @@ void InputParser::ValidateRpmdConditions(const Molecule& molecule) const{
    if(numberExcitedStatesCIS < targetStateIndex){
       stringstream ss;
       ss << this->errorMessageNonValidExcitedStatesRPMD;
+      ss << this->errorMessageElecState << targetStateIndex << endl;
+      ss << this->errorMessageNumberExcitedStateCIS << numberExcitedStatesCIS << endl;
       throw MolDSException(ss.str());
    } 
 }
@@ -1035,6 +1041,8 @@ void InputParser::ValidateOptimizeConditions(const Molecule& molecule) const{
    if(numberExcitedStatesCIS < targetStateIndex){
       stringstream ss;
       ss << this->errorMessageNonValidExcitedStatesOptimize;
+      ss << this->errorMessageElecState << targetStateIndex << endl;
+      ss << this->errorMessageNumberExcitedStateCIS << numberExcitedStatesCIS << endl;
       throw MolDSException(ss.str());
    } 
 }

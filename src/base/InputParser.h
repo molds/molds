@@ -37,6 +37,7 @@ private:
    std::string errorMessageNonValidExcitedStatesOptimize;
    std::string errorMessageElecState;
    std::string errorMessageTheory;
+   std::string errorMessageNumberExcitedStateCIS;
    std::string messageStartParseInput;
    std::string messageDoneParseInput;
    std::string messageTotalNumberAOs;
