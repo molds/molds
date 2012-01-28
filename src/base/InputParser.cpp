@@ -1010,7 +1010,29 @@ void InputParser::ValidateRpmdConditions(const Molecule& molecule) const{
 }
 
 void InputParser::ValidateOptimizeConditions(const Molecule& molecule) const{
-   // ToDo: Validate optimization (steepest descent) conditions
+   int groundStateIndex = 0;
+   int targetStateIndex = Parameters::GetInstance()->GetElectronicStateIndexSteepestDescent();
+   TheoryType theory = Parameters::GetInstance()->GetCurrentTheory();
+   // Validate theory
+   if(theory == CNDO2 || theory == INDO || (theory == ZINDOS && groundStateIndex < targetStateIndex)){
+      stringstream ss;
+      ss << this->errorMessageNonValidExcitedStatesOptimize;
+      ss << this->errorMessageElecState << targetStateIndex << endl;
+      ss << this->errorMessageTheory << TheoryTypeStr(theory) << endl;
+      throw MolDSException(ss.str());
+   }
+   // Validate for the excited states dynamics
+   if(groundStateIndex < targetStateIndex && !Parameters::GetInstance()->RequiresCIS()){
+      Parameters::GetInstance()->SetNumberExcitedStatesCIS(targetStateIndex);
+      Parameters::GetInstance()->SetRequiresCIS(true);
+      this->ValidateCisConditions(molecule);
+   }
+   int numberExcitedStatesCIS = Parameters::GetInstance()->GetNumberExcitedStatesCIS();
+   if(numberExcitedStatesCIS < targetStateIndex){
+      stringstream ss;
+      ss << this->errorMessageNonValidExcitedStatesOptimize;
+      throw MolDSException(ss.str());
+   } 
 }
 
 void InputParser::OutputMolecularBasics(Molecule* molecule) const{
