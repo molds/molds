@@ -203,11 +203,11 @@ private:
    std::string stringSteepestDescentRmsGradient;
    std::string stringSteepestDescentTimeWidth;
    void CalcMolecularBasics(Molecule* molecule) const;
-   void CheckCisConditions(const Molecule& molecule) const;
-   void CheckMdConditions(const Molecule& molecule) const;
-   void CheckMcConditions(const Molecule& molecule) const;
-   void CheckRpmdConditions(const Molecule& molecule) const;
-   void CheckOptimizeConditions(const Molecule& molecule) const;
+   void ValidateCisConditions(const Molecule& molecule) const;
+   void ValidateMdConditions(const Molecule& molecule) const;
+   void ValidateMcConditions(const Molecule& molecule) const;
+   void ValidateRpmdConditions(const Molecule& molecule) const;
+   void ValidateOptimizeConditions(const Molecule& molecule) const;
    void OutputMolecularBasics(Molecule* molecule) const;
    void OutputScfConditions() const;
    void OutputMemoryConditions() const;

@@ -69,13 +69,13 @@ void InputParser::DeleteInstance(){
 
 void InputParser::SetMessages(){
    this->errorMessageNonValidExcitedStatesMD
-      = "Error in base::InputParser::CheckMdConditions: Excited state on which MD runs or CIS condition are wrong.\n";
+      = "Error in base::InputParser::ValidateMdConditions: Excited state on which MD runs or CIS condition are wrong.\n";
    this->errorMessageNonValidExcitedStatesMC
-      = "Error in base::InputParser::CheckMcConditions: Excited state on which MC runs or CIS condition are wrong.\n";
+      = "Error in base::InputParser::ValidateMcConditions: Excited state on which MC runs or CIS condition are wrong.\n";
    this->errorMessageNonValidExcitedStatesRPMD
-      = "Error in base::InputParser::CheckRpmdConditions: Excited state on which RPMD runs or CIS condition are wrong.\n";
+      = "Error in base::InputParser::ValidateRpmdConditions: Excited state on which RPMD runs or CIS condition are wrong.\n";
    this->errorMessageNonValidExcitedStatesOptimize
-      = "Error in base::InputParser::CheckOptimizeConditions: Excited state on which optimization is carried out or CIS condition are wrong.\n";
+      = "Error in base::InputParser::ValidateOptimizeConditions: Excited state on which optimization is carried out or CIS condition are wrong.\n";
    this->messageStartParseInput = "**********  START: Parse input  **********\n";
    this->messageDoneParseInput =  "**********  DONE: Parse input  ***********\n\n\n";
    this->messageTotalNumberAOs = "\tTotal number of valence AOs: ";
@@ -848,22 +848,22 @@ void InputParser::Parse(Molecule* molecule) const{
 
    }
 
-   // calculate basics and check conditions
+   // calculate basics and validate conditions
    this->CalcMolecularBasics(molecule);
    if(Parameters::GetInstance()->RequiresCIS()){
-      this->CheckCisConditions(*molecule);
+      this->ValidateCisConditions(*molecule);
    }
    if(Parameters::GetInstance()->GetCurrentSimulation()==MD){
-      this->CheckMdConditions(*molecule);
+      this->ValidateMdConditions(*molecule);
    }
    else if(Parameters::GetInstance()->GetCurrentSimulation()==MC){
-      this->CheckMcConditions(*molecule);
+      this->ValidateMcConditions(*molecule);
    }
    else if(Parameters::GetInstance()->GetCurrentSimulation()==RPMD){
-      this->CheckRpmdConditions(*molecule);
+      this->ValidateRpmdConditions(*molecule);
    }
    else if(Parameters::GetInstance()->GetCurrentSimulation()==Optimize){
-      this->CheckOptimizeConditions(*molecule);
+      this->ValidateOptimizeConditions(*molecule);
    }
 
    // output conditions
@@ -899,23 +899,23 @@ void InputParser::CalcMolecularBasics(Molecule* molecule) const{
    molecule->CalcBasics();
 }
 
-void InputParser::CheckCisConditions(const Molecule& molecule) const{
+void InputParser::ValidateCisConditions(const Molecule& molecule) const{
 
    // direct CIS
    int numberOcc = molecule.GetTotalNumberValenceElectrons()/2;
    int numberVir = molecule.GetTotalNumberAOs() - numberOcc;
 
-   // check the number of active occupied orbitals.
+   // Validate the number of active occupied orbitals.
    if(numberOcc < Parameters::GetInstance()->GetActiveOccCIS()){
       Parameters::GetInstance()->SetActiveOccCIS(numberOcc);
    }   
 
-   // check the number of active virtual orbitals.
+   // Validate the number of active virtual orbitals.
    if(numberVir < Parameters::GetInstance()->GetActiveVirCIS()){
       Parameters::GetInstance()->SetActiveVirCIS(numberVir);
    }   
 
-   // check the number of calculated excited states.
+   // Validate the number of calculated excited states.
    int numberSlaterDeterminants = Parameters::GetInstance()->GetActiveOccCIS() 
                                  *Parameters::GetInstance()->GetActiveVirCIS();
    if(!Parameters::GetInstance()->IsDavidsonCIS()){
@@ -932,18 +932,18 @@ void InputParser::CheckCisConditions(const Molecule& molecule) const{
    
 }
 
-void InputParser::CheckMdConditions(const Molecule& molecule) const{
+void InputParser::ValidateMdConditions(const Molecule& molecule) const{
    int groundStateIndex = 0;
    // ZINDO does not support excited states force.
    if(Parameters::GetInstance()->GetCurrentTheory() == ZINDOS){
       Parameters::GetInstance()->SetElectronicStateIndexMD(groundStateIndex);
    }
-   // check for the excited states dynamics
+   // Validate for the excited states dynamics
    int targetStateIndex = Parameters::GetInstance()->GetElectronicStateIndexMD();
    if(groundStateIndex < targetStateIndex && !Parameters::GetInstance()->RequiresCIS()){
       Parameters::GetInstance()->SetNumberExcitedStatesCIS(targetStateIndex);
       Parameters::GetInstance()->SetRequiresCIS(true);
-      this->CheckCisConditions(molecule);
+      this->ValidateCisConditions(molecule);
    }
    int numberExcitedStatesCIS = Parameters::GetInstance()->GetNumberExcitedStatesCIS();
    if(numberExcitedStatesCIS < targetStateIndex){
@@ -953,19 +953,19 @@ void InputParser::CheckMdConditions(const Molecule& molecule) const{
    } 
 }
 
-void InputParser::CheckMcConditions(const Molecule& molecule) const{
+void InputParser::ValidateMcConditions(const Molecule& molecule) const{
    int groundStateIndex = 0;
    // CNDO2 and INDO do not support excited states.
    if(Parameters::GetInstance()->GetCurrentTheory() == CNDO2 || 
       Parameters::GetInstance()->GetCurrentTheory() == INDO){
       Parameters::GetInstance()->SetElectronicStateIndexMC(groundStateIndex);
    }
-   // check for the excited states dynamics
+   // Validate for the excited states dynamics
    int targetStateIndex = Parameters::GetInstance()->GetElectronicStateIndexMC();
    if(groundStateIndex < targetStateIndex && !Parameters::GetInstance()->RequiresCIS()){
       Parameters::GetInstance()->SetNumberExcitedStatesCIS(targetStateIndex);
       Parameters::GetInstance()->SetRequiresCIS(true);
-      this->CheckCisConditions(molecule);
+      this->ValidateCisConditions(molecule);
    }
    int numberExcitedStatesCIS = Parameters::GetInstance()->GetNumberExcitedStatesCIS();
    if(numberExcitedStatesCIS < targetStateIndex){
@@ -975,12 +975,12 @@ void InputParser::CheckMcConditions(const Molecule& molecule) const{
    }
 }
 
-void InputParser::CheckRpmdConditions(const Molecule& molecule) const{
-   // ToDo: check rpmd conditions
+void InputParser::ValidateRpmdConditions(const Molecule& molecule) const{
+   // ToDo: Validate rpmd conditions
 }
 
-void InputParser::CheckOptimizeConditions(const Molecule& molecule) const{
-   // ToDo: check optimization (steepest descent) conditions
+void InputParser::ValidateOptimizeConditions(const Molecule& molecule) const{
+   // ToDo: Validate optimization (steepest descent) conditions
 }
 
 void InputParser::OutputMolecularBasics(Molecule* molecule) const{
