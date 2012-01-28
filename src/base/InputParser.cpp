@@ -74,6 +74,8 @@ void InputParser::SetMessages(){
       = "Error in base::InputParser::CheckMcConditions: Excited state on which MC runs or CIS condition are wrong.\n";
    this->errorMessageNonValidExcitedStatesRPMD
       = "Error in base::InputParser::CheckRpmdConditions: Excited state on which RPMD runs or CIS condition are wrong.\n";
+   this->errorMessageNonValidExcitedStatesOptimize
+      = "Error in base::InputParser::CheckOptimizeConditions: Excited state on which optimization is carried out or CIS condition are wrong.\n";
    this->messageStartParseInput = "**********  START: Parse input  **********\n";
    this->messageDoneParseInput =  "**********  DONE: Parse input  ***********\n\n\n";
    this->messageTotalNumberAOs = "\tTotal number of valence AOs: ";
@@ -129,6 +131,15 @@ void InputParser::SetMessages(){
    this->messageRpmdTemperature = "\t\tTemperature: ";
    this->messageRpmdNumBeads = "\t\tNumber of the beads in the Ring Polymer: ";
    this->messageRpmdSeed = "\t\tSeed: ";
+
+   // Optimize (steepestDescent)
+   this->messageOptimizeConditions = "\tOptimize conditions:\n";
+   this->messageSteepestDescentLineReturnTimes = "\t\tLine return times:";
+   this->messageSteepestDescentSteps = "\t\tSteepest Descent steps: ";
+   this->messageSteepestDescentElecState = "\t\tElectronic eigenstate: ";
+   this->messageSteepestDescentMaxGradient = "\t\tMax gradient: ";
+   this->messageSteepestDescentRmsGradient = "\t\tRms gradient: ";
+   this->messageSteepestDescentTimeWidth = "\t\tFictious time width: ";
 
    // MOPlot
    this->messageMOPlotConditions = "\tMO plot conditions:\n";
@@ -245,6 +256,16 @@ void InputParser::SetMessages(){
    this->stringRPMDTemperature = "temperature";
    this->stringRPMDNumBeads = "num_beads";
    this->stringRPMDSeed = "seed";
+
+   // Opt
+   this->stringOptimize = "optimize";
+   this->stringOptimizeEnd = "optimize_end";
+   this->stringSteepestDescentLineReturnTimes = "line_return_times";
+   this->stringSteepestDescentSteps = "steep_step";
+   this->stringSteepestDescentElecState = "electronic_state";
+   this->stringSteepestDescentMaxGradient = "max_gradient";
+   this->stringSteepestDescentRmsGradient = "rms_gradient";
+   this->stringSteepestDescentTimeWidth = "dt";
 }
 
 vector<string> InputParser::GetInputTerms() const{
@@ -655,6 +676,51 @@ int InputParser::ParseConditionsRPMD(vector<string>* inputTerms, int parseIndex)
    return parseIndex;
 }
 
+int InputParser::ParseConditionsOptimize(vector<string>* inputTerms, int parseIndex) const{
+   Parameters::GetInstance()->SetCurrentSimulation(Optimize);
+   parseIndex++;
+   while((*inputTerms)[parseIndex].compare(this->stringOptimizeEnd) != 0){
+      // number of steps of the steepest descent
+      if((*inputTerms)[parseIndex].compare(this->stringSteepestDescentLineReturnTimes) == 0){
+         int lineReturnTimes = atoi((*inputTerms)[parseIndex+1].c_str());
+         Parameters::GetInstance()->SetLineReturnTimesSteepestDescent(lineReturnTimes);
+         parseIndex++;
+      }
+      // number of steps of the steepest descent
+      if((*inputTerms)[parseIndex].compare(this->stringSteepestDescentSteps) == 0){
+         int steps = atoi((*inputTerms)[parseIndex+1].c_str());
+         Parameters::GetInstance()->SetStepsSteepestDescent(steps);
+         parseIndex++;
+      }
+      // index of electronic eigen state on which steepest descent is carried out. 
+      if((*inputTerms)[parseIndex].compare(this->stringSteepestDescentElecState) == 0){
+         int elecStateIndex = atoi((*inputTerms)[parseIndex+1].c_str());
+         Parameters::GetInstance()->SetElectronicStateIndexSteepestDescent(elecStateIndex);
+         parseIndex++;
+      }
+      // time width for the steepest descent.
+      if((*inputTerms)[parseIndex].compare(this->stringSteepestDescentTimeWidth) == 0){
+         double timeWidth = atof((*inputTerms)[parseIndex+1].c_str()) * Parameters::GetInstance()->GetFs2AU();
+         Parameters::GetInstance()->SetTimeWidthSteepestDescent(timeWidth);
+         parseIndex++;
+      }
+      // max gradient for the steepest descent.
+      if((*inputTerms)[parseIndex].compare(this->stringSteepestDescentMaxGradient) == 0){
+         double maxGradient = atof((*inputTerms)[parseIndex+1].c_str());
+         Parameters::GetInstance()->SetMaxGradientSteepestDescent(maxGradient);
+         parseIndex++;
+      }
+      // rms gradient for the steepest descent.
+      if((*inputTerms)[parseIndex].compare(this->stringSteepestDescentRmsGradient) == 0){
+         double rmsGradient = atof((*inputTerms)[parseIndex+1].c_str());
+         Parameters::GetInstance()->SetRmsGradientSteepestDescent(rmsGradient);
+         parseIndex++;
+      }
+      parseIndex++;   
+   }
+   return parseIndex;
+}
+
 int InputParser::ParseTheory(vector<string>* inputTerms, int parseIndex) const{
    parseIndex++;
    while((*inputTerms)[parseIndex].compare(this->stringTheoryEnd) != 0){
@@ -775,6 +841,11 @@ void InputParser::Parse(Molecule* molecule) const{
          i = this->ParseConditionsRPMD(&inputTerms, i);
       }
 
+      // Optimize condition
+      if(inputTerms[i].compare(this->stringOptimize) == 0){
+         i = this->ParseConditionsOptimize(&inputTerms, i);
+      }
+
    }
 
    // calculate basics and check conditions
@@ -790,6 +861,9 @@ void InputParser::Parse(Molecule* molecule) const{
    }
    else if(Parameters::GetInstance()->GetCurrentSimulation()==RPMD){
       this->CheckRpmdConditions(*molecule);
+   }
+   else if(Parameters::GetInstance()->GetCurrentSimulation()==Optimize){
+      this->CheckOptimizeConditions(*molecule);
    }
 
    // output conditions
@@ -810,6 +884,9 @@ void InputParser::Parse(Molecule* molecule) const{
    }
    else if(Parameters::GetInstance()->GetCurrentSimulation()==RPMD){
       this->OutputRpmdConditions();
+   }
+   else if(Parameters::GetInstance()->GetCurrentSimulation()==Optimize){
+      this->OutputOptimizeConditions();
    }
 
    // output inputs
@@ -902,6 +979,10 @@ void InputParser::CheckRpmdConditions(const Molecule& molecule) const{
    // ToDo: check rpmd conditions
 }
 
+void InputParser::CheckOptimizeConditions(const Molecule& molecule) const{
+   // ToDo: check optimization (steepest descent) conditions
+}
+
 void InputParser::OutputMolecularBasics(Molecule* molecule) const{
    molecule->OutputTotalNumberAtomsAOsValenceelectrons();
    molecule->OutputConfiguration();
@@ -979,6 +1060,19 @@ void InputParser::OutputRpmdConditions() const{
    printf("%s%lf%s\n",this->messageRpmdTimeWidth.c_str(),Parameters::GetInstance()->GetTimeWidthRPMD()/Parameters::GetInstance()->GetFs2AU(),this->messageFs.c_str());
    printf("%s%d\n",this->messageRpmdNumBeads.c_str(),Parameters::GetInstance()->GetNumberBeadsRPMD());
    printf("%s%lu\n",this->messageRpmdSeed.c_str(),Parameters::GetInstance()->GetSeedRPMD());
+
+   cout << "\n";
+}
+
+void InputParser::OutputOptimizeConditions() const{
+   cout << this->messageOptimizeConditions;
+
+   printf("%s%d\n",this->messageSteepestDescentLineReturnTimes.c_str(),Parameters::GetInstance()->GetLineReturnTimesSteepestDescent());
+   printf("%s%d\n",this->messageSteepestDescentSteps.c_str(),Parameters::GetInstance()->GetStepsSteepestDescent());
+   printf("%s%d\n",this->messageSteepestDescentElecState.c_str(),Parameters::GetInstance()->GetElectronicStateIndexSteepestDescent());
+   printf("%s%lf\n",this->messageSteepestDescentMaxGradient.c_str(),Parameters::GetInstance()->GetMaxGradientSteepestDescent());
+   printf("%s%lf\n",this->messageSteepestDescentRmsGradient.c_str(),Parameters::GetInstance()->GetRmsGradientSteepestDescent());
+   printf("%s%lf%s\n",this->messageSteepestDescentTimeWidth.c_str(),Parameters::GetInstance()->GetTimeWidthSteepestDescent()/Parameters::GetInstance()->GetFs2AU(),this->messageFs.c_str());
 
    cout << "\n";
 }

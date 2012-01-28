@@ -34,6 +34,7 @@ private:
    std::string errorMessageNonValidExcitedStatesMD;
    std::string errorMessageNonValidExcitedStatesMC;
    std::string errorMessageNonValidExcitedStatesRPMD;
+   std::string errorMessageNonValidExcitedStatesOptimize;
    std::string messageStartParseInput;
    std::string messageDoneParseInput;
    std::string messageTotalNumberAOs;
@@ -83,6 +84,14 @@ private:
    std::string messageRpmdTemperature;
    std::string messageRpmdNumBeads;
    std::string messageRpmdSeed;
+   // Optimize (steepest descent)
+   std::string messageOptimizeConditions;
+   std::string messageSteepestDescentLineReturnTimes;
+   std::string messageSteepestDescentSteps;
+   std::string messageSteepestDescentElecState;
+   std::string messageSteepestDescentTimeWidth;
+   std::string messageSteepestDescentRmsGradient;
+   std::string messageSteepestDescentMaxGradient;
    // MOPlot
    std::string messageMOPlotConditions;
    std::string messageMOPlotIndex;
@@ -184,11 +193,21 @@ private:
    std::string stringRPMDTemperature;
    std::string stringRPMDNumBeads;
    std::string stringRPMDSeed;
+   // Optimize
+   std::string stringOptimize;
+   std::string stringOptimizeEnd;
+   std::string stringSteepestDescentLineReturnTimes;
+   std::string stringSteepestDescentSteps;
+   std::string stringSteepestDescentElecState;
+   std::string stringSteepestDescentMaxGradient;
+   std::string stringSteepestDescentRmsGradient;
+   std::string stringSteepestDescentTimeWidth;
    void CalcMolecularBasics(Molecule* molecule) const;
    void CheckCisConditions(const Molecule& molecule) const;
    void CheckMdConditions(const Molecule& molecule) const;
    void CheckMcConditions(const Molecule& molecule) const;
    void CheckRpmdConditions(const Molecule& molecule) const;
+   void CheckOptimizeConditions(const Molecule& molecule) const;
    void OutputMolecularBasics(Molecule* molecule) const;
    void OutputScfConditions() const;
    void OutputMemoryConditions() const;
@@ -196,6 +215,7 @@ private:
    void OutputMdConditions() const;
    void OutputMcConditions() const;
    void OutputRpmdConditions() const;
+   void OutputOptimizeConditions() const;
    void OutputMOPlotConditions() const;
    void OutputInputTerms(std::vector<std::string> inputTerms) const;
    bool IsCommentOut(std::string str) const;
@@ -211,6 +231,7 @@ private:
    int ParseConditionsMC(std::vector<std::string>* inputTerms, int parseIndex) const;
    int ParseConditionsMD(std::vector<std::string>* inputTerms, int parseIndex) const;
    int ParseConditionsRPMD(std::vector<std::string>* inputTerms, int parseIndex) const;
+   int ParseConditionsOptimize(std::vector<std::string>* inputTerms, int parseIndex) const;
    int ParseConditionsMemory(std::vector<std::string>* inputTerms, int parseIndex) const;
 };
 
