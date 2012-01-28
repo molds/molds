@@ -939,7 +939,7 @@ void InputParser::ValidateMdConditions(const Molecule& molecule) const{
    int groundStateIndex = 0;
    int targetStateIndex = Parameters::GetInstance()->GetElectronicStateIndexMD();
    TheoryType theory = Parameters::GetInstance()->GetCurrentTheory();
-   // ZINDO does not support excited states force.
+   // Validate theory
    if(theory == CNDO2 || theory == INDO || (theory == ZINDOS && groundStateIndex < targetStateIndex)){
       stringstream ss;
       ss << this->errorMessageNonValidExcitedStatesMD;
