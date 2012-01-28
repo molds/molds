@@ -156,10 +156,12 @@ void InputParser::SetMessages(){
    this->stringTheoryAM1 = "am1";
    this->stringTheoryPM3 = "pm3";
    this->stringTheoryPM3PDDG = "pm3/pddg";
-   this->stringGeometry =    "geometry";
-   this->stringGeometryEnd = "geometry_end";
    this->stringTheory = "theory";
    this->stringTheoryEnd = "theory_end";
+
+   // geometry
+   this->stringGeometry =    "geometry";
+   this->stringGeometryEnd = "geometry_end";
 
    // SCF
    this->stringScf = "scf";

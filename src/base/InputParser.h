@@ -108,6 +108,7 @@ private:
    std::string stringTheoryAM1;
    std::string stringTheoryPM3;
    std::string stringTheoryPM3PDDG;
+   // geometry
    std::string stringGeometry;
    std::string stringGeometryEnd;
    // SCF
