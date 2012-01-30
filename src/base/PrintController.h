@@ -22,10 +22,19 @@ namespace MolDS_base{
 
 class PrintController{
 public:
-   PrintController();
-   virtual ~PrintController();
-   bool PrintsLogs() const;
-   void SetPrintsLogs(bool printsLogs);
+   PrintController(){
+      this->printsLogs = true;
+      //cout << "printController is created.\n";
+   }
+   virtual ~PrintController(){
+      //cout << "printController is destructed.\n";
+   }
+   bool PrintsLogs() const{
+      return this->printsLogs;
+   }
+   void SetPrintsLogs(bool printsLogs){
+      this->printsLogs = printsLogs;
+   }
 private:
    bool printsLogs;
 };

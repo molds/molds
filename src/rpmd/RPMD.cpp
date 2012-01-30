@@ -168,19 +168,21 @@ void RPMD::DoRPMD(const Molecule& refferenceMolecule){
    // initialize Beads fluctuations (quantum fluctuations)
    this->FluctuateBeads(molecularBeads, elecState, temperature, seed);
 
-   // initialize Beads electronic states
+   // initialize electronic states of each bead.
    if(this->PrintsLogs()){
       cout << this->messageStartInitialRPMD;
    }
    this->UpdateElectronicStructure(electronicStructureBeads);
    if(this->PrintsLogs()){
       cout << this->messageinitialConditionRPMD;
-      cout << this->messageEndInitialRPMD;
    }
    double initialEnergy = this->OutputEnergies(molecularBeads,
                                                electronicStructureBeads,
                                                elecState,
                                                temperature);
+   if(this->PrintsLogs()){
+      cout << this->messageEndInitialRPMD;
+   }
 
    // time step roop
    for(int s=0; s<totalSteps; s++){
@@ -224,9 +226,9 @@ void RPMD::SetMessages(){
       = "**********  START: Ring Polymer Molecular dynamics  **********\n";
    this->messageEndRPMD 
       = "**********  DONE: Ring Polymer Molecular dynamics  **********\n";
-   this->messageStartInitialRPMD = "\n**********  START: Initial calculation  ********* \n";
-   this->messageEndInitialRPMD =   "\n**********  DONE: Initial calculation   ********* \n";
-   this->messageinitialConditionRPMD = "\n=========  Initial conditions  ==========\n";
+   this->messageStartInitialRPMD = "\n**********  START: Initial calculation of electronic structure of each bead  ********* \n";
+   this->messageEndInitialRPMD =   "\n**********  DONE: Initial calculation of electronic structure of each bead   ********* \n";
+   this->messageinitialConditionRPMD = "\n=========  Initial conditions of the beads  ==========\n";
    this->messageStartStepRPMD =    "\n==========  START: RPMD step ";
    this->messageEndStepRPMD =        "==========  DONE: RPMD step ";
    this->messageBeadsNum = "----------  Beads number ";
