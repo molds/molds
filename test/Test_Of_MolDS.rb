@@ -626,6 +626,31 @@ mklNumThreads = "2"
 ompNumThreads = "2"
 testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
 
+system("echo '------------------------------------------------'")
+system("echo '----------  Test of PM3/PDDG/RPMD  -------------'")
+system("echo '------------------------------------------------\n'")
+system("echo '\t\t\t>>> C2H6 <<<\n'")
+prefix = "c2h6_pm3pddg_rpmd"
+mklNumThreads = "1"
+ompNumThreads = "1"
+testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
+mklNumThreads = "2"
+ompNumThreads = "2"
+testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
+
+system("echo '---------------------------------------------------'")
+system("echo '---------  Test of PM3/PDDG/CIS/RPMD      ---------'")
+system("echo '---------  With Davidson for the CIS      ---------'")
+system("echo '---------------------------------------------------\n'")
+system("echo '\t\t\t>>> C2H6 <<<\n'")
+prefix = "c2h6_pm3pddg_davidsonCIS_singlet_rpmd"
+mklNumThreads = "1"
+ompNumThreads = "1"
+testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
+mklNumThreads = "2"
+ompNumThreads = "2"
+testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
+
 system("echo '---------------------------------------------------'")
 system("echo '-----------  Test of limitation of Heap  ----------'")
 system("echo '---------------------------------------------------\n'")
