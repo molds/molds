@@ -49,6 +49,7 @@
 #include"md/MD.h"
 #include"mc/MC.h"
 #include"rpmd/RPMD.h"
+#include"optimize/SteepestDescent.h"
 using namespace std;
 using namespace MolDS_base;
 
@@ -142,7 +143,6 @@ int main(){
          MolDS_rpmd::RPMD* rpmd = NULL;
          try{
             rpmd = new MolDS_rpmd::RPMD();
-            //rpmd->SetMolecule(molecule);
             rpmd->DoRPMD(*molecule);
          }
          catch(MolDSException ex){
@@ -151,6 +151,22 @@ int main(){
          }
          if(rpmd != NULL){
             delete rpmd;
+         }
+      }
+
+      // Optimize (Steepest Descent)
+      else if(runingNormally && Parameters::GetInstance()->GetCurrentSimulation() == Optimize){
+         MolDS_optimize::SteepestDescent* steepestDescent = NULL;
+         try{
+            steepestDescent = new MolDS_optimize::SteepestDescent();
+            steepestDescent->Optimize(*molecule);
+         }
+         catch(MolDSException ex){
+            cout << ex.what() << endl;
+            runingNormally = false;
+         }
+         if(steepestDescent != NULL){
+            delete steepestDescent;
          }
       }
 
