@@ -53,7 +53,7 @@ SteepestDescent::~SteepestDescent(){
 
 void SteepestDescent::Optimize(Molecule& molecule){
    if(this->PrintsLogs()){
-      cout << this->messageStartSteepestDescent;
+      cout << this->messageStartGeometryOptimization;
    }
    this->ClearMolecularMomenta(molecule);
 
@@ -65,11 +65,15 @@ void SteepestDescent::Optimize(Molecule& molecule){
    electronicStructure->SetPrintsLogs(this->PrintsLogs());
 
    // Search Minimum
-   this->LineSearch(electronicStructure, molecule);
-   this->SteepestDescentSearch(electronicStructure, molecule);
+   double lineSearchedEnergy = 0.0;
+   bool obtainesOptimizedStructure = false;
+   this->LineSearch(electronicStructure, molecule, &lineSearchedEnergy, &obtainesOptimizedStructure);
+   if(!obtainesOptimizedStructure){
+      this->SteepestDescentSearch(electronicStructure, molecule, lineSearchedEnergy, &obtainesOptimizedStructure);
+   }
 
    if(this->PrintsLogs()){
-      cout << this->messageEndSteepestDescent;
+      cout << this->messageEndGeometryOptimization;
    }
 }
 
@@ -77,13 +81,15 @@ void SteepestDescent::SetMessages(){
    this->errorMessageTheoryType = "\ttheory type = ";
    this->errorMessageNotEnebleTheoryType  
       = "Error in optimize::SteepestDescent::CheckEnableTheoryType: Non available theory is set.\n";
+   this->messageStartGeometryOptimization = "**********  START: Geometry optimization  **********\n";
+   this->messageEndGeometryOptimization =   "**********  DONE: Geometry optimization  **********\n";
    this->messageStartSteepestDescent = "**********  START: Steepest descent  **********\n";
    this->messageEndSteepestDescent =   "**********  DONE: Steepest descent  **********\n";
-   this->messageStartStepSteepestDescent = "\n========== START: Steepest descent step ";
-   this->messageEndStepSteepestDescent =     "========== DONE: Steepest descent step ";
+   this->messageStartStepSteepestDescent = "==========  START: Steepest descent step ";
    this->messageStartLineSearch = "**********  START: Line search  **********\n";
    this->messageEndLineSearch =   "**********  DONE: Line search  **********\n";
    this->messageStartLineReturnTimes = "\n==========  START: Line return times ";
+   this->messageLineSearchSteps = "Number of steps in this Line search: ";
    this->messageEnergies = "\tEnergies:\n";
    this->messageEnergiesTitle = "\t\t|\tkind\t\t\t| [a.u.] | [eV] | \n";
    this->messageCoreRepulsionEnergy = "Core repulsion   ";
@@ -146,73 +152,163 @@ void SteepestDescent::UpdateElectronicStructure(boost::shared_ptr<ElectronicStru
    }
 }
 
-void SteepestDescent::LineSearch(boost::shared_ptr<ElectronicStructure> electronicStructure, Molecule& molecule) const{
-   int elecState = Parameters::GetInstance()->GetElectronicStateIndexSteepestDescent();
-   double dt = Parameters::GetInstance()->GetTimeWidthSteepestDescent();
-   int lineReturnTimes = Parameters::GetInstance()->GetLineReturnTimesSteepestDescent();
+void SteepestDescent::LineSearch(boost::shared_ptr<ElectronicStructure> electronicStructure, 
+                                 Molecule& molecule,
+                                 double* lineSearchedEnergy,
+                                 bool* obtainesOptimizedStructure) const{
    if(this->PrintsLogs()){
       cout << this->messageStartLineSearch;
    }
-   for(int s=0; s<=lineReturnTimes; s++){
-      if(this->PrintsLogs()){
-         cout << this->messageStartLineReturnTimes << s << endl;
-      }
-      bool requireGuess = true;
-      this->UpdateElectronicStructure(electronicStructure, requireGuess, this->PrintsLogs());
-      double** matrixForce = electronicStructure->GetForce(elecState);
-      double lineSearchOldEnergy = electronicStructure->GetElectronicEnergy(elecState);
-      double lineSearchCurrentEnergy = lineSearchOldEnergy;
-      if(this->PrintsLogs()){
-         molecule.OutputConfiguration();
-         molecule.OutputXyzCOC();
-      }
-      while(lineSearchCurrentEnergy <= lineSearchOldEnergy){
-         this->UpdateMolecularCoordinates(molecule, matrixForce, dt);
-         requireGuess = false;
-         bool tempPrintsLogs = false;
-         this->UpdateElectronicStructure(electronicStructure, requireGuess, tempPrintsLogs);
-         lineSearchOldEnergy = lineSearchCurrentEnergy;
+   int elecState = Parameters::GetInstance()->GetElectronicStateIndexSteepestDescent();
+   double dt = Parameters::GetInstance()->GetTimeWidthSteepestDescent();
+   int lineReturnTimes = Parameters::GetInstance()->GetLineReturnTimesSteepestDescent();
+   double maxGradientThreshold = Parameters::GetInstance()->GetMaxGradientSteepestDescent();
+   double rmsGradientThreshold = Parameters::GetInstance()->GetRmsGradientSteepestDescent();
+   double lineSearchCurrentEnergy = 0.0;
+   double lineSearchInitialEnergy = 0.0;
+   double** matrixForce = NULL;
+
+   // initial calculation
+   bool requireGuess = true;
+   this->UpdateElectronicStructure(electronicStructure, requireGuess, this->PrintsLogs());
+   lineSearchCurrentEnergy = electronicStructure->GetElectronicEnergy(elecState);
+
+   if(0<lineReturnTimes){
+      requireGuess = false;
+      matrixForce = electronicStructure->GetForce(elecState);
+      for(int s=0; s<lineReturnTimes; s++){
+         if(this->PrintsLogs()){
+            cout << this->messageStartLineReturnTimes << s << endl;
+         }
+
+         lineSearchInitialEnergy = lineSearchCurrentEnergy;
+
+         // line search roop
+         int lineSearchSteps = 0;
+         double lineSearchOldEnergy = lineSearchCurrentEnergy;
+         while(lineSearchCurrentEnergy <= lineSearchOldEnergy){
+            this->UpdateMolecularCoordinates(molecule, matrixForce, dt);
+            bool tempPrintsLogs = false;
+            this->UpdateElectronicStructure(electronicStructure, requireGuess, tempPrintsLogs);
+            lineSearchOldEnergy = lineSearchCurrentEnergy;
+            lineSearchCurrentEnergy = electronicStructure->GetElectronicEnergy(elecState);
+            lineSearchSteps++;
+         }
+
+         // final state of line search
+         this->UpdateElectronicStructure(electronicStructure, requireGuess, this->PrintsLogs());
+         matrixForce = electronicStructure->GetForce(elecState);
+         if(this->PrintsLogs()){
+            molecule.OutputConfiguration();
+            molecule.OutputXyzCOC();
+         }
          lineSearchCurrentEnergy = electronicStructure->GetElectronicEnergy(elecState);
+         if(this->PrintsLogs()){
+            cout << this->messageLineSearchSteps << lineSearchSteps << endl;
+         }
+
+         // check convergence
+         if(this->SatisfiesConvergenceCriterion(matrixForce, 
+                                                molecule,
+                                                lineSearchInitialEnergy, 
+                                                lineSearchCurrentEnergy,
+                                                maxGradientThreshold, 
+                                                rmsGradientThreshold)){
+            *obtainesOptimizedStructure = true;
+            break;
+         }
+
       }
    }
+   *lineSearchedEnergy = lineSearchCurrentEnergy;
    if(this->PrintsLogs()){
       cout << this->messageEndLineSearch;
    }
 }
 
-void SteepestDescent::SteepestDescentSearch(boost::shared_ptr<ElectronicStructure> electronicStructure, Molecule& molecule) const{
+
+// This method should be called after the LineSearch-method.
+void SteepestDescent::SteepestDescentSearch(boost::shared_ptr<ElectronicStructure> electronicStructure, 
+                                            Molecule& molecule,
+                                            double lineSearchedEnergy,
+                                            bool* obtainesOptimizedStructure) const{
    int elecState = Parameters::GetInstance()->GetElectronicStateIndexSteepestDescent();
    double dt = Parameters::GetInstance()->GetTimeWidthSteepestDescent();
    int steepSteps = Parameters::GetInstance()->GetStepsSteepestDescent();
-   double currentEnergy = 0.0;
+   double maxGradientThreshold = Parameters::GetInstance()->GetMaxGradientSteepestDescent();
+   double rmsGradientThreshold = Parameters::GetInstance()->GetRmsGradientSteepestDescent();
+   double currentEnergy = lineSearchedEnergy;
    double oldEnergy = 0.0;
    double** matrixForce = NULL;
-   bool requireGuess = true;
+   double** oldMatrixForce = NULL;
+   bool requireGuess = false;
    if(this->PrintsLogs()){
-      cout << this->messageStartSteepestDescent;
+      printf("%s",this->messageStartSteepestDescent.c_str());
    }
+   matrixForce = electronicStructure->GetForce(elecState);
+
+   // steepest descent roop
    for(int s=0; s<steepSteps; s++){
       if(this->PrintsLogs()){
-         cout << this->messageStartStepSteepestDescent << s+1 << endl;
+         printf("%s %d\n",this->messageStartStepSteepestDescent.c_str(), s+1);
       }
-      if(s!=0){
-         requireGuess = false;
-      }
-      this->UpdateElectronicStructure(electronicStructure, requireGuess, this->PrintsLogs());
-      matrixForce = electronicStructure->GetForce(elecState);
       this->UpdateMolecularCoordinates(molecule, matrixForce, dt);
+      this->UpdateElectronicStructure(electronicStructure, requireGuess, this->PrintsLogs());
       oldEnergy = currentEnergy;
       currentEnergy = electronicStructure->GetElectronicEnergy(elecState);
+      matrixForce = electronicStructure->GetForce(elecState);
+      if(this->SatisfiesConvergenceCriterion(matrixForce, 
+                                             molecule, 
+                                             oldEnergy, 
+                                             currentEnergy, 
+                                             maxGradientThreshold, 
+                                             rmsGradientThreshold)){
+         *obtainesOptimizedStructure = true;
+         break;
+      }
       if(oldEnergy < currentEnergy){
          dt *= 0.1;
-      }
-      if(this->PrintsLogs()){
-         cout << this->messageStartStepSteepestDescent << s+1 << endl;
+         if(this->PrintsLogs()){
+            printf("%s %e\n","dt is reduced to ", dt);
+         }
       }
    }
+
    if(this->PrintsLogs()){
-      cout << this->messageEndSteepestDescent;
+      printf("%s",this->messageEndSteepestDescent.c_str());
    }
+}
+
+bool SteepestDescent::SatisfiesConvergenceCriterion(double** matrixForce, 
+                                                    const MolDS_base::Molecule& molecule,
+                                                    double oldEnergy,
+                                                    double currentEnergy,
+                                                    double maxGradientThreshold,
+                                                    double rmsGradientThreshold) const{
+   bool satisfies = false;
+   double maxGradient = 0.0;
+   double sumSqureGradient = 0.0;
+   double energyDifference = currentEnergy - oldEnergy;
+   for(int a=0; a<molecule.GetAtomVect()->size(); a++){
+      for(int i=0; i<CartesianType_end; i++){
+         if(maxGradient<fabs(matrixForce[a][i])){
+            maxGradient = fabs(matrixForce[a][i]);
+         }
+         sumSqureGradient += pow(matrixForce[a][i],2.0);
+      }
+   }
+   sumSqureGradient /= (double)(molecule.GetAtomVect()->size()*CartesianType_end);
+   double rmsGradient = sqrt(sumSqureGradient);
+   if(this->PrintsLogs()){
+      printf("%s %e\n","energy diff: ", energyDifference);
+      printf("%s %e\n","maxGradient: ", maxGradient);
+      printf("%s %e\n","rmsGradient: ", rmsGradient);
+      printf("\n\n");
+   }
+   if(maxGradient < maxGradientThreshold && rmsGradient < rmsGradientThreshold && energyDifference < 0){
+      satisfies = true;
+   }
+   return satisfies;
 }
 
 }

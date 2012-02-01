@@ -261,6 +261,18 @@ HOW TO WRITE INPUT:
       "dt" is initial fictious time steps for the steepest descent algorythms.
       The defaul value of the "dt" is 0.5[fs]
 
+      E.g.
+         OPTIMIZE
+            line_return_times 10
+            steep_step 5
+            electronic_state 0
+            max_gradient 0.00045
+            rms_gradient 0.00030
+            dt 50
+         OPTIMIZE_END
+  
+      
+
    <MD (Molecular dynamics)>
       Write MD-directive.
 
