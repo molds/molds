@@ -25,6 +25,7 @@
 #include<vector>
 #include<stdexcept>
 #include<boost/shared_ptr.hpp>
+#include<boost/format.hpp>
 #include"../base/PrintController.h"
 #include"../base/MolDSException.h"
 #include"../base/Uncopyable.h"
@@ -44,16 +45,16 @@ namespace MolDS_optimize{
 SteepestDescent::SteepestDescent(){
    this->SetMessages();
    this->SetEnableTheoryTypes();
-   //cout << "SteepestDescent created \n";
+   //printf("%s\n", "SteepestDescent created");
 }
 
 SteepestDescent::~SteepestDescent(){
-   //cout << "SteepestDescent deleted\n";
+   //printf("%s\n", "SteepestDescent deleted");
 }
 
 void SteepestDescent::Optimize(Molecule& molecule){
    if(this->PrintsLogs()){
-      cout << this->messageStartGeometryOptimization;
+      printf("%s",this->messageStartGeometryOptimization.c_str());
    }
    this->ClearMolecularMomenta(molecule);
 
@@ -71,9 +72,19 @@ void SteepestDescent::Optimize(Molecule& molecule){
    if(!obtainesOptimizedStructure){
       this->SteepestDescentSearch(electronicStructure, molecule, lineSearchedEnergy, &obtainesOptimizedStructure);
    }
-
+  
+   // Not converged
+   if(!obtainesOptimizedStructure){
+      int lineSearchTimes = Parameters::GetInstance()->GetLineSearchTimesSteepestDescent();
+      int steepSteps = Parameters::GetInstance()->GetStepsSteepestDescent();
+      stringstream ss;
+      ss << this->errorMessageGeometyrOptimizationNotConverged;
+      ss << this->errorMessageLineSearchTimes << lineSearchTimes << endl;
+      ss << this->errorMessageSteepestDescentSteps << steepSteps << endl;
+      throw MolDSException(ss.str());
+   }
    if(this->PrintsLogs()){
-      cout << this->messageEndGeometryOptimization;
+      printf("%s",this->messageEndGeometryOptimization.c_str());
    }
 }
 
@@ -81,6 +92,12 @@ void SteepestDescent::SetMessages(){
    this->errorMessageTheoryType = "\ttheory type = ";
    this->errorMessageNotEnebleTheoryType  
       = "Error in optimize::SteepestDescent::CheckEnableTheoryType: Non available theory is set.\n";
+   this->errorMessageGeometyrOptimizationNotConverged 
+      = "Error in optimize::SteepestDescent::Optimize: Optimization did not met convergence criterion.\n";
+   this->errorMessageLineSearchTimes = "\tLine search times = ";
+   this->errorMessageSteepestDescentSteps = "\tSteepest descent steps = ";
+   this->messageGeometyrOptimizationMetConvergence 
+      = "\t\tGeometry otimization met convergence criterion(^^b\n\n\n";
    this->messageStartGeometryOptimization = "**********  START: Geometry optimization  **********\n";
    this->messageEndGeometryOptimization =   "**********  DONE: Geometry optimization  **********\n";
    this->messageStartSteepestDescent = "**********  START: Steepest descent  **********\n";
@@ -88,14 +105,13 @@ void SteepestDescent::SetMessages(){
    this->messageStartStepSteepestDescent = "==========  START: Steepest descent step ";
    this->messageStartLineSearch = "**********  START: Line search  **********\n";
    this->messageEndLineSearch =   "**********  DONE: Line search  **********\n";
-   this->messageStartLineReturnTimes = "\n==========  START: Line return times ";
+   this->messageStartLineSearchTimes = "\n==========  START: Line return times ";
    this->messageLineSearchSteps = "Number of steps in this Line search: ";
-   this->messageEnergies = "\tEnergies:\n";
-   this->messageEnergiesTitle = "\t\t|\tkind\t\t\t| [a.u.] | [eV] | \n";
-   this->messageCoreRepulsionEnergy = "Core repulsion   ";
-   this->messageElectronicEnergy = "Electronic\n\t\t(inc. core rep.)";
-   this->messageTotalEnergy =         "Total            ";
-   this->messageDifferentEnergy =     "Different        ";
+   this->messageOptimizationLog = "====== Optimization Logs ======\n";
+   this->messageEnergyDifference = "Energy difference: ";
+   this->messageMaxGradient = "Max gradient: ";
+   this->messageRmsGradient = "Rms gradient: ";
+   this->messageAu = "[a.u.]";
 }
 
 void SteepestDescent::SetEnableTheoryTypes(){
@@ -157,11 +173,11 @@ void SteepestDescent::LineSearch(boost::shared_ptr<ElectronicStructure> electron
                                  double* lineSearchedEnergy,
                                  bool* obtainesOptimizedStructure) const{
    if(this->PrintsLogs()){
-      cout << this->messageStartLineSearch;
+      printf("%s",this->messageStartLineSearch.c_str());
    }
    int elecState = Parameters::GetInstance()->GetElectronicStateIndexSteepestDescent();
    double dt = Parameters::GetInstance()->GetTimeWidthSteepestDescent();
-   int lineReturnTimes = Parameters::GetInstance()->GetLineReturnTimesSteepestDescent();
+   int lineSearchTimes = Parameters::GetInstance()->GetLineSearchTimesSteepestDescent();
    double maxGradientThreshold = Parameters::GetInstance()->GetMaxGradientSteepestDescent();
    double rmsGradientThreshold = Parameters::GetInstance()->GetRmsGradientSteepestDescent();
    double lineSearchCurrentEnergy = 0.0;
@@ -173,12 +189,12 @@ void SteepestDescent::LineSearch(boost::shared_ptr<ElectronicStructure> electron
    this->UpdateElectronicStructure(electronicStructure, requireGuess, this->PrintsLogs());
    lineSearchCurrentEnergy = electronicStructure->GetElectronicEnergy(elecState);
 
-   if(0<lineReturnTimes){
+   if(0<lineSearchTimes){
       requireGuess = false;
       matrixForce = electronicStructure->GetForce(elecState);
-      for(int s=0; s<lineReturnTimes; s++){
+      for(int s=0; s<lineSearchTimes; s++){
          if(this->PrintsLogs()){
-            cout << this->messageStartLineReturnTimes << s << endl;
+            printf("%s%d\n",this->messageStartLineSearchTimes.c_str(),s);
          }
 
          lineSearchInitialEnergy = lineSearchCurrentEnergy;
@@ -204,7 +220,7 @@ void SteepestDescent::LineSearch(boost::shared_ptr<ElectronicStructure> electron
          }
          lineSearchCurrentEnergy = electronicStructure->GetElectronicEnergy(elecState);
          if(this->PrintsLogs()){
-            cout << this->messageLineSearchSteps << lineSearchSteps << endl;
+            printf("\t%s%d\n",this->messageLineSearchSteps.c_str(), lineSearchSteps);
          }
 
          // check convergence
@@ -222,7 +238,7 @@ void SteepestDescent::LineSearch(boost::shared_ptr<ElectronicStructure> electron
    }
    *lineSearchedEnergy = lineSearchCurrentEnergy;
    if(this->PrintsLogs()){
-      cout << this->messageEndLineSearch;
+      printf("%s", this->messageEndLineSearch.c_str());
    }
 }
 
@@ -300,12 +316,16 @@ bool SteepestDescent::SatisfiesConvergenceCriterion(double** matrixForce,
    sumSqureGradient /= (double)(molecule.GetAtomVect()->size()*CartesianType_end);
    double rmsGradient = sqrt(sumSqureGradient);
    if(this->PrintsLogs()){
-      printf("%s %e\n","energy diff: ", energyDifference);
-      printf("%s %e\n","maxGradient: ", maxGradient);
-      printf("%s %e\n","rmsGradient: ", rmsGradient);
+      printf("\n");
+      printf("\t%s", this->messageOptimizationLog.c_str());
+      printf("\t%s %e%s\n", this->messageEnergyDifference.c_str(), energyDifference, this->messageAu.c_str());
+      printf("\t%s %e%s\n", this->messageMaxGradient.c_str(), maxGradient, this->messageAu.c_str());
+      printf("\t%s %e%s\n", this->messageRmsGradient.c_str(), rmsGradient, this->messageAu.c_str());
       printf("\n\n");
+      //cout << (boost::format("\t%s %e%s") % this->messageEnergyDifference.c_str() % energyDifference % this->messageAu.c_str()).str();
    }
    if(maxGradient < maxGradientThreshold && rmsGradient < rmsGradientThreshold && energyDifference < 0){
+      printf("%s", this->messageGeometyrOptimizationMetConvergence.c_str());
       satisfies = true;
    }
    return satisfies;

@@ -136,8 +136,8 @@ public:
    unsigned long GetSeedRPMD() const;
    void SetSeedRPMD(unsigned long seed);
    // Opt (steepest descent)
-   int GetLineReturnTimesSteepestDescent();
-   void SetLineReturnTimesSteepestDescent(int lineReturnTimes);
+   int GetLineSearchTimesSteepestDescent();
+   void SetLineSearchTimesSteepestDescent(int lineSearchTimes);
    int GetStepsSteepestDescent() const;
    void SetStepsSteepestDescent(int steps);
    int GetElectronicStateIndexSteepestDescent() const;
@@ -217,7 +217,7 @@ private:
    int numberBeadsRPMD;
    unsigned long seedRPMD;
    // Opt (steepest descent)
-   int lineReturnTimesSteepestDescent;
+   int lineSearchTimesSteepestDescent;
    int stepsSteepestDescent;
    int electronicStateIndexSteepestDescent;
    double maxGradientSteepestDescent;

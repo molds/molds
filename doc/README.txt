@@ -247,8 +247,8 @@ HOW TO WRITE INPUT:
        The default value of the "electronic_state" is 0. That is, 
        electronic ground state is default.
 
-      "line_return_times" means the times of turnback of the line-search.
-      The default value of the "line_return_times" is 10.
+      "line_search_times" means the times of line-search trials.
+      The default value of the "line_search_times" is 50.
 
       "steep_step" means the number of steps of the steepest descent.
       The default value of the "steep_step" is 50.
@@ -259,11 +259,11 @@ HOW TO WRITE INPUT:
       The default value of the "rms_gradient" is 0.00030.
 
       "dt" is initial fictious time steps for the steepest descent algorythms.
-      The defaul value of the "dt" is 0.5[fs]
+      The defaul value of the "dt" is 50[fs]
 
       E.g.
          OPTIMIZE
-            line_return_times 10
+            line_search_times 10
             steep_step 5
             electronic_state 0
             max_gradient 0.00045

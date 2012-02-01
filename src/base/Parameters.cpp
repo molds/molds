@@ -140,12 +140,12 @@ void Parameters::SetDefaultValues(){
    this->numberBeadsRPMD = 10;
    this->seedRPMD = static_cast<unsigned long>(time(0));
    // Optimization (Steepest Descent)
-   this->lineReturnTimesSteepestDescent = 10;
+   this->lineSearchTimesSteepestDescent = 50;
    this->stepsSteepestDescent = 50;
    this->electronicStateIndexSteepestDescent = 0;
    this->maxGradientSteepestDescent = 0.00045;
    this->rmsGradientSteepestDescent = 0.00030;
-   this->timeWidthSteepestDescent = 0.5*this->fs2AU;
+   this->timeWidthSteepestDescent = 50.0*this->fs2AU;
 }
 
 void Parameters::SetMessages(){
@@ -578,12 +578,12 @@ void Parameters::SetSeedRPMD(unsigned long seed){
 }
 
 // Opt (steepest descent)
-int Parameters::GetLineReturnTimesSteepestDescent(){
-   return this->lineReturnTimesSteepestDescent;
+int Parameters::GetLineSearchTimesSteepestDescent(){
+   return this->lineSearchTimesSteepestDescent;
 }
 
-void Parameters::SetLineReturnTimesSteepestDescent(int lineReturnTimes){
-   this->lineReturnTimesSteepestDescent = lineReturnTimes;
+void Parameters::SetLineSearchTimesSteepestDescent(int lineSearchTimes){
+   this->lineSearchTimesSteepestDescent = lineSearchTimes;
 }
 
 int Parameters::GetStepsSteepestDescent() const{

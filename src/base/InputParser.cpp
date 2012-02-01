@@ -137,7 +137,7 @@ void InputParser::SetMessages(){
 
    // Optimize (steepestDescent)
    this->messageOptimizeConditions = "\tOptimize conditions:\n";
-   this->messageSteepestDescentLineReturnTimes = "\t\tLine return times:";
+   this->messageSteepestDescentLineSearchTimes = "\t\tLine return times:";
    this->messageSteepestDescentSteps = "\t\tSteepest Descent steps: ";
    this->messageSteepestDescentElecState = "\t\tElectronic eigenstate: ";
    this->messageSteepestDescentMaxGradient = "\t\tMax gradient: ";
@@ -263,7 +263,7 @@ void InputParser::SetMessages(){
    // Opt
    this->stringOptimize = "optimize";
    this->stringOptimizeEnd = "optimize_end";
-   this->stringSteepestDescentLineReturnTimes = "line_return_times";
+   this->stringSteepestDescentLineSearchTimes = "line_search_times";
    this->stringSteepestDescentSteps = "steep_step";
    this->stringSteepestDescentElecState = "electronic_state";
    this->stringSteepestDescentMaxGradient = "max_gradient";
@@ -684,9 +684,9 @@ int InputParser::ParseConditionsOptimize(vector<string>* inputTerms, int parseIn
    parseIndex++;
    while((*inputTerms)[parseIndex].compare(this->stringOptimizeEnd) != 0){
       // number of steps of the steepest descent
-      if((*inputTerms)[parseIndex].compare(this->stringSteepestDescentLineReturnTimes) == 0){
-         int lineReturnTimes = atoi((*inputTerms)[parseIndex+1].c_str());
-         Parameters::GetInstance()->SetLineReturnTimesSteepestDescent(lineReturnTimes);
+      if((*inputTerms)[parseIndex].compare(this->stringSteepestDescentLineSearchTimes) == 0){
+         int lineSearchTimes = atoi((*inputTerms)[parseIndex+1].c_str());
+         Parameters::GetInstance()->SetLineSearchTimesSteepestDescent(lineSearchTimes);
          parseIndex++;
       }
       // number of steps of the steepest descent
@@ -1131,7 +1131,7 @@ void InputParser::OutputRpmdConditions() const{
 void InputParser::OutputOptimizeConditions() const{
    cout << this->messageOptimizeConditions;
 
-   printf("%s%d\n",this->messageSteepestDescentLineReturnTimes.c_str(),Parameters::GetInstance()->GetLineReturnTimesSteepestDescent());
+   printf("%s%d\n",this->messageSteepestDescentLineSearchTimes.c_str(),Parameters::GetInstance()->GetLineSearchTimesSteepestDescent());
    printf("%s%d\n",this->messageSteepestDescentSteps.c_str(),Parameters::GetInstance()->GetStepsSteepestDescent());
    printf("%s%d\n",this->messageSteepestDescentElecState.c_str(),Parameters::GetInstance()->GetElectronicStateIndexSteepestDescent());
    printf("%s%lf\n",this->messageSteepestDescentMaxGradient.c_str(),Parameters::GetInstance()->GetMaxGradientSteepestDescent());

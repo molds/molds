@@ -32,6 +32,10 @@ public:
 private:
    std::string errorMessageNotEnebleTheoryType;
    std::string errorMessageTheoryType;
+   std::string errorMessageGeometyrOptimizationNotConverged;
+   std::string errorMessageLineSearchTimes;
+   std::string errorMessageSteepestDescentSteps;
+   std::string messageGeometyrOptimizationMetConvergence;
    std::string messageStartGeometryOptimization;
    std::string messageEndGeometryOptimization;
    std::string messageStartSteepestDescent;
@@ -39,14 +43,13 @@ private:
    std::string messageStartStepSteepestDescent;
    std::string messageStartLineSearch;
    std::string messageEndLineSearch;
-   std::string messageStartLineReturnTimes;
+   std::string messageStartLineSearchTimes;
    std::string messageLineSearchSteps;
-   std::string messageEnergies;
-   std::string messageEnergiesTitle;
-   std::string messageCoreRepulsionEnergy;
-   std::string messageElectronicEnergy;
-   std::string messageTotalEnergy;
-   std::string messageDifferentEnergy;
+   std::string messageOptimizationLog;
+   std::string messageEnergyDifference;
+   std::string messageMaxGradient;
+   std::string messageRmsGradient;
+   std::string messageAu;
    std::vector<MolDS_base::TheoryType> enableTheoryTypes;
    void SetMessages();
    void SetEnableTheoryTypes();

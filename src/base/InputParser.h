@@ -89,7 +89,7 @@ private:
    std::string messageRpmdSeed;
    // Optimize (steepest descent)
    std::string messageOptimizeConditions;
-   std::string messageSteepestDescentLineReturnTimes;
+   std::string messageSteepestDescentLineSearchTimes;
    std::string messageSteepestDescentSteps;
    std::string messageSteepestDescentElecState;
    std::string messageSteepestDescentTimeWidth;
@@ -199,7 +199,7 @@ private:
    // Optimize
    std::string stringOptimize;
    std::string stringOptimizeEnd;
-   std::string stringSteepestDescentLineReturnTimes;
+   std::string stringSteepestDescentLineSearchTimes;
    std::string stringSteepestDescentSteps;
    std::string stringSteepestDescentElecState;
    std::string stringSteepestDescentMaxGradient;
