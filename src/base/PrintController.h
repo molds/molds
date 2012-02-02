@@ -23,20 +23,23 @@ namespace MolDS_base{
 class PrintController{
 public:
    PrintController(){
-      this->printsLogs = true;
+      this->canOutputLogs = true;
       //cout << "printController is created.\n";
    }
    virtual ~PrintController(){
       //cout << "printController is destructed.\n";
    }
-   bool PrintsLogs() const{
-      return this->printsLogs;
+   bool CanOutputLogs() const{
+      return this->canOutputLogs;
    }
-   void SetPrintsLogs(bool printsLogs){
-      this->printsLogs = printsLogs;
+   void SetCanOutputLogs(bool canOuputLogs){
+      this->canOutputLogs = canOutputLogs;
+   }
+   void OutputLog(std::string log){
+      if(this->canOutputLogs){std::cout << log;}
    }
 private:
-   bool printsLogs;
+   bool canOutputLogs;
 };
 }
 #endif

@@ -273,7 +273,7 @@ double Cndo2::GetDiatomCoreRepulsionFirstDerivative(int indexAtomA, int indexAto
  *
  *****/
 void Cndo2::DoSCF(bool requiresGuess){
-   if(this->PrintsLogs()){
+   if(this->CanOutputLogs()){
       cout << this->messageStartSCF;
    }
    double ompStartTime = omp_get_wtime();
@@ -360,7 +360,7 @@ void Cndo2::DoSCF(bool requiresGuess){
                                               &rmsDensity, 
                                               i)){
             // converged!!!!!
-            if(this->PrintsLogs()){
+            if(this->CanOutputLogs()){
                cout << this->messageSCFMetConvergence;
             }
 
@@ -418,7 +418,7 @@ void Cndo2::DoSCF(bool requiresGuess){
                                   &diisErrorCoefficients);
 
    double ompEndTime = omp_get_wtime();
-   if(this->PrintsLogs()){
+   if(this->CanOutputLogs()){
       cout << this->messageOmpElapsedTimeSCF;
       cout << ompEndTime - ompStartTime;
       cout << this->messageUnitSec << endl;
@@ -688,7 +688,7 @@ void Cndo2::OutputHFResults(double const* const* fockMatrix,
                             double const* energiesMO, 
                             double const* atomicElectronPopulation, 
                             const Molecule& molecule) const{
-   if(this->PrintsLogs()){
+   if(this->CanOutputLogs()){
       // output MO energy
       cout << this->messageEnergiesMOs;
       cout << this->messageEnergiesMOsTitle;
@@ -906,7 +906,7 @@ bool Cndo2::SatisfyConvergenceCriterion(double const* const* oldOrbitalElectronP
    }
    *rmsDensity = sqrt(change);
   
-   if(this->PrintsLogs()){
+   if(this->CanOutputLogs()){
       printf("SCF iter=%d: RMS density=%.15lf \n",times,*rmsDensity);
    }
    if(*rmsDensity < Parameters::GetInstance()->GetThresholdSCF()){

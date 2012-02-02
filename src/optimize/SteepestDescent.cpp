@@ -53,7 +53,7 @@ SteepestDescent::~SteepestDescent(){
 }
 
 void SteepestDescent::Optimize(Molecule& molecule){
-   if(this->PrintsLogs()){
+   if(this->CanOutputLogs()){
       printf("%s",this->messageStartGeometryOptimization.c_str());
    }
    this->ClearMolecularMomenta(molecule);
@@ -63,7 +63,7 @@ void SteepestDescent::Optimize(Molecule& molecule){
    this->CheckEnableTheoryType(theory);
    boost::shared_ptr<ElectronicStructure> electronicStructure(ElectronicStructureFactory::GetInstance()->Create());
    electronicStructure->SetMolecule(&molecule);
-   electronicStructure->SetPrintsLogs(this->PrintsLogs());
+   electronicStructure->SetCanOutputLogs(this->CanOutputLogs());
 
    // Search Minimum
    double lineSearchedEnergy = 0.0;
@@ -83,7 +83,7 @@ void SteepestDescent::Optimize(Molecule& molecule){
       ss << this->errorMessageSteepestDescentSteps << steepSteps << endl;
       throw MolDSException(ss.str());
    }
-   if(this->PrintsLogs()){
+   if(this->CanOutputLogs()){
       printf("%s",this->messageEndGeometryOptimization.c_str());
    }
 }
@@ -161,7 +161,7 @@ void SteepestDescent::UpdateMolecularCoordinates(Molecule& molecule, double** ma
 void SteepestDescent::UpdateElectronicStructure(boost::shared_ptr<ElectronicStructure> electronicStructure, 
                                                 bool requireGuess, 
                                                 bool printsLogs) const{
-   electronicStructure->SetPrintsLogs(printsLogs);
+   electronicStructure->SetCanOutputLogs(printsLogs);
    electronicStructure->DoSCF(requireGuess);
    if(Parameters::GetInstance()->RequiresCIS()){
       electronicStructure->DoCIS();
@@ -172,7 +172,7 @@ void SteepestDescent::LineSearch(boost::shared_ptr<ElectronicStructure> electron
                                  Molecule& molecule,
                                  double* lineSearchedEnergy,
                                  bool* obtainesOptimizedStructure) const{
-   if(this->PrintsLogs()){
+   if(this->CanOutputLogs()){
       printf("%s",this->messageStartLineSearch.c_str());
    }
    int elecState = Parameters::GetInstance()->GetElectronicStateIndexSteepestDescent();
@@ -186,14 +186,14 @@ void SteepestDescent::LineSearch(boost::shared_ptr<ElectronicStructure> electron
 
    // initial calculation
    bool requireGuess = true;
-   this->UpdateElectronicStructure(electronicStructure, requireGuess, this->PrintsLogs());
+   this->UpdateElectronicStructure(electronicStructure, requireGuess, this->CanOutputLogs());
    lineSearchCurrentEnergy = electronicStructure->GetElectronicEnergy(elecState);
 
    if(0<lineSearchTimes){
       requireGuess = false;
       matrixForce = electronicStructure->GetForce(elecState);
       for(int s=0; s<lineSearchTimes; s++){
-         if(this->PrintsLogs()){
+         if(this->CanOutputLogs()){
             printf("%s%d\n",this->messageStartLineSearchTimes.c_str(),s);
          }
 
@@ -204,22 +204,22 @@ void SteepestDescent::LineSearch(boost::shared_ptr<ElectronicStructure> electron
          double lineSearchOldEnergy = lineSearchCurrentEnergy;
          while(lineSearchCurrentEnergy <= lineSearchOldEnergy){
             this->UpdateMolecularCoordinates(molecule, matrixForce, dt);
-            bool tempPrintsLogs = false;
-            this->UpdateElectronicStructure(electronicStructure, requireGuess, tempPrintsLogs);
+            bool tempCanOutputLogs = false;
+            this->UpdateElectronicStructure(electronicStructure, requireGuess, tempCanOutputLogs);
             lineSearchOldEnergy = lineSearchCurrentEnergy;
             lineSearchCurrentEnergy = electronicStructure->GetElectronicEnergy(elecState);
             lineSearchSteps++;
          }
 
          // final state of line search
-         this->UpdateElectronicStructure(electronicStructure, requireGuess, this->PrintsLogs());
+         this->UpdateElectronicStructure(electronicStructure, requireGuess, this->CanOutputLogs());
          matrixForce = electronicStructure->GetForce(elecState);
-         if(this->PrintsLogs()){
+         if(this->CanOutputLogs()){
             molecule.OutputConfiguration();
             molecule.OutputXyzCOC();
          }
          lineSearchCurrentEnergy = electronicStructure->GetElectronicEnergy(elecState);
-         if(this->PrintsLogs()){
+         if(this->CanOutputLogs()){
             printf("\t%s%d\n",this->messageLineSearchSteps.c_str(), lineSearchSteps);
          }
 
@@ -237,7 +237,7 @@ void SteepestDescent::LineSearch(boost::shared_ptr<ElectronicStructure> electron
       }
    }
    *lineSearchedEnergy = lineSearchCurrentEnergy;
-   if(this->PrintsLogs()){
+   if(this->CanOutputLogs()){
       printf("%s", this->messageEndLineSearch.c_str());
    }
 }
@@ -258,18 +258,18 @@ void SteepestDescent::SteepestDescentSearch(boost::shared_ptr<ElectronicStructur
    double** matrixForce = NULL;
    double** oldMatrixForce = NULL;
    bool requireGuess = false;
-   if(this->PrintsLogs()){
+   if(this->CanOutputLogs()){
       printf("%s",this->messageStartSteepestDescent.c_str());
    }
    matrixForce = electronicStructure->GetForce(elecState);
 
    // steepest descent roop
    for(int s=0; s<steepSteps; s++){
-      if(this->PrintsLogs()){
+      if(this->CanOutputLogs()){
          printf("%s %d\n",this->messageStartStepSteepestDescent.c_str(), s+1);
       }
       this->UpdateMolecularCoordinates(molecule, matrixForce, dt);
-      this->UpdateElectronicStructure(electronicStructure, requireGuess, this->PrintsLogs());
+      this->UpdateElectronicStructure(electronicStructure, requireGuess, this->CanOutputLogs());
       oldEnergy = currentEnergy;
       currentEnergy = electronicStructure->GetElectronicEnergy(elecState);
       matrixForce = electronicStructure->GetForce(elecState);
@@ -284,13 +284,13 @@ void SteepestDescent::SteepestDescentSearch(boost::shared_ptr<ElectronicStructur
       }
       if(oldEnergy < currentEnergy){
          dt *= 0.1;
-         if(this->PrintsLogs()){
+         if(this->CanOutputLogs()){
             printf("%s %e\n","dt is reduced to ", dt);
          }
       }
    }
 
-   if(this->PrintsLogs()){
+   if(this->CanOutputLogs()){
       printf("%s",this->messageEndSteepestDescent.c_str());
    }
 }
@@ -315,7 +315,7 @@ bool SteepestDescent::SatisfiesConvergenceCriterion(double** matrixForce,
    }
    sumSqureGradient /= (double)(molecule.GetAtomVect()->size()*CartesianType_end);
    double rmsGradient = sqrt(sumSqureGradient);
-   if(this->PrintsLogs()){
+   if(this->CanOutputLogs()){
       printf("\n");
       printf("\t%s", this->messageOptimizationLog.c_str());
       printf("\t%s %e%s\n", this->messageEnergyDifference.c_str(), energyDifference, this->messageAu.c_str());

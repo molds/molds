@@ -250,7 +250,7 @@ void Mndo::OutputHFResults(double const* const* fockMatrix,
                                       atomicElectronPopulation, 
                                       molecule);
    // output heats of formation
-   if(this->PrintsLogs()){
+   if(this->CanOutputLogs()){
       cout << this->messageHeatsFormation;
       cout << this->messageHeatsFormationTitle;
       printf("\t\t%e\t%e\n\n",this->heatsFormation,
@@ -582,7 +582,7 @@ double Mndo::GetMolecularIntegralElement(int moI, int moJ, int moK, int moL,
 
 // right-upper part is only calculated by this method.
 void Mndo::CalcCISMatrix(double** matrixCIS, int numberActiveOcc, int numberActiveVir) const{
-   if(this->PrintsLogs()){
+   if(this->CanOutputLogs()){
       cout << this->messageStartCalcCISMatrix;
    }
    double ompStartTime = omp_get_wtime();
@@ -762,7 +762,7 @@ void Mndo::CalcCISMatrix(double** matrixCIS, int numberActiveOcc, int numberActi
       throw MolDSException(ompErrors.str());
    }
    double ompEndTime = omp_get_wtime();
-   if(this->PrintsLogs()){
+   if(this->CanOutputLogs()){
       cout << this->messageOmpElapsedTimeCalcCISMarix;
       cout << ompEndTime - ompStartTime;
       cout << this->messageUnitSec << endl;

@@ -79,7 +79,7 @@ void MC::DoMC(){
 }
 
 void MC::DoMC(int totalSteps, int elecState, double temperature, double stepWidth, unsigned long seed){
-   if(this->PrintsLogs()){
+   if(this->CanOutputLogs()){
       cout << this->messageStartMC;
    }
    double transitionRate = 0.0;
@@ -93,25 +93,25 @@ void MC::DoMC(int totalSteps, int elecState, double temperature, double stepWidt
    boost::shared_ptr<ElectronicStructure> electronicStructure2(ElectronicStructureFactory::GetInstance()->Create());
    ElectronicStructure* trialES = electronicStructure2.get();
    trialES->SetMolecule(&trialMolecule);
-   trialES->SetPrintsLogs(this->PrintsLogs());
+   trialES->SetCanOutputLogs(this->CanOutputLogs());
 
    // initial calculation
    boost::shared_ptr<ElectronicStructure> electronicStructure1(ElectronicStructureFactory::GetInstance()->Create());
    ElectronicStructure* currentES = electronicStructure1.get();
    currentES->SetMolecule(this->molecule);
-   currentES->SetPrintsLogs(this->PrintsLogs());
+   currentES->SetCanOutputLogs(this->CanOutputLogs());
    currentES->DoSCF();
    if(Parameters::GetInstance()->RequiresCIS()){
       currentES->DoCIS();
    }
-   if(this->PrintsLogs()){
+   if(this->CanOutputLogs()){
       cout << this->messageinitialConditionMC;
    }
    this->OutputMolecule(*currentES, *this->molecule, elecState);
 
    // Monte Carlo roop 
    for(int s=0; s<totalSteps; s++){
-      if(this->PrintsLogs()){
+      if(this->CanOutputLogs()){
          cout << this->messageStartStepMC << s+1 << endl << endl;
       }
       // create trial molecule
@@ -138,11 +138,11 @@ void MC::DoMC(int totalSteps, int elecState, double temperature, double stepWidt
       
       // output molecular states
       this->OutputMolecule(*currentES, *this->molecule, elecState);
-      if(this->PrintsLogs()){
+      if(this->CanOutputLogs()){
          cout << this->messageEndStepMC << s+1 << endl;
       }
    }
-   if(this->PrintsLogs()){
+   if(this->CanOutputLogs()){
       cout << this->messageTransitionRate << transitionRate/(double)totalSteps << endl << endl;
       cout << this->messageEndMC << endl;
    }
@@ -226,7 +226,7 @@ void MC::OutputMolecule(const ElectronicStructure& electronicStructure,
                         const Molecule& molecule,
                         int elecState) const{
    this->OutputEnergies(electronicStructure, elecState);
-   if(this->PrintsLogs()){
+   if(this->CanOutputLogs()){
       molecule.OutputConfiguration();
       molecule.OutputXyzCOC();
    }
@@ -234,7 +234,7 @@ void MC::OutputMolecule(const ElectronicStructure& electronicStructure,
 
 void MC::OutputEnergies(const MolDS_base::ElectronicStructure& electronicStructure,
                         int elecState) const{
-   if(this->PrintsLogs()){
+   if(this->CanOutputLogs()){
       cout << this->messageEnergies;
       cout << this->messageEnergiesTitle;
       printf("\t\t%s\t%e\t%e\n",this->messageCoreRepulsionEnergy.c_str(), 

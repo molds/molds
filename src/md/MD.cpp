@@ -58,7 +58,7 @@ void MD::SetMolecule(Molecule* molecule){
 }
 
 void MD::DoMD(){
-   if(this->PrintsLogs()){
+   if(this->CanOutputLogs()){
       cout << this->messageStartMD;
    }
 
@@ -67,7 +67,7 @@ void MD::DoMD(){
    this->CheckEnableTheoryType(theory);
    boost::shared_ptr<ElectronicStructure> electronicStructure(ElectronicStructureFactory::GetInstance()->Create());
    electronicStructure->SetMolecule(this->molecule);
-   electronicStructure->SetPrintsLogs(this->PrintsLogs());
+   electronicStructure->SetCanOutputLogs(this->CanOutputLogs());
 
    int totalSteps = Parameters::GetInstance()->GetTotalStepsMD();
    int elecState = Parameters::GetInstance()->GetElectronicStateIndexMD();
@@ -85,11 +85,11 @@ void MD::DoMD(){
    matrixForce = electronicStructure->GetForce(elecState);
 
    // output initial conditions
-   if(this->PrintsLogs()){
+   if(this->CanOutputLogs()){
       cout << this->messageinitialConditionMD;
    }
    initialEnergy = this->OutputEnergies(electronicStructure);
-   if(this->PrintsLogs()){
+   if(this->CanOutputLogs()){
       cout << endl;
       this->molecule->OutputConfiguration();
       this->molecule->OutputXyzCOM();
@@ -98,7 +98,7 @@ void MD::DoMD(){
    }
 
    for(int s=0; s<totalSteps; s++){
-      if(this->PrintsLogs()){
+      if(this->CanOutputLogs()){
          cout << this->messageStartStepMD << s+1 << endl;
       }
 
@@ -140,7 +140,7 @@ void MD::DoMD(){
 
       // output results
       this->OutputEnergies(electronicStructure, initialEnergy);
-      if(this->PrintsLogs()){
+      if(this->CanOutputLogs()){
          this->molecule->OutputConfiguration();
          this->molecule->OutputXyzCOM();
          this->molecule->OutputXyzCOC();
@@ -150,7 +150,7 @@ void MD::DoMD(){
       }
    }
 
-   if(this->PrintsLogs()){
+   if(this->CanOutputLogs()){
       cout << this->messageEndMD;
    }
 }
@@ -185,7 +185,7 @@ double MD::OutputEnergies(boost::shared_ptr<ElectronicStructure> electronicStruc
       }
    }  
    // output energies:
-   if(this->PrintsLogs()){
+   if(this->CanOutputLogs()){
       cout << this->messageEnergies;
       cout << this->messageEnergiesTitle;
       printf("\t\t%s\t%e\t%e\n",this->messageCoreKineticEnergy.c_str(), 
@@ -210,7 +210,7 @@ double MD::OutputEnergies(boost::shared_ptr<ElectronicStructure> electronicStruc
 void MD::OutputEnergies(boost::shared_ptr<ElectronicStructure> electronicStructure, 
                         double initialEnergy){
    double energy = this->OutputEnergies(electronicStructure);
-   if(this->PrintsLogs()){
+   if(this->CanOutputLogs()){
       printf("\t\t%s\t%e\t%e\n\n",this->messageErrorEnergy.c_str(), 
                                 (initialEnergy - energy),
                                 (initialEnergy - energy)

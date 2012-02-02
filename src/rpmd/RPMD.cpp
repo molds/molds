@@ -72,7 +72,7 @@ void RPMD::CreateBeads(vector<boost::shared_ptr<Molecule> >& molecularBeads,
 void RPMD::UpdateElectronicStructure(const std::vector<boost::shared_ptr<ElectronicStructure> >& electronicStructureBeads){
    int numBeads = electronicStructureBeads.size();
    for(int b=0; b<numBeads; b++){
-      if(this->PrintsLogs()){
+      if(this->CanOutputLogs()){
          cout << this->messageBeadsNum << b << endl;
       }
       electronicStructureBeads[b]->DoSCF();
@@ -137,13 +137,13 @@ void RPMD::FluctuateBeads(const vector<boost::shared_ptr<Molecule> >& molecularB
       boost::shared_ptr<MolDS_mc::MC> mc(new MolDS_mc::MC());
       Molecule* molecule = molecularBeads[b].get();
       mc->SetMolecule(molecule);
-      mc->SetPrintsLogs(false);
+      mc->SetCanOutputLogs(false);
       mc->DoMC(molecule->GetAtomVect()->size(), elecState, temperature, stepWidth, seed+b);
    }
 }
 
 void RPMD::DoRPMD(const Molecule& refferenceMolecule){
-   if(this->PrintsLogs()){
+   if(this->CanOutputLogs()){
       cout << this->messageStartRPMD;
    }
 
@@ -169,24 +169,24 @@ void RPMD::DoRPMD(const Molecule& refferenceMolecule){
    this->FluctuateBeads(molecularBeads, elecState, temperature, seed);
 
    // initialize electronic states of each bead.
-   if(this->PrintsLogs()){
+   if(this->CanOutputLogs()){
       cout << this->messageStartInitialRPMD;
    }
    this->UpdateElectronicStructure(electronicStructureBeads);
-   if(this->PrintsLogs()){
+   if(this->CanOutputLogs()){
       cout << this->messageinitialConditionRPMD;
    }
    double initialEnergy = this->OutputEnergies(molecularBeads,
                                                electronicStructureBeads,
                                                elecState,
                                                temperature);
-   if(this->PrintsLogs()){
+   if(this->CanOutputLogs()){
       cout << this->messageEndInitialRPMD;
    }
 
    // time step roop
    for(int s=0; s<totalSteps; s++){
-      if(this->PrintsLogs()){
+      if(this->CanOutputLogs()){
          cout << this->messageStartStepRPMD << s+1 << endl;
       }
       // update momenta
@@ -208,11 +208,11 @@ void RPMD::DoRPMD(const Molecule& refferenceMolecule){
                            temperature,
                            initialEnergy);
 
-      if(this->PrintsLogs()){
+      if(this->CanOutputLogs()){
          cout << this->messageEndStepRPMD << s+1 << endl;
       }
    }
-   if(this->PrintsLogs()){
+   if(this->CanOutputLogs()){
       cout << this->messageEndRPMD;
    }
 }
@@ -287,7 +287,7 @@ double RPMD::OutputEnergies(const vector<boost::shared_ptr<Molecule> >& molecula
    double totalEnergy = beadsKineticEnergy + beadsHarmonicEnergy + elecStateEnergy;
 
    // output energies:
-   if(this->PrintsLogs()){
+   if(this->CanOutputLogs()){
       cout << this->messageEnergies;
       cout << this->messageEnergiesTitle;
       printf("\t\t%s\t%e\t%e\n",this->messageBeadsKineticEnergy.c_str(), 
@@ -312,7 +312,7 @@ void RPMD::OutputEnergies(const vector<boost::shared_ptr<Molecule> >& molecularB
                           double temperature,
                           double initialEnergy){
    double energy = this->OutputEnergies(molecularBeads, electronicStructureBeads, elecState, temperature);
-   if(this->PrintsLogs()){
+   if(this->CanOutputLogs()){
       printf("\t\t%s\t%e\t%e\n\n",this->messageErrorEnergy.c_str(), 
                                 (initialEnergy - energy),
                                 (initialEnergy - energy)
