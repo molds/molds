@@ -32,10 +32,12 @@ public:
    bool CanOutputLogs() const{
       return this->canOutputLogs;
    }
-   void SetCanOutputLogs(bool canOuputLogs){
+   void SetCanOutputLogs(bool canOutputLogs){
       this->canOutputLogs = canOutputLogs;
    }
-   void OutputLog(std::string log){
+
+protected:
+   void OutputLog(std::string log) const{
       if(this->canOutputLogs){std::cout << log;}
    }
 private:

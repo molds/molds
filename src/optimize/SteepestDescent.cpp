@@ -105,7 +105,7 @@ void SteepestDescent::SetMessages(){
    this->messageStartStepSteepestDescent = "==========  START: Steepest descent step ";
    this->messageStartLineSearch = "**********  START: Line search  **********\n";
    this->messageEndLineSearch =   "**********  DONE: Line search  **********\n";
-   this->messageStartLineSearchTimes = "\n==========  START: Line return times ";
+   this->messageStartLineSearchTimes = "\n==========  START: Line search times ";
    this->messageLineSearchSteps = "Number of steps in this Line search: ";
    this->messageOptimizationLog = "====== Optimization Logs ======\n";
    this->messageEnergyDifference = "Energy difference: ";
@@ -160,8 +160,8 @@ void SteepestDescent::UpdateMolecularCoordinates(Molecule& molecule, double** ma
 
 void SteepestDescent::UpdateElectronicStructure(boost::shared_ptr<ElectronicStructure> electronicStructure, 
                                                 bool requireGuess, 
-                                                bool printsLogs) const{
-   electronicStructure->SetCanOutputLogs(printsLogs);
+                                                bool canOutputLogs) const{
+   electronicStructure->SetCanOutputLogs(canOutputLogs);
    electronicStructure->DoSCF(requireGuess);
    if(Parameters::GetInstance()->RequiresCIS()){
       electronicStructure->DoCIS();
@@ -315,15 +315,22 @@ bool SteepestDescent::SatisfiesConvergenceCriterion(double** matrixForce,
    }
    sumSqureGradient /= (double)(molecule.GetAtomVect()->size()*CartesianType_end);
    double rmsGradient = sqrt(sumSqureGradient);
-   if(this->CanOutputLogs()){
-      printf("\n");
-      printf("\t%s", this->messageOptimizationLog.c_str());
-      printf("\t%s %e%s\n", this->messageEnergyDifference.c_str(), energyDifference, this->messageAu.c_str());
-      printf("\t%s %e%s\n", this->messageMaxGradient.c_str(), maxGradient, this->messageAu.c_str());
-      printf("\t%s %e%s\n", this->messageRmsGradient.c_str(), rmsGradient, this->messageAu.c_str());
-      printf("\n\n");
-      //cout << (boost::format("\t%s %e%s") % this->messageEnergyDifference.c_str() % energyDifference % this->messageAu.c_str()).str();
-   }
+
+   // output logs
+   this->OutputLog("\n");
+   this->OutputLog((boost::format("\t%s") % this->messageOptimizationLog.c_str()).str());
+   this->OutputLog((boost::format("\t%s %e%s\n") % this->messageEnergyDifference.c_str() 
+                                               % energyDifference 
+                                               % this->messageAu.c_str()).str());
+   this->OutputLog((boost::format("\t%s %e%s\n") % this->messageMaxGradient.c_str() 
+                                               % maxGradient 
+                                               % this->messageAu.c_str()).str());
+   this->OutputLog((boost::format("\t%s %e%s\n") % this->messageRmsGradient.c_str() 
+                                               % rmsGradient 
+                                               % this->messageAu.c_str()).str());
+   this->OutputLog("\n\n");
+  
+   // judge convergence
    if(maxGradient < maxGradientThreshold && rmsGradient < rmsGradientThreshold && energyDifference < 0){
       printf("%s", this->messageGeometyrOptimizationMetConvergence.c_str());
       satisfies = true;
