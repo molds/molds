@@ -137,7 +137,7 @@ void InputParser::SetMessages(){
 
    // Optimize (steepestDescent)
    this->messageOptimizeConditions = "\tOptimize conditions:\n";
-   this->messageSteepestDescentLineSearchTimes = "\t\tLine return times:";
+   this->messageSteepestDescentLineSearchTimes = "\t\tLine search times:";
    this->messageSteepestDescentSteps = "\t\tSteepest Descent steps: ";
    this->messageSteepestDescentElecState = "\t\tElectronic eigenstate: ";
    this->messageSteepestDescentMaxGradient = "\t\tMax gradient: ";
