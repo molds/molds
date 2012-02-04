@@ -44,6 +44,7 @@ private:
    std::string messageStartLineSearch;
    std::string messageEndLineSearch;
    std::string messageStartLineSearchTimes;
+   std::string messageReducedTimeWidth;
    std::string messageLineSearchSteps;
    std::string messageOptimizationLog;
    std::string messageEnergyDifference;

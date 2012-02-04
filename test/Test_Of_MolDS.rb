@@ -601,6 +601,18 @@ mklNumThreads = "2"
 ompNumThreads = "2"
 testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
 
+system("echo '------------------------------------------------'")
+system("echo '------  Test of PM3/PDDG/Steepest Descent ------'")
+system("echo '------------------------------------------------\n'")
+system("echo '\t\t\t>>> C2H6 <<<\n'")
+prefix = "c2h6_pm3pddg_opt_steepest"
+mklNumThreads = "1"
+ompNumThreads = "1"
+testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
+mklNumThreads = "2"
+ompNumThreads = "2"
+testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
+
 system("echo '---------------------------------------------------'")
 system("echo '---------  Test of PM3/HF-MC  ---------------------'")
 system("echo '---------------------------------------------------\n'")

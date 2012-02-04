@@ -45,17 +45,15 @@ namespace MolDS_optimize{
 SteepestDescent::SteepestDescent(){
    this->SetMessages();
    this->SetEnableTheoryTypes();
-   //printf("%s\n", "SteepestDescent created");
+   //this->OutputLog("SteepestDescent created");
 }
 
 SteepestDescent::~SteepestDescent(){
-   //printf("%s\n", "SteepestDescent deleted");
+   //this->OutputLog("SteepestDescent deleted");
 }
 
 void SteepestDescent::Optimize(Molecule& molecule){
-   if(this->CanOutputLogs()){
-      printf("%s",this->messageStartGeometryOptimization.c_str());
-   }
+   this->OutputLog(this->messageStartGeometryOptimization);
    this->ClearMolecularMomenta(molecule);
 
    // malloc electornic structure
@@ -83,9 +81,7 @@ void SteepestDescent::Optimize(Molecule& molecule){
       ss << this->errorMessageSteepestDescentSteps << steepSteps << endl;
       throw MolDSException(ss.str());
    }
-   if(this->CanOutputLogs()){
-      printf("%s",this->messageEndGeometryOptimization.c_str());
-   }
+   this->OutputLog(this->messageEndGeometryOptimization);
 }
 
 void SteepestDescent::SetMessages(){
@@ -106,11 +102,12 @@ void SteepestDescent::SetMessages(){
    this->messageStartLineSearch = "**********  START: Line search  **********\n";
    this->messageEndLineSearch =   "**********  DONE: Line search  **********\n";
    this->messageStartLineSearchTimes = "\n==========  START: Line search times ";
-   this->messageLineSearchSteps = "Number of steps in this Line search: ";
-   this->messageOptimizationLog = "====== Optimization Logs ======\n";
-   this->messageEnergyDifference = "Energy difference: ";
-   this->messageMaxGradient = "Max gradient: ";
-   this->messageRmsGradient = "Rms gradient: ";
+   this->messageReducedTimeWidth = "dt is reduced to ";
+   this->messageLineSearchSteps = "\tNumber of steps in this Line search: ";
+   this->messageOptimizationLog = "\t====== Optimization Logs ======\n";
+   this->messageEnergyDifference = "\tEnergy difference: ";
+   this->messageMaxGradient = "\tMax gradient: ";
+   this->messageRmsGradient = "\tRms gradient: ";
    this->messageAu = "[a.u.]";
 }
 
@@ -140,6 +137,7 @@ void SteepestDescent::CheckEnableTheoryType(TheoryType theoryType) const{
 }
 
 void SteepestDescent::ClearMolecularMomenta(Molecule& molecule) const{
+   #pragma omp parallel for schedule(auto) 
    for(int a=0; a<molecule.GetAtomVect()->size(); a++){
       const Atom* atom = (*molecule.GetAtomVect())[a];
       atom->SetPxyz(0.0, 0.0, 0.0);
@@ -147,6 +145,7 @@ void SteepestDescent::ClearMolecularMomenta(Molecule& molecule) const{
 }
 
 void SteepestDescent::UpdateMolecularCoordinates(Molecule& molecule, double** matrixForce, double dt) const{
+   #pragma omp parallel for schedule(auto) 
    for(int a=0; a<molecule.GetAtomVect()->size(); a++){
       const Atom* atom = (*molecule.GetAtomVect())[a];
       double coreMass = atom->GetAtomicMass() - (double)atom->GetNumberValenceElectrons();
@@ -172,9 +171,7 @@ void SteepestDescent::LineSearch(boost::shared_ptr<ElectronicStructure> electron
                                  Molecule& molecule,
                                  double* lineSearchedEnergy,
                                  bool* obtainesOptimizedStructure) const{
-   if(this->CanOutputLogs()){
-      printf("%s",this->messageStartLineSearch.c_str());
-   }
+   this->OutputLog(this->messageStartLineSearch);
    int elecState = Parameters::GetInstance()->GetElectronicStateIndexSteepestDescent();
    double dt = Parameters::GetInstance()->GetTimeWidthSteepestDescent();
    int lineSearchTimes = Parameters::GetInstance()->GetLineSearchTimesSteepestDescent();
@@ -193,10 +190,7 @@ void SteepestDescent::LineSearch(boost::shared_ptr<ElectronicStructure> electron
       requireGuess = false;
       matrixForce = electronicStructure->GetForce(elecState);
       for(int s=0; s<lineSearchTimes; s++){
-         if(this->CanOutputLogs()){
-            printf("%s%d\n",this->messageStartLineSearchTimes.c_str(),s);
-         }
-
+         this->OutputLog((boost::format("%s%d\n") % this->messageStartLineSearchTimes.c_str() % s).str());
          lineSearchInitialEnergy = lineSearchCurrentEnergy;
 
          // line search roop
@@ -219,9 +213,7 @@ void SteepestDescent::LineSearch(boost::shared_ptr<ElectronicStructure> electron
             molecule.OutputXyzCOC();
          }
          lineSearchCurrentEnergy = electronicStructure->GetElectronicEnergy(elecState);
-         if(this->CanOutputLogs()){
-            printf("\t%s%d\n",this->messageLineSearchSteps.c_str(), lineSearchSteps);
-         }
+         this->OutputLog((boost::format("%s%d\n") % this->messageLineSearchSteps.c_str() % lineSearchSteps).str());
 
          // check convergence
          if(this->SatisfiesConvergenceCriterion(matrixForce, 
@@ -237,9 +229,7 @@ void SteepestDescent::LineSearch(boost::shared_ptr<ElectronicStructure> electron
       }
    }
    *lineSearchedEnergy = lineSearchCurrentEnergy;
-   if(this->CanOutputLogs()){
-      printf("%s", this->messageEndLineSearch.c_str());
-   }
+   this->OutputLog(this->messageEndLineSearch);
 }
 
 
@@ -258,16 +248,12 @@ void SteepestDescent::SteepestDescentSearch(boost::shared_ptr<ElectronicStructur
    double** matrixForce = NULL;
    double** oldMatrixForce = NULL;
    bool requireGuess = false;
-   if(this->CanOutputLogs()){
-      printf("%s",this->messageStartSteepestDescent.c_str());
-   }
+   this->OutputLog(this->messageStartSteepestDescent);
    matrixForce = electronicStructure->GetForce(elecState);
 
    // steepest descent roop
    for(int s=0; s<steepSteps; s++){
-      if(this->CanOutputLogs()){
-         printf("%s %d\n",this->messageStartStepSteepestDescent.c_str(), s+1);
-      }
+      this->OutputLog((boost::format("%s %d\n") % this->messageStartStepSteepestDescent.c_str() % (s+1)).str());
       this->UpdateMolecularCoordinates(molecule, matrixForce, dt);
       this->UpdateElectronicStructure(electronicStructure, requireGuess, this->CanOutputLogs());
       oldEnergy = currentEnergy;
@@ -284,15 +270,10 @@ void SteepestDescent::SteepestDescentSearch(boost::shared_ptr<ElectronicStructur
       }
       if(oldEnergy < currentEnergy){
          dt *= 0.1;
-         if(this->CanOutputLogs()){
-            printf("%s %e\n","dt is reduced to ", dt);
-         }
+         this->OutputLog((boost::format("%s %e\n") % this->messageReducedTimeWidth.c_str() % dt).str());
       }
    }
-
-   if(this->CanOutputLogs()){
-      printf("%s",this->messageEndSteepestDescent.c_str());
-   }
+   this->OutputLog(this->messageEndSteepestDescent);
 }
 
 bool SteepestDescent::SatisfiesConvergenceCriterion(double** matrixForce, 
@@ -318,21 +299,21 @@ bool SteepestDescent::SatisfiesConvergenceCriterion(double** matrixForce,
 
    // output logs
    this->OutputLog("\n");
-   this->OutputLog((boost::format("\t%s") % this->messageOptimizationLog.c_str()).str());
-   this->OutputLog((boost::format("\t%s %e%s\n") % this->messageEnergyDifference.c_str() 
+   this->OutputLog(this->messageOptimizationLog);
+   this->OutputLog((boost::format("%s %e%s\n") % this->messageEnergyDifference.c_str() 
                                                % energyDifference 
                                                % this->messageAu.c_str()).str());
-   this->OutputLog((boost::format("\t%s %e%s\n") % this->messageMaxGradient.c_str() 
+   this->OutputLog((boost::format("%s %e%s\n") % this->messageMaxGradient.c_str() 
                                                % maxGradient 
                                                % this->messageAu.c_str()).str());
-   this->OutputLog((boost::format("\t%s %e%s\n") % this->messageRmsGradient.c_str() 
+   this->OutputLog((boost::format("%s %e%s\n") % this->messageRmsGradient.c_str() 
                                                % rmsGradient 
                                                % this->messageAu.c_str()).str());
    this->OutputLog("\n\n");
   
    // judge convergence
    if(maxGradient < maxGradientThreshold && rmsGradient < rmsGradientThreshold && energyDifference < 0){
-      printf("%s", this->messageGeometyrOptimizationMetConvergence.c_str());
+      this->OutputLog(this->messageGeometyrOptimizationMetConvergence);
       satisfies = true;
    }
    return satisfies;
