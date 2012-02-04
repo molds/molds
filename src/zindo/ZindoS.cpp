@@ -24,6 +24,7 @@
 #include<string>
 #include<vector>
 #include<stdexcept>
+#include<algorithm>
 #include<omp.h>
 #include"mkl.h"
 #include"../base/PrintController.h"

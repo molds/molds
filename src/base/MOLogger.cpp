@@ -22,6 +22,7 @@
 #include<sstream>
 #include<fstream>
 #include<string>
+#include<string.h>
 #include<math.h>
 #include<vector>
 #include<stdexcept>
