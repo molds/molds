@@ -20,7 +20,7 @@
 #define INCLUDED_ATOM
 namespace MolDS_base_atoms{
 
-class Atom{
+class Atom : public MolDS_base::PrintController{
 public:
    Atom();
    virtual ~Atom();

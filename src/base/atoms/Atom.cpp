@@ -25,6 +25,7 @@
 #include<string>
 #include<vector>
 #include<stdexcept>
+#include"../PrintController.h"
 #include"../MolDSException.h"
 #include"../Uncopyable.h"
 #include"../Enums.h"
@@ -54,7 +55,7 @@ Atom::Atom(){
 Atom::~Atom(){
    MallocerFreer::GetInstance()->Free<double>(&this->xyz, CartesianType_end);
    MallocerFreer::GetInstance()->Free<double>(&this->pxyz, CartesianType_end);
-   //cout << "atom deleted\n";
+   this->OutputLog("atom deleted\n");
 }
 
 void Atom::SetMessages(){

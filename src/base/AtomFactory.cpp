@@ -22,6 +22,7 @@
 #include<sstream>
 #include<vector>
 #include<stdexcept>
+#include"PrintController.h"
 #include"MolDSException.h"
 #include"Uncopyable.h"
 #include"Enums.h"

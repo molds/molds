@@ -22,6 +22,7 @@
 #include<sstream>
 #include<math.h>
 #include<vector>
+#include"../PrintController.h"
 #include"../Uncopyable.h"
 #include"../Enums.h"
 #include"../EularAngle.h"

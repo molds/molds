@@ -25,6 +25,7 @@
 #include<vector>
 #include<stdexcept>
 #include"mkl.h"
+#include"PrintController.h"
 #include"MolDSException.h"
 #include"Uncopyable.h"
 #include"../mkl_wrapper/LapackWrapper.h"
