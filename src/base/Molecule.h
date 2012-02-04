@@ -20,7 +20,7 @@
 #define INCLUDED_MOLECULE
 namespace MolDS_base{
 
-class Molecule{
+class Molecule : public MolDS_base::PrintController{
 public:
    Molecule();
    Molecule(const Molecule& rhs);

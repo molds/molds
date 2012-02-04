@@ -68,6 +68,7 @@ void MD::DoMD(){
    boost::shared_ptr<ElectronicStructure> electronicStructure(ElectronicStructureFactory::GetInstance()->Create());
    electronicStructure->SetMolecule(this->molecule);
    electronicStructure->SetCanOutputLogs(this->CanOutputLogs());
+   this->molecule->SetCanOutputLogs(this->CanOutputLogs());
 
    int totalSteps = Parameters::GetInstance()->GetTotalStepsMD();
    int elecState = Parameters::GetInstance()->GetElectronicStateIndexMD();
@@ -91,11 +92,11 @@ void MD::DoMD(){
    initialEnergy = this->OutputEnergies(electronicStructure);
    if(this->CanOutputLogs()){
       cout << endl;
-      this->molecule->OutputConfiguration();
-      this->molecule->OutputXyzCOM();
-      this->molecule->OutputXyzCOC();
-      this->molecule->OutputMomenta();
    }
+   this->molecule->OutputConfiguration();
+   this->molecule->OutputXyzCOM();
+   this->molecule->OutputXyzCOC();
+   this->molecule->OutputMomenta();
 
    for(int s=0; s<totalSteps; s++){
       if(this->CanOutputLogs()){
@@ -140,11 +141,11 @@ void MD::DoMD(){
 
       // output results
       this->OutputEnergies(electronicStructure, initialEnergy);
+      this->molecule->OutputConfiguration();
+      this->molecule->OutputXyzCOM();
+      this->molecule->OutputXyzCOC();
+      this->molecule->OutputMomenta();
       if(this->CanOutputLogs()){
-         this->molecule->OutputConfiguration();
-         this->molecule->OutputXyzCOM();
-         this->molecule->OutputXyzCOC();
-         this->molecule->OutputMomenta();
          cout << this->messageTime << dt*((double)s+1)/Parameters::GetInstance()->GetFs2AU() << endl;
          cout << this->messageEndStepMD << s+1 << endl;
       }

@@ -94,12 +94,14 @@ void MC::DoMC(int totalSteps, int elecState, double temperature, double stepWidt
    ElectronicStructure* trialES = electronicStructure2.get();
    trialES->SetMolecule(&trialMolecule);
    trialES->SetCanOutputLogs(this->CanOutputLogs());
+   trialMolecule.SetCanOutputLogs(this->CanOutputLogs());
 
    // initial calculation
    boost::shared_ptr<ElectronicStructure> electronicStructure1(ElectronicStructureFactory::GetInstance()->Create());
    ElectronicStructure* currentES = electronicStructure1.get();
    currentES->SetMolecule(this->molecule);
    currentES->SetCanOutputLogs(this->CanOutputLogs());
+   this->molecule->SetCanOutputLogs(this->CanOutputLogs());
    currentES->DoSCF();
    if(Parameters::GetInstance()->RequiresCIS()){
       currentES->DoCIS();
@@ -226,10 +228,8 @@ void MC::OutputMolecule(const ElectronicStructure& electronicStructure,
                         const Molecule& molecule,
                         int elecState) const{
    this->OutputEnergies(electronicStructure, elecState);
-   if(this->CanOutputLogs()){
-      molecule.OutputConfiguration();
-      molecule.OutputXyzCOC();
-   }
+   molecule.OutputConfiguration();
+   molecule.OutputXyzCOC();
 }
 
 void MC::OutputEnergies(const MolDS_base::ElectronicStructure& electronicStructure,

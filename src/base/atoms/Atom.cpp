@@ -55,7 +55,7 @@ Atom::Atom(){
 Atom::~Atom(){
    MallocerFreer::GetInstance()->Free<double>(&this->xyz, CartesianType_end);
    MallocerFreer::GetInstance()->Free<double>(&this->pxyz, CartesianType_end);
-   this->OutputLog("atom deleted\n");
+   //this->OutputLog("atom deleted\n");
 }
 
 void Atom::SetMessages(){

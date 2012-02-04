@@ -24,6 +24,7 @@
 #include<string>
 #include<vector>
 #include<stdexcept>
+#include<boost/format.hpp>
 #include"mkl.h"
 #include"PrintController.h"
 #include"MolDSException.h"
@@ -60,7 +61,7 @@ Molecule& Molecule::operator=(const Molecule& rhs){
 
 Molecule::~Molecule(){
    this->Finalize(&this->atomVect, &this->xyzCOM, &this->xyzCOC);
-   //cout << "molecule deleted" << endl;
+   //this->OutputLog("molecule deleted\n");
 }
 
 void Molecule::CopyInitialize(const Molecule& rhs){
@@ -115,7 +116,7 @@ void Molecule::Finalize(vector<Atom*>** atomVect, double** xyzCOM, double**xyzCO
       (*atomVect)->clear();
       delete *atomVect;
       *atomVect = NULL;
-      //cout << "atomVect deleted" << endl;
+      //this->OutputLog("atomVect deleted\n");
    }
    MallocerFreer::GetInstance()->Free<double>(xyzCOM, CartesianType_end);
    MallocerFreer::GetInstance()->Free<double>(xyzCOC, CartesianType_end);
@@ -302,22 +303,28 @@ void Molecule::CalcTotalCoreMass(){
 
 void Molecule::OutputConfiguration() const{
    double ang2AU = Parameters::GetInstance()->GetAngstrom2AU();
-   cout << this->messageConfiguration;
-   cout << this->messageConfigurationTitleAng;
+   this->OutputLog(this->messageConfiguration);
+   this->OutputLog(this->messageConfigurationTitleAng);
    for(int a=0; a<this->atomVect->size(); a++){
       const Atom& atom = *(*this->atomVect)[a];
-      printf("\t\t%d\t%s\t%e\t%e\t%e\n",a,AtomTypeStr(atom.GetAtomType()),
-            atom.GetXyz()[0]/ang2AU, atom.GetXyz()[1]/ang2AU, atom.GetXyz()[2]/ang2AU);
+      this->OutputLog((boost::format("\t\t%d\t%s\t%e\t%e\t%e\n") % a
+                                                                 % AtomTypeStr(atom.GetAtomType()) 
+                                                                 % (atom.GetXyz()[0]/ang2AU)
+                                                                 % (atom.GetXyz()[1]/ang2AU)
+                                                                 % (atom.GetXyz()[2]/ang2AU)).str());
    }
-   cout << "\n";
+   this->OutputLog("\n");
 
-   cout << this->messageConfigurationTitleAU;
+   this->OutputLog(this->messageConfigurationTitleAU);
    for(int a=0; a<this->atomVect->size(); a++){
       const Atom& atom = *(*this->atomVect)[a];
-      printf("\t\t%d\t%s\t%e\t%e\t%e\n",a,AtomTypeStr(atom.GetAtomType()),
-            atom.GetXyz()[0], atom.GetXyz()[1], atom.GetXyz()[2]);
+      this->OutputLog((boost::format("\t\t%d\t%s\t%e\t%e\t%e\n") % a
+                                                                 % AtomTypeStr(atom.GetAtomType())
+                                                                 % atom.GetXyz()[0]
+                                                                 % atom.GetXyz()[1]
+                                                                 % atom.GetXyz()[2]).str());
    }
-   cout << "\n";
+   this->OutputLog("\n");
 
 }
 
@@ -326,65 +333,69 @@ void Molecule::OutputMomenta() const{
    double fs2AU = Parameters::GetInstance()->GetFs2AU();
    double gMolin2AU = Parameters::GetInstance()->GetGMolin2AU();
    double momentumUnit2AU = ang2AU*gMolin2AU/fs2AU;
-   cout << this->messageMomenta;
-   cout << this-> messageMomentaTitleGAngMolinFsin;
+   this->OutputLog(this->messageMomenta);
+   this->OutputLog(this->messageMomentaTitleGAngMolinFsin);
    for(int a=0; a<this->atomVect->size(); a++){
       const Atom& atom = *(*this->atomVect)[a];
-      printf("\t\t%d\t%s\t%e\t%e\t%e\n",a,AtomTypeStr(atom.GetAtomType()),
-            atom.GetPxyz()[0]/momentumUnit2AU, 
-            atom.GetPxyz()[1]/momentumUnit2AU, 
-            atom.GetPxyz()[2]/momentumUnit2AU);
+      this->OutputLog((boost::format("\t\t%d\t%s\t%e\t%e\t%e\n") % a
+                                                                 % AtomTypeStr(atom.GetAtomType())
+                                                                 % (atom.GetPxyz()[0]/momentumUnit2AU)
+                                                                 % (atom.GetPxyz()[1]/momentumUnit2AU)
+                                                                 % (atom.GetPxyz()[2]/momentumUnit2AU)).str());
    }
-   cout << "\n";
+   this->OutputLog("\n");
 
-   cout << this->messageMomentaTitleAU;
+   this->OutputLog(this->messageMomentaTitleAU);
    for(int a=0; a<this->atomVect->size(); a++){
       const Atom& atom = *(*this->atomVect)[a];
-      printf("\t\t%d\t%s\t%e\t%e\t%e\n",a,AtomTypeStr(atom.GetAtomType()),
-            atom.GetPxyz()[0], atom.GetPxyz()[1], atom.GetPxyz()[2]);
+      this->OutputLog((boost::format("\t\t%d\t%s\t%e\t%e\t%e\n") % a
+                                                                 % AtomTypeStr(atom.GetAtomType())
+                                                                 % atom.GetPxyz()[0]
+                                                                 % atom.GetPxyz()[1]
+                                                                 % atom.GetPxyz()[2]).str());
    }
-   cout << "\n";
-
+   this->OutputLog("\n");
 }
 
 void Molecule::OutputXyzCOM() const{
    double ang2AU = Parameters::GetInstance()->GetAngstrom2AU();
-   cout << this->messageCOM;
-   cout << this->messageCOMTitleAng;
-   printf("\t\t%e\t%e\t%e\n",this->xyzCOM[0]/ang2AU,
-                             this->xyzCOM[1]/ang2AU,
-                             this->xyzCOM[2]/ang2AU);
-   cout << "\n";
+   this->OutputLog(this->messageCOM);
+   this->OutputLog(this->messageCOMTitleAng);
+   this->OutputLog((boost::format("\t\t%e\t%e\t%e\n") % (this->xyzCOM[0]/ang2AU)
+                                                      % (this->xyzCOM[1]/ang2AU)
+                                                      % (this->xyzCOM[2]/ang2AU)).str());
+   this->OutputLog("\n");
 
-   cout << this->messageCOMTitleAU;
-   printf("\t\t%e\t%e\t%e\n",this->xyzCOM[0],
-                             this->xyzCOM[1],
-                             this->xyzCOM[2]);
-   cout << "\n";
-
+   this->OutputLog(this->messageCOMTitleAU);
+   this->OutputLog((boost::format("\t\t%e\t%e\t%e\n") % this->xyzCOM[0]
+                                                      % this->xyzCOM[1]
+                                                      % this->xyzCOM[2]).str());
+   this->OutputLog("\n");
 }
 
 void Molecule::OutputXyzCOC() const{
    double ang2AU = Parameters::GetInstance()->GetAngstrom2AU();
-   cout << this->messageCOC;
-   cout << this->messageCOMTitleAng;
-   printf("\t\t%e\t%e\t%e\n",this->xyzCOC[0]/ang2AU,
-                             this->xyzCOC[1]/ang2AU,
-                             this->xyzCOC[2]/ang2AU);
-   cout << "\n";
+   this->OutputLog(this->messageCOC);
+   this->OutputLog(this->messageCOMTitleAng);
+   this->OutputLog((boost::format("\t\t%e\t%e\t%e\n") % (this->xyzCOC[0]/ang2AU)
+                                                      % (this->xyzCOC[1]/ang2AU)
+                                                      % (this->xyzCOC[2]/ang2AU)).str());
+   this->OutputLog("\n");
 
-   cout << this->messageCOMTitleAU;
-   printf("\t\t%e\t%e\t%e\n",this->xyzCOC[0],
-                             this->xyzCOC[1],
-                             this->xyzCOC[2]);
-   cout << "\n";
-
+   this->OutputLog(this->messageCOMTitleAU);
+   this->OutputLog((boost::format("\t\t%e\t%e\t%e\n") % this->xyzCOC[0]
+                                                      % this->xyzCOC[1]
+                                                      % this->xyzCOC[2]).str());
+   this->OutputLog("\n");
 }
 
 void Molecule::OutputTotalNumberAtomsAOsValenceelectrons() const{
-   cout << this->messageTotalNumberAtoms << this->atomVect->size() << "\n";
-   cout << this->messageTotalNumberAOs << this->totalNumberAOs << "\n";
-   cout << this->messageTotalNumberValenceElectrons << this->totalNumberValenceElectrons << "\n\n";
+   this->OutputLog((boost::format("%s%d\n") % this->messageTotalNumberAtoms
+                                            % this->atomVect->size()).str());
+   this->OutputLog((boost::format("%s%d\n") % this->messageTotalNumberAOs
+                                            % this->totalNumberAOs).str());
+   this->OutputLog((boost::format("%s%d\n\n") % this->messageTotalNumberValenceElectrons
+                                              % this->totalNumberValenceElectrons).str());
 }
 
 void Molecule::OutputPrincipalAxes(double const* const* inertiaTensor, 
@@ -392,49 +403,44 @@ void Molecule::OutputPrincipalAxes(double const* const* inertiaTensor,
    double ang2AU = Parameters::GetInstance()->GetAngstrom2AU();
    double gMolin2AU = Parameters::GetInstance()->GetGMolin2AU();
 
-   cout << this->messagePrincipalAxes;
-   cout << this->messagePrincipalAxesTitleAng;
+   this->OutputLog(this->messagePrincipalAxes);
+   this->OutputLog(this->messagePrincipalAxesTitleAng);
    for(int i=0; i<3; i++){
-      printf("\t\t%e\t%e\t%e\t%e\n",inertiaMoments[i]/gMolin2AU, 
-                                    inertiaTensor[i][0]/ang2AU,
-                                    inertiaTensor[i][1]/ang2AU,
-                                    inertiaTensor[i][2]/ang2AU);
+      this->OutputLog((boost::format("\t\t%e\t%e\t%e\t%e\n") % (inertiaMoments[i]/gMolin2AU)
+                                                             % (inertiaTensor[i][0]/ang2AU)
+                                                             % (inertiaTensor[i][1]/ang2AU)
+                                                             % (inertiaTensor[i][2]/ang2AU)).str());
    }
-   cout << "\n";
+   this->OutputLog("\n");
 
-   cout << this->messagePrincipalAxesTitleAU;
+   this->OutputLog(this->messagePrincipalAxesTitleAU);
    for(int i=0; i<3; i++){
-      printf("\t\t%e\t%e\t%e\t%e\n",inertiaMoments[i], 
-                                    inertiaTensor[i][0],
-                                    inertiaTensor[i][1],
-                                    inertiaTensor[i][2]);
+      this->OutputLog((boost::format("\t\t%e\t%e\t%e\t%e\n") % inertiaMoments[i]
+                                                             % inertiaTensor[i][0]
+                                                             % inertiaTensor[i][1]
+                                                             % inertiaTensor[i][2]).str());
    }
-   cout << "\n";
-
+   this->OutputLog("\n");
 }
 
 void Molecule::OutputInertiaTensorOrigin(double* inertiaTensorOrigin) const{
    double ang2AU = Parameters::GetInstance()->GetAngstrom2AU();
+   this->OutputLog(this->messageInertiaTensorOrigin);
+   this->OutputLog(this->messageInertiaTensorOriginTitleAng);
+   this->OutputLog((boost::format("\t\t%e\t%e\t%e\n") % (inertiaTensorOrigin[0]/ang2AU)
+                                                      % (inertiaTensorOrigin[1]/ang2AU)
+                                                      % (inertiaTensorOrigin[2]/ang2AU)).str());
+   this->OutputLog("\n");
 
-   cout << this->messageInertiaTensorOrigin;
-   cout << this->messageInertiaTensorOriginTitleAng;
-   printf("\t\t%e\t%e\t%e\n",inertiaTensorOrigin[0]/ang2AU,
-                             inertiaTensorOrigin[1]/ang2AU,
-                             inertiaTensorOrigin[2]/ang2AU);
-   cout << "\n";
-
-   cout << this->messageInertiaTensorOriginTitleAU;
-   printf("\t\t%e\t%e\t%e\n",inertiaTensorOrigin[0],
-                             inertiaTensorOrigin[1],
-                             inertiaTensorOrigin[2]);
-   cout << "\n";
-
+   this->OutputLog(this->messageInertiaTensorOriginTitleAU);
+   this->OutputLog((boost::format("\t\t%e\t%e\t%e\n") % inertiaTensorOrigin[0]
+                                                      % inertiaTensorOrigin[1]
+                                                      % inertiaTensorOrigin[2]).str());
+   this->OutputLog("\n");
 }
 
 void Molecule::CalcPrincipalAxes(){
-
-   cout << this->messageStartPrincipalAxes;
-
+   this->OutputLog(this->messageStartPrincipalAxes);
    if(!this->wasCalculatedXyzCOM){
       this->CalcXyzCOM();
    }
@@ -465,9 +471,7 @@ void Molecule::CalcPrincipalAxes(){
       throw ex;
    }
    this->FreeInertiaTensorMoments(&inertiaTensor, &inertiaMoments);
-
-   cout << this->messageDonePrincipalAxes;
-   
+   this->OutputLog(this->messageDonePrincipalAxes);
 }
 
 void Molecule::CalcInertiaTensor(double** inertiaTensor, const double* inertiaTensorOrigin){
@@ -505,7 +509,7 @@ void Molecule::FreeInertiaTensorMoments(double*** inertiaTensor, double** inerti
 
 void Molecule::Rotate(){
 
-   cout << this->messageStartRotate;
+   this->OutputLog(this->messageStartRotate);
 
    // Default values are set if some conditions are not specified.
    if(!this->wasCalculatedXyzCOM){
@@ -542,7 +546,7 @@ void Molecule::Rotate(){
    }
    
    this->OutputConfiguration();
-   cout << this->messageDoneRotate;
+   this->OutputLog(this->messageDoneRotate);
 }
 
 /***
@@ -618,52 +622,49 @@ void Molecule::OutputRotatingConditions(RotatingType rotatingType,
    double degree2Radian = Parameters::GetInstance()->GetDegree2Radian();
 
    // type
-   printf("%s%s\n\n",this->messageRotatingType.c_str(),RotatingTypeStr(rotatingType));
+   this->OutputLog((boost::format("%s%s\n\n") % this->messageRotatingType.c_str() 
+                                              % RotatingTypeStr(rotatingType)).str());
 
    // rotating origin
-   cout << this->messageRotatingOrigin;
-   cout << this->messageRotatingOriginTitleAng;
-   printf("\t\t%e\t%e\t%e\n\n",rotatingOrigin[0]/angst2AU,
-                               rotatingOrigin[1]/angst2AU,
-                               rotatingOrigin[2]/angst2AU);
-
-   cout << this->messageRotatingOriginTitleAU;
-   printf("\t\t%e\t%e\t%e\n\n",rotatingOrigin[0],
-                               rotatingOrigin[1],
-                               rotatingOrigin[2]);
+   this->OutputLog(this->messageRotatingOrigin);
+   this->OutputLog(this->messageRotatingOriginTitleAng);
+   this->OutputLog((boost::format("\t\t%e\t%e\t%e\n\n") % (rotatingOrigin[0]/angst2AU)
+                                                        % (rotatingOrigin[1]/angst2AU)
+                                                        % (rotatingOrigin[2]/angst2AU)).str());
+   this->OutputLog(this->messageRotatingOriginTitleAU);
+   this->OutputLog((boost::format("\t\t%e\t%e\t%e\n\n") % rotatingOrigin[0]
+                                                        % rotatingOrigin[1]
+                                                        % rotatingOrigin[2]).str());
 
    if(rotatingType == Axis){
       // rotating axis
-      cout << this->messageRotatingAxis;
-      cout << this->messageRotatingAxisTitleAng;
-      printf("\t\t%e\t%e\t%e\n\n",rotatingAxis[0]/angst2AU,
-                                  rotatingAxis[1]/angst2AU,
-                                  rotatingAxis[2]/angst2AU);
-
-      cout << this->messageRotatingAxisTitleAU;
-      printf("\t\t%e\t%e\t%e\n\n",rotatingAxis[0],
-                                  rotatingAxis[1],
-                                  rotatingAxis[2]);
+      this->OutputLog(this->messageRotatingAxis);
+      this->OutputLog(this->messageRotatingAxisTitleAng);
+      this->OutputLog((boost::format("\t\t%e\t%e\t%e\n\n") % (rotatingAxis[0]/angst2AU)
+                                                           % (rotatingAxis[1]/angst2AU)
+                                                           % (rotatingAxis[2]/angst2AU)).str());
+      this->OutputLog(this->messageRotatingAxisTitleAU);
+      this->OutputLog((boost::format("\t\t%e\t%e\t%e\n\n") % rotatingAxis[0]
+                                                           % rotatingAxis[1]
+                                                           % rotatingAxis[2]).str());
 
       // angle
-      printf("%s%e\n\n",this->messageRotatingAngle.c_str(),rotatingAngle/degree2Radian);
+      this->OutputLog((boost::format("%s%e\n\n") % this->messageRotatingAngle.c_str() 
+                                                 % (rotatingAngle/degree2Radian)).str());
    }
    else if (rotatingType == Eular){
       // Eular angles
-      cout << this->messageRotatingEularAngles;
-      cout << this->messageRotatingEularAnglesTitle;
-      printf("\t\t%e\t%e\t%e\t\n\n",rotatingEularAngles.GetAlpha()/degree2Radian, 
-                                    rotatingEularAngles.GetBeta()/degree2Radian,
-                                    rotatingEularAngles.GetGamma()/degree2Radian);
+      this->OutputLog(this->messageRotatingEularAngles);
+      this->OutputLog(this->messageRotatingEularAnglesTitle);
+      this->OutputLog((boost::format("\t\t%e\t%e\t%e\n\n") % (rotatingEularAngles.GetAlpha()/degree2Radian)
+                                                           % (rotatingEularAngles.GetBeta()/degree2Radian)
+                                                           % (rotatingEularAngles.GetGamma()/degree2Radian)).str());
    }
-
 }
 
 
 void Molecule::Translate(){
-
-   cout << this->messageStartTranslate;
-
+   this->OutputLog(this->messageStartTranslate);
    double x = Parameters::GetInstance()->GetTranslatingDifference()[0];
    double y = Parameters::GetInstance()->GetTranslatingDifference()[1];
    double z = Parameters::GetInstance()->GetTranslatingDifference()[2];
@@ -685,24 +686,23 @@ void Molecule::Translate(){
    this->OutputConfiguration();
    this->OutputXyzCOM();
    this->OutputXyzCOC();
-
-   cout << this->messageDoneTranslate;
+   this->OutputLog(this->messageDoneTranslate);
 }
 
 void Molecule::OutputTranslatingConditions(double const* translatingDifference) const{
 
    double angst2AU = Parameters::GetInstance()->GetAngstrom2AU();
 
-   cout << this->messageTranslatingDifference;
-   cout << this->messageTranslatingDifferenceTitleAng;
-   printf("\t\t%e\t%e\t%e\n\n",translatingDifference[0]/angst2AU,
-                               translatingDifference[1]/angst2AU,
-                               translatingDifference[2]/angst2AU);
+   this->OutputLog(this->messageTranslatingDifference);
+   this->OutputLog(this->messageTranslatingDifferenceTitleAng);
+   this->OutputLog((boost::format("\t\t%e\t%e\t%e\n\n") % (translatingDifference[0]/angst2AU)
+                                                        % (translatingDifference[1]/angst2AU)
+                                                        % (translatingDifference[2]/angst2AU)).str());
 
-   cout << this->messageTranslatingDifferenceTitleAU;
-   printf("\t\t%e\t%e\t%e\n\n",translatingDifference[0],
-                               translatingDifference[1],
-                               translatingDifference[2]);
+   this->OutputLog(this->messageTranslatingDifferenceTitleAU);
+   this->OutputLog((boost::format("\t\t%e\t%e\t%e\n\n") % translatingDifference[0]
+                                                        % translatingDifference[1]
+                                                        % translatingDifference[2]).str());
 
 }
 

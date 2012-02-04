@@ -62,6 +62,7 @@ void SteepestDescent::Optimize(Molecule& molecule){
    boost::shared_ptr<ElectronicStructure> electronicStructure(ElectronicStructureFactory::GetInstance()->Create());
    electronicStructure->SetMolecule(&molecule);
    electronicStructure->SetCanOutputLogs(this->CanOutputLogs());
+   molecule.SetCanOutputLogs(this->CanOutputLogs());
 
    // Search Minimum
    double lineSearchedEnergy = 0.0;
@@ -158,9 +159,11 @@ void SteepestDescent::UpdateMolecularCoordinates(Molecule& molecule, double** ma
 }
 
 void SteepestDescent::UpdateElectronicStructure(boost::shared_ptr<ElectronicStructure> electronicStructure, 
+                                                Molecule& molecule,
                                                 bool requireGuess, 
                                                 bool canOutputLogs) const{
    electronicStructure->SetCanOutputLogs(canOutputLogs);
+   molecule.SetCanOutputLogs(canOutputLogs);
    electronicStructure->DoSCF(requireGuess);
    if(Parameters::GetInstance()->RequiresCIS()){
       electronicStructure->DoCIS();
@@ -183,7 +186,7 @@ void SteepestDescent::LineSearch(boost::shared_ptr<ElectronicStructure> electron
 
    // initial calculation
    bool requireGuess = true;
-   this->UpdateElectronicStructure(electronicStructure, requireGuess, this->CanOutputLogs());
+   this->UpdateElectronicStructure(electronicStructure, molecule, requireGuess, this->CanOutputLogs());
    lineSearchCurrentEnergy = electronicStructure->GetElectronicEnergy(elecState);
 
    if(0<lineSearchTimes){
@@ -199,19 +202,17 @@ void SteepestDescent::LineSearch(boost::shared_ptr<ElectronicStructure> electron
          while(lineSearchCurrentEnergy <= lineSearchOldEnergy){
             this->UpdateMolecularCoordinates(molecule, matrixForce, dt);
             bool tempCanOutputLogs = false;
-            this->UpdateElectronicStructure(electronicStructure, requireGuess, tempCanOutputLogs);
+            this->UpdateElectronicStructure(electronicStructure, molecule, requireGuess, tempCanOutputLogs);
             lineSearchOldEnergy = lineSearchCurrentEnergy;
             lineSearchCurrentEnergy = electronicStructure->GetElectronicEnergy(elecState);
             lineSearchSteps++;
          }
 
          // final state of line search
-         this->UpdateElectronicStructure(electronicStructure, requireGuess, this->CanOutputLogs());
+         this->UpdateElectronicStructure(electronicStructure, molecule, requireGuess, this->CanOutputLogs());
          matrixForce = electronicStructure->GetForce(elecState);
-         if(this->CanOutputLogs()){
-            molecule.OutputConfiguration();
-            molecule.OutputXyzCOC();
-         }
+         molecule.OutputConfiguration();
+         molecule.OutputXyzCOC();
          lineSearchCurrentEnergy = electronicStructure->GetElectronicEnergy(elecState);
          this->OutputLog((boost::format("%s%d\n") % this->messageLineSearchSteps.c_str() % lineSearchSteps).str());
 
@@ -255,7 +256,7 @@ void SteepestDescent::SteepestDescentSearch(boost::shared_ptr<ElectronicStructur
    for(int s=0; s<steepSteps; s++){
       this->OutputLog((boost::format("%s %d\n") % this->messageStartStepSteepestDescent.c_str() % (s+1)).str());
       this->UpdateMolecularCoordinates(molecule, matrixForce, dt);
-      this->UpdateElectronicStructure(electronicStructure, requireGuess, this->CanOutputLogs());
+      this->UpdateElectronicStructure(electronicStructure, molecule, requireGuess, this->CanOutputLogs());
       oldEnergy = currentEnergy;
       currentEnergy = electronicStructure->GetElectronicEnergy(elecState);
       matrixForce = electronicStructure->GetForce(elecState);

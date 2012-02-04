@@ -136,6 +136,7 @@ void RPMD::FluctuateBeads(const vector<boost::shared_ptr<Molecule> >& molecularB
    for(int b=0; b<numBeads; b++){
       boost::shared_ptr<MolDS_mc::MC> mc(new MolDS_mc::MC());
       Molecule* molecule = molecularBeads[b].get();
+      molecule->SetCanOutputLogs(false);
       mc->SetMolecule(molecule);
       mc->SetCanOutputLogs(false);
       mc->DoMC(molecule->GetAtomVect()->size(), elecState, temperature, stepWidth, seed+b);
