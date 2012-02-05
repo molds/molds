@@ -23,6 +23,7 @@
 #include<math.h>
 #include<string>
 #include<vector>
+#include<boost/format.hpp>
 #include"../base/PrintController.h"
 #include"../base/Uncopyable.h"
 #include"../base/Enums.h"
@@ -53,11 +54,11 @@ Am1::Am1() : MolDS_mndo::Mndo(){
    this->theory = AM1;
    this->SetMessages();
    this->SetEnableAtomTypes();
-   //cout << "Am1 created\n";
+   //this->OutputLog("Am1 created\n");
 }
 
 Am1::~Am1(){
-   //cout << "Am1 deleted\n";
+   //this->OutputLog("Am1 deleted\n");
 }
 
 void Am1::SetMessages(){

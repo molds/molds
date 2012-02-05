@@ -23,6 +23,7 @@
 #include<math.h>
 #include<string>
 #include<vector>
+#include<boost/format.hpp>
 #include"../base/PrintController.h"
 #include"../base/Uncopyable.h"
 #include"../base/Enums.h"
@@ -56,11 +57,11 @@ Pm3Pddg::Pm3Pddg() : MolDS_pm3::Pm3(){
    this->theory = PM3PDDG;
    this->SetMessages();
    this->SetEnableAtomTypes();
-   //cout << "Pm3Pddg created\n";
+   //this->OutputLog("Pm3Pddg created\n");
 }
 
 Pm3Pddg::~Pm3Pddg(){
-   //cout << "Pm3Pddg deleted\n";
+   //this->OutputLog("Pm3Pddg deleted\n");
 }
 
 void Pm3Pddg::SetMessages(){

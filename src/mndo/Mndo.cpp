@@ -25,6 +25,7 @@
 #include<vector>
 #include<stdexcept>
 #include<omp.h>
+#include<boost/format.hpp>
 #include"../base/PrintController.h"
 #include"../base/MolDSException.h"
 #include"../base/Uncopyable.h"
@@ -62,7 +63,7 @@ Mndo::Mndo() : MolDS_zindo::ZindoS(){
    this->etaMatrixForceElecStatesNum = 0;
    this->zMatrixForce = NULL;
    this->etaMatrixForce = NULL;
-   //cout << "Mndo created\n";
+   //this->OutputLog("Mndo created\n");
 }
 
 Mndo::~Mndo(){
@@ -250,13 +251,11 @@ void Mndo::OutputHFResults(double const* const* fockMatrix,
                                       atomicElectronPopulation, 
                                       molecule);
    // output heats of formation
-   if(this->CanOutputLogs()){
-      cout << this->messageHeatsFormation;
-      cout << this->messageHeatsFormationTitle;
-      printf("\t\t%e\t%e\n\n",this->heatsFormation,
-                              this->heatsFormation/Parameters::GetInstance()->
-                                                               GetKcalMolin2AU());
-   }
+   this->OutputLog(this->messageHeatsFormation);
+   this->OutputLog(this->messageHeatsFormationTitle);
+   this->OutputLog((boost::format("\t\t%e\t%e\n\n") % this->heatsFormation 
+                                                    % (this->heatsFormation/Parameters::GetInstance()->
+                                                                                        GetKcalMolin2AU())).str());
 }
 
 double Mndo::GetFockDiagElement(const Atom& atomA, 
@@ -582,9 +581,7 @@ double Mndo::GetMolecularIntegralElement(int moI, int moJ, int moK, int moL,
 
 // right-upper part is only calculated by this method.
 void Mndo::CalcCISMatrix(double** matrixCIS, int numberActiveOcc, int numberActiveVir) const{
-   if(this->CanOutputLogs()){
-      cout << this->messageStartCalcCISMatrix;
-   }
+   this->OutputLog(this->messageStartCalcCISMatrix);
    double ompStartTime = omp_get_wtime();
 
    stringstream ompErrors;
@@ -762,12 +759,10 @@ void Mndo::CalcCISMatrix(double** matrixCIS, int numberActiveOcc, int numberActi
       throw MolDSException(ompErrors.str());
    }
    double ompEndTime = omp_get_wtime();
-   if(this->CanOutputLogs()){
-      cout << this->messageOmpElapsedTimeCalcCISMarix;
-      cout << ompEndTime - ompStartTime;
-      cout << this->messageUnitSec << endl;
-      cout << this->messageDoneCalcCISMatrix;
-   }
+   this->OutputLog((boost::format("%s%lf%s\n%s") % this->messageOmpElapsedTimeCalcCISMarix.c_str()
+                                                 % (ompEndTime - ompStartTime)
+                                                 % this->messageUnitSec.c_str()
+                                                 % this->messageDoneCalcCISMatrix.c_str()).str());
 }
 
 void Mndo::CheckZMatrixForce(const vector<int>& elecStates){
@@ -1319,11 +1314,11 @@ void Mndo::CalcQVector(double* q,
    }
    /* 
    for(int i=0; i<nonRedundantQIndeces.size(); i++){
-      printf("q[%d] = %e\n",i,q[i]);
+      this->OutputLog((boost::format("q[%d] = %e\n") % i % q[i]).str());
    }
    for(int i=0; i<redundantQIndeces.size(); i++){
       int r = nonRedundantQIndeces.size() + i;
-      printf("q[%d] = %e\n",r,q[r]);
+      this->OutputLog((boost::format("q[%d] = %e\n") % r % q[r]).str());
    }
    */
 }
@@ -2183,14 +2178,17 @@ void Mndo::CalcTwoElecTwoCoreDiatomic(double**** matrix, int atomAIndex, int ato
    }
    MallocerFreer::GetInstance()->Free<double>(&rotatingMatrix, OrbitalType_end, OrbitalType_end);
 
-   /*
-   printf("(mu, nu | lambda, sigma) matrix\n"); 
+   /* 
+   this->OutputLog("(mu, nu | lambda, sigma) matrix\n");
    for(int mu=0; mu<dxy; mu++){
       for(int nu=0; nu<dxy; nu++){
          for(int lambda=0; lambda<dxy; lambda++){
             for(int sigma=0; sigma<dxy; sigma++){
-               printf("mu=%d nu=%d lambda=%d sigma=%d $e\n",
-                        mu,nu,lambda,sigma,matrix[mu][nu][lambda][sigma]);
+               this->OutputLog((boost::format("mu=%d nu=%d lambda=%d sigma=%d $e\n") % mu
+                                                                                     % nu
+                                                                                     % lambda
+                                                                                     % sigma 
+                                                                                     % matrix[mu][nu][lambda][sigma]).str());
             }
          }
       }

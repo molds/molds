@@ -23,6 +23,7 @@
 #include<math.h>
 #include<string>
 #include<vector>
+#include<boost/format.hpp>
 #include"../base/PrintController.h"
 #include"../base/Uncopyable.h"
 #include"../base/Enums.h"
@@ -55,11 +56,11 @@ Pm3::Pm3() : MolDS_am1::Am1(){
    this->theory = PM3;
    this->SetMessages();
    this->SetEnableAtomTypes();
-   //cout << "Pm3 created\n";
+   //this->OutputLog("Pm3 created\n");
 }
 
 Pm3::~Pm3(){
-   //cout << "Pm3 deleted\n";
+   //this->OutputLog("Pm3 deleted\n");
 }
 
 void Pm3::SetMessages(){
