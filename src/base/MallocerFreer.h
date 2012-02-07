@@ -21,7 +21,7 @@
 namespace MolDS_base{
 
 // MallocerFreer is singleton
-class MallocerFreer: private Uncopyable{
+class MallocerFreer: public MolDS_base::PrintController, private Uncopyable{
 public:
    static MallocerFreer* GetInstance();
    static void DeleteInstance();

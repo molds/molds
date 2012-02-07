@@ -23,6 +23,8 @@
 #include<string>
 #include<vector>
 #include<stdexcept>
+#include<boost/format.hpp>
+#include"PrintController.h"
 #include"MolDSException.h"
 #include"Uncopyable.h"
 #include"Enums.h"
@@ -41,8 +43,8 @@ MallocerFreer::MallocerFreer(){
    this->errorMessageMallocFailure = "Error in base::MallocFreer::Malloc: Malloc failure...\n";
    this->errorMessageReachHeapLimit = "Error in base::MallocFreer::Malloc: Reaches limit of heap. Change the \"limit_heap\" option in the memory-directive, machine you using, or your study!!!\n";
    this->messageMemoryUsage = "\tSummary for memory usage:\n";
-   this->messageMemoryCurrentHeap = "\t\tMax Heap: ";
-   this->messageMemoryMaxHeap = "\t\tCurrent Heap(Leaked): ";
+   this->messageMemoryMaxHeap = "\t\tMax Heap: ";
+   this->messageMemoryCurrentHeap = "\t\tCurrent Heap(Leaked): ";
    this->messageMByte = "[MB].\n";
 }
 
@@ -58,9 +60,13 @@ void MallocerFreer::CheckLimitHeap(double wannaMalloc) const{
 }
 
 void MallocerFreer::OutputMemoryUsage() const{
-   cout << this->messageMemoryUsage;
-   cout << this->messageMemoryCurrentHeap << MallocerFreer::maxMalloced/pow(10.0,6.0) << this->messageMByte;
-   cout << this->messageMemoryMaxHeap << MallocerFreer::currentMalloced/pow(10.0,6.0) << this->messageMByte;
+   this->OutputLog(this->messageMemoryUsage);
+   this->OutputLog((boost::format("%s%lf%s") % this->messageMemoryMaxHeap.c_str()
+                                            % (MallocerFreer::maxMalloced/pow(10.0,6.0))
+                                            % this->messageMByte.c_str()).str());
+   this->OutputLog((boost::format("%s%lf%s") % this->messageMemoryCurrentHeap.c_str()
+                                            % (MallocerFreer::currentMalloced/pow(10.0,6.0))
+                                            % this->messageMByte.c_str()).str());
 }
 
 MallocerFreer* MallocerFreer::GetInstance(){
