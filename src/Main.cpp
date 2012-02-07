@@ -18,9 +18,14 @@
 //************************************************************************//
 #include<stdio.h>
 #include<stdlib.h>
+#include<vector>
 #include<stdexcept>
 #include<boost/shared_ptr.hpp>
 #include"base/PrintController.h"
+#include"base/Enums.h"
+#include"base/EularAngle.h"
+#include"base/atoms/Atom.h"
+#include"base/Molecule.h"
 #include"base/MolDS.h"
 using namespace std;
 int main(){

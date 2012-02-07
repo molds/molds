@@ -216,7 +216,7 @@ void RPMD::SetMessages(){
    this->messageEndInitialRPMD =   "\n**********  DONE: Initial calculation of electronic structure of each bead   ********* \n";
    this->messageinitialConditionRPMD = "\n=========  Initial conditions of the beads  ==========\n";
    this->messageStartStepRPMD =    "\n==========  START: RPMD step ";
-   this->messageEndStepRPMD =        "==========  DONE: RPMD step ";
+   this->messageEndStepRPMD =        "\n==========  DONE: RPMD step ";
    this->messageBeadsNum = "----------  Beads number ";
    this->messageEnergies = "\tEnergies:\n";
    this->messageEnergiesTitle = "\t\t|\tkind\t\t\t| [a.u.] | [eV] | \n";

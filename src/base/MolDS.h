@@ -21,7 +21,16 @@
 namespace MolDS_base{
 class MolDS: public PrintController{
 public:
-   void Run();
+   void Run() const;
+private:
+   void CalculateElectronicStructureOnce(Molecule* molecule, bool* runningNormally) const;
+   void DoMC(Molecule* molecule, bool* runningNormally) const;
+   void DoMD(Molecule* molecule, bool* runningNormally) const;
+   void DoRPMD(Molecule* molecule, bool* runningNormally) const;
+   void OptimizeGeometry(Molecule* molecule, bool* runningNormally) const;
+   void DiagonalizePrincipalAxes(Molecule* molecule, bool* runningNormally) const;
+   void TranslateMolecule(Molecule* molecule, bool* runningNormally) const;
+   void RotateMolecule(Molecule* molecule, bool* runningNormally) const;
 };
 }
 #endif

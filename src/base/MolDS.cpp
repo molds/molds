@@ -53,7 +53,7 @@
 #include"MolDS.h"
 using namespace std;
 namespace MolDS_base{
-void MolDS::Run(){
+void MolDS::Run() const{
    // Welcome Messages
    this->OutputLog(Utilities::GetWelcomeMessage());
    
@@ -64,7 +64,7 @@ void MolDS::Run(){
    double ompStartTime = omp_get_wtime();
 
    Molecule* molecule = NULL;
-   bool runingNormally = true;
+   bool runningNormally = true;
    try{
       // declare 
       MallocerFreer::GetInstance();
@@ -79,129 +79,47 @@ void MolDS::Run(){
    }
    catch(MolDSException ex){
       this->OutputLog((boost::format("%s\n") % ex.what()).str());
-      runingNormally = false;
+      runningNormally = false;
    }
    
    // once electronic structure calculation
-   if(runingNormally && Parameters::GetInstance()->GetCurrentSimulation() == Once){
-      ElectronicStructure* electronicStructure = NULL;
-      try{
-         electronicStructure = ElectronicStructureFactory::GetInstance()->Create();
-         electronicStructure->SetMolecule(molecule);
-         electronicStructure->DoSCF();
-         if(Parameters::GetInstance()->RequiresCIS()){
-            electronicStructure->DoCIS();
-         }
-      }
-      catch(MolDSException ex){
-         this->OutputLog((boost::format("%s\n") % ex.what()).str());
-         runingNormally = false;
-      }
-      if(electronicStructure != NULL){
-         delete electronicStructure;
-      }
+   if(runningNormally && Parameters::GetInstance()->GetCurrentSimulation() == Once){
+      this->CalculateElectronicStructureOnce(molecule, &runningNormally);
    }
 
    // MD
-   else if(runingNormally && Parameters::GetInstance()->GetCurrentSimulation() == MD){
-      MolDS_md::MD* md = NULL;
-      try{
-         md = new MolDS_md::MD();
-         md->SetMolecule(molecule);
-         md->DoMD();
-      }
-      catch(MolDSException ex){
-         this->OutputLog((boost::format("%s\n") % ex.what()).str());
-         runingNormally = false;
-      }
-      if(md != NULL){
-         delete md;
-      }
+   else if(runningNormally && Parameters::GetInstance()->GetCurrentSimulation() == MD){
+      this->DoMD(molecule, &runningNormally);
    }
 
    // MC
-   else if(runingNormally && Parameters::GetInstance()->GetCurrentSimulation() == MC){
-      MolDS_mc::MC* mc = NULL;
-      try{
-         mc = new MolDS_mc::MC();
-         mc->SetMolecule(molecule);
-         mc->DoMC();
-      }
-      catch(MolDSException ex){
-         this->OutputLog((boost::format("%s\n") % ex.what()).str());
-         runingNormally = false;
-      }
-      if(mc != NULL){
-         delete mc;
-      }
+   else if(runningNormally && Parameters::GetInstance()->GetCurrentSimulation() == MC){
+      this->DoMC(molecule, &runningNormally);
    }
 
    // RPMD
-   else if(runingNormally && Parameters::GetInstance()->GetCurrentSimulation() == RPMD){
-      MolDS_rpmd::RPMD* rpmd = NULL;
-      try{
-         rpmd = new MolDS_rpmd::RPMD();
-         rpmd->DoRPMD(*molecule);
-      }
-      catch(MolDSException ex){
-         this->OutputLog((boost::format("%s\n") % ex.what()).str());
-         runingNormally = false;
-      }
-      if(rpmd != NULL){
-         delete rpmd;
-      }
+   else if(runningNormally && Parameters::GetInstance()->GetCurrentSimulation() == RPMD){
+      this->DoRPMD(molecule, &runningNormally);
    }
 
    // Optimize (Steepest Descent)
-   else if(runingNormally && Parameters::GetInstance()->GetCurrentSimulation() == Optimize){
-      MolDS_optimize::SteepestDescent* steepestDescent = NULL;
-      try{
-         steepestDescent = new MolDS_optimize::SteepestDescent();
-         steepestDescent->Optimize(*molecule);
-      }
-      catch(MolDSException ex){
-         this->OutputLog((boost::format("%s\n") % ex.what()).str());
-         runingNormally = false;
-      }
-      if(steepestDescent != NULL){
-         delete steepestDescent;
-      }
+   else if(runningNormally && Parameters::GetInstance()->GetCurrentSimulation() == Optimize){
+      this->OptimizeGeometry(molecule, &runningNormally);
    }
 
    // Diagonalize Inertia Tensor
-   else if(runingNormally && Parameters::GetInstance()->GetCurrentSimulation() == PrincipalAxes ){
-      try{
-         molecule->CalcPrincipalAxes();
-      }
-      catch(MolDSException ex){
-         this->OutputLog((boost::format("%s\n") % ex.what()).str());
-         runingNormally = false;
-      }
-
+   else if(runningNormally && Parameters::GetInstance()->GetCurrentSimulation() == PrincipalAxes ){
+      this->DiagonalizePrincipalAxes(molecule, &runningNormally);
    }
 
    // Translate molecule
-   else if(runingNormally && Parameters::GetInstance()->GetCurrentSimulation() == Translate){
-      try{
-         molecule->Translate();
-      }
-      catch(MolDSException ex){
-         this->OutputLog((boost::format("%s\n") % ex.what()).str());
-         runingNormally = false;
-      }
-
+   else if(runningNormally && Parameters::GetInstance()->GetCurrentSimulation() == Translate){
+      this->TranslateMolecule(molecule, &runningNormally);
    }
 
    // Rotate molecule
-   else if(runingNormally && Parameters::GetInstance()->GetCurrentSimulation() == Rotate){
-      try{
-         molecule->Rotate();
-      }
-      catch(MolDSException ex){
-         this->OutputLog((boost::format("%s\n") % ex.what()).str());
-         runingNormally = false;
-      }
-
+   else if(runningNormally && Parameters::GetInstance()->GetCurrentSimulation() == Rotate){
+      this->RotateMolecule(molecule, &runningNormally);
    }
 
    //Free 
@@ -214,7 +132,99 @@ void MolDS::Run(){
    MallocerFreer::DeleteInstance();
 
    // Farewell Messages
-   this->OutputLog(Utilities::GetFarewellMessage(startTime, startTick, ompStartTime, runingNormally));
+   this->OutputLog(Utilities::GetFarewellMessage(startTime, startTick, ompStartTime, runningNormally));
 }
+
+void MolDS::CalculateElectronicStructureOnce(Molecule* molecule, bool* runningNormally) const{
+   try{
+      boost::shared_ptr<ElectronicStructure> electronicStructure(ElectronicStructureFactory::GetInstance()->Create());
+      electronicStructure->SetMolecule(molecule);
+      electronicStructure->DoSCF();
+      if(Parameters::GetInstance()->RequiresCIS()){
+         electronicStructure->DoCIS();
+      }
+   }
+   catch(MolDSException ex){
+      this->OutputLog((boost::format("%s\n") % ex.what()).str());
+      *runningNormally = false;
+   }
+}
+
+void MolDS::DoMC(Molecule* molecule, bool* runningNormally) const{
+   try{
+      boost::shared_ptr<MolDS_mc::MC> mc(new MolDS_mc::MC());
+      mc->SetMolecule(molecule);
+      mc->DoMC();
+   }
+   catch(MolDSException ex){
+      this->OutputLog((boost::format("%s\n") % ex.what()).str());
+      *runningNormally = false;
+   }
+}
+
+void MolDS::DoMD(Molecule* molecule, bool* runningNormally) const{
+   try{
+      boost::shared_ptr<MolDS_md::MD> md(new MolDS_md::MD());
+      md->SetMolecule(molecule);
+      md->DoMD();
+   }
+   catch(MolDSException ex){
+      this->OutputLog((boost::format("%s\n") % ex.what()).str());
+      *runningNormally = false;
+   }
+}
+
+void MolDS::DoRPMD(Molecule* molecule, bool* runningNormally) const{
+   try{
+      boost::shared_ptr<MolDS_rpmd::RPMD> rpmd(new MolDS_rpmd::RPMD());
+      rpmd->DoRPMD(*molecule);
+   }
+   catch(MolDSException ex){
+      this->OutputLog((boost::format("%s\n") % ex.what()).str());
+      *runningNormally = false;
+   }
+}
+
+void MolDS::OptimizeGeometry(Molecule* molecule, bool* runningNormally) const{
+   try{
+      boost::shared_ptr<MolDS_optimize::SteepestDescent> steepestDescent(new MolDS_optimize::SteepestDescent());
+      steepestDescent->Optimize(*molecule);
+   }
+   catch(MolDSException ex){
+      this->OutputLog((boost::format("%s\n") % ex.what()).str());
+      *runningNormally = false;
+   }
+}
+
+void MolDS::DiagonalizePrincipalAxes(Molecule* molecule, bool* runningNormally) const{
+   try{
+      molecule->CalcPrincipalAxes();
+   }
+   catch(MolDSException ex){
+      this->OutputLog((boost::format("%s\n") % ex.what()).str());
+      *runningNormally = false;
+   }
+}
+
+void MolDS::TranslateMolecule(Molecule* molecule, bool* runningNormally) const{
+   try{
+      molecule->Translate();
+   }
+   catch(MolDSException ex){
+      this->OutputLog((boost::format("%s\n") % ex.what()).str());
+      *runningNormally = false;
+   }
+}
+
+void MolDS::RotateMolecule(Molecule* molecule, bool* runningNormally) const{
+   try{
+      molecule->Rotate();
+   }
+   catch(MolDSException ex){
+      this->OutputLog((boost::format("%s\n") % ex.what()).str());
+      *runningNormally = false;
+   }
+}
+
 }
 
