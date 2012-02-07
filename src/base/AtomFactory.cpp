@@ -38,29 +38,8 @@ using namespace std;
 using namespace MolDS_base_atoms;
 namespace MolDS_base{
 
-AtomFactory* AtomFactory::atomFactory = NULL;
-
-AtomFactory::AtomFactory(){
-   this->errorMessageNotEnableAtom = "Error in base::AtomFactory::Create: Not Enable AtomType is set.";
-   this->errorMessageAtomType = "\tatom type = ";
-}
-
-AtomFactory::~AtomFactory(){
-}
-
-AtomFactory* AtomFactory::GetInstance(){
-   if(atomFactory == NULL){
-      atomFactory = new AtomFactory();
-   }
-   return atomFactory;
-}
-
-void AtomFactory::DeleteInstance(){
-   if(atomFactory != NULL){
-      delete atomFactory; 
-   }
-   atomFactory = NULL;
-}
+string AtomFactory::errorMessageNotEnableAtom = "Error in base::AtomFactory::Create: Not Enable AtomType is set.";
+string AtomFactory::errorMessageAtomType = "\tatom type = ";
 
 Atom* AtomFactory::Create(AtomType atomType, double x, double y, double z, double px, double py, double pz){
    Atom* atom=NULL;
@@ -84,8 +63,8 @@ Atom* AtomFactory::Create(AtomType atomType, double x, double y, double z, doubl
    }
    else{
       stringstream ss;
-      ss << this->errorMessageNotEnableAtom << endl;
-      ss << this->errorMessageAtomType << AtomTypeStr(atomType) << endl;
+      ss << AtomFactory::errorMessageNotEnableAtom << endl;
+      ss << AtomFactory::errorMessageAtomType << AtomTypeStr(atomType) << endl;
       throw MolDSException(ss.str());
    }
    atom->SetXyz(x, y, z);

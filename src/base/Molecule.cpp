@@ -77,13 +77,13 @@ void Molecule::CopyInitialize(const Molecule& rhs){
    this->totalCoreMass = rhs.totalCoreMass;
    for(int i=0; i<rhs.atomVect->size(); i++){
       Atom* atom = (*rhs.atomVect)[i];
-      this->atomVect->push_back(AtomFactory::GetInstance()->Create(atom->GetAtomType(),
-                                                                   atom->GetXyz()[XAxis],
-                                                                   atom->GetXyz()[YAxis],
-                                                                   atom->GetXyz()[ZAxis],
-                                                                   atom->GetPxyz()[XAxis],
-                                                                   atom->GetPxyz()[YAxis],
-                                                                   atom->GetPxyz()[ZAxis]));
+      this->atomVect->push_back(AtomFactory::Create(atom->GetAtomType(),
+                                                    atom->GetXyz()[XAxis],
+                                                    atom->GetXyz()[YAxis],
+                                                    atom->GetXyz()[ZAxis],
+                                                    atom->GetPxyz()[XAxis],
+                                                    atom->GetPxyz()[YAxis],
+                                                    atom->GetPxyz()[ZAxis]));
       (*this->atomVect)[i]->SetFirstAOIndex(atom->GetFirstAOIndex());
    }                                                                     
 }

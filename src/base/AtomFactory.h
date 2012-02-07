@@ -21,27 +21,24 @@
 namespace MolDS_base{
 
 // AtomFactory is singleton
-class AtomFactory: private Uncopyable{
+class AtomFactory{
 public:
-   static AtomFactory* GetInstance();
-   static void DeleteInstance();
-   MolDS_base_atoms::Atom* Create(MolDS_base::AtomType atomType,
-                                  double x,
-                                  double y,
-                                  double z,
-                                  double px,
-                                  double py,
-                                  double pz);
-   MolDS_base_atoms::Atom* Create(MolDS_base::AtomType atomType,
-                                  double x,
-                                  double y,
-                                  double z);
+   static MolDS_base_atoms::Atom* Create(MolDS_base::AtomType atomType,
+                                         double x,
+                                         double y,
+                                         double z,
+                                         double px,
+                                         double py,
+                                         double pz);
+   static MolDS_base_atoms::Atom* Create(MolDS_base::AtomType atomType,
+                                         double x,
+                                         double y,
+                                         double z);
 private:
-   static AtomFactory* atomFactory;
-   AtomFactory();
-   ~AtomFactory();
-   std::string errorMessageNotEnableAtom;
-   std::string errorMessageAtomType;
+   AtomFactory(); 
+   ~AtomFactory(); 
+   static std::string errorMessageNotEnableAtom;
+   static std::string errorMessageAtomType;
 };
 
 }
