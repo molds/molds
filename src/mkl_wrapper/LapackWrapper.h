@@ -20,7 +20,7 @@
 #define INCLUDED_LAPACKWRAPPER
 namespace MolDS_mkl_wrapper{
 // LapackWrapper is singleton
-class LapackWrapper: private MolDS_base::Uncopyable{
+class LapackWrapper: public MolDS_base::PrintController, private MolDS_base::Uncopyable{
 public:
    static LapackWrapper* GetInstance();
    static void DeleteInstance();
@@ -35,6 +35,7 @@ private:
    std::string errorMessageDsyevdInfo;
    std::string errorMessageDsyevdSize;
    std::string errorMessageDsysvInfo;
+   std::string errorMessageInfo;
    std::string errorMessageDsysvSize;
 };
 }

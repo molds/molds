@@ -23,7 +23,9 @@
 #include<math.h>
 #include<string>
 #include<stdexcept>
+#include<boost/format.hpp>
 #include"mkl.h"
+#include"../base/PrintController.h"
 #include"../base/MolDSException.h"
 #include"../base/Uncopyable.h"
 #include"LapackWrapper.h"
@@ -39,6 +41,7 @@ LapackWrapper::LapackWrapper(){
    this->errorMessageDsyevdInfo = "Error in mkl_wrapper::LapackWrapper::Dsyevd: info != 0: info = ";
    this->errorMessageDsyevdSize = "Error in mkl_wrapper::LapackWrapper::Dsyevd: size of matirx < 1\n";
    this->errorMessageDsysvInfo = "Error in mkl_wrapper::LapackWrapper::Dsysv: info != 0\n";
+   this->errorMessageInfo = "info=";
    this->errorMessageDsysvSize = "Error in mkl_wrapper::LapackWrapper::Dsysv: size of matirx < 1\n";
 }
 
@@ -48,7 +51,7 @@ LapackWrapper::~LapackWrapper(){
 LapackWrapper* LapackWrapper::GetInstance(){
    if(lapackWrapper == NULL){
       lapackWrapper = new LapackWrapper();
-      //cout << "LapackWrapper created.\n\n" << endl;
+      //this->OutputLog("LapackWrapper created.\n\n");
    }
    return lapackWrapper;
 }
@@ -56,7 +59,7 @@ LapackWrapper* LapackWrapper::GetInstance(){
 void LapackWrapper::DeleteInstance(){
    if(lapackWrapper != NULL){
       delete lapackWrapper;
-      //cout << "LapackWrapper deleted\n\n" << endl;
+      //this->OutputLog("LapackWrapper deleted\n\n");
    }
    lapackWrapper = NULL;
 }
@@ -150,7 +153,7 @@ int LapackWrapper::Dsyevd(double** matrix, double* eigenValues, int size, bool c
    for(int i = 0; i < size; i++){
       eigenValues[i] = tempEigenValues[i];
    }
-   //printf("size=%d lwork=%d liwork=%d k=%d info=%d\n",size,lwork,liwork,k,info);
+   this->OutputLog((boost::format("size=%d lwork=%d liwork=%d k=%d info=%d\n") % size % lwork % liwork % k % info ).str());
 
    // free
    mkl_free(work);
@@ -233,9 +236,9 @@ int LapackWrapper::Dsysv(double const* const* matrix, double* b, int size){
    mkl_free(tempB);
   
    if(info != 0){
-      cout << "info=" << info << endl;
       stringstream ss;
       ss << errorMessageDsysvInfo;
+      ss << errorMessageInfo << info << endl;
       throw MolDSException(ss.str());
    }
    return info;
