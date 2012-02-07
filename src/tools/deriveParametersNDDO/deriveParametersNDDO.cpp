@@ -26,18 +26,7 @@
 #include<list>
 #include<vector>
 #include<stdexcept>
-#include"../../base/MolDSException.h"
-#include"../../base/Uncopyable.h"
-#include"../../base/Utilities.h"
-#include"../../base/Enums.h"
-#include"../../base/MathUtilities.h"
-#include"../../base/MallocerFreer.h"
-#include"../../base/EularAngle.h"
-#include"../../base/Parameters.h"
-
 using namespace std;
-using namespace MolDS_base;
-
 
 /*******************************************************************
  * This program calculates reduced parameters for NDDO-series (MNDO, AM1, PM3, and etc).
@@ -48,7 +37,9 @@ using namespace MolDS_base;
  *    in http://openmopac.net/manual/index.html
  *
  * Methods calculating D1 and D2 should be selected according to the periodic table.
- * That is, see commented outed coded to calculate D1 and D2 in this file.
+ * That is, see commented outed code to calculate D1 and D2 in this file.
+ *
+ * Note that eV2AU should be equal to MolDS_base::Parameters::eV2AU.
  *
  * refferences
  * [MOPAC_1990] J. J. P. Stewart, J. Computer-Aided Molecular Design 4, 1 (1990)
@@ -70,8 +61,6 @@ long double GetAForAQ(long double AQ, long double D2){
 }
 
 int main(){
-   Parameters::GetInstance();
-
    // notation is [MOPAC1970]
    // all valuable should be in atomic units.
    long double D1=0.0;
@@ -86,11 +75,13 @@ int main(){
 
    long double orbitalExponentS=1.891185;
    long double orbitalExponentP=1.658972;
-   long double Gss = 8.964667 * Parameters::GetInstance()->GetEV2AU();
-   long double Gpp = 9.968164 * Parameters::GetInstance()->GetEV2AU();
-   long double Gsp = 6.785936 * Parameters::GetInstance()->GetEV2AU();
-   long double Gpp2= 7.970247 * Parameters::GetInstance()->GetEV2AU();
-   long double Hsp = 4.041836 * Parameters::GetInstance()->GetEV2AU();
+
+   double eV2AU = 0.03674903;
+   long double Gss = 8.964667 * eV2AU;
+   long double Gpp = 9.968164 * eV2AU;
+   long double Gsp = 6.785936 * eV2AU;
+   long double Gpp2= 7.970247 * eV2AU;
+   long double Hsp = 4.041836 * eV2AU;
    long double Hpp = 0.5*(Gpp - Gpp2);
 
    // output prepared parameters
@@ -159,9 +150,6 @@ int main(){
       AQ_old = AQ;
       printf("iter=%d\tAQ in [a.u.] = %.10lf\n",n,(double)AQ);
    }
-
-
-   Parameters::DeleteInstance();
    return 0;
 }
 
