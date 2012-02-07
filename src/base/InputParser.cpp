@@ -338,7 +338,7 @@ int InputParser::ParseMolecularGeometry(Molecule* molecule, vector<string>* inpu
          atomType = S;
       }
       Atom* atom = AtomFactory::Create(atomType, x, y, z);
-      molecule->GetAtomVect()->push_back(atom);
+      molecule->AddAtom(atom);
       parseIndex += 4;
    }
    return parseIndex;

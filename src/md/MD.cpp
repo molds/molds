@@ -97,16 +97,16 @@ void MD::DoMD(){
       this->OutputLog((boost::format("%s%d\n") % this->messageStartStepMD.c_str() % (s+1) ).str());
 
       // update momenta
-      for(int a=0; a<this->molecule->GetAtomVect()->size(); a++){
-         Atom* atom = (*this->molecule->GetAtomVect())[a];
+      for(int a=0; a<this->molecule->GetNumberAtoms(); a++){
+         Atom* atom = this->molecule->GetAtom(a);
          for(int i=0; i<CartesianType_end; i++){
             atom->GetPxyz()[i] += 0.5*dt*(matrixForce[a][i]);
          }
       }
 
       // update coordinates
-      for(int a=0; a<this->molecule->GetAtomVect()->size(); a++){
-         Atom* atom = (*this->molecule->GetAtomVect())[a];
+      for(int a=0; a<this->molecule->GetNumberAtoms(); a++){
+         Atom* atom = this->molecule->GetAtom(a);
          double coreMass = atom->GetAtomicMass() - (double)atom->GetNumberValenceElectrons();
          for(int i=0; i<CartesianType_end; i++){
             atom->GetXyz()[i] += dt*atom->GetPxyz()[i]/coreMass;
@@ -125,8 +125,8 @@ void MD::DoMD(){
       matrixForce = electronicStructure->GetForce(elecState);
 
       // update momenta
-      for(int a=0; a<this->molecule->GetAtomVect()->size(); a++){
-         Atom* atom = (*this->molecule->GetAtomVect())[a];
+      for(int a=0; a<this->molecule->GetNumberAtoms(); a++){
+         Atom* atom = this->molecule->GetAtom(a);
          for(int i=0; i<CartesianType_end; i++){
             atom->GetPxyz()[i] += 0.5*dt*(matrixForce[a][i]);
          }
@@ -169,8 +169,8 @@ double MD::OutputEnergies(boost::shared_ptr<ElectronicStructure> electronicStruc
    int elecState = Parameters::GetInstance()->GetElectronicStateIndexMD();
    double eV2AU = Parameters::GetInstance()->GetEV2AU();
    double coreKineticEnergy = 0.0;
-   for(int a=0; a<this->molecule->GetAtomVect()->size(); a++){
-      Atom* atom = (*this->molecule->GetAtomVect())[a];
+   for(int a=0; a<this->molecule->GetNumberAtoms(); a++){
+      Atom* atom = this->molecule->GetAtom(a);
       double coreMass = atom->GetAtomicMass() - (double)atom->GetNumberValenceElectrons();
       for(int i=0; i<CartesianType_end; i++){
          coreKineticEnergy += 0.5*pow(atom->GetPxyz()[i],2.0)/coreMass;

@@ -116,8 +116,8 @@ void Am1::SetEnableAtomTypes(){
 
 double Am1::GetDiatomCoreRepulsionEnergy(int indexAtomA, int indexAtomB) const{
    double energy = Mndo::GetDiatomCoreRepulsionEnergy(indexAtomA, indexAtomB);
-   const Atom& atomA = *(*this->molecule->GetAtomVect())[indexAtomA];
-   const Atom& atomB = *(*this->molecule->GetAtomVect())[indexAtomB];
+   const Atom& atomA = *this->molecule->GetAtom(indexAtomA);
+   const Atom& atomB = *this->molecule->GetAtom(indexAtomB);
    double distance = this->molecule->GetDistanceAtoms(indexAtomA, indexAtomB);
    double ang2AU = Parameters::GetInstance()->GetAngstrom2AU();
    double alphaA = atomA.GetNddoAlpha(this->theory);
@@ -146,8 +146,8 @@ double Am1::GetDiatomCoreRepulsionFirstDerivative(int atomAIndex,
                                                               atomBIndex,
                                                               axisA);
    double ang2AU = Parameters::GetInstance()->GetAngstrom2AU();
-   const Atom& atomA = *(*this->molecule->GetAtomVect())[atomAIndex];
-   const Atom& atomB = *(*this->molecule->GetAtomVect())[atomBIndex];
+   const Atom& atomA = *this->molecule->GetAtom(atomAIndex);
+   const Atom& atomB = *this->molecule->GetAtom(atomBIndex);
    double alphaA = atomA.GetNddoAlpha(this->theory);
    double alphaB = atomB.GetNddoAlpha(this->theory);
    double Rab = this->molecule->GetDistanceAtoms(atomAIndex, atomBIndex);

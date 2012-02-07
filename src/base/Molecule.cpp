@@ -166,13 +166,8 @@ void Molecule::SetMessages(){
    this->messageTranslatingDifferenceTitleAng = "\t\t| x[angst.] | y[angst.] | z[angst.] |\n";
 }
 
-vector<Atom*>* Molecule::GetAtomVect() const{
-   if(this->atomVect==NULL){
-      stringstream ss;
-      ss << this->errorMessageGetAtomVectNull;
-      throw MolDSException(ss.str());
-   }
-   return this->atomVect;
+void Molecule::AddAtom(Atom* atom){
+   this->atomVect->push_back(atom);
 }
 
 double* Molecule::GetXyzCOM() const{

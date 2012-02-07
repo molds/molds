@@ -89,15 +89,15 @@ void RPMD::UpdateMomenta(const vector<boost::shared_ptr<Molecule> >& molecularBe
                          double temperature){
    double kB = Parameters::GetInstance()->GetBoltzmann();
    int numBeads = molecularBeads.size();
-   int numAtom = molecularBeads[0]->GetAtomVect()->size();
+   int numAtom = molecularBeads[0]->GetNumberAtoms();
    for(int b=0; b<numBeads; b++){
       int preB  = b==0 ? numBeads-1 : b-1;
       int postB = b==numBeads-1 ? 0 : b+1;
       double** electronicForceMatrix = electronicStructureBeads[b]->GetForce(elecState);;
       for(int a=0; a<numAtom; a++){
-         Atom* atom = (*molecularBeads[b]->GetAtomVect())[a];
-         Atom* preAtom = (*molecularBeads[preB]->GetAtomVect())[a];
-         Atom* postAtom = (*molecularBeads[postB]->GetAtomVect())[a];
+         Atom* atom = molecularBeads[b]->GetAtom(a);
+         Atom* preAtom = molecularBeads[preB]->GetAtom(a);
+         Atom* postAtom = molecularBeads[postB]->GetAtom(a);
          double coreMass = atom->GetAtomicMass() - (double)atom->GetNumberValenceElectrons();
          for(int i=0; i<CartesianType_end; i++){
             double beadsForce = -1.0*coreMass*pow(kB*temperature*(double)numBeads,2.0)
@@ -112,10 +112,10 @@ void RPMD::UpdateMomenta(const vector<boost::shared_ptr<Molecule> >& molecularBe
 void RPMD::UpdateCoordinates(const vector<boost::shared_ptr<Molecule> >& molecularBeads,
                              double dt){
    int numBeads = molecularBeads.size();
-   int numAtom = molecularBeads[0]->GetAtomVect()->size();
+   int numAtom = molecularBeads[0]->GetNumberAtoms();
    for(int b=0; b<numBeads; b++){
       for(int a=0; a<numAtom; a++){
-         Atom* atom = (*molecularBeads[b]->GetAtomVect())[a];
+         Atom* atom = molecularBeads[b]->GetAtom(a);
          double coreMass = atom->GetAtomicMass() - (double)atom->GetNumberValenceElectrons();
          for(int i=0; i<CartesianType_end; i++){
             atom->GetXyz()[i] += dt*atom->GetPxyz()[i]/coreMass;
@@ -138,7 +138,7 @@ void RPMD::FluctuateBeads(const vector<boost::shared_ptr<Molecule> >& molecularB
       molecule->SetCanOutputLogs(false);
       mc->SetMolecule(molecule);
       mc->SetCanOutputLogs(false);
-      mc->DoMC(molecule->GetAtomVect()->size(), elecState, temperature, stepWidth, seed+b);
+      mc->DoMC(molecule->GetNumberAtoms(), elecState, temperature, stepWidth, seed+b);
    }
 }
 
@@ -154,7 +154,7 @@ void RPMD::DoRPMD(const Molecule& refferenceMolecule){
    unsigned long seed = Parameters::GetInstance()->GetSeedRPMD();
    int totalSteps = Parameters::GetInstance()->GetTotalStepsRPMD();
    double dt = Parameters::GetInstance()->GetTimeWidthRPMD();
-   int numAtom = refferenceMolecule.GetAtomVect()->size();
+   int numAtom = refferenceMolecule.GetNumberAtoms();
    int numBeads = Parameters::GetInstance()->GetNumberBeadsRPMD();
    double kB = Parameters::GetInstance()->GetBoltzmann();
 
@@ -233,12 +233,12 @@ double RPMD::OutputEnergies(const vector<boost::shared_ptr<Molecule> >& molecula
                             int elecState,
                             double temperature){
    int numBeads = molecularBeads.size();
-   int numAtom = molecularBeads[0]->GetAtomVect()->size();
+   int numAtom = molecularBeads[0]->GetNumberAtoms();
    double beadsKineticEnergy = 0.0;;
    for(int b=0; b<numBeads; b++){
       double coreKineticEnergy = 0.0;
       for(int a=0; a<numAtom; a++){
-         Atom* atom = (*molecularBeads[b]->GetAtomVect())[a];
+         Atom* atom = molecularBeads[b]->GetAtom(a);
          double coreMass = atom->GetAtomicMass() - (double)atom->GetNumberValenceElectrons();
          for(int i=0; i<CartesianType_end; i++){
             coreKineticEnergy += 0.5*pow(atom->GetPxyz()[i],2.0)/coreMass;
@@ -253,8 +253,8 @@ double RPMD::OutputEnergies(const vector<boost::shared_ptr<Molecule> >& molecula
       double harmonicEnergy = 0.0;
       int preB = b==0 ? numBeads-1 : b-1;
       for(int a=0; a<numAtom; a++){
-         Atom* atom = (*molecularBeads[b]->GetAtomVect())[a];
-         Atom* preAtom = (*molecularBeads[preB]->GetAtomVect())[a];
+         Atom* atom = molecularBeads[b]->GetAtom(a);
+         Atom* preAtom = molecularBeads[preB]->GetAtom(a);
          double coreMass = atom->GetAtomicMass() - (double)atom->GetNumberValenceElectrons();
          double dx = atom->GetXyz()[XAxis] - preAtom->GetXyz()[XAxis];
          double dy = atom->GetXyz()[YAxis] - preAtom->GetXyz()[YAxis];

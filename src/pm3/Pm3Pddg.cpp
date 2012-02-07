@@ -119,8 +119,8 @@ void Pm3Pddg::SetEnableAtomTypes(){
 
 double Pm3Pddg::GetDiatomCoreRepulsionEnergy(int indexAtomA, int indexAtomB) const{
    double energy = Pm3::GetDiatomCoreRepulsionEnergy(indexAtomA, indexAtomB);
-   const Atom& atomA = *(*this->molecule->GetAtomVect())[indexAtomA];
-   const Atom& atomB = *(*this->molecule->GetAtomVect())[indexAtomB];
+   const Atom& atomA = *this->molecule->GetAtom(indexAtomA);
+   const Atom& atomB = *this->molecule->GetAtom(indexAtomB);
    double na = (double)(atomA.GetNumberValenceElectrons());
    double nb = (double)(atomB.GetNumberValenceElectrons());
    double distance = this->molecule->GetDistanceAtoms(indexAtomA, indexAtomB);
@@ -146,8 +146,8 @@ double Pm3Pddg::GetDiatomCoreRepulsionFirstDerivative(int atomAIndex,
    double value = Pm3::GetDiatomCoreRepulsionFirstDerivative(atomAIndex,
                                                              atomBIndex,
                                                              axisA);
-   const Atom& atomA = *(*this->molecule->GetAtomVect())[atomAIndex];
-   const Atom& atomB = *(*this->molecule->GetAtomVect())[atomBIndex];
+   const Atom& atomA = *this->molecule->GetAtom(atomAIndex);
+   const Atom& atomB = *this->molecule->GetAtom(atomBIndex);
    double Rab = this->molecule->GetDistanceAtoms(atomAIndex, atomBIndex);
    double dRabDa = (atomA.GetXyz()[axisA] - atomB.GetXyz()[axisA])/Rab;
    double na = (double)(atomA.GetNumberValenceElectrons());

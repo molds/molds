@@ -106,7 +106,7 @@ void MOLogger::DrawMO(vector<int> moIndeces){
       // output cube file
       ofs << this->messageCubeHeaderComment1;
       ofs << this->messageCubeHeaderComment2;
-      sprintf(data,"\t%d\t%e\t%e\t%e\n", (int)this->molecule->GetAtomVect()->size(),
+      sprintf(data,"\t%d\t%e\t%e\t%e\n", (int)this->molecule->GetNumberAtoms(),
                                          origin[XAxis], 
                                          origin[YAxis], 
                                          origin[ZAxis]);
@@ -121,8 +121,8 @@ void MOLogger::DrawMO(vector<int> moIndeces){
       sprintf(data,"\t%d\t%e\t%e\t%e\n", gridNumber[ZAxis], 0.0, 0.0, dz);
       ofs << string(data);
 
-      for(int a=0; a<this->molecule->GetAtomVect()->size(); a++){
-         Atom* atomA = (*this->molecule->GetAtomVect())[a];
+      for(int a=0; a<this->molecule->GetNumberAtoms(); a++){
+         Atom* atomA = this->molecule->GetAtom(a);
          memset(data,0,sizeof(data));
          sprintf(data,"\t%d\t%d\t%e\t%e\t%e\n", atomA->GetAtomType()+1, 
                                           atomA->GetNumberValenceElectrons(),
@@ -140,8 +140,8 @@ void MOLogger::DrawMO(vector<int> moIndeces){
                double z = origin[ZAxis] + dz*(double)iz;
 
                double moValue = 0.0;
-               for(int a=0; a<this->molecule->GetAtomVect()->size(); a++){
-                  Atom* atomA = (*this->molecule->GetAtomVect())[a];
+               for(int a=0; a<this->molecule->GetNumberAtoms(); a++){
+                  Atom* atomA = this->molecule->GetAtom(a);
                   int firstAOIndexA = atomA->GetFirstAOIndex();
                   int numberAOsA = atomA->GetValenceSize();
                   for(int mu=firstAOIndexA; mu<firstAOIndexA+numberAOsA; mu++){

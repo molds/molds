@@ -139,16 +139,16 @@ void SteepestDescent::CheckEnableTheoryType(TheoryType theoryType) const{
 
 void SteepestDescent::ClearMolecularMomenta(Molecule& molecule) const{
    #pragma omp parallel for schedule(auto) 
-   for(int a=0; a<molecule.GetAtomVect()->size(); a++){
-      const Atom* atom = (*molecule.GetAtomVect())[a];
+   for(int a=0; a<molecule.GetNumberAtoms(); a++){
+      const Atom* atom = molecule.GetAtom(a);
       atom->SetPxyz(0.0, 0.0, 0.0);
    }
 }
 
 void SteepestDescent::UpdateMolecularCoordinates(Molecule& molecule, double** matrixForce, double dt) const{
    #pragma omp parallel for schedule(auto) 
-   for(int a=0; a<molecule.GetAtomVect()->size(); a++){
-      const Atom* atom = (*molecule.GetAtomVect())[a];
+   for(int a=0; a<molecule.GetNumberAtoms(); a++){
+      const Atom* atom = molecule.GetAtom(a);
       double coreMass = atom->GetAtomicMass() - (double)atom->GetNumberValenceElectrons();
       for(int i=0; i<CartesianType_end; i++){
          atom->GetXyz()[i] += dt*matrixForce[a][i]/coreMass;
@@ -287,7 +287,7 @@ bool SteepestDescent::SatisfiesConvergenceCriterion(double** matrixForce,
    double maxGradient = 0.0;
    double sumSqureGradient = 0.0;
    double energyDifference = currentEnergy - oldEnergy;
-   for(int a=0; a<molecule.GetAtomVect()->size(); a++){
+   for(int a=0; a<molecule.GetNumberAtoms(); a++){
       for(int i=0; i<CartesianType_end; i++){
          if(maxGradient<fabs(matrixForce[a][i])){
             maxGradient = fabs(matrixForce[a][i]);
@@ -295,7 +295,7 @@ bool SteepestDescent::SatisfiesConvergenceCriterion(double** matrixForce,
          sumSqureGradient += pow(matrixForce[a][i],2.0);
       }
    }
-   sumSqureGradient /= (double)(molecule.GetAtomVect()->size()*CartesianType_end);
+   sumSqureGradient /= (double)(molecule.GetNumberAtoms()*CartesianType_end);
    double rmsGradient = sqrt(sumSqureGradient);
 
    // output logs

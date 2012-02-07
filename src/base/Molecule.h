@@ -26,7 +26,9 @@ public:
    Molecule(const Molecule& rhs);
    Molecule& operator=(const Molecule& rhs);
    ~Molecule();
-   std::vector<MolDS_base_atoms::Atom*>* GetAtomVect() const; 
+   int GetNumberAtoms() const{return this->atomVect->size();}
+   MolDS_base_atoms::Atom* GetAtom(int atomIndex) const{return (*this->atomVect)[atomIndex];}
+   void AddAtom(MolDS_base_atoms::Atom* atom);
    double* GetXyzCOM() const;
    double* GetXyzCOM();
    double* GetXyzCOC() const;

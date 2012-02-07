@@ -124,9 +124,9 @@ double Indo::GetFockDiagElement(const Atom& atomA,
       value += temp;
    
       temp = 0.0;
-      for(int B=0; B<molecule.GetAtomVect()->size(); B++){
+      for(int B=0; B<molecule.GetNumberAtoms(); B++){
          if(B != atomAIndex){
-            const Atom& atomB = *(*molecule.GetAtomVect())[B];
+            const Atom& atomB = *molecule.GetAtom(B);
             temp += ( atomicElectronPopulation[B] - atomB.GetCoreCharge()  )
                      *gammaAB[atomAIndex][B];
          }
@@ -194,8 +194,8 @@ double Indo::GetMolecularIntegralElement(int moI, int moJ, int moK, int moL,
    value = Cndo2::GetMolecularIntegralElement(moI, moJ, moK, moL, molecule, fockMatrix, gammaAB);
 
    // Aditional terms for INDO, see Eq. (10) in [RZ_1973]
-   for(int A=0; A<molecule.GetAtomVect()->size(); A++){
-      const Atom& atomA = *(*molecule.GetAtomVect())[A];
+   for(int A=0; A<molecule.GetNumberAtoms(); A++){
+      const Atom& atomA = *molecule.GetAtom(A);
       firstAOIndexA = atomA.GetFirstAOIndex();
       numberAOsA = atomA.GetValenceSize();
 
