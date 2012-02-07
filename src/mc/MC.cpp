@@ -26,6 +26,7 @@
 #include<stdexcept>
 #include<boost/shared_ptr.hpp>
 #include<boost/random.hpp>
+#include<boost/format.hpp>
 #include"../base/PrintController.h"
 #include"../base/MolDSException.h"
 #include"../base/Uncopyable.h"
@@ -45,11 +46,11 @@ namespace MolDS_mc{
 MC::MC(){
    this->molecule = NULL;
    this->SetMessages();
-   //cout << "MC created \n";
+   //this->OutputLog("MC created \n");
 }
 
 MC::~MC(){
-   //cout << "MC deleted\n";
+   //this->OutputLog("MC deleted\n");
 }
 
 void MC::SetMolecule(Molecule* molecule){
@@ -58,7 +59,7 @@ void MC::SetMolecule(Molecule* molecule){
 
 void MC::SetMessages(){
    this->messageStartMC = "**********  START: Monte Carlo  **********\n";
-   this->messageEndMC = "**********  DONE: Monte Carlo  **********\n";
+   this->messageEndMC = "**********  DONE: Monte Carlo  **********\n\n";
    this->messageinitialConditionMC = "\n\t========= Initial conditions \n";
    this->messageStartStepMC = "\n\t========== START: MC step ";
    this->messageEndStepMC =     "\t========== DONE: MC step ";
@@ -80,7 +81,7 @@ void MC::DoMC(){
 
 void MC::DoMC(int totalSteps, int elecState, double temperature, double stepWidth, unsigned long seed){
    if(this->CanOutputLogs()){
-      cout << this->messageStartMC;
+      this->OutputLog(this->messageStartMC);
    }
    double transitionRate = 0.0;
    // create real random generator
@@ -107,15 +108,13 @@ void MC::DoMC(int totalSteps, int elecState, double temperature, double stepWidt
       currentES->DoCIS();
    }
    if(this->CanOutputLogs()){
-      cout << this->messageinitialConditionMC;
+      this->OutputLog(this->messageinitialConditionMC);
    }
    this->OutputMolecule(*currentES, *this->molecule, elecState);
 
    // Monte Carlo roop 
    for(int s=0; s<totalSteps; s++){
-      if(this->CanOutputLogs()){
-         cout << this->messageStartStepMC << s+1 << endl << endl;
-      }
+      this->OutputLog((boost::format("%s%d\n\n") % this->messageStartStepMC.c_str() % (s+1) ).str());
       // create trial molecule
       this->CreateTrialConfiguration(&trialMolecule, *this->molecule, &realRand, stepWidth);
      
@@ -140,14 +139,10 @@ void MC::DoMC(int totalSteps, int elecState, double temperature, double stepWidt
       
       // output molecular states
       this->OutputMolecule(*currentES, *this->molecule, elecState);
-      if(this->CanOutputLogs()){
-         cout << this->messageEndStepMC << s+1 << endl;
-      }
+      this->OutputLog((boost::format("%s%d\n\n") % this->messageEndStepMC.c_str() % (s+1) ).str());
    }
-   if(this->CanOutputLogs()){
-      cout << this->messageTransitionRate << transitionRate/(double)totalSteps << endl << endl;
-      cout << this->messageEndMC << endl;
-   }
+   this->OutputLog((boost::format("%s%lf\n\n") % this->messageTransitionRate.c_str() % (transitionRate/(double)totalSteps) ).str());
+   this->OutputLog(this->messageEndMC);
 }
 
 void MC::CreateTrialConfiguration(Molecule* trial,
@@ -234,19 +229,15 @@ void MC::OutputMolecule(const ElectronicStructure& electronicStructure,
 
 void MC::OutputEnergies(const MolDS_base::ElectronicStructure& electronicStructure,
                         int elecState) const{
-   if(this->CanOutputLogs()){
-      cout << this->messageEnergies;
-      cout << this->messageEnergiesTitle;
-      printf("\t\t%s\t%e\t%e\n",this->messageCoreRepulsionEnergy.c_str(), 
-                                electronicStructure.GetCoreRepulsionEnergy(),
-                                electronicStructure.GetCoreRepulsionEnergy()
-                                /Parameters::GetInstance()->GetEV2AU());
-      printf("\t\t%s\t%e\t%e\n",this->messageElectronicEnergy.c_str(), 
-                                electronicStructure.GetElectronicEnergy(elecState),
-                                electronicStructure.GetElectronicEnergy(elecState)
-                                /Parameters::GetInstance()->GetEV2AU());
-      cout << endl;
-   }
+   double eV2AU = Parameters::GetInstance()->GetEV2AU();
+   this->OutputLog(this->messageEnergies);
+   this->OutputLog(this->messageEnergiesTitle);
+   this->OutputLog((boost::format("\t\t%s\t%e\t%e\n") % this->messageCoreRepulsionEnergy.c_str()
+                                                      % electronicStructure.GetCoreRepulsionEnergy()
+                                                      % (electronicStructure.GetCoreRepulsionEnergy()/eV2AU)).str());
+   this->OutputLog((boost::format("\t\t%s\t%e\t%e\n") % this->messageElectronicEnergy.c_str()
+                                                      % electronicStructure.GetElectronicEnergy(elecState)
+                                                      % (electronicStructure.GetElectronicEnergy(elecState)/eV2AU)).str());
 }
 
 }
