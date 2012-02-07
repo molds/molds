@@ -24,10 +24,10 @@ class PrintController{
 public:
    PrintController(){
       this->canOutputLogs = true;
-      //cout << "printController is created.\n";
+      //this->OutputLog("printController is created.\n");
    }
    virtual ~PrintController(){
-      //cout << "printController is destructed.\n";
+      //this->OutputLog("printController is destructed.\n";
    }
    bool CanOutputLogs() const{
       return this->canOutputLogs;
@@ -35,7 +35,6 @@ public:
    void SetCanOutputLogs(bool canOutputLogs){
       this->canOutputLogs = canOutputLogs;
    }
-
 protected:
    void OutputLog(std::string log) const{
       if(this->canOutputLogs){std::cout << log;}
