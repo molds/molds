@@ -164,6 +164,8 @@ private:
    std::string errorMessageRotDiaOverlapToSpaceFrameNullDiaMatrix;
    std::string errorMessageRotDiaOverlapToSpaceFrameNullRotMatrix;
    std::string errorMessageSetOverlapElementNullDiaMatrix;
+   std::string messageIterSCF;
+   std::string messageDensityRMS;
    std::string messageEnergiesMOs;
    std::string messageEnergiesMOsTitle;
    std::string messageMullikenAtoms;

@@ -25,6 +25,7 @@
 #include<vector>
 #include<stdexcept>
 #include<omp.h>
+#include<boost/format.hpp>
 #include"../base/PrintController.h"
 #include"../base/MolDSException.h"
 #include"../base/Uncopyable.h"
@@ -76,7 +77,7 @@ Cndo2::Cndo2(){
    this->matrixCIS = NULL;
    this->excitedEnergies = NULL;
    this->matrixCISdimension = 0;
-   //cout << "Cndo created\n";
+   //this->OutputLog("Cndo created\n");
 }
 
 Cndo2::~Cndo2(){
@@ -96,7 +97,7 @@ Cndo2::~Cndo2(){
                                               this->molecule->GetTotalNumberAOs());
    MallocerFreer::GetInstance()->Free<double>(&this->energiesMO, 
                                               this->molecule->GetTotalNumberAOs());
-   //cout << "cndo deleted\n";
+   //this->OutputLog("cndo deleted\n");
 }
 
 void Cndo2::SetMessages(){
@@ -144,6 +145,8 @@ void Cndo2::SetMessages(){
    this->messageStartSCF = "**********  START: CNDO/2-SCF  **********\n";
    this->messageDoneSCF = "**********  DONE: CNDO/2-SCF  **********\n\n\n";
    this->messageOmpElapsedTimeSCF = "\tElapsed time(omp) for the SCF = ";
+   this->messageIterSCF = "SCF iter=";
+   this->messageDensityRMS = ": RMS density=";
    this->messageEnergiesMOs = "\tEnergies of MOs:\n";
    this->messageEnergiesMOsTitle = "\t\t| i-th | occ/unocc | e[a.u.] | e[eV] | \n";
    this->messageOcc = "occ";
@@ -273,9 +276,7 @@ double Cndo2::GetDiatomCoreRepulsionFirstDerivative(int indexAtomA, int indexAto
  *
  *****/
 void Cndo2::DoSCF(bool requiresGuess){
-   if(this->CanOutputLogs()){
-      cout << this->messageStartSCF;
-   }
+   this->OutputLog(this->messageStartSCF);
    double ompStartTime = omp_get_wtime();
 
    if(this->molecule == NULL){
@@ -360,9 +361,7 @@ void Cndo2::DoSCF(bool requiresGuess){
                                               &rmsDensity, 
                                               i)){
             // converged!!!!!
-            if(this->CanOutputLogs()){
-               cout << this->messageSCFMetConvergence;
-            }
+            this->OutputLog(this->messageSCFMetConvergence);
 
             // calc. some properties.
             // e.g. electronic energy, electron population in each atom, and core replsion.
@@ -418,12 +417,10 @@ void Cndo2::DoSCF(bool requiresGuess){
                                   &diisErrorCoefficients);
 
    double ompEndTime = omp_get_wtime();
-   if(this->CanOutputLogs()){
-      cout << this->messageOmpElapsedTimeSCF;
-      cout << ompEndTime - ompStartTime;
-      cout << this->messageUnitSec << endl;
-      cout << this->messageDoneSCF;
-   }
+   this->OutputLog((boost::format("%s%lf%s\n%s") % this->messageOmpElapsedTimeSCF.c_str()
+                                                 % (ompEndTime - ompStartTime)
+                                                 % this->messageUnitSec.c_str()
+                                                 % this->messageDoneSCF.c_str()).str());
 
 }
 
@@ -688,45 +685,51 @@ void Cndo2::OutputHFResults(double const* const* fockMatrix,
                             double const* energiesMO, 
                             double const* atomicElectronPopulation, 
                             const Molecule& molecule) const{
-   if(this->CanOutputLogs()){
-      // output MO energy
-      cout << this->messageEnergiesMOs;
-      cout << this->messageEnergiesMOsTitle;
-      double eV2AU = Parameters::GetInstance()->GetEV2AU();
-      for(int mo=0; mo<molecule.GetTotalNumberAOs(); mo++){
-         if(mo < molecule.GetTotalNumberValenceElectrons()/2){
-            printf("\t\t %d\t%s\t%e\t%e \n",
-            mo, this->messageOcc.c_str(), energiesMO[mo], energiesMO[mo]/eV2AU);
-         }
-         else{
-            printf("\t\t %d\t%s\t%e\t%e \n",
-            mo, this->messageUnOcc.c_str(), energiesMO[mo], energiesMO[mo]/eV2AU);
-         }
+   // output MO energy
+   this->OutputLog(this->messageEnergiesMOs);
+   this->OutputLog(this->messageEnergiesMOsTitle);
+   double eV2AU = Parameters::GetInstance()->GetEV2AU();
+   for(int mo=0; mo<molecule.GetTotalNumberAOs(); mo++){
+      if(mo < molecule.GetTotalNumberValenceElectrons()/2){
+         this->OutputLog((boost::format("\t\t %d\t%s\t%e\t%e \n") % mo
+                                                                  % this->messageOcc.c_str()
+                                                                  % energiesMO[mo] 
+                                                                  % (energiesMO[mo]/eV2AU) ).str());
       }
-      cout << endl;
-
-      // output total energy
-      cout << this->messageElecEnergy;
-      cout << this->messageElecEnergyTitle;
-      printf("\t\t%e\t%e\n\n",this->elecHFEnergy, 
-                              this->elecHFEnergy / Parameters::GetInstance()->GetEV2AU());
-
-      // output core repulsion energy
-      cout << this->messageCoreRepulsion;
-      cout << this->messageCoreRepulsionTitle;
-      printf("\t\t%e\t%e\n\n",this->coreRepulsionEnergy, this->coreRepulsionEnergy/eV2AU);
-
-      // ToDo: output eigen-vectors of the Hartree Fock matrix
-  
-      // output Mulliken charge
-      cout << messageMullikenAtoms;
-      cout << messageMullikenAtomsTitle;
-      for(int a=0; a<molecule.GetAtomVect()->size(); a++){
-         Atom* atom = (*molecule.GetAtomVect())[a];
-         printf("\t\t%d\t%s\t%e\t%e\n",a,AtomTypeStr(atom->GetAtomType()),atom->GetCoreCharge(),atom->GetCoreCharge()-atomicElectronPopulation[a]);
+      else{
+         this->OutputLog((boost::format("\t\t %d\t%s\t%e\t%e \n") % mo
+                                                                  % this->messageUnOcc.c_str()
+                                                                  % energiesMO[mo] 
+                                                                  % (energiesMO[mo]/eV2AU) ).str());
       }
-      cout << endl;
    }
+   this->OutputLog("\n");
+
+   // output total energy
+   this->OutputLog(this->messageElecEnergy);
+   this->OutputLog(this->messageElecEnergyTitle);
+   this->OutputLog((boost::format("\t\t%e\t%e\n\n") % this->elecHFEnergy 
+                                                    % (this->elecHFEnergy/eV2AU)).str());
+
+   // output core repulsion energy
+   this->OutputLog(this->messageCoreRepulsion);
+   this->OutputLog(this->messageCoreRepulsionTitle);
+   this->OutputLog((boost::format("\t\t%e\t%e\n\n") % this->coreRepulsionEnergy 
+                                                    % (this->coreRepulsionEnergy/eV2AU)).str());
+
+   // ToDo: output eigen-vectors of the Hartree Fock matrix
+
+   // output Mulliken charge
+   this->OutputLog(this->messageMullikenAtoms);
+   this->OutputLog(this->messageMullikenAtomsTitle);
+   for(int a=0; a<molecule.GetAtomVect()->size(); a++){
+      Atom* atom = (*molecule.GetAtomVect())[a];
+      this->OutputLog((boost::format("\t\t%d\t%s\t%e\t%e\n") % a
+                                                             % AtomTypeStr(atom->GetAtomType())
+                                                             % atom->GetCoreCharge()
+                                                             % (atom->GetCoreCharge()-atomicElectronPopulation[a])).str());
+   }
+   this->OutputLog("\n");
 
    // output MOs
    if(Parameters::GetInstance()->RequiresMOPlot()){
@@ -906,9 +909,11 @@ bool Cndo2::SatisfyConvergenceCriterion(double const* const* oldOrbitalElectronP
    }
    *rmsDensity = sqrt(change);
   
-   if(this->CanOutputLogs()){
-      printf("SCF iter=%d: RMS density=%.15lf \n",times,*rmsDensity);
-   }
+   this->OutputLog((boost::format("%s%d%s%.15lf\n") % this->messageIterSCF.c_str()
+                                                    % times
+                                                    % this->messageDensityRMS.c_str()
+                                                    % *rmsDensity).str());
+
    if(*rmsDensity < Parameters::GetInstance()->GetThresholdSCF()){
       satisfy = true;
    }
@@ -992,14 +997,14 @@ void Cndo2::CalcFockMatrix(double** fockMatrix,
       throw MolDSException(ompErrors.str());
    }
    /*  
-   printf("fock matrix\n"); 
+   this->OutputLog("fock matrix\n");
    for(int o=0; o<this->molecule.GetTotalNumberAOs(); o++){
       for(int p=0; p<this->molecule.GetTotalNumberAOs(); p++){
-         printf("%lf\t",fockMatrix[o][p]);
+         this->OutputLog((boost::format("%lf\t") % fockMatrix[o][p]).str());
       }
-      printf("\n");
+      this->OutputLog("\n");
    }
-   printf("\n\n");
+   this->OutputLog("\n\n");
    */
 }
 
@@ -1101,14 +1106,14 @@ void Cndo2::CalcOrbitalElectronPopulation(double** orbitalElectronPopulation,
    }
 
    /* 
-   printf("orbital population\n");
+   this->OutputLog("orbital population\n");
    for(int mu=0; mu<totalNumberAOs; mu++){
       for(int nu=0; nu<totalNumberAOs; nu++){
-         printf("%lf\t",orbitalElectronPopulation[mu][nu]);
+         this->OutputLog((boost::format("%lf\t") % orbitalElectronPopulation[mu][nu]).str());
       }
-      printf("\n");
+      this->OutputLog("\n");
    }
-   printf("\n");
+   this->OutputLog("\n");
    */
 }
 
@@ -1127,7 +1132,7 @@ void Cndo2::CalcAtomicElectronPopulation(double* atomicElectronPopulation,
       for(int i=firstAOIndex; i<firstAOIndex+numberAOs; i++){
          atomicElectronPopulation[A] += orbitalElectronPopulation[i][i];
       }
-      //printf("P_AA[%d]=%lf\n",A,atomicElectronPopulation[A]);
+      //this->OutputLog((boost::format("P_AA[%d]=%lf\n") % A % atomicElectronPopulation[A]).str());
    }
 }
 
@@ -1210,14 +1215,14 @@ void Cndo2::CalcGammaAB(double** gammaAB, const Molecule& molecule) const{
    }
    
    /* 
-   printf("gamma matrix\n");
+   this->OutputLog("gamma matrix\n");
    for(int A=0; A<totalAtomNumber; A++){
       for(int B=0; B<totalAtomNumber; B++){
-         printf("gammaAB[%d][%d]=%lf\n",A,B,gammaAB[A][B]);
+         this->OutputLog((boost::format("gammaAB[%d][%d]=%lf\n") % A % B % gammaAB[A][B]).str());
       }
-      printf("\n");
+      this->OutputLog("\n");
    }
-   printf("\n");
+   this->OutputLog("\n");
    */
 
 }
@@ -1274,14 +1279,14 @@ void Cndo2::CalcOverlap(double** overlap, const Molecule& molecule) const{
       throw MolDSException(ompErrors.str());
    }
    /*
-   printf("overlap matrix\n"); 
+   this->OutputLog("overlap matrix\n"); 
    for(int o=0; o<this->molecule.GetTotalNumberAOs(); o++){
       for(int p=0; p<this->molecule.GetTotalNumberAOs(); p++){
-         printf("%lf\t",overlap[o][p]);
+         this->OutputLog((boost::format("%lf\t") % overlap[o][p]).str());
       }
-      printf("\n");
+      this->OutputLog("\n");
    }
-   printf("\n");
+   this->OutputLog("\n");
    */
 }
 
@@ -1416,14 +1421,14 @@ void Cndo2::CalcOverlapByGTOExpansion(double** overlap,
       throw MolDSException(ompErrors.str());
    }
    /* 
-   printf("overlap matrix by STOnG\n"); 
+   this->OutputLog("overlap matrix by STOnG\n"); 
    for(int o=0; o<this->molecule->GetTotalNumberAOs(); o++){
       for(int p=0; p<this->molecule->GetTotalNumberAOs(); p++){
-         printf("%lf\t",overlap[o][p]);
+         this->OutputLog((boost::format("%lf\t") % overlap[o][p]).str());
       }
-      printf("\n");
+      this->OutputLog("\n");
    }
-   printf("\n");
+   this->OutputLog("\n");
    */
 
 }
@@ -2178,7 +2183,7 @@ void Cndo2::CalcDiatomicOverlapInDiatomicFrame(double** diatomicOverlap,
    /*
    for(int i=0;i<OrbitalType_end;i++){
       for(int j=0;j<OrbitalType_end;j++){
-         printf("diatomicOverlap[%d][%d]=%lf\n",i,j,diatomicOverlap[i][j]);
+         this->OutputLog((boost::format("diatomicOverlap[%d][%d]=%lf\n") % i % j % diatomicOverlap[i][j]).str());
       }
    }
    */
@@ -2268,7 +2273,7 @@ void Cndo2::CalcDiatomicOverlapFirstDerivativeInDiatomicFrame(double** diatomicO
    /*
    for(int i=0;i<OrbitalType_end;i++){
       for(int j=0;j<OrbitalType_end;j++){
-         printf("diatomicOverlap[%d][%d]=%lf\n",i,j,diatomicOverlap[i][j]);
+         this->OutputLog((boost::format("diatomicOverlap[%d][%d]=%lf\n") % i % j % diatomicOverlap[i][j]).str());
       }
    }
    */
@@ -2320,8 +2325,8 @@ void Cndo2::RotateDiatmicOverlapToSpaceFrame(double** diatomicOverlap,
    /*
    for(int i=0;i<OrbitalType_end;i++){
       for(int j=0;j<OrbitalType_end;j++){
-         printf("rotateddiatomicOverlap[%d][%d]=%lf\n",i,j,diatomicOverlap[i][j]);
-         printf("rotating[%d][%d]=%lf\n",i,j,rotatingMatrix[i][j]);
+         this->OutputLog((boost::format("rotated diatomicOverlap[%d][%d]=%lf\n") % i % j % diatomicOverlap[i][j]).str());
+         this->OutputLog((boost::format("rotating[%d][%d]=%lf\n") % i % j % rotating[i][j]).str());
       }
    }
    */
@@ -2510,7 +2515,7 @@ double Cndo2::GetAuxiliaryD(int la, int lb, int m) const{
    double termA = ( (2.0*la+1.0)*Factorial(la-m) ) / ( 2.0*Factorial(la+m) );
    double termB = ( (2.0*lb+1.0)*Factorial(lb-m) ) / ( 2.0*Factorial(lb+m) );
    value = pre*sqrt(termA)*sqrt(termB);
-   //printf("pre=%lf, termA=%lf, termB=%lf\n",pre,termA,termB);
+   //this->OutputLog((boost::format("pre=%lf, termA=%lf, termB=%lf\n") % pre % termA % termB).str());
    
    return value;
 }
