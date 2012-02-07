@@ -26,6 +26,7 @@
 #include<stdexcept>
 #include<boost/shared_ptr.hpp>
 #include<boost/random.hpp>
+#include<boost/format.hpp>
 #include"../base/PrintController.h"
 #include"../base/MolDSException.h"
 #include"../base/Uncopyable.h"
@@ -46,11 +47,11 @@ namespace MolDS_rpmd{
 RPMD::RPMD(){
    this->SetMessages();
    this->SetEnableTheoryTypes();
-   //cout << "RPMD created \n";
+   //this->OutputLog("RPMD created \n");
 }
 
 RPMD::~RPMD(){
-   //cout << "RPMD deleted\n";
+   //this->OutputLog("RPMD deleted\n");
 }
 
 void RPMD::CreateBeads(vector<boost::shared_ptr<Molecule> >& molecularBeads,
@@ -72,9 +73,7 @@ void RPMD::CreateBeads(vector<boost::shared_ptr<Molecule> >& molecularBeads,
 void RPMD::UpdateElectronicStructure(const std::vector<boost::shared_ptr<ElectronicStructure> >& electronicStructureBeads){
    int numBeads = electronicStructureBeads.size();
    for(int b=0; b<numBeads; b++){
-      if(this->CanOutputLogs()){
-         cout << this->messageBeadsNum << b << endl;
-      }
+      this->OutputLog((boost::format("%s%d\n") % this->messageBeadsNum.c_str() % b).str());
       electronicStructureBeads[b]->DoSCF();
       if(Parameters::GetInstance()->RequiresCIS()){
          electronicStructureBeads[b]->DoCIS();
@@ -144,9 +143,7 @@ void RPMD::FluctuateBeads(const vector<boost::shared_ptr<Molecule> >& molecularB
 }
 
 void RPMD::DoRPMD(const Molecule& refferenceMolecule){
-   if(this->CanOutputLogs()){
-      cout << this->messageStartRPMD;
-   }
+   this->OutputLog(this->messageStartRPMD);
 
    // validate theory
    TheoryType theory = Parameters::GetInstance()->GetCurrentTheory();
@@ -170,26 +167,18 @@ void RPMD::DoRPMD(const Molecule& refferenceMolecule){
    this->FluctuateBeads(molecularBeads, elecState, temperature, seed);
 
    // initialize electronic states of each bead.
-   if(this->CanOutputLogs()){
-      cout << this->messageStartInitialRPMD;
-   }
+   this->OutputLog(this->messageStartInitialRPMD);
    this->UpdateElectronicStructure(electronicStructureBeads);
-   if(this->CanOutputLogs()){
-      cout << this->messageinitialConditionRPMD;
-   }
+   this->OutputLog(this->messageinitialConditionRPMD);
    double initialEnergy = this->OutputEnergies(molecularBeads,
                                                electronicStructureBeads,
                                                elecState,
                                                temperature);
-   if(this->CanOutputLogs()){
-      cout << this->messageEndInitialRPMD;
-   }
+   this->OutputLog(this->messageEndInitialRPMD);
 
    // time step roop
    for(int s=0; s<totalSteps; s++){
-      if(this->CanOutputLogs()){
-         cout << this->messageStartStepRPMD << s+1 << endl;
-      }
+      this->OutputLog((boost::format("%s%d\n") % this->messageStartStepRPMD.c_str() % (s+1)).str());
       // update momenta
       this->UpdateMomenta(molecularBeads, electronicStructureBeads, elecState, dt, temperature);
 
@@ -209,13 +198,9 @@ void RPMD::DoRPMD(const Molecule& refferenceMolecule){
                            temperature,
                            initialEnergy);
 
-      if(this->CanOutputLogs()){
-         cout << this->messageEndStepRPMD << s+1 << endl;
-      }
+      this->OutputLog((boost::format("%s%d\n") % this->messageEndStepRPMD.c_str() % (s+1)).str());
    }
-   if(this->CanOutputLogs()){
-      cout << this->messageEndRPMD;
-   }
+      this->OutputLog(this->messageEndRPMD);
 }
 
 void RPMD::SetMessages(){
@@ -286,24 +271,22 @@ double RPMD::OutputEnergies(const vector<boost::shared_ptr<Molecule> >& molecula
    }
 
    double totalEnergy = beadsKineticEnergy + beadsHarmonicEnergy + elecStateEnergy;
-
+   double eV2AU = Parameters::GetInstance()->GetEV2AU();
    // output energies:
-   if(this->CanOutputLogs()){
-      cout << this->messageEnergies;
-      cout << this->messageEnergiesTitle;
-      printf("\t\t%s\t%e\t%e\n",this->messageBeadsKineticEnergy.c_str(), 
-                                beadsKineticEnergy,
-                                beadsKineticEnergy/Parameters::GetInstance()->GetEV2AU());
-      printf("\t\t%s\t%e\t%e\n",this->messageBeadsHarmonicEnergy.c_str(), 
-                                beadsHarmonicEnergy,
-                                beadsHarmonicEnergy/Parameters::GetInstance()->GetEV2AU());
-      printf("\t\t%s\t%e\t%e\n",this->messageElecStateEnergy.c_str(), 
-                                elecStateEnergy,
-                                elecStateEnergy/Parameters::GetInstance()->GetEV2AU());
-      printf("\t\t%s\t%e\t%e\n",this->messageTotalEnergy.c_str(), 
-                                totalEnergy,
-                                totalEnergy/Parameters::GetInstance()->GetEV2AU());
-   }
+   this->OutputLog(this->messageEnergies);
+   this->OutputLog(this->messageEnergiesTitle);
+   this->OutputLog((boost::format("\t\t%s\t%e\t%e\n") % this->messageBeadsKineticEnergy.c_str()
+                                                      % beadsKineticEnergy
+                                                      % (beadsKineticEnergy/eV2AU)).str());
+   this->OutputLog((boost::format("\t\t%s\t%e\t%e\n") % this->messageBeadsHarmonicEnergy.c_str()
+                                                      % beadsHarmonicEnergy
+                                                      % (beadsHarmonicEnergy/eV2AU)).str());
+   this->OutputLog((boost::format("\t\t%s\t%e\t%e\n") % this->messageElecStateEnergy.c_str()
+                                                      % elecStateEnergy
+                                                      % (elecStateEnergy/eV2AU)).str());
+   this->OutputLog((boost::format("\t\t%s\t%e\t%e\n") % this->messageTotalEnergy.c_str()
+                                                      % totalEnergy
+                                                      % (totalEnergy/eV2AU)).str());
    return totalEnergy;
 }
 
@@ -313,12 +296,9 @@ void RPMD::OutputEnergies(const vector<boost::shared_ptr<Molecule> >& molecularB
                           double temperature,
                           double initialEnergy){
    double energy = this->OutputEnergies(molecularBeads, electronicStructureBeads, elecState, temperature);
-   if(this->CanOutputLogs()){
-      printf("\t\t%s\t%e\t%e\n\n",this->messageErrorEnergy.c_str(), 
-                                (initialEnergy - energy),
-                                (initialEnergy - energy)
-                                /Parameters::GetInstance()->GetEV2AU());
-   }
+   this->OutputLog((boost::format("\t\t%s\t%e\t%e\n") % this->messageErrorEnergy.c_str()
+                                                      % (initialEnergy - energy)
+                                                      % ((initialEnergy - energy)/Parameters::GetInstance()->GetEV2AU())).str());
 }
 
 void RPMD::SetEnableTheoryTypes(){
