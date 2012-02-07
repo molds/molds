@@ -80,9 +80,7 @@ void MC::DoMC(){
 }
 
 void MC::DoMC(int totalSteps, int elecState, double temperature, double stepWidth, unsigned long seed){
-   if(this->CanOutputLogs()){
-      this->OutputLog(this->messageStartMC);
-   }
+   this->OutputLog(this->messageStartMC);
    double transitionRate = 0.0;
    // create real random generator
 	boost::mt19937 realGenerator(seed);
@@ -107,9 +105,7 @@ void MC::DoMC(int totalSteps, int elecState, double temperature, double stepWidt
    if(Parameters::GetInstance()->RequiresCIS()){
       currentES->DoCIS();
    }
-   if(this->CanOutputLogs()){
-      this->OutputLog(this->messageinitialConditionMC);
-   }
+   this->OutputLog(this->messageinitialConditionMC);
    this->OutputMolecule(*currentES, *this->molecule, elecState);
 
    // Monte Carlo roop 
