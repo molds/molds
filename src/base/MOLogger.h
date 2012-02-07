@@ -20,7 +20,7 @@
 #define INCLUDED_MOLOGGER
 namespace MolDS_base{
 
-class MOLogger{
+class MOLogger: public PrintController{
 public:
    MOLogger(const MolDS_base::Molecule& molecule, double const* const* fockMatrix, MolDS_base::TheoryType theory);
    void DrawMO(int moIndex);

@@ -26,6 +26,7 @@
 #include<math.h>
 #include<vector>
 #include<stdexcept>
+#include<boost/format.hpp>
 #include"PrintController.h"
 #include"MolDSException.h"
 #include"Uncopyable.h"
@@ -68,7 +69,7 @@ void MOLogger::DrawMO(int moIndex){
 }
 
 void MOLogger::DrawMO(vector<int> moIndeces){
-   cout << this->messageStartMOPlot;
+   this->OutputLog(this->messageStartMOPlot);
    Parameters* parameters = Parameters::GetInstance();
    int digit = 5;
    int gridNumber[CartesianType_end] = {parameters->GetGridNumberMOPlot()[XAxis], 
@@ -92,7 +93,7 @@ void MOLogger::DrawMO(vector<int> moIndeces){
    // MO output 
    for(int i=0; i<moIndeces.size(); i++){
       if(this->molecule->GetTotalNumberAOs() <= moIndeces[i]){
-         cout << this->messageSkippedMOIndex << moIndeces[i] << endl;
+         this->OutputLog((boost::format("%s%d\n") % this->messageSkippedMOIndex.c_str() % moIndeces[i]).str()) ;
          continue;
       }
       // file open
@@ -164,7 +165,7 @@ void MOLogger::DrawMO(vector<int> moIndeces){
          }
       }
    }
-   cout << this->messageEndMOPlot;
+   this->OutputLog(this->messageEndMOPlot);
 }
 
 }
