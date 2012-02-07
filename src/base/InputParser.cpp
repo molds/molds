@@ -1227,7 +1227,7 @@ void InputParser::OutputInputTerms(vector<string> inputTerms) const{
  *
  ****/
 bool InputParser::IsCommentOut(string tempStr) const{
-   string str = TrimString(tempStr);
+   string str = Utilities::TrimString(tempStr);
 
    string commentPrefix1 = "#";
    string prefix1;

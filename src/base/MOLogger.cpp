@@ -99,7 +99,7 @@ void MOLogger::DrawMO(vector<int> moIndeces){
       // file open
       stringstream fileName;
       fileName << fileNamePrefix;
-      fileName << Num2String(moIndeces[i],digit);
+      fileName << Utilities::Num2String(moIndeces[i],digit);
       fileName << this->stringCubeExtension;
       ofstream ofs(fileName.str().c_str());
 

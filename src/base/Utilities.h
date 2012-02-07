@@ -19,18 +19,24 @@
 #ifndef INCLUDED_UTILITIES
 #define INCLUDED_UTILITIES
 namespace MolDS_base{
-// output welcome message
-void OutputWelcomeMessage();
-// output farewell message
-void OutputFarewellMessage(time_t startTime, clock_t startTick, double ompStartTime, bool runingNormally);
-// string for today.
-std::string GetDateString();
-// trim the string
-std::string TrimString(const std::string str);
-// number to string
-// ex. Num2String(23,5) = "00023";
-std::string Num2String(int number, int digit);
+class Utilities{
+public:
+   // output welcome message
+   static std::string GetWelcomeMessage();
 
+   // output farewell message
+   static std::string GetFarewellMessage(time_t startTime, clock_t startTick, double ompStartTime, bool runingNormally);
+
+   // string for today.
+   static std::string GetDateString();
+
+   // trim the string
+   static std::string TrimString(const std::string str);
+
+   // number to string
+   // ex. Num2String(23,5) = "00023";
+   static std::string Num2String(int number, int digit);
+};
 }
 #endif
 

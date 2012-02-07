@@ -24,36 +24,40 @@
 #include<math.h>
 #include<time.h>
 #include<omp.h>
+#include<boost/format.hpp>
+#include"PrintController.h"
 #include"Utilities.h"
 using namespace std;
 
 namespace MolDS_base{
 // output welcome message
-void OutputWelcomeMessage(){
-   cout << "\n\n     >>>>>  Welcome to the MolDS world at " << GetDateString() << "  <<<<<\n\n\n";
+string Utilities::GetWelcomeMessage(){
+   return "\n\n     >>>>>  Welcome to the MolDS world at " + Utilities::GetDateString() + "  <<<<<\n\n\n";
 }
 
 // output farewell message
-void OutputFarewellMessage(time_t startTime, clock_t startTick, double ompStartTime, bool runingNormally){
+string Utilities::GetFarewellMessage(time_t startTime, clock_t startTick, double ompStartTime, bool runingNormally){
    time_t endTime;
    time(&endTime);
    clock_t endTick = clock();
    double consumedTime = (double)(endTick - startTick)/(double)CLOCKS_PER_SEC;
    double ompEndTime = omp_get_wtime();
+   stringstream ss;
    if(runingNormally){
-      cout << "\n\n     >>>>>  The MolDS finished normally!  <<<<<\n";
+      ss << "\n\n     >>>>>  The MolDS finished normally!  <<<<<\n";
    }
    else{
-      cout << "\n\n     >>>>>  The MolDS finished abnormally..............  <<<<<\n";
+      ss << "\n\n     >>>>>  The MolDS finished abnormally..............  <<<<<\n";
    }
-   cout << "     >>>>>  CPU time: " << consumedTime << "[s].  <<<<<\n";
-   cout << "     >>>>>  Elapsed time: " << endTime - startTime << "[s].  <<<<<\n";
-   cout << "     >>>>>  Elapsed time(OMP): " << ompEndTime - ompStartTime << "[s].  <<<<<\n";
-   cout << "     >>>>>  See you.  <<<<<\n\n\n";
+   ss << "     >>>>>  CPU time: " << consumedTime << "[s].  <<<<<\n";
+   ss << "     >>>>>  Elapsed time: " << endTime - startTime << "[s].  <<<<<\n";
+   ss << "     >>>>>  Elapsed time(OMP): " << ompEndTime - ompStartTime << "[s].  <<<<<\n";
+   ss << "     >>>>>  See you.  <<<<<\n\n\n";
+   return ss.str();
 }
 
 // string of today
-string GetDateString(){
+string Utilities::GetDateString(){
    time_t current;
    struct tm *local;
    char  wday_name[][10] = {"Sun.", "Mon.", "Thu.", "Wed.", "Thu.", "Fri.", "Sat."};
@@ -73,7 +77,7 @@ string GetDateString(){
 }
 
 // trim the string
-string TrimString(const string str){
+string Utilities::TrimString(const string str){
    int nStart = 0;
    int nEnd = str.length() - 1;
    // left trim 
@@ -93,7 +97,7 @@ string TrimString(const string str){
    return(str.substr( nStart, nEnd - nStart + 1 ));
 }
 
-string Num2String(int number, int digit){
+string Utilities::Num2String(int number, int digit){
    stringstream ss;
    int numberDigit = (int)(log10((double)number)) + 1;
    for(int i=0; i<digit-numberDigit; i++){

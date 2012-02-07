@@ -57,7 +57,7 @@ int main(){
 
    try{
       // Welcome Messages
-      OutputWelcomeMessage();
+      cout << Utilities::GetWelcomeMessage();
       
       //timer set
       time_t startTime;
@@ -216,7 +216,7 @@ int main(){
       MallocerFreer::DeleteInstance();
 
       // Farewell Messages
-      OutputFarewellMessage(startTime, startTick, ompStartTime, runingNormally);
+      cout << Utilities::GetFarewellMessage(startTime, startTick, ompStartTime, runingNormally);
    }
    catch(exception ex){
       cout << ex.what();
