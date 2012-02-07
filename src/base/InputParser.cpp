@@ -24,6 +24,7 @@
 #include<string>
 #include<vector>
 #include<stdexcept>
+#include<boost/format.hpp>
 #include"PrintController.h"
 #include"MolDSException.h"
 #include"Uncopyable.h"
@@ -777,7 +778,7 @@ int InputParser::ParseConditionsMemory(vector<string>* inputTerms, int parseInde
 
 void InputParser::Parse(Molecule* molecule) const{
 
-   cout << messageStartParseInput;
+   this->OutputLog(messageStartParseInput);
 
    // read input
    vector<string> inputTerms = this->GetInputTerms();
@@ -895,7 +896,7 @@ void InputParser::Parse(Molecule* molecule) const{
 
    // output inputs
    this->OutputInputTerms(inputTerms);
-   cout << messageDoneParseInput;
+   this->OutputLog(messageDoneParseInput);
 
 }
 
@@ -1056,125 +1057,168 @@ void InputParser::OutputMolecularBasics(Molecule* molecule) const{
 }
 
 void InputParser::OutputScfConditions() const{
-   cout << this->messageScfConditions;
-   printf("%s%d\n",this->messageScfMaxIterations.c_str(),Parameters::GetInstance()->GetMaxIterationsSCF());
-   printf("%s%e\n",this->messageScfRmsDensity.c_str(),Parameters::GetInstance()->GetThresholdSCF());
-   printf("%s%e\n",this->messageScfDampingThresh.c_str(),Parameters::GetInstance()->GetDampingThreshSCF());
-   printf("%s%e\n",this->messageScfDampingWeight.c_str(),Parameters::GetInstance()->GetDampingWeightSCF());
-   printf("%s%d\n",this->messageScfDiisNumErrorVect.c_str(),Parameters::GetInstance()->GetDiisNumErrorVectSCF());
-   printf("%s%e\n",this->messageScfDiisStartError.c_str(),Parameters::GetInstance()->GetDiisStartErrorSCF());
-   printf("%s%e\n",this->messageScfDiisEndError.c_str(),Parameters::GetInstance()->GetDiisEndErrorSCF());
-   cout << "\n";
+   this->OutputLog(this->messageScfConditions);
+   this->OutputLog((boost::format("%s%d\n") % this->messageScfMaxIterations.c_str() 
+                                            % Parameters::GetInstance()->GetMaxIterationsSCF()).str());
+   this->OutputLog((boost::format("%s%e\n") % this->messageScfRmsDensity.c_str() 
+                                            % Parameters::GetInstance()->GetThresholdSCF()).str());
+   this->OutputLog((boost::format("%s%e\n") % this->messageScfDampingThresh.c_str()
+                                            % Parameters::GetInstance()->GetDampingThreshSCF()).str());
+   this->OutputLog((boost::format("%s%e\n") % this->messageScfDampingWeight.c_str()
+                                            % Parameters::GetInstance()->GetDampingWeightSCF()).str());
+   this->OutputLog((boost::format("%s%d\n") % this->messageScfDiisNumErrorVect.c_str() 
+                                            % Parameters::GetInstance()->GetDiisNumErrorVectSCF()).str());
+   this->OutputLog((boost::format("%s%e\n") % this->messageScfDiisStartError.c_str() 
+                                            % Parameters::GetInstance()->GetDiisStartErrorSCF()).str());
+   this->OutputLog((boost::format("%s%e\n") % this->messageScfDiisEndError.c_str() 
+                                            % Parameters::GetInstance()->GetDiisEndErrorSCF()).str());
+   this->OutputLog("\n");
 }
 
 void InputParser::OutputMemoryConditions() const{
-   cout << this->messageMemoryConditions;
-   printf("%s%e%s",this->messageMemoryLimitHeap.c_str(), Parameters::GetInstance()->GetLimitHeapMemory(), this->messageMemoryMB.c_str());
-   cout << "\n";
+   this->OutputLog(this->messageMemoryConditions);
+   this->OutputLog((boost::format("%s%e%s") % this->messageMemoryLimitHeap.c_str() 
+                                            % Parameters::GetInstance()->GetLimitHeapMemory()
+                                            % this->messageMemoryMB.c_str()).str());
+   this->OutputLog("\n");
 }
 
 void InputParser::OutputCisConditions() const{
-   cout << this->messageCisConditions;
+   this->OutputLog(this->messageCisConditions);
 
-   printf("%s%d\n",this->messageCisNumberActiveOcc.c_str(),Parameters::GetInstance()->GetActiveOccCIS());
-   printf("%s%d\n",this->messageCisNumberActiveVir.c_str(),Parameters::GetInstance()->GetActiveVirCIS());
-   printf("%s%d\n",this->messageCisNumberExcitedStates.c_str(),Parameters::GetInstance()->GetNumberExcitedStatesCIS());
-   printf("%s",this->messageCisDavidson.c_str());
+   this->OutputLog((boost::format("%s%d\n") % this->messageCisNumberActiveOcc.c_str() 
+                                            % Parameters::GetInstance()->GetActiveOccCIS()).str());
+   this->OutputLog((boost::format("%s%d\n") % this->messageCisNumberActiveVir.c_str() 
+                                            % Parameters::GetInstance()->GetActiveVirCIS()).str());
+   this->OutputLog((boost::format("%s%d\n") % this->messageCisNumberExcitedStates.c_str() 
+                                            % Parameters::GetInstance()->GetNumberExcitedStatesCIS()).str());
+   this->OutputLog(this->messageCisDavidson);
    if(Parameters::GetInstance()->IsDavidsonCIS()){
-      printf("%s\n",this->stringYES.c_str());
-      printf("%s%d\n",this->messageCisMaxIterations.c_str(),Parameters::GetInstance()->GetMaxIterationsCIS());
-      printf("%s%d\n",this->messageCisMaxDimensions.c_str(),Parameters::GetInstance()->GetMaxDimensionsCIS());
-      printf("%s%e\n",this->messageCisNormTolerance.c_str(),Parameters::GetInstance()->GetNormToleranceCIS());
+      this->OutputLog((boost::format("%s\n") % this->stringYES.c_str()).str());
+      this->OutputLog((boost::format("%s%d\n") % this->messageCisMaxIterations.c_str() 
+                                               % Parameters::GetInstance()->GetMaxIterationsCIS()).str());
+      this->OutputLog((boost::format("%s%d\n") % this->messageCisMaxDimensions.c_str() 
+                                               % Parameters::GetInstance()->GetMaxDimensionsCIS()).str());
+      this->OutputLog((boost::format("%s%e\n") % this->messageCisNormTolerance.c_str() 
+                                               % Parameters::GetInstance()->GetNormToleranceCIS()).str());
    }
    else{
-      printf("%s\n",this->stringNO.c_str());
+      this->OutputLog((boost::format("%s\n") % this->stringNO.c_str()).str());
    }
 
-   cout << "\n";
+   this->OutputLog("\n");
 }
 
 void InputParser::OutputMdConditions() const{
-   cout << this->messageMdConditions;
+   this->OutputLog(this->messageMdConditions);
 
-   printf("%s%d\n",this->messageMdElecState.c_str(),Parameters::GetInstance()->GetElectronicStateIndexMD());
-   printf("%s%d\n",this->messageMdTotalSteps.c_str(),Parameters::GetInstance()->GetTotalStepsMD());
-   printf("%s%lf%s\n",this->messageMdTimeWidth.c_str(),Parameters::GetInstance()->GetTimeWidthMD()/Parameters::GetInstance()->GetFs2AU(),this->messageFs.c_str());
+   this->OutputLog((boost::format("%s%d\n") % this->messageMdElecState.c_str() 
+                                            % Parameters::GetInstance()->GetElectronicStateIndexMD()).str());
+   this->OutputLog((boost::format("%s%d\n") % this->messageMdTotalSteps.c_str() 
+                                            % Parameters::GetInstance()->GetTotalStepsMD()).str());
+   this->OutputLog((boost::format("%s%lf%s\n") % this->messageMdTimeWidth.c_str() 
+                                               % (Parameters::GetInstance()->GetTimeWidthMD()/Parameters::GetInstance()->GetFs2AU())
+                                               % this->messageFs.c_str()).str());
 
-   cout << "\n";
+   this->OutputLog("\n");
 }
 
 void InputParser::OutputMcConditions() const{
-   cout << this->messageMcConditions;
+   this->OutputLog(this->messageMcConditions);
 
-   printf("%s%d\n",this->messageMcElecState.c_str(),Parameters::GetInstance()->GetElectronicStateIndexMC());
-   printf("%s%d\n",this->messageMcTotalSteps.c_str(),Parameters::GetInstance()->GetTotalStepsMC());
-   printf("%s%lf%s\n",this->messageMcTemperature.c_str(),Parameters::GetInstance()->GetTemperatureMC(),this->messageK.c_str());
-   printf("%s%lf%s\n",this->messageMcStepWidth.c_str(),Parameters::GetInstance()->GetStepWidthMC()/Parameters::GetInstance()->GetAngstrom2AU(),this->messageAngst.c_str());
-   printf("%s%lu\n",this->messageMcSeed.c_str(),Parameters::GetInstance()->GetSeedMC());
+   this->OutputLog((boost::format("%s%d\n") % this->messageMcElecState.c_str() 
+                                            % Parameters::GetInstance()->GetElectronicStateIndexMC()).str());
+   this->OutputLog((boost::format("%s%d\n") % this->messageMcTotalSteps.c_str() 
+                                            % Parameters::GetInstance()->GetTotalStepsMC()).str());
+   this->OutputLog((boost::format("%s%lf%s\n") % this->messageMcTemperature.c_str() 
+                                               % Parameters::GetInstance()->GetTemperatureMC()
+                                               % this->messageK.c_str()).str());
+   this->OutputLog((boost::format("%s%lf%s\n") % this->messageMcStepWidth.c_str() 
+                                               % (Parameters::GetInstance()->GetStepWidthMC()/Parameters::GetInstance()->GetAngstrom2AU())
+                                               % this->messageAngst.c_str()).str());
+   this->OutputLog((boost::format("%s%lu\n") % this->messageMcSeed.c_str() 
+                                             % Parameters::GetInstance()->GetSeedMC()).str());
 
-   cout << "\n";
+   this->OutputLog("\n");
 }
 
 void InputParser::OutputRpmdConditions() const{
-   cout << this->messageRpmdConditions;
+   this->OutputLog(this->messageRpmdConditions);
 
-   printf("%s%d\n",this->messageRpmdElecState.c_str(),Parameters::GetInstance()->GetElectronicStateIndexRPMD());
-   printf("%s%d\n",this->messageRpmdNumElecStates.c_str(),Parameters::GetInstance()->GetNumberElectronicStatesRPMD());
-   printf("%s%d\n",this->messageRpmdTotalSteps.c_str(),Parameters::GetInstance()->GetTotalStepsRPMD());
-   printf("%s%lf%s\n",this->messageRpmdTemperature.c_str(),Parameters::GetInstance()->GetTemperatureRPMD(),this->messageK.c_str());
-   printf("%s%lf%s\n",this->messageRpmdTimeWidth.c_str(),Parameters::GetInstance()->GetTimeWidthRPMD()/Parameters::GetInstance()->GetFs2AU(),this->messageFs.c_str());
-   printf("%s%d\n",this->messageRpmdNumBeads.c_str(),Parameters::GetInstance()->GetNumberBeadsRPMD());
-   printf("%s%lu\n",this->messageRpmdSeed.c_str(),Parameters::GetInstance()->GetSeedRPMD());
+   this->OutputLog((boost::format("%s%d\n") % this->messageRpmdElecState.c_str() 
+                                            % Parameters::GetInstance()->GetElectronicStateIndexRPMD()).str());
+   this->OutputLog((boost::format("%s%d\n") % this->messageRpmdNumElecStates.c_str() 
+                                            % Parameters::GetInstance()->GetNumberElectronicStatesRPMD()).str());
+   this->OutputLog((boost::format("%s%d\n") % this->messageRpmdTotalSteps.c_str() 
+                                            % Parameters::GetInstance()->GetTotalStepsRPMD()).str());
+   this->OutputLog((boost::format("%s%lf%s\n") % this->messageRpmdTemperature.c_str() 
+                                               % Parameters::GetInstance()->GetTemperatureRPMD()
+                                               % this->messageK.c_str()).str());
+   this->OutputLog((boost::format("%s%lf%s\n") % this->messageRpmdTimeWidth.c_str() 
+                                               % (Parameters::GetInstance()->GetTimeWidthRPMD()/Parameters::GetInstance()->GetFs2AU()) 
+                                               % this->messageFs.c_str()).str());
+   this->OutputLog((boost::format("%s%d\n") % this->messageRpmdNumBeads.c_str() 
+                                            % Parameters::GetInstance()->GetNumberBeadsRPMD()).str());
+   this->OutputLog((boost::format("%s%lu\n") % this->messageRpmdSeed.c_str() 
+                                             % Parameters::GetInstance()->GetSeedRPMD()).str());
 
-   cout << "\n";
+   this->OutputLog("\n");
 }
 
 void InputParser::OutputOptimizeConditions() const{
-   cout << this->messageOptimizeConditions;
+   this->OutputLog(this->messageOptimizeConditions);
 
-   printf("%s%d\n",this->messageSteepestDescentLineSearchTimes.c_str(),Parameters::GetInstance()->GetLineSearchTimesSteepestDescent());
-   printf("%s%d\n",this->messageSteepestDescentSteps.c_str(),Parameters::GetInstance()->GetStepsSteepestDescent());
-   printf("%s%d\n",this->messageSteepestDescentElecState.c_str(),Parameters::GetInstance()->GetElectronicStateIndexSteepestDescent());
-   printf("%s%lf\n",this->messageSteepestDescentMaxGradient.c_str(),Parameters::GetInstance()->GetMaxGradientSteepestDescent());
-   printf("%s%lf\n",this->messageSteepestDescentRmsGradient.c_str(),Parameters::GetInstance()->GetRmsGradientSteepestDescent());
-   printf("%s%lf%s\n",this->messageSteepestDescentTimeWidth.c_str(),Parameters::GetInstance()->GetTimeWidthSteepestDescent()/Parameters::GetInstance()->GetFs2AU(),this->messageFs.c_str());
+   this->OutputLog((boost::format("%s%d\n") % this->messageSteepestDescentLineSearchTimes.c_str() 
+                                            % Parameters::GetInstance()->GetLineSearchTimesSteepestDescent()).str());
+   this->OutputLog((boost::format("%s%d\n") % this->messageSteepestDescentSteps.c_str() 
+                                            % Parameters::GetInstance()->GetStepsSteepestDescent()).str());
+   this->OutputLog((boost::format("%s%d\n") % this->messageSteepestDescentElecState.c_str() 
+                                            % Parameters::GetInstance()->GetElectronicStateIndexSteepestDescent()).str());
+   this->OutputLog((boost::format("%s%lf\n") % this->messageSteepestDescentMaxGradient.c_str() 
+                                             % Parameters::GetInstance()->GetMaxGradientSteepestDescent()).str());
+   this->OutputLog((boost::format("%s%lf\n") % this->messageSteepestDescentRmsGradient.c_str() 
+                                             % Parameters::GetInstance()->GetRmsGradientSteepestDescent()).str());
+   this->OutputLog((boost::format("%s%lf%s\n") % this->messageSteepestDescentTimeWidth.c_str() 
+                                               % (Parameters::GetInstance()->GetTimeWidthSteepestDescent()/Parameters::GetInstance()->GetFs2AU())
+                                               % this->messageFs.c_str()).str());
 
-   cout << "\n";
+   this->OutputLog("\n");
 }
 
 void InputParser::OutputMOPlotConditions() const{
-   cout << this->messageMOPlotConditions;
+   this->OutputLog(this->messageMOPlotConditions);
    vector<int>* moIndeces = Parameters::GetInstance()->GetIndecesMOPlot();
    for(int i=0; i<moIndeces->size(); i++){
-      printf("%s%d\n", this->messageMOPlotIndex.c_str(), (*moIndeces)[i]);
+      this->OutputLog((boost::format("%s%d\n") % this->messageMOPlotIndex.c_str() 
+                                               % (*moIndeces)[i]).str());
    }
    int* gridNum = Parameters::GetInstance()->GetGridNumberMOPlot();
-   printf("%s%d %d %d\n", this->messageMOPlotGridNumber.c_str(), 
-                              gridNum[XAxis], 
-                              gridNum[YAxis],
-                              gridNum[ZAxis]);
+   this->OutputLog((boost::format("%s%d %d %d\n") % this->messageMOPlotGridNumber.c_str() 
+                                                  % gridNum[XAxis] 
+                                                  % gridNum[YAxis]
+                                                  % gridNum[ZAxis]).str());
    double* frameLength = Parameters::GetInstance()->GetFrameLengthMOPlot();
    double ang2AU = Parameters::GetInstance()->GetAngstrom2AU();
-   printf("%s%e %e %e\n", this->messageMOPlotFrameLength.c_str(), 
-                              frameLength[XAxis]/ang2AU, 
-                              frameLength[YAxis]/ang2AU,
-                              frameLength[ZAxis]/ang2AU);
-   printf("%s%s\n", this->messageMOPlotFilePrefix.c_str(),
-                      Parameters::GetInstance()->GetFileNamePrefixMOPlot().c_str());
+   this->OutputLog((boost::format("%s%e %e %e\n") % this->messageMOPlotFrameLength.c_str() 
+                                                  % (frameLength[XAxis]/ang2AU) 
+                                                  % (frameLength[YAxis]/ang2AU)
+                                                  % (frameLength[ZAxis]/ang2AU)).str());
+   this->OutputLog((boost::format("%s%s\n") % this->messageMOPlotFilePrefix.c_str() 
+                                            % Parameters::GetInstance()->GetFileNamePrefixMOPlot().c_str()).str());
 
-   cout << endl;
+   this->OutputLog("\n");
 }
 
 void InputParser::OutputInputTerms(vector<string> inputTerms) const{
    // output input terms
-   cout << this->messageInputTerms;
+   this->OutputLog(this->messageInputTerms);
    for(int i=0; i<inputTerms.size();i++){
-      cout << inputTerms[i] << " | ";
+      this->OutputLog((inputTerms[i] + " | "));
       if(i%10 == 9){
-         cout << "\n";
+         this->OutputLog("\n");
       }
    }
-   cout << endl << endl;
+   this->OutputLog("\n\n");
 }
 
 /****

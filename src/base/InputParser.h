@@ -21,7 +21,7 @@
 namespace MolDS_base{
 
 // InputParser is singleton
-class InputParser: private Uncopyable{
+class InputParser: public PrintController, private Uncopyable{
 public:
    static InputParser* GetInstance();
    static void DeleteInstance();
