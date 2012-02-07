@@ -64,7 +64,7 @@ void MD::DoMD(){
    // malloc electornic structure
    TheoryType theory = Parameters::GetInstance()->GetCurrentTheory();
    this->CheckEnableTheoryType(theory);
-   boost::shared_ptr<ElectronicStructure> electronicStructure(ElectronicStructureFactory::GetInstance()->Create());
+   boost::shared_ptr<ElectronicStructure> electronicStructure(ElectronicStructureFactory::Create());
    electronicStructure->SetMolecule(this->molecule);
    electronicStructure->SetCanOutputLogs(this->CanOutputLogs());
    this->molecule->SetCanOutputLogs(this->CanOutputLogs());

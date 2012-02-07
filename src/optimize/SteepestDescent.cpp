@@ -59,7 +59,7 @@ void SteepestDescent::Optimize(Molecule& molecule){
    // malloc electornic structure
    TheoryType theory = Parameters::GetInstance()->GetCurrentTheory();
    this->CheckEnableTheoryType(theory);
-   boost::shared_ptr<ElectronicStructure> electronicStructure(ElectronicStructureFactory::GetInstance()->Create());
+   boost::shared_ptr<ElectronicStructure> electronicStructure(ElectronicStructureFactory::Create());
    electronicStructure->SetMolecule(&molecule);
    electronicStructure->SetCanOutputLogs(this->CanOutputLogs());
    molecule.SetCanOutputLogs(this->CanOutputLogs());

@@ -21,18 +21,15 @@
 namespace MolDS_base{
 
 // ElectronicStructureFactory is singleton
-class ElectronicStructureFactory: private Uncopyable{
+class ElectronicStructureFactory{
 public:
-   static ElectronicStructureFactory* GetInstance();
-   static void DeleteInstance();
-   MolDS_base::ElectronicStructure* Create(MolDS_base::TheoryType theoryType);
-   MolDS_base::ElectronicStructure* Create();
+   static MolDS_base::ElectronicStructure* Create(MolDS_base::TheoryType theoryType);
+   static MolDS_base::ElectronicStructure* Create();
 private:
-   static ElectronicStructureFactory* electronicStructureFactory;
    ElectronicStructureFactory();
    ~ElectronicStructureFactory();
-   std::string errorMessageNotEnableTheory;
-   std::string errorMessageTheoryType;
+   static std::string errorMessageNotEnableTheory;
+   static std::string errorMessageTheoryType;
 };
 
 }

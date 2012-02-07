@@ -89,14 +89,14 @@ void MC::DoMC(int totalSteps, int elecState, double temperature, double stepWidt
 
    // prepare trial molecule and electronic structure pointa
    Molecule trialMolecule(*this->molecule);
-   boost::shared_ptr<ElectronicStructure> electronicStructure2(ElectronicStructureFactory::GetInstance()->Create());
+   boost::shared_ptr<ElectronicStructure> electronicStructure2(ElectronicStructureFactory::Create());
    ElectronicStructure* trialES = electronicStructure2.get();
    trialES->SetMolecule(&trialMolecule);
    trialES->SetCanOutputLogs(this->CanOutputLogs());
    trialMolecule.SetCanOutputLogs(this->CanOutputLogs());
 
    // initial calculation
-   boost::shared_ptr<ElectronicStructure> electronicStructure1(ElectronicStructureFactory::GetInstance()->Create());
+   boost::shared_ptr<ElectronicStructure> electronicStructure1(ElectronicStructureFactory::Create());
    ElectronicStructure* currentES = electronicStructure1.get();
    currentES->SetMolecule(this->molecule);
    currentES->SetCanOutputLogs(this->CanOutputLogs());

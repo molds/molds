@@ -68,7 +68,6 @@ void MolDS::Run() const{
    try{
       // declare 
       MallocerFreer::GetInstance();
-      ElectronicStructureFactory::GetInstance();
       InputParser::GetInstance();
       molecule = new Molecule();
       Parameters::GetInstance();
@@ -128,7 +127,6 @@ void MolDS::Run() const{
    Parameters::DeleteInstance();
    delete molecule;
    InputParser::DeleteInstance();
-   ElectronicStructureFactory::DeleteInstance();
    MallocerFreer::DeleteInstance();
 
    // Farewell Messages
@@ -137,7 +135,7 @@ void MolDS::Run() const{
 
 void MolDS::CalculateElectronicStructureOnce(Molecule* molecule, bool* runningNormally) const{
    try{
-      boost::shared_ptr<ElectronicStructure> electronicStructure(ElectronicStructureFactory::GetInstance()->Create());
+      boost::shared_ptr<ElectronicStructure> electronicStructure(ElectronicStructureFactory::Create());
       electronicStructure->SetMolecule(molecule);
       electronicStructure->DoSCF();
       if(Parameters::GetInstance()->RequiresCIS()){

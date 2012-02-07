@@ -64,7 +64,7 @@ void RPMD::CreateBeads(vector<boost::shared_ptr<Molecule> >& molecularBeads,
       *molecule = refferenceMolecule;
       molecularBeads.push_back(molecule);
       // create electronic structure beads
-      boost::shared_ptr<ElectronicStructure> electronicStructure(ElectronicStructureFactory::GetInstance()->Create());
+      boost::shared_ptr<ElectronicStructure> electronicStructure(ElectronicStructureFactory::Create());
       electronicStructure->SetMolecule(molecule.get());
       electronicStructureBeads.push_back(electronicStructure);
    }

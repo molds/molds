@@ -43,31 +43,9 @@
 #include"ElectronicStructureFactory.h"
 using namespace std;
 namespace MolDS_base{
-
-ElectronicStructureFactory* ElectronicStructureFactory::electronicStructureFactory = NULL;
-
-ElectronicStructureFactory::ElectronicStructureFactory(){
-   this->errorMessageNotEnableTheory 
+string ElectronicStructureFactory::errorMessageNotEnableTheory 
       = "Error in base::ElectronicStructureFactory::Create: Not Enable TheoryType is set.";
-   this->errorMessageTheoryType = "\ttheory type = ";
-}
-
-ElectronicStructureFactory::~ElectronicStructureFactory(){
-}
-
-ElectronicStructureFactory* ElectronicStructureFactory::GetInstance(){
-   if(electronicStructureFactory == NULL){
-      electronicStructureFactory = new ElectronicStructureFactory();
-   }
-   return electronicStructureFactory;
-}
-
-void ElectronicStructureFactory::DeleteInstance(){
-   if(electronicStructureFactory != NULL){
-      delete electronicStructureFactory; 
-   }
-   electronicStructureFactory = NULL;
-}
+string ElectronicStructureFactory::errorMessageTheoryType = "\ttheory type = ";
 
 ElectronicStructure* ElectronicStructureFactory::Create(TheoryType theoryType){
    ElectronicStructure* electronicStructure=NULL;
@@ -94,8 +72,8 @@ ElectronicStructure* ElectronicStructureFactory::Create(TheoryType theoryType){
    }
    else{
       stringstream ss;
-      ss << this->errorMessageNotEnableTheory << endl;
-      ss << this->errorMessageTheoryType << TheoryTypeStr(theoryType) << endl;
+      ss << ElectronicStructureFactory::errorMessageNotEnableTheory << endl;
+      ss << ElectronicStructureFactory::errorMessageTheoryType << TheoryTypeStr(theoryType) << endl;
       throw MolDSException(ss.str());
    }
    return electronicStructure;
