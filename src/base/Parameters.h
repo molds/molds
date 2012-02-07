@@ -22,7 +22,7 @@
 namespace MolDS_base{
 
 // Parameters is singleton
-class Parameters: private Uncopyable{
+class Parameters: public PrintController, private Uncopyable{
 public:
    static Parameters* GetInstance();
    static void DeleteInstance();

@@ -59,7 +59,7 @@ Parameters::~Parameters(){
    if(this->indecesMOPlot != NULL){
       delete this->indecesMOPlot;
       this->indecesMOPlot = NULL;
-      //cout << "indecesMOPlot deleted\n";
+      //this->OutputLog("indecesMOPlot deleted\n");
    }
 }
 
