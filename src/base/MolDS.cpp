@@ -69,6 +69,7 @@ void MolDS::Run() const{
       // declare 
       MallocerFreer::GetInstance();
       AtomFactory::GetInstance();
+      ElectronicStructureFactory::GetInstance();
       InputParser::GetInstance();
       molecule = new Molecule();
       Parameters::GetInstance();
@@ -128,6 +129,7 @@ void MolDS::Run() const{
    Parameters::DeleteInstance();
    delete molecule;
    InputParser::DeleteInstance();
+   ElectronicStructureFactory::DeleteInstance();
    AtomFactory::DeleteInstance();
    MallocerFreer::DeleteInstance();
 
