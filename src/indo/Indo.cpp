@@ -48,11 +48,11 @@ Indo::Indo() : MolDS_cndo::Cndo2(){
    this->theory = INDO;
    this->SetMessages();
    this->SetEnableAtomTypes();
-   //cout << "Indo created\n";
+   //this->OutputLog("Indo created\n");
 }
 
 Indo::~Indo(){
-   //cout << "Indo deleted\n";
+   //this->OutputLog("Indo deleted\n");
 }
 
 void Indo::SetMessages(){
