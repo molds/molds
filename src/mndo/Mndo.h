@@ -124,6 +124,7 @@ private:
    double GetKNRElement(int moI, int moJ, int moK, int moL) const;
    double GetKRElement(int moI, int moJ, int moK, int moL) const;
    double GetKRDagerElement(int moI, int moJ, int moK, int moL) const;
+   double GetAuxiliaryKNRKRElement(int moI, int moJ, int moK, int moL) const;
    void MallocTempMatrixForZMatrix(double** delta,
                                    double** q,
                                    double*** kNR, 
