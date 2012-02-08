@@ -2180,9 +2180,12 @@ void Mndo::CalcForce(const vector<int>& elecStates){
                                                          b,
                                                          twoElecTwoCoreFirstDeriv);
                         // sum up contributions from static part (excited state)
-                        for(int i=0; i<CartesianType_end; i++){
-                           this->matrixForce[n][b][i] += forceExcitedStaticPart[i];
-                           this->matrixForce[n][a][i] -= forceExcitedStaticPart[i];
+                        #pragma omp critical
+                        {
+                           for(int i=0; i<CartesianType_end; i++){
+                              this->matrixForce[n][b][i] += forceExcitedStaticPart[i];
+                              this->matrixForce[n][a][i] -= forceExcitedStaticPart[i];
+                           }
                         }
 
                         // response part
