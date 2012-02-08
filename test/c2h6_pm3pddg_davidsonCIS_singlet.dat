@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/1/10(Thu.) 15:15:25  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/2/8(Wed.) 12:24:11  <<<<<
 
 
 **********  START: Parse input  **********
@@ -8,7 +8,7 @@
 	Total number of valence AOs: 14
 	Total number of valence electrons: 14
 
-	Molecular configration:
+	Molecular configuration:
 		| i-th | atom type | x[angst.] | y[angst.] | z[angst.] |
 		0	C	0.000000e+00	2.000000e-02	0.000000e+00
 		1	C	1.493800e+00	-1.500000e-02	2.000000e-03
@@ -77,19 +77,19 @@ h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 | -1.0401 | 0.0000 | geometry_end |
 
 
 **********  START: PM3/PDDG-SCF  **********
-SCF iter=0: RMS density=5.291502622129178 
-SCF iter=1: RMS density=1.862872189503768 
-SCF iter=2: RMS density=0.993239189796957 
-SCF iter=3: RMS density=0.533349207055902 
-SCF iter=4: RMS density=0.285488533225343 
-SCF iter=5: RMS density=0.152407528472138 
-SCF iter=6: RMS density=0.000620521117909 
-SCF iter=7: RMS density=0.000181786594273 
-SCF iter=8: RMS density=0.000057887199698 
-SCF iter=9: RMS density=0.000021427661555 
-SCF iter=10: RMS density=0.000003665762852 
-SCF iter=11: RMS density=0.000001692271513 
-SCF iter=12: RMS density=0.000000190761140 
+SCF iter=0: RMS density=5.291502622129178
+SCF iter=1: RMS density=1.862872189503768
+SCF iter=2: RMS density=0.993239189796957
+SCF iter=3: RMS density=0.533349207055902
+SCF iter=4: RMS density=0.285488533225343
+SCF iter=5: RMS density=0.152407528472138
+SCF iter=6: RMS density=0.000620521117909
+SCF iter=7: RMS density=0.000181786594273
+SCF iter=8: RMS density=0.000057887199698
+SCF iter=9: RMS density=0.000021427661555
+SCF iter=10: RMS density=0.000003665762852
+SCF iter=11: RMS density=0.000001692271513
+SCF iter=12: RMS density=0.000000190761140
 
 
 
@@ -132,81 +132,81 @@ SCF iter=12: RMS density=0.000000190761140
 		6	H	1.000000e+00	8.849413e-02
 		7	H	1.000000e+00	9.338598e-02
 
-	Elapsed time(omp) for the SCF = 0.0450661[s].
+	Elapsed time(omp) for the SCF = 0.050306[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.0557358[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.056292[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
 	Davidson iter=0
-	  1-th excited: norm of the residual = 0.0519578
-	  2-th excited: norm of the residual = 0.0533253
-	  3-th excited: norm of the residual = 0.0660474
-	  4-th excited: norm of the residual = 0.0656198
+	  1-th excited: norm of the residual = 5.195782e-02
+	  2-th excited: norm of the residual = 5.332535e-02
+	  3-th excited: norm of the residual = 6.604740e-02
+	  4-th excited: norm of the residual = 6.561985e-02
 
 	Davidson iter=1
-	  1-th excited: norm of the residual = 0.0208364
-	  2-th excited: norm of the residual = 0.0236653
-	  3-th excited: norm of the residual = 0.0252445
-	  4-th excited: norm of the residual = 0.0301366
+	  1-th excited: norm of the residual = 2.083640e-02
+	  2-th excited: norm of the residual = 2.366531e-02
+	  3-th excited: norm of the residual = 2.524455e-02
+	  4-th excited: norm of the residual = 3.013663e-02
 
 	Davidson iter=2
-	  1-th excited: norm of the residual = 0.006044
-	  2-th excited: norm of the residual = 0.00698638
-	  3-th excited: norm of the residual = 0.00330125
-	  4-th excited: norm of the residual = 0.00723137
+	  1-th excited: norm of the residual = 6.044000e-03
+	  2-th excited: norm of the residual = 6.986382e-03
+	  3-th excited: norm of the residual = 3.301249e-03
+	  4-th excited: norm of the residual = 7.231367e-03
 
 	Davidson iter=3
-	  1-th excited: norm of the residual = 0.00204321
-	  2-th excited: norm of the residual = 0.00239647
-	  3-th excited: norm of the residual = 0.00318002
-	  4-th excited: norm of the residual = 0.00685397
+	  1-th excited: norm of the residual = 2.043207e-03
+	  2-th excited: norm of the residual = 2.396471e-03
+	  3-th excited: norm of the residual = 3.180017e-03
+	  4-th excited: norm of the residual = 6.853968e-03
 
 	Davidson iter=4
-	  1-th excited: norm of the residual = 0.000406463
-	  2-th excited: norm of the residual = 0.0205586
-	  3-th excited: norm of the residual = 0.00455866
-	  4-th excited: norm of the residual = 0.00295743
+	  1-th excited: norm of the residual = 4.064629e-04
+	  2-th excited: norm of the residual = 2.055856e-02
+	  3-th excited: norm of the residual = 4.558657e-03
+	  4-th excited: norm of the residual = 2.957427e-03
 
 	Davidson iter=5
-	  1-th excited: norm of the residual = 0.00415019
-	  2-th excited: norm of the residual = 0.0103066
-	  3-th excited: norm of the residual = 0.0010051
-	  4-th excited: norm of the residual = 0.00163965
+	  1-th excited: norm of the residual = 4.150185e-03
+	  2-th excited: norm of the residual = 1.030662e-02
+	  3-th excited: norm of the residual = 1.005097e-03
+	  4-th excited: norm of the residual = 1.639648e-03
 
 	Davidson iter=6
-	  1-th excited: norm of the residual = 0.0043208
-	  2-th excited: norm of the residual = 0.000216139
-	  3-th excited: norm of the residual = 0.000401604
-	  4-th excited: norm of the residual = 0.000688086
+	  1-th excited: norm of the residual = 4.320803e-03
+	  2-th excited: norm of the residual = 2.161388e-04
+	  3-th excited: norm of the residual = 4.016038e-04
+	  4-th excited: norm of the residual = 6.880857e-04
 
 	Davidson iter=7
-	  1-th excited: norm of the residual = 0.000310037
-	  2-th excited: norm of the residual = 1.39486e-05
-	  3-th excited: norm of the residual = 3.16047e-05
-	  4-th excited: norm of the residual = 6.68739e-05
+	  1-th excited: norm of the residual = 3.100371e-04
+	  2-th excited: norm of the residual = 1.394857e-05
+	  3-th excited: norm of the residual = 3.160472e-05
+	  4-th excited: norm of the residual = 6.687393e-05
 
 	Davidson iter=8
-	  1-th excited: norm of the residual = 3.66882e-05
-	  2-th excited: norm of the residual = 1.68778e-06
-	  3-th excited: norm of the residual = 3.90807e-06
-	  4-th excited: norm of the residual = 7.70582e-06
+	  1-th excited: norm of the residual = 3.668817e-05
+	  2-th excited: norm of the residual = 1.687784e-06
+	  3-th excited: norm of the residual = 3.908071e-06
+	  4-th excited: norm of the residual = 7.705824e-06
 
 	Davidson iter=9
-	  1-th excited: norm of the residual = 1.46129e-06
-	  2-th excited: norm of the residual = 6.61962e-08
-	  3-th excited: norm of the residual = 1.88951e-07
-	  4-th excited: norm of the residual = 7.62463e-07
+	  1-th excited: norm of the residual = 1.461285e-06
+	  2-th excited: norm of the residual = 6.619622e-08
+	  3-th excited: norm of the residual = 1.889515e-07
+	  4-th excited: norm of the residual = 7.624631e-07
 
 	Davidson iter=10
-	  1-th excited: norm of the residual = 1.43491e-07
-	  2-th excited: norm of the residual = 8.1975e-09
-	  3-th excited: norm of the residual = 5.06692e-08
-	  4-th excited: norm of the residual = 5.62549e-07
+	  1-th excited: norm of the residual = 1.434912e-07
+	  2-th excited: norm of the residual = 8.197498e-09
+	  3-th excited: norm of the residual = 5.066923e-08
+	  4-th excited: norm of the residual = 5.625493e-07
 
 
 
@@ -223,19 +223,19 @@ SCF iter=12: RMS density=0.000000190761140
 		 3	2.837531e-01	7.721377e+00
 		 4	2.901091e-01	7.894334e+00
 
-	Elapsed time(omp) for the CIS = 0.197962[s].
+	Elapsed time(omp) for the CIS = 0.200308[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
 	Summary for memory usage:
 		Max Heap: 0.189752[MB].
-		Current Heap(Leaked): 0[MB].
+		Current Heap(Leaked): 0.000000[MB].
 
 
      >>>>>  The MolDS finished normally!  <<<<<
-     >>>>>  CPU time: 0.25[s].  <<<<<
+     >>>>>  CPU time: 0.26[s].  <<<<<
      >>>>>  Elapsed time: 0[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 0.245535[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 0.256191[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

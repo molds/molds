@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/1/10(Thu.) 15:13:51  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/2/8(Wed.) 12:21:3  <<<<<
 
 
 **********  START: Parse input  **********
@@ -8,7 +8,7 @@
 	Total number of valence AOs: 11
 	Total number of valence electrons: 8
 
-	Molecular configration:
+	Molecular configuration:
 		| i-th | atom type | x[angst.] | y[angst.] | z[angst.] |
 		0	S	-5.592990e-01	4.716980e-01	3.000000e-01
 		1	H	7.507010e-01	4.716980e-01	0.000000e+00
@@ -55,14 +55,14 @@ s | -0.559299 | 0.471698 | 0.300000 | h | 0.750701 | 0.471698 | 0.000000 | h | -
 
 
 **********  START: CNDO/2-SCF  **********
-SCF iter=0: RMS density=3.999999999999997 
-SCF iter=1: RMS density=0.004357636108853 
-SCF iter=2: RMS density=0.000849439366198 
-SCF iter=3: RMS density=0.000329969077288 
-SCF iter=4: RMS density=0.000174134515761 
-SCF iter=5: RMS density=0.000098690640918 
-SCF iter=6: RMS density=0.000002020855249 
-SCF iter=7: RMS density=0.000000473889783 
+SCF iter=0: RMS density=3.999999999999997
+SCF iter=1: RMS density=0.004357636108853
+SCF iter=2: RMS density=0.000849439366198
+SCF iter=3: RMS density=0.000329969077288
+SCF iter=4: RMS density=0.000174134515761
+SCF iter=5: RMS density=0.000098690640918
+SCF iter=6: RMS density=0.000002020855249
+SCF iter=7: RMS density=0.000000473889783
 
 
 
@@ -97,19 +97,19 @@ SCF iter=7: RMS density=0.000000473889783
 		1	H	1.000000e+00	5.963133e-03
 		2	H	1.000000e+00	2.543626e-03
 
-	Elapsed time(omp) for the SCF = 0.0156829[s].
+	Elapsed time(omp) for the SCF = 0.020724[s].
 **********  DONE: CNDO/2-SCF  **********
 
 
 	Summary for memory usage:
 		Max Heap: 0.017192[MB].
-		Current Heap(Leaked): 0[MB].
+		Current Heap(Leaked): 0.000000[MB].
 
 
      >>>>>  The MolDS finished normally!  <<<<<
-     >>>>>  CPU time: 0.01[s].  <<<<<
+     >>>>>  CPU time: 0.02[s].  <<<<<
      >>>>>  Elapsed time: 0[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 0.0167251[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 0.0227129[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

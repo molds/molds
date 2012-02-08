@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/1/10(Thu.) 15:13:52  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/2/8(Wed.) 12:21:5  <<<<<
 
 
 **********  START: Parse input  **********
@@ -8,7 +8,7 @@
 	Total number of valence AOs: 14
 	Total number of valence electrons: 14
 
-	Molecular configration:
+	Molecular configuration:
 		| i-th | atom type | x[angst.] | y[angst.] | z[angst.] |
 		0	C	0.000000e+00	2.000000e-02	0.000000e+00
 		1	C	1.493800e+00	-1.500000e-02	2.000000e-03
@@ -74,15 +74,15 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 
 
 **********  START: ZINDO/S-SCF  **********
-SCF iter=0: RMS density=5.291502622129184 
-SCF iter=1: RMS density=3.838492151665711 
-SCF iter=2: RMS density=0.639670447585092 
-SCF iter=3: RMS density=0.104551025859929 
-SCF iter=4: RMS density=0.017838263308206 
-SCF iter=5: RMS density=0.002973046733479 
-SCF iter=6: RMS density=0.000074147072849 
-SCF iter=7: RMS density=0.000011993148172 
-SCF iter=8: RMS density=0.000000782384959 
+SCF iter=0: RMS density=5.291502622129184
+SCF iter=1: RMS density=3.838492151665711
+SCF iter=2: RMS density=0.639670447585092
+SCF iter=3: RMS density=0.104551025859929
+SCF iter=4: RMS density=0.017838263308206
+SCF iter=5: RMS density=0.002973046733479
+SCF iter=6: RMS density=0.000074147072849
+SCF iter=7: RMS density=0.000011993148172
+SCF iter=8: RMS density=0.000000782384959
 
 
 
@@ -125,13 +125,13 @@ SCF iter=8: RMS density=0.000000782384959
 		6	H	1.000000e+00	1.599949e-02
 		7	H	1.000000e+00	2.221343e-02
 
-	Elapsed time(omp) for the SCF = 0.013217[s].
+	Elapsed time(omp) for the SCF = 0.022571[s].
 **********  DONE: ZINDO/S-SCF  **********
 
 
 **********  START: ZINDO/S-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.039336[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.039880[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Direct-CIS  =====
@@ -191,19 +191,19 @@ SCF iter=8: RMS density=0.000000782384959
 		 48	1.453102e+00	3.954123e+01
 		 49	1.553220e+00	4.226561e+01
 
-	Elapsed time(omp) for the CIS = 0.041095[s].
+	Elapsed time(omp) for the CIS = 0.042519[s].
 **********  DONE: ZINDO/S-CIS  **********
 
 
 	Summary for memory usage:
 		Max Heap: 0.027664[MB].
-		Current Heap(Leaked): 0[MB].
+		Current Heap(Leaked): 0.000000[MB].
 
 
      >>>>>  The MolDS finished normally!  <<<<<
-     >>>>>  CPU time: 0.06[s].  <<<<<
+     >>>>>  CPU time: 0.07[s].  <<<<<
      >>>>>  Elapsed time: 0[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 0.0555389[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 0.067982[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

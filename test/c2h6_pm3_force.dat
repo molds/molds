@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/1/13(Fri.) 13:41:2  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/2/8(Wed.) 12:23:20  <<<<<
 
 
 **********  START: Parse input  **********
@@ -8,7 +8,7 @@
 	Total number of valence AOs: 14
 	Total number of valence electrons: 14
 
-	Molecular configration:
+	Molecular configuration:
 		| i-th | atom type | x[angst.] | y[angst.] | z[angst.] |
 		0	C	0.000000e+00	2.000000e-02	0.000000e+00
 		1	C	1.493800e+00	-1.500000e-02	2.000000e-03
@@ -56,7 +56,7 @@
 		Heap limit: 2.560000e+02[MB]
 
 	MD conditions:
-		Electronic eigen state: 0
+		Electronic eigenstate: 0
 		Total steps: 5
 		Time width(dt): 0.050000[fs]
 
@@ -74,19 +74,19 @@ geometry_end |
 
 **********  START: Molecular dynamics  **********
 **********  START: PM3-SCF  **********
-SCF iter=0: RMS density=5.291502622129178 
-SCF iter=1: RMS density=1.910456125626945 
-SCF iter=2: RMS density=1.044203238495392 
-SCF iter=3: RMS density=0.569275110921828 
-SCF iter=4: RMS density=0.308641545774631 
-SCF iter=5: RMS density=0.166813060251973 
-SCF iter=6: RMS density=0.000657312351890 
-SCF iter=7: RMS density=0.000224796079741 
-SCF iter=8: RMS density=0.000083564976989 
-SCF iter=9: RMS density=0.000026986732841 
-SCF iter=10: RMS density=0.000004938275842 
-SCF iter=11: RMS density=0.000002003884716 
-SCF iter=12: RMS density=0.000000169506350 
+SCF iter=0: RMS density=5.291502622129178
+SCF iter=1: RMS density=1.910456125626945
+SCF iter=2: RMS density=1.044203238495392
+SCF iter=3: RMS density=0.569275110921828
+SCF iter=4: RMS density=0.308641545774631
+SCF iter=5: RMS density=0.166813060251973
+SCF iter=6: RMS density=0.000657312351890
+SCF iter=7: RMS density=0.000224796079741
+SCF iter=8: RMS density=0.000083564976989
+SCF iter=9: RMS density=0.000026986732841
+SCF iter=10: RMS density=0.000004938275842
+SCF iter=11: RMS density=0.000002003884716
+SCF iter=12: RMS density=0.000000169506350
 
 
 
@@ -129,7 +129,7 @@ SCF iter=12: RMS density=0.000000169506350
 		6	H	1.000000e+00	3.744313e-02
 		7	H	1.000000e+00	4.258006e-02
 
-	Elapsed time(omp) for the SCF = 0.0586371[s].
+	Elapsed time(omp) for the SCF = 0.049684[s].
 **********  DONE: PM3-SCF  **********
 
 
@@ -143,7 +143,7 @@ SCF iter=12: RMS density=0.000000169506350
 		(inc. core rep.)	-1.212596e+01	-3.299667e+02
 		Total            	-1.212596e+01	-3.299667e+02
 
-	Molecular configration:
+	Molecular configuration:
 		| i-th | atom type | x[angst.] | y[angst.] | z[angst.] |
 		0	C	0.000000e+00	2.000000e-02	0.000000e+00
 		1	C	1.493800e+00	-1.500000e-02	2.000000e-03
@@ -202,9 +202,9 @@ SCF iter=12: RMS density=0.000000169506350
 
 	========== START: MD step 1
 **********  START: PM3-SCF  **********
-SCF iter=0: RMS density=0.000006941604620 
-SCF iter=1: RMS density=0.000002089746326 
-SCF iter=2: RMS density=0.000000729632414 
+SCF iter=0: RMS density=0.000006941604620
+SCF iter=1: RMS density=0.000002089746326
+SCF iter=2: RMS density=0.000000729632414
 
 
 
@@ -247,7 +247,7 @@ SCF iter=2: RMS density=0.000000729632414
 		6	H	1.000000e+00	3.744282e-02
 		7	H	1.000000e+00	4.257957e-02
 
-	Elapsed time(omp) for the SCF = 0.037457[s].
+	Elapsed time(omp) for the SCF = 0.038000[s].
 **********  DONE: PM3-SCF  **********
 
 
@@ -260,7 +260,7 @@ SCF iter=2: RMS density=0.000000729632414
 		Total            	-1.212596e+01	-3.299667e+02
 		Error            	1.925748e-10	5.240270e-09
 
-	Molecular configration:
+	Molecular configuration:
 		| i-th | atom type | x[angst.] | y[angst.] | z[angst.] |
 		0	C	-2.455591e-07	1.999849e-02	-3.550510e-07
 		1	C	1.493800e+00	-1.499913e-02	2.000003e-03
@@ -316,15 +316,15 @@ SCF iter=2: RMS density=0.000000729632414
 		6	H	1.319931e-02	-1.239706e-02	-1.657478e-02
 		7	H	1.160413e-02	-2.588831e-03	1.149756e-03
 
-	Time in [fs]: 0.05
+	Time in [fs]: 0.050000
 	========== DONE: MD step 1
 
 	========== START: MD step 2
 **********  START: PM3-SCF  **********
-SCF iter=0: RMS density=0.000021046101621 
-SCF iter=1: RMS density=0.000006380790340 
-SCF iter=2: RMS density=0.000002247867459 
-SCF iter=3: RMS density=0.000000900612188 
+SCF iter=0: RMS density=0.000021046101621
+SCF iter=1: RMS density=0.000006380790340
+SCF iter=2: RMS density=0.000002247867459
+SCF iter=3: RMS density=0.000000900612188
 
 
 
@@ -367,7 +367,7 @@ SCF iter=3: RMS density=0.000000900612188
 		6	H	1.000000e+00	3.744189e-02
 		7	H	1.000000e+00	4.257782e-02
 
-	Elapsed time(omp) for the SCF = 0.0383821[s].
+	Elapsed time(omp) for the SCF = 0.037793[s].
 **********  DONE: PM3-SCF  **********
 
 
@@ -380,7 +380,7 @@ SCF iter=3: RMS density=0.000000900612188
 		Total            	-1.212596e+01	-3.299667e+02
 		Error            	7.696777e-10	2.094416e-08
 
-	Molecular configration:
+	Molecular configuration:
 		| i-th | atom type | x[angst.] | y[angst.] | z[angst.] |
 		0	C	-9.821136e-07	1.999395e-02	-1.420010e-06
 		1	C	1.493800e+00	-1.499652e-02	2.000014e-03
@@ -436,16 +436,16 @@ SCF iter=3: RMS density=0.000000900612188
 		6	H	2.639975e-02	-2.478738e-02	-3.313825e-02
 		7	H	2.320468e-02	-5.172810e-03	2.299358e-03
 
-	Time in [fs]: 0.1
+	Time in [fs]: 0.100000
 	========== DONE: MD step 2
 
 	========== START: MD step 3
 **********  START: PM3-SCF  **********
-SCF iter=0: RMS density=0.000034948782917 
-SCF iter=1: RMS density=0.000010593145636 
-SCF iter=2: RMS density=0.000003732214206 
-SCF iter=3: RMS density=0.000001495837113 
-SCF iter=4: RMS density=0.000000657597544 
+SCF iter=0: RMS density=0.000034948782917
+SCF iter=1: RMS density=0.000010593145636
+SCF iter=2: RMS density=0.000003732214206
+SCF iter=3: RMS density=0.000001495837113
+SCF iter=4: RMS density=0.000000657597544
 
 
 
@@ -488,7 +488,7 @@ SCF iter=4: RMS density=0.000000657597544
 		6	H	1.000000e+00	3.744032e-02
 		7	H	1.000000e+00	4.257474e-02
 
-	Elapsed time(omp) for the SCF = 0.0371959[s].
+	Elapsed time(omp) for the SCF = 0.039481[s].
 **********  DONE: PM3-SCF  **********
 
 
@@ -501,7 +501,7 @@ SCF iter=4: RMS density=0.000000657597544
 		Total            	-1.212596e+01	-3.299667e+02
 		Error            	1.729074e-09	4.705087e-08
 
-	Molecular configration:
+	Molecular configuration:
 		| i-th | atom type | x[angst.] | y[angst.] | z[angst.] |
 		0	C	-2.209291e-06	1.998640e-02	-3.194297e-06
 		1	C	1.493800e+00	-1.499218e-02	2.000031e-03
@@ -557,16 +557,16 @@ SCF iter=4: RMS density=0.000000657597544
 		6	H	3.960249e-02	-3.716427e-02	-4.967909e-02
 		7	H	3.479806e-02	-7.747108e-03	3.448654e-03
 
-	Time in [fs]: 0.15
+	Time in [fs]: 0.150000
 	========== DONE: MD step 3
 
 	========== START: MD step 4
 **********  START: PM3-SCF  **********
-SCF iter=0: RMS density=0.000048719169623 
-SCF iter=1: RMS density=0.000014736017799 
-SCF iter=2: RMS density=0.000005178632954 
-SCF iter=3: RMS density=0.000002070636310 
-SCF iter=4: RMS density=0.000000908676309 
+SCF iter=0: RMS density=0.000048719169623
+SCF iter=1: RMS density=0.000014736017799
+SCF iter=2: RMS density=0.000005178632954
+SCF iter=3: RMS density=0.000002070636310
+SCF iter=4: RMS density=0.000000908676309
 
 
 
@@ -609,7 +609,7 @@ SCF iter=4: RMS density=0.000000908676309
 		6	H	1.000000e+00	3.743813e-02
 		7	H	1.000000e+00	4.257054e-02
 
-	Elapsed time(omp) for the SCF = 0.0378981[s].
+	Elapsed time(omp) for the SCF = 0.039159[s].
 **********  DONE: PM3-SCF  **********
 
 
@@ -622,7 +622,7 @@ SCF iter=4: RMS density=0.000000908676309
 		Total            	-1.212596e+01	-3.299667e+02
 		Error            	3.068886e-09	8.350930e-08
 
-	Molecular configration:
+	Molecular configuration:
 		| i-th | atom type | x[angst.] | y[angst.] | z[angst.] |
 		0	C	-3.926468e-06	1.997583e-02	-5.676947e-06
 		1	C	1.493800e+00	-1.498611e-02	2.000056e-03
@@ -678,17 +678,17 @@ SCF iter=4: RMS density=0.000000908676309
 		6	H	5.280869e-02	-4.952103e-02	-6.618602e-02
 		7	H	4.638071e-02	-1.030690e-02	4.597490e-03
 
-	Time in [fs]: 0.2
+	Time in [fs]: 0.200000
 	========== DONE: MD step 4
 
 	========== START: MD step 5
 **********  START: PM3-SCF  **********
-SCF iter=0: RMS density=0.000062607770554 
-SCF iter=1: RMS density=0.000018943591287 
-SCF iter=2: RMS density=0.000006660018087 
-SCF iter=3: RMS density=0.000002663946545 
-SCF iter=4: RMS density=0.000001169374476 
-SCF iter=5: RMS density=0.000000544380516 
+SCF iter=0: RMS density=0.000062607770554
+SCF iter=1: RMS density=0.000018943591287
+SCF iter=2: RMS density=0.000006660018087
+SCF iter=3: RMS density=0.000002663946545
+SCF iter=4: RMS density=0.000001169374476
+SCF iter=5: RMS density=0.000000544380516
 
 
 
@@ -731,7 +731,7 @@ SCF iter=5: RMS density=0.000000544380516
 		6	H	1.000000e+00	3.743528e-02
 		7	H	1.000000e+00	4.256496e-02
 
-	Elapsed time(omp) for the SCF = 0.0374629[s].
+	Elapsed time(omp) for the SCF = 0.038532[s].
 **********  DONE: PM3-SCF  **********
 
 
@@ -744,7 +744,7 @@ SCF iter=5: RMS density=0.000000544380516
 		Total            	-1.212596e+01	-3.299667e+02
 		Error            	4.784537e-09	1.301949e-07
 
-	Molecular configration:
+	Molecular configuration:
 		| i-th | atom type | x[angst.] | y[angst.] | z[angst.] |
 		0	C	-6.132773e-06	1.996225e-02	-8.866607e-06
 		1	C	1.493800e+00	-1.497830e-02	2.000088e-03
@@ -800,18 +800,18 @@ SCF iter=5: RMS density=0.000000544380516
 		6	H	6.601949e-02	-6.185096e-02	-8.264776e-02
 		7	H	5.794904e-02	-1.284736e-02	5.745712e-03
 
-	Time in [fs]: 0.25
+	Time in [fs]: 0.250000
 	========== DONE: MD step 5
 **********  DONE: Molecular dynamics  **********
 	Summary for memory usage:
 		Max Heap: 0.158928[MB].
-		Current Heap(Leaked): 0[MB].
+		Current Heap(Leaked): 0.000000[MB].
 
 
      >>>>>  The MolDS finished normally!  <<<<<
-     >>>>>  CPU time: 7.04[s].  <<<<<
-     >>>>>  Elapsed time: 7[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 7.03035[s].  <<<<<
+     >>>>>  CPU time: 7.13[s].  <<<<<
+     >>>>>  Elapsed time: 8[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 7.14456[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

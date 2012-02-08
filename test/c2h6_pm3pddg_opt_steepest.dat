@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/2/4(Sat.) 18:22:55  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/2/8(Wed.) 12:25:40  <<<<<
 
 
 **********  START: Parse input  **********
@@ -78,19 +78,19 @@ h | -0.3681 | -0.4725 | 0.8016 | h | 1.9519 | 0.5200 | -0.9007 | h | 1.8519 |
 **********  START: Geometry optimization  **********
 **********  START: Line search  **********
 **********  START: PM3/PDDG-SCF  **********
-SCF iter=0: RMS density=5.291502622129179 
-SCF iter=1: RMS density=1.776302500713474 
-SCF iter=2: RMS density=0.953825787215979 
-SCF iter=3: RMS density=0.523019383342597 
-SCF iter=4: RMS density=0.287694781515638 
-SCF iter=5: RMS density=0.158473555927061 
-SCF iter=6: RMS density=0.001365259404962 
-SCF iter=7: RMS density=0.000269846866922 
-SCF iter=8: RMS density=0.000098252575178 
-SCF iter=9: RMS density=0.000042078671256 
-SCF iter=10: RMS density=0.000013333148842 
-SCF iter=11: RMS density=0.000002624318415 
-SCF iter=12: RMS density=0.000000435961071 
+SCF iter=0: RMS density=5.291502622129179
+SCF iter=1: RMS density=1.776302500713474
+SCF iter=2: RMS density=0.953825787215979
+SCF iter=3: RMS density=0.523019383342597
+SCF iter=4: RMS density=0.287694781515638
+SCF iter=5: RMS density=0.158473555927061
+SCF iter=6: RMS density=0.001365259404962
+SCF iter=7: RMS density=0.000269846866922
+SCF iter=8: RMS density=0.000098252575178
+SCF iter=9: RMS density=0.000042078671256
+SCF iter=10: RMS density=0.000013333148842
+SCF iter=11: RMS density=0.000002624318415
+SCF iter=12: RMS density=0.000000435961071
 
 
 
@@ -133,14 +133,14 @@ SCF iter=12: RMS density=0.000000435961071
 		6	H	1.000000e+00	9.774623e-02
 		7	H	1.000000e+00	1.088898e-01
 
-	Elapsed time(omp) for the SCF = 0.049365[s].
+	Elapsed time(omp) for the SCF = 0.047298[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 
 ==========  START: Line search times 0
 **********  START: PM3/PDDG-SCF  **********
-SCF iter=0: RMS density=0.000000464745869 
+SCF iter=0: RMS density=0.000000464745869
 
 
 
@@ -183,7 +183,7 @@ SCF iter=0: RMS density=0.000000464745869
 		6	H	1.000000e+00	9.436048e-02
 		7	H	1.000000e+00	1.040534e-01
 
-	Elapsed time(omp) for the SCF = 0.0372288[s].
+	Elapsed time(omp) for the SCF = 0.037502[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
@@ -226,7 +226,7 @@ SCF iter=0: RMS density=0.000000464745869
 
 ==========  START: Line search times 1
 **********  START: PM3/PDDG-SCF  **********
-SCF iter=0: RMS density=0.000000276530356 
+SCF iter=0: RMS density=0.000000276530356
 
 
 
@@ -269,7 +269,7 @@ SCF iter=0: RMS density=0.000000276530356
 		6	H	1.000000e+00	8.707308e-02
 		7	H	1.000000e+00	9.374562e-02
 
-	Elapsed time(omp) for the SCF = 0.0367[s].
+	Elapsed time(omp) for the SCF = 0.037786[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
@@ -312,7 +312,7 @@ SCF iter=0: RMS density=0.000000276530356
 
 ==========  START: Line search times 2
 **********  START: PM3/PDDG-SCF  **********
-SCF iter=0: RMS density=0.000000298316908 
+SCF iter=0: RMS density=0.000000298316908
 
 
 
@@ -355,7 +355,7 @@ SCF iter=0: RMS density=0.000000298316908
 		6	H	1.000000e+00	8.563591e-02
 		7	H	1.000000e+00	9.079782e-02
 
-	Elapsed time(omp) for the SCF = 0.0366089[s].
+	Elapsed time(omp) for the SCF = 0.036762[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
@@ -398,7 +398,7 @@ SCF iter=0: RMS density=0.000000298316908
 
 ==========  START: Line search times 3
 **********  START: PM3/PDDG-SCF  **********
-SCF iter=0: RMS density=0.000000216579944 
+SCF iter=0: RMS density=0.000000216579944
 
 
 
@@ -441,7 +441,7 @@ SCF iter=0: RMS density=0.000000216579944
 		6	H	1.000000e+00	8.347208e-02
 		7	H	1.000000e+00	8.712791e-02
 
-	Elapsed time(omp) for the SCF = 0.0367632[s].
+	Elapsed time(omp) for the SCF = 0.037230[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
@@ -484,7 +484,7 @@ SCF iter=0: RMS density=0.000000216579944
 
 ==========  START: Line search times 4
 **********  START: PM3/PDDG-SCF  **********
-SCF iter=0: RMS density=0.000000414114411 
+SCF iter=0: RMS density=0.000000414114411
 
 
 
@@ -527,7 +527,7 @@ SCF iter=0: RMS density=0.000000414114411
 		6	H	1.000000e+00	8.305914e-02
 		7	H	1.000000e+00	8.542991e-02
 
-	Elapsed time(omp) for the SCF = 0.0375018[s].
+	Elapsed time(omp) for the SCF = 0.037077[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
@@ -570,7 +570,7 @@ SCF iter=0: RMS density=0.000000414114411
 
 ==========  START: Line search times 5
 **********  START: PM3/PDDG-SCF  **********
-SCF iter=0: RMS density=0.000000278399737 
+SCF iter=0: RMS density=0.000000278399737
 
 
 
@@ -613,7 +613,7 @@ SCF iter=0: RMS density=0.000000278399737
 		6	H	1.000000e+00	8.234071e-02
 		7	H	1.000000e+00	8.392319e-02
 
-	Elapsed time(omp) for the SCF = 0.0369029[s].
+	Elapsed time(omp) for the SCF = 0.037017[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
@@ -656,7 +656,7 @@ SCF iter=0: RMS density=0.000000278399737
 
 ==========  START: Line search times 6
 **********  START: PM3/PDDG-SCF  **********
-SCF iter=0: RMS density=0.000000194962214 
+SCF iter=0: RMS density=0.000000194962214
 
 
 
@@ -699,7 +699,7 @@ SCF iter=0: RMS density=0.000000194962214
 		6	H	1.000000e+00	8.259326e-02
 		7	H	1.000000e+00	8.360290e-02
 
-	Elapsed time(omp) for the SCF = 0.037354[s].
+	Elapsed time(omp) for the SCF = 0.037503[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
@@ -742,7 +742,7 @@ SCF iter=0: RMS density=0.000000194962214
 
 ==========  START: Line search times 7
 **********  START: PM3/PDDG-SCF  **********
-SCF iter=0: RMS density=0.000000145006977 
+SCF iter=0: RMS density=0.000000145006977
 
 
 
@@ -785,7 +785,7 @@ SCF iter=0: RMS density=0.000000145006977
 		6	H	1.000000e+00	8.243304e-02
 		7	H	1.000000e+00	8.300259e-02
 
-	Elapsed time(omp) for the SCF = 0.0364869[s].
+	Elapsed time(omp) for the SCF = 0.037520[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
@@ -828,7 +828,7 @@ SCF iter=0: RMS density=0.000000145006977
 
 ==========  START: Line search times 8
 **********  START: PM3/PDDG-SCF  **********
-SCF iter=0: RMS density=0.000000090900262 
+SCF iter=0: RMS density=0.000000090900262
 
 
 
@@ -871,7 +871,7 @@ SCF iter=0: RMS density=0.000000090900262
 		6	H	1.000000e+00	8.270341e-02
 		7	H	1.000000e+00	8.298338e-02
 
-	Elapsed time(omp) for the SCF = 0.0374489[s].
+	Elapsed time(omp) for the SCF = 0.037060[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
@@ -914,7 +914,7 @@ SCF iter=0: RMS density=0.000000090900262
 
 ==========  START: Line search times 9
 **********  START: PM3/PDDG-SCF  **********
-SCF iter=0: RMS density=0.000000083761643 
+SCF iter=0: RMS density=0.000000083761643
 
 
 
@@ -957,7 +957,7 @@ SCF iter=0: RMS density=0.000000083761643
 		6	H	1.000000e+00	8.273585e-02
 		7	H	1.000000e+00	8.279647e-02
 
-	Elapsed time(omp) for the SCF = 0.0366471[s].
+	Elapsed time(omp) for the SCF = 0.037919[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
@@ -1000,7 +1000,7 @@ SCF iter=0: RMS density=0.000000083761643
 
 ==========  START: Line search times 10
 **********  START: PM3/PDDG-SCF  **********
-SCF iter=0: RMS density=0.000000043525898 
+SCF iter=0: RMS density=0.000000043525898
 
 
 
@@ -1043,7 +1043,7 @@ SCF iter=0: RMS density=0.000000043525898
 		6	H	1.000000e+00	8.300155e-02
 		7	H	1.000000e+00	8.289807e-02
 
-	Elapsed time(omp) for the SCF = 0.037189[s].
+	Elapsed time(omp) for the SCF = 0.037619[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
@@ -1086,7 +1086,7 @@ SCF iter=0: RMS density=0.000000043525898
 
 ==========  START: Line search times 11
 **********  START: PM3/PDDG-SCF  **********
-SCF iter=0: RMS density=0.000000060353977 
+SCF iter=0: RMS density=0.000000060353977
 
 
 
@@ -1129,7 +1129,7 @@ SCF iter=0: RMS density=0.000000060353977
 		6	H	1.000000e+00	8.303443e-02
 		7	H	1.000000e+00	8.287049e-02
 
-	Elapsed time(omp) for the SCF = 0.0385909[s].
+	Elapsed time(omp) for the SCF = 0.037423[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
@@ -1172,7 +1172,7 @@ SCF iter=0: RMS density=0.000000060353977
 
 ==========  START: Line search times 12
 **********  START: PM3/PDDG-SCF  **********
-SCF iter=0: RMS density=0.000000026264230 
+SCF iter=0: RMS density=0.000000026264230
 
 
 
@@ -1215,7 +1215,7 @@ SCF iter=0: RMS density=0.000000026264230
 		6	H	1.000000e+00	8.321590e-02
 		7	H	1.000000e+00	8.299015e-02
 
-	Elapsed time(omp) for the SCF = 0.0370982[s].
+	Elapsed time(omp) for the SCF = 0.037310[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
@@ -1258,7 +1258,7 @@ SCF iter=0: RMS density=0.000000026264230
 
 ==========  START: Line search times 13
 **********  START: PM3/PDDG-SCF  **********
-SCF iter=0: RMS density=0.000000035602353 
+SCF iter=0: RMS density=0.000000035602353
 
 
 
@@ -1301,7 +1301,7 @@ SCF iter=0: RMS density=0.000000035602353
 		6	H	1.000000e+00	8.325978e-02
 		7	H	1.000000e+00	8.301917e-02
 
-	Elapsed time(omp) for the SCF = 0.0365951[s].
+	Elapsed time(omp) for the SCF = 0.037283[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
@@ -1344,7 +1344,7 @@ SCF iter=0: RMS density=0.000000035602353
 
 ==========  START: Line search times 14
 **********  START: PM3/PDDG-SCF  **********
-SCF iter=0: RMS density=0.000000018969730 
+SCF iter=0: RMS density=0.000000018969730
 
 
 
@@ -1387,7 +1387,7 @@ SCF iter=0: RMS density=0.000000018969730
 		6	H	1.000000e+00	8.337757e-02
 		7	H	1.000000e+00	8.312513e-02
 
-	Elapsed time(omp) for the SCF = 0.0368431[s].
+	Elapsed time(omp) for the SCF = 0.036877[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
@@ -1430,7 +1430,7 @@ SCF iter=0: RMS density=0.000000018969730
 
 ==========  START: Line search times 15
 **********  START: PM3/PDDG-SCF  **********
-SCF iter=0: RMS density=0.000000021585968 
+SCF iter=0: RMS density=0.000000021585968
 
 
 
@@ -1473,7 +1473,7 @@ SCF iter=0: RMS density=0.000000021585968
 		6	H	1.000000e+00	8.342163e-02
 		7	H	1.000000e+00	8.317757e-02
 
-	Elapsed time(omp) for the SCF = 0.0416629[s].
+	Elapsed time(omp) for the SCF = 0.038202[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
@@ -1516,7 +1516,7 @@ SCF iter=0: RMS density=0.000000021585968
 
 ==========  START: Line search times 16
 **********  START: PM3/PDDG-SCF  **********
-SCF iter=0: RMS density=0.000000012828114 
+SCF iter=0: RMS density=0.000000012828114
 
 
 
@@ -1559,7 +1559,7 @@ SCF iter=0: RMS density=0.000000012828114
 		6	H	1.000000e+00	8.348633e-02
 		7	H	1.000000e+00	8.325100e-02
 
-	Elapsed time(omp) for the SCF = 0.0368619[s].
+	Elapsed time(omp) for the SCF = 0.038030[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
@@ -1602,7 +1602,7 @@ SCF iter=0: RMS density=0.000000012828114
 
 ==========  START: Line search times 17
 **********  START: PM3/PDDG-SCF  **********
-SCF iter=0: RMS density=0.000000013370535 
+SCF iter=0: RMS density=0.000000013370535
 
 
 
@@ -1645,7 +1645,7 @@ SCF iter=0: RMS density=0.000000013370535
 		6	H	1.000000e+00	8.351597e-02
 		7	H	1.000000e+00	8.329954e-02
 
-	Elapsed time(omp) for the SCF = 0.0371408[s].
+	Elapsed time(omp) for the SCF = 0.037449[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
@@ -1688,7 +1688,7 @@ SCF iter=0: RMS density=0.000000013370535
 
 ==========  START: Line search times 18
 **********  START: PM3/PDDG-SCF  **********
-SCF iter=0: RMS density=0.000000008846217 
+SCF iter=0: RMS density=0.000000008846217
 
 
 
@@ -1731,7 +1731,7 @@ SCF iter=0: RMS density=0.000000008846217
 		6	H	1.000000e+00	8.355365e-02
 		7	H	1.000000e+00	8.335198e-02
 
-	Elapsed time(omp) for the SCF = 0.0392749[s].
+	Elapsed time(omp) for the SCF = 0.037076[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
@@ -1774,7 +1774,7 @@ SCF iter=0: RMS density=0.000000008846217
 
 ==========  START: Line search times 19
 **********  START: PM3/PDDG-SCF  **********
-SCF iter=0: RMS density=0.000000008236199 
+SCF iter=0: RMS density=0.000000008236199
 
 
 
@@ -1817,7 +1817,7 @@ SCF iter=0: RMS density=0.000000008236199
 		6	H	1.000000e+00	8.357176e-02
 		7	H	1.000000e+00	8.339136e-02
 
-	Elapsed time(omp) for the SCF = 0.0365651[s].
+	Elapsed time(omp) for the SCF = 0.036901[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
@@ -1860,7 +1860,7 @@ SCF iter=0: RMS density=0.000000008236199
 
 ==========  START: Line search times 20
 **********  START: PM3/PDDG-SCF  **********
-SCF iter=0: RMS density=0.000000005890881 
+SCF iter=0: RMS density=0.000000005890881
 
 
 
@@ -1903,7 +1903,7 @@ SCF iter=0: RMS density=0.000000005890881
 		6	H	1.000000e+00	8.359285e-02
 		7	H	1.000000e+00	8.342807e-02
 
-	Elapsed time(omp) for the SCF = 0.0493679[s].
+	Elapsed time(omp) for the SCF = 0.037137[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
@@ -1946,7 +1946,7 @@ SCF iter=0: RMS density=0.000000005890881
 
 ==========  START: Line search times 21
 **********  START: PM3/PDDG-SCF  **********
-SCF iter=0: RMS density=0.000000005065433 
+SCF iter=0: RMS density=0.000000005065433
 
 
 
@@ -1989,7 +1989,7 @@ SCF iter=0: RMS density=0.000000005065433
 		6	H	1.000000e+00	8.360299e-02
 		7	H	1.000000e+00	8.345812e-02
 
-	Elapsed time(omp) for the SCF = 0.037812[s].
+	Elapsed time(omp) for the SCF = 0.037416[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
@@ -2032,7 +2032,7 @@ SCF iter=0: RMS density=0.000000005065433
 
 ==========  START: Line search times 22
 **********  START: PM3/PDDG-SCF  **********
-SCF iter=0: RMS density=0.000000003821994 
+SCF iter=0: RMS density=0.000000003821994
 
 
 
@@ -2075,7 +2075,7 @@ SCF iter=0: RMS density=0.000000003821994
 		6	H	1.000000e+00	8.361708e-02
 		7	H	1.000000e+00	8.348997e-02
 
-	Elapsed time(omp) for the SCF = 0.0368991[s].
+	Elapsed time(omp) for the SCF = 0.037626[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
@@ -2122,13 +2122,13 @@ SCF iter=0: RMS density=0.000000003821994
 **********  DONE: Geometry optimization  **********
 	Summary for memory usage:
 		Max Heap: 0.158928[MB].
-		Current Heap(Leaked): 0[MB].
+		Current Heap(Leaked): 0.000000[MB].
 
 
      >>>>>  The MolDS finished normally!  <<<<<
-     >>>>>  CPU time: 32.5[s].  <<<<<
+     >>>>>  CPU time: 32.34[s].  <<<<<
      >>>>>  Elapsed time: 33[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 32.7013[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 32.3621[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

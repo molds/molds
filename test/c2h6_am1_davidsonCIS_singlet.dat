@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/1/10(Thu.) 15:14:26  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/2/8(Wed.) 12:22:12  <<<<<
 
 
 **********  START: Parse input  **********
@@ -8,7 +8,7 @@
 	Total number of valence AOs: 14
 	Total number of valence electrons: 14
 
-	Molecular configration:
+	Molecular configuration:
 		| i-th | atom type | x[angst.] | y[angst.] | z[angst.] |
 		0	C	0.000000e+00	2.000000e-02	0.000000e+00
 		1	C	1.493800e+00	-1.500000e-02	2.000000e-03
@@ -77,18 +77,18 @@ h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 | -1.0401 | 0.0000 | geometry_end |
 
 
 **********  START: AM1-SCF  **********
-SCF iter=0: RMS density=5.291502622129178 
-SCF iter=1: RMS density=2.251392923186922 
-SCF iter=2: RMS density=1.066360223936913 
-SCF iter=3: RMS density=0.485163652173431 
-SCF iter=4: RMS density=0.221525604336855 
-SCF iter=5: RMS density=0.101527699951394 
-SCF iter=6: RMS density=0.000475612652614 
-SCF iter=7: RMS density=0.000114151272532 
-SCF iter=8: RMS density=0.000045086399356 
-SCF iter=9: RMS density=0.000008220727852 
-SCF iter=10: RMS density=0.000002287341920 
-SCF iter=11: RMS density=0.000000372121783 
+SCF iter=0: RMS density=5.291502622129178
+SCF iter=1: RMS density=2.251392923186922
+SCF iter=2: RMS density=1.066360223936913
+SCF iter=3: RMS density=0.485163652173431
+SCF iter=4: RMS density=0.221525604336855
+SCF iter=5: RMS density=0.101527699951394
+SCF iter=6: RMS density=0.000475612652614
+SCF iter=7: RMS density=0.000114151272532
+SCF iter=8: RMS density=0.000045086399356
+SCF iter=9: RMS density=0.000008220727852
+SCF iter=10: RMS density=0.000002287341920
+SCF iter=11: RMS density=0.000000372121783
 
 
 
@@ -131,87 +131,87 @@ SCF iter=11: RMS density=0.000000372121783
 		6	H	1.000000e+00	7.029841e-02
 		7	H	1.000000e+00	7.579838e-02
 
-	Elapsed time(omp) for the SCF = 0.0470951[s].
+	Elapsed time(omp) for the SCF = 0.050054[s].
 **********  DONE: AM1-SCF  **********
 
 
 **********  START: AM1-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.0562768[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.055936[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
 	Davidson iter=0
-	  1-th excited: norm of the residual = 0.0728378
-	  2-th excited: norm of the residual = 0.0416523
-	  3-th excited: norm of the residual = 0.0428708
-	  4-th excited: norm of the residual = 0.0520726
+	  1-th excited: norm of the residual = 7.283779e-02
+	  2-th excited: norm of the residual = 4.165227e-02
+	  3-th excited: norm of the residual = 4.287076e-02
+	  4-th excited: norm of the residual = 5.207261e-02
 
 	Davidson iter=1
-	  1-th excited: norm of the residual = 0.0229801
-	  2-th excited: norm of the residual = 0.0274605
-	  3-th excited: norm of the residual = 0.032779
-	  4-th excited: norm of the residual = 0.0545607
+	  1-th excited: norm of the residual = 2.298015e-02
+	  2-th excited: norm of the residual = 2.746050e-02
+	  3-th excited: norm of the residual = 3.277905e-02
+	  4-th excited: norm of the residual = 5.456073e-02
 
 	Davidson iter=2
-	  1-th excited: norm of the residual = 0.00525131
-	  2-th excited: norm of the residual = 0.0203323
-	  3-th excited: norm of the residual = 0.0205904
-	  4-th excited: norm of the residual = 0.0129594
+	  1-th excited: norm of the residual = 5.251314e-03
+	  2-th excited: norm of the residual = 2.033227e-02
+	  3-th excited: norm of the residual = 2.059043e-02
+	  4-th excited: norm of the residual = 1.295943e-02
 
 	Davidson iter=3
-	  1-th excited: norm of the residual = 0.00239178
-	  2-th excited: norm of the residual = 0.00939853
-	  3-th excited: norm of the residual = 0.0150366
-	  4-th excited: norm of the residual = 0.0127669
+	  1-th excited: norm of the residual = 2.391784e-03
+	  2-th excited: norm of the residual = 9.398529e-03
+	  3-th excited: norm of the residual = 1.503659e-02
+	  4-th excited: norm of the residual = 1.276686e-02
 
 	Davidson iter=4
-	  1-th excited: norm of the residual = 0.000734699
-	  2-th excited: norm of the residual = 0.00291876
-	  3-th excited: norm of the residual = 0.00803302
-	  4-th excited: norm of the residual = 0.00459575
+	  1-th excited: norm of the residual = 7.346987e-04
+	  2-th excited: norm of the residual = 2.918760e-03
+	  3-th excited: norm of the residual = 8.033015e-03
+	  4-th excited: norm of the residual = 4.595753e-03
 
 	Davidson iter=5
-	  1-th excited: norm of the residual = 0.000192212
-	  2-th excited: norm of the residual = 0.0024442
-	  3-th excited: norm of the residual = 0.00299628
-	  4-th excited: norm of the residual = 0.00365582
+	  1-th excited: norm of the residual = 1.922116e-04
+	  2-th excited: norm of the residual = 2.444202e-03
+	  3-th excited: norm of the residual = 2.996284e-03
+	  4-th excited: norm of the residual = 3.655823e-03
 
 	Davidson iter=6
-	  1-th excited: norm of the residual = 5.99631e-05
-	  2-th excited: norm of the residual = 0.00151372
-	  3-th excited: norm of the residual = 0.00137429
-	  4-th excited: norm of the residual = 0.0136229
+	  1-th excited: norm of the residual = 5.996306e-05
+	  2-th excited: norm of the residual = 1.513717e-03
+	  3-th excited: norm of the residual = 1.374286e-03
+	  4-th excited: norm of the residual = 1.362289e-02
 
 	Davidson iter=7
-	  1-th excited: norm of the residual = 2.50431e-05
-	  2-th excited: norm of the residual = 0.000929263
-	  3-th excited: norm of the residual = 0.000466912
-	  4-th excited: norm of the residual = 0.00383575
+	  1-th excited: norm of the residual = 2.504307e-05
+	  2-th excited: norm of the residual = 9.292625e-04
+	  3-th excited: norm of the residual = 4.669115e-04
+	  4-th excited: norm of the residual = 3.835746e-03
 
 	Davidson iter=8
-	  1-th excited: norm of the residual = 4.14873e-06
-	  2-th excited: norm of the residual = 0.000123915
-	  3-th excited: norm of the residual = 7.63119e-05
-	  4-th excited: norm of the residual = 0.000568239
+	  1-th excited: norm of the residual = 4.148735e-06
+	  2-th excited: norm of the residual = 1.239155e-04
+	  3-th excited: norm of the residual = 7.631194e-05
+	  4-th excited: norm of the residual = 5.682392e-04
 
 	Davidson iter=9
-	  1-th excited: norm of the residual = 3.98903e-07
-	  2-th excited: norm of the residual = 1.13943e-05
-	  3-th excited: norm of the residual = 1.20538e-05
-	  4-th excited: norm of the residual = 7.077e-05
+	  1-th excited: norm of the residual = 3.989035e-07
+	  2-th excited: norm of the residual = 1.139433e-05
+	  3-th excited: norm of the residual = 1.205378e-05
+	  4-th excited: norm of the residual = 7.076997e-05
 
 	Davidson iter=10
-	  1-th excited: norm of the residual = 8.27526e-08
-	  2-th excited: norm of the residual = 1.36275e-06
-	  3-th excited: norm of the residual = 6.6542e-07
-	  4-th excited: norm of the residual = 5.74631e-06
+	  1-th excited: norm of the residual = 8.275260e-08
+	  2-th excited: norm of the residual = 1.362746e-06
+	  3-th excited: norm of the residual = 6.654198e-07
+	  4-th excited: norm of the residual = 5.746308e-06
 
 	Davidson iter=11
-	  1-th excited: norm of the residual = 7.13171e-08
-	  2-th excited: norm of the residual = 2.45283e-08
-	  3-th excited: norm of the residual = 6.32279e-08
-	  4-th excited: norm of the residual = 2.72851e-07
+	  1-th excited: norm of the residual = 7.131714e-08
+	  2-th excited: norm of the residual = 2.452829e-08
+	  3-th excited: norm of the residual = 6.322789e-08
+	  4-th excited: norm of the residual = 2.728510e-07
 
 
 
@@ -228,19 +228,19 @@ SCF iter=11: RMS density=0.000000372121783
 		 3	3.114695e-01	8.475583e+00
 		 4	3.126553e-01	8.507851e+00
 
-	Elapsed time(omp) for the CIS = 0.237216[s].
+	Elapsed time(omp) for the CIS = 0.239945[s].
 **********  DONE: AM1-CIS  **********
 
 
 	Summary for memory usage:
 		Max Heap: 0.192536[MB].
-		Current Heap(Leaked): 0[MB].
+		Current Heap(Leaked): 0.000000[MB].
 
 
      >>>>>  The MolDS finished normally!  <<<<<
      >>>>>  CPU time: 0.29[s].  <<<<<
      >>>>>  Elapsed time: 0[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 0.286851[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 0.294879[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

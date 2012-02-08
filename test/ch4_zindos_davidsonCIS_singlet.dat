@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/1/10(Thu.) 15:13:53  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/2/8(Wed.) 12:21:7  <<<<<
 
 
 **********  START: Parse input  **********
@@ -8,7 +8,7 @@
 	Total number of valence AOs: 8
 	Total number of valence electrons: 8
 
-	Molecular configration:
+	Molecular configuration:
 		| i-th | atom type | x[angst.] | y[angst.] | z[angst.] |
 		0	C	6.473890e-01	8.201310e-01	0.000000e+00
 		1	H	1.004043e+00	-1.886790e-01	0.000000e+00
@@ -70,14 +70,14 @@ h | 1.004043 | -0.188679 | 0.000000 | h | 1.004062 | 1.324529 | 0.873652 | h | 1
 
 
 **********  START: ZINDO/S-SCF  **********
-SCF iter=0: RMS density=4.000000000000001 
-SCF iter=1: RMS density=3.097217959517265 
-SCF iter=2: RMS density=0.566569862085649 
-SCF iter=3: RMS density=0.100842032032177 
-SCF iter=4: RMS density=0.018517626285137 
-SCF iter=5: RMS density=0.003277687282703 
-SCF iter=6: RMS density=0.000006005767757 
-SCF iter=7: RMS density=0.000000025983597 
+SCF iter=0: RMS density=4.000000000000001
+SCF iter=1: RMS density=3.097217959517265
+SCF iter=2: RMS density=0.566569862085649
+SCF iter=3: RMS density=0.100842032032177
+SCF iter=4: RMS density=0.018517626285137
+SCF iter=5: RMS density=0.003277687282703
+SCF iter=6: RMS density=0.000006005767757
+SCF iter=7: RMS density=0.000000025983597
 
 
 
@@ -111,39 +111,39 @@ SCF iter=7: RMS density=0.000000025983597
 		3	H	1.000000e+00	2.223536e-02
 		4	H	1.000000e+00	2.223536e-02
 
-	Elapsed time(omp) for the SCF = 0.010674[s].
+	Elapsed time(omp) for the SCF = 0.013936[s].
 **********  DONE: ZINDO/S-SCF  **********
 
 
 **********  START: ZINDO/S-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.00150704[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.001481[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
 	Davidson iter=0
-	  1-th excited: norm of the residual = 0.0441371
-	  2-th excited: norm of the residual = 0.0447529
-	  3-th excited: norm of the residual = 0.0447529
-	  4-th excited: norm of the residual = 0.0932162
+	  1-th excited: norm of the residual = 4.413714e-02
+	  2-th excited: norm of the residual = 4.475288e-02
+	  3-th excited: norm of the residual = 4.475291e-02
+	  4-th excited: norm of the residual = 9.321619e-02
 
 	Davidson iter=1
-	  1-th excited: norm of the residual = 0.00449941
-	  2-th excited: norm of the residual = 0.00561151
-	  3-th excited: norm of the residual = 0.00844908
-	  4-th excited: norm of the residual = 0.0337034
+	  1-th excited: norm of the residual = 4.499411e-03
+	  2-th excited: norm of the residual = 5.611514e-03
+	  3-th excited: norm of the residual = 8.449078e-03
+	  4-th excited: norm of the residual = 3.370345e-02
 
 	Davidson iter=2
-	  1-th excited: norm of the residual = 4.24665e-06
-	  2-th excited: norm of the residual = 9.30364e-05
-	  3-th excited: norm of the residual = 0.000646462
-	  4-th excited: norm of the residual = 0.00489769
+	  1-th excited: norm of the residual = 4.246651e-06
+	  2-th excited: norm of the residual = 9.303640e-05
+	  3-th excited: norm of the residual = 6.464624e-04
+	  4-th excited: norm of the residual = 4.897693e-03
 
 	Davidson iter=3
-	  1-th excited: norm of the residual = 9.12551e-10
-	  2-th excited: norm of the residual = 1.09018e-09
-	  3-th excited: norm of the residual = 7.16478e-13
-	  4-th excited: norm of the residual = 1.70902e-09
+	  1-th excited: norm of the residual = 9.125506e-10
+	  2-th excited: norm of the residual = 1.090177e-09
+	  3-th excited: norm of the residual = 7.164783e-13
+	  4-th excited: norm of the residual = 1.709016e-09
 
 
 
@@ -160,19 +160,19 @@ SCF iter=7: RMS density=0.000000025983597
 		 3	5.274569e-01	1.435295e+01
 		 4	5.898275e-01	1.605015e+01
 
-	Elapsed time(omp) for the CIS = 0.0159771[s].
+	Elapsed time(omp) for the CIS = 0.003701[s].
 **********  DONE: ZINDO/S-CIS  **********
 
 
 	Summary for memory usage:
-		Max Heap: 0.00984[MB].
-		Current Heap(Leaked): 0[MB].
+		Max Heap: 0.009840[MB].
+		Current Heap(Leaked): 0.000000[MB].
 
 
      >>>>>  The MolDS finished normally!  <<<<<
-     >>>>>  CPU time: 0.01[s].  <<<<<
+     >>>>>  CPU time: 0.02[s].  <<<<<
      >>>>>  Elapsed time: 0[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 0.028564[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 0.020119[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

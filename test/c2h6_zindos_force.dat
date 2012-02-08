@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/1/13(Fri.) 13:31:3  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/2/8(Wed.) 12:21:9  <<<<<
 
 
 **********  START: Parse input  **********
@@ -8,7 +8,7 @@
 	Total number of valence AOs: 14
 	Total number of valence electrons: 14
 
-	Molecular configration:
+	Molecular configuration:
 		| i-th | atom type | x[angst.] | y[angst.] | z[angst.] |
 		0	C	0.000000e+00	2.000000e-02	0.000000e+00
 		1	C	1.493800e+00	-1.500000e-02	2.000000e-03
@@ -56,7 +56,7 @@
 		Heap limit: 2.560000e+02[MB]
 
 	MD conditions:
-		Electronic eigen state: 0
+		Electronic eigenstate: 0
 		Total steps: 5
 		Time width(dt): 0.050000[fs]
 
@@ -74,15 +74,15 @@ geometry_end |
 
 **********  START: Molecular dynamics  **********
 **********  START: ZINDO/S-SCF  **********
-SCF iter=0: RMS density=5.291502622129184 
-SCF iter=1: RMS density=3.838492151665711 
-SCF iter=2: RMS density=0.639670447585092 
-SCF iter=3: RMS density=0.104551025859929 
-SCF iter=4: RMS density=0.017838263308206 
-SCF iter=5: RMS density=0.002973046733479 
-SCF iter=6: RMS density=0.000074147072849 
-SCF iter=7: RMS density=0.000011993148172 
-SCF iter=8: RMS density=0.000000782384959 
+SCF iter=0: RMS density=5.291502622129184
+SCF iter=1: RMS density=3.838492151665711
+SCF iter=2: RMS density=0.639670447585092
+SCF iter=3: RMS density=0.104551025859929
+SCF iter=4: RMS density=0.017838263308206
+SCF iter=5: RMS density=0.002973046733479
+SCF iter=6: RMS density=0.000074147072849
+SCF iter=7: RMS density=0.000011993148172
+SCF iter=8: RMS density=0.000000782384959
 
 
 
@@ -125,7 +125,7 @@ SCF iter=8: RMS density=0.000000782384959
 		6	H	1.000000e+00	1.599949e-02
 		7	H	1.000000e+00	2.221343e-02
 
-	Elapsed time(omp) for the SCF = 0.0272248[s].
+	Elapsed time(omp) for the SCF = 0.022231[s].
 **********  DONE: ZINDO/S-SCF  **********
 
 
@@ -139,7 +139,7 @@ SCF iter=8: RMS density=0.000000782384959
 		(inc. core rep.)	-5.340728e+00	-1.453298e+02
 		Total            	-5.340728e+00	-1.453298e+02
 
-	Molecular configration:
+	Molecular configuration:
 		| i-th | atom type | x[angst.] | y[angst.] | z[angst.] |
 		0	C	0.000000e+00	2.000000e-02	0.000000e+00
 		1	C	1.493800e+00	-1.500000e-02	2.000000e-03
@@ -198,11 +198,11 @@ SCF iter=8: RMS density=0.000000782384959
 
 	========== START: MD step 1
 **********  START: ZINDO/S-SCF  **********
-SCF iter=0: RMS density=0.000399629201404 
-SCF iter=1: RMS density=0.000081736877335 
-SCF iter=2: RMS density=0.000018350514825 
-SCF iter=3: RMS density=0.000004027773906 
-SCF iter=4: RMS density=0.000000916022614 
+SCF iter=0: RMS density=0.000399629201404
+SCF iter=1: RMS density=0.000081736877335
+SCF iter=2: RMS density=0.000018350514825
+SCF iter=3: RMS density=0.000004027773906
+SCF iter=4: RMS density=0.000000916022614
 
 
 
@@ -245,7 +245,7 @@ SCF iter=4: RMS density=0.000000916022614
 		6	H	1.000000e+00	1.597875e-02
 		7	H	1.000000e+00	2.219382e-02
 
-	Elapsed time(omp) for the SCF = 0.00564408[s].
+	Elapsed time(omp) for the SCF = 0.006097[s].
 **********  DONE: ZINDO/S-SCF  **********
 
 
@@ -258,7 +258,7 @@ SCF iter=4: RMS density=0.000000916022614
 		Total            	-5.340730e+00	-1.453298e+02
 		Error            	1.495290e-06	4.068925e-05
 
-	Molecular configration:
+	Molecular configuration:
 		| i-th | atom type | x[angst.] | y[angst.] | z[angst.] |
 		0	C	-5.687113e-05	1.999809e-02	-1.020925e-06
 		1	C	1.493857e+00	-1.500022e-02	2.000026e-03
@@ -314,17 +314,17 @@ SCF iter=4: RMS density=0.000000916022614
 		6	H	6.062726e-01	5.602902e-01	9.632815e-01
 		7	H	6.357576e-01	-1.161242e+00	5.051472e-04
 
-	Time in [fs]: 0.05
+	Time in [fs]: 0.050000
 	========== DONE: MD step 1
 
 	========== START: MD step 2
 **********  START: ZINDO/S-SCF  **********
-SCF iter=0: RMS density=0.001197576731378 
-SCF iter=1: RMS density=0.000245066261714 
-SCF iter=2: RMS density=0.000055047292894 
-SCF iter=3: RMS density=0.000012086530016 
-SCF iter=4: RMS density=0.000002750216149 
-SCF iter=5: RMS density=0.000000616040327 
+SCF iter=0: RMS density=0.001197576731378
+SCF iter=1: RMS density=0.000245066261714
+SCF iter=2: RMS density=0.000055047292894
+SCF iter=3: RMS density=0.000012086530016
+SCF iter=4: RMS density=0.000002750216149
+SCF iter=5: RMS density=0.000000616040327
 
 
 
@@ -367,7 +367,7 @@ SCF iter=5: RMS density=0.000000616040327
 		6	H	1.000000e+00	1.591669e-02
 		7	H	1.000000e+00	2.213515e-02
 
-	Elapsed time(omp) for the SCF = 0.00578284[s].
+	Elapsed time(omp) for the SCF = 0.006362[s].
 **********  DONE: ZINDO/S-SCF  **********
 
 
@@ -380,7 +380,7 @@ SCF iter=5: RMS density=0.000000616040327
 		Total            	-5.340734e+00	-1.453299e+02
 		Error            	5.950898e-06	1.619335e-04
 
-	Molecular configration:
+	Molecular configuration:
 		| i-th | atom type | x[angst.] | y[angst.] | z[angst.] |
 		0	C	-2.274880e-04	1.999238e-02	-4.080002e-06
 		1	C	1.494026e+00	-1.500088e-02	2.000104e-03
@@ -436,18 +436,18 @@ SCF iter=5: RMS density=0.000000616040327
 		6	H	1.211492e+00	1.119243e+00	1.924300e+00
 		7	H	1.270293e+00	-2.319626e+00	1.014317e-03
 
-	Time in [fs]: 0.1
+	Time in [fs]: 0.100000
 	========== DONE: MD step 2
 
 	========== START: MD step 3
 **********  START: ZINDO/S-SCF  **********
-SCF iter=0: RMS density=0.001991668552523 
-SCF iter=1: RMS density=0.000407959046498 
-SCF iter=2: RMS density=0.000091713202377 
-SCF iter=3: RMS density=0.000020149483813 
-SCF iter=4: RMS density=0.000004588760801 
-SCF iter=5: RMS density=0.000001028351503 
-SCF iter=6: RMS density=0.000000007274088 
+SCF iter=0: RMS density=0.001991668552523
+SCF iter=1: RMS density=0.000407959046498
+SCF iter=2: RMS density=0.000091713202377
+SCF iter=3: RMS density=0.000020149483813
+SCF iter=4: RMS density=0.000004588760801
+SCF iter=5: RMS density=0.000001028351503
+SCF iter=6: RMS density=0.000000007274088
 
 
 
@@ -490,7 +490,7 @@ SCF iter=6: RMS density=0.000000007274088
 		6	H	1.000000e+00	1.581390e-02
 		7	H	1.000000e+00	2.203806e-02
 
-	Elapsed time(omp) for the SCF = 0.00606704[s].
+	Elapsed time(omp) for the SCF = 0.006929[s].
 **********  DONE: ZINDO/S-SCF  **********
 
 
@@ -503,7 +503,7 @@ SCF iter=6: RMS density=0.000000007274088
 		Total            	-5.340741e+00	-1.453301e+02
 		Error            	1.327706e-05	3.612900e-04
 
-	Molecular configration:
+	Molecular configuration:
 		| i-th | atom type | x[angst.] | y[angst.] | z[angst.] |
 		0	C	-5.118608e-04	1.998290e-02	-9.166178e-06
 		1	C	1.494309e+00	-1.500199e-02	2.000237e-03
@@ -559,18 +559,18 @@ SCF iter=6: RMS density=0.000000007274088
 		6	H	1.814612e+00	1.675535e+00	2.880813e+00
 		7	H	1.902393e+00	-3.472322e+00	1.531473e-03
 
-	Time in [fs]: 0.15
+	Time in [fs]: 0.150000
 	========== DONE: MD step 3
 
 	========== START: MD step 4
 **********  START: ZINDO/S-SCF  **********
-SCF iter=0: RMS density=0.002779628410982 
-SCF iter=1: RMS density=0.000570162606597 
-SCF iter=2: RMS density=0.000128325918763 
-SCF iter=3: RMS density=0.000028218388925 
-SCF iter=4: RMS density=0.000006433878292 
-SCF iter=5: RMS density=0.000001442816918 
-SCF iter=6: RMS density=0.000000010198127 
+SCF iter=0: RMS density=0.002779628410982
+SCF iter=1: RMS density=0.000570162606597
+SCF iter=2: RMS density=0.000128325918763
+SCF iter=3: RMS density=0.000028218388925
+SCF iter=4: RMS density=0.000006433878292
+SCF iter=5: RMS density=0.000001442816918
+SCF iter=6: RMS density=0.000000010198127
 
 
 
@@ -613,7 +613,7 @@ SCF iter=6: RMS density=0.000000010198127
 		6	H	1.000000e+00	1.567135e-02
 		7	H	1.000000e+00	2.190363e-02
 
-	Elapsed time(omp) for the SCF = 0.00603986[s].
+	Elapsed time(omp) for the SCF = 0.006691[s].
 **********  DONE: ZINDO/S-SCF  **********
 
 
@@ -626,7 +626,7 @@ SCF iter=6: RMS density=0.000000010198127
 		Total            	-5.340752e+00	-1.453304e+02
 		Error            	2.332776e-05	6.347858e-04
 
-	Molecular configration:
+	Molecular configuration:
 		| i-th | atom type | x[angst.] | y[angst.] | z[angst.] |
 		0	C	-9.100050e-04	1.996971e-02	-1.626120e-05
 		1	C	1.494704e+00	-1.500358e-02	2.000426e-03
@@ -682,18 +682,18 @@ SCF iter=6: RMS density=0.000000010198127
 		6	H	2.414606e+00	2.227865e+00	3.830620e+00
 		7	H	2.530868e+00	-4.616554e+00	2.060438e-03
 
-	Time in [fs]: 0.2
+	Time in [fs]: 0.200000
 	========== DONE: MD step 4
 
 	========== START: MD step 5
 **********  START: ZINDO/S-SCF  **********
-SCF iter=0: RMS density=0.003559360272668 
-SCF iter=1: RMS density=0.000731462985485 
-SCF iter=2: RMS density=0.000164872389223 
-SCF iter=3: RMS density=0.000036297384031 
-SCF iter=4: RMS density=0.000008288430738 
-SCF iter=5: RMS density=0.000001860366233 
-SCF iter=6: RMS density=0.000000013139607 
+SCF iter=0: RMS density=0.003559360272668
+SCF iter=1: RMS density=0.000731462985485
+SCF iter=2: RMS density=0.000164872389223
+SCF iter=3: RMS density=0.000036297384031
+SCF iter=4: RMS density=0.000008288430738
+SCF iter=5: RMS density=0.000001860366233
+SCF iter=6: RMS density=0.000000013139607
 
 
 
@@ -736,7 +736,7 @@ SCF iter=6: RMS density=0.000000013139607
 		6	H	1.000000e+00	1.549037e-02
 		7	H	1.000000e+00	2.173328e-02
 
-	Elapsed time(omp) for the SCF = 0.00631499[s].
+	Elapsed time(omp) for the SCF = 0.006649[s].
 **********  DONE: ZINDO/S-SCF  **********
 
 
@@ -749,7 +749,7 @@ SCF iter=6: RMS density=0.000000013139607
 		Total            	-5.340764e+00	-1.453308e+02
 		Error            	3.590567e-05	9.770509e-04
 
-	Molecular configration:
+	Molecular configuration:
 		| i-th | atom type | x[angst.] | y[angst.] | z[angst.] |
 		0	C	-1.421940e-03	1.995291e-02	-2.533985e-05
 		1	C	1.495213e+00	-1.500565e-02	2.000675e-03
@@ -805,18 +805,18 @@ SCF iter=6: RMS density=0.000000013139607
 		6	H	3.010467e+00	2.774970e+00	4.771581e+00
 		7	H	3.154556e+00	-5.749627e+00	2.604836e-03
 
-	Time in [fs]: 0.25
+	Time in [fs]: 0.250000
 	========== DONE: MD step 5
 **********  DONE: Molecular dynamics  **********
 	Summary for memory usage:
 		Max Heap: 0.027856[MB].
-		Current Heap(Leaked): 0[MB].
+		Current Heap(Leaked): 0.000000[MB].
 
 
      >>>>>  The MolDS finished normally!  <<<<<
-     >>>>>  CPU time: 0.39[s].  <<<<<
-     >>>>>  Elapsed time: 1[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 0.390279[s].  <<<<<
+     >>>>>  CPU time: 0.38[s].  <<<<<
+     >>>>>  Elapsed time: 0[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 0.397421[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

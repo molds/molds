@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/1/19(Thu.) 10:32:35  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/2/8(Wed.) 12:26:14  <<<<<
 
 
 **********  START: Parse input  **********
@@ -62,7 +62,7 @@
 		CIS-Davidson: no
 
 	MC conditions:
-		Electronic eigen state: 1
+		Electronic eigenstate: 1
 		Total steps: 5
 		Temperature: 300.000000[K]
 		Step width: 0.050000[Angst.]
@@ -83,19 +83,19 @@ h | 1.8600 | -1.0401 | 0.0000 | geometry_end |
 
 **********  START: Monte Carlo  **********
 **********  START: PM3-SCF  **********
-SCF iter=0: RMS density=5.291502622129178 
-SCF iter=1: RMS density=1.910456125626945 
-SCF iter=2: RMS density=1.044203238495392 
-SCF iter=3: RMS density=0.569275110921828 
-SCF iter=4: RMS density=0.308641545774631 
-SCF iter=5: RMS density=0.166813060251973 
-SCF iter=6: RMS density=0.000657312351890 
-SCF iter=7: RMS density=0.000224796079741 
-SCF iter=8: RMS density=0.000083564976989 
-SCF iter=9: RMS density=0.000026986732841 
-SCF iter=10: RMS density=0.000004938275842 
-SCF iter=11: RMS density=0.000002003884716 
-SCF iter=12: RMS density=0.000000169506350 
+SCF iter=0: RMS density=5.291502622129178
+SCF iter=1: RMS density=1.910456125626945
+SCF iter=2: RMS density=1.044203238495392
+SCF iter=3: RMS density=0.569275110921828
+SCF iter=4: RMS density=0.308641545774631
+SCF iter=5: RMS density=0.166813060251973
+SCF iter=6: RMS density=0.000657312351890
+SCF iter=7: RMS density=0.000224796079741
+SCF iter=8: RMS density=0.000083564976989
+SCF iter=9: RMS density=0.000026986732841
+SCF iter=10: RMS density=0.000004938275842
+SCF iter=11: RMS density=0.000002003884716
+SCF iter=12: RMS density=0.000000169506350
 
 
 
@@ -138,13 +138,13 @@ SCF iter=12: RMS density=0.000000169506350
 		6	H	1.000000e+00	3.744313e-02
 		7	H	1.000000e+00	4.258006e-02
 
-	Elapsed time(omp) for the SCF = 0.0765638[s].
+	Elapsed time(omp) for the SCF = 0.050394[s].
 **********  DONE: PM3-SCF  **********
 
 
 **********  START: PM3-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.0673211[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.056087[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Direct-CIS  =====
@@ -204,7 +204,7 @@ SCF iter=12: RMS density=0.000000169506350
 		 48	1.176330e+00	3.200982e+01
 		 49	1.181425e+00	3.214846e+01
 
-	Elapsed time(omp) for the CIS = 0.0691462[s].
+	Elapsed time(omp) for the CIS = 0.059076[s].
 **********  DONE: PM3-CIS  **********
 
 
@@ -215,7 +215,6 @@ SCF iter=12: RMS density=0.000000169506350
 		Core repulsion   	2.185489e+01	5.947066e+02
 		Electronic
 		(inc. core rep.)	-1.185671e+01	-3.226400e+02
-
 	Molecular configuration:
 		| i-th | atom type | x[angst.] | y[angst.] | z[angst.] |
 		0	C	0.000000e+00	2.000000e-02	0.000000e+00
@@ -248,19 +247,19 @@ SCF iter=12: RMS density=0.000000169506350
 	========== START: MC step 1
 
 **********  START: PM3-SCF  **********
-SCF iter=0: RMS density=5.291502622129184 
-SCF iter=1: RMS density=1.903193717221936 
-SCF iter=2: RMS density=1.041663226876399 
-SCF iter=3: RMS density=0.569732144751601 
-SCF iter=4: RMS density=0.310012794711905 
-SCF iter=5: RMS density=0.168187496154966 
-SCF iter=6: RMS density=0.000957818190247 
-SCF iter=7: RMS density=0.000407933075989 
-SCF iter=8: RMS density=0.000143630981113 
-SCF iter=9: RMS density=0.000046259144689 
-SCF iter=10: RMS density=0.000008336690893 
-SCF iter=11: RMS density=0.000002748787969 
-SCF iter=12: RMS density=0.000000330165342 
+SCF iter=0: RMS density=5.291502622129184
+SCF iter=1: RMS density=1.903193717221936
+SCF iter=2: RMS density=1.041663226876399
+SCF iter=3: RMS density=0.569732144751601
+SCF iter=4: RMS density=0.310012794711905
+SCF iter=5: RMS density=0.168187496154966
+SCF iter=6: RMS density=0.000957818190247
+SCF iter=7: RMS density=0.000407933075989
+SCF iter=8: RMS density=0.000143630981113
+SCF iter=9: RMS density=0.000046259144689
+SCF iter=10: RMS density=0.000008336690893
+SCF iter=11: RMS density=0.000002748787969
+SCF iter=12: RMS density=0.000000330165342
 
 
 
@@ -303,13 +302,13 @@ SCF iter=12: RMS density=0.000000330165342
 		6	H	1.000000e+00	3.876166e-02
 		7	H	1.000000e+00	4.011921e-02
 
-	Elapsed time(omp) for the SCF = 0.0395579[s].
+	Elapsed time(omp) for the SCF = 0.039799[s].
 **********  DONE: PM3-SCF  **********
 
 
 **********  START: PM3-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.0562551[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.056381[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Direct-CIS  =====
@@ -369,7 +368,7 @@ SCF iter=12: RMS density=0.000000330165342
 		 48	1.181629e+00	3.215403e+01
 		 49	1.184753e+00	3.223904e+01
 
-	Elapsed time(omp) for the CIS = 0.0573771[s].
+	Elapsed time(omp) for the CIS = 0.058405[s].
 **********  DONE: PM3-CIS  **********
 
 
@@ -378,7 +377,6 @@ SCF iter=12: RMS density=0.000000330165342
 		Core repulsion   	2.190779e+01	5.961461e+02
 		Electronic
 		(inc. core rep.)	-1.185591e+01	-3.226184e+02
-
 	Molecular configuration:
 		| i-th | atom type | x[angst.] | y[angst.] | z[angst.] |
 		0	C	6.242460e-05	2.154173e-02	-6.289213e-04
@@ -409,17 +407,18 @@ SCF iter=12: RMS density=0.000000330165342
 
 	========== DONE: MC step 1
 
+
 	========== START: MC step 2
 
 **********  START: PM3-SCF  **********
-SCF iter=0: RMS density=0.020355665157566 
-SCF iter=1: RMS density=0.007503243042569 
-SCF iter=2: RMS density=0.003176480683969 
-SCF iter=3: RMS density=0.001440267560210 
-SCF iter=4: RMS density=0.000674519468047 
-SCF iter=5: RMS density=0.000321084866702 
-SCF iter=6: RMS density=0.000001271066000 
-SCF iter=7: RMS density=0.000000485534180 
+SCF iter=0: RMS density=0.020355665157566
+SCF iter=1: RMS density=0.007503243042569
+SCF iter=2: RMS density=0.003176480683969
+SCF iter=3: RMS density=0.001440267560210
+SCF iter=4: RMS density=0.000674519468047
+SCF iter=5: RMS density=0.000321084866702
+SCF iter=6: RMS density=0.000001271066000
+SCF iter=7: RMS density=0.000000485534180
 
 
 
@@ -462,13 +461,13 @@ SCF iter=7: RMS density=0.000000485534180
 		6	H	1.000000e+00	3.956646e-02
 		7	H	1.000000e+00	4.000530e-02
 
-	Elapsed time(omp) for the SCF = 0.038852[s].
+	Elapsed time(omp) for the SCF = 0.038718[s].
 **********  DONE: PM3-SCF  **********
 
 
 **********  START: PM3-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.056654[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.057082[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Direct-CIS  =====
@@ -528,7 +527,7 @@ SCF iter=7: RMS density=0.000000485534180
 		 48	1.180585e+00	3.212560e+01
 		 49	1.183468e+00	3.220405e+01
 
-	Elapsed time(omp) for the CIS = 0.0577931[s].
+	Elapsed time(omp) for the CIS = 0.059248[s].
 **********  DONE: PM3-CIS  **********
 
 
@@ -537,7 +536,6 @@ SCF iter=7: RMS density=0.000000485534180
 		Core repulsion   	2.189056e+01	5.956771e+02
 		Electronic
 		(inc. core rep.)	-1.185551e+01	-3.226074e+02
-
 	Molecular configuration:
 		| i-th | atom type | x[angst.] | y[angst.] | z[angst.] |
 		0	C	6.458752e-04	2.159958e-02	-1.549800e-03
@@ -568,18 +566,19 @@ SCF iter=7: RMS density=0.000000485534180
 
 	========== DONE: MC step 2
 
+
 	========== START: MC step 3
 
 **********  START: PM3-SCF  **********
-SCF iter=0: RMS density=0.020858990565728 
-SCF iter=1: RMS density=0.007746384946864 
-SCF iter=2: RMS density=0.003337747993105 
-SCF iter=3: RMS density=0.001540462674213 
-SCF iter=4: RMS density=0.000731201243672 
-SCF iter=5: RMS density=0.000351360743813 
-SCF iter=6: RMS density=0.000002243952163 
-SCF iter=7: RMS density=0.000001018835581 
-SCF iter=8: RMS density=0.000000182665937 
+SCF iter=0: RMS density=0.020858990565728
+SCF iter=1: RMS density=0.007746384946864
+SCF iter=2: RMS density=0.003337747993105
+SCF iter=3: RMS density=0.001540462674213
+SCF iter=4: RMS density=0.000731201243672
+SCF iter=5: RMS density=0.000351360743813
+SCF iter=6: RMS density=0.000002243952163
+SCF iter=7: RMS density=0.000001018835581
+SCF iter=8: RMS density=0.000000182665937
 
 
 
@@ -622,13 +621,13 @@ SCF iter=8: RMS density=0.000000182665937
 		6	H	1.000000e+00	3.940052e-02
 		7	H	1.000000e+00	4.004738e-02
 
-	Elapsed time(omp) for the SCF = 0.038728[s].
+	Elapsed time(omp) for the SCF = 0.039426[s].
 **********  DONE: PM3-SCF  **********
 
 
 **********  START: PM3-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.0561519[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.056785[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Direct-CIS  =====
@@ -688,7 +687,7 @@ SCF iter=8: RMS density=0.000000182665937
 		 48	1.175547e+00	3.198852e+01
 		 49	1.180059e+00	3.211130e+01
 
-	Elapsed time(omp) for the CIS = 0.0572529[s].
+	Elapsed time(omp) for the CIS = 0.058588[s].
 **********  DONE: PM3-CIS  **********
 
 
@@ -697,7 +696,6 @@ SCF iter=8: RMS density=0.000000182665937
 		Core repulsion   	2.189056e+01	5.956771e+02
 		Electronic
 		(inc. core rep.)	-1.185551e+01	-3.226074e+02
-
 	Molecular configuration:
 		| i-th | atom type | x[angst.] | y[angst.] | z[angst.] |
 		0	C	6.458752e-04	2.159958e-02	-1.549800e-03
@@ -728,17 +726,18 @@ SCF iter=8: RMS density=0.000000182665937
 
 	========== DONE: MC step 3
 
+
 	========== START: MC step 4
 
 **********  START: PM3-SCF  **********
-SCF iter=0: RMS density=0.022985499982069 
-SCF iter=1: RMS density=0.006753550137732 
-SCF iter=2: RMS density=0.002525932616757 
-SCF iter=3: RMS density=0.001095254671450 
-SCF iter=4: RMS density=0.000506988602794 
-SCF iter=5: RMS density=0.000240999823944 
-SCF iter=6: RMS density=0.000001584274508 
-SCF iter=7: RMS density=0.000000653205127 
+SCF iter=0: RMS density=0.022985499982069
+SCF iter=1: RMS density=0.006753550137732
+SCF iter=2: RMS density=0.002525932616757
+SCF iter=3: RMS density=0.001095254671450
+SCF iter=4: RMS density=0.000506988602794
+SCF iter=5: RMS density=0.000240999823944
+SCF iter=6: RMS density=0.000001584274508
+SCF iter=7: RMS density=0.000000653205127
 
 
 
@@ -781,13 +780,13 @@ SCF iter=7: RMS density=0.000000653205127
 		6	H	1.000000e+00	3.963294e-02
 		7	H	1.000000e+00	4.006195e-02
 
-	Elapsed time(omp) for the SCF = 0.0388901[s].
+	Elapsed time(omp) for the SCF = 0.041005[s].
 **********  DONE: PM3-SCF  **********
 
 
 **********  START: PM3-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.0568731[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.056811[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Direct-CIS  =====
@@ -847,7 +846,7 @@ SCF iter=7: RMS density=0.000000653205127
 		 48	1.174399e+00	3.195727e+01
 		 49	1.177925e+00	3.205323e+01
 
-	Elapsed time(omp) for the CIS = 0.057868[s].
+	Elapsed time(omp) for the CIS = 0.059190[s].
 **********  DONE: PM3-CIS  **********
 
 
@@ -856,7 +855,6 @@ SCF iter=7: RMS density=0.000000653205127
 		Core repulsion   	2.189056e+01	5.956771e+02
 		Electronic
 		(inc. core rep.)	-1.185551e+01	-3.226074e+02
-
 	Molecular configuration:
 		| i-th | atom type | x[angst.] | y[angst.] | z[angst.] |
 		0	C	6.458752e-04	2.159958e-02	-1.549800e-03
@@ -887,17 +885,18 @@ SCF iter=7: RMS density=0.000000653205127
 
 	========== DONE: MC step 4
 
+
 	========== START: MC step 5
 
 **********  START: PM3-SCF  **********
-SCF iter=0: RMS density=0.018168455583591 
-SCF iter=1: RMS density=0.004833996724618 
-SCF iter=2: RMS density=0.001636907865471 
-SCF iter=3: RMS density=0.000674060791770 
-SCF iter=4: RMS density=0.000310587160216 
-SCF iter=5: RMS density=0.000151426385087 
-SCF iter=6: RMS density=0.000002843091933 
-SCF iter=7: RMS density=0.000000865976554 
+SCF iter=0: RMS density=0.018168455583591
+SCF iter=1: RMS density=0.004833996724618
+SCF iter=2: RMS density=0.001636907865471
+SCF iter=3: RMS density=0.000674060791770
+SCF iter=4: RMS density=0.000310587160216
+SCF iter=5: RMS density=0.000151426385087
+SCF iter=6: RMS density=0.000002843091933
+SCF iter=7: RMS density=0.000000865976554
 
 
 
@@ -940,13 +939,13 @@ SCF iter=7: RMS density=0.000000865976554
 		6	H	1.000000e+00	3.983954e-02
 		7	H	1.000000e+00	3.965667e-02
 
-	Elapsed time(omp) for the SCF = 0.0383391[s].
+	Elapsed time(omp) for the SCF = 0.039195[s].
 **********  DONE: PM3-SCF  **********
 
 
 **********  START: PM3-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.0576448[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.056656[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Direct-CIS  =====
@@ -1006,7 +1005,7 @@ SCF iter=7: RMS density=0.000000865976554
 		 48	1.178713e+00	3.207467e+01
 		 49	1.181690e+00	3.215568e+01
 
-	Elapsed time(omp) for the CIS = 0.058609[s].
+	Elapsed time(omp) for the CIS = 0.058476[s].
 **********  DONE: PM3-CIS  **********
 
 
@@ -1015,7 +1014,6 @@ SCF iter=7: RMS density=0.000000865976554
 		Core repulsion   	2.186739e+01	5.950468e+02
 		Electronic
 		(inc. core rep.)	-1.185610e+01	-3.226235e+02
-
 	Molecular configuration:
 		| i-th | atom type | x[angst.] | y[angst.] | z[angst.] |
 		0	C	3.526696e-04	2.155718e-02	-1.106068e-03
@@ -1045,19 +1043,20 @@ SCF iter=7: RMS density=0.000000865976554
 		1.409689e+00	4.008721e-03	9.968163e-04
 
 	========== DONE: MC step 5
-	Transition Rate: 0.6
+
+	Transition Rate: 0.600000
 
 **********  DONE: Monte Carlo  **********
 
 	Summary for memory usage:
-		Max Heap: 0.33432[MB].
-		Current Heap(Leaked): 0[MB].
+		Max Heap: 0.334320[MB].
+		Current Heap(Leaked): 0.000000[MB].
 
 
      >>>>>  The MolDS finished normally!  <<<<<
-     >>>>>  CPU time: 0.62[s].  <<<<<
-     >>>>>  Elapsed time: 0[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 0.634741[s].  <<<<<
+     >>>>>  CPU time: 0.61[s].  <<<<<
+     >>>>>  Elapsed time: 1[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 0.612261[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

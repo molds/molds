@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/1/10(Thu.) 15:15:53  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/2/8(Wed.) 12:29:19  <<<<<
 
 
 **********  START: Parse input  **********
@@ -8,7 +8,7 @@
 	Total number of valence AOs: 14
 	Total number of valence electrons: 14
 
-	Molecular configration:
+	Molecular configuration:
 		| i-th | atom type | x[angst.] | y[angst.] | z[angst.] |
 		0	C	0.000000e+00	2.000000e-02	0.000000e+00
 		1	C	1.493800e+00	-1.500000e-02	2.000000e-03
@@ -62,7 +62,7 @@
 		CIS-Davidson: no
 
 	MD conditions:
-		Electronic eigen state: 1
+		Electronic eigenstate: 1
 		Total steps: 1
 		Time width(dt): 0.050000[fs]
 
@@ -79,19 +79,20 @@ h | 1.8600 | -1.0401 | 0.0000 | geometry_end |
 **********  DONE: Parse input  ***********
 
 
+**********  START: Molecular dynamics  **********
 **********  START: MNDO-SCF  **********
-SCF iter=0: RMS density=5.291502622129181 
-SCF iter=1: RMS density=2.406832383581161 
-SCF iter=2: RMS density=1.097693927705069 
-SCF iter=3: RMS density=0.485996526273502 
-SCF iter=4: RMS density=0.217393982341887 
-SCF iter=5: RMS density=0.097852276195715 
-SCF iter=6: RMS density=0.000404257452988 
-SCF iter=7: RMS density=0.000094990567886 
-SCF iter=8: RMS density=0.000036084327847 
-SCF iter=9: RMS density=0.000007701726064 
-SCF iter=10: RMS density=0.000002052101653 
-SCF iter=11: RMS density=0.000000358204693 
+SCF iter=0: RMS density=5.291502622129181
+SCF iter=1: RMS density=2.406832383581161
+SCF iter=2: RMS density=1.097693927705069
+SCF iter=3: RMS density=0.485996526273502
+SCF iter=4: RMS density=0.217393982341887
+SCF iter=5: RMS density=0.097852276195715
+SCF iter=6: RMS density=0.000404257452988
+SCF iter=7: RMS density=0.000094990567886
+SCF iter=8: RMS density=0.000036084327847
+SCF iter=9: RMS density=0.000007701726064
+SCF iter=10: RMS density=0.000002052101653
+SCF iter=11: RMS density=0.000000358204693
 
 
 
@@ -138,13 +139,13 @@ SCF iter=11: RMS density=0.000000358204693
 		| [a.u.] | [Kcal/mol] | 
 		-2.736798e-02	-1.717367e+01
 
-	Elapsed time(omp) for the SCF = 0.046607[s].
+	Elapsed time(omp) for the SCF = 0.051292[s].
 **********  DONE: MNDO-SCF  **********
 
 
 **********  START: MNDO-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.0560348[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.056137[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Direct-CIS  =====
@@ -204,22 +205,21 @@ SCF iter=11: RMS density=0.000000358204693
 		 48	1.251950e+00	3.406757e+01
 		 49	1.264508e+00	3.440928e+01
 
-	Elapsed time(omp) for the CIS = 0.0576842[s].
+	Elapsed time(omp) for the CIS = 0.059005[s].
 **********  DONE: MNDO-CIS  **********
 
 
-**********  START: Molecular dynamics  **********
 Error in base::MallocFreer::Malloc: Reaches limit of heap. Change the "limit_heap" option in the memory-directive, machine you using, or your study!!!
 
 	Summary for memory usage:
 		Max Heap: 0.179472[MB].
-		Current Heap(Leaked): 0[MB].
+		Current Heap(Leaked): 0.000000[MB].
 
 
      >>>>>  The MolDS finished abnormally..............  <<<<<
-     >>>>>  CPU time: 0.12[s].  <<<<<
-     >>>>>  Elapsed time: 1[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 0.107687[s].  <<<<<
+     >>>>>  CPU time: 0.11[s].  <<<<<
+     >>>>>  Elapsed time: 0[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 0.116488[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

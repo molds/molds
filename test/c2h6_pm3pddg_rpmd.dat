@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/1/30(Mon.) 10:45:8  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/2/8(Wed.) 12:26:52  <<<<<
 
 
 **********  START: Parse input  **********
@@ -81,19 +81,19 @@ h | -0.3700 | -0.5208 | 0.9016 | h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 |
 **********  START: Initial calculation of electronic structure of each bead  ********* 
 ----------  Beads number 0
 **********  START: PM3/PDDG-SCF  **********
-SCF iter=0: RMS density=5.291502622129181 
-SCF iter=1: RMS density=1.861628657932584 
-SCF iter=2: RMS density=0.993038917902004 
-SCF iter=3: RMS density=0.533537667207403 
-SCF iter=4: RMS density=0.285736551185240 
-SCF iter=5: RMS density=0.152614133369432 
-SCF iter=6: RMS density=0.000600320800586 
-SCF iter=7: RMS density=0.000168359659961 
-SCF iter=8: RMS density=0.000050425360374 
-SCF iter=9: RMS density=0.000017587112674 
-SCF iter=10: RMS density=0.000002987470751 
-SCF iter=11: RMS density=0.000001449250234 
-SCF iter=12: RMS density=0.000000208044935 
+SCF iter=0: RMS density=5.291502622129181
+SCF iter=1: RMS density=1.861628657932584
+SCF iter=2: RMS density=0.993038917902004
+SCF iter=3: RMS density=0.533537667207403
+SCF iter=4: RMS density=0.285736551185240
+SCF iter=5: RMS density=0.152614133369432
+SCF iter=6: RMS density=0.000600320800586
+SCF iter=7: RMS density=0.000168359659961
+SCF iter=8: RMS density=0.000050425360374
+SCF iter=9: RMS density=0.000017587112674
+SCF iter=10: RMS density=0.000002987470751
+SCF iter=11: RMS density=0.000001449250234
+SCF iter=12: RMS density=0.000000208044935
 
 
 
@@ -136,25 +136,25 @@ SCF iter=12: RMS density=0.000000208044935
 		6	H	1.000000e+00	8.795855e-02
 		7	H	1.000000e+00	9.365443e-02
 
-	Elapsed time(omp) for the SCF = 0.0397959[s].
+	Elapsed time(omp) for the SCF = 0.040048[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 ----------  Beads number 1
 **********  START: PM3/PDDG-SCF  **********
-SCF iter=0: RMS density=5.291502622129181 
-SCF iter=1: RMS density=1.862104624197383 
-SCF iter=2: RMS density=0.993073580546309 
-SCF iter=3: RMS density=0.533365323535764 
-SCF iter=4: RMS density=0.285552669886114 
-SCF iter=5: RMS density=0.152473920154098 
-SCF iter=6: RMS density=0.000651918042023 
-SCF iter=7: RMS density=0.000200240894382 
-SCF iter=8: RMS density=0.000066038544882 
-SCF iter=9: RMS density=0.000024604869746 
-SCF iter=10: RMS density=0.000004237075975 
-SCF iter=11: RMS density=0.000001872941490 
-SCF iter=12: RMS density=0.000000172780660 
+SCF iter=0: RMS density=5.291502622129181
+SCF iter=1: RMS density=1.862104624197383
+SCF iter=2: RMS density=0.993073580546309
+SCF iter=3: RMS density=0.533365323535764
+SCF iter=4: RMS density=0.285552669886114
+SCF iter=5: RMS density=0.152473920154098
+SCF iter=6: RMS density=0.000651918042023
+SCF iter=7: RMS density=0.000200240894382
+SCF iter=8: RMS density=0.000066038544882
+SCF iter=9: RMS density=0.000024604869746
+SCF iter=10: RMS density=0.000004237075975
+SCF iter=11: RMS density=0.000001872941490
+SCF iter=12: RMS density=0.000000172780660
 
 
 
@@ -197,25 +197,25 @@ SCF iter=12: RMS density=0.000000172780660
 		6	H	1.000000e+00	8.864300e-02
 		7	H	1.000000e+00	9.446856e-02
 
-	Elapsed time(omp) for the SCF = 0.039799[s].
+	Elapsed time(omp) for the SCF = 0.040356[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 ----------  Beads number 2
 **********  START: PM3/PDDG-SCF  **********
-SCF iter=0: RMS density=5.291502622129177 
-SCF iter=1: RMS density=1.862832179355902 
-SCF iter=2: RMS density=0.993037152440104 
-SCF iter=3: RMS density=0.533234702458090 
-SCF iter=4: RMS density=0.285449662914721 
-SCF iter=5: RMS density=0.152406922581314 
-SCF iter=6: RMS density=0.000626844456721 
-SCF iter=7: RMS density=0.000174845519568 
-SCF iter=8: RMS density=0.000049871893110 
-SCF iter=9: RMS density=0.000015146452767 
-SCF iter=10: RMS density=0.000001965904664 
-SCF iter=11: RMS density=0.000001007616283 
-SCF iter=12: RMS density=0.000000242311105 
+SCF iter=0: RMS density=5.291502622129177
+SCF iter=1: RMS density=1.862832179355902
+SCF iter=2: RMS density=0.993037152440104
+SCF iter=3: RMS density=0.533234702458090
+SCF iter=4: RMS density=0.285449662914721
+SCF iter=5: RMS density=0.152406922581314
+SCF iter=6: RMS density=0.000626844456721
+SCF iter=7: RMS density=0.000174845519568
+SCF iter=8: RMS density=0.000049871893110
+SCF iter=9: RMS density=0.000015146452767
+SCF iter=10: RMS density=0.000001965904664
+SCF iter=11: RMS density=0.000001007616283
+SCF iter=12: RMS density=0.000000242311105
 
 
 
@@ -258,7 +258,7 @@ SCF iter=12: RMS density=0.000000242311105
 		6	H	1.000000e+00	8.848772e-02
 		7	H	1.000000e+00	9.308310e-02
 
-	Elapsed time(omp) for the SCF = 0.0397611[s].
+	Elapsed time(omp) for the SCF = 0.039831[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
@@ -277,19 +277,19 @@ SCF iter=12: RMS density=0.000000242311105
 ==========  START: RPMD step 1
 ----------  Beads number 0
 **********  START: PM3/PDDG-SCF  **********
-SCF iter=0: RMS density=3.724309455417795 
-SCF iter=1: RMS density=1.861625341705335 
-SCF iter=2: RMS density=0.993037371122125 
-SCF iter=3: RMS density=0.533537729578363 
-SCF iter=4: RMS density=0.285737131673967 
-SCF iter=5: RMS density=0.152614736081209 
-SCF iter=6: RMS density=0.000600251222497 
-SCF iter=7: RMS density=0.000168332731175 
-SCF iter=8: RMS density=0.000050416667713 
-SCF iter=9: RMS density=0.000017584917320 
-SCF iter=10: RMS density=0.000002986744922 
-SCF iter=11: RMS density=0.000001448849333 
-SCF iter=12: RMS density=0.000000208047379 
+SCF iter=0: RMS density=3.724309455417795
+SCF iter=1: RMS density=1.861625341705335
+SCF iter=2: RMS density=0.993037371122125
+SCF iter=3: RMS density=0.533537729578363
+SCF iter=4: RMS density=0.285737131673967
+SCF iter=5: RMS density=0.152614736081209
+SCF iter=6: RMS density=0.000600251222497
+SCF iter=7: RMS density=0.000168332731175
+SCF iter=8: RMS density=0.000050416667713
+SCF iter=9: RMS density=0.000017584917320
+SCF iter=10: RMS density=0.000002986744922
+SCF iter=11: RMS density=0.000001448849333
+SCF iter=12: RMS density=0.000000208047379
 
 
 
@@ -332,25 +332,25 @@ SCF iter=12: RMS density=0.000000208047379
 		6	H	1.000000e+00	8.795832e-02
 		7	H	1.000000e+00	9.365380e-02
 
-	Elapsed time(omp) for the SCF = 0.0396399[s].
+	Elapsed time(omp) for the SCF = 0.040324[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 ----------  Beads number 1
 **********  START: PM3/PDDG-SCF  **********
-SCF iter=0: RMS density=3.724177471514305 
-SCF iter=1: RMS density=1.862101059184789 
-SCF iter=2: RMS density=0.993071976204155 
-SCF iter=3: RMS density=0.533365427152301 
-SCF iter=4: RMS density=0.285553307947503 
-SCF iter=5: RMS density=0.152474570196816 
-SCF iter=6: RMS density=0.000651825700190 
-SCF iter=7: RMS density=0.000200202927883 
-SCF iter=8: RMS density=0.000066027269193 
-SCF iter=9: RMS density=0.000024602318898 
-SCF iter=10: RMS density=0.000004235719724 
-SCF iter=11: RMS density=0.000001872424435 
-SCF iter=12: RMS density=0.000000172792203 
+SCF iter=0: RMS density=3.724177471514305
+SCF iter=1: RMS density=1.862101059184789
+SCF iter=2: RMS density=0.993071976204155
+SCF iter=3: RMS density=0.533365427152301
+SCF iter=4: RMS density=0.285553307947503
+SCF iter=5: RMS density=0.152474570196816
+SCF iter=6: RMS density=0.000651825700190
+SCF iter=7: RMS density=0.000200202927883
+SCF iter=8: RMS density=0.000066027269193
+SCF iter=9: RMS density=0.000024602318898
+SCF iter=10: RMS density=0.000004235719724
+SCF iter=11: RMS density=0.000001872424435
+SCF iter=12: RMS density=0.000000172792203
 
 
 
@@ -393,25 +393,25 @@ SCF iter=12: RMS density=0.000000172792203
 		6	H	1.000000e+00	8.864265e-02
 		7	H	1.000000e+00	9.446782e-02
 
-	Elapsed time(omp) for the SCF = 0.0396361[s].
+	Elapsed time(omp) for the SCF = 0.040175[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 ----------  Beads number 2
 **********  START: PM3/PDDG-SCF  **********
-SCF iter=0: RMS density=3.724361371609103 
-SCF iter=1: RMS density=1.862828661086435 
-SCF iter=2: RMS density=0.993035579669564 
-SCF iter=3: RMS density=0.533234810909222 
-SCF iter=4: RMS density=0.285450292082042 
-SCF iter=5: RMS density=0.152407559965780 
-SCF iter=6: RMS density=0.000626761146098 
-SCF iter=7: RMS density=0.000174815709380 
-SCF iter=8: RMS density=0.000049863929639 
-SCF iter=9: RMS density=0.000015145051234 
-SCF iter=10: RMS density=0.000001965910873 
-SCF iter=11: RMS density=0.000001007595985 
-SCF iter=12: RMS density=0.000000242301510 
+SCF iter=0: RMS density=3.724361371609103
+SCF iter=1: RMS density=1.862828661086435
+SCF iter=2: RMS density=0.993035579669564
+SCF iter=3: RMS density=0.533234810909222
+SCF iter=4: RMS density=0.285450292082042
+SCF iter=5: RMS density=0.152407559965780
+SCF iter=6: RMS density=0.000626761146098
+SCF iter=7: RMS density=0.000174815709380
+SCF iter=8: RMS density=0.000049863929639
+SCF iter=9: RMS density=0.000015145051234
+SCF iter=10: RMS density=0.000001965910873
+SCF iter=11: RMS density=0.000001007595985
+SCF iter=12: RMS density=0.000000242301510
 
 
 
@@ -454,7 +454,7 @@ SCF iter=12: RMS density=0.000000242301510
 		6	H	1.000000e+00	8.848739e-02
 		7	H	1.000000e+00	9.308251e-02
 
-	Elapsed time(omp) for the SCF = 0.0394478[s].
+	Elapsed time(omp) for the SCF = 0.040363[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
@@ -472,19 +472,19 @@ SCF iter=12: RMS density=0.000000242301510
 ==========  START: RPMD step 2
 ----------  Beads number 0
 **********  START: PM3/PDDG-SCF  **********
-SCF iter=0: RMS density=3.724301846148449 
-SCF iter=1: RMS density=1.861615396933355 
-SCF iter=2: RMS density=0.993032732350922 
-SCF iter=3: RMS density=0.533537916621440 
-SCF iter=4: RMS density=0.285738872617757 
-SCF iter=5: RMS density=0.152616543711025 
-SCF iter=6: RMS density=0.000600042677894 
-SCF iter=7: RMS density=0.000168251998655 
-SCF iter=8: RMS density=0.000050390588104 
-SCF iter=9: RMS density=0.000017578322643 
-SCF iter=10: RMS density=0.000002984567303 
-SCF iter=11: RMS density=0.000001447646195 
-SCF iter=12: RMS density=0.000000208054710 
+SCF iter=0: RMS density=3.724301846148449
+SCF iter=1: RMS density=1.861615396933355
+SCF iter=2: RMS density=0.993032732350922
+SCF iter=3: RMS density=0.533537916621440
+SCF iter=4: RMS density=0.285738872617757
+SCF iter=5: RMS density=0.152616543711025
+SCF iter=6: RMS density=0.000600042677894
+SCF iter=7: RMS density=0.000168251998655
+SCF iter=8: RMS density=0.000050390588104
+SCF iter=9: RMS density=0.000017578322643
+SCF iter=10: RMS density=0.000002984567303
+SCF iter=11: RMS density=0.000001447646195
+SCF iter=12: RMS density=0.000000208054710
 
 
 
@@ -527,25 +527,25 @@ SCF iter=12: RMS density=0.000000208054710
 		6	H	1.000000e+00	8.795762e-02
 		7	H	1.000000e+00	9.365191e-02
 
-	Elapsed time(omp) for the SCF = 0.0406749[s].
+	Elapsed time(omp) for the SCF = 0.040429[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 ----------  Beads number 1
 **********  START: PM3/PDDG-SCF  **********
-SCF iter=0: RMS density=3.724169529133336 
-SCF iter=1: RMS density=1.862090368319756 
-SCF iter=2: RMS density=0.993067164794702 
-SCF iter=3: RMS density=0.533365737883080 
-SCF iter=4: RMS density=0.285555221552017 
-SCF iter=5: RMS density=0.152476519776855 
-SCF iter=6: RMS density=0.000651548859111 
-SCF iter=7: RMS density=0.000200089060954 
-SCF iter=8: RMS density=0.000065993427765 
-SCF iter=9: RMS density=0.000024594659154 
-SCF iter=10: RMS density=0.000004231651585 
-SCF iter=11: RMS density=0.000001870872585 
-SCF iter=12: RMS density=0.000000172826872 
+SCF iter=0: RMS density=3.724169529133336
+SCF iter=1: RMS density=1.862090368319756
+SCF iter=2: RMS density=0.993067164794702
+SCF iter=3: RMS density=0.533365737883080
+SCF iter=4: RMS density=0.285555221552017
+SCF iter=5: RMS density=0.152476519776855
+SCF iter=6: RMS density=0.000651548859111
+SCF iter=7: RMS density=0.000200089060954
+SCF iter=8: RMS density=0.000065993427765
+SCF iter=9: RMS density=0.000024594659154
+SCF iter=10: RMS density=0.000004231651585
+SCF iter=11: RMS density=0.000001870872585
+SCF iter=12: RMS density=0.000000172826872
 
 
 
@@ -588,25 +588,25 @@ SCF iter=12: RMS density=0.000000172826872
 		6	H	1.000000e+00	8.864161e-02
 		7	H	1.000000e+00	9.446560e-02
 
-	Elapsed time(omp) for the SCF = 0.041146[s].
+	Elapsed time(omp) for the SCF = 0.040562[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 ----------  Beads number 2
 **********  START: PM3/PDDG-SCF  **********
-SCF iter=0: RMS density=3.724353549449444 
-SCF iter=1: RMS density=1.862818110351026 
-SCF iter=2: RMS density=0.993030862972516 
-SCF iter=3: RMS density=0.533235136161535 
-SCF iter=4: RMS density=0.285452179032218 
-SCF iter=5: RMS density=0.152409471600536 
-SCF iter=6: RMS density=0.000626511420793 
-SCF iter=7: RMS density=0.000174726329471 
-SCF iter=8: RMS density=0.000049840034767 
-SCF iter=9: RMS density=0.000015140839049 
-SCF iter=10: RMS density=0.000001965928325 
-SCF iter=11: RMS density=0.000001007534167 
-SCF iter=12: RMS density=0.000000242272672 
+SCF iter=0: RMS density=3.724353549449444
+SCF iter=1: RMS density=1.862818110351026
+SCF iter=2: RMS density=0.993030862972516
+SCF iter=3: RMS density=0.533235136161535
+SCF iter=4: RMS density=0.285452179032218
+SCF iter=5: RMS density=0.152409471600536
+SCF iter=6: RMS density=0.000626511420793
+SCF iter=7: RMS density=0.000174726329471
+SCF iter=8: RMS density=0.000049840034767
+SCF iter=9: RMS density=0.000015140839049
+SCF iter=10: RMS density=0.000001965928325
+SCF iter=11: RMS density=0.000001007534167
+SCF iter=12: RMS density=0.000000242272672
 
 
 
@@ -649,7 +649,7 @@ SCF iter=12: RMS density=0.000000242272672
 		6	H	1.000000e+00	8.848641e-02
 		7	H	1.000000e+00	9.308071e-02
 
-	Elapsed time(omp) for the SCF = 0.039927[s].
+	Elapsed time(omp) for the SCF = 0.040634[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
@@ -667,19 +667,19 @@ SCF iter=12: RMS density=0.000000242272672
 ==========  START: RPMD step 3
 ----------  Beads number 0
 **********  START: PM3/PDDG-SCF  **********
-SCF iter=0: RMS density=3.724290365349034 
-SCF iter=1: RMS density=1.861598835342736 
-SCF iter=2: RMS density=0.993025006292644 
-SCF iter=3: RMS density=0.533538228127513 
-SCF iter=4: RMS density=0.285741772449757 
-SCF iter=5: RMS density=0.152619554742429 
-SCF iter=6: RMS density=0.000599695735804 
-SCF iter=7: RMS density=0.000168117623897 
-SCF iter=8: RMS density=0.000050347115647 
-SCF iter=9: RMS density=0.000017567302208 
-SCF iter=10: RMS density=0.000002980937559 
-SCF iter=11: RMS density=0.000001445639499 
-SCF iter=12: RMS density=0.000000208066830 
+SCF iter=0: RMS density=3.724290365349034
+SCF iter=1: RMS density=1.861598835342736
+SCF iter=2: RMS density=0.993025006292644
+SCF iter=3: RMS density=0.533538228127513
+SCF iter=4: RMS density=0.285741772449757
+SCF iter=5: RMS density=0.152619554742429
+SCF iter=6: RMS density=0.000599695735804
+SCF iter=7: RMS density=0.000168117623897
+SCF iter=8: RMS density=0.000050347115647
+SCF iter=9: RMS density=0.000017567302208
+SCF iter=10: RMS density=0.000002980937559
+SCF iter=11: RMS density=0.000001445639499
+SCF iter=12: RMS density=0.000000208066830
 
 
 
@@ -722,25 +722,25 @@ SCF iter=12: RMS density=0.000000208066830
 		6	H	1.000000e+00	8.795645e-02
 		7	H	1.000000e+00	9.364876e-02
 
-	Elapsed time(omp) for the SCF = 0.040838[s].
+	Elapsed time(omp) for the SCF = 0.040030[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 ----------  Beads number 1
 **********  START: PM3/PDDG-SCF  **********
-SCF iter=0: RMS density=3.724157594548998 
-SCF iter=1: RMS density=1.862072564117296 
-SCF iter=2: RMS density=0.993059151167867 
-SCF iter=3: RMS density=0.533366255371932 
-SCF iter=4: RMS density=0.285558408961048 
-SCF iter=5: RMS density=0.152479767250008 
-SCF iter=6: RMS density=0.000651088072207 
-SCF iter=7: RMS density=0.000199899391750 
-SCF iter=8: RMS density=0.000065936978330 
-SCF iter=9: RMS density=0.000024581868776 
-SCF iter=10: RMS density=0.000004224873195 
-SCF iter=11: RMS density=0.000001868283873 
-SCF iter=12: RMS density=0.000000172884799 
+SCF iter=0: RMS density=3.724157594548998
+SCF iter=1: RMS density=1.862072564117296
+SCF iter=2: RMS density=0.993059151167867
+SCF iter=3: RMS density=0.533366255371932
+SCF iter=4: RMS density=0.285558408961048
+SCF iter=5: RMS density=0.152479767250008
+SCF iter=6: RMS density=0.000651088072207
+SCF iter=7: RMS density=0.000199899391750
+SCF iter=8: RMS density=0.000065936978330
+SCF iter=9: RMS density=0.000024581868776
+SCF iter=10: RMS density=0.000004224873195
+SCF iter=11: RMS density=0.000001868283873
+SCF iter=12: RMS density=0.000000172884799
 
 
 
@@ -783,25 +783,25 @@ SCF iter=12: RMS density=0.000000172884799
 		6	H	1.000000e+00	8.863989e-02
 		7	H	1.000000e+00	9.446189e-02
 
-	Elapsed time(omp) for the SCF = 0.039521[s].
+	Elapsed time(omp) for the SCF = 0.040614[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 ----------  Beads number 2
 **********  START: PM3/PDDG-SCF  **********
-SCF iter=0: RMS density=3.724341786501597 
-SCF iter=1: RMS density=1.862800539365947 
-SCF iter=2: RMS density=0.993023007191257 
-SCF iter=3: RMS density=0.533235677911871 
-SCF iter=4: RMS density=0.285455322110132 
-SCF iter=5: RMS density=0.152412655929700 
-SCF iter=6: RMS density=0.000626095900560 
-SCF iter=7: RMS density=0.000174577532308 
-SCF iter=8: RMS density=0.000049800194705 
-SCF iter=9: RMS density=0.000015133793379 
-SCF iter=10: RMS density=0.000001965953550 
-SCF iter=11: RMS density=0.000001007428083 
-SCF iter=12: RMS density=0.000000242224392 
+SCF iter=0: RMS density=3.724341786501597
+SCF iter=1: RMS density=1.862800539365947
+SCF iter=2: RMS density=0.993023007191257
+SCF iter=3: RMS density=0.533235677911871
+SCF iter=4: RMS density=0.285455322110132
+SCF iter=5: RMS density=0.152412655929700
+SCF iter=6: RMS density=0.000626095900560
+SCF iter=7: RMS density=0.000174577532308
+SCF iter=8: RMS density=0.000049800194705
+SCF iter=9: RMS density=0.000015133793379
+SCF iter=10: RMS density=0.000001965953550
+SCF iter=11: RMS density=0.000001007428083
+SCF iter=12: RMS density=0.000000242224392
 
 
 
@@ -844,7 +844,7 @@ SCF iter=12: RMS density=0.000000242224392
 		6	H	1.000000e+00	8.848476e-02
 		7	H	1.000000e+00	9.307773e-02
 
-	Elapsed time(omp) for the SCF = 0.0399189[s].
+	Elapsed time(omp) for the SCF = 0.055292[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
@@ -862,19 +862,19 @@ SCF iter=12: RMS density=0.000000242224392
 ==========  START: RPMD step 4
 ----------  Beads number 0
 **********  START: PM3/PDDG-SCF  **********
-SCF iter=0: RMS density=3.724275024439492 
-SCF iter=1: RMS density=1.861575676468349 
-SCF iter=2: RMS density=0.993014200783348 
-SCF iter=3: RMS density=0.533538663748277 
-SCF iter=4: RMS density=0.285745828559313 
-SCF iter=5: RMS density=0.152623766648251 
-SCF iter=6: RMS density=0.000599211344438 
-SCF iter=7: RMS density=0.000167929877542 
-SCF iter=8: RMS density=0.000050286241218 
-SCF iter=9: RMS density=0.000017551811937 
-SCF iter=10: RMS density=0.000002975855160 
-SCF iter=11: RMS density=0.000001442827074 
-SCF iter=12: RMS density=0.000000208083593 
+SCF iter=0: RMS density=3.724275024439492
+SCF iter=1: RMS density=1.861575676468349
+SCF iter=2: RMS density=0.993014200783348
+SCF iter=3: RMS density=0.533538663748277
+SCF iter=4: RMS density=0.285745828559313
+SCF iter=5: RMS density=0.152623766648251
+SCF iter=6: RMS density=0.000599211344438
+SCF iter=7: RMS density=0.000167929877542
+SCF iter=8: RMS density=0.000050286241218
+SCF iter=9: RMS density=0.000017551811937
+SCF iter=10: RMS density=0.000002975855160
+SCF iter=11: RMS density=0.000001442827074
+SCF iter=12: RMS density=0.000000208083593
 
 
 
@@ -917,25 +917,25 @@ SCF iter=12: RMS density=0.000000208083593
 		6	H	1.000000e+00	8.795482e-02
 		7	H	1.000000e+00	9.364435e-02
 
-	Elapsed time(omp) for the SCF = 0.0394728[s].
+	Elapsed time(omp) for the SCF = 0.040459[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 ----------  Beads number 1
 **********  START: PM3/PDDG-SCF  **********
-SCF iter=0: RMS density=3.724141679566929 
-SCF iter=1: RMS density=1.862047667425953 
-SCF iter=2: RMS density=0.993047943402687 
-SCF iter=3: RMS density=0.533366979025950 
-SCF iter=4: RMS density=0.285562867278017 
-SCF iter=5: RMS density=0.152484309876328 
-SCF iter=6: RMS density=0.000650444262392 
-SCF iter=7: RMS density=0.000199634085122 
-SCF iter=8: RMS density=0.000065857850192 
-SCF iter=9: RMS density=0.000024563911096 
-SCF iter=10: RMS density=0.000004215387146 
-SCF iter=11: RMS density=0.000001864654877 
-SCF iter=12: RMS density=0.000000172966206 
+SCF iter=0: RMS density=3.724141679566929
+SCF iter=1: RMS density=1.862047667425953
+SCF iter=2: RMS density=0.993047943402687
+SCF iter=3: RMS density=0.533366979025950
+SCF iter=4: RMS density=0.285562867278017
+SCF iter=5: RMS density=0.152484309876328
+SCF iter=6: RMS density=0.000650444262392
+SCF iter=7: RMS density=0.000199634085122
+SCF iter=8: RMS density=0.000065857850192
+SCF iter=9: RMS density=0.000024563911096
+SCF iter=10: RMS density=0.000004215387146
+SCF iter=11: RMS density=0.000001864654877
+SCF iter=12: RMS density=0.000000172966206
 
 
 
@@ -978,25 +978,25 @@ SCF iter=12: RMS density=0.000000172966206
 		6	H	1.000000e+00	8.863747e-02
 		7	H	1.000000e+00	9.445671e-02
 
-	Elapsed time(omp) for the SCF = 0.0397758[s].
+	Elapsed time(omp) for the SCF = 0.040433[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 ----------  Beads number 2
 **********  START: PM3/PDDG-SCF  **********
-SCF iter=0: RMS density=3.724326094563130 
-SCF iter=1: RMS density=1.862775968481929 
-SCF iter=2: RMS density=0.993012020392032 
-SCF iter=3: RMS density=0.533236435655565 
-SCF iter=4: RMS density=0.285459718558131 
-SCF iter=5: RMS density=0.152417110360286 
-SCF iter=6: RMS density=0.000625515618403 
-SCF iter=7: RMS density=0.000174369572883 
-SCF iter=8: RMS density=0.000049744387377 
-SCF iter=9: RMS density=0.000015123876286 
-SCF iter=10: RMS density=0.000001965980634 
-SCF iter=11: RMS density=0.000001007273154 
-SCF iter=12: RMS density=0.000000242156390 
+SCF iter=0: RMS density=3.724326094563130
+SCF iter=1: RMS density=1.862775968481929
+SCF iter=2: RMS density=0.993012020392032
+SCF iter=3: RMS density=0.533236435655565
+SCF iter=4: RMS density=0.285459718558131
+SCF iter=5: RMS density=0.152417110360286
+SCF iter=6: RMS density=0.000625515618403
+SCF iter=7: RMS density=0.000174369572883
+SCF iter=8: RMS density=0.000049744387377
+SCF iter=9: RMS density=0.000015123876286
+SCF iter=10: RMS density=0.000001965980634
+SCF iter=11: RMS density=0.000001007273154
+SCF iter=12: RMS density=0.000000242156390
 
 
 
@@ -1039,7 +1039,7 @@ SCF iter=12: RMS density=0.000000242156390
 		6	H	1.000000e+00	8.848246e-02
 		7	H	1.000000e+00	9.307354e-02
 
-	Elapsed time(omp) for the SCF = 0.0390391[s].
+	Elapsed time(omp) for the SCF = 0.040224[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
@@ -1057,19 +1057,19 @@ SCF iter=12: RMS density=0.000000242156390
 ==========  START: RPMD step 5
 ----------  Beads number 0
 **********  START: PM3/PDDG-SCF  **********
-SCF iter=0: RMS density=3.724255840027723 
-SCF iter=1: RMS density=1.861545947639964 
-SCF iter=2: RMS density=0.993000326784816 
-SCF iter=3: RMS density=0.533539222996926 
-SCF iter=4: RMS density=0.285751037293221 
-SCF iter=5: RMS density=0.152629175890969 
-SCF iter=6: RMS density=0.000598590830925 
-SCF iter=7: RMS density=0.000167689140246 
-SCF iter=8: RMS density=0.000050207953748 
-SCF iter=9: RMS density=0.000017531790143 
-SCF iter=10: RMS density=0.000002969319343 
-SCF iter=11: RMS density=0.000001439205912 
-SCF iter=12: RMS density=0.000000208104788 
+SCF iter=0: RMS density=3.724255840027723
+SCF iter=1: RMS density=1.861545947639964
+SCF iter=2: RMS density=0.993000326784816
+SCF iter=3: RMS density=0.533539222996926
+SCF iter=4: RMS density=0.285751037293221
+SCF iter=5: RMS density=0.152629175890969
+SCF iter=6: RMS density=0.000598590830925
+SCF iter=7: RMS density=0.000167689140246
+SCF iter=8: RMS density=0.000050207953748
+SCF iter=9: RMS density=0.000017531790143
+SCF iter=10: RMS density=0.000002969319343
+SCF iter=11: RMS density=0.000001439205912
+SCF iter=12: RMS density=0.000000208104788
 
 
 
@@ -1112,25 +1112,25 @@ SCF iter=12: RMS density=0.000000208104788
 		6	H	1.000000e+00	8.795271e-02
 		7	H	1.000000e+00	9.363868e-02
 
-	Elapsed time(omp) for the SCF = 0.04055[s].
+	Elapsed time(omp) for the SCF = 0.039878[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 ----------  Beads number 1
 **********  START: PM3/PDDG-SCF  **********
-SCF iter=0: RMS density=3.724121801308011 
-SCF iter=1: RMS density=1.862015707412637 
-SCF iter=2: RMS density=0.993033552801273 
-SCF iter=3: RMS density=0.533367908016681 
-SCF iter=4: RMS density=0.285568592450017 
-SCF iter=5: RMS density=0.152490143820787 
-SCF iter=6: RMS density=0.000649618723101 
-SCF iter=7: RMS density=0.000199293374746 
-SCF iter=8: RMS density=0.000065755945128 
-SCF iter=9: RMS density=0.000024540734296 
-SCF iter=10: RMS density=0.000004203197535 
-SCF iter=11: RMS density=0.000001859980840 
-SCF iter=12: RMS density=0.000000173071407 
+SCF iter=0: RMS density=3.724121801308011
+SCF iter=1: RMS density=1.862015707412637
+SCF iter=2: RMS density=0.993033552801273
+SCF iter=3: RMS density=0.533367908016681
+SCF iter=4: RMS density=0.285568592450017
+SCF iter=5: RMS density=0.152490143820787
+SCF iter=6: RMS density=0.000649618723101
+SCF iter=7: RMS density=0.000199293374746
+SCF iter=8: RMS density=0.000065755945128
+SCF iter=9: RMS density=0.000024540734296
+SCF iter=10: RMS density=0.000004203197535
+SCF iter=11: RMS density=0.000001859980840
+SCF iter=12: RMS density=0.000000173071407
 
 
 
@@ -1173,25 +1173,25 @@ SCF iter=12: RMS density=0.000000173071407
 		6	H	1.000000e+00	8.863436e-02
 		7	H	1.000000e+00	9.445004e-02
 
-	Elapsed time(omp) for the SCF = 0.0396018[s].
+	Elapsed time(omp) for the SCF = 0.040547[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 ----------  Beads number 2
 **********  START: PM3/PDDG-SCF  **********
-SCF iter=0: RMS density=3.724306490794564 
-SCF iter=1: RMS density=1.862744426170085 
-SCF iter=2: RMS density=0.992997913858402 
-SCF iter=3: RMS density=0.533237408687201 
-SCF iter=4: RMS density=0.285465364517261 
-SCF iter=5: RMS density=0.152422831262434 
-SCF iter=6: RMS density=0.000624772020936 
-SCF iter=7: RMS density=0.000174102811091 
-SCF iter=8: RMS density=0.000049672582775 
-SCF iter=9: RMS density=0.000015111034434 
-SCF iter=10: RMS density=0.000001966001596 
-SCF iter=11: RMS density=0.000001007062982 
-SCF iter=12: RMS density=0.000000242068201 
+SCF iter=0: RMS density=3.724306490794564
+SCF iter=1: RMS density=1.862744426170085
+SCF iter=2: RMS density=0.992997913858402
+SCF iter=3: RMS density=0.533237408687201
+SCF iter=4: RMS density=0.285465364517261
+SCF iter=5: RMS density=0.152422831262434
+SCF iter=6: RMS density=0.000624772020936
+SCF iter=7: RMS density=0.000174102811091
+SCF iter=8: RMS density=0.000049672582775
+SCF iter=9: RMS density=0.000015111034434
+SCF iter=10: RMS density=0.000001966001596
+SCF iter=11: RMS density=0.000001007062982
+SCF iter=12: RMS density=0.000000242068201
 
 
 
@@ -1234,7 +1234,7 @@ SCF iter=12: RMS density=0.000000242068201
 		6	H	1.000000e+00	8.847950e-02
 		7	H	1.000000e+00	9.306816e-02
 
-	Elapsed time(omp) for the SCF = 0.0400321[s].
+	Elapsed time(omp) for the SCF = 0.040283[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
@@ -1251,13 +1251,13 @@ SCF iter=12: RMS density=0.000000242068201
 **********  DONE: Ring Polymer Molecular dynamics  **********
 	Summary for memory usage:
 		Max Heap: 0.704272[MB].
-		Current Heap(Leaked): 0[MB].
+		Current Heap(Leaked): 0.000000[MB].
 
 
      >>>>>  The MolDS finished normally!  <<<<<
-     >>>>>  CPU time: 36.16[s].  <<<<<
+     >>>>>  CPU time: 35.9[s].  <<<<<
      >>>>>  Elapsed time: 36[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 36.3473[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 35.9296[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

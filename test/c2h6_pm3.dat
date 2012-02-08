@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/1/10(Thu.) 15:14:55  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/2/8(Wed.) 12:23:10  <<<<<
 
 
 **********  START: Parse input  **********
@@ -8,7 +8,7 @@
 	Total number of valence AOs: 14
 	Total number of valence electrons: 14
 
-	Molecular configration:
+	Molecular configuration:
 		| i-th | atom type | x[angst.] | y[angst.] | z[angst.] |
 		0	C	0.000000e+00	2.000000e-02	0.000000e+00
 		1	C	1.493800e+00	-1.500000e-02	2.000000e-03
@@ -67,19 +67,19 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 
 
 **********  START: PM3-SCF  **********
-SCF iter=0: RMS density=5.291502622129178 
-SCF iter=1: RMS density=1.910456125626945 
-SCF iter=2: RMS density=1.044203238495392 
-SCF iter=3: RMS density=0.569275110921828 
-SCF iter=4: RMS density=0.308641545774631 
-SCF iter=5: RMS density=0.166813060251973 
-SCF iter=6: RMS density=0.000657312351890 
-SCF iter=7: RMS density=0.000224796079741 
-SCF iter=8: RMS density=0.000083564976989 
-SCF iter=9: RMS density=0.000026986732841 
-SCF iter=10: RMS density=0.000004938275842 
-SCF iter=11: RMS density=0.000002003884716 
-SCF iter=12: RMS density=0.000000169506350 
+SCF iter=0: RMS density=5.291502622129178
+SCF iter=1: RMS density=1.910456125626945
+SCF iter=2: RMS density=1.044203238495392
+SCF iter=3: RMS density=0.569275110921828
+SCF iter=4: RMS density=0.308641545774631
+SCF iter=5: RMS density=0.166813060251973
+SCF iter=6: RMS density=0.000657312351890
+SCF iter=7: RMS density=0.000224796079741
+SCF iter=8: RMS density=0.000083564976989
+SCF iter=9: RMS density=0.000026986732841
+SCF iter=10: RMS density=0.000004938275842
+SCF iter=11: RMS density=0.000002003884716
+SCF iter=12: RMS density=0.000000169506350
 
 
 
@@ -122,19 +122,19 @@ SCF iter=12: RMS density=0.000000169506350
 		6	H	1.000000e+00	3.744313e-02
 		7	H	1.000000e+00	4.258006e-02
 
-	Elapsed time(omp) for the SCF = 0.05703[s].
+	Elapsed time(omp) for the SCF = 0.049331[s].
 **********  DONE: PM3-SCF  **********
 
 
 	Summary for memory usage:
 		Max Heap: 0.158736[MB].
-		Current Heap(Leaked): 0[MB].
+		Current Heap(Leaked): 0.000000[MB].
 
 
      >>>>>  The MolDS finished normally!  <<<<<
-     >>>>>  CPU time: 0.05[s].  <<<<<
+     >>>>>  CPU time: 0.04[s].  <<<<<
      >>>>>  Elapsed time: 0[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 0.059727[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 0.0524778[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 
