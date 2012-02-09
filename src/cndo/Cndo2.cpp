@@ -72,7 +72,7 @@ Cndo2::Cndo2(){
    this->matrixForce = NULL;
    this->bondingAdjustParameterK[0] = 1.000; //see (3.79) in J. A. Pople book
    this->bondingAdjustParameterK[1] = 0.750; //see (3.79) in J. A. Pople book
-   this->elecHFEnergy = 0.0;
+   this->elecSCFEnergy = 0.0;
    this->coreRepulsionEnergy = 0.0;
    this->matrixCIS = NULL;
    this->excitedEnergies = NULL;
@@ -365,8 +365,8 @@ void Cndo2::DoSCF(bool requiresGuess){
 
             // calc. some properties.
             // e.g. electronic energy, electron population in each atom, and core replsion.
-            this->CalcHFProperties();
-            this->OutputHFResults(this->fockMatrix, 
+            this->CalcSCFProperties();
+            this->OutputSCFResults(this->fockMatrix, 
                                   this->energiesMO, 
                                   this->atomicElectronPopulation, 
                                   *this->molecule);
@@ -429,12 +429,12 @@ void Cndo2::DoSCF(){
    this->DoSCF(requiresGuess);
 }
 
-void Cndo2::CalcHFProperties(){
+void Cndo2::CalcSCFProperties(){
    this->CalcAtomicElectronPopulation(this->atomicElectronPopulation, 
                                       this->orbitalElectronPopulation, 
                                       *this->molecule);
    this->CalcCoreRepulsionEnergy();
-   this->CalcElecHFEnergy(&this->elecHFEnergy, 
+   this->CalcElecSCFEnergy(&this->elecSCFEnergy, 
                           *this->molecule, 
                           this->energiesMO, 
                           this->fockMatrix, 
@@ -460,7 +460,7 @@ void Cndo2::DoCIS(){
 double Cndo2::GetElectronicEnergy(int elecState) const{
    int groundState = 0;
    if(elecState==groundState){
-      return this->elecHFEnergy;
+      return this->elecSCFEnergy;
    }
    else{
       if(this->excitedEnergies == NULL){
@@ -476,7 +476,7 @@ double Cndo2::GetElectronicEnergy(int elecState) const{
          ss << errorMessageGetElectronicEnergyNumberCISStates << numberExcitedStates << endl;
          throw MolDSException(ss.str());
       }
-      return this->elecHFEnergy + this->excitedEnergies[elecState-1];
+      return this->elecSCFEnergy + this->excitedEnergies[elecState-1];
    }
 }
 
@@ -681,7 +681,7 @@ void Cndo2::DoDamp(double rmsDensity,
 
 }
 
-void Cndo2::OutputHFResults(double const* const* fockMatrix, 
+void Cndo2::OutputSCFResults(double const* const* fockMatrix, 
                             double const* energiesMO, 
                             double const* atomicElectronPopulation, 
                             const Molecule& molecule) const{
@@ -708,8 +708,8 @@ void Cndo2::OutputHFResults(double const* const* fockMatrix,
    // output total energy
    this->OutputLog(this->messageElecEnergy);
    this->OutputLog(this->messageElecEnergyTitle);
-   this->OutputLog((boost::format("\t\t%e\t%e\n\n") % this->elecHFEnergy 
-                                                    % (this->elecHFEnergy/eV2AU)).str());
+   this->OutputLog((boost::format("\t\t%e\t%e\n\n") % this->elecSCFEnergy 
+                                                    % (this->elecSCFEnergy/eV2AU)).str());
 
    // output core repulsion energy
    this->OutputLog(this->messageCoreRepulsion);
@@ -739,7 +739,7 @@ void Cndo2::OutputHFResults(double const* const* fockMatrix,
    }
 }
 
-void Cndo2::CalcElecHFEnergy(double* elecHFEnergy, 
+void Cndo2::CalcElecSCFEnergy(double* elecSCFEnergy, 
                              const Molecule& molecule, 
                              double const* energiesMO, 
                              double const* const* fockMatrix, 
@@ -823,7 +823,7 @@ void Cndo2::CalcElecHFEnergy(double* elecHFEnergy,
    }
    */
 
-   *elecHFEnergy = electronicEnergy + coreRepulsionEnergy;
+   *elecSCFEnergy = electronicEnergy + coreRepulsionEnergy;
 }
 
 void Cndo2::FreeElecEnergyMatrices(double*** fMatrix, 

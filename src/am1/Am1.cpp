@@ -178,15 +178,15 @@ double Am1::GetDiatomCoreRepulsionFirstDerivative(int atomAIndex,
    return value;
 }
 
-void Am1::CalcHFProperties(){
-   MolDS_cndo::Cndo2::CalcHFProperties();
+void Am1::CalcSCFProperties(){
+   MolDS_cndo::Cndo2::CalcSCFProperties();
 }
 
-void Am1::OutputHFResults(double const* const* fockMatrix, 
+void Am1::OutputSCFResults(double const* const* fockMatrix, 
                           double const* energiesMO, 
                           double const* atomicElectronPopulation, 
                           const Molecule& molecule) const{
-   MolDS_cndo::Cndo2::OutputHFResults(fockMatrix, 
+   MolDS_cndo::Cndo2::OutputSCFResults(fockMatrix, 
                                       energiesMO, 
                                       atomicElectronPopulation, 
                                       molecule);

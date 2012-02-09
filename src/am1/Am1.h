@@ -30,12 +30,12 @@ public:
 protected:
    virtual void SetMessages();
    virtual void SetEnableAtomTypes();
-   virtual void CalcHFProperties();
+   virtual void CalcSCFProperties();
    virtual double GetDiatomCoreRepulsionEnergy(int indexAtomA, int indexAtomB) const;
    virtual double GetDiatomCoreRepulsionFirstDerivative(int atomAIndex,
                                                         int atomBIndex, 
                                                         MolDS_base::CartesianType axisA) const;
-   virtual void OutputHFResults(double const* const* fockMatrix, 
+   virtual void OutputSCFResults(double const* const* fockMatrix, 
                                 double const* energiesMO, 
                                 double const* atomicElectronPopulation, 
                                 const MolDS_base::Molecule& molecule) const;

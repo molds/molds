@@ -76,7 +76,7 @@ protected:
    int matrixCISdimension;
    virtual void SetMessages();
    virtual void SetEnableAtomTypes();
-   virtual void CalcHFProperties();
+   virtual void CalcSCFProperties();
    double GetBondingAdjustParameterK(MolDS_base::ShellType shellA, 
                                      MolDS_base::ShellType shellB) const;
    virtual double GetDiatomCoreRepulsionEnergy(int indexAtomA, int indexAtomB) const;
@@ -141,7 +141,7 @@ protected:
    virtual void CalcTwoElecTwoCore(double****** twoElecTwoCore, 
                                    const MolDS_base::Molecule& molecule) const;
    virtual void CalcForce(const std::vector<int>& elecStates);
-   virtual void OutputHFResults(double const* const* fockMatrix, 
+   virtual void OutputSCFResults(double const* const* fockMatrix, 
                                 double const* energiesMO, 
                                 double const* atomicElectronPopulation, 
                                 const MolDS_base::Molecule& molecule) const;
@@ -176,7 +176,7 @@ private:
    std::string messageUnOcc;
    std::string messageCoreRepulsionTitle;
    std::string messageCoreRepulsion;
-   double elecHFEnergy;
+   double elecSCFEnergy;
    double** gammaAB;
    double** overlap;
    double bondingAdjustParameterK[2]; //see (3.79) in J. A. Pople book
@@ -278,7 +278,7 @@ private:
    void CheckNumberValenceElectrons(const MolDS_base::Molecule& molecule) const;
    void FreeDiatomicOverlapAndRotatingMatrix(double*** diatomicOverlap, 
                                              double*** rotatingMatrix) const;
-   void CalcElecHFEnergy(double* elecHFEnergy, 
+   void CalcElecSCFEnergy(double* elecSCFEnergy, 
                          const MolDS_base::Molecule& molecule, 
                          double const* energiesMO, 
                          double const* const* fockMatrix, 

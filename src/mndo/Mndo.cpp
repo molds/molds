@@ -237,16 +237,16 @@ void Mndo::CalcHeatsFormation(double* heatsFormation,
    }
 }
 
-void Mndo::CalcHFProperties(){
-   MolDS_cndo::Cndo2::CalcHFProperties();
+void Mndo::CalcSCFProperties(){
+   MolDS_cndo::Cndo2::CalcSCFProperties();
    this->CalcHeatsFormation(&this->heatsFormation, *this->molecule);
 }
 
-void Mndo::OutputHFResults(double const* const* fockMatrix, 
+void Mndo::OutputSCFResults(double const* const* fockMatrix, 
                            double const* energiesMO, 
                            double const* atomicElectronPopulation, 
                            const Molecule& molecule) const{
-   MolDS_cndo::Cndo2::OutputHFResults(fockMatrix, 
+   MolDS_cndo::Cndo2::OutputSCFResults(fockMatrix, 
                                       energiesMO, 
                                       atomicElectronPopulation, 
                                       molecule);
@@ -1871,7 +1871,7 @@ bool Mndo::RequiresExcitedStatesForce(const vector<int>& elecStates) const{
    return requires;
 }
 
-void Mndo::CalcForceHFElecCoreAttractionPart(double* force, 
+void Mndo::CalcForceSCFElecCoreAttractionPart(double* force, 
                                              int atomAIndex, 
                                              int atomBIndex,
                                              double const* const* const* const* const* twoElecTwoCoreFirstDeriv) const{
@@ -1895,7 +1895,7 @@ void Mndo::CalcForceHFElecCoreAttractionPart(double* force,
    }
 }
 
-void Mndo::CalcForceHFOverlapPart(double* force, 
+void Mndo::CalcForceSCFOverlapPart(double* force, 
                                   int atomAIndex, 
                                   int atomBIndex,
                                   double const* const* const* overlapDer) const{
@@ -1924,7 +1924,7 @@ void Mndo::CalcForceHFOverlapPart(double* force,
    }
 }
 
-void Mndo::CalcForceHFTwoElecPart(double* force, 
+void Mndo::CalcForceSCFTwoElecPart(double* force, 
                                   int atomAIndex, 
                                   int atomBIndex,
                                   double const* const* const* const* const* twoElecTwoCoreFirstDeriv) const{
@@ -2138,19 +2138,19 @@ void Mndo::CalcForce(const vector<int>& elecStates){
                   }  
                   // electron core attraction part (ground state)
                   double forceElecCoreAttPart[CartesianType_end] = {0.0,0.0,0.0};
-                  this->CalcForceHFElecCoreAttractionPart(forceElecCoreAttPart,
+                  this->CalcForceSCFElecCoreAttractionPart(forceElecCoreAttPart,
                                                           a,
                                                           b,
                                                           twoElecTwoCoreFirstDeriv);
                   // overlap part (ground state)
                   double forceOverlapPart[CartesianType_end] = {0.0,0.0,0.0};
-                  this->CalcForceHFOverlapPart(forceOverlapPart, 
+                  this->CalcForceSCFOverlapPart(forceOverlapPart, 
                                                a,
                                                b,
                                                overlapDer);
                   // two electron part (ground state)
                   double forceTwoElecPart[CartesianType_end] = {0.0,0.0,0.0};
-                  this->CalcForceHFTwoElecPart(forceTwoElecPart,
+                  this->CalcForceSCFTwoElecPart(forceTwoElecPart,
                                                a,
                                                b,
                                                twoElecTwoCoreFirstDeriv);

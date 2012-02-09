@@ -41,13 +41,13 @@ protected:
    std::string errorMessageCalcZMatrixForceEtaNull;
    virtual void SetMessages();
    virtual void SetEnableAtomTypes();
-   virtual void CalcHFProperties();
+   virtual void CalcSCFProperties();
    virtual void CalcForce(const std::vector<int>& elecStates);
    virtual double GetDiatomCoreRepulsionEnergy(int indexAtomA, int indexAtomB) const;
    virtual double GetDiatomCoreRepulsionFirstDerivative(int atomAIndex,
                                                         int atomBIndex, 
                                                         MolDS_base::CartesianType axisA) const;
-   virtual void OutputHFResults(double const* const* fockMatrix, 
+   virtual void OutputSCFResults(double const* const* fockMatrix, 
                                 double const* energiesMO, 
                                 double const* atomicElectronPopulation, 
                                 const MolDS_base::Molecule& molecule) const;
@@ -239,15 +239,15 @@ private:
                                                double Rab) const;
    void FreeCalcForceTempMatrices(double**** overlapDer, 
                                   double****** twoElecTwoCoreFirstDeriv) const;
-   void CalcForceHFElecCoreAttractionPart(double* force, 
+   void CalcForceSCFElecCoreAttractionPart(double* force, 
                                           int atomAIndex,
                                           int atomBIndex,
                                           double const* const* const* const* const* twoElecTwoCoreFirstDeriv) const;
-   void CalcForceHFOverlapPart(double* force, 
+   void CalcForceSCFOverlapPart(double* force, 
                                int atomAIndex,
                                int atomBIndex,
                                double const* const* const* overlapDer) const;
-   void CalcForceHFTwoElecPart(double* force, 
+   void CalcForceSCFTwoElecPart(double* force, 
                                int atomAIndex,
                                int atomBIndex,
                                double const* const* const* const* const* twoElecTwoCoreFirstDeriv) const;
