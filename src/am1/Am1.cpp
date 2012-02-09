@@ -182,14 +182,8 @@ void Am1::CalcSCFProperties(){
    MolDS_cndo::Cndo2::CalcSCFProperties();
 }
 
-void Am1::OutputSCFResults(double const* const* fockMatrix, 
-                          double const* energiesMO, 
-                          double const* atomicElectronPopulation, 
-                          const Molecule& molecule) const{
-   MolDS_cndo::Cndo2::OutputSCFResults(fockMatrix, 
-                                      energiesMO, 
-                                      atomicElectronPopulation, 
-                                      molecule);
+void Am1::OutputSCFResults() const{
+   MolDS_cndo::Cndo2::OutputSCFResults();
 }
 
 }

@@ -23,15 +23,16 @@ namespace MolDS_base{
 class ElectronicStructure : public MolDS_base::PrintController{
 public:
    virtual ~ElectronicStructure(){};
+   virtual MolDS_base::TheoryType GetTheoryType() const = 0;
    virtual void SetMolecule(MolDS_base::Molecule* molecule) = 0;
    virtual void DoSCF() = 0;
    virtual void DoSCF(bool requiresGuess) = 0;
+   virtual void OutputSCFResults() const = 0;
    virtual void DoCIS() = 0;
    virtual double** GetForce(int elecState) = 0;
    virtual double*** GetForce(const std::vector<int>& elecStates) = 0;
    virtual double GetElectronicEnergy(int elecState) const = 0;
    virtual double GetCoreRepulsionEnergy() const = 0;
-   virtual MolDS_base::TheoryType GetTheoryType() const = 0;
 };
 
 }

@@ -366,10 +366,7 @@ void Cndo2::DoSCF(bool requiresGuess){
             // calc. some properties.
             // e.g. electronic energy, electron population in each atom, and core replsion.
             this->CalcSCFProperties();
-            this->OutputSCFResults(this->fockMatrix, 
-                                  this->energiesMO, 
-                                  this->atomicElectronPopulation, 
-                                  *this->molecule);
+            this->OutputSCFResults();
             break;
          }
          else{
@@ -681,26 +678,23 @@ void Cndo2::DoDamp(double rmsDensity,
 
 }
 
-void Cndo2::OutputSCFResults(double const* const* fockMatrix, 
-                            double const* energiesMO, 
-                            double const* atomicElectronPopulation, 
-                            const Molecule& molecule) const{
+void Cndo2::OutputSCFResults() const{
    // output MO energy
    this->OutputLog(this->messageEnergiesMOs);
    this->OutputLog(this->messageEnergiesMOsTitle);
    double eV2AU = Parameters::GetInstance()->GetEV2AU();
-   for(int mo=0; mo<molecule.GetTotalNumberAOs(); mo++){
-      if(mo < molecule.GetTotalNumberValenceElectrons()/2){
+   for(int mo=0; mo<this->molecule->GetTotalNumberAOs(); mo++){
+      if(mo < this->molecule->GetTotalNumberValenceElectrons()/2){
          this->OutputLog((boost::format("\t\t %d\t%s\t%e\t%e \n") % mo
                                                                   % this->messageOcc.c_str()
-                                                                  % energiesMO[mo] 
-                                                                  % (energiesMO[mo]/eV2AU) ).str());
+                                                                  % this->energiesMO[mo] 
+                                                                  % (this->energiesMO[mo]/eV2AU) ).str());
       }
       else{
          this->OutputLog((boost::format("\t\t %d\t%s\t%e\t%e \n") % mo
                                                                   % this->messageUnOcc.c_str()
-                                                                  % energiesMO[mo] 
-                                                                  % (energiesMO[mo]/eV2AU) ).str());
+                                                                  % this->energiesMO[mo] 
+                                                                  % (this->energiesMO[mo]/eV2AU) ).str());
       }
    }
    this->OutputLog("\n");
@@ -722,8 +716,8 @@ void Cndo2::OutputSCFResults(double const* const* fockMatrix,
    // output Mulliken charge
    this->OutputLog(this->messageMullikenAtoms);
    this->OutputLog(this->messageMullikenAtomsTitle);
-   for(int a=0; a<molecule.GetNumberAtoms(); a++){
-      Atom* atom = molecule.GetAtom(a);
+   for(int a=0; a<this->molecule->GetNumberAtoms(); a++){
+      Atom* atom = this->molecule->GetAtom(a);
       this->OutputLog((boost::format("\t\t%d\t%s\t%e\t%e\n") % a
                                                              % AtomTypeStr(atom->GetAtomType())
                                                              % atom->GetCoreCharge()
@@ -733,7 +727,7 @@ void Cndo2::OutputSCFResults(double const* const* fockMatrix,
 
    // output MOs
    if(Parameters::GetInstance()->RequiresMOPlot()){
-      MOLogger* moLogger = new MOLogger(molecule, fockMatrix, this->theory);
+      MOLogger* moLogger = new MOLogger(*this->molecule, this->fockMatrix, this->theory);
       moLogger->DrawMO(*(Parameters::GetInstance()->GetIndecesMOPlot()));
       delete moLogger;
    }

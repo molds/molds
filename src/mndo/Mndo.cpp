@@ -242,14 +242,8 @@ void Mndo::CalcSCFProperties(){
    this->CalcHeatsFormation(&this->heatsFormation, *this->molecule);
 }
 
-void Mndo::OutputSCFResults(double const* const* fockMatrix, 
-                           double const* energiesMO, 
-                           double const* atomicElectronPopulation, 
-                           const Molecule& molecule) const{
-   MolDS_cndo::Cndo2::OutputSCFResults(fockMatrix, 
-                                      energiesMO, 
-                                      atomicElectronPopulation, 
-                                      molecule);
+void Mndo::OutputSCFResults() const{
+   MolDS_cndo::Cndo2::OutputSCFResults();
    // output heats of formation
    this->OutputLog(this->messageHeatsFormation);
    this->OutputLog(this->messageHeatsFormationTitle);

@@ -27,6 +27,7 @@ class Am1 : public MolDS_mndo::Mndo{
 public:
    Am1();
    virtual ~Am1();
+   virtual void OutputSCFResults() const;
 protected:
    virtual void SetMessages();
    virtual void SetEnableAtomTypes();
@@ -35,10 +36,6 @@ protected:
    virtual double GetDiatomCoreRepulsionFirstDerivative(int atomAIndex,
                                                         int atomBIndex, 
                                                         MolDS_base::CartesianType axisA) const;
-   virtual void OutputSCFResults(double const* const* fockMatrix, 
-                                double const* energiesMO, 
-                                double const* atomicElectronPopulation, 
-                                const MolDS_base::Molecule& molecule) const;
 private:
 };
 

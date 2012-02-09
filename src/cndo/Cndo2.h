@@ -36,6 +36,7 @@ public:
    double GetElectronicEnergy(int elecState) const;
    double GetCoreRepulsionEnergy() const;
    MolDS_base::TheoryType GetTheoryType() const;
+   virtual void OutputSCFResults() const;
 protected:
    std::string errorMessageAtomA;
    std::string errorMessageAtomB;
@@ -141,10 +142,6 @@ protected:
    virtual void CalcTwoElecTwoCore(double****** twoElecTwoCore, 
                                    const MolDS_base::Molecule& molecule) const;
    virtual void CalcForce(const std::vector<int>& elecStates);
-   virtual void OutputSCFResults(double const* const* fockMatrix, 
-                                double const* energiesMO, 
-                                double const* atomicElectronPopulation, 
-                                const MolDS_base::Molecule& molecule) const;
    void CalcRotatingMatrixFirstDerivatives(double*** rMatFirstDeri, 
                                            const MolDS_base_atoms::Atom& atomA,
                                            const MolDS_base_atoms::Atom& atomB) const;

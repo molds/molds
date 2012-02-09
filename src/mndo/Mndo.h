@@ -28,6 +28,7 @@ public:
    Mndo();
    virtual ~Mndo();
    virtual void SetMolecule(MolDS_base::Molecule* molecule);
+   virtual void OutputSCFResults() const;
 protected:
    std::string errorMessageGetSemiEmpiricalMultipoleInteractionBadMultipoles;
    std::string errorMessageGetSemiEmpiricalMultipoleInteractionFirstDeriBadMultipoles;
@@ -47,10 +48,6 @@ protected:
    virtual double GetDiatomCoreRepulsionFirstDerivative(int atomAIndex,
                                                         int atomBIndex, 
                                                         MolDS_base::CartesianType axisA) const;
-   virtual void OutputSCFResults(double const* const* fockMatrix, 
-                                double const* energiesMO, 
-                                double const* atomicElectronPopulation, 
-                                const MolDS_base::Molecule& molecule) const;
    virtual double GetFockDiagElement(const MolDS_base_atoms::Atom& atomA, 
                                      int atomAIndex, 
                                      int mu, 
