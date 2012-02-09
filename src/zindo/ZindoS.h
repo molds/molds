@@ -27,7 +27,8 @@ class ZindoS : public MolDS_cndo::Cndo2{
 public:
    ZindoS();
    virtual ~ZindoS();
-   virtual void DoCIS();
+   void DoCIS();
+   void OutputCISResults() const;
 protected:
    std::string errorMessageDavidsonNotConverged;
    std::string errorMessageCalcCISMatrix;

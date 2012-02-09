@@ -453,6 +453,12 @@ void Cndo2::DoCIS(){
    throw MolDSException(ss.str());
 }
 
+void Cndo2::OutputCISResults() const{
+   stringstream ss;
+   ss << this->errorMessageCISNotImplemented;
+   throw MolDSException(ss.str());
+}
+
 // elecState=0 means ground state
 double Cndo2::GetElectronicEnergy(int elecState) const{
    int groundState = 0;

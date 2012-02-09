@@ -801,7 +801,17 @@ void ZindoS::DoCIS(){
    else{
       this->DoCISDirect();
    }
-   // output eigen energies
+   this->OutputCISResults();
+
+   double ompEndTime = omp_get_wtime();
+   this->OutputLog((boost::format("%s%lf%s\n%s") % this->messageOmpElapsedTimeCIS.c_str()
+                                                 % (ompEndTime - ompStartTime)
+                                                 % this->messageUnitSec.c_str()
+                                                 % this->messageDoneCIS.c_str() ).str());
+}
+
+void ZindoS::OutputCISResults() const{
+   // output cis eigen energies
    this->OutputLog(this->messageExcitedStatesEnergies);
    this->OutputLog(this->messageExcitedStatesEnergiesTitle);
    double eV2AU = Parameters::GetInstance()->GetEV2AU();
@@ -811,12 +821,6 @@ void ZindoS::DoCIS(){
                                                           % (this->excitedEnergies[k]/eV2AU)).str());
    }
    this->OutputLog("\n");
-
-   double ompEndTime = omp_get_wtime();
-   this->OutputLog((boost::format("%s%lf%s\n%s") % this->messageOmpElapsedTimeCIS.c_str()
-                                                 % (ompEndTime - ompStartTime)
-                                                 % this->messageUnitSec.c_str()
-                                                 % this->messageDoneCIS.c_str() ).str());
 }
 
 void ZindoS::SortSingleExcitationSlaterDeterminants(vector<MoEnergyGap>* moEnergyGaps) const{

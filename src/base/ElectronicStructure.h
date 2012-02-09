@@ -29,6 +29,7 @@ public:
    virtual void DoSCF(bool requiresGuess) = 0;
    virtual void OutputSCFResults() const = 0;
    virtual void DoCIS() = 0;
+   virtual void OutputCISResults() const = 0;
    virtual double** GetForce(int elecState) = 0;
    virtual double*** GetForce(const std::vector<int>& elecStates) = 0;
    virtual double GetElectronicEnergy(int elecState) const = 0;

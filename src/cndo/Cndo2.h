@@ -30,13 +30,14 @@ public:
    virtual void SetMolecule(MolDS_base::Molecule* molecule);
    void DoSCF();
    void DoSCF(bool requiresGuess);
+   virtual void OutputSCFResults() const;
    virtual void DoCIS();
+   virtual void OutputCISResults() const;
    double** GetForce(int elecState);
    double*** GetForce(const std::vector<int>& elecStates);
    double GetElectronicEnergy(int elecState) const;
    double GetCoreRepulsionEnergy() const;
    MolDS_base::TheoryType GetTheoryType() const;
-   virtual void OutputSCFResults() const;
 protected:
    std::string errorMessageAtomA;
    std::string errorMessageAtomB;
