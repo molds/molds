@@ -16,15 +16,25 @@
 // You should have received a copy of the GNU General Public License      // 
 // along with MolDS.  If not, see <http://www.gnu.org/licenses/>.         // 
 //************************************************************************//
+
+
+==============================================================================
+REQUIREMENTS:
+   MolDS requires intel-c++-compliler(icpc), mkl, and boost-libraries.
+   GNU c++-compiler is not supported for MolDS.
+   To get the boost-libraries, see the HP of the boost: http://www.boost.org/
+
 ==============================================================================
 COMPILE(using GNUmake): 
    In the "src" directory in the MolDS package.
+   Change the "BOOST_TOP_DIR" to the top directory of the boost-libraries 
+   in your systems.
 
-   for 32 bit
+   To compile MolDS on 32 bit archtecture,
    $ make depend INTEL=32
    $ make INTEL=32
 
-   for 64 bit
+   To compile MolDS on 64 bit archtecture,
    $ make depend INTEL=64
    $ make INTEL=64
 
@@ -58,21 +68,21 @@ SAMPLE and TEST
 CAPABILITIES:
 
    Electronic state and molecular dynamics:
-            | HF  | CIS | MD(gs) | MD(es) | MC(gs) | MC(es) | 
-   ---------|-----|-----|--------|--------|--------|--------|
-   CNDO2    | OK  | --  | --     | --     | OK     | --     |
-   ---------|-----|-----|--------|--------|--------|--------|
-   INDO     | OK  | --  | --     | --     | OK     | --     |
-   ---------|-----|-----|--------|--------|--------|--------|
-   ZINDO/S  | OK  | OK  | OK     | --     | OK     | OK     |
-   ---------|-----|-----|--------|--------|--------|--------|
-   MNDO     | OK  | OK  | OK     | OK     | OK     | OK     |
-   ---------|-----|-----|--------|--------|--------|--------|
-   AM1      | OK  | OK  | OK     | OK     | OK     | OK     |
-   ---------|-----|-----|--------|--------|--------|--------|
-   PM3      | OK  | OK  | OK     | OK     | OK     | OK     |
-   ---------|-----|-----|--------|--------|--------|--------|
-   PM3/PDDG | OK  | OK  | OK     | OK     | OK     | OK     |
+            | HF  | CIS | MD(gs) | MD(es) | MC(gs) | MC(es) | RPMD(gs) | RPMD(es) | Optimize(gs) | Optimize(es) |
+   ---------|-----|-----|--------|--------|--------|--------|----------|----------|--------------|--------------|
+   CNDO2    | OK  | --  | --     | --     | OK     | --     | --       | --       | --           | --           |
+   ---------|-----|-----|--------|--------|--------|--------|----------|----------|--------------|--------------|
+   INDO     | OK  | --  | --     | --     | OK     | --     | --       | --       | --           | --           |
+   ---------|-----|-----|--------|--------|--------|--------|----------|----------|--------------|--------------|
+   ZINDO/S  | OK  | OK  | OK     | --     | OK     | OK     | OK       | --       | OK           | --           |
+   ---------|-----|-----|--------|--------|--------|--------|----------|----------|--------------|--------------|
+   MNDO     | OK  | OK  | OK     | OK     | OK     | OK     | OK       | OK       | OK           | OK           |
+   ---------|-----|-----|--------|--------|--------|--------|----------|----------|--------------|--------------|
+   AM1      | OK  | OK  | OK     | OK     | OK     | OK     | OK       | OK       | OK           | OK           |
+   ---------|-----|-----|--------|--------|--------|--------|----------|----------|--------------|--------------|
+   PM3      | OK  | OK  | OK     | OK     | OK     | OK     | OK       | OK       | OK           | OK           |
+   ---------|-----|-----|--------|--------|--------|--------|----------|----------|--------------|--------------|
+   PM3/PDDG | OK  | OK  | OK     | OK     | OK     | OK     | OK       | OK       | OK           | OK           |
 
       "OK", "Sch", and "--" mean available, shceduled, and non-scheduled methods, respectively.
       MD(gs) and MD(es) mean Born-Oppenheimer Molecular Dynamics on ground and excited states, respectively. 
