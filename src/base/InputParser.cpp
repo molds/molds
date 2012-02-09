@@ -162,6 +162,7 @@ void InputParser::SetMessages(){
    this->stringYES = "yes";
    this->stringNO = "no";
    this->stringSpace = " ";
+   this->stringTab = "\t";
 
    // theory
    this->stringCommentOut = "//";
@@ -288,7 +289,7 @@ vector<string> InputParser::GetInputTerms() const{
 
       // get input terms
       for(int i=0; i<str.length(); i++){
-         if(str.data()[i] != stringSpace.data()[0]){
+         if(str.data()[i] != stringSpace.data()[0] && str.data()[i] != stringTab.data()[0]){
             // change to lower case.
             inputTerm += tolower(str.data()[i]);
             isPreCharSpace = false;

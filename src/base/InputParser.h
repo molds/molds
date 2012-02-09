@@ -109,6 +109,7 @@ private:
    std::string stringYES;
    std::string stringNO;
    std::string stringSpace;
+   std::string stringTab;
    std::string stringCommentOut;
    // Theory
    std::string stringTheory;
