@@ -89,6 +89,7 @@ private:
    std::string messageRpmdSeed;
    // Optimization
    std::string messageOptimizationConditions;
+   std::string messageOptimizationMethod;
    std::string messageOptimizationTotalSteps;
    std::string messageOptimizationElecState;
    std::string messageOptimizationTimeWidth;
@@ -199,6 +200,9 @@ private:
    // Optimization
    std::string stringOptimization;
    std::string stringOptimizationEnd;
+   std::string stringOptimizationMethod;
+   std::string stringOptimizationConjugateGradient;
+   std::string stringOptimizationSteepestDescent;
    std::string stringOptimizationTotalSteps;
    std::string stringOptimizationElecState;
    std::string stringOptimizationMaxGradient;

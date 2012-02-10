@@ -140,6 +140,7 @@ void InputParser::SetMessages(){
 
    // Optimization
    this->messageOptimizationConditions = "\tOptimization conditions:\n";
+   this->messageOptimizationMethod = "\t\tMethod: ";
    this->messageOptimizationTotalSteps = "\t\tTotal steps: ";
    this->messageOptimizationElecState = "\t\tElectronic eigenstate: ";
    this->messageOptimizationMaxGradient = "\t\tMax gradient: ";
@@ -266,6 +267,9 @@ void InputParser::SetMessages(){
    // Opt
    this->stringOptimization = "optimization";
    this->stringOptimizationEnd = "optimization_end";
+   this->stringOptimizationMethod = "method";
+   this->stringOptimizationConjugateGradient = "conjugate_gradient";
+   this->stringOptimizationSteepestDescent = "steepest_descent";
    this->stringOptimizationTotalSteps = "total_steps";
    this->stringOptimizationElecState = "electronic_state";
    this->stringOptimizationMaxGradient = "max_gradient";
@@ -685,31 +689,43 @@ int InputParser::ParseConditionsOptimization(vector<string>* inputTerms, int par
    Parameters::GetInstance()->SetCurrentSimulation(Optimization);
    parseIndex++;
    while((*inputTerms)[parseIndex].compare(this->stringOptimizationEnd) != 0){
-      // number of steps of the steepest descent
+      // method 
+      if((*inputTerms)[parseIndex].compare(this->stringOptimizationMethod) == 0){
+         if((*inputTerms)[parseIndex+1].compare(this->stringOptimizationConjugateGradient) == 0){
+            Parameters::GetInstance()->SetMethodOptimization(ConjugateGradientMethod);
+         }
+         else if((*inputTerms)[parseIndex+1].compare(this->stringOptimizationSteepestDescent) == 0){
+            Parameters::GetInstance()->SetMethodOptimization(SteepestDescentMethod);
+         }
+         else{
+         }
+         parseIndex++;
+      }
+      // number of steps of the optimization
       if((*inputTerms)[parseIndex].compare(this->stringOptimizationTotalSteps) == 0){
          int totalSteps = atoi((*inputTerms)[parseIndex+1].c_str());
          Parameters::GetInstance()->SetTotalStepsOptimization(totalSteps);
          parseIndex++;
       }
-      // index of electronic eigen state on which steepest descent is carried out. 
+      // index of electronic eigen state on which optimization is carried out. 
       if((*inputTerms)[parseIndex].compare(this->stringOptimizationElecState) == 0){
          int elecStateIndex = atoi((*inputTerms)[parseIndex+1].c_str());
          Parameters::GetInstance()->SetElectronicStateIndexOptimization(elecStateIndex);
          parseIndex++;
       }
-      // time width for the steepest descent.
+      // time width for the optimization.
       if((*inputTerms)[parseIndex].compare(this->stringOptimizationTimeWidth) == 0){
          double timeWidth = atof((*inputTerms)[parseIndex+1].c_str()) * Parameters::GetInstance()->GetFs2AU();
          Parameters::GetInstance()->SetTimeWidthOptimization(timeWidth);
          parseIndex++;
       }
-      // max gradient for the steepest descent.
+      // max gradient for the optimization.
       if((*inputTerms)[parseIndex].compare(this->stringOptimizationMaxGradient) == 0){
          double maxGradient = atof((*inputTerms)[parseIndex+1].c_str());
          Parameters::GetInstance()->SetMaxGradientOptimization(maxGradient);
          parseIndex++;
       }
-      // rms gradient for the steepest descent.
+      // rms gradient for the optimization.
       if((*inputTerms)[parseIndex].compare(this->stringOptimizationRmsGradient) == 0){
          double rmsGradient = atof((*inputTerms)[parseIndex+1].c_str());
          Parameters::GetInstance()->SetRmsGradientOptimization(rmsGradient);
@@ -1162,6 +1178,9 @@ void InputParser::OutputRpmdConditions() const{
 void InputParser::OutputOptimizationConditions() const{
    this->OutputLog(this->messageOptimizationConditions);
 
+   this->OutputLog((boost::format("%s%s\n") % this->messageOptimizationMethod.c_str() 
+                                            % OptimizationMethodTypeStr(Parameters::GetInstance()->
+                                                                        GetMethodOptimization())).str());
    this->OutputLog((boost::format("%s%d\n") % this->messageOptimizationTotalSteps.c_str() 
                                             % Parameters::GetInstance()->GetTotalStepsOptimization()).str());
    this->OutputLog((boost::format("%s%d\n") % this->messageOptimizationElecState.c_str() 

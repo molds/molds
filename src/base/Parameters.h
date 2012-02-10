@@ -136,6 +136,8 @@ public:
    unsigned long GetSeedRPMD() const;
    void SetSeedRPMD(unsigned long seed);
    // Optimization
+   OptimizationMethodType GetMethodOptimization() const;
+   void SetMethodOptimization(OptimizationMethodType method);
    int GetTotalStepsOptimization() const;
    void SetTotalStepsOptimization(int totalSteps);
    int GetElectronicStateIndexOptimization() const;
@@ -215,6 +217,7 @@ private:
    int numberBeadsRPMD;
    unsigned long seedRPMD;
    // Optimization
+   OptimizationMethodType methodOptimization;
    int totalStepsOptimization;
    int electronicStateIndexOptimization;
    double maxGradientOptimization;

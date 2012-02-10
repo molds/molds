@@ -141,6 +141,7 @@ void Parameters::SetDefaultValues(){
    this->numberBeadsRPMD = 10;
    this->seedRPMD = static_cast<unsigned long>(time(0));
    // Optimization 
+   this->methodOptimization = ConjugateGradientMethod;
    this->totalStepsOptimization = 50;
    this->electronicStateIndexOptimization = 0;
    this->maxGradientOptimization = 0.00045;
@@ -578,6 +579,14 @@ void Parameters::SetSeedRPMD(unsigned long seed){
 }
 
 // Optimization
+OptimizationMethodType Parameters::GetMethodOptimization() const{
+   return this->methodOptimization;
+}
+
+void Parameters::SetMethodOptimization(OptimizationMethodType method){
+   this->methodOptimization = method;
+}
+
 int Parameters::GetTotalStepsOptimization() const{
    return this->totalStepsOptimization;
 }

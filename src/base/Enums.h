@@ -48,6 +48,12 @@ RENUMSTR_BEGIN( TheoryType, TheoryTypeStr )
    RENUMSTR( TheoryType_end,  "TheoryType_end" )
 RENUMSTR_END()
 
+RENUMSTR_BEGIN( OptimizationMethodType, OptimizationMethodTypeStr )
+   RENUMSTR( ConjugateGradientMethod,  "Conjugate gradient" )
+   RENUMSTR( SteepestDescentMethod,  "Steepest descent" )
+   RENUMSTR( OptimizationMethodType_end,  "OptimizationMethodType_end" )
+RENUMSTR_END()
+
 RENUMSTR_BEGIN( RotatingType, RotatingTypeStr )
    RENUMSTR( Axis,  "Axis" )
    RENUMSTR( Eular,  "EularAngle" )
