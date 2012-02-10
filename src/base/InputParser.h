@@ -34,7 +34,7 @@ private:
    std::string errorMessageNonValidExcitedStatesMD;
    std::string errorMessageNonValidExcitedStatesMC;
    std::string errorMessageNonValidExcitedStatesRPMD;
-   std::string errorMessageNonValidExcitedStatesOptimize;
+   std::string errorMessageNonValidExcitedStatesOptimization;
    std::string errorMessageElecState;
    std::string errorMessageTheory;
    std::string errorMessageNumberExcitedStateCIS;
@@ -87,14 +87,13 @@ private:
    std::string messageRpmdTemperature;
    std::string messageRpmdNumBeads;
    std::string messageRpmdSeed;
-   // Optimize (steepest descent)
-   std::string messageOptimizeConditions;
-   std::string messageSteepestDescentLineSearchTimes;
-   std::string messageSteepestDescentSteps;
-   std::string messageSteepestDescentElecState;
-   std::string messageSteepestDescentTimeWidth;
-   std::string messageSteepestDescentRmsGradient;
-   std::string messageSteepestDescentMaxGradient;
+   // Optimization
+   std::string messageOptimizationConditions;
+   std::string messageOptimizationTotalSteps;
+   std::string messageOptimizationElecState;
+   std::string messageOptimizationTimeWidth;
+   std::string messageOptimizationRmsGradient;
+   std::string messageOptimizationMaxGradient;
    // MOPlot
    std::string messageMOPlotConditions;
    std::string messageMOPlotIndex;
@@ -197,21 +196,20 @@ private:
    std::string stringRPMDTemperature;
    std::string stringRPMDNumBeads;
    std::string stringRPMDSeed;
-   // Optimize
-   std::string stringOptimize;
-   std::string stringOptimizeEnd;
-   std::string stringSteepestDescentLineSearchTimes;
-   std::string stringSteepestDescentSteps;
-   std::string stringSteepestDescentElecState;
-   std::string stringSteepestDescentMaxGradient;
-   std::string stringSteepestDescentRmsGradient;
-   std::string stringSteepestDescentTimeWidth;
+   // Optimization
+   std::string stringOptimization;
+   std::string stringOptimizationEnd;
+   std::string stringOptimizationTotalSteps;
+   std::string stringOptimizationElecState;
+   std::string stringOptimizationMaxGradient;
+   std::string stringOptimizationRmsGradient;
+   std::string stringOptimizationTimeWidth;
    void CalcMolecularBasics(Molecule* molecule) const;
    void ValidateCisConditions(const Molecule& molecule) const;
    void ValidateMdConditions(const Molecule& molecule) const;
    void ValidateMcConditions(const Molecule& molecule) const;
    void ValidateRpmdConditions(const Molecule& molecule) const;
-   void ValidateOptimizeConditions(const Molecule& molecule) const;
+   void ValidateOptimizationConditions(const Molecule& molecule) const;
    void OutputMolecularBasics(Molecule* molecule) const;
    void OutputScfConditions() const;
    void OutputMemoryConditions() const;
@@ -219,7 +217,7 @@ private:
    void OutputMdConditions() const;
    void OutputMcConditions() const;
    void OutputRpmdConditions() const;
-   void OutputOptimizeConditions() const;
+   void OutputOptimizationConditions() const;
    void OutputMOPlotConditions() const;
    void OutputInputTerms(std::vector<std::string> inputTerms) const;
    bool IsCommentOut(std::string str) const;
@@ -235,7 +233,7 @@ private:
    int ParseConditionsMC(std::vector<std::string>* inputTerms, int parseIndex) const;
    int ParseConditionsMD(std::vector<std::string>* inputTerms, int parseIndex) const;
    int ParseConditionsRPMD(std::vector<std::string>* inputTerms, int parseIndex) const;
-   int ParseConditionsOptimize(std::vector<std::string>* inputTerms, int parseIndex) const;
+   int ParseConditionsOptimization(std::vector<std::string>* inputTerms, int parseIndex) const;
    int ParseConditionsMemory(std::vector<std::string>* inputTerms, int parseIndex) const;
 };
 

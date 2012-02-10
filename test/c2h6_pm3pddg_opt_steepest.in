@@ -13,14 +13,13 @@ SCF
  diis_end_error 0.00000002
 SCF_END
 
-OPTIMIZE
-   line_search_times 50
-   steep_step 50
+OPTIMIZATION
+   total_step 50
    electronic_state 0
    max_gradient 0.00045
    rms_gradient 0.00030
    dt 50
-OPTIMIZE_END
+OPTIMIZATION_END
 
 // methylene-3
 GEOMETRY

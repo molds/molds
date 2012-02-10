@@ -49,7 +49,7 @@
 #include"../md/MD.h"
 #include"../mc/MC.h"
 #include"../rpmd/RPMD.h"
-#include"../optimize/SteepestDescent.h"
+#include"../optimization/SteepestDescent.h"
 #include"MolDS.h"
 using namespace std;
 using namespace MolDS_base_factories;
@@ -102,8 +102,8 @@ void MolDS::Run() const{
       this->DoRPMD(molecule, &runningNormally);
    }
 
-   // Optimize (Steepest Descent)
-   else if(runningNormally && Parameters::GetInstance()->GetCurrentSimulation() == Optimize){
+   // Optimization (Steepest Descent)
+   else if(runningNormally && Parameters::GetInstance()->GetCurrentSimulation() == Optimization){
       this->OptimizeGeometry(molecule, &runningNormally);
    }
 
@@ -186,7 +186,7 @@ void MolDS::DoRPMD(Molecule* molecule, bool* runningNormally) const{
 
 void MolDS::OptimizeGeometry(Molecule* molecule, bool* runningNormally) const{
    try{
-      boost::shared_ptr<MolDS_optimize::SteepestDescent> steepestDescent(new MolDS_optimize::SteepestDescent());
+      boost::shared_ptr<MolDS_optimization::SteepestDescent> steepestDescent(new MolDS_optimization::SteepestDescent());
       steepestDescent->Optimize(*molecule);
    }
    catch(MolDSException ex){

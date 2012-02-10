@@ -18,7 +18,7 @@
 //************************************************************************//
 #ifndef INCLUDED_STEEPEST_DESCENT
 #define INCLUDED_STEEPEST_DESCENT
-namespace MolDS_optimize{
+namespace MolDS_optimization{
 
 /***
  *  Line search algorythm is used in the early stage of the optimization.
@@ -33,17 +33,11 @@ private:
    std::string errorMessageNotEnebleTheoryType;
    std::string errorMessageTheoryType;
    std::string errorMessageGeometyrOptimizationNotConverged;
-   std::string errorMessageLineSearchTimes;
-   std::string errorMessageSteepestDescentSteps;
+   std::string errorMessageTotalSteps;
    std::string messageGeometyrOptimizationMetConvergence;
    std::string messageStartGeometryOptimization;
    std::string messageEndGeometryOptimization;
-   std::string messageStartSteepestDescent;
-   std::string messageEndSteepestDescent;
-   std::string messageStartStepSteepestDescent;
-   std::string messageStartLineSearch;
-   std::string messageEndLineSearch;
-   std::string messageStartLineSearchTimes;
+   std::string messageStartSteepestDescentStep;
    std::string messageReducedTimeWidth;
    std::string messageLineSearchSteps;
    std::string messageOptimizationLog;
@@ -61,14 +55,13 @@ private:
                                   MolDS_base::Molecule& molecule,
                                   bool requireGuess, 
                                   bool printsLogs) const;
+   void OutputMoleculeElectronicStructure(boost::shared_ptr<MolDS_base::ElectronicStructure> electronicStructure, 
+                                          MolDS_base::Molecule& molecule,
+                                          bool printsLogs) const;
    void LineSearch(boost::shared_ptr<MolDS_base::ElectronicStructure> electronicStructure, 
                    MolDS_base::Molecule& molecule,
                    double* lineSearchedEnergy,
                    bool* obainesOptimizedStructure) const;
-   void SteepestDescentSearch(boost::shared_ptr<MolDS_base::ElectronicStructure> electronicStructure, 
-                              MolDS_base::Molecule& molecule,
-                              double lineSearchedEnergy,
-                              bool* obainesOptimizedStructure) const;
    bool SatisfiesConvergenceCriterion(double** matrixForce, 
                                       const MolDS_base::Molecule& molecule,
                                       double oldEnergy,

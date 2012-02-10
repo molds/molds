@@ -77,8 +77,8 @@ void InputParser::SetMessages(){
       = "Error in base::InputParser::ValidateMcConditions: Excited state on which MC runs or CIS condition are wrong.\n";
    this->errorMessageNonValidExcitedStatesRPMD
       = "Error in base::InputParser::ValidateRpmdConditions: Excited state on which RPMD runs or CIS condition are wrong.\n";
-   this->errorMessageNonValidExcitedStatesOptimize
-      = "Error in base::InputParser::ValidateOptimizeConditions: Excited state on which optimization is carried out or CIS condition are wrong.\n";
+   this->errorMessageNonValidExcitedStatesOptimization
+      = "Error in base::InputParser::ValidateOptimizationConditions: Excited state on which optimization is carried out or CIS condition are wrong.\n";
    this->errorMessageElecState = "Electronic eigenstate: ";
    this->errorMessageTheory = "Theory: ";
    this->errorMessageNumberExcitedStateCIS = "Number of CIS excited states: ";
@@ -138,14 +138,13 @@ void InputParser::SetMessages(){
    this->messageRpmdNumBeads = "\t\tNumber of the beads in the Ring Polymer: ";
    this->messageRpmdSeed = "\t\tSeed: ";
 
-   // Optimize (steepestDescent)
-   this->messageOptimizeConditions = "\tOptimize conditions:\n";
-   this->messageSteepestDescentLineSearchTimes = "\t\tLine search times: ";
-   this->messageSteepestDescentSteps = "\t\tSteepest Descent steps: ";
-   this->messageSteepestDescentElecState = "\t\tElectronic eigenstate: ";
-   this->messageSteepestDescentMaxGradient = "\t\tMax gradient: ";
-   this->messageSteepestDescentRmsGradient = "\t\tRms gradient: ";
-   this->messageSteepestDescentTimeWidth = "\t\tFictious time width: ";
+   // Optimization
+   this->messageOptimizationConditions = "\tOptimization conditions:\n";
+   this->messageOptimizationTotalSteps = "\t\tTotal steps: ";
+   this->messageOptimizationElecState = "\t\tElectronic eigenstate: ";
+   this->messageOptimizationMaxGradient = "\t\tMax gradient: ";
+   this->messageOptimizationRmsGradient = "\t\tRms gradient: ";
+   this->messageOptimizationTimeWidth = "\t\tFictious time width: ";
 
    // MOPlot
    this->messageMOPlotConditions = "\tMO plot conditions:\n";
@@ -265,14 +264,13 @@ void InputParser::SetMessages(){
    this->stringRPMDSeed = "seed";
 
    // Opt
-   this->stringOptimize = "optimize";
-   this->stringOptimizeEnd = "optimize_end";
-   this->stringSteepestDescentLineSearchTimes = "line_search_times";
-   this->stringSteepestDescentSteps = "steep_step";
-   this->stringSteepestDescentElecState = "electronic_state";
-   this->stringSteepestDescentMaxGradient = "max_gradient";
-   this->stringSteepestDescentRmsGradient = "rms_gradient";
-   this->stringSteepestDescentTimeWidth = "dt";
+   this->stringOptimization = "optimization";
+   this->stringOptimizationEnd = "optimization_end";
+   this->stringOptimizationTotalSteps = "total_step";
+   this->stringOptimizationElecState = "electronic_state";
+   this->stringOptimizationMaxGradient = "max_gradient";
+   this->stringOptimizationRmsGradient = "rms_gradient";
+   this->stringOptimizationTimeWidth = "dt";
 }
 
 vector<string> InputParser::GetInputTerms() const{
@@ -683,44 +681,38 @@ int InputParser::ParseConditionsRPMD(vector<string>* inputTerms, int parseIndex)
    return parseIndex;
 }
 
-int InputParser::ParseConditionsOptimize(vector<string>* inputTerms, int parseIndex) const{
-   Parameters::GetInstance()->SetCurrentSimulation(Optimize);
+int InputParser::ParseConditionsOptimization(vector<string>* inputTerms, int parseIndex) const{
+   Parameters::GetInstance()->SetCurrentSimulation(Optimization);
    parseIndex++;
-   while((*inputTerms)[parseIndex].compare(this->stringOptimizeEnd) != 0){
+   while((*inputTerms)[parseIndex].compare(this->stringOptimizationEnd) != 0){
       // number of steps of the steepest descent
-      if((*inputTerms)[parseIndex].compare(this->stringSteepestDescentLineSearchTimes) == 0){
-         int lineSearchTimes = atoi((*inputTerms)[parseIndex+1].c_str());
-         Parameters::GetInstance()->SetLineSearchTimesSteepestDescent(lineSearchTimes);
-         parseIndex++;
-      }
-      // number of steps of the steepest descent
-      if((*inputTerms)[parseIndex].compare(this->stringSteepestDescentSteps) == 0){
-         int steps = atoi((*inputTerms)[parseIndex+1].c_str());
-         Parameters::GetInstance()->SetStepsSteepestDescent(steps);
+      if((*inputTerms)[parseIndex].compare(this->stringOptimizationTotalSteps) == 0){
+         int totalSteps = atoi((*inputTerms)[parseIndex+1].c_str());
+         Parameters::GetInstance()->SetTotalStepsOptimization(totalSteps);
          parseIndex++;
       }
       // index of electronic eigen state on which steepest descent is carried out. 
-      if((*inputTerms)[parseIndex].compare(this->stringSteepestDescentElecState) == 0){
+      if((*inputTerms)[parseIndex].compare(this->stringOptimizationElecState) == 0){
          int elecStateIndex = atoi((*inputTerms)[parseIndex+1].c_str());
-         Parameters::GetInstance()->SetElectronicStateIndexSteepestDescent(elecStateIndex);
+         Parameters::GetInstance()->SetElectronicStateIndexOptimization(elecStateIndex);
          parseIndex++;
       }
       // time width for the steepest descent.
-      if((*inputTerms)[parseIndex].compare(this->stringSteepestDescentTimeWidth) == 0){
+      if((*inputTerms)[parseIndex].compare(this->stringOptimizationTimeWidth) == 0){
          double timeWidth = atof((*inputTerms)[parseIndex+1].c_str()) * Parameters::GetInstance()->GetFs2AU();
-         Parameters::GetInstance()->SetTimeWidthSteepestDescent(timeWidth);
+         Parameters::GetInstance()->SetTimeWidthOptimization(timeWidth);
          parseIndex++;
       }
       // max gradient for the steepest descent.
-      if((*inputTerms)[parseIndex].compare(this->stringSteepestDescentMaxGradient) == 0){
+      if((*inputTerms)[parseIndex].compare(this->stringOptimizationMaxGradient) == 0){
          double maxGradient = atof((*inputTerms)[parseIndex+1].c_str());
-         Parameters::GetInstance()->SetMaxGradientSteepestDescent(maxGradient);
+         Parameters::GetInstance()->SetMaxGradientOptimization(maxGradient);
          parseIndex++;
       }
       // rms gradient for the steepest descent.
-      if((*inputTerms)[parseIndex].compare(this->stringSteepestDescentRmsGradient) == 0){
+      if((*inputTerms)[parseIndex].compare(this->stringOptimizationRmsGradient) == 0){
          double rmsGradient = atof((*inputTerms)[parseIndex+1].c_str());
-         Parameters::GetInstance()->SetRmsGradientSteepestDescent(rmsGradient);
+         Parameters::GetInstance()->SetRmsGradientOptimization(rmsGradient);
          parseIndex++;
       }
       parseIndex++;   
@@ -848,9 +840,9 @@ void InputParser::Parse(Molecule* molecule) const{
          i = this->ParseConditionsRPMD(&inputTerms, i);
       }
 
-      // Optimize condition
-      if(inputTerms[i].compare(this->stringOptimize) == 0){
-         i = this->ParseConditionsOptimize(&inputTerms, i);
+      // Optimization condition
+      if(inputTerms[i].compare(this->stringOptimization) == 0){
+         i = this->ParseConditionsOptimization(&inputTerms, i);
       }
 
    }
@@ -869,8 +861,8 @@ void InputParser::Parse(Molecule* molecule) const{
    else if(Parameters::GetInstance()->GetCurrentSimulation()==RPMD){
       this->ValidateRpmdConditions(*molecule);
    }
-   else if(Parameters::GetInstance()->GetCurrentSimulation()==Optimize){
-      this->ValidateOptimizeConditions(*molecule);
+   else if(Parameters::GetInstance()->GetCurrentSimulation()==Optimization){
+      this->ValidateOptimizationConditions(*molecule);
    }
 
    // output conditions
@@ -892,8 +884,8 @@ void InputParser::Parse(Molecule* molecule) const{
    else if(Parameters::GetInstance()->GetCurrentSimulation()==RPMD){
       this->OutputRpmdConditions();
    }
-   else if(Parameters::GetInstance()->GetCurrentSimulation()==Optimize){
-      this->OutputOptimizeConditions();
+   else if(Parameters::GetInstance()->GetCurrentSimulation()==Optimization){
+      this->OutputOptimizationConditions();
    }
 
    // output inputs
@@ -1023,14 +1015,14 @@ void InputParser::ValidateRpmdConditions(const Molecule& molecule) const{
    } 
 }
 
-void InputParser::ValidateOptimizeConditions(const Molecule& molecule) const{
+void InputParser::ValidateOptimizationConditions(const Molecule& molecule) const{
    int groundStateIndex = 0;
-   int targetStateIndex = Parameters::GetInstance()->GetElectronicStateIndexSteepestDescent();
+   int targetStateIndex = Parameters::GetInstance()->GetElectronicStateIndexOptimization();
    TheoryType theory = Parameters::GetInstance()->GetCurrentTheory();
    // Validate theory
    if(theory == CNDO2 || theory == INDO || (theory == ZINDOS && groundStateIndex < targetStateIndex)){
       stringstream ss;
-      ss << this->errorMessageNonValidExcitedStatesOptimize;
+      ss << this->errorMessageNonValidExcitedStatesOptimization;
       ss << this->errorMessageElecState << targetStateIndex << endl;
       ss << this->errorMessageTheory << TheoryTypeStr(theory) << endl;
       throw MolDSException(ss.str());
@@ -1044,7 +1036,7 @@ void InputParser::ValidateOptimizeConditions(const Molecule& molecule) const{
    int numberExcitedStatesCIS = Parameters::GetInstance()->GetNumberExcitedStatesCIS();
    if(numberExcitedStatesCIS < targetStateIndex){
       stringstream ss;
-      ss << this->errorMessageNonValidExcitedStatesOptimize;
+      ss << this->errorMessageNonValidExcitedStatesOptimization;
       ss << this->errorMessageElecState << targetStateIndex << endl;
       ss << this->errorMessageNumberExcitedStateCIS << numberExcitedStatesCIS << endl;
       throw MolDSException(ss.str());
@@ -1167,21 +1159,19 @@ void InputParser::OutputRpmdConditions() const{
    this->OutputLog("\n");
 }
 
-void InputParser::OutputOptimizeConditions() const{
-   this->OutputLog(this->messageOptimizeConditions);
+void InputParser::OutputOptimizationConditions() const{
+   this->OutputLog(this->messageOptimizationConditions);
 
-   this->OutputLog((boost::format("%s%d\n") % this->messageSteepestDescentLineSearchTimes.c_str() 
-                                            % Parameters::GetInstance()->GetLineSearchTimesSteepestDescent()).str());
-   this->OutputLog((boost::format("%s%d\n") % this->messageSteepestDescentSteps.c_str() 
-                                            % Parameters::GetInstance()->GetStepsSteepestDescent()).str());
-   this->OutputLog((boost::format("%s%d\n") % this->messageSteepestDescentElecState.c_str() 
-                                            % Parameters::GetInstance()->GetElectronicStateIndexSteepestDescent()).str());
-   this->OutputLog((boost::format("%s%lf\n") % this->messageSteepestDescentMaxGradient.c_str() 
-                                             % Parameters::GetInstance()->GetMaxGradientSteepestDescent()).str());
-   this->OutputLog((boost::format("%s%lf\n") % this->messageSteepestDescentRmsGradient.c_str() 
-                                             % Parameters::GetInstance()->GetRmsGradientSteepestDescent()).str());
-   this->OutputLog((boost::format("%s%lf%s\n") % this->messageSteepestDescentTimeWidth.c_str() 
-                                               % (Parameters::GetInstance()->GetTimeWidthSteepestDescent()/Parameters::GetInstance()->GetFs2AU())
+   this->OutputLog((boost::format("%s%d\n") % this->messageOptimizationTotalSteps.c_str() 
+                                            % Parameters::GetInstance()->GetTotalStepsOptimization()).str());
+   this->OutputLog((boost::format("%s%d\n") % this->messageOptimizationElecState.c_str() 
+                                            % Parameters::GetInstance()->GetElectronicStateIndexOptimization()).str());
+   this->OutputLog((boost::format("%s%lf\n") % this->messageOptimizationMaxGradient.c_str() 
+                                             % Parameters::GetInstance()->GetMaxGradientOptimization()).str());
+   this->OutputLog((boost::format("%s%lf\n") % this->messageOptimizationRmsGradient.c_str() 
+                                             % Parameters::GetInstance()->GetRmsGradientOptimization()).str());
+   this->OutputLog((boost::format("%s%lf%s\n") % this->messageOptimizationTimeWidth.c_str() 
+                                               % (Parameters::GetInstance()->GetTimeWidthOptimization()/Parameters::GetInstance()->GetFs2AU())
                                                % this->messageFs.c_str()).str());
 
    this->OutputLog("\n");

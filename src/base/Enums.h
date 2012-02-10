@@ -33,7 +33,7 @@ RENUMSTR_BEGIN( SimulationType, SimulationTypeStr )
    RENUMSTR( PrincipalAxes, "PrincipalAxes" )
    RENUMSTR( Translate, "Translate" )
    RENUMSTR( Rotate, "Rotate" )
-   RENUMSTR( Optimize, "Optimize" )
+   RENUMSTR( Optimization, "Optimization" )
    RENUMSTR( SimulationType_end,  "SimulationType_end" )
 RENUMSTR_END()
 

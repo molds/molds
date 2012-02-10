@@ -273,8 +273,9 @@ HOW TO WRITE INPUT:
 
       E.g.
          OPTIMIZE
-            line_search_times 10
-            steep_step 5
+            //line_search_times 10
+            //steep_step 5
+            total_steps 50
             electronic_state 0
             max_gradient 0.00045
             rms_gradient 0.00030

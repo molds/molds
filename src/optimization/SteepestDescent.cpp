@@ -42,7 +42,7 @@ using namespace MolDS_base;
 using namespace MolDS_base_atoms;
 using namespace MolDS_base_factories;
 
-namespace MolDS_optimize{
+namespace MolDS_optimization{
 SteepestDescent::SteepestDescent(){
    this->SetMessages();
    this->SetEnableTheoryTypes();
@@ -69,18 +69,13 @@ void SteepestDescent::Optimize(Molecule& molecule){
    double lineSearchedEnergy = 0.0;
    bool obtainesOptimizedStructure = false;
    this->LineSearch(electronicStructure, molecule, &lineSearchedEnergy, &obtainesOptimizedStructure);
-   if(!obtainesOptimizedStructure){
-      this->SteepestDescentSearch(electronicStructure, molecule, lineSearchedEnergy, &obtainesOptimizedStructure);
-   }
   
    // Not converged
    if(!obtainesOptimizedStructure){
-      int lineSearchTimes = Parameters::GetInstance()->GetLineSearchTimesSteepestDescent();
-      int steepSteps = Parameters::GetInstance()->GetStepsSteepestDescent();
+      int totalSteps = Parameters::GetInstance()->GetTotalStepsOptimization();
       stringstream ss;
       ss << this->errorMessageGeometyrOptimizationNotConverged;
-      ss << this->errorMessageLineSearchTimes << lineSearchTimes << endl;
-      ss << this->errorMessageSteepestDescentSteps << steepSteps << endl;
+      ss << this->errorMessageTotalSteps << totalSteps << endl;
       throw MolDSException(ss.str());
    }
    this->OutputLog(this->messageEndGeometryOptimization);
@@ -89,23 +84,17 @@ void SteepestDescent::Optimize(Molecule& molecule){
 void SteepestDescent::SetMessages(){
    this->errorMessageTheoryType = "\ttheory type = ";
    this->errorMessageNotEnebleTheoryType  
-      = "Error in optimize::SteepestDescent::CheckEnableTheoryType: Non available theory is set.\n";
+      = "Error in optimization::SteepestDescent::CheckEnableTheoryType: Non available theory is set.\n";
    this->errorMessageGeometyrOptimizationNotConverged 
-      = "Error in optimize::SteepestDescent::Optimize: Optimization did not met convergence criterion.\n";
-   this->errorMessageLineSearchTimes = "\tLine search times = ";
-   this->errorMessageSteepestDescentSteps = "\tSteepest descent steps = ";
+      = "Error in optimization::SteepestDescent::Optimize: Optimization did not met convergence criterion.\n";
+   this->errorMessageTotalSteps = "\tTotal steps = ";
    this->messageGeometyrOptimizationMetConvergence 
       = "\t\tGeometry otimization met convergence criterion(^^b\n\n\n";
    this->messageStartGeometryOptimization = "**********  START: Geometry optimization  **********\n";
    this->messageEndGeometryOptimization =   "**********  DONE: Geometry optimization  **********\n";
-   this->messageStartSteepestDescent = "**********  START: Steepest descent  **********\n";
-   this->messageEndSteepestDescent =   "**********  DONE: Steepest descent  **********\n";
-   this->messageStartStepSteepestDescent = "==========  START: Steepest descent step ";
-   this->messageStartLineSearch = "**********  START: Line search  **********\n";
-   this->messageEndLineSearch =   "**********  DONE: Line search  **********\n";
-   this->messageStartLineSearchTimes = "\n==========  START: Line search times ";
+   this->messageStartSteepestDescentStep = "\n==========  START: Steepest Descent step ";
    this->messageReducedTimeWidth = "dt is reduced to ";
-   this->messageLineSearchSteps = "\tNumber of steps in this Line search: ";
+   this->messageLineSearchSteps = "\tNumber of Line search steps: ";
    this->messageOptimizationLog = "\t====== Optimization Logs ======\n";
    this->messageEnergyDifference = "\tEnergy difference: ";
    this->messageMaxGradient = "\tMax gradient: ";
@@ -171,16 +160,32 @@ void SteepestDescent::UpdateElectronicStructure(boost::shared_ptr<ElectronicStru
    }
 }
 
+void SteepestDescent::OutputMoleculeElectronicStructure(boost::shared_ptr<ElectronicStructure> electronicStructure, 
+                                                        Molecule& molecule,
+                                                        bool canOutputLogs) const{
+   // output molecular configuration
+   molecule.SetCanOutputLogs(canOutputLogs);
+   molecule.OutputConfiguration();
+   molecule.OutputXyzCOM();
+   molecule.OutputXyzCOC();
+
+   // output electornic structure
+   electronicStructure->SetCanOutputLogs(canOutputLogs);
+   electronicStructure->OutputSCFResults();
+   if(Parameters::GetInstance()->RequiresCIS()){
+      electronicStructure->OutputCISResults();
+   }
+}
+
 void SteepestDescent::LineSearch(boost::shared_ptr<ElectronicStructure> electronicStructure, 
                                  Molecule& molecule,
                                  double* lineSearchedEnergy,
                                  bool* obtainesOptimizedStructure) const{
-   this->OutputLog(this->messageStartLineSearch);
-   int elecState = Parameters::GetInstance()->GetElectronicStateIndexSteepestDescent();
-   double dt = Parameters::GetInstance()->GetTimeWidthSteepestDescent();
-   int lineSearchTimes = Parameters::GetInstance()->GetLineSearchTimesSteepestDescent();
-   double maxGradientThreshold = Parameters::GetInstance()->GetMaxGradientSteepestDescent();
-   double rmsGradientThreshold = Parameters::GetInstance()->GetRmsGradientSteepestDescent();
+   int elecState = Parameters::GetInstance()->GetElectronicStateIndexOptimization();
+   double dt = Parameters::GetInstance()->GetTimeWidthOptimization();
+   int totalSteps = Parameters::GetInstance()->GetTotalStepsOptimization();
+   double maxGradientThreshold = Parameters::GetInstance()->GetMaxGradientOptimization();
+   double rmsGradientThreshold = Parameters::GetInstance()->GetRmsGradientOptimization();
    double lineSearchCurrentEnergy = 0.0;
    double lineSearchInitialEnergy = 0.0;
    double** matrixForce = NULL;
@@ -190,92 +195,43 @@ void SteepestDescent::LineSearch(boost::shared_ptr<ElectronicStructure> electron
    this->UpdateElectronicStructure(electronicStructure, molecule, requireGuess, this->CanOutputLogs());
    lineSearchCurrentEnergy = electronicStructure->GetElectronicEnergy(elecState);
 
-   if(0<lineSearchTimes){
-      requireGuess = false;
-      matrixForce = electronicStructure->GetForce(elecState);
-      for(int s=0; s<lineSearchTimes; s++){
-         this->OutputLog((boost::format("%s%d\n") % this->messageStartLineSearchTimes.c_str() % s).str());
-         lineSearchInitialEnergy = lineSearchCurrentEnergy;
-
-         // line search roop
-         int lineSearchSteps = 0;
-         double lineSearchOldEnergy = lineSearchCurrentEnergy;
-         while(lineSearchCurrentEnergy <= lineSearchOldEnergy){
-            this->UpdateMolecularCoordinates(molecule, matrixForce, dt);
-            bool tempCanOutputLogs = false;
-            this->UpdateElectronicStructure(electronicStructure, molecule, requireGuess, tempCanOutputLogs);
-            lineSearchOldEnergy = lineSearchCurrentEnergy;
-            lineSearchCurrentEnergy = electronicStructure->GetElectronicEnergy(elecState);
-            lineSearchSteps++;
-         }
-
-         // final state of line search
-         this->UpdateElectronicStructure(electronicStructure, molecule, requireGuess, this->CanOutputLogs());
-         matrixForce = electronicStructure->GetForce(elecState);
-         molecule.OutputConfiguration();
-         molecule.OutputXyzCOC();
-         lineSearchCurrentEnergy = electronicStructure->GetElectronicEnergy(elecState);
-         this->OutputLog((boost::format("%s%d\n") % this->messageLineSearchSteps.c_str() % lineSearchSteps).str());
-
-         // check convergence
-         if(this->SatisfiesConvergenceCriterion(matrixForce, 
-                                                molecule,
-                                                lineSearchInitialEnergy, 
-                                                lineSearchCurrentEnergy,
-                                                maxGradientThreshold, 
-                                                rmsGradientThreshold)){
-            *obtainesOptimizedStructure = true;
-            break;
-         }
-
-      }
-   }
-   *lineSearchedEnergy = lineSearchCurrentEnergy;
-   this->OutputLog(this->messageEndLineSearch);
-}
-
-
-// This method should be called after the LineSearch-method.
-void SteepestDescent::SteepestDescentSearch(boost::shared_ptr<ElectronicStructure> electronicStructure, 
-                                            Molecule& molecule,
-                                            double lineSearchedEnergy,
-                                            bool* obtainesOptimizedStructure) const{
-   int elecState = Parameters::GetInstance()->GetElectronicStateIndexSteepestDescent();
-   double dt = Parameters::GetInstance()->GetTimeWidthSteepestDescent();
-   int steepSteps = Parameters::GetInstance()->GetStepsSteepestDescent();
-   double maxGradientThreshold = Parameters::GetInstance()->GetMaxGradientSteepestDescent();
-   double rmsGradientThreshold = Parameters::GetInstance()->GetRmsGradientSteepestDescent();
-   double currentEnergy = lineSearchedEnergy;
-   double oldEnergy = 0.0;
-   double** matrixForce = NULL;
-   double** oldMatrixForce = NULL;
-   bool requireGuess = false;
-   this->OutputLog(this->messageStartSteepestDescent);
+   requireGuess = false;
    matrixForce = electronicStructure->GetForce(elecState);
+   for(int s=0; s<totalSteps; s++){
+      this->OutputLog((boost::format("%s%d\n\n") % this->messageStartSteepestDescentStep.c_str() % (s+1)).str());
+      lineSearchInitialEnergy = lineSearchCurrentEnergy;
 
-   // steepest descent roop
-   for(int s=0; s<steepSteps; s++){
-      this->OutputLog((boost::format("%s %d\n") % this->messageStartStepSteepestDescent.c_str() % (s+1)).str());
-      this->UpdateMolecularCoordinates(molecule, matrixForce, dt);
-      this->UpdateElectronicStructure(electronicStructure, molecule, requireGuess, this->CanOutputLogs());
-      oldEnergy = currentEnergy;
-      currentEnergy = electronicStructure->GetElectronicEnergy(elecState);
+      // line search roop
+      int lineSearchSteps = 0;
+      double lineSearchOldEnergy = lineSearchCurrentEnergy;
+      while(lineSearchCurrentEnergy <= lineSearchOldEnergy){
+         this->UpdateMolecularCoordinates(molecule, matrixForce, dt);
+         bool tempCanOutputLogs = false;
+         this->UpdateElectronicStructure(electronicStructure, molecule, requireGuess, tempCanOutputLogs);
+         lineSearchOldEnergy = lineSearchCurrentEnergy;
+         lineSearchCurrentEnergy = electronicStructure->GetElectronicEnergy(elecState);
+         lineSearchSteps++;
+      }
+
+      // final state of line search
+      this->OutputLog((boost::format("%s%d\n\n") % this->messageLineSearchSteps.c_str() % lineSearchSteps).str());
+      this->OutputMoleculeElectronicStructure(electronicStructure, molecule, this->CanOutputLogs());
       matrixForce = electronicStructure->GetForce(elecState);
+      lineSearchCurrentEnergy = electronicStructure->GetElectronicEnergy(elecState);
+
+      // check convergence
       if(this->SatisfiesConvergenceCriterion(matrixForce, 
-                                             molecule, 
-                                             oldEnergy, 
-                                             currentEnergy, 
+                                             molecule,
+                                             lineSearchInitialEnergy, 
+                                             lineSearchCurrentEnergy,
                                              maxGradientThreshold, 
                                              rmsGradientThreshold)){
          *obtainesOptimizedStructure = true;
          break;
       }
-      if(oldEnergy < currentEnergy){
-         dt *= 0.1;
-         this->OutputLog((boost::format("%s %e\n") % this->messageReducedTimeWidth.c_str() % dt).str());
-      }
+
    }
-   this->OutputLog(this->messageEndSteepestDescent);
+   *lineSearchedEnergy = lineSearchCurrentEnergy;
 }
 
 bool SteepestDescent::SatisfiesConvergenceCriterion(double** matrixForce, 

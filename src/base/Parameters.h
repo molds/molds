@@ -135,19 +135,17 @@ public:
    void SetNumberBeadsRPMD(int numberBeads);
    unsigned long GetSeedRPMD() const;
    void SetSeedRPMD(unsigned long seed);
-   // Opt (steepest descent)
-   int GetLineSearchTimesSteepestDescent();
-   void SetLineSearchTimesSteepestDescent(int lineSearchTimes);
-   int GetStepsSteepestDescent() const;
-   void SetStepsSteepestDescent(int steps);
-   int GetElectronicStateIndexSteepestDescent() const;
-   void SetElectronicStateIndexSteepestDescent(int electronicStateIndex);
-   double GetMaxGradientSteepestDescent() const;
-   void SetMaxGradientSteepestDescent(double maxGradient);
-   double GetRmsGradientSteepestDescent() const;
-   void SetRmsGradientSteepestDescent(double rmsGradient);
-   double GetTimeWidthSteepestDescent() const;
-   void SetTimeWidthSteepestDescent(double timeWidth);
+   // Optimization
+   int GetTotalStepsOptimization() const;
+   void SetTotalStepsOptimization(int totalSteps);
+   int GetElectronicStateIndexOptimization() const;
+   void SetElectronicStateIndexOptimization(int electronicStateIndex);
+   double GetMaxGradientOptimization() const;
+   void SetMaxGradientOptimization(double maxGradient);
+   double GetRmsGradientOptimization() const;
+   void SetRmsGradientOptimization(double rmsGradient);
+   double GetTimeWidthOptimization() const;
+   void SetTimeWidthOptimization(double timeWidth);
 private:
    static Parameters* parameters;
    Parameters();
@@ -216,13 +214,12 @@ private:
    double timeWidthRPMD;
    int numberBeadsRPMD;
    unsigned long seedRPMD;
-   // Opt (steepest descent)
-   int lineSearchTimesSteepestDescent;
-   int stepsSteepestDescent;
-   int electronicStateIndexSteepestDescent;
-   double maxGradientSteepestDescent;
-   double rmsGradientSteepestDescent;
-   double timeWidthSteepestDescent;
+   // Optimization
+   int totalStepsOptimization;
+   int electronicStateIndexOptimization;
+   double maxGradientOptimization;
+   double rmsGradientOptimization;
+   double timeWidthOptimization;
    // Other
    void SetDefaultValues();
    void SetMessages();

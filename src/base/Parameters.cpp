@@ -140,13 +140,12 @@ void Parameters::SetDefaultValues(){
    this->temperatureRPMD = 300;
    this->numberBeadsRPMD = 10;
    this->seedRPMD = static_cast<unsigned long>(time(0));
-   // Optimization (Steepest Descent)
-   this->lineSearchTimesSteepestDescent = 50;
-   this->stepsSteepestDescent = 50;
-   this->electronicStateIndexSteepestDescent = 0;
-   this->maxGradientSteepestDescent = 0.00045;
-   this->rmsGradientSteepestDescent = 0.00030;
-   this->timeWidthSteepestDescent = 50.0*this->fs2AU;
+   // Optimization 
+   this->totalStepsOptimization = 50;
+   this->electronicStateIndexOptimization = 0;
+   this->maxGradientOptimization = 0.00045;
+   this->rmsGradientOptimization = 0.00030;
+   this->timeWidthOptimization = 50.0*this->fs2AU;
 }
 
 void Parameters::SetMessages(){
@@ -578,53 +577,45 @@ void Parameters::SetSeedRPMD(unsigned long seed){
    this->seedRPMD = seed;
 }
 
-// Opt (steepest descent)
-int Parameters::GetLineSearchTimesSteepestDescent(){
-   return this->lineSearchTimesSteepestDescent;
+// Optimization
+int Parameters::GetTotalStepsOptimization() const{
+   return this->totalStepsOptimization;
 }
 
-void Parameters::SetLineSearchTimesSteepestDescent(int lineSearchTimes){
-   this->lineSearchTimesSteepestDescent = lineSearchTimes;
+void Parameters::SetTotalStepsOptimization(int steps){
+   this->totalStepsOptimization = steps;
 }
 
-int Parameters::GetStepsSteepestDescent() const{
-   return this->stepsSteepestDescent;
+int Parameters::GetElectronicStateIndexOptimization() const{
+   return this->electronicStateIndexOptimization;
 }
 
-void Parameters::SetStepsSteepestDescent(int steps){
-   this->stepsSteepestDescent = steps;
+void Parameters::SetElectronicStateIndexOptimization(int electronicStateIndex){
+   this->electronicStateIndexOptimization = electronicStateIndex;
 }
 
-int Parameters::GetElectronicStateIndexSteepestDescent() const{
-   return this->electronicStateIndexSteepestDescent;
+double Parameters::GetMaxGradientOptimization() const{
+   return this->maxGradientOptimization;
 }
 
-void Parameters::SetElectronicStateIndexSteepestDescent(int electronicStateIndex){
-   this->electronicStateIndexSteepestDescent = electronicStateIndex;
+void Parameters::SetMaxGradientOptimization(double maxGradient){
+   this->maxGradientOptimization = maxGradient;
 }
 
-double Parameters::GetMaxGradientSteepestDescent() const{
-   return this->maxGradientSteepestDescent;
+double Parameters::GetRmsGradientOptimization() const{
+   return this->rmsGradientOptimization;
 }
 
-void Parameters::SetMaxGradientSteepestDescent(double maxGradient){
-   this->maxGradientSteepestDescent = maxGradient;
+void Parameters::SetRmsGradientOptimization(double rmsGradient){
+   this->rmsGradientOptimization = rmsGradient;
 }
 
-double Parameters::GetRmsGradientSteepestDescent() const{
-   return this->rmsGradientSteepestDescent;
+double Parameters::GetTimeWidthOptimization() const{
+   return this->timeWidthOptimization;
 }
 
-void Parameters::SetRmsGradientSteepestDescent(double rmsGradient){
-   this->rmsGradientSteepestDescent = rmsGradient;
-}
-
-double Parameters::GetTimeWidthSteepestDescent() const{
-   return this->timeWidthSteepestDescent;
-}
-
-void Parameters::SetTimeWidthSteepestDescent(double timeWidth){
-   this->timeWidthSteepestDescent = timeWidth;
+void Parameters::SetTimeWidthOptimization(double timeWidth){
+   this->timeWidthOptimization = timeWidth;
 }
 
 }
