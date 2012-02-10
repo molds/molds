@@ -248,8 +248,7 @@ HOW TO WRITE INPUT:
          OPTIMIZE_END
   
       -options
-       "line_return_times", "steep_step", "electronic_state", 
-       "max_gradient", "rms_gradient", 
+       "total_steps", "electronic_state", "max_gradient", "rms_gradient", 
        and "dt" are prepared as options.
 
        "electronic_state" means the electronic eigenstate 
@@ -273,8 +272,6 @@ HOW TO WRITE INPUT:
 
       E.g.
          OPTIMIZE
-            //line_search_times 10
-            //steep_step 5
             total_steps 50
             electronic_state 0
             max_gradient 0.00045

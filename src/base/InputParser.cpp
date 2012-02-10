@@ -266,7 +266,7 @@ void InputParser::SetMessages(){
    // Opt
    this->stringOptimization = "optimization";
    this->stringOptimizationEnd = "optimization_end";
-   this->stringOptimizationTotalSteps = "total_step";
+   this->stringOptimizationTotalSteps = "total_steps";
    this->stringOptimizationElecState = "electronic_state";
    this->stringOptimizationMaxGradient = "max_gradient";
    this->stringOptimizationRmsGradient = "rms_gradient";

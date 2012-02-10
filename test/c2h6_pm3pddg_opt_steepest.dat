@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/2/10(Fri.) 15:34:2  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/2/10(Fri.) 15:42:16  <<<<<
 
 
 **********  START: Parse input  **********
@@ -65,7 +65,7 @@
 Input terms:
 theory | pm3/pddg | theory_end | scf | max_iter | 50 | rms_density | 0.000001 | damping_thresh | 1.0 | 
 damping_weight | 0.0 | diis_num_error_vect | 5 | diis_start_error | 0.1 | diis_end_error | 0.00000002 | scf_end | optimization | 
-total_step | 50 | electronic_state | 0 | max_gradient | 0.00045 | rms_gradient | 0.00030 | dt | 50 | 
+total_steps | 50 | electronic_state | 0 | max_gradient | 0.00045 | rms_gradient | 0.00030 | dt | 50 | 
 optimization_end | geometry | c | -0.1000 | 0.1000 | 0.0000 | c | 1.6938 | 0.0000 | -0.1000 | 
 h | -0.381 | 1.1411 | 0.0000 | h | -0.2681 | -0.5205 | -0.9016 | h | -0.3681 | 
 -0.4725 | 0.8016 | h | 1.9519 | 0.5200 | -0.9007 | h | 1.8519 | 0.5300 | 0.8007 | 
@@ -131,7 +131,7 @@ SCF iter=12: RMS density=0.000000435961071
 		6	H	1.000000e+00	9.774623e-02
 		7	H	1.000000e+00	1.088898e-01
 
-	Elapsed time(omp) for the SCF = 0.242549[s].
+	Elapsed time(omp) for the SCF = 0.048990[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
@@ -160,6 +160,13 @@ SCF iter=12: RMS density=0.000000435961071
 		5	H	3.824564e+00	1.131662e+00	-1.980332e+00
 		6	H	3.611605e+00	1.015670e+00	1.586650e+00
 		7	H	3.408702e+00	-2.088314e+00	-1.918624e-01
+
+	Center of Mass:
+		| x[angst.] | y[angst.] | z[angst.] |
+		7.887587e-01	4.524017e-02	-5.000001e-02
+
+		| x[a.u.] | y[a.u.] | z[a.u.] |
+		1.490538e+00	8.549154e-02	-9.448632e-02
 
 	Center of Core:
 		| x[angst.] | y[angst.] | z[angst.] |
@@ -237,6 +244,13 @@ SCF iter=12: RMS density=0.000000435961071
 		6	H	3.715141e+00	9.636515e-01	1.548639e+00
 		7	H	3.493743e+00	-1.990517e+00	-1.912303e-01
 
+	Center of Mass:
+		| x[angst.] | y[angst.] | z[angst.] |
+		7.887589e-01	4.524018e-02	-4.999996e-02
+
+		| x[a.u.] | y[a.u.] | z[a.u.] |
+		1.490538e+00	8.549156e-02	-9.448623e-02
+
 	Center of Core:
 		| x[angst.] | y[angst.] | z[angst.] |
 		7.887601e-01	4.524141e-02	-5.000000e-02
@@ -312,6 +326,13 @@ SCF iter=12: RMS density=0.000000435961071
 		5	H	3.845904e+00	1.046899e+00	-1.900980e+00
 		6	H	3.762384e+00	9.458749e-01	1.536437e+00
 		7	H	3.545790e+00	-1.998976e+00	-1.945591e-01
+
+	Center of Mass:
+		| x[angst.] | y[angst.] | z[angst.] |
+		7.887594e-01	4.524034e-02	-5.000000e-02
+
+		| x[a.u.] | y[a.u.] | z[a.u.] |
+		1.490539e+00	8.549185e-02	-9.448631e-02
 
 	Center of Core:
 		| x[angst.] | y[angst.] | z[angst.] |
@@ -389,6 +410,13 @@ SCF iter=12: RMS density=0.000000435961071
 		6	H	3.806721e+00	9.349667e-01	1.536902e+00
 		7	H	3.584816e+00	-1.976192e+00	-1.939745e-01
 
+	Center of Mass:
+		| x[angst.] | y[angst.] | z[angst.] |
+		7.887595e-01	4.524043e-02	-4.999996e-02
+
+		| x[a.u.] | y[a.u.] | z[a.u.] |
+		1.490539e+00	8.549202e-02	-9.448623e-02
+
 	Center of Core:
 		| x[angst.] | y[angst.] | z[angst.] |
 		7.887601e-01	4.524141e-02	-5.000000e-02
@@ -464,6 +492,13 @@ SCF iter=12: RMS density=0.000000435961071
 		5	H	3.831790e+00	1.008378e+00	-1.861985e+00
 		6	H	3.821342e+00	9.120696e-01	1.505112e+00
 		7	H	3.608918e+00	-1.948294e+00	-1.955043e-01
+
+	Center of Mass:
+		| x[angst.] | y[angst.] | z[angst.] |
+		7.887598e-01	4.524060e-02	-5.000001e-02
+
+		| x[a.u.] | y[a.u.] | z[a.u.] |
+		1.490540e+00	8.549234e-02	-9.448633e-02
 
 	Center of Core:
 		| x[angst.] | y[angst.] | z[angst.] |
@@ -541,6 +576,13 @@ SCF iter=12: RMS density=0.000000435961071
 		6	H	3.844052e+00	9.163064e-01	1.520057e+00
 		7	H	3.627913e+00	-1.949582e+00	-1.958125e-01
 
+	Center of Mass:
+		| x[angst.] | y[angst.] | z[angst.] |
+		7.887598e-01	4.524069e-02	-4.999998e-02
+
+		| x[a.u.] | y[a.u.] | z[a.u.] |
+		1.490540e+00	8.549252e-02	-9.448628e-02
+
 	Center of Core:
 		| x[angst.] | y[angst.] | z[angst.] |
 		7.887601e-01	4.524141e-02	-5.000000e-02
@@ -616,6 +658,13 @@ SCF iter=12: RMS density=0.000000435961071
 		5	H	3.800027e+00	9.821950e-01	-1.825090e+00
 		6	H	3.837832e+00	9.015439e-01	1.495533e+00
 		7	H	3.630064e+00	-1.926783e+00	-1.958680e-01
+
+	Center of Mass:
+		| x[angst.] | y[angst.] | z[angst.] |
+		7.887599e-01	4.524080e-02	-5.000001e-02
+
+		| x[a.u.] | y[a.u.] | z[a.u.] |
+		1.490540e+00	8.549272e-02	-9.448633e-02
 
 	Center of Core:
 		| x[angst.] | y[angst.] | z[angst.] |
@@ -693,6 +742,13 @@ SCF iter=12: RMS density=0.000000435961071
 		6	H	3.846489e+00	9.065602e-01	1.505938e+00
 		7	H	3.638477e+00	-1.930802e+00	-1.967372e-01
 
+	Center of Mass:
+		| x[angst.] | y[angst.] | z[angst.] |
+		7.887600e-01	4.524088e-02	-4.999999e-02
+
+		| x[a.u.] | y[a.u.] | z[a.u.] |
+		1.490540e+00	8.549288e-02	-9.448629e-02
+
 	Center of Core:
 		| x[angst.] | y[angst.] | z[angst.] |
 		7.887601e-01	4.524141e-02	-5.000000e-02
@@ -768,6 +824,13 @@ SCF iter=12: RMS density=0.000000435961071
 		5	H	3.773785e+00	9.711122e-01	-1.807792e+00
 		6	H	3.838691e+00	8.986061e-01	1.491751e+00
 		7	H	3.636480e+00	-1.916138e+00	-1.964728e-01
+
+	Center of Mass:
+		| x[angst.] | y[angst.] | z[angst.] |
+		7.887600e-01	4.524096e-02	-5.000001e-02
+
+		| x[a.u.] | y[a.u.] | z[a.u.] |
+		1.490540e+00	8.549302e-02	-9.448633e-02
 
 	Center of Core:
 		| x[angst.] | y[angst.] | z[angst.] |
@@ -845,6 +908,13 @@ SCF iter=12: RMS density=0.000000435961071
 		6	H	3.840473e+00	9.030410e-01	1.498765e+00
 		7	H	3.639509e+00	-1.919753e+00	-1.971898e-01
 
+	Center of Mass:
+		| x[angst.] | y[angst.] | z[angst.] |
+		7.887600e-01	4.524102e-02	-5.000000e-02
+
+		| x[a.u.] | y[a.u.] | z[a.u.] |
+		1.490540e+00	8.549315e-02	-9.448630e-02
+
 	Center of Core:
 		| x[angst.] | y[angst.] | z[angst.] |
 		7.887601e-01	4.524141e-02	-5.000000e-02
@@ -920,6 +990,13 @@ SCF iter=12: RMS density=0.000000435961071
 		5	H	3.754253e+00	9.702848e-01	-1.805328e+00
 		6	H	3.832005e+00	8.980974e-01	1.488880e+00
 		7	H	3.636239e+00	-1.908860e+00	-1.968594e-01
+
+	Center of Mass:
+		| x[angst.] | y[angst.] | z[angst.] |
+		7.887601e-01	4.524109e-02	-5.000002e-02
+
+		| x[a.u.] | y[a.u.] | z[a.u.] |
+		1.490541e+00	8.549328e-02	-9.448634e-02
 
 	Center of Core:
 		| x[angst.] | y[angst.] | z[angst.] |
@@ -997,6 +1074,13 @@ SCF iter=12: RMS density=0.000000435961071
 		6	H	3.832864e+00	9.026731e-01	1.495628e+00
 		7	H	3.637782e+00	-1.913819e+00	-1.973879e-01
 
+	Center of Mass:
+		| x[angst.] | y[angst.] | z[angst.] |
+		7.887601e-01	4.524113e-02	-5.000000e-02
+
+		| x[a.u.] | y[a.u.] | z[a.u.] |
+		1.490541e+00	8.549334e-02	-9.448631e-02
+
 	Center of Core:
 		| x[angst.] | y[angst.] | z[angst.] |
 		7.887601e-01	4.524141e-02	-5.000000e-02
@@ -1072,6 +1156,13 @@ SCF iter=12: RMS density=0.000000435961071
 		5	H	3.738123e+00	9.673598e-01	-1.798292e+00
 		6	H	3.826375e+00	9.003330e-01	1.490012e+00
 		7	H	3.635156e+00	-1.907379e+00	-1.971427e-01
+
+	Center of Mass:
+		| x[angst.] | y[angst.] | z[angst.] |
+		7.887601e-01	4.524118e-02	-5.000001e-02
+
+		| x[a.u.] | y[a.u.] | z[a.u.] |
+		1.490541e+00	8.549344e-02	-9.448633e-02
 
 	Center of Core:
 		| x[angst.] | y[angst.] | z[angst.] |
@@ -1149,6 +1240,13 @@ SCF iter=12: RMS density=0.000000435961071
 		6	H	3.826164e+00	9.034932e-01	1.494296e+00
 		7	H	3.635925e+00	-1.910577e+00	-1.974336e-01
 
+	Center of Mass:
+		| x[angst.] | y[angst.] | z[angst.] |
+		7.887601e-01	4.524121e-02	-5.000000e-02
+
+		| x[a.u.] | y[a.u.] | z[a.u.] |
+		1.490541e+00	8.549349e-02	-9.448631e-02
+
 	Center of Core:
 		| x[angst.] | y[angst.] | z[angst.] |
 		7.887601e-01	4.524141e-02	-5.000000e-02
@@ -1224,6 +1322,13 @@ SCF iter=12: RMS density=0.000000435961071
 		5	H	3.727440e+00	9.666228e-01	-1.795151e+00
 		6	H	3.821584e+00	9.025292e-01	1.491156e+00
 		7	H	3.634233e+00	-1.906836e+00	-1.972520e-01
+
+	Center of Mass:
+		| x[angst.] | y[angst.] | z[angst.] |
+		7.887601e-01	4.524124e-02	-5.000001e-02
+
+		| x[a.u.] | y[a.u.] | z[a.u.] |
+		1.490541e+00	8.549356e-02	-9.448632e-02
 
 	Center of Core:
 		| x[angst.] | y[angst.] | z[angst.] |
@@ -1301,6 +1406,13 @@ SCF iter=12: RMS density=0.000000435961071
 		6	H	3.820907e+00	9.051880e-01	1.494442e+00
 		7	H	3.634829e+00	-1.909266e+00	-1.974227e-01
 
+	Center of Mass:
+		| x[angst.] | y[angst.] | z[angst.] |
+		7.887601e-01	4.524127e-02	-5.000000e-02
+
+		| x[a.u.] | y[a.u.] | z[a.u.] |
+		1.490541e+00	8.549361e-02	-9.448631e-02
+
 	Center of Core:
 		| x[angst.] | y[angst.] | z[angst.] |
 		7.887601e-01	4.524141e-02	-5.000000e-02
@@ -1376,6 +1488,13 @@ SCF iter=12: RMS density=0.000000435961071
 		5	H	3.720465e+00	9.666930e-01	-1.793768e+00
 		6	H	3.817950e+00	9.043790e-01	1.492038e+00
 		7	H	3.633778e+00	-1.906610e+00	-1.972440e-01
+
+	Center of Mass:
+		| x[angst.] | y[angst.] | z[angst.] |
+		7.887601e-01	4.524129e-02	-5.000001e-02
+
+		| x[a.u.] | y[a.u.] | z[a.u.] |
+		1.490541e+00	8.549364e-02	-9.448632e-02
 
 	Center of Core:
 		| x[angst.] | y[angst.] | z[angst.] |
@@ -1453,6 +1572,13 @@ SCF iter=12: RMS density=0.000000435961071
 		6	H	3.817238e+00	9.061461e-01	1.493986e+00
 		7	H	3.634232e+00	-1.908011e+00	-1.972974e-01
 
+	Center of Mass:
+		| x[angst.] | y[angst.] | z[angst.] |
+		7.887601e-01	4.524131e-02	-5.000000e-02
+
+		| x[a.u.] | y[a.u.] | z[a.u.] |
+		1.490541e+00	8.549368e-02	-9.448631e-02
+
 	Center of Core:
 		| x[angst.] | y[angst.] | z[angst.] |
 		7.887601e-01	4.524141e-02	-5.000000e-02
@@ -1528,6 +1654,13 @@ SCF iter=12: RMS density=0.000000435961071
 		5	H	3.715931e+00	9.669597e-01	-1.793125e+00
 		6	H	3.815339e+00	9.058315e-01	1.492616e+00
 		7	H	3.633721e+00	-1.906454e+00	-1.971592e-01
+
+	Center of Mass:
+		| x[angst.] | y[angst.] | z[angst.] |
+		7.887601e-01	4.524132e-02	-5.000000e-02
+
+		| x[a.u.] | y[a.u.] | z[a.u.] |
+		1.490541e+00	8.549371e-02	-9.448632e-02
 
 	Center of Core:
 		| x[angst.] | y[angst.] | z[angst.] |
@@ -1605,6 +1738,13 @@ SCF iter=12: RMS density=0.000000435961071
 		6	H	3.814732e+00	9.070166e-01	1.493751e+00
 		7	H	3.634110e+00	-1.907238e+00	-1.971427e-01
 
+	Center of Mass:
+		| x[angst.] | y[angst.] | z[angst.] |
+		7.887601e-01	4.524134e-02	-5.000000e-02
+
+		| x[a.u.] | y[a.u.] | z[a.u.] |
+		1.490541e+00	8.549373e-02	-9.448631e-02
+
 	Center of Core:
 		| x[angst.] | y[angst.] | z[angst.] |
 		7.887601e-01	4.524141e-02	-5.000000e-02
@@ -1680,6 +1820,13 @@ SCF iter=12: RMS density=0.000000435961071
 		5	H	3.713003e+00	9.672345e-01	-1.792852e+00
 		6	H	3.813518e+00	9.069488e-01	1.492960e+00
 		7	H	3.633911e+00	-1.906315e+00	-1.970262e-01
+
+	Center of Mass:
+		| x[angst.] | y[angst.] | z[angst.] |
+		7.887601e-01	4.524135e-02	-5.000000e-02
+
+		| x[a.u.] | y[a.u.] | z[a.u.] |
+		1.490541e+00	8.549375e-02	-9.448631e-02
 
 	Center of Core:
 		| x[angst.] | y[angst.] | z[angst.] |
@@ -1757,6 +1904,13 @@ SCF iter=12: RMS density=0.000000435961071
 		6	H	3.813044e+00	9.077569e-01	1.493606e+00
 		7	H	3.634251e+00	-1.906737e+00	-1.969685e-01
 
+	Center of Mass:
+		| x[angst.] | y[angst.] | z[angst.] |
+		7.887601e-01	4.524136e-02	-5.000000e-02
+
+		| x[a.u.] | y[a.u.] | z[a.u.] |
+		1.490541e+00	8.549377e-02	-9.448631e-02
+
 	Center of Core:
 		| x[angst.] | y[angst.] | z[angst.] |
 		7.887601e-01	4.524141e-02	-5.000000e-02
@@ -1833,6 +1987,13 @@ SCF iter=12: RMS density=0.000000435961071
 		6	H	3.812074e+00	9.078195e-01	1.493025e+00
 		7	H	3.634212e+00	-1.906044e+00	-1.968374e-01
 
+	Center of Mass:
+		| x[angst.] | y[angst.] | z[angst.] |
+		7.887601e-01	4.524137e-02	-5.000000e-02
+
+		| x[a.u.] | y[a.u.] | z[a.u.] |
+		1.490541e+00	8.549379e-02	-9.448631e-02
+
 	Center of Core:
 		| x[angst.] | y[angst.] | z[angst.] |
 		7.887601e-01	4.524141e-02	-5.000000e-02
@@ -1893,9 +2054,9 @@ SCF iter=12: RMS density=0.000000435961071
 
 
      >>>>>  The MolDS finished normally!  <<<<<
-     >>>>>  CPU time: 31.41[s].  <<<<<
-     >>>>>  Elapsed time: 32[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 31.5736[s].  <<<<<
+     >>>>>  CPU time: 31.42[s].  <<<<<
+     >>>>>  Elapsed time: 31[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 31.464[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 
