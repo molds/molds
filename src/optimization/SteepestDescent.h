@@ -20,10 +20,6 @@
 #define INCLUDED_STEEPEST_DESCENT
 namespace MolDS_optimization{
 
-/***
- *  Line search algorythm is used in the early stage of the optimization.
- *  Then, steepest descent algorythm is used to get final optimized struture.
- */
 class SteepestDescent : public MolDS_base::PrintController{
 public:
    SteepestDescent();
