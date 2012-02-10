@@ -51,6 +51,7 @@
 #include"../rpmd/RPMD.h"
 #include"../optimization/Optimizer.h"
 #include"../optimization/SteepestDescent.h"
+#include"../optimization/ConjugateGradient.h"
 #include"MolDS.h"
 using namespace std;
 using namespace MolDS_base_factories;
