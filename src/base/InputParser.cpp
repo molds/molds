@@ -39,11 +39,12 @@
 #include"atoms/Natom.h"
 #include"atoms/Oatom.h"
 #include"atoms/Satom.h"
-#include"AtomFactory.h"
+#include"factories/AtomFactory.h"
 #include"Molecule.h"
 #include"InputParser.h"
 using namespace std;
 using namespace MolDS_base_atoms;
+using namespace MolDS_base_factories;
 namespace MolDS_base{
 
 InputParser* InputParser::inputParser = NULL;

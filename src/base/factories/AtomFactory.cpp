@@ -22,21 +22,22 @@
 #include<sstream>
 #include<vector>
 #include<stdexcept>
-#include"PrintController.h"
-#include"MolDSException.h"
-#include"Uncopyable.h"
-#include"Enums.h"
-#include"atoms/Atom.h"
-#include"atoms/Hatom.h"
-#include"atoms/Liatom.h"
-#include"atoms/Catom.h"
-#include"atoms/Natom.h"
-#include"atoms/Oatom.h"
-#include"atoms/Satom.h"
+#include"../PrintController.h"
+#include"../MolDSException.h"
+#include"../Uncopyable.h"
+#include"../Enums.h"
+#include"../atoms/Atom.h"
+#include"../atoms/Hatom.h"
+#include"../atoms/Liatom.h"
+#include"../atoms/Catom.h"
+#include"../atoms/Natom.h"
+#include"../atoms/Oatom.h"
+#include"../atoms/Satom.h"
 #include"AtomFactory.h"
 using namespace std;
+using namespace MolDS_base;
 using namespace MolDS_base_atoms;
-namespace MolDS_base{
+namespace MolDS_base_factories{
 
 string AtomFactory::errorMessageNotEnableAtom = "Error in base::AtomFactory::Create: Not Enable AtomType is set.";
 string AtomFactory::errorMessageAtomType = "\tatom type = ";

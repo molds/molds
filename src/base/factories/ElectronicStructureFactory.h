@@ -18,7 +18,7 @@
 //************************************************************************//
 #ifndef INCLUDED_ELECTRONICSTRICTUREFACTORY
 #define INCLUDED_ELECTRONICSTRICTUREFACTORY
-namespace MolDS_base{
+namespace MolDS_base_factories{
 
 // ElectronicStructureFactory is singleton
 class ElectronicStructureFactory{

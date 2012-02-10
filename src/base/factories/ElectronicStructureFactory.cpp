@@ -22,27 +22,28 @@
 #include<sstream>
 #include<vector>
 #include<stdexcept>
-#include"PrintController.h"
-#include"MolDSException.h"
-#include"Uncopyable.h"
-#include"Enums.h"
-#include"MallocerFreer.h"
-#include"EularAngle.h"
-#include"Parameters.h"
-#include"atoms/Atom.h"
+#include"../PrintController.h"
+#include"../MolDSException.h"
+#include"../Uncopyable.h"
+#include"../Enums.h"
+#include"../MallocerFreer.h"
+#include"../EularAngle.h"
+#include"../Parameters.h"
+#include"../atoms/Atom.h"
 #include"AtomFactory.h"
-#include"Molecule.h"
-#include"ElectronicStructure.h"
-#include"../cndo/Cndo2.h"
-#include"../indo/Indo.h"
-#include"../zindo/ZindoS.h"
-#include"../mndo/Mndo.h"
-#include"../am1/Am1.h"
-#include"../pm3/Pm3.h"
-#include"../pm3/Pm3Pddg.h"
+#include"../Molecule.h"
+#include"../ElectronicStructure.h"
+#include"../../cndo/Cndo2.h"
+#include"../../indo/Indo.h"
+#include"../../zindo/ZindoS.h"
+#include"../../mndo/Mndo.h"
+#include"../../am1/Am1.h"
+#include"../../pm3/Pm3.h"
+#include"../../pm3/Pm3Pddg.h"
 #include"ElectronicStructureFactory.h"
 using namespace std;
-namespace MolDS_base{
+using namespace MolDS_base;
+namespace MolDS_base_factories{
 string ElectronicStructureFactory::errorMessageNotEnableTheory 
       = "Error in base::ElectronicStructureFactory::Create: Not Enable TheoryType is set.";
 string ElectronicStructureFactory::errorMessageTheoryType = "\ttheory type = ";

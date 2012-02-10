@@ -40,18 +40,19 @@
 #include"EularAngle.h"
 #include"Parameters.h"
 #include"atoms/Atom.h"
-#include"AtomFactory.h"
+#include"factories/AtomFactory.h"
 #include"Molecule.h"
 #include"InputParser.h"
 #include"GTOExpansionSTO.h"
 #include"ElectronicStructure.h"
-#include"ElectronicStructureFactory.h"
+#include"factories/ElectronicStructureFactory.h"
 #include"../md/MD.h"
 #include"../mc/MC.h"
 #include"../rpmd/RPMD.h"
 #include"../optimize/SteepestDescent.h"
 #include"MolDS.h"
 using namespace std;
+using namespace MolDS_base_factories;
 namespace MolDS_base{
 void MolDS::Run() const{
    // Welcome Messages

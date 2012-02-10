@@ -36,10 +36,11 @@
 #include"EularAngle.h"
 #include"Parameters.h"
 #include"atoms/Atom.h"
-#include"AtomFactory.h"
+#include"factories/AtomFactory.h"
 #include"Molecule.h"
 using namespace std;
 using namespace MolDS_base_atoms;
+using namespace MolDS_base_factories;
 namespace MolDS_base{
 
 Molecule::Molecule(){

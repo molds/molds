@@ -18,7 +18,7 @@
 //************************************************************************//
 #ifndef INCLUDED_ATOMFACTORY
 #define INCLUDED_ATOMFACTORY
-namespace MolDS_base{
+namespace MolDS_base_factories{
 
 // AtomFactory is singleton
 class AtomFactory{

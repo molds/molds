@@ -35,11 +35,12 @@
 #include"../base/atoms/Atom.h"
 #include"../base/Molecule.h"
 #include"../base/ElectronicStructure.h"
-#include"../base/ElectronicStructureFactory.h"
+#include"../base/factories/ElectronicStructureFactory.h"
 #include"MD.h"
 using namespace std;
 using namespace MolDS_base;
 using namespace MolDS_base_atoms;
+using namespace MolDS_base_factories;
 
 namespace MolDS_md{
 MD::MD(){
