@@ -49,6 +49,7 @@
 #include"../md/MD.h"
 #include"../mc/MC.h"
 #include"../rpmd/RPMD.h"
+#include"../optimization/Optimizer.h"
 #include"../optimization/SteepestDescent.h"
 #include"MolDS.h"
 using namespace std;

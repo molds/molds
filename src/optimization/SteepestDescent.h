@@ -20,50 +20,18 @@
 #define INCLUDED_STEEPEST_DESCENT
 namespace MolDS_optimization{
 
-class SteepestDescent : public MolDS_base::PrintController{
+class SteepestDescent : public MolDS_optimization::Optimizer{
 public:
    SteepestDescent();
    ~SteepestDescent();
-   void Optimize(MolDS_base::Molecule& molecule);
-private:
-   std::string errorMessageNotEnebleTheoryType;
-   std::string errorMessageTheoryType;
-   std::string errorMessageGeometyrOptimizationNotConverged;
-   std::string errorMessageTotalSteps;
-   std::string messageGeometyrOptimizationMetConvergence;
-   std::string messageStartGeometryOptimization;
-   std::string messageEndGeometryOptimization;
-   std::string messageStartSteepestDescentStep;
-   std::string messageReducedTimeWidth;
-   std::string messageLineSearchSteps;
-   std::string messageOptimizationLog;
-   std::string messageEnergyDifference;
-   std::string messageMaxGradient;
-   std::string messageRmsGradient;
-   std::string messageAu;
-   std::vector<MolDS_base::TheoryType> enableTheoryTypes;
+protected:
    void SetMessages();
-   void SetEnableTheoryTypes();
-   void CheckEnableTheoryType(MolDS_base::TheoryType theoryType) const;
-   void ClearMolecularMomenta(MolDS_base::Molecule& molecule) const;
-   void UpdateMolecularCoordinates(MolDS_base::Molecule& molecule, double** matrixForce, double dt) const;
-   void UpdateElectronicStructure(boost::shared_ptr<MolDS_base::ElectronicStructure> electronicStructure, 
-                                  MolDS_base::Molecule& molecule,
-                                  bool requireGuess, 
-                                  bool printsLogs) const;
-   void OutputMoleculeElectronicStructure(boost::shared_ptr<MolDS_base::ElectronicStructure> electronicStructure, 
-                                          MolDS_base::Molecule& molecule,
-                                          bool printsLogs) const;
+private:
+   std::string messageStartSteepestDescentStep;
    void LineSearch(boost::shared_ptr<MolDS_base::ElectronicStructure> electronicStructure, 
                    MolDS_base::Molecule& molecule,
                    double* lineSearchedEnergy,
                    bool* obainesOptimizedStructure) const;
-   bool SatisfiesConvergenceCriterion(double** matrixForce, 
-                                      const MolDS_base::Molecule& molecule,
-                                      double oldEnergy,
-                                      double currentEnergy,
-                                      double maxGradientThreshold,
-                                      double rmsGradientThreshold) const;
 };
 
 }

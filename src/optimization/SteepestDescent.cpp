@@ -35,146 +35,29 @@
 #include"../base/atoms/Atom.h"
 #include"../base/Molecule.h"
 #include"../base/ElectronicStructure.h"
-#include"../base/factories/ElectronicStructureFactory.h"
+#include"Optimizer.h"
 #include"SteepestDescent.h"
 using namespace std;
 using namespace MolDS_base;
 using namespace MolDS_base_atoms;
-using namespace MolDS_base_factories;
 
 namespace MolDS_optimization{
 SteepestDescent::SteepestDescent(){
    this->SetMessages();
-   this->SetEnableTheoryTypes();
-   //this->OutputLog("SteepestDescent created");
+   //this->OutputLog("SteepestDescent created\n");
 }
 
 SteepestDescent::~SteepestDescent(){
-   //this->OutputLog("SteepestDescent deleted");
-}
-
-void SteepestDescent::Optimize(Molecule& molecule){
-   this->OutputLog(this->messageStartGeometryOptimization);
-   this->ClearMolecularMomenta(molecule);
-
-   // malloc electornic structure
-   TheoryType theory = Parameters::GetInstance()->GetCurrentTheory();
-   this->CheckEnableTheoryType(theory);
-   boost::shared_ptr<ElectronicStructure> electronicStructure(ElectronicStructureFactory::Create());
-   electronicStructure->SetMolecule(&molecule);
-   electronicStructure->SetCanOutputLogs(this->CanOutputLogs());
-   molecule.SetCanOutputLogs(this->CanOutputLogs());
-
-   // Search Minimum
-   double lineSearchedEnergy = 0.0;
-   bool obtainesOptimizedStructure = false;
-   this->LineSearch(electronicStructure, molecule, &lineSearchedEnergy, &obtainesOptimizedStructure);
-  
-   // Not converged
-   if(!obtainesOptimizedStructure){
-      int totalSteps = Parameters::GetInstance()->GetTotalStepsOptimization();
-      stringstream ss;
-      ss << this->errorMessageGeometyrOptimizationNotConverged;
-      ss << this->errorMessageTotalSteps << totalSteps << endl;
-      throw MolDSException(ss.str());
-   }
-   this->OutputLog(this->messageEndGeometryOptimization);
+   //this->OutputLog("SteepestDescent deleted\n");
 }
 
 void SteepestDescent::SetMessages(){
-   this->errorMessageTheoryType = "\ttheory type = ";
+   Optimizer::SetMessages();
    this->errorMessageNotEnebleTheoryType  
       = "Error in optimization::SteepestDescent::CheckEnableTheoryType: Non available theory is set.\n";
    this->errorMessageGeometyrOptimizationNotConverged 
       = "Error in optimization::SteepestDescent::Optimize: Optimization did not met convergence criterion.\n";
-   this->errorMessageTotalSteps = "\tTotal steps = ";
-   this->messageGeometyrOptimizationMetConvergence 
-      = "\t\tGeometry otimization met convergence criterion(^^b\n\n\n";
-   this->messageStartGeometryOptimization = "**********  START: Geometry optimization  **********\n";
-   this->messageEndGeometryOptimization =   "**********  DONE: Geometry optimization  **********\n";
    this->messageStartSteepestDescentStep = "\n==========  START: Steepest Descent step ";
-   this->messageReducedTimeWidth = "dt is reduced to ";
-   this->messageLineSearchSteps = "\tNumber of Line search steps: ";
-   this->messageOptimizationLog = "\t====== Optimization Logs ======\n";
-   this->messageEnergyDifference = "\tEnergy difference: ";
-   this->messageMaxGradient = "\tMax gradient: ";
-   this->messageRmsGradient = "\tRms gradient: ";
-   this->messageAu = "[a.u.]";
-}
-
-void SteepestDescent::SetEnableTheoryTypes(){
-   this->enableTheoryTypes.clear();
-   this->enableTheoryTypes.push_back(ZINDOS);
-   this->enableTheoryTypes.push_back(MNDO);
-   this->enableTheoryTypes.push_back(AM1);
-   this->enableTheoryTypes.push_back(PM3);
-   this->enableTheoryTypes.push_back(PM3PDDG);
-}
-
-void SteepestDescent::CheckEnableTheoryType(TheoryType theoryType) const{
-   bool isEnable = false;
-   for(int i=0; i<this->enableTheoryTypes.size();i++){
-      if(theoryType == this->enableTheoryTypes[i]){
-         isEnable = true;
-         break;
-      }
-   }
-   if(!isEnable){
-      stringstream ss;
-      ss << this->errorMessageNotEnebleTheoryType;
-      ss << this->errorMessageTheoryType << TheoryTypeStr(theoryType) << endl;
-      throw MolDSException(ss.str());
-   }
-}
-
-void SteepestDescent::ClearMolecularMomenta(Molecule& molecule) const{
-   #pragma omp parallel for schedule(auto) 
-   for(int a=0; a<molecule.GetNumberAtoms(); a++){
-      const Atom* atom = molecule.GetAtom(a);
-      atom->SetPxyz(0.0, 0.0, 0.0);
-   }
-}
-
-void SteepestDescent::UpdateMolecularCoordinates(Molecule& molecule, double** matrixForce, double dt) const{
-   #pragma omp parallel for schedule(auto) 
-   for(int a=0; a<molecule.GetNumberAtoms(); a++){
-      const Atom* atom = molecule.GetAtom(a);
-      double coreMass = atom->GetAtomicMass() - (double)atom->GetNumberValenceElectrons();
-      for(int i=0; i<CartesianType_end; i++){
-         atom->GetXyz()[i] += dt*matrixForce[a][i]/coreMass;
-      }
-   }
-   molecule.CalcXyzCOM();
-   molecule.CalcXyzCOC();
-}
-
-void SteepestDescent::UpdateElectronicStructure(boost::shared_ptr<ElectronicStructure> electronicStructure, 
-                                                Molecule& molecule,
-                                                bool requireGuess, 
-                                                bool canOutputLogs) const{
-   electronicStructure->SetCanOutputLogs(canOutputLogs);
-   molecule.SetCanOutputLogs(canOutputLogs);
-   electronicStructure->DoSCF(requireGuess);
-   if(Parameters::GetInstance()->RequiresCIS()){
-      electronicStructure->DoCIS();
-   }
-}
-
-void SteepestDescent::OutputMoleculeElectronicStructure(boost::shared_ptr<ElectronicStructure> electronicStructure, 
-                                                        Molecule& molecule,
-                                                        bool canOutputLogs) const{
-   // output molecular configuration
-   molecule.SetCanOutputLogs(canOutputLogs);
-   molecule.OutputConfiguration();
-   molecule.OutputXyzCOM();
-   molecule.OutputXyzCOC();
-
-   // output electornic structure
-   electronicStructure->SetCanOutputLogs(canOutputLogs);
-   electronicStructure->OutputSCFResults();
-   if(Parameters::GetInstance()->RequiresCIS()){
-      electronicStructure->OutputCISResults();
-   }
 }
 
 void SteepestDescent::LineSearch(boost::shared_ptr<ElectronicStructure> electronicStructure, 
@@ -233,50 +116,6 @@ void SteepestDescent::LineSearch(boost::shared_ptr<ElectronicStructure> electron
    }
    *lineSearchedEnergy = lineSearchCurrentEnergy;
 }
-
-bool SteepestDescent::SatisfiesConvergenceCriterion(double** matrixForce, 
-                                                    const MolDS_base::Molecule& molecule,
-                                                    double oldEnergy,
-                                                    double currentEnergy,
-                                                    double maxGradientThreshold,
-                                                    double rmsGradientThreshold) const{
-   bool satisfies = false;
-   double maxGradient = 0.0;
-   double sumSqureGradient = 0.0;
-   double energyDifference = currentEnergy - oldEnergy;
-   for(int a=0; a<molecule.GetNumberAtoms(); a++){
-      for(int i=0; i<CartesianType_end; i++){
-         if(maxGradient<fabs(matrixForce[a][i])){
-            maxGradient = fabs(matrixForce[a][i]);
-         }
-         sumSqureGradient += pow(matrixForce[a][i],2.0);
-      }
-   }
-   sumSqureGradient /= (double)(molecule.GetNumberAtoms()*CartesianType_end);
-   double rmsGradient = sqrt(sumSqureGradient);
-
-   // output logs
-   this->OutputLog("\n");
-   this->OutputLog(this->messageOptimizationLog);
-   this->OutputLog((boost::format("%s %e%s\n") % this->messageEnergyDifference.c_str() 
-                                               % energyDifference 
-                                               % this->messageAu.c_str()).str());
-   this->OutputLog((boost::format("%s %e%s\n") % this->messageMaxGradient.c_str() 
-                                               % maxGradient 
-                                               % this->messageAu.c_str()).str());
-   this->OutputLog((boost::format("%s %e%s\n") % this->messageRmsGradient.c_str() 
-                                               % rmsGradient 
-                                               % this->messageAu.c_str()).str());
-   this->OutputLog("\n\n");
-  
-   // judge convergence
-   if(maxGradient < maxGradientThreshold && rmsGradient < rmsGradientThreshold && energyDifference < 0){
-      this->OutputLog(this->messageGeometyrOptimizationMetConvergence);
-      satisfies = true;
-   }
-   return satisfies;
-}
-
 }
 
 
