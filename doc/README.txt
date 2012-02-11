@@ -248,8 +248,11 @@ HOW TO WRITE INPUT:
          OPTIMIZE_END
   
       -options
-       "total_steps", "electronic_state", "max_gradient", "rms_gradient", 
+       "method", "total_steps", "electronic_state", "max_gradient", "rms_gradient", 
        and "dt" are prepared as options.
+
+       "method" should be set as "conjugate_gradient" or "steepest_descent". 
+       The default of the "method" is conjugate gradient.
 
        "electronic_state" means the electronic eigenstate 
        on which the system runs.
@@ -272,6 +275,7 @@ HOW TO WRITE INPUT:
 
       E.g.
          OPTIMIZE
+            method steepest_descent
             total_steps 50
             electronic_state 0
             max_gradient 0.00045
