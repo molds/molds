@@ -57,7 +57,7 @@ void ConjugateGradient::SetMessages(){
       = "Error in optimization::ConjugateGradient::CheckEnableTheoryType: Non available theory is set.\n";
    this->errorMessageGeometyrOptimizationNotConverged 
       = "Error in optimization::ConjugateGradient::Optimize: Optimization did not met convergence criterion.\n";
-   this->messageStartConjugateGradientStep = "\n==========  START: Steepest Descent step ";
+   this->messageStartConjugateGradientStep = "\n==========  START: Conjugate gradient step ";
 }
 
 void ConjugateGradient::LineSearch(boost::shared_ptr<ElectronicStructure> electronicStructure, 
