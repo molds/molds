@@ -32,6 +32,12 @@ private:
                    MolDS_base::Molecule& molecule,
                    double* lineSearchedEnergy,
                    bool* obainesOptimizedStructure) const;
+   void UpdateSearchDirection(double*** matrixForce, 
+                              double** oldMatrixForce, 
+                              double** matrixSearchDirection,
+                              boost::shared_ptr<MolDS_base::ElectronicStructure> electronicStructure,
+                              const MolDS_base::Molecule& molecule,
+                              int elecState) const;
 };
 
 }
