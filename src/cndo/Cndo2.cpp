@@ -1069,35 +1069,43 @@ void Cndo2::CalcOrbitalElectronPopulation(double** orbitalElectronPopulation,
    int totalNumberAOs = molecule.GetTotalNumberAOs();
    MallocerFreer::GetInstance()->Initialize<double>(orbitalElectronPopulation, totalNumberAOs, totalNumberAOs);
 
-   double transposedFockMatrix[totalNumberAOs][totalNumberAOs];
-   for(int mu=0; mu<totalNumberAOs; mu++){
-      for(int nu=0; nu<totalNumberAOs; nu++){
-         transposedFockMatrix[mu][nu] = fockMatrix[nu][mu];
-      }
-   }
-   
-   int numberTotalValenceElectrons = molecule.GetTotalNumberValenceElectrons();
-   stringstream ompErrors;
-   #pragma omp parallel for schedule(auto) 
-   for(int mu=0; mu<totalNumberAOs; mu++){
-      try{
-         for(int nu=mu; nu<totalNumberAOs; nu++){
-            double value = 0.0;
-            for(int mo=0; mo<numberTotalValenceElectrons/2; mo++){
-               value += transposedFockMatrix[mu][mo]*transposedFockMatrix[nu][mo];
-            }
-            orbitalElectronPopulation[mu][nu] = 2.0*value;
+   double** transposedFockMatrix = NULL;
+   try{
+      MallocerFreer::GetInstance()->Malloc<double>(&transposedFockMatrix, totalNumberAOs, totalNumberAOs);
+      for(int mu=0; mu<totalNumberAOs; mu++){
+         for(int nu=0; nu<totalNumberAOs; nu++){
+            transposedFockMatrix[mu][nu] = fockMatrix[nu][mu];
          }
       }
-      catch(MolDSException ex){
-         #pragma omp critical
-         ompErrors << ex.what() << endl ;
+   
+      int numberTotalValenceElectrons = molecule.GetTotalNumberValenceElectrons();
+      stringstream ompErrors;
+      #pragma omp parallel for schedule(auto) 
+      for(int mu=0; mu<totalNumberAOs; mu++){
+         try{
+            for(int nu=mu; nu<totalNumberAOs; nu++){
+               double value = 0.0;
+               for(int mo=0; mo<numberTotalValenceElectrons/2; mo++){
+                  value += transposedFockMatrix[mu][mo]*transposedFockMatrix[nu][mo];
+               }
+               orbitalElectronPopulation[mu][nu] = 2.0*value;
+            }
+         }
+         catch(MolDSException ex){
+            #pragma omp critical
+            ompErrors << ex.what() << endl ;
+         }
+      }
+      // Exception throwing for omp-region
+      if(!ompErrors.str().empty()){
+         throw MolDSException(ompErrors.str());
       }
    }
-   // Exception throwing for omp-region
-   if(!ompErrors.str().empty()){
-      throw MolDSException(ompErrors.str());
+   catch(MolDSException ex){
+      MallocerFreer::GetInstance()->Free<double>(&transposedFockMatrix, totalNumberAOs, totalNumberAOs);
+      throw ex;
    }
+   MallocerFreer::GetInstance()->Free<double>(&transposedFockMatrix, totalNumberAOs, totalNumberAOs);
    
    for(int mu=0; mu<totalNumberAOs; mu++){
       for(int nu=mu+1; nu<totalNumberAOs; nu++){
