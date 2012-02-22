@@ -129,6 +129,8 @@ private:
                                   double const* ritzVector, 
                                   double const* interactionEigenEnergies, 
                                   int residualVectorIndex) const;
+   void SortCISEigenVectorCoefficients(std::vector<CISEigenVectorCoefficient>* cisEigenVectorCoefficients,
+                                       double* cisEigenVector) const;
    void SortSingleExcitationSlaterDeterminants(std::vector<MoEnergyGap>* moEnergyGaps) const;
    void UpdateExpansionVectors(double** expansionVectors, 
                                int* notConvergedStates, 

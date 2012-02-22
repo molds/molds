@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/2/8(Wed.) 12:22:11  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/2/22(Wed.) 18:39:30  <<<<<
 
 
 **********  START: Parse input  **********
@@ -53,6 +53,7 @@
 		Number of active Occ.: 4
 		Number of active Vir.: 4
 		Number of excited states: 4
+		Number of printed coefficients of CIS-eigenvector: 1
 		CIS-Davidson: yes
 		Max iterations for the Davidson: 200
 		Max dimensions for the Davidson: 16
@@ -114,13 +115,13 @@ SCF iter=10: RMS density=0.000000031138605
 		3	H	1.000000e+00	6.455701e-02
 		4	H	1.000000e+00	6.455694e-02
 
-	Elapsed time(omp) for the SCF = 0.024917[s].
+	Elapsed time(omp) for the SCF = 0.026402[s].
 **********  DONE: AM1-SCF  **********
 
 
 **********  START: AM1-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.001956[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.001965[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -163,13 +164,13 @@ SCF iter=10: RMS density=0.000000031138605
 
 
 	Excitation energies:
-		| i-th | e[a.u.] | e[eV] | 
-		 1	3.300706e-01	8.981751e+00
-		 2	3.393234e-01	9.233533e+00
-		 3	3.393234e-01	9.233534e+00
-		 4	3.393234e-01	9.233534e+00
+		| i-th | e[a.u.] | e[eV] | dominant eigenvector coefficients (occ. -> vir.) |
+		 1	3.300706e-01	8.981751e+00	-5.761062e-01 (1 -> 5)	
+		 2	3.393234e-01	9.233533e+00	-6.553840e-01 (3 -> 7)	
+		 3	3.393234e-01	9.233534e+00	6.559156e-01 (1 -> 7)	
+		 4	3.393234e-01	9.233534e+00	-6.553841e-01 (2 -> 7)	
 
-	Elapsed time(omp) for the CIS = 0.004621[s].
+	Elapsed time(omp) for the CIS = 0.004837[s].
 **********  DONE: AM1-CIS  **********
 
 
@@ -181,7 +182,7 @@ SCF iter=10: RMS density=0.000000031138605
      >>>>>  The MolDS finished normally!  <<<<<
      >>>>>  CPU time: 0.03[s].  <<<<<
      >>>>>  Elapsed time: 0[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 0.0318611[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 0.034898[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

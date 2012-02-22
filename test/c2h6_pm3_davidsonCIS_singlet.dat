@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/2/8(Wed.) 12:23:13  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/2/22(Wed.) 18:39:51  <<<<<
 
 
 **********  START: Parse input  **********
@@ -59,6 +59,7 @@
 		Number of active Occ.: 7
 		Number of active Vir.: 7
 		Number of excited states: 4
+		Number of printed coefficients of CIS-eigenvector: 1
 		CIS-Davidson: yes
 		Max iterations for the Davidson: 200
 		Max dimensions for the Davidson: 49
@@ -132,13 +133,13 @@ SCF iter=12: RMS density=0.000000169506350
 		6	H	1.000000e+00	3.744313e-02
 		7	H	1.000000e+00	4.258006e-02
 
-	Elapsed time(omp) for the SCF = 0.052550[s].
+	Elapsed time(omp) for the SCF = 0.074817[s].
 **********  DONE: PM3-SCF  **********
 
 
 **********  START: PM3-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.055686[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.056659[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -223,13 +224,13 @@ SCF iter=12: RMS density=0.000000169506350
 
 
 	Excitation energies:
-		| i-th | e[a.u.] | e[eV] | 
-		 1	2.692494e-01	7.326709e+00
-		 2	2.853619e-01	7.765154e+00
-		 3	2.895810e-01	7.879964e+00
-		 4	2.934328e-01	7.984778e+00
+		| i-th | e[a.u.] | e[eV] | dominant eigenvector coefficients (occ. -> vir.) |
+		 1	2.692494e-01	7.326709e+00	-6.090921e-01 (6 -> 8)	
+		 2	2.853619e-01	7.765154e+00	8.573731e-01 (6 -> 7)	
+		 3	2.895810e-01	7.879964e+00	7.894824e-01 (5 -> 7)	
+		 4	2.934328e-01	7.984778e+00	-7.664230e-01 (6 -> 10)	
 
-	Elapsed time(omp) for the CIS = 0.234078[s].
+	Elapsed time(omp) for the CIS = 0.237224[s].
 **********  DONE: PM3-CIS  **********
 
 
@@ -241,7 +242,7 @@ SCF iter=12: RMS density=0.000000169506350
      >>>>>  The MolDS finished normally!  <<<<<
      >>>>>  CPU time: 0.3[s].  <<<<<
      >>>>>  Elapsed time: 0[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 0.291108[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 0.317082[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

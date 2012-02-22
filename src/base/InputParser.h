@@ -62,6 +62,7 @@ private:
    std::string messageCisNormTolerance;
    std::string messageCisMaxIterations;
    std::string messageCisMaxDimensions;
+   std::string messageCisNumPrintCoefficients;
    // Memory
    std::string messageMemoryConditions;
    std::string messageMemoryLimitHeap;
@@ -169,6 +170,7 @@ private:
    std::string stringCISMaxIter;
    std::string stringCISMaxDimensions;
    std::string stringCISNormTolerance;
+   std::string stringCISNumPrintCoefficients;
    // Memory
    std::string stringMemory;
    std::string stringMemoryEnd;

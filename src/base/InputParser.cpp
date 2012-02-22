@@ -108,6 +108,7 @@ void InputParser::SetMessages(){
    this->messageCisNormTolerance = "\t\tNorm tolerance for the residual of the Davidson: ";
    this->messageCisMaxIterations = "\t\tMax iterations for the Davidson: ";
    this->messageCisMaxDimensions = "\t\tMax dimensions for the Davidson: ";
+   this->messageCisNumPrintCoefficients = "\t\tNumber of printed coefficients of CIS-eigenvector: ";
 
    // memory
    this->messageMemoryConditions = "\tMemory conditions:\n";
@@ -231,6 +232,7 @@ void InputParser::SetMessages(){
    this->stringCISMaxIter = "max_iter";
    this->stringCISMaxDimensions = "max_dim";
    this->stringCISNormTolerance = "norm_tol";
+   this->stringCISNumPrintCoefficients = "num_print_coefficients";
 
    // Memory
    this->stringMemory = "memory";
@@ -561,6 +563,12 @@ int InputParser::ParseConditionsCIS(vector<string>* inputTerms, int parseIndex) 
       if((*inputTerms)[parseIndex].compare(this->stringCISNormTolerance) == 0){
          double normTol = atof((*inputTerms)[parseIndex+1].c_str());
          Parameters::GetInstance()->SetNormToleranceCIS(normTol);
+         parseIndex++;
+      }
+      // max dimensions for the Davidson expansion
+      if((*inputTerms)[parseIndex].compare(this->stringCISNumPrintCoefficients) == 0){
+         int numPrintCoeff = atoi((*inputTerms)[parseIndex+1].c_str());
+         Parameters::GetInstance()->SetNumberPrintCoefficientsCIS(numPrintCoeff);
          parseIndex++;
       }
       parseIndex++;   
@@ -945,6 +953,12 @@ void InputParser::ValidateCisConditions(const Molecule& molecule) const{
       }
    }
    
+   // Validate the number of printing coefficients of CIS-eigenvector.
+   int numPrintCoefficients = Parameters::GetInstance()->GetNumberPrintCoefficientsCIS();
+   if(numberSlaterDeterminants < numPrintCoefficients){
+      Parameters::GetInstance()->SetNumberPrintCoefficientsCIS(numberSlaterDeterminants);
+   }   
+
 }
 
 void InputParser::ValidateMdConditions(const Molecule& molecule) const{
@@ -1102,6 +1116,8 @@ void InputParser::OutputCisConditions() const{
                                             % Parameters::GetInstance()->GetActiveVirCIS()).str());
    this->OutputLog((boost::format("%s%d\n") % this->messageCisNumberExcitedStates.c_str() 
                                             % Parameters::GetInstance()->GetNumberExcitedStatesCIS()).str());
+   this->OutputLog((boost::format("%s%d\n") % this->messageCisNumPrintCoefficients.c_str() 
+                                            % Parameters::GetInstance()->GetNumberPrintCoefficientsCIS()).str());
    this->OutputLog(this->messageCisDavidson);
    if(Parameters::GetInstance()->IsDavidsonCIS()){
       this->OutputLog((boost::format("%s\n") % this->stringYES.c_str()).str());

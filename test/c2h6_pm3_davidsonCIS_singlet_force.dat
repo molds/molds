@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/2/8(Wed.) 12:23:58  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/2/22(Wed.) 18:40:0  <<<<<
 
 
 **********  START: Parse input  **********
@@ -59,6 +59,7 @@
 		Number of active Occ.: 7
 		Number of active Vir.: 7
 		Number of excited states: 4
+		Number of printed coefficients of CIS-eigenvector: 1
 		CIS-Davidson: yes
 		Max iterations for the Davidson: 200
 		Max dimensions for the Davidson: 49
@@ -139,13 +140,13 @@ SCF iter=12: RMS density=0.000000169506350
 		6	H	1.000000e+00	3.744313e-02
 		7	H	1.000000e+00	4.258006e-02
 
-	Elapsed time(omp) for the SCF = 0.055267[s].
+	Elapsed time(omp) for the SCF = 0.049037[s].
 **********  DONE: PM3-SCF  **********
 
 
 **********  START: PM3-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.058789[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.056900[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -230,13 +231,13 @@ SCF iter=12: RMS density=0.000000169506350
 
 
 	Excitation energies:
-		| i-th | e[a.u.] | e[eV] | 
-		 1	2.692494e-01	7.326709e+00
-		 2	2.853619e-01	7.765154e+00
-		 3	2.895810e-01	7.879964e+00
-		 4	2.934328e-01	7.984778e+00
+		| i-th | e[a.u.] | e[eV] | dominant eigenvector coefficients (occ. -> vir.) |
+		 1	2.692494e-01	7.326709e+00	-6.090921e-01 (6 -> 8)	
+		 2	2.853619e-01	7.765154e+00	8.573731e-01 (6 -> 7)	
+		 3	2.895810e-01	7.879964e+00	7.894824e-01 (5 -> 7)	
+		 4	2.934328e-01	7.984778e+00	-7.664230e-01 (6 -> 10)	
 
-	Elapsed time(omp) for the CIS = 0.242725[s].
+	Elapsed time(omp) for the CIS = 0.234619[s].
 **********  DONE: PM3-CIS  **********
 
 
@@ -355,13 +356,13 @@ SCF iter=3: RMS density=0.000000510247437
 		6	H	1.000000e+00	3.744291e-02
 		7	H	1.000000e+00	4.257972e-02
 
-	Elapsed time(omp) for the SCF = 0.037770[s].
+	Elapsed time(omp) for the SCF = 0.038580[s].
 **********  DONE: PM3-SCF  **********
 
 
 **********  START: PM3-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.056204[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.055994[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -446,13 +447,13 @@ SCF iter=3: RMS density=0.000000510247437
 
 
 	Excitation energies:
-		| i-th | e[a.u.] | e[eV] | 
-		 1	2.692486e-01	7.326686e+00
-		 2	2.853613e-01	7.765138e+00
-		 3	2.895796e-01	7.879925e+00
-		 4	2.934327e-01	7.984774e+00
+		| i-th | e[a.u.] | e[eV] | dominant eigenvector coefficients (occ. -> vir.) |
+		 1	2.692486e-01	7.326686e+00	-6.091288e-01 (6 -> 8)	
+		 2	2.853613e-01	7.765138e+00	8.573954e-01 (6 -> 7)	
+		 3	2.895796e-01	7.879925e+00	7.895802e-01 (5 -> 7)	
+		 4	2.934327e-01	7.984774e+00	-7.664882e-01 (6 -> 10)	
 
-	Elapsed time(omp) for the CIS = 0.232825[s].
+	Elapsed time(omp) for the CIS = 0.231709[s].
 **********  DONE: PM3-CIS  **********
 
 
@@ -573,13 +574,13 @@ SCF iter=4: RMS density=0.000000665623844
 		6	H	1.000000e+00	3.744212e-02
 		7	H	1.000000e+00	4.257853e-02
 
-	Elapsed time(omp) for the SCF = 0.038722[s].
+	Elapsed time(omp) for the SCF = 0.039193[s].
 **********  DONE: PM3-SCF  **********
 
 
 **********  START: PM3-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.056545[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.055636[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -664,13 +665,13 @@ SCF iter=4: RMS density=0.000000665623844
 
 
 	Excitation energies:
-		| i-th | e[a.u.] | e[eV] | 
-		 1	2.692461e-01	7.326619e+00
-		 2	2.853595e-01	7.765089e+00
-		 3	2.895753e-01	7.879807e+00
-		 4	2.934323e-01	7.984763e+00
+		| i-th | e[a.u.] | e[eV] | dominant eigenvector coefficients (occ. -> vir.) |
+		 1	2.692461e-01	7.326619e+00	-6.092386e-01 (6 -> 8)	
+		 2	2.853595e-01	7.765089e+00	8.574617e-01 (6 -> 7)	
+		 3	2.895753e-01	7.879807e+00	7.898726e-01 (5 -> 7)	
+		 4	2.934323e-01	7.984763e+00	-7.666838e-01 (6 -> 10)	
 
-	Elapsed time(omp) for the CIS = 0.231038[s].
+	Elapsed time(omp) for the CIS = 0.231909[s].
 **********  DONE: PM3-CIS  **********
 
 
@@ -792,13 +793,13 @@ SCF iter=5: RMS density=0.000000514146936
 		6	H	1.000000e+00	3.744072e-02
 		7	H	1.000000e+00	4.257640e-02
 
-	Elapsed time(omp) for the SCF = 0.038237[s].
+	Elapsed time(omp) for the SCF = 0.039115[s].
 **********  DONE: PM3-SCF  **********
 
 
 **********  START: PM3-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.057740[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.056343[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -883,13 +884,13 @@ SCF iter=5: RMS density=0.000000514146936
 
 
 	Excitation energies:
-		| i-th | e[a.u.] | e[eV] | 
-		 1	2.692420e-01	7.326507e+00
-		 2	2.853565e-01	7.765008e+00
-		 3	2.895681e-01	7.879611e+00
-		 4	2.934316e-01	7.984745e+00
+		| i-th | e[a.u.] | e[eV] | dominant eigenvector coefficients (occ. -> vir.) |
+		 1	2.692420e-01	7.326507e+00	-6.094213e-01 (6 -> 8)	
+		 2	2.853565e-01	7.765008e+00	8.575717e-01 (6 -> 7)	
+		 3	2.895681e-01	7.879611e+00	7.903597e-01 (5 -> 7)	
+		 4	2.934316e-01	7.984745e+00	-7.670081e-01 (6 -> 10)	
 
-	Elapsed time(omp) for the CIS = 0.233844[s].
+	Elapsed time(omp) for the CIS = 0.231676[s].
 **********  DONE: PM3-CIS  **********
 
 
@@ -1011,13 +1012,13 @@ SCF iter=5: RMS density=0.000000714158607
 		6	H	1.000000e+00	3.743881e-02
 		7	H	1.000000e+00	4.257351e-02
 
-	Elapsed time(omp) for the SCF = 0.038375[s].
+	Elapsed time(omp) for the SCF = 0.038569[s].
 **********  DONE: PM3-SCF  **********
 
 
 **********  START: PM3-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.055763[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.056135[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -1102,13 +1103,13 @@ SCF iter=5: RMS density=0.000000714158607
 
 
 	Excitation energies:
-		| i-th | e[a.u.] | e[eV] | 
-		 1	2.692362e-01	7.326350e+00
-		 2	2.853523e-01	7.764895e+00
-		 3	2.895580e-01	7.879337e+00
-		 4	2.934307e-01	7.984720e+00
+		| i-th | e[a.u.] | e[eV] | dominant eigenvector coefficients (occ. -> vir.) |
+		 1	2.692362e-01	7.326350e+00	-6.096770e-01 (6 -> 8)	
+		 2	2.853523e-01	7.764895e+00	8.577247e-01 (6 -> 7)	
+		 3	2.895580e-01	7.879337e+00	7.910421e-01 (5 -> 7)	
+		 4	2.934307e-01	7.984720e+00	-7.674584e-01 (6 -> 10)	
 
-	Elapsed time(omp) for the CIS = 0.229810[s].
+	Elapsed time(omp) for the CIS = 0.232505[s].
 **********  DONE: PM3-CIS  **********
 
 
@@ -1230,13 +1231,13 @@ SCF iter=5: RMS density=0.000000918731811
 		6	H	1.000000e+00	3.743634e-02
 		7	H	1.000000e+00	4.256977e-02
 
-	Elapsed time(omp) for the SCF = 0.038635[s].
+	Elapsed time(omp) for the SCF = 0.039004[s].
 **********  DONE: PM3-SCF  **********
 
 
 **********  START: PM3-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.056758[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.056698[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -1321,13 +1322,13 @@ SCF iter=5: RMS density=0.000000918731811
 
 
 	Excitation energies:
-		| i-th | e[a.u.] | e[eV] | 
-		 1	2.692288e-01	7.326148e+00
-		 2	2.853470e-01	7.764748e+00
-		 3	2.895451e-01	7.878985e+00
-		 4	2.934295e-01	7.984688e+00
+		| i-th | e[a.u.] | e[eV] | dominant eigenvector coefficients (occ. -> vir.) |
+		 1	2.692288e-01	7.326148e+00	-6.100052e-01 (6 -> 8)	
+		 2	2.853470e-01	7.764748e+00	8.579191e-01 (6 -> 7)	
+		 3	2.895451e-01	7.878985e+00	7.919192e-01 (5 -> 7)	
+		 4	2.934295e-01	7.984688e+00	-7.680316e-01 (6 -> 10)	
 
-	Elapsed time(omp) for the CIS = 0.230825[s].
+	Elapsed time(omp) for the CIS = 0.230993[s].
 **********  DONE: PM3-CIS  **********
 
 
@@ -1405,9 +1406,9 @@ SCF iter=5: RMS density=0.000000918731811
 
 
      >>>>>  The MolDS finished normally!  <<<<<
-     >>>>>  CPU time: 10.69[s].  <<<<<
-     >>>>>  Elapsed time: 11[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 10.6913[s].  <<<<<
+     >>>>>  CPU time: 9.95[s].  <<<<<
+     >>>>>  Elapsed time: 10[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 9.95074[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

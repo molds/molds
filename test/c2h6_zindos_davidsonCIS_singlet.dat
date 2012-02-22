@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/2/8(Wed.) 12:21:7  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/2/22(Wed.) 18:39:6  <<<<<
 
 
 **********  START: Parse input  **********
@@ -59,6 +59,7 @@
 		Number of active Occ.: 7
 		Number of active Vir.: 7
 		Number of excited states: 5
+		Number of printed coefficients of CIS-eigenvector: 1
 		CIS-Davidson: yes
 		Max iterations for the Davidson: 200
 		Max dimensions for the Davidson: 49
@@ -128,13 +129,13 @@ SCF iter=8: RMS density=0.000000782384959
 		6	H	1.000000e+00	1.599949e-02
 		7	H	1.000000e+00	2.221343e-02
 
-	Elapsed time(omp) for the SCF = 0.018032[s].
+	Elapsed time(omp) for the SCF = 0.017547[s].
 **********  DONE: ZINDO/S-SCF  **********
 
 
 **********  START: ZINDO/S-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.040201[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.039209[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -210,14 +211,14 @@ SCF iter=8: RMS density=0.000000782384959
 
 
 	Excitation energies:
-		| i-th | e[a.u.] | e[eV] | 
-		 1	4.277632e-01	1.164012e+01
-		 2	4.355292e-01	1.185145e+01
-		 3	4.503798e-01	1.225556e+01
-		 4	4.569359e-01	1.243396e+01
-		 5	4.987457e-01	1.357167e+01
+		| i-th | e[a.u.] | e[eV] | dominant eigenvector coefficients (occ. -> vir.) |
+		 1	4.277632e-01	1.164012e+01	9.852585e-01 (6 -> 7)	
+		 2	4.355292e-01	1.185145e+01	9.851348e-01 (5 -> 7)	
+		 3	4.503798e-01	1.225556e+01	-9.815653e-01 (6 -> 8)	
+		 4	4.569359e-01	1.243396e+01	9.782131e-01 (5 -> 8)	
+		 5	4.987457e-01	1.357167e+01	9.919580e-01 (4 -> 7)	
 
-	Elapsed time(omp) for the CIS = 0.146743[s].
+	Elapsed time(omp) for the CIS = 0.151033[s].
 **********  DONE: ZINDO/S-CIS  **********
 
 
@@ -229,7 +230,7 @@ SCF iter=8: RMS density=0.000000782384959
      >>>>>  The MolDS finished normally!  <<<<<
      >>>>>  CPU time: 0.17[s].  <<<<<
      >>>>>  Elapsed time: 1[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 0.167256[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 0.171716[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

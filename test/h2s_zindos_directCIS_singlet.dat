@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/2/8(Wed.) 12:21:6  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/2/22(Wed.) 18:39:5  <<<<<
 
 
 **********  START: Parse input  **********
@@ -49,6 +49,7 @@
 		Number of active Occ.: 4
 		Number of active Vir.: 2
 		Number of excited states: 8
+		Number of printed coefficients of CIS-eigenvector: 1
 		CIS-Davidson: no
 
 Input terms:
@@ -100,13 +101,13 @@ SCF iter=8: RMS density=0.000000521835813
 		1	H	1.000000e+00	1.436080e-01
 		2	H	1.000000e+00	1.436792e-01
 
-	Elapsed time(omp) for the SCF = 0.019919[s].
+	Elapsed time(omp) for the SCF = 0.011835[s].
 **********  DONE: ZINDO/S-SCF  **********
 
 
 **********  START: ZINDO/S-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.000245[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.000272[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Direct-CIS  =====
@@ -115,17 +116,17 @@ SCF iter=8: RMS density=0.000000521835813
 
 
 	Excitation energies:
-		| i-th | e[a.u.] | e[eV] | 
-		 1	2.448437e-01	6.662589e+00
-		 2	2.730712e-01	7.430705e+00
-		 3	3.424713e-01	9.319192e+00
-		 4	3.689766e-01	1.004044e+01
-		 5	4.868225e-01	1.324722e+01
-		 6	5.406508e-01	1.471198e+01
-		 7	8.182918e-01	2.226703e+01
-		 8	8.383834e-01	2.281376e+01
+		| i-th | e[a.u.] | e[eV] | dominant eigenvector coefficients (occ. -> vir.) |
+		 1	2.448437e-01	6.662589e+00	9.999206e-01 (3 -> 4)	
+		 2	2.730712e-01	7.430705e+00	-9.999206e-01 (3 -> 5)	
+		 3	3.424713e-01	9.319192e+00	9.818146e-01 (2 -> 4)	
+		 4	3.689766e-01	1.004044e+01	-9.850747e-01 (2 -> 5)	
+		 5	4.868225e-01	1.324722e+01	-9.560711e-01 (1 -> 4)	
+		 6	5.406508e-01	1.471198e+01	9.478238e-01 (1 -> 5)	
+		 7	8.182918e-01	2.226703e+01	-8.294412e-01 (0 -> 4)	
+		 8	8.383834e-01	2.281376e+01	-8.374588e-01 (0 -> 5)	
 
-	Elapsed time(omp) for the CIS = 0.000466[s].
+	Elapsed time(omp) for the CIS = 0.000813[s].
 **********  DONE: ZINDO/S-CIS  **********
 
 
@@ -136,8 +137,8 @@ SCF iter=8: RMS density=0.000000521835813
 
      >>>>>  The MolDS finished normally!  <<<<<
      >>>>>  CPU time: 0.02[s].  <<<<<
-     >>>>>  Elapsed time: 0[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 0.0225241[s].  <<<<<
+     >>>>>  Elapsed time: 1[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 0.015132[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

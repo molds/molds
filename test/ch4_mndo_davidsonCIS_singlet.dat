@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/2/8(Wed.) 12:21:12  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/2/22(Wed.) 18:39:8  <<<<<
 
 
 **********  START: Parse input  **********
@@ -53,6 +53,7 @@
 		Number of active Occ.: 4
 		Number of active Vir.: 4
 		Number of excited states: 4
+		Number of printed coefficients of CIS-eigenvector: 1
 		CIS-Davidson: yes
 		Max iterations for the Davidson: 200
 		Max dimensions for the Davidson: 16
@@ -117,13 +118,13 @@ SCF iter=9: RMS density=0.000000388310808
 		| [a.u.] | [Kcal/mol] | 
 		-1.520346e-02	-9.540316e+00
 
-	Elapsed time(omp) for the SCF = 0.031726[s].
+	Elapsed time(omp) for the SCF = 0.025363[s].
 **********  DONE: MNDO-SCF  **********
 
 
 **********  START: MNDO-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.001976[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.002862[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -166,13 +167,13 @@ SCF iter=9: RMS density=0.000000388310808
 
 
 	Excitation energies:
-		| i-th | e[a.u.] | e[eV] | 
-		 1	3.370473e-01	9.171598e+00
-		 2	3.644174e-01	9.916380e+00
-		 3	3.644174e-01	9.916381e+00
-		 4	3.644174e-01	9.916381e+00
+		| i-th | e[a.u.] | e[eV] | dominant eigenvector coefficients (occ. -> vir.) |
+		 1	3.370473e-01	9.171598e+00	5.763875e-01 (1 -> 5)	
+		 2	3.644174e-01	9.916380e+00	-6.215210e-01 (1 -> 4)	
+		 3	3.644174e-01	9.916381e+00	4.936966e-01 (3 -> 6)	
+		 4	3.644174e-01	9.916381e+00	-5.840630e-01 (2 -> 6)	
 
-	Elapsed time(omp) for the CIS = 0.004647[s].
+	Elapsed time(omp) for the CIS = 0.005789[s].
 **********  DONE: MNDO-CIS  **********
 
 
@@ -184,7 +185,7 @@ SCF iter=9: RMS density=0.000000388310808
      >>>>>  The MolDS finished normally!  <<<<<
      >>>>>  CPU time: 0.03[s].  <<<<<
      >>>>>  Elapsed time: 0[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 0.0387499[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 0.034888[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

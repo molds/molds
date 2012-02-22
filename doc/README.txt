@@ -197,7 +197,7 @@ HOW TO WRITE INPUT:
    
       -options
        "davidson", "active_occ", "active_vir", "max_iter", "max_dim", "norm_tol", 
-       and "nstates" are prepared as options.
+       "nstates", and "num_print_coefficients" are prepared as options.
 
        "davidson" should be set as "yes" or "no". 
        The default value of the "davidson" is "yes".
@@ -225,6 +225,9 @@ HOW TO WRITE INPUT:
        "norm_tol" is valid for the Davidson algorithm only. 
        This option means the max tolerance for the norm of the residual vectors.
        The default value of the "norm_tol" is 10**(-6.0).
+
+       "num_print_coefficients" is a number of the coefficients of CIS-eigenvector shown in output.
+       The default value of the "num_print_coefficients" is 1.
 
        E.g.
          CIS

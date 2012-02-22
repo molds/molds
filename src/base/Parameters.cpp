@@ -120,6 +120,7 @@ void Parameters::SetDefaultValues(){
    this->maxIterationsCIS = 100;
    this->maxDimensionsCIS = 100;
    this->normToleranceCIS = pow(10.0, -6.0);
+   this->numberPrintCoefficientsCIS = 1;
    // Memory
    this->limitHeapMemory = 256;
    // MD
@@ -444,6 +445,14 @@ double Parameters::GetNormToleranceCIS() const{
 
 void Parameters::SetNormToleranceCIS(double normToleranceCIS){
    this->normToleranceCIS = normToleranceCIS;
+}
+
+int Parameters::GetNumberPrintCoefficientsCIS() const{
+   return this->numberPrintCoefficientsCIS;
+}
+   
+void Parameters::SetNumberPrintCoefficientsCIS(int numberPrintCoefficientsCIS){
+   this->numberPrintCoefficientsCIS = numberPrintCoefficientsCIS;
 }
 
 // methods for Memory

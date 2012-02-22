@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/2/8(Wed.) 12:21:5  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/2/22(Wed.) 18:39:5  <<<<<
 
 
 **********  START: Parse input  **********
@@ -53,6 +53,7 @@
 		Number of active Occ.: 4
 		Number of active Vir.: 4
 		Number of excited states: 16
+		Number of printed coefficients of CIS-eigenvector: 1
 		CIS-Davidson: no
 
 Input terms:
@@ -108,13 +109,13 @@ SCF iter=7: RMS density=0.000000025983597
 		3	H	1.000000e+00	2.223536e-02
 		4	H	1.000000e+00	2.223536e-02
 
-	Elapsed time(omp) for the SCF = 0.017978[s].
+	Elapsed time(omp) for the SCF = 0.013749[s].
 **********  DONE: ZINDO/S-SCF  **********
 
 
 **********  START: ZINDO/S-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.001523[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.001515[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Direct-CIS  =====
@@ -123,25 +124,25 @@ SCF iter=7: RMS density=0.000000025983597
 
 
 	Excitation energies:
-		| i-th | e[a.u.] | e[eV] | 
-		 1	5.274566e-01	1.435294e+01
-		 2	5.274567e-01	1.435294e+01
-		 3	5.274569e-01	1.435295e+01
-		 4	5.898275e-01	1.605015e+01
-		 5	5.898276e-01	1.605015e+01
-		 6	5.898277e-01	1.605016e+01
-		 7	5.997702e-01	1.632071e+01
-		 8	5.997704e-01	1.632071e+01
-		 9	6.371642e-01	1.733826e+01
-		 10	6.371642e-01	1.733826e+01
-		 11	6.371643e-01	1.733826e+01
-		 12	7.594654e-01	2.066627e+01
-		 13	1.192806e+00	3.245816e+01
-		 14	1.272297e+00	3.462124e+01
-		 15	1.272297e+00	3.462124e+01
-		 16	1.272297e+00	3.462124e+01
+		| i-th | e[a.u.] | e[eV] | dominant eigenvector coefficients (occ. -> vir.) |
+		 1	5.274566e-01	1.435294e+01	9.485688e-01 (3 -> 4)	
+		 2	5.274567e-01	1.435294e+01	-9.485687e-01 (2 -> 4)	
+		 3	5.274569e-01	1.435295e+01	-9.761774e-01 (1 -> 4)	
+		 4	5.898275e-01	1.605015e+01	6.764266e-01 (3 -> 7)	
+		 5	5.898276e-01	1.605015e+01	-7.058475e-01 (3 -> 6)	
+		 6	5.898277e-01	1.605016e+01	-7.058511e-01 (2 -> 6)	
+		 7	5.997702e-01	1.632071e+01	-7.252999e-01 (3 -> 5)	
+		 8	5.997704e-01	1.632071e+01	7.024876e-01 (1 -> 7)	
+		 9	6.371642e-01	1.733826e+01	6.425329e-01 (3 -> 7)	
+		 10	6.371642e-01	1.733826e+01	6.858924e-01 (1 -> 5)	
+		 11	6.371643e-01	1.733826e+01	6.888437e-01 (2 -> 7)	
+		 12	7.594654e-01	2.066627e+01	5.654187e-01 (1 -> 6)	
+		 13	1.192806e+00	3.245816e+01	9.793326e-01 (0 -> 4)	
+		 14	1.272297e+00	3.462124e+01	-9.979028e-01 (0 -> 5)	
+		 15	1.272297e+00	3.462124e+01	-9.979072e-01 (0 -> 6)	
+		 16	1.272297e+00	3.462124e+01	-9.979028e-01 (0 -> 7)	
 
-	Elapsed time(omp) for the CIS = 0.002097[s].
+	Elapsed time(omp) for the CIS = 0.002547[s].
 **********  DONE: ZINDO/S-CIS  **********
 
 
@@ -153,7 +154,7 @@ SCF iter=7: RMS density=0.000000025983597
      >>>>>  The MolDS finished normally!  <<<<<
      >>>>>  CPU time: 0.02[s].  <<<<<
      >>>>>  Elapsed time: 0[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 0.022485[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 0.0192261[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

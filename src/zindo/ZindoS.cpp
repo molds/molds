@@ -126,7 +126,7 @@ void ZindoS::SetMessages(){
    this->messageDavidsonReachCISMatrix = "\n\t\tDimension of the expansion vectors reaches to the dimension of the CIS-matrix.\n";
    this->messageDavidsonGoToDirect = "\t\tHence, we go to the Direct-CIS.\n\n";
    this->messageExcitedStatesEnergies = "\tExcitation energies:\n";
-   this->messageExcitedStatesEnergiesTitle = "\t\t| i-th | e[a.u.] | e[eV] | \n";
+   this->messageExcitedStatesEnergiesTitle = "\t\t| i-th | e[a.u.] | e[eV] | dominant eigenvector coefficients (occ. -> vir.) |\n";
 }
 
 void ZindoS::SetEnableAtomTypes(){
@@ -811,16 +811,44 @@ void ZindoS::DoCIS(){
 }
 
 void ZindoS::OutputCISResults() const{
+   int numberActiveOcc = Parameters::GetInstance()->GetActiveOccCIS();
+   int numberActiveVir = Parameters::GetInstance()->GetActiveVirCIS();
    // output cis eigen energies
    this->OutputLog(this->messageExcitedStatesEnergies);
    this->OutputLog(this->messageExcitedStatesEnergiesTitle);
    double eV2AU = Parameters::GetInstance()->GetEV2AU();
    for(int k=0; k<Parameters::GetInstance()->GetNumberExcitedStatesCIS(); k++){
-      this->OutputLog((boost::format("\t\t %d\t%e\t%e\n") % (k+1) 
+      this->OutputLog((boost::format("\t\t %d\t%e\t%e\t") % (k+1) 
                                                           % this->excitedEnergies[k]
                                                           % (this->excitedEnergies[k]/eV2AU)).str());
+
+      // sort eigen vector coefficeits of CIS and output
+      vector<CISEigenVectorCoefficient> cisEigenVectorCoefficients;
+      this->SortCISEigenVectorCoefficients(&cisEigenVectorCoefficients, this->matrixCIS[k]);
+      for(int l=0; l<Parameters::GetInstance()->GetNumberPrintCoefficientsCIS(); l++){
+         this->OutputLog((boost::format("%e (%d -> %d)\t") % cisEigenVectorCoefficients[l].coefficient
+                                                           % cisEigenVectorCoefficients[l].occIndex
+                                                           % cisEigenVectorCoefficients[l].virIndex).str());
+      }
+      this->OutputLog("\n");
    }
    this->OutputLog("\n");
+}
+
+void ZindoS::SortCISEigenVectorCoefficients(vector<CISEigenVectorCoefficient>* cisEigenVectorCoefficients,
+                                            double* cisEigenVector) const{
+   int numberOcc = Parameters::GetInstance()->GetActiveOccCIS();
+   int numberVir = Parameters::GetInstance()->GetActiveVirCIS();
+   for(int l=0; l<numberOcc*numberVir; l++){
+      // single excitation from I-th (occupied)MO to A-th (virtual)MO
+      int moI = this->molecule->GetTotalNumberValenceElectrons()/2 - (l/numberVir) -1;
+      int moA = this->molecule->GetTotalNumberValenceElectrons()/2 + (l%numberVir);
+      CISEigenVectorCoefficient cisEigenVectorCoefficient = {cisEigenVector[l], moI, moA, k};
+      cisEigenVectorCoefficients->push_back(cisEigenVectorCoefficient);
+   }
+   sort(cisEigenVectorCoefficients->begin(), 
+        cisEigenVectorCoefficients->end(), 
+        MoreCISEigenVectorCoefficient());
 }
 
 void ZindoS::SortSingleExcitationSlaterDeterminants(vector<MoEnergyGap>* moEnergyGaps) const{

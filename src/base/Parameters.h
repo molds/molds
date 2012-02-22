@@ -99,6 +99,8 @@ public:
    void SetMaxDimensionsCIS(int maxDimensionsCIS);
    double GetNormToleranceCIS() const;
    void SetNormToleranceCIS(double normToleranceCIS);
+   int GetNumberPrintCoefficientsCIS() const;
+   void SetNumberPrintCoefficientsCIS(int numberPrintCoefficientsCIS);
    // Memory
    double GetLimitHeapMemory() const;
    void SetLimitHeapMemory(double limitHeap);
@@ -196,6 +198,7 @@ private:
    double normToleranceCIS;
    bool requiresCIS;
    bool isDavidsonCIS;
+   int numberPrintCoefficientsCIS;
    // Memory
    double limitHeapMemory;
    // MD

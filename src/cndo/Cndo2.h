@@ -156,6 +156,16 @@ protected:
       bool operator()(const MoEnergyGap& rLeft, const MoEnergyGap& rRight) 
       const { return rLeft.energyGap < rRight.energyGap; } 
    };
+   struct CISEigenVectorCoefficient{
+      double coefficient;
+      int occIndex;
+      int virIndex;
+      int slaterIndex;
+   };
+   struct MoreCISEigenVectorCoefficient { 
+      bool operator()(const CISEigenVectorCoefficient& rLeft, const CISEigenVectorCoefficient& rRight) 
+      const { return fabs(rLeft.coefficient) > fabs(rRight.coefficient); } 
+   };
 private:
    std::string errorMessageCalDiaOverlapDiaFrameNullMatrix;
    std::string errorMessageCalcRotatingMatrixNullRotMatrix;
