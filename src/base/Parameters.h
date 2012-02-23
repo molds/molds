@@ -72,8 +72,8 @@ public:
    void SetGridNumberHolePlot(int Nx, int Ny, int Nz);
    double* GetFrameLengthHolePlot() const;
    void SetFrameLengthHolePlot(double lx, double ly, double lz);
-   std::vector<int>* GetIndecesHolePlot() const;
-   void AddIndexHolePlot(int holeIndex);
+   std::vector<int>* GetElecIndecesHolePlot() const;
+   void AddElecIndexHolePlot(int elecIndex);
    bool RequiresHolePlot() const;
    // ParticlePlot
    std::string GetFileNamePrefixParticlePlot() const;
@@ -82,8 +82,8 @@ public:
    void SetGridNumberParticlePlot(int Nx, int Ny, int Nz);
    double* GetFrameLengthParticlePlot() const;
    void SetFrameLengthParticlePlot(double lx, double ly, double lz);
-   std::vector<int>* GetIndecesParticlePlot() const;
-   void AddIndexParticlePlot(int particleIndex);
+   std::vector<int>* GetElecIndecesParticlePlot() const;
+   void AddElecIndexParticlePlot(int elecIndex);
    bool RequiresParticlePlot() const;
    // Translation
    void SetTranslatingDifference(double x, double y, double z);
@@ -205,12 +205,12 @@ private:
    std::string fileNamePrefixHolePlot;
    int gridNumberHolePlot[CartesianType_end];
    double frameLengthHolePlot[CartesianType_end];
-   std::vector<int>* indecesHolePlot;
+   std::vector<int>* elecIndecesHolePlot;
    // ParticlePlot
    std::string fileNamePrefixParticlePlot;
    int gridNumberParticlePlot[CartesianType_end];
    double frameLengthParticlePlot[CartesianType_end];
-   std::vector<int>* indecesParticlePlot;
+   std::vector<int>* elecIndecesParticlePlot;
    // Translation
    double translatingDifference[3];
    // Principal axes

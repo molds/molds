@@ -104,13 +104,13 @@ private:
    std::string messageMOPlotFilePrefix;
    // HolePlot
    std::string messageHolePlotConditions;
-   std::string messageHolePlotIndex;
+   std::string messageHolePlotElecIndex;
    std::string messageHolePlotGridNumber;
    std::string messageHolePlotFrameLength;
    std::string messageHolePlotFilePrefix;
    // ParticlePlot
    std::string messageParticlePlotConditions;
-   std::string messageParticlePlotIndex;
+   std::string messageParticlePlotElecIndex;
    std::string messageParticlePlotGridNumber;
    std::string messageParticlePlotFrameLength;
    std::string messageParticlePlotFilePrefix;
@@ -155,16 +155,16 @@ private:
    std::string stringMOPlotFrameLength;
    std::string stringMOPlotFilePrefix;
    // HolePlot
-   std::string stringHole;
    std::string stringHolePlot;
    std::string stringHolePlotEnd;
+   std::string stringHolePlotElecIndex;
    std::string stringHolePlotGridNumber;
    std::string stringHolePlotFrameLength;
    std::string stringHolePlotFilePrefix;
    // ParticlePlot
-   std::string stringParticle;
    std::string stringParticlePlot;
    std::string stringParticlePlotEnd;
+   std::string stringParticlePlotElecIndex;
    std::string stringParticlePlotGridNumber;
    std::string stringParticlePlotFrameLength;
    std::string stringParticlePlotFilePrefix;

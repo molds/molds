@@ -157,14 +157,14 @@ void InputParser::SetMessages(){
 
    // HolePlot
    this->messageHolePlotConditions = "\tHole plot conditions:\n";
-   this->messageHolePlotIndex = "\t\tHole index: ";
+   this->messageHolePlotElecIndex = "\t\tElectronic index: ";
    this->messageHolePlotGridNumber = "\t\tNumber of grid(x, y, z): ";
    this->messageHolePlotFrameLength = "\t\tFrame length[angst.](x, y, z): ";
    this->messageHolePlotFilePrefix = "\t\tFile name prefix: ";
 
    // ParticlePlot
    this->messageParticlePlotConditions = "\tParticle plot conditions:\n";
-   this->messageParticlePlotIndex = "\t\tParticle index: ";
+   this->messageParticlePlotElecIndex = "\t\tElectronic state: ";
    this->messageParticlePlotGridNumber = "\t\tNumber of grid(x, y, z): ";
    this->messageParticlePlotFrameLength = "\t\tFrame length[angst.](x, y, z): ";
    this->messageParticlePlotFilePrefix = "\t\tFile name prefix: ";
@@ -216,17 +216,17 @@ void InputParser::SetMessages(){
    this->stringMOPlotFilePrefix = "file_prefix";
 
    // Hole plot
-   this->stringHole = "hole";
    this->stringHolePlot = "holeplot";
    this->stringHolePlotEnd = "holeplot_end";
+   this->stringHolePlotElecIndex = "electronic_state";
    this->stringHolePlotGridNumber = "grid_number";
    this->stringHolePlotFrameLength = "frame_length";
    this->stringHolePlotFilePrefix = "file_prefix";
 
    // MO plot
-   this->stringParticle = "particle";
    this->stringParticlePlot = "particleplot";
    this->stringParticlePlotEnd = "particleplot_end";
+   this->stringParticlePlotElecIndex = "electronic_state";
    this->stringParticlePlotGridNumber = "grid_number";
    this->stringParticlePlotFrameLength = "frame_length";
    this->stringParticlePlotFilePrefix = "file_prefix";
@@ -568,9 +568,9 @@ int InputParser::ParseConditionsHolePlot(vector<string>* inputTerms, int parseIn
          parseIndex += 3;
       }
       // hole index
-      if((*inputTerms)[parseIndex].compare(this->stringHole) == 0){
-         int holeIndex = atoi((*inputTerms)[parseIndex+1].c_str());
-         Parameters::GetInstance()->AddIndexHolePlot(holeIndex);
+      if((*inputTerms)[parseIndex].compare(this->stringHolePlotElecIndex) == 0){
+         int elecIndex = atoi((*inputTerms)[parseIndex+1].c_str());
+         Parameters::GetInstance()->AddElecIndexHolePlot(elecIndex);
          parseIndex++;
       }
       // file prefix
@@ -607,9 +607,9 @@ int InputParser::ParseConditionsParticlePlot(vector<string>* inputTerms, int par
          parseIndex += 3;
       }
       // particle index
-      if((*inputTerms)[parseIndex].compare(this->stringParticle) == 0){
-         int particleIndex = atoi((*inputTerms)[parseIndex+1].c_str());
-         Parameters::GetInstance()->AddIndexParticlePlot(particleIndex);
+      if((*inputTerms)[parseIndex].compare(this->stringParticlePlotElecIndex) == 0){
+         int elecIndex = atoi((*inputTerms)[parseIndex+1].c_str());
+         Parameters::GetInstance()->AddElecIndexParticlePlot(elecIndex);
          parseIndex++;
       }
       // file prefix
@@ -1362,9 +1362,9 @@ void InputParser::OutputMOPlotConditions() const{
 
 void InputParser::OutputHolePlotConditions() const{
    this->OutputLog(this->messageHolePlotConditions);
-   vector<int>* moIndeces = Parameters::GetInstance()->GetIndecesHolePlot();
+   vector<int>* moIndeces = Parameters::GetInstance()->GetElecIndecesHolePlot();
    for(int i=0; i<moIndeces->size(); i++){
-      this->OutputLog((boost::format("%s%d\n") % this->messageHolePlotIndex.c_str() 
+      this->OutputLog((boost::format("%s%d\n") % this->messageHolePlotElecIndex.c_str() 
                                                % (*moIndeces)[i]).str());
    }
    int* gridNum = Parameters::GetInstance()->GetGridNumberHolePlot();
@@ -1386,9 +1386,9 @@ void InputParser::OutputHolePlotConditions() const{
 
 void InputParser::OutputParticlePlotConditions() const{
    this->OutputLog(this->messageParticlePlotConditions);
-   vector<int>* moIndeces = Parameters::GetInstance()->GetIndecesParticlePlot();
+   vector<int>* moIndeces = Parameters::GetInstance()->GetElecIndecesParticlePlot();
    for(int i=0; i<moIndeces->size(); i++){
-      this->OutputLog((boost::format("%s%d\n") % this->messageParticlePlotIndex.c_str() 
+      this->OutputLog((boost::format("%s%d\n") % this->messageParticlePlotElecIndex.c_str() 
                                                % (*moIndeces)[i]).str());
    }
    int* gridNum = Parameters::GetInstance()->GetGridNumberParticlePlot();

@@ -49,8 +49,8 @@ Parameters::Parameters(){
    this->SetDefaultValues();
    this->SetMessages();
    this->indecesMOPlot = NULL;
-   this->indecesHolePlot = NULL;
-   this->indecesParticlePlot = NULL;
+   this->elecIndecesHolePlot = NULL;
+   this->elecIndecesParticlePlot = NULL;
 }
 
 Parameters::~Parameters(){
@@ -63,15 +63,15 @@ Parameters::~Parameters(){
       this->indecesMOPlot = NULL;
       //this->OutputLog("indecesMOPlot deleted\n");
    }
-   if(this->indecesHolePlot != NULL){
-      delete this->indecesHolePlot;
-      this->indecesHolePlot = NULL;
-      //this->OutputLog("indecesHolePlot deleted\n");
+   if(this->elecIndecesHolePlot != NULL){
+      delete this->elecIndecesHolePlot;
+      this->elecIndecesHolePlot = NULL;
+      //this->OutputLog("elecIndecesHolePlot deleted\n");
    }
-   if(this->indecesParticlePlot != NULL){
-      delete this->indecesParticlePlot;
-      this->indecesParticlePlot = NULL;
-      //this->OutputLog("indecesParticlePlot deleted\n");
+   if(this->elecIndecesParticlePlot != NULL){
+      delete this->elecIndecesParticlePlot;
+      this->elecIndecesParticlePlot = NULL;
+      //this->OutputLog("elecIndecesParticlePlot deleted\n");
    }
 }
 
@@ -182,9 +182,9 @@ void Parameters::SetMessages(){
    this->errorMessageGetIndecesMOPlotNull
       = "Error in base::Parameters::GetIndecesMOPlot: indecesMOPlot is NULL.\n";
    this->errorMessageGetIndecesHolePlotNull
-      = "Error in base::Parameters::GetIndecesHolePlot: indecesHolePlot is NULL.\n";
+      = "Error in base::Parameters::GetIndecesHolePlot: elecIndecesHolePlot is NULL.\n";
    this->errorMessageGetIndecesParticlePlotNull
-      = "Error in base::Parameters::GetIndecesParticlePlot: indecesParticlePlot is NULL.\n";
+      = "Error in base::Parameters::GetIndecesParticlePlot: elecIndecesParticlePlot is NULL.\n";
 }
 
 SimulationType Parameters::GetCurrentSimulation() const{
@@ -415,24 +415,24 @@ void Parameters::SetFrameLengthMOPlot(double lx, double ly, double lz){
 }
 
 // methods for HolePlot
-vector<int>* Parameters::GetIndecesHolePlot() const{
-   if(this->indecesHolePlot==NULL){
+vector<int>* Parameters::GetElecIndecesHolePlot() const{
+   if(this->elecIndecesHolePlot==NULL){
       stringstream ss;
       ss << this->errorMessageGetIndecesHolePlotNull; 
       throw MolDSException(ss.str());
    }
-   return this->indecesHolePlot;
+   return this->elecIndecesHolePlot;
 }
 
-void Parameters::AddIndexHolePlot(int holeIndex){
-   if(this->indecesHolePlot==NULL){
-      this->indecesHolePlot = new vector<int>;
+void Parameters::AddElecIndexHolePlot(int elecIndex){
+   if(this->elecIndecesHolePlot==NULL){
+      this->elecIndecesHolePlot = new vector<int>;
    }
-   this->indecesHolePlot->push_back(holeIndex);
+   this->elecIndecesHolePlot->push_back(elecIndex);
 }
 
 bool Parameters::RequiresHolePlot() const{
-   return (this->indecesHolePlot!=NULL && 0<this->indecesHolePlot->size());
+   return (this->elecIndecesHolePlot!=NULL && 0<this->elecIndecesHolePlot->size());
 }
 
 string Parameters::GetFileNamePrefixHolePlot() const{
@@ -464,24 +464,24 @@ void Parameters::SetFrameLengthHolePlot(double lx, double ly, double lz){
 }
 
 // methods for ParticlePlot
-vector<int>* Parameters::GetIndecesParticlePlot() const{
-   if(this->indecesParticlePlot==NULL){
+vector<int>* Parameters::GetElecIndecesParticlePlot() const{
+   if(this->elecIndecesParticlePlot==NULL){
       stringstream ss;
       ss << this->errorMessageGetIndecesParticlePlotNull; 
       throw MolDSException(ss.str());
    }
-   return this->indecesParticlePlot;
+   return this->elecIndecesParticlePlot;
 }
 
-void Parameters::AddIndexParticlePlot(int particleIndex){
-   if(this->indecesParticlePlot==NULL){
-      this->indecesParticlePlot = new vector<int>;
+void Parameters::AddElecIndexParticlePlot(int elecIndex){
+   if(this->elecIndecesParticlePlot==NULL){
+      this->elecIndecesParticlePlot = new vector<int>;
    }
-   this->indecesParticlePlot->push_back(particleIndex);
+   this->elecIndecesParticlePlot->push_back(elecIndex);
 }
 
 bool Parameters::RequiresParticlePlot() const{
-   return (this->indecesParticlePlot!=NULL && 0<this->indecesParticlePlot->size());
+   return (this->elecIndecesParticlePlot!=NULL && 0<this->elecIndecesParticlePlot->size());
 }
 
 string Parameters::GetFileNamePrefixParticlePlot() const{

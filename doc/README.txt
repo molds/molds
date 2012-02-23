@@ -250,10 +250,11 @@ HOW TO WRITE INPUT:
          HOLEPLOT_END
 
       -options
-       "hole", "grid_number", "frame_length", and "file_prefix" are prepared.
+       "electronic_state", "grid_number", "frame_length", and "file_prefix" are prepared.
 
-       "hole" is index of the molcular orbital. hole=0 means the ground state.
-       hole=1 means, then, first excited state.
+       "electronic_state" is index of the electronic state. 
+       electronic_state=0 means the electronic ground state.
+       electronic_state=1 means, then, first electornic excited state.
        The default value of the "hole" is not set.
 
        "grid_number" is the grid number of the frame in xyz-coordinates.
@@ -267,8 +268,8 @@ HOW TO WRITE INPUT:
 
       E.g.
          HOLEPLOT
-            hole 5
-            hole 8
+            electronic_state 5
+            electronic_state 8
             grid_number 30 30 30
             frame_length 10 10 10
             file_prefix HOLEPlot_
@@ -285,11 +286,12 @@ HOW TO WRITE INPUT:
          PARTICLEPLOT_END
 
       -options
-       "particle", "grid_number", "frame_length", and "file_prefix" are prepared.
+       "electronic_state", "grid_number", "frame_length", and "file_prefix" are prepared.
 
-       "particle" is index of the molcular orbital. particle=0 means the ground state.
-       particle=1 means, then, first excited state.
-       The default value of the "particle" is not set.
+       "electronic_state" is index of the electronic state. 
+       electronic_state=0 means the electronic ground state.
+       electronic_state=1 means, then, first electornic excited state.
+       The default value of the "hole" is not set.
 
        "grid_number" is the grid number of the frame in xyz-coordinates.
        The default values are 25, 25, and 25 for x, y, and z coordinates, respectively.
@@ -302,8 +304,8 @@ HOW TO WRITE INPUT:
 
       E.g.
          HOLEPLOT
-            hole 5
-            hole 8
+            electronic_state 5
+            electronic_state 8
             grid_number 30 30 30
             frame_length 10 10 10
             file_prefix HOLEPlot_
