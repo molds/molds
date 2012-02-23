@@ -102,6 +102,18 @@ private:
    std::string messageMOPlotGridNumber;
    std::string messageMOPlotFrameLength;
    std::string messageMOPlotFilePrefix;
+   // HolePlot
+   std::string messageHolePlotConditions;
+   std::string messageHolePlotIndex;
+   std::string messageHolePlotGridNumber;
+   std::string messageHolePlotFrameLength;
+   std::string messageHolePlotFilePrefix;
+   // ParticlePlot
+   std::string messageParticlePlotConditions;
+   std::string messageParticlePlotIndex;
+   std::string messageParticlePlotGridNumber;
+   std::string messageParticlePlotFrameLength;
+   std::string messageParticlePlotFilePrefix;
    // unit 
    std::string messageFs;
    std::string messageK;
@@ -142,6 +154,20 @@ private:
    std::string stringMOPlotGridNumber;
    std::string stringMOPlotFrameLength;
    std::string stringMOPlotFilePrefix;
+   // HolePlot
+   std::string stringHole;
+   std::string stringHolePlot;
+   std::string stringHolePlotEnd;
+   std::string stringHolePlotGridNumber;
+   std::string stringHolePlotFrameLength;
+   std::string stringHolePlotFilePrefix;
+   // ParticlePlot
+   std::string stringParticle;
+   std::string stringParticlePlot;
+   std::string stringParticlePlotEnd;
+   std::string stringParticlePlotGridNumber;
+   std::string stringParticlePlotFrameLength;
+   std::string stringParticlePlotFilePrefix;
    // Principal axes
    std::string stringInertiaTensor;
    std::string stringInertiaTensorEnd;
@@ -225,6 +251,8 @@ private:
    void OutputRpmdConditions() const;
    void OutputOptimizationConditions() const;
    void OutputMOPlotConditions() const;
+   void OutputHolePlotConditions() const;
+   void OutputParticlePlotConditions() const;
    void OutputInputTerms(std::vector<std::string> inputTerms) const;
    bool IsCommentOut(std::string str) const;
    std::vector<std::string> GetInputTerms() const;
@@ -235,6 +263,8 @@ private:
    int ParseConditionsTranslation(std::vector<std::string>* inputTerms, int parseIndex) const;
    int ParseConditionsRotation(std::vector<std::string>* inputTerms, int parseIndex) const;
    int ParseConditionsMOPlot(std::vector<std::string>* inputTerms, int parseIndex) const;
+   int ParseConditionsHolePlot(std::vector<std::string>* inputTerms, int parseIndex) const;
+   int ParseConditionsParticlePlot(std::vector<std::string>* inputTerms, int parseIndex) const;
    int ParseConditionsCIS(std::vector<std::string>* inputTerms, int parseIndex) const;
    int ParseConditionsMC(std::vector<std::string>* inputTerms, int parseIndex) const;
    int ParseConditionsMD(std::vector<std::string>* inputTerms, int parseIndex) const;

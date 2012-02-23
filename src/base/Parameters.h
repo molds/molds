@@ -65,6 +65,26 @@ public:
    std::vector<int>* GetIndecesMOPlot() const;
    void AddIndexMOPlot(int moIndex);
    bool RequiresMOPlot() const;
+   // HoleEPlot
+   std::string GetFileNamePrefixHolePlot() const;
+   void SetFileNamePrefixHolePlot(std::string fileNamePrefixHolePlot);
+   int* GetGridNumberHolePlot() const;
+   void SetGridNumberHolePlot(int Nx, int Ny, int Nz);
+   double* GetFrameLengthHolePlot() const;
+   void SetFrameLengthHolePlot(double lx, double ly, double lz);
+   std::vector<int>* GetIndecesHolePlot() const;
+   void AddIndexHolePlot(int holeIndex);
+   bool RequiresHolePlot() const;
+   // ParticlePlot
+   std::string GetFileNamePrefixParticlePlot() const;
+   void SetFileNamePrefixParticlePlot(std::string fileNamePrefixParticlePlot);
+   int* GetGridNumberParticlePlot() const;
+   void SetGridNumberParticlePlot(int Nx, int Ny, int Nz);
+   double* GetFrameLengthParticlePlot() const;
+   void SetFrameLengthParticlePlot(double lx, double ly, double lz);
+   std::vector<int>* GetIndecesParticlePlot() const;
+   void AddIndexParticlePlot(int particleIndex);
+   bool RequiresParticlePlot() const;
    // Translation
    void SetTranslatingDifference(double x, double y, double z);
    double* GetTranslatingDifference() const;
@@ -155,6 +175,8 @@ private:
    Parameters();
    ~Parameters();
    std::string errorMessageGetIndecesMOPlotNull;
+   std::string errorMessageGetIndecesHolePlotNull;
+   std::string errorMessageGetIndecesParticlePlotNull;
    SimulationType currentSimulation;
    TheoryType currentTheory;
    // Physical constants
@@ -179,6 +201,16 @@ private:
    int gridNumberMOPlot[CartesianType_end];
    double frameLengthMOPlot[CartesianType_end];
    std::vector<int>* indecesMOPlot;
+   // HolePlot
+   std::string fileNamePrefixHolePlot;
+   int gridNumberHolePlot[CartesianType_end];
+   double frameLengthHolePlot[CartesianType_end];
+   std::vector<int>* indecesHolePlot;
+   // ParticlePlot
+   std::string fileNamePrefixParticlePlot;
+   int gridNumberParticlePlot[CartesianType_end];
+   double frameLengthParticlePlot[CartesianType_end];
+   std::vector<int>* indecesParticlePlot;
    // Translation
    double translatingDifference[3];
    // Principal axes

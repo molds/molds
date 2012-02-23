@@ -155,6 +155,20 @@ void InputParser::SetMessages(){
    this->messageMOPlotFrameLength = "\t\tFrame length[angst.](x, y, z): ";
    this->messageMOPlotFilePrefix = "\t\tFile name prefix: ";
 
+   // HolePlot
+   this->messageHolePlotConditions = "\tHole plot conditions:\n";
+   this->messageHolePlotIndex = "\t\tHole index: ";
+   this->messageHolePlotGridNumber = "\t\tNumber of grid(x, y, z): ";
+   this->messageHolePlotFrameLength = "\t\tFrame length[angst.](x, y, z): ";
+   this->messageHolePlotFilePrefix = "\t\tFile name prefix: ";
+
+   // ParticlePlot
+   this->messageParticlePlotConditions = "\tParticle plot conditions:\n";
+   this->messageParticlePlotIndex = "\t\tParticle index: ";
+   this->messageParticlePlotGridNumber = "\t\tNumber of grid(x, y, z): ";
+   this->messageParticlePlotFrameLength = "\t\tFrame length[angst.](x, y, z): ";
+   this->messageParticlePlotFilePrefix = "\t\tFile name prefix: ";
+
    // unit
    this->messageFs = "[fs]";
    this->messageK = "[K]";
@@ -200,6 +214,22 @@ void InputParser::SetMessages(){
    this->stringMOPlotGridNumber = "grid_number";
    this->stringMOPlotFrameLength = "frame_length";
    this->stringMOPlotFilePrefix = "file_prefix";
+
+   // Hole plot
+   this->stringHole = "hole";
+   this->stringHolePlot = "holeplot";
+   this->stringHolePlotEnd = "holeplot_end";
+   this->stringHolePlotGridNumber = "grid_number";
+   this->stringHolePlotFrameLength = "frame_length";
+   this->stringHolePlotFilePrefix = "file_prefix";
+
+   // MO plot
+   this->stringParticle = "particle";
+   this->stringParticlePlot = "particleplot";
+   this->stringParticlePlotEnd = "particleplot_end";
+   this->stringParticlePlotGridNumber = "grid_number";
+   this->stringParticlePlotFrameLength = "frame_length";
+   this->stringParticlePlotFilePrefix = "file_prefix";
 
    // Principal axes
    this->stringInertiaTensor = "inertia";
@@ -508,6 +538,84 @@ int InputParser::ParseConditionsMOPlot(vector<string>* inputTerms, int parseInde
       if((*inputTerms)[parseIndex].compare(this->stringMOPlotFilePrefix) == 0){
          string filePrefix((*inputTerms)[parseIndex+1].c_str());
          Parameters::GetInstance()->SetFileNamePrefixMOPlot(filePrefix);
+         parseIndex++;
+      }
+      parseIndex++;   
+   }
+   return parseIndex;
+}
+
+int InputParser::ParseConditionsHolePlot(vector<string>* inputTerms, int parseIndex) const{
+   parseIndex++;
+   while((*inputTerms)[parseIndex].compare(this->stringHolePlotEnd) != 0){
+      // Frame length
+      if((*inputTerms)[parseIndex].compare(this->stringHolePlotFrameLength) == 0){
+         double lx = atof((*inputTerms)[parseIndex+1].c_str()) 
+                    *Parameters::GetInstance()->GetAngstrom2AU();
+         double ly = atof((*inputTerms)[parseIndex+2].c_str()) 
+                    *Parameters::GetInstance()->GetAngstrom2AU();
+         double lz = atof((*inputTerms)[parseIndex+3].c_str()) 
+                    *Parameters::GetInstance()->GetAngstrom2AU();
+         Parameters::GetInstance()->SetFrameLengthHolePlot(lx, ly, lz);
+         parseIndex += 3;
+      }
+      // Grid number
+      if((*inputTerms)[parseIndex].compare(this->stringHolePlotGridNumber) == 0){
+         int nx = atof((*inputTerms)[parseIndex+1].c_str());
+         int ny = atof((*inputTerms)[parseIndex+2].c_str());
+         int nz = atof((*inputTerms)[parseIndex+3].c_str());
+         Parameters::GetInstance()->SetGridNumberHolePlot(nx, ny, nz);
+         parseIndex += 3;
+      }
+      // hole index
+      if((*inputTerms)[parseIndex].compare(this->stringHole) == 0){
+         int holeIndex = atoi((*inputTerms)[parseIndex+1].c_str());
+         Parameters::GetInstance()->AddIndexHolePlot(holeIndex);
+         parseIndex++;
+      }
+      // file prefix
+      if((*inputTerms)[parseIndex].compare(this->stringHolePlotFilePrefix) == 0){
+         string filePrefix((*inputTerms)[parseIndex+1].c_str());
+         Parameters::GetInstance()->SetFileNamePrefixHolePlot(filePrefix);
+         parseIndex++;
+      }
+      parseIndex++;   
+   }
+   return parseIndex;
+}
+
+int InputParser::ParseConditionsParticlePlot(vector<string>* inputTerms, int parseIndex) const{
+   parseIndex++;
+   while((*inputTerms)[parseIndex].compare(this->stringParticlePlotEnd) != 0){
+      // Frame length
+      if((*inputTerms)[parseIndex].compare(this->stringParticlePlotFrameLength) == 0){
+         double lx = atof((*inputTerms)[parseIndex+1].c_str()) 
+                    *Parameters::GetInstance()->GetAngstrom2AU();
+         double ly = atof((*inputTerms)[parseIndex+2].c_str()) 
+                    *Parameters::GetInstance()->GetAngstrom2AU();
+         double lz = atof((*inputTerms)[parseIndex+3].c_str()) 
+                    *Parameters::GetInstance()->GetAngstrom2AU();
+         Parameters::GetInstance()->SetFrameLengthParticlePlot(lx, ly, lz);
+         parseIndex += 3;
+      }
+      // Grid number
+      if((*inputTerms)[parseIndex].compare(this->stringParticlePlotGridNumber) == 0){
+         int nx = atof((*inputTerms)[parseIndex+1].c_str());
+         int ny = atof((*inputTerms)[parseIndex+2].c_str());
+         int nz = atof((*inputTerms)[parseIndex+3].c_str());
+         Parameters::GetInstance()->SetGridNumberParticlePlot(nx, ny, nz);
+         parseIndex += 3;
+      }
+      // particle index
+      if((*inputTerms)[parseIndex].compare(this->stringParticle) == 0){
+         int particleIndex = atoi((*inputTerms)[parseIndex+1].c_str());
+         Parameters::GetInstance()->AddIndexParticlePlot(particleIndex);
+         parseIndex++;
+      }
+      // file prefix
+      if((*inputTerms)[parseIndex].compare(this->stringParticlePlotFilePrefix) == 0){
+         string filePrefix((*inputTerms)[parseIndex+1].c_str());
+         Parameters::GetInstance()->SetFileNamePrefixParticlePlot(filePrefix);
          parseIndex++;
       }
       parseIndex++;   
@@ -839,6 +947,16 @@ void InputParser::Parse(Molecule* molecule) const{
          i = this->ParseConditionsMOPlot(&inputTerms, i);
       }
 
+      // hole plot condition
+      if(inputTerms[i].compare(this->stringHolePlot) == 0){
+         i = this->ParseConditionsHolePlot(&inputTerms, i);
+      }
+
+      // particle plot condition
+      if(inputTerms[i].compare(this->stringParticlePlot) == 0){
+         i = this->ParseConditionsParticlePlot(&inputTerms, i);
+      }
+
       // cis condition
       if(inputTerms[i].compare(this->stringCIS) == 0){
          i = this->ParseConditionsCIS(&inputTerms, i);
@@ -898,6 +1016,12 @@ void InputParser::Parse(Molecule* molecule) const{
    }
    if(Parameters::GetInstance()->RequiresMOPlot()){
       this->OutputMOPlotConditions();
+   }
+   if(Parameters::GetInstance()->RequiresHolePlot()){
+      this->OutputHolePlotConditions();
+   }
+   if(Parameters::GetInstance()->RequiresParticlePlot()){
+      this->OutputParticlePlotConditions();
    }
    if(Parameters::GetInstance()->GetCurrentSimulation()==MD){
       this->OutputMdConditions();
@@ -1232,6 +1356,54 @@ void InputParser::OutputMOPlotConditions() const{
                                                   % (frameLength[ZAxis]/ang2AU)).str());
    this->OutputLog((boost::format("%s%s\n") % this->messageMOPlotFilePrefix.c_str() 
                                             % Parameters::GetInstance()->GetFileNamePrefixMOPlot().c_str()).str());
+
+   this->OutputLog("\n");
+}
+
+void InputParser::OutputHolePlotConditions() const{
+   this->OutputLog(this->messageHolePlotConditions);
+   vector<int>* moIndeces = Parameters::GetInstance()->GetIndecesHolePlot();
+   for(int i=0; i<moIndeces->size(); i++){
+      this->OutputLog((boost::format("%s%d\n") % this->messageHolePlotIndex.c_str() 
+                                               % (*moIndeces)[i]).str());
+   }
+   int* gridNum = Parameters::GetInstance()->GetGridNumberHolePlot();
+   this->OutputLog((boost::format("%s%d %d %d\n") % this->messageHolePlotGridNumber.c_str() 
+                                                  % gridNum[XAxis] 
+                                                  % gridNum[YAxis]
+                                                  % gridNum[ZAxis]).str());
+   double* frameLength = Parameters::GetInstance()->GetFrameLengthHolePlot();
+   double ang2AU = Parameters::GetInstance()->GetAngstrom2AU();
+   this->OutputLog((boost::format("%s%e %e %e\n") % this->messageHolePlotFrameLength.c_str() 
+                                                  % (frameLength[XAxis]/ang2AU) 
+                                                  % (frameLength[YAxis]/ang2AU)
+                                                  % (frameLength[ZAxis]/ang2AU)).str());
+   this->OutputLog((boost::format("%s%s\n") % this->messageHolePlotFilePrefix.c_str() 
+                                            % Parameters::GetInstance()->GetFileNamePrefixHolePlot().c_str()).str());
+
+   this->OutputLog("\n");
+}
+
+void InputParser::OutputParticlePlotConditions() const{
+   this->OutputLog(this->messageParticlePlotConditions);
+   vector<int>* moIndeces = Parameters::GetInstance()->GetIndecesParticlePlot();
+   for(int i=0; i<moIndeces->size(); i++){
+      this->OutputLog((boost::format("%s%d\n") % this->messageParticlePlotIndex.c_str() 
+                                               % (*moIndeces)[i]).str());
+   }
+   int* gridNum = Parameters::GetInstance()->GetGridNumberParticlePlot();
+   this->OutputLog((boost::format("%s%d %d %d\n") % this->messageParticlePlotGridNumber.c_str() 
+                                                  % gridNum[XAxis] 
+                                                  % gridNum[YAxis]
+                                                  % gridNum[ZAxis]).str());
+   double* frameLength = Parameters::GetInstance()->GetFrameLengthParticlePlot();
+   double ang2AU = Parameters::GetInstance()->GetAngstrom2AU();
+   this->OutputLog((boost::format("%s%e %e %e\n") % this->messageParticlePlotFrameLength.c_str() 
+                                                  % (frameLength[XAxis]/ang2AU) 
+                                                  % (frameLength[YAxis]/ang2AU)
+                                                  % (frameLength[ZAxis]/ang2AU)).str());
+   this->OutputLog((boost::format("%s%s\n") % this->messageParticlePlotFilePrefix.c_str() 
+                                            % Parameters::GetInstance()->GetFileNamePrefixParticlePlot().c_str()).str());
 
    this->OutputLog("\n");
 }

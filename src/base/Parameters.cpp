@@ -49,6 +49,8 @@ Parameters::Parameters(){
    this->SetDefaultValues();
    this->SetMessages();
    this->indecesMOPlot = NULL;
+   this->indecesHolePlot = NULL;
+   this->indecesParticlePlot = NULL;
 }
 
 Parameters::~Parameters(){
@@ -60,6 +62,16 @@ Parameters::~Parameters(){
       delete this->indecesMOPlot;
       this->indecesMOPlot = NULL;
       //this->OutputLog("indecesMOPlot deleted\n");
+   }
+   if(this->indecesHolePlot != NULL){
+      delete this->indecesHolePlot;
+      this->indecesHolePlot = NULL;
+      //this->OutputLog("indecesHolePlot deleted\n");
+   }
+   if(this->indecesParticlePlot != NULL){
+      delete this->indecesParticlePlot;
+      this->indecesParticlePlot = NULL;
+      //this->OutputLog("indecesParticlePlot deleted\n");
    }
 }
 
@@ -96,6 +108,22 @@ void Parameters::SetDefaultValues(){
    this->frameLengthMOPlot[XAxis] = 20.0;
    this->frameLengthMOPlot[YAxis] = 20.0;
    this->frameLengthMOPlot[ZAxis] = 20.0;
+   // HolePlot
+   this->fileNamePrefixHolePlot = "hole_";
+   this->gridNumberHolePlot[XAxis] = 25;
+   this->gridNumberHolePlot[YAxis] = 25;
+   this->gridNumberHolePlot[ZAxis] = 25;
+   this->frameLengthHolePlot[XAxis] = 20.0;
+   this->frameLengthHolePlot[YAxis] = 20.0;
+   this->frameLengthHolePlot[ZAxis] = 20.0;
+   // ParticlePlot
+   this->fileNamePrefixParticlePlot = "particle_";
+   this->gridNumberParticlePlot[XAxis] = 25;
+   this->gridNumberParticlePlot[YAxis] = 25;
+   this->gridNumberParticlePlot[ZAxis] = 25;
+   this->frameLengthParticlePlot[XAxis] = 20.0;
+   this->frameLengthParticlePlot[YAxis] = 20.0;
+   this->frameLengthParticlePlot[ZAxis] = 20.0;
    // Translation
    this->translatingDifference[0] = 0.0;
    this->translatingDifference[1] = 0.0;
@@ -153,6 +181,10 @@ void Parameters::SetDefaultValues(){
 void Parameters::SetMessages(){
    this->errorMessageGetIndecesMOPlotNull
       = "Error in base::Parameters::GetIndecesMOPlot: indecesMOPlot is NULL.\n";
+   this->errorMessageGetIndecesHolePlotNull
+      = "Error in base::Parameters::GetIndecesHolePlot: indecesHolePlot is NULL.\n";
+   this->errorMessageGetIndecesParticlePlotNull
+      = "Error in base::Parameters::GetIndecesParticlePlot: indecesParticlePlot is NULL.\n";
 }
 
 SimulationType Parameters::GetCurrentSimulation() const{
@@ -380,6 +412,104 @@ void Parameters::SetFrameLengthMOPlot(double lx, double ly, double lz){
    this->frameLengthMOPlot[XAxis] = lx;
    this->frameLengthMOPlot[YAxis] = ly;
    this->frameLengthMOPlot[ZAxis] = lz;
+}
+
+// methods for HolePlot
+vector<int>* Parameters::GetIndecesHolePlot() const{
+   if(this->indecesHolePlot==NULL){
+      stringstream ss;
+      ss << this->errorMessageGetIndecesHolePlotNull; 
+      throw MolDSException(ss.str());
+   }
+   return this->indecesHolePlot;
+}
+
+void Parameters::AddIndexHolePlot(int holeIndex){
+   if(this->indecesHolePlot==NULL){
+      this->indecesHolePlot = new vector<int>;
+   }
+   this->indecesHolePlot->push_back(holeIndex);
+}
+
+bool Parameters::RequiresHolePlot() const{
+   return (this->indecesHolePlot!=NULL && 0<this->indecesHolePlot->size());
+}
+
+string Parameters::GetFileNamePrefixHolePlot() const{
+   return this->fileNamePrefixHolePlot;
+}
+
+void Parameters::SetFileNamePrefixHolePlot(string fileNamePrefixHolePlot){
+   this->fileNamePrefixHolePlot = fileNamePrefixHolePlot;
+}
+
+int* Parameters::GetGridNumberHolePlot() const{
+   return (int*)this->gridNumberHolePlot;
+}
+
+void Parameters::SetGridNumberHolePlot(int Nx, int Ny, int Nz){
+   this->gridNumberHolePlot[XAxis] = Nx;
+   this->gridNumberHolePlot[YAxis] = Ny;
+   this->gridNumberHolePlot[ZAxis] = Nz;
+}
+
+double* Parameters::GetFrameLengthHolePlot() const{
+   return (double*)this->frameLengthHolePlot;
+}
+
+void Parameters::SetFrameLengthHolePlot(double lx, double ly, double lz){
+   this->frameLengthHolePlot[XAxis] = lx;
+   this->frameLengthHolePlot[YAxis] = ly;
+   this->frameLengthHolePlot[ZAxis] = lz;
+}
+
+// methods for ParticlePlot
+vector<int>* Parameters::GetIndecesParticlePlot() const{
+   if(this->indecesParticlePlot==NULL){
+      stringstream ss;
+      ss << this->errorMessageGetIndecesParticlePlotNull; 
+      throw MolDSException(ss.str());
+   }
+   return this->indecesParticlePlot;
+}
+
+void Parameters::AddIndexParticlePlot(int particleIndex){
+   if(this->indecesParticlePlot==NULL){
+      this->indecesParticlePlot = new vector<int>;
+   }
+   this->indecesParticlePlot->push_back(particleIndex);
+}
+
+bool Parameters::RequiresParticlePlot() const{
+   return (this->indecesParticlePlot!=NULL && 0<this->indecesParticlePlot->size());
+}
+
+string Parameters::GetFileNamePrefixParticlePlot() const{
+   return this->fileNamePrefixParticlePlot;
+}
+
+void Parameters::SetFileNamePrefixParticlePlot(string fileNamePrefixParticlePlot){
+   this->fileNamePrefixParticlePlot = fileNamePrefixParticlePlot;
+}
+
+int* Parameters::GetGridNumberParticlePlot() const{
+   return (int*)this->gridNumberParticlePlot;
+}
+
+void Parameters::SetGridNumberParticlePlot(int Nx, int Ny, int Nz){
+   this->gridNumberParticlePlot[XAxis] = Nx;
+   this->gridNumberParticlePlot[YAxis] = Ny;
+   this->gridNumberParticlePlot[ZAxis] = Nz;
+}
+
+double* Parameters::GetFrameLengthParticlePlot() const{
+   return (double*)this->frameLengthParticlePlot;
+}
+
+void Parameters::SetFrameLengthParticlePlot(double lx, double ly, double lz){
+   this->frameLengthParticlePlot[XAxis] = lx;
+   this->frameLengthParticlePlot[YAxis] = ly;
+   this->frameLengthParticlePlot[ZAxis] = lz;
 }
 
 // methods for CIS

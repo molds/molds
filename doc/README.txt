@@ -159,9 +159,9 @@ HOW TO WRITE INPUT:
       writ MO plot directive
 
       E.g.
-         MOPlot 
+         MOPLOT 
             (options)
-         MOPlot_END
+         MOPLOT_END
 
       -options
        "mo", "grid_number", "frame_length", and "file_prefix" are prepared.
@@ -239,6 +239,75 @@ HOW TO WRITE INPUT:
             max_dim 100
             norm_tol 0.000001
          CIS_END
+
+   <Hole Plot>
+      Write hole plot directive for the output of the density of the hole.
+      Note that this hole plot is valid only when CIS is required.
+
+      E.g.
+         HOlEPLOT
+            (options)
+         HOLEPLOT_END
+
+      -options
+       "hole", "grid_number", "frame_length", and "file_prefix" are prepared.
+
+       "hole" is index of the molcular orbital. hole=0 means the ground state.
+       hole=1 means, then, first excited state.
+       The default value of the "hole" is not set.
+
+       "grid_number" is the grid number of the frame in xyz-coordinates.
+       The default values are 25, 25, and 25 for x, y, and z coordinates, respectively.
+
+       "frame_length" is the length of the frame of each coordinate.
+       The default values are 10, 10, and 10[angst.] for x, y, and z coordinates.
+
+       "file_prefix" is a prefix of the file name to which the density of the hole is written.
+       The default values is "hole_".
+
+      E.g.
+         HOLEPLOT
+            hole 5
+            hole 8
+            grid_number 30 30 30
+            frame_length 10 10 10
+            file_prefix HOLEPlot_
+         HOLEPLOT_END
+
+   <Particle Plot>
+      Write particle plot directive for the output of the density of i
+      the particle which lives avobe Fermi's see.
+      Note that this plot is valid only when CIS is required.
+
+      E.g.
+         PARTICLEPLOT
+            (options)
+         PARTICLEPLOT_END
+
+      -options
+       "particle", "grid_number", "frame_length", and "file_prefix" are prepared.
+
+       "particle" is index of the molcular orbital. particle=0 means the ground state.
+       particle=1 means, then, first excited state.
+       The default value of the "particle" is not set.
+
+       "grid_number" is the grid number of the frame in xyz-coordinates.
+       The default values are 25, 25, and 25 for x, y, and z coordinates, respectively.
+
+       "frame_length" is the length of the frame of each coordinate.
+       The default values are 10, 10, and 10[angst.] for x, y, and z coordinates.
+
+       "file_prefix" is a prefix of the file name to which the density of the particle is written.
+       The default values is "particle_".
+
+      E.g.
+         HOLEPLOT
+            hole 5
+            hole 8
+            grid_number 30 30 30
+            frame_length 10 10 10
+            file_prefix HOLEPlot_
+         HOLEPLOT_END
 
    <OPT (geometry optimization)>
       Write OPT-directive. This module uses line search and steepest descent algorythms.
