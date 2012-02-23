@@ -834,6 +834,13 @@ void ZindoS::OutputCISResults() const{
       this->OutputLog("\n");
    }
    this->OutputLog("\n");
+
+   // output Hole density
+   if(Parameters::GetInstance()->RequiresHolePlot()){
+      HoleLogger* holeLogger = new HoleLogger(*this->molecule, this->fockMatrix, this->matrixCIS, this->theory);
+      holeLogger->DrawHoleDensity(*(Parameters::GetInstance()->GetElecIndecesHolePlot()));
+      delete holeLogger;
+   }
 }
 
 void ZindoS::SortCISEigenVectorCoefficients(vector<CISEigenVectorCoefficient>* cisEigenVectorCoefficients,
