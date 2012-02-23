@@ -18,6 +18,7 @@
 //************************************************************************//
 #include<stdio.h>
 #include<stdlib.h>
+#include<iostream>
 #include<vector>
 #include<stdexcept>
 #include<boost/shared_ptr.hpp>
