@@ -45,6 +45,7 @@
 #include"../base/atoms/Satom.h"
 #include"../base/Molecule.h"
 #include"../base/ElectronicStructure.h"
+#include"../base/HoleLogger.h"
 #include"../cndo/Cndo2.h"
 #include"ZindoS.h"
 using namespace std;

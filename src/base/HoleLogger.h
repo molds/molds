@@ -29,17 +29,28 @@ public:
    void DrawHoleDensity(int elecStateIndex);
    void DrawHoleDensity(std::vector<int> elecStateIndeces);
 private:
-   std::string stringCubeExtension;
+   std::string errorMessageCISMatrixNULL;
+   std::string errorMessageFockMatrixNULL;
    std::string messageCubeHeaderComment1;
    std::string messageCubeHeaderComment2;
    std::string messageStartHoleDensityPlot;
    std::string messageEndHoleDensityPlot;
    std::string messageSkippedElecStateIndex;
+   std::string stringCubeExtension;
    HoleLogger();
    MolDS_base::Molecule const* molecule;
    double const* const* fockMatrix;
    double const* const* cisMatrix;
    MolDS_base::TheoryType theory;
+   void MatricesNullCheck() const;
+   void OutputHeaderToFile(std::ofstream& ofs, 
+                           double const* origin, 
+                           int const* gridNumber,
+                           double dx, 
+                           double dy,
+                           double dz) const;
+   void OutputMoleculeToFile(std::ofstream& ofs, const MolDS_base::Molecule& molecule)const ;
+   double GetMOValue(int moIndex, const MolDS_base::Molecule& molecule, double x, double y, double z) const;
    void SetMessage();
 };
 
