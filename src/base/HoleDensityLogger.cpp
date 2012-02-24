@@ -36,12 +36,12 @@
 #include"Parameters.h"
 #include"atoms/Atom.h"
 #include"Molecule.h"
-#include"HoleLogger.h"
+#include"HoleDensityLogger.h"
 using namespace std;
 using namespace MolDS_base_atoms;
 namespace MolDS_base{
 
-HoleLogger::HoleLogger(const Molecule& molecule, 
+HoleDensityLogger::HoleDensityLogger(const Molecule& molecule, 
                        double const* const* fockMatrix, 
                        double const* const* cisMatrix, 
                    TheoryType theory){
@@ -52,14 +52,14 @@ HoleLogger::HoleLogger(const Molecule& molecule,
    this->SetMessage();
 }
 
-HoleLogger::HoleLogger(){
+HoleDensityLogger::HoleDensityLogger(){
 }
 
-void HoleLogger::SetMessage(){
+void HoleDensityLogger::SetMessage(){
    this->errorMessageCISMatrixNULL
-      = "Error in base::HolePlot::DrawHoleDensity: CIS Matrix is NULL.\n";
+      = "Error in base::HolePlot::DrawDensity: CIS Matrix is NULL.\n";
    this->errorMessageFockMatrixNULL
-      = "Error in base::HolePlot::DrawHoleDensity: Fock Matrix is NULL.\n";
+      = "Error in base::HolePlot::DrawDensity: Fock Matrix is NULL.\n";
    this->messageCubeHeaderComment1 = "MolDS cube file (in atomic units) for Hole density.\n";
    this->messageCubeHeaderComment2 = "outer loop:x, middle loop:y, inner loop:z\n";
    this->messageStartHoleDensityPlot = "\t== START: Hole density plot ==\n";
@@ -68,13 +68,13 @@ void HoleLogger::SetMessage(){
    this->stringCubeExtension = ".cube";
 }
 
-void HoleLogger::DrawHoleDensity(int elecStateIndex){
+void HoleDensityLogger::DrawDensity(int elecStateIndex){
    vector<int> elecStateIndeces;
    elecStateIndeces.push_back(elecStateIndex);
-   this->DrawHoleDensity(elecStateIndeces);
+   this->DrawDensity(elecStateIndeces);
 }
 
-void HoleLogger::DrawHoleDensity(vector<int> elecStateIndeces){
+void HoleDensityLogger::DrawDensity(vector<int> elecStateIndeces){
    this->MatricesNullCheck();
    this->OutputLog(this->messageStartHoleDensityPlot);
    Parameters* parameters = Parameters::GetInstance();
@@ -130,9 +130,9 @@ void HoleLogger::DrawHoleDensity(vector<int> elecStateIndeces){
             for(int iz=0; iz<gridNumber[ZAxis]; iz++){
                double z = origin[ZAxis] + dz*(double)iz;
 
-               double holeDensity = 0.0;
+               double density = 0.0;
                stringstream ompErrors;
-               #pragma omp parallel for schedule(auto) reduction(+:holeDensity)
+               #pragma omp parallel for schedule(auto) reduction(+:density)
                for(int i=0; i<numberActiveOcc; i++){
                   try{
                      int moI = numberActiveOcc - (i+1);
@@ -143,8 +143,8 @@ void HoleLogger::DrawHoleDensity(vector<int> elecStateIndeces){
                            int slaterDeterminatIndexJA = j*numberActiveVir + a;
                            double moIValue = this->GetMOValue(moI, *this->molecule, x, y, z);
                            double moJValue = this->GetMOValue(moJ, *this->molecule, x, y, z);
-                           holeDensity += moIValue*this->cisMatrix[excitedState][slaterDeterminatIndexIA]
-                                         *moJValue*this->cisMatrix[excitedState][slaterDeterminatIndexJA];
+                           density += moIValue*this->cisMatrix[excitedState][slaterDeterminatIndexIA]
+                                     *moJValue*this->cisMatrix[excitedState][slaterDeterminatIndexJA];
                         }
                      }
                   }
@@ -159,7 +159,7 @@ void HoleLogger::DrawHoleDensity(vector<int> elecStateIndeces){
                }
 
                memset(data,0,sizeof(data));
-               sprintf(data,"\t%e",holeDensity);
+               sprintf(data,"\t%e",density);
                ofs << string(data);
                lineBreakCounter++;
                if(lineBreakCounter%6==0){
@@ -173,7 +173,7 @@ void HoleLogger::DrawHoleDensity(vector<int> elecStateIndeces){
    this->OutputLog(this->messageEndHoleDensityPlot);
 }
 
-double HoleLogger::GetMOValue(int moIndex, const MolDS_base::Molecule& molecule, double x, double y, double z) const{
+double HoleDensityLogger::GetMOValue(int moIndex, const MolDS_base::Molecule& molecule, double x, double y, double z) const{
    double moValue = 0.0;
    for(int a=0; a<this->molecule->GetNumberAtoms(); a++){
       Atom* atomA = this->molecule->GetAtom(a);
@@ -191,7 +191,7 @@ double HoleLogger::GetMOValue(int moIndex, const MolDS_base::Molecule& molecule,
    return moValue;
 }
 
-void HoleLogger::OutputHeaderToFile(ofstream& ofs, double const* origin, int const* gridNumber, double dx, double dy, double dz) const{
+void HoleDensityLogger::OutputHeaderToFile(ofstream& ofs, double const* origin, int const* gridNumber, double dx, double dy, double dz) const{
    char data[1000] = "";
    // output header to the cube file
    ofs << this->messageCubeHeaderComment1;
@@ -212,7 +212,7 @@ void HoleLogger::OutputHeaderToFile(ofstream& ofs, double const* origin, int con
    ofs << string(data);
 }
 
-void HoleLogger::OutputMoleculeToFile(ofstream& ofs, const Molecule& molecule) const{
+void HoleDensityLogger::OutputMoleculeToFile(ofstream& ofs, const Molecule& molecule) const{
    char data[1000] = "";
    // output molecule to the cube file
    for(int a=0; a<molecule.GetNumberAtoms(); a++){
@@ -227,7 +227,7 @@ void HoleLogger::OutputMoleculeToFile(ofstream& ofs, const Molecule& molecule) c
    }
 }
 
-void HoleLogger::MatricesNullCheck() const{
+void HoleDensityLogger::MatricesNullCheck() const{
    // NULL check
    if(this->cisMatrix == NULL){
       stringstream ss;

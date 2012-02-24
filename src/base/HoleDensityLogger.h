@@ -16,18 +16,18 @@
 // You should have received a copy of the GNU General Public License      // 
 // along with MolDS.  If not, see <http://www.gnu.org/licenses/>.         // 
 //************************************************************************//
-#ifndef INCLUDED_HOLELOGGER
-#define INCLUDED_HOLELOGGER
+#ifndef INCLUDED_HOLE_DENSITY_LOGGER
+#define INCLUDED_HOLE_DENSITY_LOGGER
 namespace MolDS_base{
 
-class HoleLogger: public PrintController{
+class HoleDensityLogger: public PrintController{
 public:
-   HoleLogger(const MolDS_base::Molecule& molecule, 
-              double const* const* fockMatrix, 
-              double const* const* cisMatrix, 
-              MolDS_base::TheoryType theory);
-   void DrawHoleDensity(int elecStateIndex);
-   void DrawHoleDensity(std::vector<int> elecStateIndeces);
+   HoleDensityLogger(const MolDS_base::Molecule& molecule, 
+                     double const* const* fockMatrix, 
+                     double const* const* cisMatrix, 
+                     MolDS_base::TheoryType theory);
+   void DrawDensity(int elecStateIndex);
+   void DrawDensity(std::vector<int> elecStateIndeces);
 private:
    std::string errorMessageCISMatrixNULL;
    std::string errorMessageFockMatrixNULL;
@@ -37,7 +37,7 @@ private:
    std::string messageEndHoleDensityPlot;
    std::string messageSkippedElecStateIndex;
    std::string stringCubeExtension;
-   HoleLogger();
+   HoleDensityLogger();
    MolDS_base::Molecule const* molecule;
    double const* const* fockMatrix;
    double const* const* cisMatrix;
