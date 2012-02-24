@@ -45,7 +45,7 @@
 #include"../base/atoms/Satom.h"
 #include"../base/Molecule.h"
 #include"../base/ElectronicStructure.h"
-#include"../base/HoleDensityLogger.h"
+#include"../base/loggers/HoleDensityLogger.h"
 #include"../cndo/Cndo2.h"
 #include"ZindoS.h"
 using namespace std;
@@ -837,10 +837,11 @@ void ZindoS::OutputCISResults() const{
 
    // output Hole density
    if(Parameters::GetInstance()->RequiresHolePlot()){
-      HoleDensityLogger* holeDensityLogger = new HoleDensityLogger(*this->molecule, 
-                                                            this->fockMatrix, 
-                                                            this->matrixCIS, 
-                                                            this->theory);
+      MolDS_base_loggers::HoleDensityLogger* holeDensityLogger = new MolDS_base_loggers::HoleDensityLogger(
+                                                                                         *this->molecule, 
+                                                                                         this->fockMatrix, 
+                                                                                         this->matrixCIS, 
+                                                                                         this->theory);
       holeDensityLogger->DrawDensity(*(Parameters::GetInstance()->GetElecIndecesHolePlot()));
       delete holeDensityLogger;
    }

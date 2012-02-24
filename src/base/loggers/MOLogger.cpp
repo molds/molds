@@ -27,19 +27,20 @@
 #include<vector>
 #include<stdexcept>
 #include<boost/format.hpp>
-#include"PrintController.h"
-#include"MolDSException.h"
-#include"Uncopyable.h"
-#include"Utilities.h"
-#include"Enums.h"
-#include"EularAngle.h"
-#include"Parameters.h"
-#include"atoms/Atom.h"
-#include"Molecule.h"
+#include"../PrintController.h"
+#include"../MolDSException.h"
+#include"../Uncopyable.h"
+#include"../Utilities.h"
+#include"../Enums.h"
+#include"../EularAngle.h"
+#include"../Parameters.h"
+#include"../atoms/Atom.h"
+#include"../Molecule.h"
 #include"MOLogger.h"
 using namespace std;
+using namespace MolDS_base;
 using namespace MolDS_base_atoms;
-namespace MolDS_base{
+namespace MolDS_base_loggers{
 
 MOLogger::MOLogger(const Molecule& molecule, 
                    double const* const* fockMatrix, 

@@ -45,7 +45,7 @@
 #include"../base/Molecule.h"
 #include"../base/GTOExpansionSTO.h"
 #include"../base/RealSphericalHarmonicsIndex.h"
-#include"../base/MOLogger.h"
+#include"../base/loggers/MOLogger.h"
 #include"../base/ElectronicStructure.h"
 #include"Cndo2.h"
 using namespace std;
@@ -733,7 +733,9 @@ void Cndo2::OutputSCFResults() const{
 
    // output MOs
    if(Parameters::GetInstance()->RequiresMOPlot()){
-      MOLogger* moLogger = new MOLogger(*this->molecule, this->fockMatrix, this->theory);
+      MolDS_base_loggers::MOLogger* moLogger = new MolDS_base_loggers::MOLogger(*this->molecule, 
+                                                                                this->fockMatrix, 
+                                                                                this->theory);
       moLogger->DrawMO(*(Parameters::GetInstance()->GetIndecesMOPlot()));
       delete moLogger;
    }
