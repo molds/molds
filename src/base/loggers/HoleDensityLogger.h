@@ -26,16 +26,18 @@ public:
                      double const* const* fockMatrix, 
                      double const* const* cisMatrix, 
                      MolDS_base::TheoryType theory);
-   void DrawDensity(int elecStateIndex);
-   void DrawDensity(std::vector<int> elecStateIndeces);
+   void DrawDensity(int elecStateIndex) const;
+   void DrawDensity(std::vector<int> elecStateIndeces) const;
 private:
    std::string errorMessageCISMatrixNULL;
    std::string errorMessageFockMatrixNULL;
    std::string messageCubeHeaderComment1;
    std::string messageCubeHeaderComment2;
-   std::string messageStartHoleDensityPlot;
-   std::string messageEndHoleDensityPlot;
    std::string messageSkippedElecStateIndex;
+   std::string messageStartDensityPlot;
+   std::string messageOmpElapsedTimeDensityPlot;
+   std::string messageUnitSec; 
+   std::string messageEndDensityPlot;
    std::string stringCubeExtension;
    HoleDensityLogger();
    MolDS_base::Molecule const* molecule;
@@ -43,13 +45,16 @@ private:
    double const* const* cisMatrix;
    MolDS_base::TheoryType theory;
    void MatricesNullCheck() const;
+   void CalcGridDisplacement(double* dx, double* dy, double* dz) const;
+   void CalcOrigin(double* origin) const;
+   std::string GetFileName(int elecStateIndex) const;
    void OutputHeaderToFile(std::ofstream& ofs, 
                            double const* origin, 
-                           int const* gridNumber,
                            double dx, 
                            double dy,
                            double dz) const;
    void OutputMoleculeToFile(std::ofstream& ofs, const MolDS_base::Molecule& molecule)const ;
+   double GetDensityValue(int elecStateIndex, double x, double y, double z) const;
    double GetMOValue(int moIndex, const MolDS_base::Molecule& molecule, double x, double y, double z) const;
    void SetMessage();
 };

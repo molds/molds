@@ -26,6 +26,7 @@
 #include<math.h>
 #include<vector>
 #include<stdexcept>
+#include<omp.h>
 #include<boost/format.hpp>
 #include"../PrintController.h"
 #include"../MolDSException.h"
@@ -63,115 +64,135 @@ void HoleDensityLogger::SetMessage(){
       = "Error in base::HolePlot::DrawDensity: Fock Matrix is NULL.\n";
    this->messageCubeHeaderComment1 = "MolDS cube file (in atomic units) for Hole density.\n";
    this->messageCubeHeaderComment2 = "outer loop:x, middle loop:y, inner loop:z\n";
-   this->messageStartHoleDensityPlot = "\t== START: Hole density plot ==\n";
-   this->messageEndHoleDensityPlot = "\t== DONE: Hole density plot ==\n\n";
    this->messageSkippedElecStateIndex = "\t\tBad electronic state is skipped. The skipped electronic state: ";
+   this->messageStartDensityPlot = "\t== START: Hole density plot ==\n";
+   this->messageEndDensityPlot = "\t== DONE: Hole density plot ==\n\n";
+   this->messageOmpElapsedTimeDensityPlot = "\tElapsed time(omp) for the Hole density plot = ";
+   this->messageUnitSec = "[s].";
    this->stringCubeExtension = ".cube";
 }
 
-void HoleDensityLogger::DrawDensity(int elecStateIndex){
+void HoleDensityLogger::DrawDensity(int elecStateIndex) const{
    vector<int> elecStateIndeces;
    elecStateIndeces.push_back(elecStateIndex);
    this->DrawDensity(elecStateIndeces);
 }
 
-void HoleDensityLogger::DrawDensity(vector<int> elecStateIndeces){
-   this->MatricesNullCheck();
-   this->OutputLog(this->messageStartHoleDensityPlot);
-   Parameters* parameters = Parameters::GetInstance();
-   int digit = 5;
-   int gridNumber[CartesianType_end] = {parameters->GetGridNumberHolePlot()[XAxis], 
-                                        parameters->GetGridNumberHolePlot()[YAxis],
-                                        parameters->GetGridNumberHolePlot()[ZAxis]};
-   double frameLength[CartesianType_end] = {parameters->GetFrameLengthHolePlot()[XAxis],
-                                            parameters->GetFrameLengthHolePlot()[YAxis],
-                                            parameters->GetFrameLengthHolePlot()[ZAxis]};
-   double dx = frameLength[XAxis]/(double)gridNumber[XAxis];
-   double dy = frameLength[YAxis]/(double)gridNumber[YAxis];
-   double dz = frameLength[ZAxis]/(double)gridNumber[ZAxis];
-   double origin[CartesianType_end] = {this->molecule->GetXyzCOC()[XAxis],
-                                       this->molecule->GetXyzCOC()[YAxis],
-                                       this->molecule->GetXyzCOC()[ZAxis]};
+void HoleDensityLogger::CalcOrigin(double* origin) const{
    for(int i=0; i<CartesianType_end; i++){
-      origin[i] -= 0.5*frameLength[i];
+      origin[i] = this->molecule->GetXyzCOC()[i];
+      origin[i] -= 0.5*Parameters::GetInstance()->GetFrameLengthHolePlot()[i];
    }
+}
 
-   int numberActiveOcc = parameters->GetActiveOccCIS();
-   int numberActiveVir = parameters->GetActiveVirCIS();
-   int numberExcitedStates = parameters->GetNumberExcitedStatesCIS();
+void HoleDensityLogger::DrawDensity(vector<int> elecStateIndeces) const{
+   this->MatricesNullCheck();
+   this->OutputLog(this->messageStartDensityPlot);
+   double ompStartTime = omp_get_wtime();
 
-   // file name
-   string fileNamePrefix = parameters->GetFileNamePrefixHolePlot();
-   char data[1000] = "";
+   // set frame basics
+   double dx=0.0, dy=0.0, dz=0.0;
+   double origin[CartesianType_end] = {0.0, 0.0, 0.0};
+   this->CalcGridDisplacement(&dx, &dy, &dz);
+   this->CalcOrigin(origin);
 
    // Hole density output 
-   int groundState = 0;
    for(int n=0; n<elecStateIndeces.size(); n++){
-      if(numberExcitedStates < elecStateIndeces[n] || groundState == elecStateIndeces[n]){
+      // validate electronic state
+      int groundState = 0;
+      if(Parameters::GetInstance()->GetNumberExcitedStatesCIS() < elecStateIndeces[n] || 
+         groundState == elecStateIndeces[n]){
          this->OutputLog((boost::format("%s%d\n") % this->messageSkippedElecStateIndex.c_str() 
                                                   % elecStateIndeces[n]).str()) ;
          continue;
       }
-      int excitedState = elecStateIndeces[n]-1;
 
-      // file open
-      stringstream fileName;
-      fileName << fileNamePrefix << Utilities::Num2String(elecStateIndeces[n],digit) << this->stringCubeExtension;
-      ofstream ofs(fileName.str().c_str());
+      // open the cube file
+      string fileName = this->GetFileName(elecStateIndeces[n]);
+      ofstream ofs(fileName.c_str());
 
-      this->OutputHeaderToFile(ofs, origin, gridNumber, dx, dy, dz);
+      // output feader and molecule to the cube file
+      this->OutputHeaderToFile(ofs, origin, dx, dy, dz);
       this->OutputMoleculeToFile(ofs, *this->molecule);
 
       // output grid data to the cube file
       int lineBreakCounter=0;
-      for(int ix=0; ix<gridNumber[XAxis]; ix++){
+      for(int ix=0; ix<Parameters::GetInstance()->GetGridNumberHolePlot()[XAxis]; ix++){
          double x = origin[XAxis] + dx*(double)ix;
-         for(int iy=0; iy<gridNumber[YAxis]; iy++){
+         for(int iy=0; iy<Parameters::GetInstance()->GetGridNumberHolePlot()[YAxis]; iy++){
             double y = origin[YAxis] + dy*(double)iy;
-            for(int iz=0; iz<gridNumber[ZAxis]; iz++){
+            for(int iz=0; iz<Parameters::GetInstance()->GetGridNumberHolePlot()[ZAxis]; iz++){
                double z = origin[ZAxis] + dz*(double)iz;
 
-               double density = 0.0;
-               stringstream ompErrors;
-               #pragma omp parallel for schedule(auto) reduction(+:density)
-               for(int i=0; i<numberActiveOcc; i++){
-                  try{
-                     int moI = numberActiveOcc - (i+1);
-                     for(int j=0; j<numberActiveOcc; j++){
-                        int moJ = numberActiveOcc - (j+1);
-                        for(int a=0; a<numberActiveVir; a++){
-                           int slaterDeterminatIndexIA = i*numberActiveVir + a;
-                           int slaterDeterminatIndexJA = j*numberActiveVir + a;
-                           double moIValue = this->GetMOValue(moI, *this->molecule, x, y, z);
-                           double moJValue = this->GetMOValue(moJ, *this->molecule, x, y, z);
-                           density += moIValue*this->cisMatrix[excitedState][slaterDeterminatIndexIA]
-                                     *moJValue*this->cisMatrix[excitedState][slaterDeterminatIndexJA];
-                        }
-                     }
-                  }
-                  catch(MolDSException ex){
-                     #pragma omp critical
-                     ompErrors << ex.what() << endl ;
-                  }  
-               }
-               // Exception throwing for omp-region
-               if(!ompErrors.str().empty()){
-                  throw MolDSException(ompErrors.str());
-               }
-
-               memset(data,0,sizeof(data));
-               sprintf(data,"\t%e",density);
-               ofs << string(data);
+               double density = this->GetDensityValue(elecStateIndeces[n], x, y, z);
+               ofs << (boost::format("\t%e") % density ).str();
                lineBreakCounter++;
                if(lineBreakCounter%6==0){
                   ofs << endl;
                   lineBreakCounter=0;
                }
+
             }
          }
       }
    }
-   this->OutputLog(this->messageEndHoleDensityPlot);
+   double ompEndTime = omp_get_wtime();
+   this->OutputLog((boost::format("%s%lf%s\n%s") % this->messageOmpElapsedTimeDensityPlot.c_str()
+                                                 % (ompEndTime - ompStartTime)
+                                                 % this->messageUnitSec.c_str()
+                                                 % this->messageEndDensityPlot.c_str()).str());
+}
+
+double HoleDensityLogger::GetDensityValue(int elecStateIndex, double x, double y, double z)  const{
+   double density = 0.0;
+   int excitedState = elecStateIndex-1;
+   int numberActiveOcc = Parameters::GetInstance()->GetActiveOccCIS();
+   int numberActiveVir = Parameters::GetInstance()->GetActiveVirCIS();
+   stringstream ompErrors;
+   #pragma omp parallel for schedule(auto) reduction(+:density)
+   for(int i=0; i<numberActiveOcc; i++){
+      try{
+         int moI = numberActiveOcc - (i+1);
+         for(int j=0; j<numberActiveOcc; j++){
+            int moJ = numberActiveOcc - (j+1);
+            for(int a=0; a<numberActiveVir; a++){
+               int slaterDeterminatIndexIA = i*numberActiveVir + a;
+               int slaterDeterminatIndexJA = j*numberActiveVir + a;
+               double moIValue = this->GetMOValue(moI, *this->molecule, x, y, z);
+               double moJValue = this->GetMOValue(moJ, *this->molecule, x, y, z);
+               density += moIValue*this->cisMatrix[excitedState][slaterDeterminatIndexIA]
+                         *moJValue*this->cisMatrix[excitedState][slaterDeterminatIndexJA];
+            }
+         }
+      }
+      catch(MolDSException ex){
+         #pragma omp critical
+         ompErrors << ex.what() << endl ;
+      }  
+   }
+   // Exception throwing for omp-region
+   if(!ompErrors.str().empty()){
+      throw MolDSException(ompErrors.str());
+   }
+   return density;
+}
+
+string HoleDensityLogger::GetFileName(int elecStateIndex) const{
+   int digit = 5;
+   stringstream fileName;
+   fileName << Parameters::GetInstance()->GetFileNamePrefixHolePlot();
+   fileName << Utilities::Num2String(elecStateIndex,digit);
+   fileName << this->stringCubeExtension;
+   return fileName.str();
+}
+
+void HoleDensityLogger::CalcGridDisplacement(double* dx, double* dy, double* dz) const{
+   *dx = Parameters::GetInstance()->GetFrameLengthHolePlot()[XAxis]
+        /(double)Parameters::GetInstance()->GetGridNumberHolePlot()[XAxis];
+   *dy = Parameters::GetInstance()->GetFrameLengthHolePlot()[YAxis]
+        /(double)Parameters::GetInstance()->GetGridNumberHolePlot()[YAxis];
+   *dz = Parameters::GetInstance()->GetFrameLengthHolePlot()[ZAxis]
+        /(double)Parameters::GetInstance()->GetGridNumberHolePlot()[ZAxis];
 }
 
 double HoleDensityLogger::GetMOValue(int moIndex, const MolDS_base::Molecule& molecule, double x, double y, double z) const{
@@ -192,7 +213,10 @@ double HoleDensityLogger::GetMOValue(int moIndex, const MolDS_base::Molecule& mo
    return moValue;
 }
 
-void HoleDensityLogger::OutputHeaderToFile(ofstream& ofs, double const* origin, int const* gridNumber, double dx, double dy, double dz) const{
+void HoleDensityLogger::OutputHeaderToFile(ofstream& ofs, double const* origin, double dx, double dy, double dz) const{
+   int gridNumber[CartesianType_end] = {Parameters::GetInstance()->GetGridNumberHolePlot()[XAxis], 
+                                        Parameters::GetInstance()->GetGridNumberHolePlot()[YAxis],
+                                        Parameters::GetInstance()->GetGridNumberHolePlot()[ZAxis]};
    char data[1000] = "";
    // output header to the cube file
    ofs << this->messageCubeHeaderComment1;
@@ -241,6 +265,5 @@ void HoleDensityLogger::MatricesNullCheck() const{
       throw MolDSException(ss.str());
    }
 }
-
 
 }
