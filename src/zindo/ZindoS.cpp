@@ -45,7 +45,9 @@
 #include"../base/atoms/Satom.h"
 #include"../base/Molecule.h"
 #include"../base/ElectronicStructure.h"
+#include"../base/loggers/DensityLogger.h"
 #include"../base/loggers/HoleDensityLogger.h"
+#include"../base/loggers/ParticleDensityLogger.h"
 #include"../cndo/Cndo2.h"
 #include"ZindoS.h"
 using namespace std;
@@ -837,13 +839,23 @@ void ZindoS::OutputCISResults() const{
 
    // output Hole density
    if(Parameters::GetInstance()->RequiresHolePlot()){
-      MolDS_base_loggers::HoleDensityLogger* holeDensityLogger = new MolDS_base_loggers::HoleDensityLogger(
+      MolDS_base_loggers::DensityLogger* holeDensityLogger = new MolDS_base_loggers::HoleDensityLogger(
+                                                                                     *this->molecule, 
+                                                                                     this->fockMatrix, 
+                                                                                     this->matrixCIS, 
+                                                                                     this->theory);
+      holeDensityLogger->DrawDensity(*(Parameters::GetInstance()->GetElecIndecesHolePlot()));
+      delete holeDensityLogger;
+   }
+   // output particle density
+   if(Parameters::GetInstance()->RequiresParticlePlot()){
+      MolDS_base_loggers::DensityLogger* particleDensityLogger = new MolDS_base_loggers::ParticleDensityLogger(
                                                                                          *this->molecule, 
                                                                                          this->fockMatrix, 
                                                                                          this->matrixCIS, 
                                                                                          this->theory);
-      holeDensityLogger->DrawDensity(*(Parameters::GetInstance()->GetElecIndecesHolePlot()));
-      delete holeDensityLogger;
+      particleDensityLogger->DrawDensity(*(Parameters::GetInstance()->GetElecIndecesParticlePlot()));
+      delete particleDensityLogger;
    }
 }
 

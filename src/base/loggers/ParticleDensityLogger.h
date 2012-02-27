@@ -16,17 +16,17 @@
 // You should have received a copy of the GNU General Public License      // 
 // along with MolDS.  If not, see <http://www.gnu.org/licenses/>.         // 
 //************************************************************************//
-#ifndef INCLUDED_HOLE_DENSITY_LOGGER
-#define INCLUDED_HOLE_DENSITY_LOGGER
+#ifndef INCLUDED_PARTICLE_DENSITY_LOGGER
+#define INCLUDED_PARTICLE_DENSITY_LOGGER
 namespace MolDS_base_loggers{
 
-class HoleDensityLogger: public DensityLogger{
+class ParticleDensityLogger: public DensityLogger{
 public:
-   HoleDensityLogger(const MolDS_base::Molecule& molecule, 
-                     double const* const* fockMatrix, 
-                     double const* const* cisMatrix, 
-                     MolDS_base::TheoryType theory);
-   ~HoleDensityLogger();
+   ParticleDensityLogger(const MolDS_base::Molecule& molecule, 
+                         double const* const* fockMatrix, 
+                         double const* const* cisMatrix, 
+                         MolDS_base::TheoryType theory);
+   ~ParticleDensityLogger();
 protected:
    void SetMessages();
    double GetDensityValue(int elecStateIndex, 
@@ -37,7 +37,7 @@ protected:
                           double z) const;
    std::string GetFileName(int elecStateIndex, int digit) const;
 private:
-   HoleDensityLogger();
+   ParticleDensityLogger();
 };
 
 }
