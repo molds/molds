@@ -108,7 +108,7 @@ void MD::DoMD(){
       // update coordinates
       for(int a=0; a<this->molecule->GetNumberAtoms(); a++){
          Atom* atom = this->molecule->GetAtom(a);
-         double coreMass = atom->GetAtomicMass() - (double)atom->GetNumberValenceElectrons();
+         double coreMass = atom->GetAtomicMass() - static_cast<double>(atom->GetNumberValenceElectrons());
          for(int i=0; i<CartesianType_end; i++){
             atom->GetXyz()[i] += dt*atom->GetPxyz()[i]/coreMass;
          }
