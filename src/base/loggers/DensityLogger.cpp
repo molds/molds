@@ -143,11 +143,11 @@ void DensityLogger::DrawDensity(vector<int> elecStateIndeces) const{
 
 void DensityLogger::CalcGridDisplacement(double* dx, double* dy, double* dz) const{
    *dx = Parameters::GetInstance()->GetFrameLengthHolePlot()[XAxis]
-        /(double)Parameters::GetInstance()->GetGridNumberHolePlot()[XAxis];
+        /static_cast<double>(Parameters::GetInstance()->GetGridNumberHolePlot()[XAxis]);
    *dy = Parameters::GetInstance()->GetFrameLengthHolePlot()[YAxis]
-        /(double)Parameters::GetInstance()->GetGridNumberHolePlot()[YAxis];
+        /static_cast<double>(Parameters::GetInstance()->GetGridNumberHolePlot()[YAxis]);
    *dz = Parameters::GetInstance()->GetFrameLengthHolePlot()[ZAxis]
-        /(double)Parameters::GetInstance()->GetGridNumberHolePlot()[ZAxis];
+        /static_cast<double>(Parameters::GetInstance()->GetGridNumberHolePlot()[ZAxis]);
 }
 
 double DensityLogger::GetMOValue(int moIndex, const MolDS_base::Molecule& molecule, double x, double y, double z) const{
@@ -176,7 +176,7 @@ void DensityLogger::OutputHeaderToFile(ofstream& ofs, double const* origin, doub
    // output header to the cube file
    ofs << this->messageCubeHeaderComment1;
    ofs << this->messageCubeHeaderComment2;
-   sprintf(data,"\t%d\t%e\t%e\t%e\n", (int)this->molecule->GetNumberAtoms(),
+   sprintf(data,"\t%d\t%e\t%e\t%e\n", this->molecule->GetNumberAtoms(),
                                       origin[XAxis], 
                                       origin[YAxis], 
                                       origin[ZAxis]);

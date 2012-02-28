@@ -79,9 +79,9 @@ void MOLogger::DrawMO(vector<int> moIndeces){
    double frameLength[CartesianType_end] = {parameters->GetFrameLengthMOPlot()[XAxis],
                                             parameters->GetFrameLengthMOPlot()[YAxis],
                                             parameters->GetFrameLengthMOPlot()[ZAxis]};
-   double dx = frameLength[XAxis]/(double)gridNumber[XAxis];
-   double dy = frameLength[YAxis]/(double)gridNumber[YAxis];
-   double dz = frameLength[ZAxis]/(double)gridNumber[ZAxis];
+   double dx = frameLength[XAxis]/static_cast<double>(gridNumber[XAxis]);
+   double dy = frameLength[YAxis]/static_cast<double>(gridNumber[YAxis]);
+   double dz = frameLength[ZAxis]/static_cast<double>(gridNumber[ZAxis]);
    double origin[CartesianType_end] = {this->molecule->GetXyzCOC()[XAxis],
                                        this->molecule->GetXyzCOC()[YAxis],
                                        this->molecule->GetXyzCOC()[ZAxis]};
@@ -107,7 +107,7 @@ void MOLogger::DrawMO(vector<int> moIndeces){
       // output cube file
       ofs << this->messageCubeHeaderComment1;
       ofs << this->messageCubeHeaderComment2;
-      sprintf(data,"\t%d\t%e\t%e\t%e\n", (int)this->molecule->GetNumberAtoms(),
+      sprintf(data,"\t%d\t%e\t%e\t%e\n", this->molecule->GetNumberAtoms(),
                                          origin[XAxis], 
                                          origin[YAxis], 
                                          origin[ZAxis]);
@@ -134,11 +134,11 @@ void MOLogger::DrawMO(vector<int> moIndeces){
       }
       int lineBreakCounter=0;
       for(int ix=0; ix<gridNumber[XAxis]; ix++){
-         double x = origin[XAxis] + dx*(double)ix;
+         double x = origin[XAxis] + dx*static_cast<double>(ix);
          for(int iy=0; iy<gridNumber[YAxis]; iy++){
-            double y = origin[YAxis] + dy*(double)iy;
+            double y = origin[YAxis] + dy*static_cast<double>(iy);
             for(int iz=0; iz<gridNumber[ZAxis]; iz++){
-               double z = origin[ZAxis] + dz*(double)iz;
+               double z = origin[ZAxis] + dz*static_cast<double>(iz);
 
                double moValue = 0.0;
                for(int a=0; a<this->molecule->GetNumberAtoms(); a++){
