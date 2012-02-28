@@ -99,9 +99,9 @@ void RPMD::UpdateMomenta(const vector<boost::shared_ptr<Molecule> >& molecularBe
          Atom* atom = molecularBeads[b]->GetAtom(a);
          Atom* preAtom = molecularBeads[preB]->GetAtom(a);
          Atom* postAtom = molecularBeads[postB]->GetAtom(a);
-         double coreMass = atom->GetAtomicMass() - (double)atom->GetNumberValenceElectrons();
+         double coreMass = atom->GetAtomicMass() - static_cast<double>(atom->GetNumberValenceElectrons());
          for(int i=0; i<CartesianType_end; i++){
-            double beadsForce = -1.0*coreMass*pow(kB*temperature*(double)numBeads,2.0)
+            double beadsForce = -1.0*coreMass*pow(kB*temperature*static_cast<double>(numBeads),2.0)
                                *(2.0*atom->GetXyz()[i] - preAtom->GetXyz()[i] - postAtom->GetXyz()[i]);
             double force = beadsForce + electronicForceMatrix[a][i];
             atom->GetPxyz()[i] += 0.5*dt*(force);
@@ -117,7 +117,7 @@ void RPMD::UpdateCoordinates(const vector<boost::shared_ptr<Molecule> >& molecul
    for(int b=0; b<numBeads; b++){
       for(int a=0; a<numAtom; a++){
          Atom* atom = molecularBeads[b]->GetAtom(a);
-         double coreMass = atom->GetAtomicMass() - (double)atom->GetNumberValenceElectrons();
+         double coreMass = atom->GetAtomicMass() - static_cast<double>(atom->GetNumberValenceElectrons());
          for(int i=0; i<CartesianType_end; i++){
             atom->GetXyz()[i] += dt*atom->GetPxyz()[i]/coreMass;
          }
@@ -240,7 +240,7 @@ double RPMD::OutputEnergies(const vector<boost::shared_ptr<Molecule> >& molecula
       double coreKineticEnergy = 0.0;
       for(int a=0; a<numAtom; a++){
          Atom* atom = molecularBeads[b]->GetAtom(a);
-         double coreMass = atom->GetAtomicMass() - (double)atom->GetNumberValenceElectrons();
+         double coreMass = atom->GetAtomicMass() - static_cast<double>(atom->GetNumberValenceElectrons());
          for(int i=0; i<CartesianType_end; i++){
             coreKineticEnergy += 0.5*pow(atom->GetPxyz()[i],2.0)/coreMass;
          }
@@ -256,13 +256,13 @@ double RPMD::OutputEnergies(const vector<boost::shared_ptr<Molecule> >& molecula
       for(int a=0; a<numAtom; a++){
          Atom* atom = molecularBeads[b]->GetAtom(a);
          Atom* preAtom = molecularBeads[preB]->GetAtom(a);
-         double coreMass = atom->GetAtomicMass() - (double)atom->GetNumberValenceElectrons();
+         double coreMass = atom->GetAtomicMass() - static_cast<double>(atom->GetNumberValenceElectrons());
          double dx = atom->GetXyz()[XAxis] - preAtom->GetXyz()[XAxis];
          double dy = atom->GetXyz()[YAxis] - preAtom->GetXyz()[YAxis];
          double dz = atom->GetXyz()[ZAxis] - preAtom->GetXyz()[ZAxis];
          harmonicEnergy += coreMass*(pow(dx,2.0)+pow(dy,2.0)+pow(dz,2.0));
       }
-      harmonicEnergy *= 0.5*pow(kB*temperature*(double)numBeads,2.0);
+      harmonicEnergy *= 0.5*pow(kB*temperature*static_cast<double>(numBeads),2.0);
       beadsHarmonicEnergy += harmonicEnergy;
    }
 
