@@ -138,7 +138,7 @@ void MC::DoMC(int totalSteps, int elecState, double temperature, double stepWidt
       this->OutputMolecule(*currentES, *this->molecule, elecState);
       this->OutputLog((boost::format("%s%d\n\n") % this->messageEndStepMC.c_str() % (s+1) ).str());
    }
-   this->OutputLog((boost::format("%s%lf\n\n") % this->messageTransitionRate.c_str() % (transitionRate/(double)totalSteps) ).str());
+   this->OutputLog((boost::format("%s%lf\n\n") % this->messageTransitionRate.c_str() % (transitionRate/static_cast<double>(totalSteps)) ).str());
    this->OutputLog(this->messageEndMC);
 }
 
