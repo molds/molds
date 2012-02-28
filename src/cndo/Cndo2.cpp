@@ -2264,7 +2264,7 @@ void Cndo2::CalcDiatomicOverlapFirstDerivativeInDiatomicFrame(double** diatomicO
                                                   alpha, 
                                                   beta);
 
-            temp1 = ((double)(na+nb+1))*pow(R,na+nb)*reducedOverlap;
+            temp1 = static_cast<double>(na+nb+1)*pow(R,na+nb)*reducedOverlap;
             temp2 = pow(R,na+nb+1)*(orbitalExponentA*reducedOverlapFirstDerivAlpha
                                    +orbitalExponentB*reducedOverlapFirstDerivBeta);
 
@@ -2461,9 +2461,9 @@ double Cndo2::GetAuxiliaryA(int k, double rho) const{
    double value = 0.0;
    double temp = 0.0;
 
-   value = exp(-1.0*rho)*(double)Factorial(k);
+   value = exp(-1.0*rho)*static_cast<double>(Factorial(k));
    for(int mu=1; mu<=k+1; mu++){
-      temp += pow(rho,-1.0*mu)/(double)Factorial(k-mu+1);
+      temp += pow(rho,-1.0*mu)/static_cast<double>(Factorial(k-mu+1));
    }
    value *= temp;
 
@@ -2488,14 +2488,14 @@ double Cndo2::GetAuxiliaryB(int k, double rho) const{
       pre2 = -1.0*exp(rho);
       
       for(int mu=1; mu<=k+1; mu++){
-         temp1 += pow(rho,-1.0*mu)  *(double)(Factorial(k)/Factorial(k-mu+1)) ;
-         temp2 += pow(rho,-1.0*mu)  *(double)(Factorial(k)/Factorial(k-mu+1)) *pow(-1.0,k-mu);
+         temp1 += pow(rho,-1.0*mu)  *static_cast<double>(Factorial(k)/Factorial(k-mu+1)) ;
+         temp2 += pow(rho,-1.0*mu)  *static_cast<double>(Factorial(k)/Factorial(k-mu+1)) *pow(-1.0,k-mu);
       }
       value = pre1*temp1 + pre2*temp2;
    }
    else{
       if(k%2 == 0){
-         value = 2.0/(1.0+(double)k);
+         value = 2.0/(1.0+static_cast<double>(k));
       }
       else{
          value = 0;
