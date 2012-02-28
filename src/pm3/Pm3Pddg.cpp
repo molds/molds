@@ -121,8 +121,8 @@ double Pm3Pddg::GetDiatomCoreRepulsionEnergy(int indexAtomA, int indexAtomB) con
    double energy = Pm3::GetDiatomCoreRepulsionEnergy(indexAtomA, indexAtomB);
    const Atom& atomA = *this->molecule->GetAtom(indexAtomA);
    const Atom& atomB = *this->molecule->GetAtom(indexAtomB);
-   double na = (double)(atomA.GetNumberValenceElectrons());
-   double nb = (double)(atomB.GetNumberValenceElectrons());
+   double na = static_cast<double>(atomA.GetNumberValenceElectrons());
+   double nb = static_cast<double>(atomB.GetNumberValenceElectrons());
    double distance = this->molecule->GetDistanceAtoms(indexAtomA, indexAtomB);
    double temp = 0.0;
    for(int i=0; i<2; i++){
@@ -150,8 +150,8 @@ double Pm3Pddg::GetDiatomCoreRepulsionFirstDerivative(int atomAIndex,
    const Atom& atomB = *this->molecule->GetAtom(atomBIndex);
    double Rab = this->molecule->GetDistanceAtoms(atomAIndex, atomBIndex);
    double dRabDa = (atomA.GetXyz()[axisA] - atomB.GetXyz()[axisA])/Rab;
-   double na = (double)(atomA.GetNumberValenceElectrons());
-   double nb = (double)(atomB.GetNumberValenceElectrons());
+   double na = static_cast<double>(atomA.GetNumberValenceElectrons());
+   double nb = static_cast<double>(atomB.GetNumberValenceElectrons());
    double temp = 0.0;
    for(int i=0; i<2; i++){
       double pa = atomA.GetPm3PddgParameterPa(i);
