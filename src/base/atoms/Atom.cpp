@@ -140,7 +140,7 @@ double Atom::GetAtomicMass() const{
 }
 
 double Atom::GetCoreMass() const{
-   return this->atomicMass - (double)this->numberValenceElectrons;
+   return this->atomicMass - static_cast<double>(this->numberValenceElectrons);
 }
 
 double* Atom::GetXyz() const{
@@ -589,21 +589,21 @@ double Atom::GetZindoCoreIntegral(OrbitalType orbital) const{
 
    if(orbital == s){
       value = -1.0*this->zindoIonPotS 
-              - this->GetZindoJss()*(double)(this->zindoL-1) 
-              - this->GetZindoJsp()*(double)this->zindoM
-              - this->GetZindoJsd()*(double)this->zindoN;
+              - this->GetZindoJss()*static_cast<double>(this->zindoL-1) 
+              - this->GetZindoJsp()*static_cast<double>(this->zindoM)
+              - this->GetZindoJsd()*static_cast<double>(this->zindoN);
    }
    else if(orbital == px || orbital == py || orbital == pz){
       value = -1.0*this->zindoIonPotP
-              - this->GetZindoJpp()*(double)(this->zindoM-1) 
-              - this->GetZindoJsp()*(double)this->zindoL
-              - this->GetZindoJpd()*(double)this->zindoN;
+              - this->GetZindoJpp()*static_cast<double>(this->zindoM-1) 
+              - this->GetZindoJsp()*static_cast<double>(this->zindoL)
+              - this->GetZindoJpd()*static_cast<double>(this->zindoN);
    }
    else if(orbital == dxy || orbital == dyz || orbital == dzz || orbital == dzx || orbital == dxxyy ){
       value = -1.0*this->zindoIonPotD
-              - this->GetZindoJdd()*(double)(this->zindoN-1) 
-              - this->GetZindoJsd()*(double)this->zindoL
-              - this->GetZindoJpd()*(double)this->zindoM;
+              - this->GetZindoJdd()*static_cast<double>(this->zindoN-1) 
+              - this->GetZindoJsd()*static_cast<double>(this->zindoL)
+              - this->GetZindoJpd()*static_cast<double>(this->zindoM);
    }
    else{
       stringstream ss;
