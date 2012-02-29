@@ -150,7 +150,7 @@ void MC::CreateTrialConfiguration(Molecule* trial,
                                   > (*realRand),
                                   double stepWidth) const{
    // disturb an atom in trial molecule
-   int movedAtomIndex = (int)((*realRand)()*this->molecule->GetNumberAtoms());
+   int movedAtomIndex = static_cast<int>((*realRand)()*this->molecule->GetNumberAtoms());
    const Atom& reffAtom = *current.GetAtom(movedAtomIndex);
    Atom* trialAtom = trial->GetAtom(movedAtomIndex);
    double dr[CartesianType_end] = {0.0, 0.0, 0.0};

@@ -99,7 +99,7 @@ string Utilities::TrimString(const string str){
 
 string Utilities::Num2String(int number, int digit){
    stringstream ss;
-   int numberDigit = (int)(log10(static_cast<double>(number))) + 1;
+   int numberDigit = static_cast<int>(log10(static_cast<double>(number))) + 1;
    for(int i=0; i<digit-numberDigit; i++){
       ss << "0";
    }
