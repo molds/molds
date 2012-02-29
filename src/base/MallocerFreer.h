@@ -31,7 +31,7 @@ public:
       if(*matrix!=NULL){
          return;
       }
-      double wannaMalloc = (double)(size1*sizeof(T));
+      double wannaMalloc = static_cast<double>(size1*sizeof(T));
       this->CheckLimitHeap(wannaMalloc);
 
       *matrix = new T[size1];
@@ -50,7 +50,7 @@ public:
          return;
       }
       delete [] *matrix;
-      MallocerFreer::SubtCurrentMalloced((double)(size1*sizeof(T)));
+      MallocerFreer::SubtCurrentMalloced(static_cast<double>(size1*sizeof(T)));
       *matrix = NULL;
    }
 
@@ -59,7 +59,7 @@ public:
       if(*matrix!=NULL){
          return;
       }
-      double wannaMalloc = (double)(size1*size2*sizeof(T));
+      double wannaMalloc = static_cast<double>(size1*size2*sizeof(T));
       this->CheckLimitHeap(wannaMalloc);
 
       *matrix = new T*[size1];
@@ -92,7 +92,7 @@ public:
          delete [] (*matrix)[i];
       }
       delete [] *matrix;
-      MallocerFreer::SubtCurrentMalloced((double)(size1*size2*sizeof(T)));
+      MallocerFreer::SubtCurrentMalloced(static_cast<double>(size1*size2*sizeof(T)));
       *matrix = NULL;
    }
 
@@ -101,7 +101,7 @@ public:
       if(*matrix!=NULL){
          return;
       }
-      double wannaMalloc = (double)(size1*size2*size3*sizeof(T));
+      double wannaMalloc = static_cast<double>(size1*size2*size3*sizeof(T));
       this->CheckLimitHeap(wannaMalloc);
 
       *matrix = new T**[size1];
@@ -145,7 +145,7 @@ public:
          delete [] (*matrix)[i];
       }
       delete [] *matrix;
-      MallocerFreer::SubtCurrentMalloced((double)(size1*size2*size3*sizeof(T)));
+      MallocerFreer::SubtCurrentMalloced(static_cast<double>(size1*size2*size3*sizeof(T)));
       *matrix = NULL;
    }
 
@@ -154,7 +154,7 @@ public:
       if(*matrix!=NULL){
          return;
       }
-      double wannaMalloc = (double)(size1*size2*size3*size4*sizeof(T));
+      double wannaMalloc = static_cast<double>(size1*size2*size3*size4*sizeof(T));
       this->CheckLimitHeap(wannaMalloc);
 
       *matrix = new T***[size1];
@@ -209,7 +209,7 @@ public:
          delete [] (*matrix)[i];
       }
       delete [] *matrix;
-      MallocerFreer::SubtCurrentMalloced((double)(size1*size2*size3*size4*sizeof(T)));
+      MallocerFreer::SubtCurrentMalloced(static_cast<double>(size1*size2*size3*size4*sizeof(T)));
       *matrix = NULL;
    }
 
@@ -218,7 +218,7 @@ public:
       if(*matrix!=NULL){
          return;
       }
-      double wannaMalloc = (double)(size1*size2*size3*size4*size5*sizeof(T));
+      double wannaMalloc = static_cast<double>(size1*size2*size3*size4*size5*sizeof(T));
       this->CheckLimitHeap(wannaMalloc);
 
       *matrix = new T****[size1];
@@ -284,7 +284,7 @@ public:
          delete [] (*matrix)[i];
       }
       delete [] *matrix;
-      MallocerFreer::SubtCurrentMalloced((double)(size1*size2*size3*size4*size5*sizeof(T)));
+      MallocerFreer::SubtCurrentMalloced(static_cast<double>(size1*size2*size3*size4*size5*sizeof(T)));
       *matrix = NULL;
    }
 
@@ -293,7 +293,7 @@ public:
       if(*matrix!=NULL){
          return;
       }
-      double wannaMalloc = (double)(size1*size2*size3*size4*size5*size6*sizeof(T));
+      double wannaMalloc = static_cast<double>(size1*size2*size3*size4*size5*size6*sizeof(T));
       this->CheckLimitHeap(wannaMalloc);
 
       *matrix = new T*****[size1];
@@ -370,7 +370,7 @@ public:
          delete [] (*matrix)[i];
       }
       delete [] *matrix;
-      MallocerFreer::SubtCurrentMalloced((double)(size1*size2*size3*size4*size5*size6*sizeof(T)));
+      MallocerFreer::SubtCurrentMalloced(static_cast<double>(size1*size2*size3*size4*size5*size6*sizeof(T)));
       *matrix = NULL;
    }
 private:
