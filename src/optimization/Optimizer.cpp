@@ -133,7 +133,7 @@ void Optimizer::UpdateMolecularCoordinates(Molecule& molecule, double** matrixFo
    #pragma omp parallel for schedule(auto) 
    for(int a=0; a<molecule.GetNumberAtoms(); a++){
       const Atom* atom = molecule.GetAtom(a);
-      double coreMass = atom->GetAtomicMass() - (double)atom->GetNumberValenceElectrons();
+      double coreMass = atom->GetAtomicMass() - static_cast<double>(atom->GetNumberValenceElectrons());
       for(int i=0; i<CartesianType_end; i++){
          atom->GetXyz()[i] += dt*matrixForce[a][i]/coreMass;
       }
@@ -189,7 +189,7 @@ bool Optimizer::SatisfiesConvergenceCriterion(double** matrixForce,
          sumSqureGradient += pow(matrixForce[a][i],2.0);
       }
    }
-   sumSqureGradient /= (double)(molecule.GetNumberAtoms()*CartesianType_end);
+   sumSqureGradient /= static_cast<double>(molecule.GetNumberAtoms()*CartesianType_end);
    double rmsGradient = sqrt(sumSqureGradient);
 
    // output logs
