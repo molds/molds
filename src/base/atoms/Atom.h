@@ -225,7 +225,7 @@ private:
    std::string errorMessagePm3CoreIntegral;
    std::string errorMessagePm3PddgCoreIntegral;
    std::string errorMessageGetAtomicBasisValueBadValenceIndex;
-   std::string errorMessageGetRealAnuglarPartAOBadValence;
+   std::string errorMessageGetRealAngularPartAOBadValence;
    std::string errorMessageGetOrbitalExponentBadTheory;
    std::string errorMessageTheoryType;
    std::string errorMessageGetBondingParameterBadTheoryBadOrbital;
@@ -258,7 +258,7 @@ private:
    std::string errorMessageGetXyzCoordinatesNull;
    std::string errorMessageGetPxyzMomentaNull;
    void SetMessages();
-   double GetRealAnuglarPartAO(double theta, 
+   double GetRealAngularPartAO(double theta, 
                                double phi, 
                                MolDS_base::OrbitalType orbital) const;
    double GetRadialPartAO(double dr, 

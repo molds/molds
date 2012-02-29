@@ -75,8 +75,8 @@ void Atom::SetMessages(){
    this->errorMessageValenceIndex = "\tvalenceIndex = ";
    this->errorMessageGetAtomicBasisValueBadValenceIndex 
       = "Error in molds_atoms::Atom::GetAtomicBasisValue: Bad valenceIndex is set.\n";
-   this->errorMessageGetRealAnuglarPartAOBadValence 
-      = "Error in molds_atoms::Atom::GetRealAnuglarPartAO: Bad valence orbital is set.\n";
+   this->errorMessageGetRealAngularPartAOBadValence 
+      = "Error in molds_atoms::Atom::GetRealAngularPartAO: Bad valence orbital is set.\n";
    this->errorMessageEffectivPrincipalQuantumNumber = 
       "Error in base::Atom::GetEffectivePrincipalQuantumNumber: invalid shelltype.\n";
    this->errorMessageZindoCoreIntegral = "Error in base_atoms::Atom::GetZindoCoreINtegral: Invalid orbitalType.\n";
@@ -199,7 +199,7 @@ double Atom::GetAtomicBasisValue(double x,
    double dz = z - this->xyz[ZAxis];
    double dr = sqrt( pow(dx,2.0) + pow(dy,2.0) + pow(dz,2.0) );
    EularAngle eularAngle(dx, dy, dz);
-   double angularPart = this->GetRealAnuglarPartAO(eularAngle.GetBeta(),
+   double angularPart = this->GetRealAngularPartAO(eularAngle.GetBeta(),
                                                    eularAngle.GetAlpha(),
                                                    this->valence[valenceIndex]);
    double orbitalExponent = this->GetOrbitalExponent(this->valenceShellType,
@@ -221,7 +221,7 @@ double Atom::GetRadialPartAO(double dr,
 
 // See Table 1 in [BFB_1997] or Table 1.2 in J. A. Pople book.
 // See Table 1 in [BFB_1997] or p25 in J. A. Pople book for defenitions of theta and phi.
-double Atom::GetRealAnuglarPartAO(double theta, 
+double Atom::GetRealAngularPartAO(double theta, 
                                   double phi, 
                                   OrbitalType orbital) const{
    double value=0.0;
@@ -255,7 +255,7 @@ double Atom::GetRealAnuglarPartAO(double theta,
          break;
       default:
          stringstream ss;
-         ss << this->errorMessageGetRealAnuglarPartAOBadValence;
+         ss << this->errorMessageGetRealAngularPartAOBadValence;
          ss << this->errorMessageAtomType << AtomTypeStr(this->atomType) << endl;
          ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbital) << endl;
          throw MolDSException(ss.str());
