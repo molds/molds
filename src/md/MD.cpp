@@ -140,7 +140,7 @@ void MD::DoMD(){
       this->molecule->OutputXyzCOC();
       this->molecule->OutputMomenta();
       this->OutputLog((boost::format("%s%lf\n") % this->messageTime.c_str() 
-                                                % (dt*((double)s+1)/Parameters::GetInstance()->GetFs2AU())).str());
+                                                % (dt*static_cast<double>(s+1)/Parameters::GetInstance()->GetFs2AU())).str());
       this->OutputLog((boost::format("%s%d\n") % this->messageEndStepMD.c_str() % (s+1) ).str());
    }
 
@@ -172,7 +172,7 @@ double MD::OutputEnergies(boost::shared_ptr<ElectronicStructure> electronicStruc
    double coreKineticEnergy = 0.0;
    for(int a=0; a<this->molecule->GetNumberAtoms(); a++){
       Atom* atom = this->molecule->GetAtom(a);
-      double coreMass = atom->GetAtomicMass() - (double)atom->GetNumberValenceElectrons();
+      double coreMass = atom->GetAtomicMass() - static_cast<double>(atom->GetNumberValenceElectrons());
       for(int i=0; i<CartesianType_end; i++){
          coreKineticEnergy += 0.5*pow(atom->GetPxyz()[i],2.0)/coreMass;
       }
