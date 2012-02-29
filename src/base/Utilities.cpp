@@ -40,7 +40,7 @@ string Utilities::GetFarewellMessage(time_t startTime, clock_t startTick, double
    time_t endTime;
    time(&endTime);
    clock_t endTick = clock();
-   double consumedTime = (double)(endTick - startTick)/(double)CLOCKS_PER_SEC;
+   double consumedTime = static_cast<double>(endTick - startTick)/static_cast<double>(CLOCKS_PER_SEC);
    double ompEndTime = omp_get_wtime();
    stringstream ss;
    if(runingNormally){
@@ -99,7 +99,7 @@ string Utilities::TrimString(const string str){
 
 string Utilities::Num2String(int number, int digit){
    stringstream ss;
-   int numberDigit = (int)(log10((double)number)) + 1;
+   int numberDigit = (int)(log10(static_cast<double>(number))) + 1;
    for(int i=0; i<digit-numberDigit; i++){
       ss << "0";
    }
