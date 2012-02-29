@@ -214,7 +214,7 @@ double Atom::GetRadialPartAO(double dr,
                              double orbitalExponent, 
                              MolDS_base::ShellType shell) const{
    int principalQuantumNumber = (int)shell + 1;
-   double temp1 = pow(2.0*orbitalExponent,(double)principalQuantumNumber+0.5);
+   double temp1 = pow(2.0*orbitalExponent,static_cast<double>(principalQuantumNumber)+0.5);
    double temp2 = pow(Factorial(2*principalQuantumNumber),-0.5);
    return temp1*temp2*pow(dr,principalQuantumNumber-1)*exp(-1.0*orbitalExponent*dr);
 }
