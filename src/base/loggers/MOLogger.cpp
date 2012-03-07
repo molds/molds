@@ -48,13 +48,13 @@ MOLogger::MOLogger(const Molecule& molecule,
    this->molecule = &molecule;
    this->fockMatrix = fockMatrix;
    this->theory = theory;
-   this->SetMessage();
+   this->SetMessages();
 }
 
 MOLogger::MOLogger(){
 }
 
-void MOLogger::SetMessage(){
+void MOLogger::SetMessages(){
    this->stringCubeExtension = ".cube";
    this->messageCubeHeaderComment1 = "MolDS cube file (in atomic units).\n";
    this->messageCubeHeaderComment2 = "outer loop:x, middle loop:y, inner loop:z\n";
@@ -72,7 +72,6 @@ void MOLogger::DrawMO(int moIndex){
 void MOLogger::DrawMO(vector<int> moIndeces){
    this->OutputLog(this->messageStartMOPlot);
    Parameters* parameters = Parameters::GetInstance();
-   int digit = 5;
    int gridNumber[CartesianType_end] = {parameters->GetGridNumberMOPlot()[XAxis], 
                                         parameters->GetGridNumberMOPlot()[YAxis],
                                         parameters->GetGridNumberMOPlot()[ZAxis]};
@@ -82,56 +81,26 @@ void MOLogger::DrawMO(vector<int> moIndeces){
    double dx = frameLength[XAxis]/static_cast<double>(gridNumber[XAxis]);
    double dy = frameLength[YAxis]/static_cast<double>(gridNumber[YAxis]);
    double dz = frameLength[ZAxis]/static_cast<double>(gridNumber[ZAxis]);
-   double origin[CartesianType_end] = {this->molecule->GetXyzCOC()[XAxis],
-                                       this->molecule->GetXyzCOC()[YAxis],
-                                       this->molecule->GetXyzCOC()[ZAxis]};
-   for(int i=0; i<CartesianType_end; i++){
-      origin[i] -= 0.5*frameLength[i];
-   }
-   // file name
-   string fileNamePrefix = parameters->GetFileNamePrefixMOPlot();
-   char data[1000] = "";
+   double origin[CartesianType_end] = {0.0, 0.0, 0.0};
+   this->CalcOrigin(origin);
+
    // MO output 
    for(int i=0; i<moIndeces.size(); i++){
+      // validate mo number
       if(this->molecule->GetTotalNumberAOs() <= moIndeces[i]){
-         this->OutputLog((boost::format("%s%d\n") % this->messageSkippedMOIndex.c_str() % moIndeces[i]).str()) ;
+         this->OutputLog((boost::format("%s%d\n") % this->messageSkippedMOIndex.c_str() 
+                                                  % moIndeces[i]).str()) ;
          continue;
       }
       // file open
-      stringstream fileName;
-      fileName << fileNamePrefix;
-      fileName << Utilities::Num2String(moIndeces[i],digit);
-      fileName << this->stringCubeExtension;
-      ofstream ofs(fileName.str().c_str());
+      int digit = 5;
+      string fileName = this->GetFileName(moIndeces[i], digit);
+      ofstream ofs(fileName.c_str());
 
-      // output cube file
-      ofs << this->messageCubeHeaderComment1;
-      ofs << this->messageCubeHeaderComment2;
-      sprintf(data,"\t%d\t%e\t%e\t%e\n", this->molecule->GetNumberAtoms(),
-                                         origin[XAxis], 
-                                         origin[YAxis], 
-                                         origin[ZAxis]);
-      ofs << string(data);
-      memset(data,0,sizeof(data));
-      sprintf(data,"\t%d\t%e\t%e\t%e\n", gridNumber[XAxis], dx, 0.0, 0.0);
-      ofs << string(data);
-      memset(data,0,sizeof(data));
-      sprintf(data,"\t%d\t%e\t%e\t%e\n", gridNumber[YAxis], 0.0, dy, 0.0);
-      ofs << string(data);
-      memset(data,0,sizeof(data));
-      sprintf(data,"\t%d\t%e\t%e\t%e\n", gridNumber[ZAxis], 0.0, 0.0, dz);
-      ofs << string(data);
+      // output feader and molecule to the cube file
+      this->OutputHeaderToFile(ofs, origin, dx, dy, dz);
+      this->OutputMoleculeToFile(ofs, *this->molecule);
 
-      for(int a=0; a<this->molecule->GetNumberAtoms(); a++){
-         Atom* atomA = this->molecule->GetAtom(a);
-         memset(data,0,sizeof(data));
-         sprintf(data,"\t%d\t%d\t%e\t%e\t%e\n", atomA->GetAtomType()+1, 
-                                          atomA->GetNumberValenceElectrons(),
-                                          atomA->GetXyz()[XAxis],
-                                          atomA->GetXyz()[YAxis],
-                                          atomA->GetXyz()[ZAxis]);
-         ofs << string(data);
-      }
       int lineBreakCounter=0;
       for(int ix=0; ix<gridNumber[XAxis]; ix++){
          double x = origin[XAxis] + dx*static_cast<double>(ix);
@@ -154,9 +123,8 @@ void MOLogger::DrawMO(vector<int> moIndeces){
                      moValue += fockMatrix[moIndeces[i]][mu]*aoValue;
                   }
                }
-               memset(data,0,sizeof(data));
-               sprintf(data,"\t%e",moValue);
-               ofs << string(data);
+
+               ofs << (boost::format("\t%e") % moValue ).str();
                lineBreakCounter++;
                if(lineBreakCounter%6==0){
                   ofs << endl;
@@ -167,6 +135,60 @@ void MOLogger::DrawMO(vector<int> moIndeces){
       }
    }
    this->OutputLog(this->messageEndMOPlot);
+}
+
+string MOLogger::GetFileName(int moIndex, int digit) const{
+   stringstream fileName;
+   fileName << Parameters::GetInstance()->GetFileNamePrefixMOPlot();
+   fileName << Utilities::Num2String(moIndex,digit);
+   fileName << this->stringCubeExtension;
+   return fileName.str();
+}
+
+void MOLogger::OutputHeaderToFile(ofstream& ofs, double const* origin, double dx, double dy, double dz) const{
+   int gridNumber[CartesianType_end] = {Parameters::GetInstance()->GetGridNumberMOPlot()[XAxis], 
+                                        Parameters::GetInstance()->GetGridNumberMOPlot()[YAxis],
+                                        Parameters::GetInstance()->GetGridNumberMOPlot()[ZAxis]};
+   char data[1000] = "";
+   // output header to the cube file
+   ofs << this->messageCubeHeaderComment1;
+   ofs << this->messageCubeHeaderComment2;
+   sprintf(data,"\t%d\t%e\t%e\t%e\n", this->molecule->GetNumberAtoms(),
+                                      origin[XAxis], 
+                                      origin[YAxis], 
+                                      origin[ZAxis]);
+   ofs << string(data);
+   memset(data,0,sizeof(data));
+   sprintf(data,"\t%d\t%e\t%e\t%e\n", gridNumber[XAxis], dx, 0.0, 0.0);
+   ofs << string(data);
+   memset(data,0,sizeof(data));
+   sprintf(data,"\t%d\t%e\t%e\t%e\n", gridNumber[YAxis], 0.0, dy, 0.0);
+   ofs << string(data);
+   memset(data,0,sizeof(data));
+   sprintf(data,"\t%d\t%e\t%e\t%e\n", gridNumber[ZAxis], 0.0, 0.0, dz);
+   ofs << string(data);
+}
+
+void MOLogger::OutputMoleculeToFile(ofstream& ofs, const Molecule& molecule) const{
+   char data[1000] = "";
+   // output molecule to the cube file
+   for(int a=0; a<molecule.GetNumberAtoms(); a++){
+      Atom* atomA = molecule.GetAtom(a);
+      memset(data,0,sizeof(data));
+      sprintf(data,"\t%d\t%d\t%e\t%e\t%e\n", atomA->GetAtomType()+1, 
+                                       atomA->GetNumberValenceElectrons(),
+                                       atomA->GetXyz()[XAxis],
+                                       atomA->GetXyz()[YAxis],
+                                       atomA->GetXyz()[ZAxis]);
+      ofs << string(data);
+   }
+}
+
+void MOLogger::CalcOrigin(double* origin) const{
+   for(int i=0; i<CartesianType_end; i++){
+      origin[i] = this->molecule->GetXyzCOC()[i];
+      origin[i] -= 0.5*Parameters::GetInstance()->GetFrameLengthHolePlot()[i];
+   }
 }
 
 }

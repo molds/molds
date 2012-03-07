@@ -36,7 +36,15 @@ private:
    MolDS_base::Molecule const* molecule;
    double const* const* fockMatrix;
    MolDS_base::TheoryType theory;
-   void SetMessage();
+   void SetMessages();
+   void CalcOrigin(double* origin) const;
+   std::string GetFileName(int moIndex, int digit) const;
+   void OutputHeaderToFile(std::ofstream& ofs,
+                           double const* origin,
+                           double dx,
+                           double dy,
+                           double dz) const;
+   void OutputMoleculeToFile(std::ofstream& ofs, const MolDS_base::Molecule& molecule) const;
 };
 
 }
