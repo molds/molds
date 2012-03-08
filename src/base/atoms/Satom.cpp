@@ -54,6 +54,10 @@ void Satom::SetAtomicParameters(){
       this->valence.push_back(dzx);
       this->valence.push_back(dxxyy);
    }
+   this->vdWCoefficient = 5.57*Parameters::GetInstance()->GetJ2AU()
+                              *pow(Parameters::GetInstance()->GetNm2AU(),6.0)
+                              /Parameters::GetInstance()->GetAvogadro();
+   this->vdWRadii = 1.683*Parameters::GetInstance()->GetAngstrom2AU();
    this->bondingParameter = -18.150*Parameters::GetInstance()->GetEV2AU();
    this->imuAmuS = 17.650*Parameters::GetInstance()->GetEV2AU();
    this->imuAmuP = 6.989*Parameters::GetInstance()->GetEV2AU();

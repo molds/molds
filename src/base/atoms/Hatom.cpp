@@ -45,6 +45,10 @@ void Hatom::SetAtomicParameters(){
    this->numberValenceElectrons = 1;
    this->valenceShellType = k;
    this->valence.push_back(s);
+   this->vdWCoefficient = 0.14*Parameters::GetInstance()->GetJ2AU()
+                              *pow(Parameters::GetInstance()->GetNm2AU(),6.0)
+                              /Parameters::GetInstance()->GetAvogadro();
+   this->vdWRadii = 1.001*Parameters::GetInstance()->GetAngstrom2AU();
    this->bondingParameter = -9.0*Parameters::GetInstance()->GetEV2AU();
    this->imuAmuS = 7.176*Parameters::GetInstance()->GetEV2AU();
    this->imuAmuP = 0.0;

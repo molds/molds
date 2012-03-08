@@ -33,13 +33,16 @@ public:
    void SetCurrentTheory(TheoryType theory);
    // Pysical constants
    double GetEV2AU() const;
+   double GetJ2AU() const;
    double GetKcalMolin2AU() const;
    double GetAngstrom2AU() const;
+   double GetNm2AU() const;
    double GetKayser2AU() const;
    double GetGMolin2AU() const;
    double GetDegree2Radian() const;
    double GetFs2AU() const;
    double GetBoltzmann() const;
+   double GetAvogadro() const;
    // SCF
    double GetThresholdSCF() const;
    void SetThresholdSCF(double thresholdSCF);
@@ -187,13 +190,16 @@ private:
    TheoryType currentTheory;
    // Physical constants
    static const double eV2AU;
+   static const double j2AU;
    static const double kcalMolin2AU;
    static const double angstrom2AU;
+   static const double nm2AU;
    static const double kayser2AU;
    static const double gMolin2AU;
    static const double degree2Radian;
    static const double fs2AU;
    static const double boltzmann;
+   static const double avogadro;
    // SCF
    double thresholdSCF;
    int maxIterationsSCF;

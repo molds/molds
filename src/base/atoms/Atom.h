@@ -33,6 +33,8 @@ public:
    void SetPxyz(double px, double py, double pz) const;
    int GetValenceSize() const;
    MolDS_base::OrbitalType GetValence(int index) const;
+   double GetVdWCoefficient() const;
+   double GetVdWRadii() const;
    double GetAtomicBasisValue(double x, 
                               double y, 
                               double z, 
@@ -108,6 +110,8 @@ protected:
    MolDS_base::ShellType valenceShellType;
    int firstAOIndex;
    int numberValenceElectrons;
+   double vdWCoefficient;               // Table 1 in [G_2006]
+   double vdWRadii;                     // Table 1 in [G_2006]
    double imuAmuS;                      // Table 3.4 or 3.5 in J. A. Pople book
    double imuAmuP;                      // Table 3.4 or 3.5 in J. A. Pople book
    double imuAmuD;                      // Table 3.4 or 3.5 in J. A. Pople book

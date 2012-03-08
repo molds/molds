@@ -36,14 +36,17 @@ namespace MolDS_base{
 
 Parameters* Parameters::parameters = NULL;
 // Physical constsnts
-const double Parameters::Parameters::eV2AU = 0.03674903;
+const double Parameters::eV2AU = 0.03674903;
+const double Parameters::j2AU = pow(10.0,18.0)/4.35974394;
 const double Parameters::kcalMolin2AU = 0.00159360175;
 const double Parameters::angstrom2AU = 1.0/0.5291772;
+const double Parameters::nm2AU = 10.0*Parameters::angstrom2AU;
 const double Parameters::kayser2AU = 4.556336*pow(10.0,-6.0);
 const double Parameters::fs2AU = 1.0/(2.418884326505*pow(10.0,-2.0));
 const double Parameters::gMolin2AU = pow(10.0,5.0)/(6.0221415*9.1095);
 const double Parameters::degree2Radian = M_PI / 180.0;
 const double Parameters::boltzmann = 3.166791*pow(10.0,-6.0);
+const double Parameters::avogadro = 6.0221415*pow(10.0, 23.0);
 
 Parameters::Parameters(){
    this->SetDefaultValues();
@@ -292,12 +295,20 @@ double Parameters::GetEV2AU() const{
    return this->eV2AU;
 }
 
+double Parameters::GetJ2AU() const{
+   return this->j2AU;
+}
+
 double Parameters::GetKcalMolin2AU() const{
    return this->kcalMolin2AU;
 }
 
 double Parameters::GetAngstrom2AU() const{
    return this->angstrom2AU;
+}
+
+double Parameters::GetNm2AU() const{
+   return this->nm2AU;
 }
 
 double Parameters::GetKayser2AU() const{
@@ -318,6 +329,10 @@ double Parameters::GetFs2AU() const{
 
 double Parameters::GetBoltzmann() const{
    return this->boltzmann;
+}
+
+double Parameters::GetAvogadro() const{
+   return this->avogadro;
 }
 
 // methods for translation

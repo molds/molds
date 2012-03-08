@@ -181,6 +181,14 @@ OrbitalType Atom::GetValence(int index) const{
    return this->valence[index];
 }
 
+double Atom::GetVdWCoefficient() const{
+   return this->vdWCoefficient;
+}
+
+double Atom::GetVdWRadii() const{
+   return this->vdWRadii;
+}
+
 double Atom::GetAtomicBasisValue(double x, 
                                  double y, 
                                  double z, 
