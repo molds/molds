@@ -55,6 +55,12 @@ public:
    void SetDiisStartErrorSCF(double diisStartErrorSCF);
    double GetDiisEndErrorSCF() const;
    void SetDiisEndErrorSCF(double diisEndErrorSCF);
+   bool RequiresVdWSCF() const;
+   void SetRequiresVdWSCF(bool requiresVdWSCF);
+   double GetVdWScalingFactorSCF() const;
+   void SetVdWScalingFactorSCF(double vdWScalingFactorSCF);
+   double GetVdWDampingFactorSCF() const;
+   void SetVdWDampingFactorSCF(double vdWDampingFactorSCF);
    // MOPlot
    std::string GetFileNamePrefixMOPlot() const;
    void SetFileNamePrefixMOPlot(std::string fileNamePrefixMOPlot);
@@ -196,6 +202,9 @@ private:
    int diisNumErrorVectSCF;
    double diisStartErrorSCF;
    double diisEndErrorSCF;
+   bool requiresVdWSCF;
+   double vdWScalingFactorSCF;
+   double vdWDampingFactorSCF;
    // MOPlot
    std::string fileNamePrefixMOPlot;
    int gridNumberMOPlot[CartesianType_end];

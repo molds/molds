@@ -98,6 +98,9 @@ void InputParser::SetMessages(){
    this->messageScfDiisNumErrorVect = "\t\tDIIS number of error vectors: ";
    this->messageScfDiisStartError = "\t\tDIIS starting error: ";
    this->messageScfDiisEndError = "\t\tDIIS ending error: ";
+   this->messageScfVdW = "\t\tvan der Waals (vdW) correction: ";
+   this->messageScfVdWScalingFactor = "\t\tvdW corr. scaling factor (s6): ";
+   this->messageScfVdWDampingFactor = "\t\tvdW corr. damping factor (d): ";
 
    // CIS
    this->messageCisConditions = "\tCIS conditions:\n";
@@ -206,6 +209,9 @@ void InputParser::SetMessages(){
    this->stringScfDiisNumErrorVect = "diis_num_error_vect";
    this->stringScfDiisStartError = "diis_start_error";
    this->stringScfDiisEndError = "diis_end_error";
+   this->stringScfVdW = "vdw";
+   this->stringScfVdWScalingFactor = "vdw_s6";
+   this->stringScfVdWDampingFactor = "vdw_d";
 
    // MO plot
    this->stringMO = "mo";
@@ -416,6 +422,26 @@ int InputParser::ParseConditionsSCF(vector<string>* inputTerms, int parseIndex) 
       // DIIS ending error
       if((*inputTerms)[parseIndex].compare(this->stringScfDiisEndError) == 0){
          Parameters::GetInstance()->SetDiisEndErrorSCF(atof((*inputTerms)[parseIndex+1].c_str()));
+         parseIndex++;
+      }
+      // van der Waals correction 
+      if((*inputTerms)[parseIndex].compare(this->stringScfVdW) == 0){
+         if((*inputTerms)[parseIndex+1].compare(this->stringYES) == 0){
+            Parameters::GetInstance()->SetRequiresVdWSCF(true);
+         }
+         else{
+            Parameters::GetInstance()->SetRequiresVdWSCF(false);
+         }
+         parseIndex++;
+      }
+      // van der Waals (scaling factor) 
+      if((*inputTerms)[parseIndex].compare(this->stringScfVdWScalingFactor) == 0){
+         Parameters::GetInstance()->SetVdWScalingFactorSCF(atof((*inputTerms)[parseIndex+1].c_str()));
+         parseIndex++;
+      }
+      // van der Waals (damping factor) 
+      if((*inputTerms)[parseIndex].compare(this->stringScfVdWDampingFactor) == 0){
+         Parameters::GetInstance()->SetVdWDampingFactorSCF(atof((*inputTerms)[parseIndex+1].c_str()));
          parseIndex++;
       }
       parseIndex++;   
@@ -1220,6 +1246,17 @@ void InputParser::OutputScfConditions() const{
                                             % Parameters::GetInstance()->GetDiisStartErrorSCF()).str());
    this->OutputLog((boost::format("%s%e\n") % this->messageScfDiisEndError.c_str() 
                                             % Parameters::GetInstance()->GetDiisEndErrorSCF()).str());
+   this->OutputLog(this->messageScfVdW);
+   if(Parameters::GetInstance()->RequiresVdWSCF()){
+      this->OutputLog((boost::format("%s\n") % this->stringYES.c_str()).str());
+      this->OutputLog((boost::format("%s%lf\n") % this->messageScfVdWScalingFactor.c_str() 
+                                                % Parameters::GetInstance()->GetVdWScalingFactorSCF()).str());
+      this->OutputLog((boost::format("%s%lf\n") % this->messageScfVdWDampingFactor.c_str() 
+                                                % Parameters::GetInstance()->GetVdWDampingFactorSCF()).str());
+   }
+   else{
+      this->OutputLog((boost::format("%s\n") % this->stringNO.c_str()).str());
+   }
    this->OutputLog("\n");
 }
 

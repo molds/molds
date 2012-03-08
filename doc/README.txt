@@ -115,7 +115,8 @@ HOW TO WRITE INPUT:
    
       -options
        "max_iter", "rms_density", "damping_thresh", "damping_weight", 
-       "diis_num_error_vect", "diis_start_error", and "diis_end_error" are prepared as options.
+       "diis_num_error_vect", "diis_start_error", "diis_end_error",
+       "vdW", "vdW_s6", and "vdW_d" are prepared as options.
 
        The default value of the "max_iter" is 100.
        The default value of the "rms_density" is 10**(-8.0).
@@ -124,6 +125,16 @@ HOW TO WRITE INPUT:
        The default value of the "diis_num_error_vect" is 5.
        The default value of the "diis_start_error" is 0.01.
        The default value of the "diis_end_error" is 10**(-8.0).
+
+       "vdW" should be set as "yes" or "no". 
+       For "yes", Grimmes's empirical van der Waals correction is applied.
+       The default value of the "vdW" is "no".
+
+       "vdW_s6" is a scaling factor in the Grimme's van der Waals correction.
+       The default value of the "vdW_s6" is 0.9.
+
+       "vdW_d" is a damping factor in the Grimme's van der Waals correction.
+       The default value of the "vdW_d" is 20.0.
 
        E.g.
          SCF
@@ -134,6 +145,9 @@ HOW TO WRITE INPUT:
             diis_num_error_vect 6
             diis_start_error 0.01
             diis_end_error 0.00000001
+            vdW yes
+            vdW_s6 0.75
+            vdW_d 30
          SCF_END
    
    <MEMORY>

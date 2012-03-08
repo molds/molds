@@ -100,6 +100,9 @@ void Parameters::SetDefaultValues(){
    this->diisNumErrorVectSCF = 5;
    this->diisStartErrorSCF = pow(10.0, -2.0);
    this->diisEndErrorSCF = pow(10.0, -8.0);
+   this->requiresVdWSCF = false;
+   this->vdWScalingFactorSCF = 0.90;
+   this->vdWDampingFactorSCF = 20.0;
    // MOPlot
    this->fileNamePrefixMOPlot = "MO_";
    this->gridNumberMOPlot[XAxis] = 25;
@@ -258,6 +261,30 @@ double Parameters::GetDiisEndErrorSCF() const{
 
 void Parameters::SetDiisEndErrorSCF(double diisEndErrorSCF){
    this->diisEndErrorSCF = diisEndErrorSCF;
+}
+
+bool Parameters::RequiresVdWSCF() const{
+   return this->requiresVdWSCF;
+}
+
+void Parameters::SetRequiresVdWSCF(bool requiresVdWSCF){
+   this->requiresVdWSCF = requiresVdWSCF;
+}
+
+double Parameters::GetVdWScalingFactorSCF() const{
+   return this->vdWScalingFactorSCF;
+}
+
+void Parameters::SetVdWScalingFactorSCF(double vdWScalingFactorSCF){
+   this->vdWScalingFactorSCF = vdWScalingFactorSCF;
+}
+
+double Parameters::GetVdWDampingFactorSCF() const{
+   return this->vdWDampingFactorSCF;
+}
+
+void Parameters::SetVdWDampingFactorSCF(double vdWScalingFactorSCF){
+   this->vdWDampingFactorSCF = vdWScalingFactorSCF;
 }
 
 // methods for physical constants

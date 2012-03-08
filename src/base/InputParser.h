@@ -53,6 +53,9 @@ private:
    std::string messageScfDiisNumErrorVect;
    std::string messageScfDiisStartError;
    std::string messageScfDiisEndError;
+   std::string messageScfVdW;
+   std::string messageScfVdWScalingFactor;
+   std::string messageScfVdWDampingFactor;
    // CIS
    std::string messageCisConditions;
    std::string messageCisNumberActiveOcc;
@@ -147,6 +150,9 @@ private:
    std::string stringScfDiisNumErrorVect;
    std::string stringScfDiisStartError;
    std::string stringScfDiisEndError;
+   std::string stringScfVdW;
+   std::string stringScfVdWScalingFactor;
+   std::string stringScfVdWDampingFactor;
    // MOPlot
    std::string stringMO;
    std::string stringMOPlot;
