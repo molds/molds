@@ -50,6 +50,7 @@
 [BGRJ_2003] I. T.-Brohman, C. R. W. Guimar\~{a}es, M. P. Repasky, and W. L. Jorgensen, J. Comp. Chem. 25, 138 (2003)
 [S_2004] J. J. P. Stewart, J. Mol. Model. 10, 155 (2004)
 [BGJ_2003] I. T.-Brohman, C. R. W. Guimar\~{a}es, and, W. L. Jorgensen, J. Comp. Theor. Chem. 1, 817 (2004)
+[G_2006] S. Grimme, J. Comp. Chem. 271787 (2006)
 [S_2007] J. J. P. Stewart, J. Mol. Model. 13, 1173 (2007)
 
 

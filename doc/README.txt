@@ -127,13 +127,13 @@ HOW TO WRITE INPUT:
        The default value of the "diis_end_error" is 10**(-8.0).
 
        "vdW" should be set as "yes" or "no". 
-       For "yes", Grimmes's empirical van der Waals correction is applied.
+       For "yes", Grimmes's empirical van der Waals correction([G_2006]) is applied.
        The default value of the "vdW" is "no".
 
-       "vdW_s6" is a scaling factor in the Grimme's van der Waals correction.
+       "vdW_s6" is a scaling factor in the Grimme's van der Waals correction([G_2006]).
        The default value of the "vdW_s6" is 0.9.
 
-       "vdW_d" is a damping factor in the Grimme's van der Waals correction.
+       "vdW_d" is a damping factor in the Grimme's van der Waals correction([G_2006]).
        The default value of the "vdW_d" is 20.0.
 
        E.g.
