@@ -26,17 +26,22 @@ public:
    void DrawMO(int moIndex);
    void DrawMO(std::vector<int> moIndeces);
 private:
-   std::string stringCubeExtension;
+   std::string errorMessageFockMatrixNULL;
    std::string messageCubeHeaderComment1;
    std::string messageCubeHeaderComment2;
    std::string messageStartMOPlot;
    std::string messageEndMOPlot;
    std::string messageSkippedMOIndex;
+   std::string messageOmpElapsedTimeMOPlot;
+   std::string messageUnitSec;
+   std::string stringCubeExtension;
    MOLogger();
    MolDS_base::Molecule const* molecule;
    double const* const* fockMatrix;
    MolDS_base::TheoryType theory;
+   void MatricesNullCheck() const;
    void SetMessages();
+   void CalcGridDisplacement(double* dx, double* dy, double* dz) const;
    void CalcOrigin(double* origin) const;
    std::string GetFileName(int moIndex, int digit) const;
    void OutputHeaderToFile(std::ofstream& ofs,
@@ -45,6 +50,12 @@ private:
                            double dy,
                            double dz) const;
    void OutputMoleculeToFile(std::ofstream& ofs, const MolDS_base::Molecule& molecule) const;
+   double GetMoValue(int moIndex, 
+                     const MolDS_base::Molecule& molecule, 
+                     double const* const* fockMatrix, 
+                     double x, 
+                     double y, 
+                     double z) const;
 };
 
 }

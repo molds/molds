@@ -26,6 +26,7 @@
 #include<math.h>
 #include<vector>
 #include<stdexcept>
+#include<omp.h>
 #include<boost/format.hpp>
 #include"../PrintController.h"
 #include"../MolDSException.h"
@@ -56,11 +57,15 @@ MOLogger::MOLogger(){
 
 void MOLogger::SetMessages(){
    this->stringCubeExtension = ".cube";
+   this->errorMessageFockMatrixNULL
+      = "Error in base::logger::MOLogger::DrawMO: Fock Matrix is NULL.\n";
    this->messageCubeHeaderComment1 = "MolDS cube file (in atomic units).\n";
    this->messageCubeHeaderComment2 = "outer loop:x, middle loop:y, inner loop:z\n";
    this->messageStartMOPlot = "\t== START: MO Plot ==\n";
    this->messageEndMOPlot = "\t== DONE: MO Plot ==\n\n";
    this->messageSkippedMOIndex = "\t\tBad MO-index is skipped. The skipped MO-index: ";
+   this->messageOmpElapsedTimeMOPlot = "\t\tElapsed time(omp) for the MO plot = ";
+   this->messageUnitSec = "[s].";
 }
 
 void MOLogger::DrawMO(int moIndex){
@@ -70,18 +75,14 @@ void MOLogger::DrawMO(int moIndex){
 }
 
 void MOLogger::DrawMO(vector<int> moIndeces){
+   this->MatricesNullCheck();
    this->OutputLog(this->messageStartMOPlot);
-   Parameters* parameters = Parameters::GetInstance();
-   int gridNumber[CartesianType_end] = {parameters->GetGridNumberMOPlot()[XAxis], 
-                                        parameters->GetGridNumberMOPlot()[YAxis],
-                                        parameters->GetGridNumberMOPlot()[ZAxis]};
-   double frameLength[CartesianType_end] = {parameters->GetFrameLengthMOPlot()[XAxis],
-                                            parameters->GetFrameLengthMOPlot()[YAxis],
-                                            parameters->GetFrameLengthMOPlot()[ZAxis]};
-   double dx = frameLength[XAxis]/static_cast<double>(gridNumber[XAxis]);
-   double dy = frameLength[YAxis]/static_cast<double>(gridNumber[YAxis]);
-   double dz = frameLength[ZAxis]/static_cast<double>(gridNumber[ZAxis]);
+   double ompStartTime = omp_get_wtime();
+
+   // set frame basics
+   double dx=0.0, dy=0.0, dz=0.0;
    double origin[CartesianType_end] = {0.0, 0.0, 0.0};
+   this->CalcGridDisplacement(&dx, &dy, &dz);
    this->CalcOrigin(origin);
 
    // MO output 
@@ -92,7 +93,8 @@ void MOLogger::DrawMO(vector<int> moIndeces){
                                                   % moIndeces[i]).str()) ;
          continue;
       }
-      // file open
+
+      // open the cube file
       int digit = 5;
       string fileName = this->GetFileName(moIndeces[i], digit);
       ofstream ofs(fileName.c_str());
@@ -101,40 +103,33 @@ void MOLogger::DrawMO(vector<int> moIndeces){
       this->OutputHeaderToFile(ofs, origin, dx, dy, dz);
       this->OutputMoleculeToFile(ofs, *this->molecule);
 
+      // output grid data to the cube file
       int lineBreakCounter=0;
-      for(int ix=0; ix<gridNumber[XAxis]; ix++){
+      for(int ix=0; ix<Parameters::GetInstance()->GetGridNumberMOPlot()[XAxis]; ix++){
          double x = origin[XAxis] + dx*static_cast<double>(ix);
-         for(int iy=0; iy<gridNumber[YAxis]; iy++){
+         for(int iy=0; iy<Parameters::GetInstance()->GetGridNumberMOPlot()[YAxis]; iy++){
             double y = origin[YAxis] + dy*static_cast<double>(iy);
-            for(int iz=0; iz<gridNumber[ZAxis]; iz++){
+            for(int iz=0; iz<Parameters::GetInstance()->GetGridNumberMOPlot()[ZAxis]; iz++){
                double z = origin[ZAxis] + dz*static_cast<double>(iz);
 
-               double moValue = 0.0;
-               for(int a=0; a<this->molecule->GetNumberAtoms(); a++){
-                  Atom* atomA = this->molecule->GetAtom(a);
-                  int firstAOIndexA = atomA->GetFirstAOIndex();
-                  int numberAOsA = atomA->GetValenceSize();
-                  for(int mu=firstAOIndexA; mu<firstAOIndexA+numberAOsA; mu++){
-                     double aoValue = atomA->GetAtomicBasisValue(x,
-                                                                 y,
-                                                                 z,
-                                                                 mu-firstAOIndexA,
-                                                                 this->theory);
-                     moValue += fockMatrix[moIndeces[i]][mu]*aoValue;
-                  }
-               }
-
+               double moValue = this->GetMoValue(moIndeces[i], *this->molecule, this->fockMatrix, x, y, z);
                ofs << (boost::format("\t%e") % moValue ).str();
                lineBreakCounter++;
                if(lineBreakCounter%6==0){
                   ofs << endl;
                   lineBreakCounter=0;
                }
+
             }
          }
       }
    }
-   this->OutputLog(this->messageEndMOPlot);
+   double ompEndTime = omp_get_wtime();
+   this->OutputLog((boost::format("%s%lf%s\n%s") % this->messageOmpElapsedTimeMOPlot.c_str()
+                                                 % (ompEndTime - ompStartTime)
+                                                 % this->messageUnitSec.c_str()
+                                                 % this->messageEndMOPlot.c_str()).str());
+
 }
 
 string MOLogger::GetFileName(int moIndex, int digit) const{
@@ -189,6 +184,47 @@ void MOLogger::CalcOrigin(double* origin) const{
       origin[i] = this->molecule->GetXyzCOC()[i];
       origin[i] -= 0.5*Parameters::GetInstance()->GetFrameLengthMOPlot()[i];
    }
+}
+
+void MOLogger::MatricesNullCheck() const{
+   // NULL check
+   if(this->fockMatrix == NULL){
+      stringstream ss; 
+      ss << this->errorMessageFockMatrixNULL;
+      throw MolDSException(ss.str());
+   }   
+}
+
+void MOLogger::CalcGridDisplacement(double* dx, double* dy, double* dz) const{
+   *dx = Parameters::GetInstance()->GetFrameLengthMOPlot()[XAxis]
+        /static_cast<double>(Parameters::GetInstance()->GetGridNumberMOPlot()[XAxis]);
+   *dy = Parameters::GetInstance()->GetFrameLengthMOPlot()[YAxis]
+        /static_cast<double>(Parameters::GetInstance()->GetGridNumberMOPlot()[YAxis]);
+   *dz = Parameters::GetInstance()->GetFrameLengthMOPlot()[ZAxis]
+        /static_cast<double>(Parameters::GetInstance()->GetGridNumberMOPlot()[ZAxis]);
+}
+
+double MOLogger::GetMoValue(int moIndex, 
+                            const MolDS_base::Molecule& molecule, 
+                            double const* const* fockMatrix, 
+                            double x, 
+                            double y, 
+                            double z) const{
+   double moValue = 0.0;
+   for(int a=0; a<molecule.GetNumberAtoms(); a++){
+      Atom* atomA = molecule.GetAtom(a);
+      int firstAOIndexA = atomA->GetFirstAOIndex();
+      int numberAOsA = atomA->GetValenceSize();
+      for(int mu=firstAOIndexA; mu<firstAOIndexA+numberAOsA; mu++){
+         double aoValue = atomA->GetAtomicBasisValue(x,
+                                                     y,
+                                                     z,
+                                                     mu-firstAOIndexA,
+                                                     this->theory);
+         moValue += fockMatrix[moIndex][mu]*aoValue;
+      }
+   }
+   return moValue;
 }
 
 }
