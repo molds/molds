@@ -187,7 +187,7 @@ void MOLogger::OutputMoleculeToFile(ofstream& ofs, const Molecule& molecule) con
 void MOLogger::CalcOrigin(double* origin) const{
    for(int i=0; i<CartesianType_end; i++){
       origin[i] = this->molecule->GetXyzCOC()[i];
-      origin[i] -= 0.5*Parameters::GetInstance()->GetFrameLengthHolePlot()[i];
+      origin[i] -= 0.5*Parameters::GetInstance()->GetFrameLengthMOPlot()[i];
    }
 }
 
