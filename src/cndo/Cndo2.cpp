@@ -267,8 +267,7 @@ void Cndo2::CalcVdWCorrectionEnergy(){
          value += this->GetDiatomVdWCorrectionEnergy(i, j);
       }
    }
-   double scalingFactor = Parameters::GetInstance()->GetVdWScalingFactorSCF();
-   this->vdWCorrectionEnergy = -1.0*scalingFactor*value;
+   this->vdWCorrectionEnergy = value;
 }
 
 // see (11) in [G_2006]
@@ -277,10 +276,11 @@ double Cndo2::GetDiatomVdWCorrectionEnergy(int indexAtomA, int indexAtomB) const
    const Atom& atomB = *this->molecule->GetAtom(indexAtomB);
    double distance = this->molecule->GetDistanceAtoms(indexAtomA, indexAtomB);
    double vdWDistance = atomA.GetVdWRadii() + atomB.GetVdWRadii();
+   double vdWCoefficients = sqrt(atomA.GetVdWCoefficient()*atomB.GetVdWCoefficient());
    double dampingFactor = Parameters::GetInstance()->GetVdWDampingFactorSCF();
    double damping = 1.0/(1.0+exp(-1.0*dampingFactor*(distance/vdWDistance - 1.0)));
-   double vdWCoefficients = sqrt(atomA.GetVdWCoefficient()*atomB.GetVdWCoefficient());
-   return vdWCoefficients*pow(distance,-6.0)*damping;
+   double scalingFactor = Parameters::GetInstance()->GetVdWScalingFactorSCF();
+   return -1.0*scalingFactor*vdWCoefficients*pow(distance,-6.0)*damping;
 }
 
 // First derivative of the core repulsion related to the coordinate of atom A.
@@ -299,11 +299,20 @@ double Cndo2::GetDiatomCoreRepulsionFirstDerivative(int indexAtomA, int indexAto
 // First derivative of the vdW correction related to the coordinate of atom A.
 double Cndo2::GetDiatomVdWCorrectionFirstDerivative(int indexAtomA, int indexAtomB, 
                                                     CartesianType axisA) const{
-   // ToDo: vdw first derivative
+   const Atom& atomA = *this->molecule->GetAtom(indexAtomA);
+   const Atom& atomB = *this->molecule->GetAtom(indexAtomB);
+   double distance = this->molecule->GetDistanceAtoms(indexAtomA, indexAtomB);
+   double vdWDistance = atomA.GetVdWRadii() + atomB.GetVdWRadii();
+   double dampingFactor = Parameters::GetInstance()->GetVdWDampingFactorSCF();
+   double damping = 1.0/(1.0+exp(-1.0*dampingFactor*(distance/vdWDistance - 1.0)));
+   double dampingFirstDerivative = (dampingFactor/vdWDistance)
+                                  *exp(-1.0*dampingFactor*(distance/vdWDistance - 1.0))
+                                  *pow(1.0+exp(-1.0*dampingFactor*(distance/vdWDistance - 1.0)),-2.0);
    double value=0.0;
-   stringstream ss;
-   ss << "Cndo2::GetDiatomVdWCorrectionFirstDerivative is not implemented yet.\n";
-   throw MolDSException(ss.str());
+   value += 6.0*pow(distance,-7.0)*damping - pow(distance,-6.0)*dampingFirstDerivative;
+   value *= sqrt(atomA.GetVdWCoefficient()*atomB.GetVdWCoefficient());
+   value *= Parameters::GetInstance()->GetVdWScalingFactorSCF();
+   value *= (atomA.GetXyz()[axisA] - atomB.GetXyz()[axisA])/distance;
    return value;
 }
 

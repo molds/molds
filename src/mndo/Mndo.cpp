@@ -2129,6 +2129,10 @@ void Mndo::CalcForce(const vector<int>& elecStates){
                   for(int i=0; i<CartesianType_end; i++){
                      coreRepulsion[i] += this->GetDiatomCoreRepulsionFirstDerivative(
                                                a, b, (CartesianType)i);
+                     if(Parameters::GetInstance()->RequiresVdWSCF()){
+                        coreRepulsion[i] += this->GetDiatomVdWCorrectionFirstDerivative(
+                                                  a, b, (CartesianType)i);
+                     }
                   }  
                   // electron core attraction part (ground state)
                   double forceElecCoreAttPart[CartesianType_end] = {0.0,0.0,0.0};

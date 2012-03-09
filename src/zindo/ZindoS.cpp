@@ -1563,6 +1563,11 @@ void ZindoS::CalcForce(const vector<int>& elecStates){
                   for(int i=0; i<CartesianType_end; i++){
                      coreRepulsion[i] += this->GetDiatomCoreRepulsionFirstDerivative(
                                                a, b, (CartesianType)i);
+                     if(Parameters::GetInstance()->RequiresVdWSCF()){
+                        coreRepulsion[i] += this->GetDiatomVdWCorrectionFirstDerivative(
+                                                  a, b, (CartesianType)i);
+                     }
+
                      electronicForce1[i] += ( atomA.GetCoreCharge()
                                              *atomicElectronPopulation[b]
                                              +atomB.GetCoreCharge()
@@ -1640,6 +1645,10 @@ void ZindoS::CalcForce(const vector<int>& elecStates){
                   // Calculation of core repusion force
                   coreRepulsion += this->GetDiatomCoreRepulsionFirstDerivative(
                                          a, b, (CartesianType)i);
+                  if(Parameters::GetInstance()->RequiresVdWSCF()){
+                     coreRepulsion += this->GetDiatomVdWCorrectionFirstDerivative(
+                                            a, b, (CartesianType)i);
+                  }
 
                   // Calculate force arise from electronic part.
                   electronicForce1 += ( atomA.GetCoreCharge()*atomicElectronPopulation[b]
