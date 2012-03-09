@@ -74,6 +74,7 @@ Cndo2::Cndo2(){
    this->bondingAdjustParameterK[1] = 0.750; //see (3.79) in J. A. Pople book
    this->elecSCFEnergy = 0.0;
    this->coreRepulsionEnergy = 0.0;
+   this->vdWCorrectionEnergy = 0.0;
    this->matrixCIS = NULL;
    this->excitedEnergies = NULL;
    this->matrixCISdimension = 0;
@@ -158,6 +159,8 @@ void Cndo2::SetMessages(){
    this->messageUnitSec = "[s].";
    this->messageCoreRepulsionTitle = "\t\t| [a.u.] | [eV] |\n";
    this->messageCoreRepulsion = "\tTotal core repulsion energy:\n";
+   this->messageVdWCorrectionTitle = "\t\t| [a.u.] | [eV] |\n";
+   this->messageVdWCorrection = "\tEmpirical van der Waals correction:\n";
 }
 
 void Cndo2::SetEnableAtomTypes(){
@@ -256,6 +259,30 @@ double Cndo2::GetDiatomCoreRepulsionEnergy(int indexAtomA, int indexAtomB) const
    return atomA.GetCoreCharge()*atomB.GetCoreCharge()/distance; 
 }
 
+// see (11) in [G_2006]
+void Cndo2::CalcVdWCorrectionEnergy(){
+   double value = 0.0;
+   for(int i=0; i<this->molecule->GetNumberAtoms(); i++){
+      for(int j=i+1; j<this->molecule->GetNumberAtoms(); j++){
+         value += this->GetDiatomVdWCorrectionEnergy(i, j);
+      }
+   }
+   double scalingFactor = Parameters::GetInstance()->GetVdWScalingFactorSCF();
+   this->vdWCorrectionEnergy = -1.0*scalingFactor*value;
+}
+
+// see (11) in [G_2006]
+double Cndo2::GetDiatomVdWCorrectionEnergy(int indexAtomA, int indexAtomB) const{
+   const Atom& atomA = *this->molecule->GetAtom(indexAtomA);
+   const Atom& atomB = *this->molecule->GetAtom(indexAtomB);
+   double distance = this->molecule->GetDistanceAtoms(indexAtomA, indexAtomB);
+   double vdWDistance = atomA.GetVdWRadii() + atomB.GetVdWRadii();
+   double dampingFactor = Parameters::GetInstance()->GetVdWDampingFactorSCF();
+   double damping = 1.0/(1.0+exp(-1.0*dampingFactor*(distance/vdWDistance - 1.0)));
+   double vdWCoefficients = sqrt(atomA.GetVdWCoefficient()*atomB.GetVdWCoefficient());
+   return vdWCoefficients*pow(distance,-6.0)*damping;
+}
+
 // First derivative of the core repulsion related to the coordinate of atom A.
 double Cndo2::GetDiatomCoreRepulsionFirstDerivative(int indexAtomA, int indexAtomB, 
                                                     CartesianType axisA) const{
@@ -266,6 +293,17 @@ double Cndo2::GetDiatomCoreRepulsionFirstDerivative(int indexAtomA, int indexAto
    value = atomA.GetCoreCharge()*atomB.GetCoreCharge();
    value *= (atomA.GetXyz()[axisA] - atomB.GetXyz()[axisA])/distance;
    value *= -1.0/pow(distance,2.0);
+   return value;
+}
+
+// First derivative of the vdW correction related to the coordinate of atom A.
+double Cndo2::GetDiatomVdWCorrectionFirstDerivative(int indexAtomA, int indexAtomB, 
+                                                    CartesianType axisA) const{
+   // ToDo: vdw first derivative
+   double value=0.0;
+   stringstream ss;
+   ss << "Cndo2::GetDiatomVdWCorrectionFirstDerivative is not implemented yet.\n";
+   throw MolDSException(ss.str());
    return value;
 }
 
@@ -431,12 +469,16 @@ void Cndo2::CalcSCFProperties(){
                                       this->orbitalElectronPopulation, 
                                       *this->molecule);
    this->CalcCoreRepulsionEnergy();
+   if(Parameters::GetInstance()->RequiresVdWSCF()){
+      this->CalcVdWCorrectionEnergy();
+   }
    this->CalcElecSCFEnergy(&this->elecSCFEnergy, 
                           *this->molecule, 
                           this->energiesMO, 
                           this->fockMatrix, 
                           this->gammaAB,
-                          this->coreRepulsionEnergy);
+                          this->coreRepulsionEnergy,
+                          this->vdWCorrectionEnergy);
 }
 
 double Cndo2::GetBondingAdjustParameterK(ShellType shellA, ShellType shellB) const{
@@ -485,6 +527,10 @@ double Cndo2::GetElectronicEnergy(int elecState) const{
 
 double Cndo2::GetCoreRepulsionEnergy() const{
    return this->coreRepulsionEnergy;
+}
+
+double Cndo2::GetVdWCorrectionEnergy() const{
+   return this->vdWCorrectionEnergy;
 }
 
 double*** Cndo2::GetForce(const vector<int>& elecStates){
@@ -717,6 +763,13 @@ void Cndo2::OutputSCFResults() const{
    this->OutputLog((boost::format("\t\t%e\t%e\n\n") % this->coreRepulsionEnergy 
                                                     % (this->coreRepulsionEnergy/eV2AU)).str());
 
+   // output van der Waals correction 
+   if(Parameters::GetInstance()->RequiresVdWSCF()){
+      this->OutputLog(this->messageVdWCorrection);
+      this->OutputLog(this->messageVdWCorrectionTitle);
+      this->OutputLog((boost::format("\t\t%e\t%e\n\n") % this->vdWCorrectionEnergy 
+                                                       % (this->vdWCorrectionEnergy/eV2AU)).str());
+   }
    // ToDo: output eigen-vectors of the Hartree Fock matrix
 
    // output Mulliken charge
@@ -746,7 +799,8 @@ void Cndo2::CalcElecSCFEnergy(double* elecSCFEnergy,
                              double const* energiesMO, 
                              double const* const* fockMatrix, 
                              double const* const* gammaAB, 
-                             double coreRepulsionEnergy) const{
+                             double coreRepulsionEnergy,
+                             double vdWCorrectionEnergy) const{
    double electronicEnergy = 0.0;
    // use density matrix for electronic energy
    int totalNumberAOs = this->molecule->GetTotalNumberAOs();
@@ -825,7 +879,7 @@ void Cndo2::CalcElecSCFEnergy(double* elecSCFEnergy,
    }
    */
 
-   *elecSCFEnergy = electronicEnergy + coreRepulsionEnergy;
+   *elecSCFEnergy = electronicEnergy + coreRepulsionEnergy + vdWCorrectionEnergy;
 }
 
 void Cndo2::FreeElecEnergyMatrices(double*** fMatrix, 

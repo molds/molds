@@ -37,6 +37,7 @@ public:
    double*** GetForce(const std::vector<int>& elecStates);
    double GetElectronicEnergy(int elecState) const;
    double GetCoreRepulsionEnergy() const;
+   double GetVdWCorrectionEnergy() const;
    MolDS_base::TheoryType GetTheoryType() const;
 protected:
    std::string errorMessageAtomA;
@@ -67,6 +68,7 @@ protected:
    MolDS_base::TheoryType theory;
    MolDS_base::Molecule* molecule;
    double coreRepulsionEnergy;
+   double vdWCorrectionEnergy;
    double** fockMatrix;
    double* energiesMO;
    double*** matrixForce;
@@ -83,6 +85,10 @@ protected:
                                      MolDS_base::ShellType shellB) const;
    virtual double GetDiatomCoreRepulsionEnergy(int indexAtomA, int indexAtomB) const;
    virtual double GetDiatomCoreRepulsionFirstDerivative(int indexAtomA, 
+                                                        int indexAtomB, 
+                                                        MolDS_base::CartesianType axisA) const;
+   virtual double GetDiatomVdWCorrectionEnergy(int indexAtomA, int indexAtomB) const;
+   virtual double GetDiatomVdWCorrectionFirstDerivative(int indexAtomA, 
                                                         int indexAtomB, 
                                                         MolDS_base::CartesianType axisA) const;
    double GetReducedOverlap(int na, int la, int m, 
@@ -184,6 +190,8 @@ private:
    std::string messageUnOcc;
    std::string messageCoreRepulsionTitle;
    std::string messageCoreRepulsion;
+   std::string messageVdWCorrectionTitle;
+   std::string messageVdWCorrection;
    double elecSCFEnergy;
    double** gammaAB;
    double** overlap;
@@ -203,6 +211,7 @@ private:
                         [2*MolDS_base::ShellType_end]
                         [4*MolDS_base::ShellType_end-1];
    void CalcCoreRepulsionEnergy();
+   void CalcVdWCorrectionEnergy();
    bool SatisfyConvergenceCriterion(double const* const* oldOrbitalElectronPopulation, 
                                     double const* const* orbitalElectronPopulation,
                                     int numberAOs, 
@@ -291,7 +300,8 @@ private:
                          double const* energiesMO, 
                          double const* const* fockMatrix, 
                          double const* const* gammaAB, 
-                         double coreRepulsionEnergy) const;
+                         double coreRepulsionEnergy,
+                         double vdWCorrectionEnergy) const;
    void FreeElecEnergyMatrices(double*** fMatrix, 
                                double*** hMatrix, 
                                double*** dammyOrbitalElectronPopulation, 
