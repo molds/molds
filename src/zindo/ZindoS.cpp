@@ -27,7 +27,6 @@
 #include<algorithm>
 #include<omp.h>
 #include<boost/format.hpp>
-#include"mkl.h"
 #include"../base/PrintController.h"
 #include"../base/MolDSException.h"
 #include"../base/Uncopyable.h"
