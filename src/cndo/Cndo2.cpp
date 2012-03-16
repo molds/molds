@@ -29,7 +29,7 @@
 #include"../base/PrintController.h"
 #include"../base/MolDSException.h"
 #include"../base/Uncopyable.h"
-#include"../mkl_wrapper/LapackWrapper.h"
+#include"../wrappers/Lapack.h"
 #include"../base/Enums.h"
 #include"../base/MathUtilities.h"
 #include"../base/MallocerFreer.h"
@@ -391,10 +391,10 @@ void Cndo2::DoSCF(bool requiresGuess){
 
          // diagonalization
          bool calcEigenVectors = true;
-         MolDS_mkl_wrapper::LapackWrapper::GetInstance()->Dsyevd(this->fockMatrix, 
-                                                                 this->energiesMO, 
-                                                                 this->molecule->GetTotalNumberAOs(), 
-                                                                 calcEigenVectors);
+         MolDS_wrappers::Lapack::GetInstance()->Dsyevd(this->fockMatrix, 
+                                                       this->energiesMO, 
+                                                       this->molecule->GetTotalNumberAOs(), 
+                                                       calcEigenVectors);
 
          // calc. electron population in each orbital
          this->CalcOrbitalElectronPopulation(this->orbitalElectronPopulation, 
@@ -696,9 +696,9 @@ void Cndo2::DoDIIS(double** orbitalElectronPopulation,
       }
 
       if(diisNumErrorVect <= step && diisEndError<eMax && eMax<diisStartError){
-         MolDS_mkl_wrapper::LapackWrapper::GetInstance()->Dsysv(diisErrorProducts, 
-                                                                diisErrorCoefficients, 
-                                                                diisNumErrorVect+1);
+         MolDS_wrappers::Lapack::GetInstance()->Dsysv(diisErrorProducts, 
+                                                      diisErrorCoefficients, 
+                                                      diisNumErrorVect+1);
          for(int j=0; j<totalNumberAOs; j++){
             for(int k=0; k<totalNumberAOs; k++){
                orbitalElectronPopulation[j][k] = 0.0;

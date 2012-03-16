@@ -16,21 +16,21 @@
 // You should have received a copy of the GNU General Public License      // 
 // along with MolDS.  If not, see <http://www.gnu.org/licenses/>.         // 
 //************************************************************************//
-#ifndef INCLUDED_LAPACKWRAPPER
-#define INCLUDED_LAPACKWRAPPER
+#ifndef INCLUDED_LAPACK
+#define INCLUDED_LAPACK
 #include"mkl.h"
-namespace MolDS_mkl_wrapper{
-// LapackWrapper is singleton
-class LapackWrapper: public MolDS_base::PrintController, private MolDS_base::Uncopyable{
+namespace MolDS_wrappers{
+// Lapacke is singleton
+class Lapack: public MolDS_base::PrintController, private MolDS_base::Uncopyable{
 public:
-   static LapackWrapper* GetInstance();
+   static Lapack* GetInstance();
    static void DeleteInstance();
    int Dsyevd(double** matrix, double* eigenValues, int size, bool calcEigenVectors);
    int Dsysv(double const* const* matrix, double* b, int size);
 private:
-   LapackWrapper();
-   ~LapackWrapper();
-   static LapackWrapper* lapackWrapper;
+   Lapack();
+   ~Lapack();
+   static Lapack* lapack;
    bool calculatedDsysvBlockSize;
    int dsysvBlockSize;
    std::string errorMessageDsyevdInfo;

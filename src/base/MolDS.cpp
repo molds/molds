@@ -32,7 +32,7 @@
 #include"PrintController.h"
 #include"MolDSException.h"
 #include"Uncopyable.h"
-#include"../mkl_wrapper/LapackWrapper.h"
+#include"../wrappers/Lapack.h"
 #include"Utilities.h"
 #include"Enums.h"
 #include"MallocerFreer.h"
@@ -72,7 +72,7 @@ void MolDS::Run() const{
       InputParser::GetInstance();
       molecule = new Molecule();
       Parameters::GetInstance();
-      MolDS_mkl_wrapper::LapackWrapper::GetInstance();
+      MolDS_wrappers::Lapack::GetInstance();
       GTOExpansionSTO::GetInstance();
       // Parse input
       InputParser::GetInstance()->Parse(molecule);
@@ -124,7 +124,7 @@ void MolDS::Run() const{
 
    //Free 
    GTOExpansionSTO::DeleteInstance();
-   MolDS_mkl_wrapper::LapackWrapper::DeleteInstance(); 
+   MolDS_wrappers::Lapack::DeleteInstance(); 
    Parameters::DeleteInstance();
    delete molecule;
    InputParser::DeleteInstance();

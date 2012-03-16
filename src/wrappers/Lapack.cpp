@@ -28,40 +28,40 @@
 #include"../base/PrintController.h"
 #include"../base/MolDSException.h"
 #include"../base/Uncopyable.h"
-#include"LapackWrapper.h"
+#include"Lapack.h"
 using namespace std;
 using namespace MolDS_base;
 
-namespace MolDS_mkl_wrapper{
-LapackWrapper* LapackWrapper::lapackWrapper = NULL;
+namespace MolDS_wrappers{
+Lapack* Lapack::lapack = NULL;
 
-LapackWrapper::LapackWrapper(){
+Lapack::Lapack(){
    this->calculatedDsysvBlockSize = false;
    this->dsysvBlockSize = 64;
-   this->errorMessageDsyevdInfo = "Error in mkl_wrapper::LapackWrapper::Dsyevd: info != 0: info = ";
-   this->errorMessageDsyevdSize = "Error in mkl_wrapper::LapackWrapper::Dsyevd: size of matirx < 1\n";
-   this->errorMessageDsysvInfo = "Error in mkl_wrapper::LapackWrapper::Dsysv: info != 0\n";
+   this->errorMessageDsyevdInfo = "Error in wrappers::Lapack::Dsyevd: info != 0: info = ";
+   this->errorMessageDsyevdSize = "Error in wrappers::Lapack::Dsyevd: size of matirx < 1\n";
+   this->errorMessageDsysvInfo = "Error in wrappers::Lapack::Dsysv: info != 0\n";
    this->errorMessageInfo = "info=";
-   this->errorMessageDsysvSize = "Error in mkl_wrapper::LapackWrapper::Dsysv: size of matirx < 1\n";
+   this->errorMessageDsysvSize = "Error in wrappers::Lapack::Dsysv: size of matirx < 1\n";
 }
 
-LapackWrapper::~LapackWrapper(){
+Lapack::~Lapack(){
 }
 
-LapackWrapper* LapackWrapper::GetInstance(){
-   if(lapackWrapper == NULL){
-      lapackWrapper = new LapackWrapper();
-      //this->OutputLog("LapackWrapper created.\n\n");
+Lapack* Lapack::GetInstance(){
+   if(lapack == NULL){
+      lapack = new Lapack();
+      //this->OutputLog("Lapack created.\n\n");
    }
-   return lapackWrapper;
+   return lapack;
 }
 
-void LapackWrapper::DeleteInstance(){
-   if(lapackWrapper != NULL){
-      delete lapackWrapper;
-      //this->OutputLog("LapackWrapper deleted\n\n");
+void Lapack::DeleteInstance(){
+   if(lapack != NULL){
+      delete lapack;
+      //this->OutputLog("Lapack deleted\n\n");
    }
-   lapackWrapper = NULL;
+   lapack = NULL;
 }
 
 
@@ -72,7 +72,7 @@ void LapackWrapper::DeleteInstance(){
  *    i-th eigen vector is (matirx[i][0], matirx[i][1], matirx[i][2], ....).
  *
  * ***/
-int LapackWrapper::Dsyevd(double** matrix, double* eigenValues, int size, bool calcEigenVectors){
+int Lapack::Dsyevd(double** matrix, double* eigenValues, int size, bool calcEigenVectors){
    int info = 0;
    int k = 0;
    int lwork;
@@ -180,7 +180,7 @@ int LapackWrapper::Dsyevd(double** matrix, double* eigenValues, int size, bool c
  * The X is stored in b.
  *
  */
-int LapackWrapper::Dsysv(double const* const* matrix, double* b, int size){
+int Lapack::Dsysv(double const* const* matrix, double* b, int size){
    int info = 0;
    int lwork;
    char uplo = 'U';

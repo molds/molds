@@ -29,7 +29,7 @@
 #include"../base/PrintController.h"
 #include"../base/MolDSException.h"
 #include"../base/Uncopyable.h"
-#include"../mkl_wrapper/LapackWrapper.h"
+#include"../wrappers/Lapack.h"
 #include"../base/Enums.h"
 #include"../base/MallocerFreer.h"
 #include"../base/EularAngle.h"
@@ -1744,9 +1744,9 @@ void Mndo::CalcZMatrixForce(const vector<int>& elecStates){
                               redundantQIndeces);
             this->CalcAuxiliaryVector(y, q, kRDager, nonRedundantQIndeces, redundantQIndeces);
             // solve (54) in [PT_1996]
-            MolDS_mkl_wrapper::LapackWrapper::GetInstance()->Dsysv(kNR, 
-                                                                   y, 
-                                                                   nonRedundantQIndeces.size());
+            MolDS_wrappers::Lapack::GetInstance()->Dsysv(kNR, 
+                                                         y, 
+                                                         nonRedundantQIndeces.size());
             // calculate each element of Z matrix.
             stringstream ompErrors;
             #pragma omp parallel for schedule(auto)

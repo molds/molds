@@ -30,7 +30,7 @@
 #include"../base/PrintController.h"
 #include"../base/MolDSException.h"
 #include"../base/Uncopyable.h"
-#include"../mkl_wrapper/LapackWrapper.h"
+#include"../wrappers/Lapack.h"
 #include"../base/Enums.h"
 #include"../base/MallocerFreer.h"
 #include"../base/EularAngle.h"
@@ -1058,11 +1058,10 @@ void ZindoS::DoCISDavidson(){
 
             // diagonalize interaction matrix
             bool calcEigenVectors = true;
-            MolDS_mkl_wrapper::LapackWrapper::GetInstance()->
-                                              Dsyevd(interactionMatrix,
-                                                     interactionEigenEnergies, 
-                                                     interactionMatrixDimension, 
-                                                     calcEigenVectors);
+            MolDS_wrappers::Lapack::GetInstance()->Dsyevd(interactionMatrix,
+                                                          interactionEigenEnergies, 
+                                                          interactionMatrixDimension, 
+                                                          calcEigenVectors);
 
             // check convergence of all excited states
             notConvergedStates=0;
@@ -1207,10 +1206,10 @@ void ZindoS::FreeDavidsonRoopCISTemporaryMtrices(double*** interactionMatrix,
 void ZindoS::DoCISDirect(){
    this->OutputLog(this->messageStartDirectCIS);
    bool calcEigenVectors = true;
-   MolDS_mkl_wrapper::LapackWrapper::GetInstance()->Dsyevd(this->matrixCIS,
-                                                           this->excitedEnergies, 
-                                                           this->matrixCISdimension, 
-                                                           calcEigenVectors);
+   MolDS_wrappers::Lapack::GetInstance()->Dsyevd(this->matrixCIS,
+                                                 this->excitedEnergies, 
+                                                 this->matrixCISdimension, 
+                                                 calcEigenVectors);
    this->OutputLog(this->messageDoneDirectCIS);
 }
 

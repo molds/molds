@@ -28,7 +28,7 @@
 #include"PrintController.h"
 #include"MolDSException.h"
 #include"Uncopyable.h"
-#include"../mkl_wrapper/LapackWrapper.h"
+#include"../wrappers/Lapack.h"
 #include"Enums.h"
 #include"MathUtilities.h"
 #include"MallocerFreer.h"
@@ -454,10 +454,10 @@ void Molecule::CalcPrincipalAxes(){
       this->CalcInertiaTensor(inertiaTensor, inertiaTensorOrigin);
       
       bool calcEigenVectors = true;
-      MolDS_mkl_wrapper::LapackWrapper::GetInstance()->Dsyevd(inertiaTensor,
-                                                              inertiaMoments,
-                                                              3,
-                                                              calcEigenVectors);
+      MolDS_wrappers::Lapack::GetInstance()->Dsyevd(inertiaTensor,
+                                                    inertiaMoments,
+                                                    3,
+                                                    calcEigenVectors);
       this->OutputPrincipalAxes(inertiaTensor, inertiaMoments);
       this->OutputInertiaTensorOrigin(inertiaTensorOrigin);
    }
