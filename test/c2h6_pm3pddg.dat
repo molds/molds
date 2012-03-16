@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/2/8(Wed.) 12:24:10  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/3/17(Sat.) 1:5:49  <<<<<
 
 
 **********  START: Parse input  **********
@@ -51,6 +51,7 @@
 		DIIS number of error vectors: 5
 		DIIS starting error: 1.000000e-01
 		DIIS ending error: 2.000000e-08
+		van der Waals (vdW) correction: no
 
 	Memory conditions:
 		Heap limit: 2.560000e+02[MB]
@@ -67,19 +68,19 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 
 
 **********  START: PM3/PDDG-SCF  **********
-SCF iter=0: RMS density=5.291502622129178
-SCF iter=1: RMS density=1.862872189503768
-SCF iter=2: RMS density=0.993239189796957
+SCF iter=0: RMS density=5.291502622129180
+SCF iter=1: RMS density=1.862872189503767
+SCF iter=2: RMS density=0.993239189796953
 SCF iter=3: RMS density=0.533349207055902
-SCF iter=4: RMS density=0.285488533225343
+SCF iter=4: RMS density=0.285488533225345
 SCF iter=5: RMS density=0.152407528472138
-SCF iter=6: RMS density=0.000620521117909
-SCF iter=7: RMS density=0.000181786594273
-SCF iter=8: RMS density=0.000057887199698
-SCF iter=9: RMS density=0.000021427661555
-SCF iter=10: RMS density=0.000003665762852
-SCF iter=11: RMS density=0.000001692271513
-SCF iter=12: RMS density=0.000000190761140
+SCF iter=6: RMS density=0.000620521117899
+SCF iter=7: RMS density=0.000181786594206
+SCF iter=8: RMS density=0.000057887199666
+SCF iter=9: RMS density=0.000021427661569
+SCF iter=10: RMS density=0.000003665762871
+SCF iter=11: RMS density=0.000001692271511
+SCF iter=12: RMS density=0.000000190761141
 
 
 
@@ -122,7 +123,7 @@ SCF iter=12: RMS density=0.000000190761140
 		6	H	1.000000e+00	8.849413e-02
 		7	H	1.000000e+00	9.338598e-02
 
-	Elapsed time(omp) for the SCF = 0.051116[s].
+	Elapsed time(omp) for the SCF = 0.039686[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
@@ -132,9 +133,9 @@ SCF iter=12: RMS density=0.000000190761140
 
 
      >>>>>  The MolDS finished normally!  <<<<<
-     >>>>>  CPU time: 0.06[s].  <<<<<
+     >>>>>  CPU time: 0.03[s].  <<<<<
      >>>>>  Elapsed time: 0[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 0.054764[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 0.0415061[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/2/8(Wed.) 12:22:9  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/3/17(Sat.) 1:4:29  <<<<<
 
 
 **********  START: Parse input  **********
@@ -45,6 +45,7 @@
 		DIIS number of error vectors: 5
 		DIIS starting error: 1.000000e-01
 		DIIS ending error: 2.000000e-08
+		van der Waals (vdW) correction: no
 
 	Memory conditions:
 		Heap limit: 2.560000e+02[MB]
@@ -60,17 +61,17 @@ geometry_end |
 
 
 **********  START: AM1-SCF  **********
-SCF iter=0: RMS density=3.999999999999996
+SCF iter=0: RMS density=4.000000000000000
 SCF iter=1: RMS density=1.697713561546780
 SCF iter=2: RMS density=0.860600720346228
 SCF iter=3: RMS density=0.427636051427985
-SCF iter=4: RMS density=0.212526145245563
-SCF iter=5: RMS density=0.105650646144012
-SCF iter=6: RMS density=0.000938957122592
-SCF iter=7: RMS density=0.000217809764205
-SCF iter=8: RMS density=0.000041259413673
-SCF iter=9: RMS density=0.000009909355125
-SCF iter=10: RMS density=0.000000031131529
+SCF iter=4: RMS density=0.212526145245565
+SCF iter=5: RMS density=0.105650646144011
+SCF iter=6: RMS density=0.000938957121280
+SCF iter=7: RMS density=0.000217809765836
+SCF iter=8: RMS density=0.000041259419951
+SCF iter=9: RMS density=0.000009909392662
+SCF iter=10: RMS density=0.000000031136173
 
 
 
@@ -104,7 +105,7 @@ SCF iter=10: RMS density=0.000000031131529
 		3	H	1.000000e+00	6.455696e-02
 		4	H	1.000000e+00	6.455695e-02
 
-	Elapsed time(omp) for the SCF = 0.022650[s].
+	Elapsed time(omp) for the SCF = 0.013397[s].
 **********  DONE: AM1-SCF  **********
 
 
@@ -114,9 +115,9 @@ SCF iter=10: RMS density=0.000000031131529
 
 
      >>>>>  The MolDS finished normally!  <<<<<
-     >>>>>  CPU time: 0.02[s].  <<<<<
+     >>>>>  CPU time: 0.01[s].  <<<<<
      >>>>>  Elapsed time: 0[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 0.0263989[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 0.0145659[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

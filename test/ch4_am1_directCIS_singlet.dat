@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/2/22(Wed.) 18:39:29  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/3/17(Sat.) 1:4:29  <<<<<
 
 
 **********  START: Parse input  **********
@@ -45,6 +45,7 @@
 		DIIS number of error vectors: 5
 		DIIS starting error: 1.000000e-01
 		DIIS ending error: 2.000000e-08
+		van der Waals (vdW) correction: no
 
 	Memory conditions:
 		Heap limit: 2.560000e+02[MB]
@@ -68,17 +69,17 @@ geometry_end |
 
 
 **********  START: AM1-SCF  **********
-SCF iter=0: RMS density=3.999999999999998
-SCF iter=1: RMS density=1.697713709469838
-SCF iter=2: RMS density=0.860600764021104
-SCF iter=3: RMS density=0.427636034234946
-SCF iter=4: RMS density=0.212526116765221
-SCF iter=5: RMS density=0.105650622384615
-SCF iter=6: RMS density=0.000938972216248
-SCF iter=7: RMS density=0.000217809878450
-SCF iter=8: RMS density=0.000041261336254
-SCF iter=9: RMS density=0.000009908769035
-SCF iter=10: RMS density=0.000000031138605
+SCF iter=0: RMS density=4.000000000000001
+SCF iter=1: RMS density=1.697713709469840
+SCF iter=2: RMS density=0.860600764021105
+SCF iter=3: RMS density=0.427636034234945
+SCF iter=4: RMS density=0.212526116765222
+SCF iter=5: RMS density=0.105650622384614
+SCF iter=6: RMS density=0.000938972213429
+SCF iter=7: RMS density=0.000217809716086
+SCF iter=8: RMS density=0.000041261351697
+SCF iter=9: RMS density=0.000009908755948
+SCF iter=10: RMS density=0.000000031135571
 
 
 
@@ -112,13 +113,13 @@ SCF iter=10: RMS density=0.000000031138605
 		3	H	1.000000e+00	6.455701e-02
 		4	H	1.000000e+00	6.455694e-02
 
-	Elapsed time(omp) for the SCF = 0.024088[s].
+	Elapsed time(omp) for the SCF = 0.014795[s].
 **********  DONE: AM1-SCF  **********
 
 
 **********  START: AM1-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.001956[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.001365[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Direct-CIS  =====
@@ -128,24 +129,24 @@ SCF iter=10: RMS density=0.000000031138605
 
 	Excitation energies:
 		| i-th | e[a.u.] | e[eV] | dominant eigenvector coefficients (occ. -> vir.) |
-		 1	3.300706e-01	8.981751e+00	-5.761062e-01 (1 -> 5)	
+		 1	3.300706e-01	8.981751e+00	5.761062e-01 (1 -> 5)	
 		 2	3.393234e-01	9.233533e+00	-6.553841e-01 (3 -> 7)	
 		 3	3.393234e-01	9.233534e+00	-6.559157e-01 (1 -> 7)	
-		 4	3.393234e-01	9.233534e+00	-6.553841e-01 (2 -> 7)	
-		 5	3.678090e-01	1.000867e+01	7.017253e-01 (2 -> 4)	
-		 6	3.678091e-01	1.000868e+01	-7.017196e-01 (3 -> 5)	
-		 7	3.678092e-01	1.000868e+01	7.017205e-01 (2 -> 5)	
+		 4	3.393234e-01	9.233534e+00	6.553841e-01 (2 -> 7)	
+		 5	3.678090e-01	1.000867e+01	-7.017253e-01 (2 -> 4)	
+		 6	3.678091e-01	1.000868e+01	7.017196e-01 (3 -> 5)	
+		 7	3.678092e-01	1.000868e+01	-7.017205e-01 (2 -> 5)	
 		 8	3.791979e-01	1.031858e+01	7.366066e-01 (3 -> 4)	
 		 9	3.791979e-01	1.031858e+01	6.938504e-01 (1 -> 6)	
-		 10	4.122789e-01	1.121877e+01	5.397230e-01 (2 -> 7)	
-		 11	4.122790e-01	1.121877e+01	-5.397241e-01 (3 -> 7)	
-		 12	4.122790e-01	1.121877e+01	-7.530662e-01 (1 -> 7)	
+		 10	4.122789e-01	1.121877e+01	-5.397230e-01 (2 -> 7)	
+		 11	4.122790e-01	1.121877e+01	5.397241e-01 (3 -> 7)	
+		 12	4.122790e-01	1.121877e+01	7.530662e-01 (1 -> 7)	
 		 13	9.506271e-01	2.586809e+01	9.059515e-01 (0 -> 4)	
 		 14	9.506272e-01	2.586809e+01	9.059515e-01 (0 -> 6)	
 		 15	9.506272e-01	2.586809e+01	9.958463e-01 (0 -> 5)	
-		 16	9.813499e-01	2.670410e+01	-9.978466e-01 (0 -> 7)	
+		 16	9.813499e-01	2.670410e+01	9.978466e-01 (0 -> 7)	
 
-	Elapsed time(omp) for the CIS = 0.002948[s].
+	Elapsed time(omp) for the CIS = 0.001987[s].
 **********  DONE: AM1-CIS  **********
 
 
@@ -155,9 +156,9 @@ SCF iter=10: RMS density=0.000000031138605
 
 
      >>>>>  The MolDS finished normally!  <<<<<
-     >>>>>  CPU time: 0.03[s].  <<<<<
+     >>>>>  CPU time: 0.02[s].  <<<<<
      >>>>>  Elapsed time: 0[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 0.0308321[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 0.018404[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

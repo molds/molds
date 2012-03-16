@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/2/22(Wed.) 18:39:30  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/3/17(Sat.) 1:4:29  <<<<<
 
 
 **********  START: Parse input  **********
@@ -45,6 +45,7 @@
 		DIIS number of error vectors: 5
 		DIIS starting error: 1.000000e-01
 		DIIS ending error: 2.000000e-08
+		van der Waals (vdW) correction: no
 
 	Memory conditions:
 		Heap limit: 2.560000e+02[MB]
@@ -71,17 +72,17 @@ h | 1.004043 | -0.188679 | 0.000000 | h | 1.004062 | 1.324529 | 0.873652 | h | 1
 
 
 **********  START: AM1-SCF  **********
-SCF iter=0: RMS density=3.999999999999998
-SCF iter=1: RMS density=1.697713709469838
-SCF iter=2: RMS density=0.860600764021104
-SCF iter=3: RMS density=0.427636034234946
-SCF iter=4: RMS density=0.212526116765221
-SCF iter=5: RMS density=0.105650622384615
-SCF iter=6: RMS density=0.000938972216248
-SCF iter=7: RMS density=0.000217809878450
-SCF iter=8: RMS density=0.000041261336254
-SCF iter=9: RMS density=0.000009908769035
-SCF iter=10: RMS density=0.000000031138605
+SCF iter=0: RMS density=4.000000000000001
+SCF iter=1: RMS density=1.697713709469840
+SCF iter=2: RMS density=0.860600764021105
+SCF iter=3: RMS density=0.427636034234945
+SCF iter=4: RMS density=0.212526116765222
+SCF iter=5: RMS density=0.105650622384614
+SCF iter=6: RMS density=0.000938972213429
+SCF iter=7: RMS density=0.000217809716086
+SCF iter=8: RMS density=0.000041261351697
+SCF iter=9: RMS density=0.000009908755948
+SCF iter=10: RMS density=0.000000031135571
 
 
 
@@ -115,13 +116,13 @@ SCF iter=10: RMS density=0.000000031138605
 		3	H	1.000000e+00	6.455701e-02
 		4	H	1.000000e+00	6.455694e-02
 
-	Elapsed time(omp) for the SCF = 0.026402[s].
+	Elapsed time(omp) for the SCF = 0.014438[s].
 **********  DONE: AM1-SCF  **********
 
 
 **********  START: AM1-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.001965[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.001376[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -139,21 +140,21 @@ SCF iter=10: RMS density=0.000000031138605
 
 	Davidson iter=2
 	  1-th excited: norm of the residual = 4.004227e-03
-	  2-th excited: norm of the residual = 2.332345e-07
+	  2-th excited: norm of the residual = 2.332344e-07
 	  3-th excited: norm of the residual = 3.928702e-02
 	  4-th excited: norm of the residual = 3.810033e-02
 
 	Davidson iter=3
-	  1-th excited: norm of the residual = 1.518976e-10
-	  2-th excited: norm of the residual = 7.348075e-10
-	  3-th excited: norm of the residual = 2.161648e-10
-	  4-th excited: norm of the residual = 1.502705e-03
+	  1-th excited: norm of the residual = 1.420954e-10
+	  2-th excited: norm of the residual = 1.218568e-09
+	  3-th excited: norm of the residual = 1.617520e-09
+	  4-th excited: norm of the residual = 1.593912e-03
 
 	Davidson iter=4
-	  1-th excited: norm of the residual = 1.448200e-10
-	  2-th excited: norm of the residual = 3.306811e-10
-	  3-th excited: norm of the residual = 9.200616e-12
-	  4-th excited: norm of the residual = 9.696544e-11
+	  1-th excited: norm of the residual = 1.359262e-10
+	  2-th excited: norm of the residual = 5.592510e-10
+	  3-th excited: norm of the residual = 4.495188e-11
+	  4-th excited: norm of the residual = 7.403011e-10
 
 
 
@@ -165,12 +166,12 @@ SCF iter=10: RMS density=0.000000031138605
 
 	Excitation energies:
 		| i-th | e[a.u.] | e[eV] | dominant eigenvector coefficients (occ. -> vir.) |
-		 1	3.300706e-01	8.981751e+00	-5.761062e-01 (1 -> 5)	
+		 1	3.300706e-01	8.981751e+00	5.761062e-01 (1 -> 5)	
 		 2	3.393234e-01	9.233533e+00	-6.553840e-01 (3 -> 7)	
-		 3	3.393234e-01	9.233534e+00	6.559156e-01 (1 -> 7)	
-		 4	3.393234e-01	9.233534e+00	-6.553841e-01 (2 -> 7)	
+		 3	3.393234e-01	9.233534e+00	-6.559147e-01 (1 -> 7)	
+		 4	3.393234e-01	9.233534e+00	6.553832e-01 (2 -> 7)	
 
-	Elapsed time(omp) for the CIS = 0.004837[s].
+	Elapsed time(omp) for the CIS = 0.003261[s].
 **********  DONE: AM1-CIS  **********
 
 
@@ -180,9 +181,9 @@ SCF iter=10: RMS density=0.000000031138605
 
 
      >>>>>  The MolDS finished normally!  <<<<<
-     >>>>>  CPU time: 0.03[s].  <<<<<
+     >>>>>  CPU time: 0.02[s].  <<<<<
      >>>>>  Elapsed time: 0[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 0.034898[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 0.0196068[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 
