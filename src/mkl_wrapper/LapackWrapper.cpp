@@ -143,7 +143,11 @@ int LapackWrapper::Dsyevd(double** matrix, double* eigenValues, int size, bool c
    }
 
    for(int i=0;i<size;i++){
-      if(matrix[i][0]<0){
+      double temp = 0.0;
+      for(int j=0;j<size;j++){
+         temp += matrix[i][j];
+      }
+      if(temp<0){
          for(int j=0;j<size;j++){
             matrix[i][j]*=-1.0;
          }
