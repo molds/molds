@@ -22,6 +22,7 @@ class TesterOmp
    @@tempFile = "temp.dat"
    @@moldsBin = "../src/MolDS.out"
    @@command = "command: "
+   @@deleteDiff = " | gawk '{if(($4!=\"RMS\")){print $0}}' | gawk '{if(($4!=\"time:\")){print $0}}' | gawk '{if(($3!=\"Elapsed\")){print $0}}' | gawk '{if(($2!=\"Elapsed\")){print $0}}' | gawk '{if(($3!=\"Welcome\")){print $0}}' | gawk '{if(($7!=\"residual\")){print $0}}'"
    def doesTestOmp(prefix, mklNumThreads, ompNumThreads)
       setPrefix(prefix)
       ENV["MKL_NUM_THREADS"] = mklNumThreads
@@ -31,8 +32,8 @@ class TesterOmp
       system("echo OMP_NUM_THREADS:$OMP_NUM_THREADS")
       print @@command + @moldsCommand + "\n"
       system(@moldsCommand)
-      print @@command + @diffCommand + "\n"
-      system(@diffCommand)
+      print @@command + @diffCommand + @@deleteDiff + "\n"
+      system(@diffCommand + @@deleteDiff)
       system("echo '\n\n'")
    end
    def setPrefix(prefix)
