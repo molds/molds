@@ -34,6 +34,7 @@ public:
    virtual double*** GetForce(const std::vector<int>& elecStates) = 0;
    virtual double GetElectronicEnergy(int elecState) const = 0;
    virtual double GetCoreRepulsionEnergy() const = 0;
+   virtual double GetVdWCorrectionEnergy() const = 0;
 };
 
 }

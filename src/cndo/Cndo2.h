@@ -185,6 +185,7 @@ private:
    std::string messageMullikenAtoms;
    std::string messageMullikenAtomsTitle;
    std::string messageElecEnergy;
+   std::string messageElecEnergyVdW;
    std::string messageElecEnergyTitle;
    std::string messageOcc;
    std::string messageUnOcc;

@@ -67,7 +67,9 @@ void MC::SetMessages(){
    this->messageEnergies = "\tEnergies:\n";
    this->messageEnergiesTitle = "\t\t|\tkind\t\t\t| [a.u.] | [eV] | \n";
    this->messageCoreRepulsionEnergy = "Core repulsion   ";
+   this->messageVdWCorrectionEnergy = "VdW correction   ";
    this->messageElectronicEnergy = "Electronic\n\t\t(inc. core rep.)";
+   this->messageElectronicEnergyVdW = "Electronic\n\t\t(inc. core rep. and vdW)";
    this->messageTransitionRate = "\tTransition Rate: ";
 }
 
@@ -220,6 +222,7 @@ void MC::OutputMolecule(const ElectronicStructure& electronicStructure,
                         const Molecule& molecule,
                         int elecState) const{
    this->OutputEnergies(electronicStructure, elecState);
+   this->OutputLog("\n");
    molecule.OutputConfiguration();
    molecule.OutputXyzCOC();
 }
@@ -232,9 +235,19 @@ void MC::OutputEnergies(const MolDS_base::ElectronicStructure& electronicStructu
    this->OutputLog((boost::format("\t\t%s\t%e\t%e\n") % this->messageCoreRepulsionEnergy.c_str()
                                                       % electronicStructure.GetCoreRepulsionEnergy()
                                                       % (electronicStructure.GetCoreRepulsionEnergy()/eV2AU)).str());
-   this->OutputLog((boost::format("\t\t%s\t%e\t%e\n") % this->messageElectronicEnergy.c_str()
-                                                      % electronicStructure.GetElectronicEnergy(elecState)
-                                                      % (electronicStructure.GetElectronicEnergy(elecState)/eV2AU)).str());
+   if(Parameters::GetInstance()->RequiresVdWSCF()){
+      this->OutputLog((boost::format("\t\t%s\t%e\t%e\n") % this->messageVdWCorrectionEnergy.c_str()
+                                                         % electronicStructure.GetVdWCorrectionEnergy()
+                                                         % (electronicStructure.GetVdWCorrectionEnergy()/eV2AU)).str());
+      this->OutputLog((boost::format("\t\t%s\t%e\t%e\n") % this->messageElectronicEnergyVdW.c_str()
+                                                         % electronicStructure.GetElectronicEnergy(elecState)
+                                                         % (electronicStructure.GetElectronicEnergy(elecState)/eV2AU)).str());
+   }
+   else{
+      this->OutputLog((boost::format("\t\t%s\t%e\t%e\n") % this->messageElectronicEnergy.c_str()
+                                                         % electronicStructure.GetElectronicEnergy(elecState)
+                                                         % (electronicStructure.GetElectronicEnergy(elecState)/eV2AU)).str());
+   }
 }
 
 }

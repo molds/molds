@@ -39,7 +39,9 @@ private:
    std::string messageEnergiesTitle;
    std::string messageCoreKineticEnergy;
    std::string messageCoreRepulsionEnergy;
+   std::string messageVdWCorrectionEnergy;
    std::string messageElectronicEnergy;
+   std::string messageElectronicEnergyVdW;
    std::string messageTotalEnergy;
    std::string messageErrorEnergy;
    std::string messageTime;

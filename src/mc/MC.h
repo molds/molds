@@ -39,7 +39,9 @@ private:
    std::string messageEnergies;
    std::string messageEnergiesTitle;
    std::string messageCoreRepulsionEnergy;
+   std::string messageVdWCorrectionEnergy;
    std::string messageElectronicEnergy;
+   std::string messageElectronicEnergyVdW;
    std::string messageTotalEnergy;
    std::string messageTransitionRate;
    std::string errorMessageNotEnebleExcitedTheoryType;

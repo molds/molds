@@ -160,7 +160,9 @@ void MD::SetMessages(){
    this->messageEnergiesTitle = "\t\t|\tkind\t\t\t| [a.u.] | [eV] | \n";
    this->messageCoreKineticEnergy =   "Core kinetic     ";
    this->messageCoreRepulsionEnergy = "Core repulsion   ";
+   this->messageVdWCorrectionEnergy = "VdW correction   ";
    this->messageElectronicEnergy = "Electronic\n\t\t(inc. core rep.)";
+   this->messageElectronicEnergyVdW = "Electronic\n\t\t(inc. core rep. and vdW)";
    this->messageTotalEnergy =         "Total            ";
    this->messageErrorEnergy =         "Error            ";
    this->messageTime = "\tTime in [fs]: ";
@@ -186,9 +188,19 @@ double MD::OutputEnergies(boost::shared_ptr<ElectronicStructure> electronicStruc
    this->OutputLog((boost::format("\t\t%s\t%e\t%e\n") % this->messageCoreRepulsionEnergy.c_str()
                                                       % electronicStructure->GetCoreRepulsionEnergy()
                                                       % (electronicStructure->GetCoreRepulsionEnergy()/eV2AU)).str());
-   this->OutputLog((boost::format("\t\t%s\t%e\t%e\n") % this->messageElectronicEnergy.c_str()
-                                                      % electronicStructure->GetElectronicEnergy(elecState)
-                                                      % (electronicStructure->GetElectronicEnergy(elecState)/eV2AU)).str());
+   if(Parameters::GetInstance()->RequiresVdWSCF()){
+      this->OutputLog((boost::format("\t\t%s\t%e\t%e\n") % this->messageVdWCorrectionEnergy.c_str()
+                                                         % electronicStructure->GetVdWCorrectionEnergy()
+                                                         % (electronicStructure->GetVdWCorrectionEnergy()/eV2AU)).str());
+      this->OutputLog((boost::format("\t\t%s\t%e\t%e\n") % this->messageElectronicEnergyVdW.c_str()
+                                                         % electronicStructure->GetElectronicEnergy(elecState)
+                                                         % (electronicStructure->GetElectronicEnergy(elecState)/eV2AU)).str());
+   }
+   else{
+      this->OutputLog((boost::format("\t\t%s\t%e\t%e\n") % this->messageElectronicEnergy.c_str()
+                                                         % electronicStructure->GetElectronicEnergy(elecState)
+                                                         % (electronicStructure->GetElectronicEnergy(elecState)/eV2AU)).str());
+   }
    this->OutputLog((boost::format("\t\t%s\t%e\t%e\n") % this->messageTotalEnergy.c_str()
                                                       % (coreKineticEnergy + electronicStructure->GetElectronicEnergy(elecState))
                                                       % ((coreKineticEnergy + electronicStructure->GetElectronicEnergy(elecState))/eV2AU)).str());

@@ -155,6 +155,7 @@ void Cndo2::SetMessages(){
    this->messageMullikenAtoms = "\tMulliken charge on each Atom:\n";
    this->messageMullikenAtomsTitle = "\t\t| i-th | atom type | core charge | Mulliken charge | \n";
    this->messageElecEnergy = "\tElectronic energy(including core-repulsions):\n";
+   this->messageElecEnergyVdW = "\tElectronic energy(including core-repulsions and vdW correction):\n";
    this->messageElecEnergyTitle = "\t\t| [a.u.] | [eV] | \n";
    this->messageUnitSec = "[s].";
    this->messageCoreRepulsionTitle = "\t\t| [a.u.] | [eV] |\n";
@@ -761,7 +762,12 @@ void Cndo2::OutputSCFResults() const{
    this->OutputLog("\n");
 
    // output total energy
-   this->OutputLog(this->messageElecEnergy);
+   if(Parameters::GetInstance()->RequiresVdWSCF()){
+      this->OutputLog(this->messageElecEnergyVdW);
+   }
+   else{
+      this->OutputLog(this->messageElecEnergy);
+   }
    this->OutputLog(this->messageElecEnergyTitle);
    this->OutputLog((boost::format("\t\t%e\t%e\n\n") % this->elecSCFEnergy 
                                                     % (this->elecSCFEnergy/eV2AU)).str());
