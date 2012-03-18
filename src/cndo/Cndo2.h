@@ -44,6 +44,7 @@ protected:
    std::string errorMessageAtomB;
    std::string errorMessageAtomType;
    std::string errorMessageOrbitalType;
+   std::string errorMessageCartesianType;
    std::string errorMessageSCFNotConverged;
    std::string errorMessageMoleculeNotSet;
    std::string errorMessageOddTotalValenceElectrions;
@@ -51,6 +52,7 @@ protected:
    std::string errorMessageCoulombInt;
    std::string errorMessageExchangeInt;
    std::string errorMessageMolecularIntegralElement;
+   std::string errorMessageGetGaussianDipoleOrbitalD;
    std::string errorMessageGetGaussianOverlapOrbitalD;
    std::string errorMessageGetGaussianOverlapFirstDerivativeOrbitalD;
    std::string errorMessageCISNotImplemented;
@@ -196,6 +198,7 @@ private:
    double elecSCFEnergy;
    double** gammaAB;
    double** overlap;
+   double*** dipole;
    double bondingAdjustParameterK[2]; //see (3.79) in J. A. Pople book
 
    // use Y[na][nb][la][lb][m][i][j] 
@@ -227,6 +230,24 @@ private:
    void CalcAtomicElectronPopulation(double* atomicElectronPopulation,
                                      double const* const* orbitalElectronPopulation, 
                                      const MolDS_base::Molecule& molecule) const;
+   void CalcDipoleByGTOExpansion(double*** dipole,
+                                 const MolDS_base::Molecule& molecule, 
+                                 MolDS_base::STOnGType stonG) const; 
+   double GetDipoleElementByGTOExpansion(const MolDS_base_atoms::Atom& atomA, 
+                                         int valenceIndexA, 
+                                         const MolDS_base_atoms::Atom& atomB, 
+                                         int valenceIndexB,
+                                         MolDS_base::CartesianType axis,
+                                         MolDS_base::STOnGType stonG) const;
+   double GetGaussianDipole(MolDS_base::AtomType atomTypeA, 
+                            MolDS_base::OrbitalType valenceOrbitalA, 
+                            double gaussianExponentA, 
+                            double const* xyzA,
+                            MolDS_base::AtomType atomTypeB, 
+                            MolDS_base::OrbitalType valenceOrbitalB, 
+                            double gaussianExponentB, 
+                            double const* xyzB,
+                            MolDS_base::CartesianType axis) const;
    void CalcOverlap(double** overlap, const MolDS_base::Molecule& molecule) const;
    void CalcOverlapByGTOExpansion(double** overlap, 
                                   const MolDS_base::Molecule& molecule, 

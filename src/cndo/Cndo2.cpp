@@ -63,6 +63,7 @@ Cndo2::Cndo2(){
    this->SetEnableAtomTypes();
    this->gammaAB = NULL;
    this->overlap = NULL;
+   this->dipole = NULL;
    this->twoElecTwoCore = NULL;
    this->orbitalElectronPopulation = NULL;
    this->atomicElectronPopulation = NULL;
@@ -88,6 +89,10 @@ Cndo2::~Cndo2(){
    MallocerFreer::GetInstance()->Free<double>(&this->overlap, 
                                               this->molecule->GetTotalNumberAOs(),
                                               this->molecule->GetTotalNumberAOs());
+   MallocerFreer::GetInstance()->Free<double>(&this->dipole, 
+                                              this->molecule->GetTotalNumberAOs(),
+                                              this->molecule->GetTotalNumberAOs(),
+                                              CartesianType_end);
    MallocerFreer::GetInstance()->Free<double>(&this->orbitalElectronPopulation, 
                                               this->molecule->GetTotalNumberAOs(),
                                               this->molecule->GetTotalNumberAOs());
@@ -114,8 +119,11 @@ void Cndo2::SetMessages(){
    this->errorMessageAtomB = "Atom B is:\n";
    this->errorMessageAtomType = "\tatom type = ";
    this->errorMessageOrbitalType = "\torbital type = ";
+   this->errorMessageCartesianType = "\tcartesian type = ";
    this->errorMessageMolecularIntegralElement
       = "Error in cndo::Cndo2::GetMolecularIntegralElement: Non available orbital is contained.\n";
+   this->errorMessageGetGaussianDipoleOrbitalD 
+      = "Error in cndo::Cndo2::GetGaussiangDipole: d-orbital is not treatable. The d-orbital is contained in atom A or B.\n";
    this->errorMessageGetGaussianOverlapOrbitalD 
       = "Error in cndo::Cndo2::GetGaussiangOverlap: d-orbital is not treatable. The d-orbital is contained in atom A or B.\n";
    this->errorMessageGetGaussianOverlapFirstDerivativeOrbitalD 
@@ -1304,6 +1312,317 @@ void Cndo2::CalcGammaAB(double** gammaAB, const Molecule& molecule) const{
    this->OutputLog("\n");
    */
 
+}
+
+// calculate dipole moment between atomic orbitals. 
+// The analytic dipole is calculated with Gaussian expansion technique written in [DY_1977]
+void Cndo2::CalcDipoleByGTOExpansion(double*** dipole, 
+                                     const Molecule& molecule, 
+                                     STOnGType stonG) const{
+   int totalAONumber = molecule.GetTotalNumberAOs();
+   int totalAtomNumber = molecule.GetNumberAtoms();
+
+   stringstream ompErrors;
+//   #pragma omp parallel for schedule(auto) 
+   for(int A=0; A<totalAtomNumber; A++){
+      try{
+         const Atom& atomA = *molecule.GetAtom(A);
+         int firstAOIndexAtomA = atomA.GetFirstAOIndex();
+         for(int B=0; B<totalAtomNumber; B++){
+            const Atom& atomB = *molecule.GetAtom(B);
+            int firstAOIndexAtomB = atomB.GetFirstAOIndex();
+            for(int a=0; a<atomA.GetValenceSize(); a++){
+               for(int b=0; b<atomB.GetValenceSize(); b++){
+                  int mu = firstAOIndexAtomA + a;      
+                  int nu = firstAOIndexAtomB + b;      
+                  for(int i=0; i<CartesianType_end; i++){
+                     double value = this->GetDipoleElementByGTOExpansion(atomA, 
+                                                                         a, 
+                                                                         atomB, 
+                                                                         b, 
+                                                                         static_cast<CartesianType>(i),
+                                                                         stonG);
+                     dipole[mu][nu][i] = value;
+                  }
+               }
+            }
+         }
+      }
+      catch(MolDSException ex){
+//         #pragma omp critical
+         ompErrors << ex.what() << endl ;
+      }
+   }
+   // Exception throwing for omp-region
+   if(!ompErrors.str().empty()){
+      throw MolDSException(ompErrors.str());
+   }
+}
+
+// Calculate elements of dipole moment between atomic orbitals. 
+// The analytic dipole is calculated with Gaussian expansion technique written in [DY_1977]
+double Cndo2::GetDipoleElementByGTOExpansion(const Atom& atomA, int valenceIndexA, 
+                                             const Atom& atomB, int valenceIndexB,
+                                             CartesianType axis,
+                                             STOnGType stonG) const{
+   double value = 0.0;
+   ShellType shellTypeA = atomA.GetValenceShellType();
+   ShellType shellTypeB = atomB.GetValenceShellType();
+   OrbitalType valenceOrbitalA = atomA.GetValence(valenceIndexA);
+   OrbitalType valenceOrbitalB = atomB.GetValence(valenceIndexB);
+   double orbitalExponentA = atomA.GetOrbitalExponent(atomA.GetValenceShellType(), 
+                                                      valenceOrbitalA, 
+                                                      this->theory);
+   double orbitalExponentB = atomB.GetOrbitalExponent(atomB.GetValenceShellType(), 
+                                                      valenceOrbitalB, 
+                                                      this->theory);
+   double gaussianExponentA = 0.0;
+   double gaussianExponentB = 0.0;
+
+   double temp = 0.0;
+   for(int i=0; i<=stonG; i++){
+      for(int j=0; j<=stonG; j++){
+         temp = GTOExpansionSTO::GetInstance()->GetCoefficient(stonG, 
+                                                               shellTypeA, 
+                                                               valenceOrbitalA, 
+                                                               i); 
+         temp *= GTOExpansionSTO::GetInstance()->GetCoefficient(stonG, 
+                                                                shellTypeB, 
+                                                                valenceOrbitalB, 
+                                                                j); 
+         gaussianExponentA = pow(orbitalExponentA, 2.0) *
+                             GTOExpansionSTO::GetInstance()->GetExponent(stonG, 
+                                                                         shellTypeA, 
+                                                                         valenceOrbitalA, 
+                                                                         i);
+         gaussianExponentB = pow(orbitalExponentB, 2.0) *
+                             GTOExpansionSTO::GetInstance()->GetExponent(stonG, 
+                                                                         shellTypeB, 
+                                                                         valenceOrbitalB, 
+                                                                         j);
+         temp *= this->GetGaussianDipole(atomA.GetAtomType(), 
+                                         valenceOrbitalA, 
+                                         gaussianExponentA, 
+                                         atomA.GetXyz(),
+                                         atomB.GetAtomType(), 
+                                         valenceOrbitalB, 
+                                         gaussianExponentB,
+                                         atomB.GetXyz(),
+                                         axis);
+         value += temp;
+      }
+   }
+   return value;
+}
+
+// calculate gaussian dipole integrals. 
+double Cndo2::GetGaussianDipole(AtomType atomTypeA, 
+                                OrbitalType valenceOrbitalA, 
+                                double gaussianExponentA, 
+                                double const* xyzA,
+                                AtomType atomTypeB, 
+                                OrbitalType valenceOrbitalB, 
+                                double gaussianExponentB,
+                                double const* xyzB,
+                                CartesianType axis) const{
+
+   double value = 0.0;
+   if(valenceOrbitalA == s && valenceOrbitalB == s){
+      value = gaussianExponentA*xyzA[axis] + gaussianExponentB*xyzB[axis];
+      value /= gaussianExponentA + gaussianExponentB;
+   }
+   else if( (valenceOrbitalA == s && axis == XAxis && valenceOrbitalB == px) || 
+            (valenceOrbitalA == s && axis == YAxis && valenceOrbitalB == py) || 
+            (valenceOrbitalA == s && axis == ZAxis && valenceOrbitalB == pz) ){
+      double temp = gaussianExponentA*xyzA[axis] + gaussianExponentB*xyzB[axis];
+      temp *= gaussianExponentA*xyzA[axis] - gaussianExponentA*xyzB[axis]; 
+      temp /= gaussianExponentA + gaussianExponentB;
+      value = 0.5;
+      value += temp;
+      value *= 2.0*sqrt(gaussianExponentB);
+      value /= gaussianExponentA + gaussianExponentB;
+   }
+   else if( (valenceOrbitalA == px && axis == XAxis && valenceOrbitalB == s) || 
+            (valenceOrbitalA == py && axis == YAxis && valenceOrbitalB == s) || 
+            (valenceOrbitalA == pz && axis == ZAxis && valenceOrbitalB == s) ){
+      double temp = gaussianExponentA*xyzA[axis] + gaussianExponentB*xyzB[axis];
+      temp *= gaussianExponentB*xyzA[axis] - gaussianExponentB*xyzB[axis]; 
+      temp /= gaussianExponentA + gaussianExponentB;
+      value = 0.5;
+      value -= temp;
+      value *= 2.0*sqrt(gaussianExponentA);
+      value /= gaussianExponentA + gaussianExponentB;
+   }
+   else if( (valenceOrbitalA == s && axis == YAxis && valenceOrbitalB == px) || 
+            (valenceOrbitalA == s && axis == ZAxis && valenceOrbitalB == px) || 
+            (valenceOrbitalA == s && axis == XAxis && valenceOrbitalB == py) || 
+            (valenceOrbitalA == s && axis == ZAxis && valenceOrbitalB == py) || 
+            (valenceOrbitalA == s && axis == XAxis && valenceOrbitalB == pz) || 
+            (valenceOrbitalA == s && axis == YAxis && valenceOrbitalB == pz) ){
+      CartesianType piDirectionB;
+      if(valenceOrbitalB == px){
+         piDirectionB = XAxis;
+      }
+      else if(valenceOrbitalB == py){
+         piDirectionB = YAxis;
+      }
+      else if(valenceOrbitalB == pz){
+         piDirectionB = ZAxis;
+      }
+      double temp1 = gaussianExponentA*xyzA[piDirectionB] - gaussianExponentA*xyzB[piDirectionB];
+      double temp2 = gaussianExponentA*xyzA[axis]         + gaussianExponentB*xyzB[axis];
+      value = 2.0*sqrt(gaussianExponentB)*pow(gaussianExponentA+gaussianExponentB,-2.0);
+      value *= temp1*temp2;
+   }
+   else if( (valenceOrbitalA == px && axis == YAxis && valenceOrbitalB == s) || 
+            (valenceOrbitalA == px && axis == ZAxis && valenceOrbitalB == s) || 
+            (valenceOrbitalA == py && axis == XAxis && valenceOrbitalB == s) || 
+            (valenceOrbitalA == py && axis == ZAxis && valenceOrbitalB == s) || 
+            (valenceOrbitalA == pz && axis == XAxis && valenceOrbitalB == s) || 
+            (valenceOrbitalA == pz && axis == YAxis && valenceOrbitalB == s) ){
+      CartesianType piDirectionA;
+      if(valenceOrbitalA == px){
+         piDirectionA = XAxis;
+      }
+      else if(valenceOrbitalA == py){
+         piDirectionA = YAxis;
+      }
+      else if(valenceOrbitalA == pz){
+         piDirectionA = ZAxis;
+      }
+      double temp1 = gaussianExponentB*xyzA[piDirectionA] - gaussianExponentB*xyzB[piDirectionA];
+      double temp2 = gaussianExponentA*xyzA[axis]         + gaussianExponentB*xyzB[axis];
+      value = -2.0*sqrt(gaussianExponentA)*pow(gaussianExponentA+gaussianExponentB,-2.0);
+      value *= temp1*temp2;
+   }
+   else if( (valenceOrbitalA == px && axis == XAxis && valenceOrbitalB == valenceOrbitalA) || 
+            (valenceOrbitalA == py && axis == YAxis && valenceOrbitalB == valenceOrbitalA) || 
+            (valenceOrbitalA == pz && axis == ZAxis && valenceOrbitalB == valenceOrbitalA) ){
+      double temp1 = gaussianExponentA*xyzA[axis] + gaussianExponentB*xyzB[axis];
+      double temp2 = gaussianExponentA*xyzA[axis] - gaussianExponentA*xyzB[axis];
+      double temp3 = gaussianExponentB*xyzA[axis] - gaussianExponentB*xyzB[axis];
+      value = 0.5*(temp1+temp2-temp3);
+      value -= temp1*temp2*temp3*pow(gaussianExponentA+gaussianExponentB,-1.0);
+      value *= 4.0*sqrt(gaussianExponentA*gaussianExponentB)*pow(gaussianExponentA+gaussianExponentB,-2.0);
+   }
+   else if( (valenceOrbitalA == px && axis == YAxis && valenceOrbitalB == valenceOrbitalA) || 
+            (valenceOrbitalA == px && axis == ZAxis && valenceOrbitalB == valenceOrbitalA) || 
+            (valenceOrbitalA == py && axis == XAxis && valenceOrbitalB == valenceOrbitalA) || 
+            (valenceOrbitalA == py && axis == ZAxis && valenceOrbitalB == valenceOrbitalA) || 
+            (valenceOrbitalA == pz && axis == XAxis && valenceOrbitalB == valenceOrbitalA) || 
+            (valenceOrbitalA == pz && axis == YAxis && valenceOrbitalB == valenceOrbitalA) ){
+      CartesianType piDirection;
+      if(valenceOrbitalA == px){
+         piDirection = XAxis;
+      }
+      else if(valenceOrbitalA == py){
+         piDirection = YAxis;
+      }
+      else if(valenceOrbitalA == pz){
+         piDirection = ZAxis;
+      }
+      double temp1 = gaussianExponentA*xyzA[piDirection] - gaussianExponentA*xyzB[piDirection];
+      double temp2 = gaussianExponentB*xyzA[piDirection] - gaussianExponentB*xyzB[piDirection];
+      value = 0.5 - temp1*temp2*pow(gaussianExponentA+gaussianExponentB,-1.0);
+      value *= gaussianExponentA*xyzA[axis] + gaussianExponentB*xyzB[axis];
+      value *= 4.0*sqrt(gaussianExponentA*gaussianExponentB)*pow(gaussianExponentA+gaussianExponentB,-2.0);
+   }
+   else if( (valenceOrbitalA == px && axis == YAxis && valenceOrbitalB == py) || 
+            (valenceOrbitalA == px && axis == ZAxis && valenceOrbitalB == pz) || 
+            (valenceOrbitalA == py && axis == XAxis && valenceOrbitalB == px) || 
+            (valenceOrbitalA == py && axis == ZAxis && valenceOrbitalB == pz) || 
+            (valenceOrbitalA == pz && axis == XAxis && valenceOrbitalB == px) || 
+            (valenceOrbitalA == pz && axis == YAxis && valenceOrbitalB == py) ){
+      CartesianType piDirectionA;
+      if(valenceOrbitalA == px){
+         piDirectionA = XAxis;
+      }
+      else if(valenceOrbitalA == py){
+         piDirectionA = YAxis;
+      }
+      else if(valenceOrbitalA == pz){
+         piDirectionA = ZAxis;
+      }
+      double temp1 = gaussianExponentA*xyzA[axis] + gaussianExponentB*xyzB[axis];
+      double temp2 = gaussianExponentA*xyzA[axis] - gaussianExponentA*xyzB[axis];
+      value = 0.5 + temp1*temp2*pow(gaussianExponentA+gaussianExponentB,-1.0);
+      value *= gaussianExponentB*xyzA[piDirectionA] - gaussianExponentB*xyzB[piDirectionA];
+      value *= -4.0*sqrt(gaussianExponentA*gaussianExponentB)*pow(gaussianExponentA+gaussianExponentB,-2.0);
+   }
+   else if( (valenceOrbitalA == py && axis == YAxis && valenceOrbitalB == px) || 
+            (valenceOrbitalA == py && axis == YAxis && valenceOrbitalB == pz) || 
+            (valenceOrbitalA == px && axis == XAxis && valenceOrbitalB == py) || 
+            (valenceOrbitalA == px && axis == XAxis && valenceOrbitalB == pz) || 
+            (valenceOrbitalA == pz && axis == ZAxis && valenceOrbitalB == px) || 
+            (valenceOrbitalA == pz && axis == ZAxis && valenceOrbitalB == py) ){
+      CartesianType piDirectionB;
+      if(valenceOrbitalB == px){
+         piDirectionB = XAxis;
+      }
+      else if(valenceOrbitalB == py){
+         piDirectionB = YAxis;
+      }
+      else if(valenceOrbitalB == pz){
+         piDirectionB = ZAxis;
+      }
+      double temp1 = gaussianExponentA*xyzA[axis] + gaussianExponentB*xyzB[axis];
+      double temp2 = gaussianExponentB*xyzA[axis] - gaussianExponentB*xyzB[axis];
+      value = 0.5 - temp1*temp2*pow(gaussianExponentA+gaussianExponentB,-1.0);
+      value *= gaussianExponentA*xyzA[piDirectionB] - gaussianExponentA*xyzB[piDirectionB];
+      value *= 4.0*sqrt(gaussianExponentA*gaussianExponentB)*pow(gaussianExponentA+gaussianExponentB,-2.0);
+   }
+   else if( (valenceOrbitalA == px && axis == YAxis && valenceOrbitalB == pz) || 
+            (valenceOrbitalA == py && axis == ZAxis && valenceOrbitalB == px) || 
+            (valenceOrbitalA == pz && axis == XAxis && valenceOrbitalB == py) ||
+            (valenceOrbitalA == px && axis == ZAxis && valenceOrbitalB == py) ||
+            (valenceOrbitalA == pz && axis == YAxis && valenceOrbitalB == px) ||
+            (valenceOrbitalA == py && axis == XAxis && valenceOrbitalB == pz) ){
+      CartesianType piDirectionA;
+      CartesianType piDirectionB;
+      if(valenceOrbitalA == px){
+         piDirectionA = XAxis;
+      }
+      else if(valenceOrbitalA == py){
+         piDirectionA = YAxis;
+      }
+      else if(valenceOrbitalA == pz){
+         piDirectionA = ZAxis;
+      }
+      if(valenceOrbitalB == px){
+         piDirectionB = XAxis;
+      }
+      else if(valenceOrbitalB == py){
+         piDirectionB = YAxis;
+      }
+      else if(valenceOrbitalB == pz){
+         piDirectionB = ZAxis;
+      }
+      double temp1 = gaussianExponentB*xyzA[piDirectionA] - gaussianExponentB*xyzB[piDirectionA];
+      double temp2 = gaussianExponentA*xyzA[axis]         + gaussianExponentB*xyzB[axis];
+      double temp3 = gaussianExponentA*xyzA[piDirectionB] - gaussianExponentA*xyzB[piDirectionB];
+      value = -4.0*sqrt(gaussianExponentA*gaussianExponentB)*pow(gaussianExponentA+gaussianExponentB,-3.0);
+      value *= temp1*temp2*temp3;
+   }
+   else{
+      stringstream ss;
+      ss << this->errorMessageGetGaussianDipoleOrbitalD;
+      ss << this->errorMessageAtomA;
+      ss << this->errorMessageAtomType << AtomTypeStr(atomTypeA) << endl;
+      ss << this->errorMessageOrbitalType << OrbitalTypeStr(valenceOrbitalA) << endl;
+      ss << this->errorMessageAtomB;
+      ss << this->errorMessageAtomType << AtomTypeStr(atomTypeB) << endl;
+      ss << this->errorMessageOrbitalType << OrbitalTypeStr(valenceOrbitalB) << endl;
+      ss << this->errorMessageCartesianType << CartesianTypeStr(axis) << endl;
+      throw MolDSException(ss.str());
+   }
+   double dx = xyzA[XAxis] - xyzB[XAxis];
+   double dy = xyzA[YAxis] - xyzB[YAxis];
+   double dz = xyzA[ZAxis] - xyzB[ZAxis];
+   double Rab = sqrt( pow(dx, 2.0) + pow(dy, 2.0) + pow(dz,2.0) );
+   double sasb = this->GetGaussianOverlapSaSb(gaussianExponentA, gaussianExponentB, Rab);
+   value *= sasb;
+
+   return value;
 }
 
 void Cndo2::FreeDiatomicOverlapAndRotatingMatrix(double*** diatomicOverlap, double*** rotatingMatrix) const{
