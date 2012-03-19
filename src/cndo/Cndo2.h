@@ -197,8 +197,8 @@ private:
    std::string messageVdWCorrection;
    double elecSCFEnergy;
    double** gammaAB;
-   double** overlap;
-   double*** dipole;
+   double** overlap; // overlap integral between AOs
+   double*** dipole; // dipole integral between AOs
    double bondingAdjustParameterK[2]; //see (3.79) in J. A. Pople book
 
    // use Y[na][nb][la][lb][m][i][j] 
