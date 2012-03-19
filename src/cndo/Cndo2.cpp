@@ -782,8 +782,7 @@ void Cndo2::DoDamp(double rmsDensity,
 
 }
 
-void Cndo2::OutputSCFResults() const{
-   // output MO energy
+void Cndo2::OutputMOEnergies() const{
    this->OutputLog(this->messageEnergiesMOs);
    this->OutputLog(this->messageEnergiesMOsTitle);
    double eV2AU = Parameters::GetInstance()->GetEV2AU();
@@ -802,8 +801,10 @@ void Cndo2::OutputSCFResults() const{
       }
    }
    this->OutputLog("\n");
+}
 
-   // output total energy
+void Cndo2::OutputSCFEnergies() const{
+   double eV2AU = Parameters::GetInstance()->GetEV2AU();
    if(Parameters::GetInstance()->RequiresVdWSCF()){
       this->OutputLog(this->messageElecEnergyVdW);
    }
@@ -827,10 +828,9 @@ void Cndo2::OutputSCFResults() const{
       this->OutputLog((boost::format("\t\t%e\t%e\n\n") % this->vdWCorrectionEnergy 
                                                        % (this->vdWCorrectionEnergy/eV2AU)).str());
    }
+}
 
-   // ToDo: output eigen-vectors of the Hartree Fock matrix
-
-   // output total dipole moment 
+void Cndo2::OutputSCFDipole() const{
    int groundState=0;
    double debye2AU = Parameters::GetInstance()->GetDebye2AU();
    this->OutputLog(this->messageTotalDipole);
@@ -870,8 +870,9 @@ void Cndo2::OutputSCFResults() const{
       % (this->coreDipole[XAxis]/debye2AU)
       % (this->coreDipole[YAxis]/debye2AU)
       % (this->coreDipole[ZAxis]/debye2AU)).str());
+}
 
-   // output Mulliken charge
+void Cndo2::OutputSCFMulliken() const{
    this->OutputLog(this->messageMullikenAtoms);
    this->OutputLog(this->messageMullikenAtomsTitle);
    for(int a=0; a<this->molecule->GetNumberAtoms(); a++){
@@ -882,6 +883,14 @@ void Cndo2::OutputSCFResults() const{
                                                              % (atom->GetCoreCharge()-atomicElectronPopulation[a])).str());
    }
    this->OutputLog("\n");
+}
+
+void Cndo2::OutputSCFResults() const{
+   this->OutputMOEnergies();
+   this->OutputSCFEnergies();
+   this->OutputSCFDipole();
+   this->OutputSCFMulliken();
+   // ToDo: output eigen-vectors of the Hartree Fock matrix
 
    // output MOs
    if(Parameters::GetInstance()->RequiresMOPlot()){

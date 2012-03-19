@@ -225,6 +225,10 @@ private:
    static const double Z[2*MolDS_base::ShellType_end]
                         [2*MolDS_base::ShellType_end]
                         [4*MolDS_base::ShellType_end-1];
+   void OutputMOEnergies() const;
+   void OutputSCFEnergies() const;
+   void OutputSCFDipole() const;
+   void OutputSCFMulliken() const;
    void CalcCoreRepulsionEnergy();
    void CalcVdWCorrectionEnergy();
    bool SatisfyConvergenceCriterion(double const* const* oldOrbitalElectronPopulation, 
