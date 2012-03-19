@@ -63,7 +63,7 @@ Cndo2::Cndo2(){
    this->SetEnableAtomTypes();
    this->gammaAB = NULL;
    this->overlap = NULL;
-   this->dipole = NULL;
+   this->cartesianMatrix = NULL;
    this->electronicDipoleEigenStates = NULL;
    this->coreDipole = NULL;
    this->twoElecTwoCore = NULL;
@@ -91,7 +91,7 @@ Cndo2::~Cndo2(){
    MallocerFreer::GetInstance()->Free<double>(&this->overlap, 
                                               this->molecule->GetTotalNumberAOs(),
                                               this->molecule->GetTotalNumberAOs());
-   MallocerFreer::GetInstance()->Free<double>(&this->dipole, 
+   MallocerFreer::GetInstance()->Free<double>(&this->cartesianMatrix, 
                                               this->molecule->GetTotalNumberAOs(),
                                               this->molecule->GetTotalNumberAOs(),
                                               CartesianType_end);
@@ -133,8 +133,8 @@ void Cndo2::SetMessages(){
    this->errorMessageCartesianType = "\tcartesian type = ";
    this->errorMessageMolecularIntegralElement
       = "Error in cndo::Cndo2::GetMolecularIntegralElement: Non available orbital is contained.\n";
-   this->errorMessageGetGaussianDipoleOrbitalD 
-      = "Error in cndo::Cndo2::GetGaussiangDipole: d-orbital is not treatable. The d-orbital is contained in atom A or B.\n";
+   this->errorMessageGetGaussianCartesianMatrixOrbitalD 
+      = "Error in cndo::Cndo2::GetGaussianCartesianMatrix: d-orbital is not treatable. The d-orbital is contained in atom A or B.\n";
    this->errorMessageGetGaussianOverlapOrbitalD 
       = "Error in cndo::Cndo2::GetGaussiangOverlap: d-orbital is not treatable. The d-orbital is contained in atom A or B.\n";
    this->errorMessageGetGaussianOverlapFirstDerivativeOrbitalD 
@@ -181,14 +181,14 @@ void Cndo2::SetMessages(){
    this->messageCoreRepulsion = "\tTotal core repulsion energy:\n";
    this->messageVdWCorrectionTitle = "\t\t| [a.u.] | [eV] |\n";
    this->messageVdWCorrection = "\tEmpirical van der Waals correction:\n";
-   this->messageElectronicDipoleTitleAU = "\t\t| x[a.u.] | y[a.u.] | z[a.u.] |\n";
-   this->messageElectronicDipoleTitleDebye = "\t\t| x[Debye] | y[Debye] | z[Debye] |\n";
+   this->messageElectronicDipoleTitleAU = "\t\t| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |\n";
+   this->messageElectronicDipoleTitleDebye = "\t\t| x[debye] | y[debye] | z[debye] | magnitude[debye] |\n";
    this->messageElectronicDipole = "\tElectronic Dipole moment:\n";
-   this->messageCoreDipoleTitleAU = "\t\t| x[a.u.] | y[a.u.] | z[a.u.] |\n";
-   this->messageCoreDipoleTitleDebye = "\t\t| x[Debye] | y[Debye] | z[Debye] |\n";
+   this->messageCoreDipoleTitleAU = "\t\t| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |\n";
+   this->messageCoreDipoleTitleDebye = "\t\t| x[Debye] | y[Debye] | z[Debye] | magnitude[debye] |\n";
    this->messageCoreDipole = "\tCore Dipole moment:\n";
-   this->messageTotalDipoleTitleAU = "\t\t| x[a.u.] | y[a.u.] | z[a.u.] |\n";
-   this->messageTotalDipoleTitleDebye = "\t\t| x[Debye] | y[Debye] | z[Debye] |\n";
+   this->messageTotalDipoleTitleAU = "\t\t| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |\n";
+   this->messageTotalDipoleTitleDebye = "\t\t| x[debye] | y[debye] | z[debye] | magnitude[debye] |\n";
    this->messageTotalDipole = "\tTotal Dipole moment:\n";
 }
 
@@ -232,7 +232,7 @@ void Cndo2::SetMolecule(Molecule* molecule){
    MallocerFreer::GetInstance()->Malloc<double>(&this->overlap, 
                                                 this->molecule->GetTotalNumberAOs(), 
                                                 this->molecule->GetTotalNumberAOs());
-   MallocerFreer::GetInstance()->Malloc<double>(&this->dipole, 
+   MallocerFreer::GetInstance()->Malloc<double>(&this->cartesianMatrix, 
                                                 this->molecule->GetTotalNumberAOs(), 
                                                 this->molecule->GetTotalNumberAOs(),
                                                 CartesianType_end);
@@ -403,7 +403,7 @@ void Cndo2::DoSCF(bool requiresGuess){
       // calculate electron integral
       this->CalcGammaAB(this->gammaAB, *this->molecule);
       this->CalcOverlap(this->overlap, *this->molecule);
-      this->CalcDipoleByGTOExpansion(this->dipole, *this->molecule, STO6G);
+      this->CalcCartesianMatrixByGTOExpansion(this->cartesianMatrix, *this->molecule, STO6G);
       this->CalcTwoElecTwoCore(this->twoElecTwoCore, *this->molecule);
 
       // SCF
@@ -531,6 +531,11 @@ void Cndo2::CalcSCFProperties(){
                           this->gammaAB,
                           this->coreRepulsionEnergy,
                           this->vdWCorrectionEnergy);
+   this->CalcCoreDipole(this->coreDipole, *this->molecule);
+   this->CalcElectronicDipoleGroundState(this->electronicDipoleEigenStates, 
+                                         this->cartesianMatrix,
+                                         *this->molecule, 
+                                         this->orbitalElectronPopulation);
 }
 
 double Cndo2::GetBondingAdjustParameterK(ShellType shellA, ShellType shellB) const{
@@ -833,43 +838,68 @@ void Cndo2::OutputSCFEnergies() const{
 void Cndo2::OutputSCFDipole() const{
    int groundState=0;
    double debye2AU = Parameters::GetInstance()->GetDebye2AU();
+   double magnitude = 0.0;
+   double temp = 0.0;
+
+   // output total dipole moment 
+   temp = 0.0;
+   temp += pow(this->electronicDipoleEigenStates[groundState][XAxis]+this->coreDipole[XAxis],2.0);
+   temp += pow(this->electronicDipoleEigenStates[groundState][YAxis]+this->coreDipole[YAxis],2.0);
+   temp += pow(this->electronicDipoleEigenStates[groundState][ZAxis]+this->coreDipole[ZAxis],2.0);
+   magnitude = sqrt(temp);
    this->OutputLog(this->messageTotalDipole);
    this->OutputLog(this->messageTotalDipoleTitleAU);
-   this->OutputLog((boost::format("\t\t%e\t%e\t%e\n\n") 
+   this->OutputLog((boost::format("\t\t%e\t%e\t%e\t%e\n\n") 
       % (this->electronicDipoleEigenStates[groundState][XAxis]+this->coreDipole[XAxis])
-      % (this->electronicDipoleEigenStates[groundState][YAxis]+this->coreDipole[XAxis])
-      % (this->electronicDipoleEigenStates[groundState][ZAxis]+this->coreDipole[XAxis])).str());
+      % (this->electronicDipoleEigenStates[groundState][YAxis]+this->coreDipole[YAxis])
+      % (this->electronicDipoleEigenStates[groundState][ZAxis]+this->coreDipole[ZAxis])
+      % magnitude).str());
    this->OutputLog(this->messageTotalDipoleTitleDebye);
-   this->OutputLog((boost::format("\t\t%e\t%e\t%e\n\n") 
+   this->OutputLog((boost::format("\t\t%e\t%e\t%e\t%e\n\n") 
       % ((this->electronicDipoleEigenStates[groundState][XAxis]+this->coreDipole[XAxis])/debye2AU)
-      % ((this->electronicDipoleEigenStates[groundState][YAxis]+this->coreDipole[XAxis])/debye2AU)
-      % ((this->electronicDipoleEigenStates[groundState][ZAxis]+this->coreDipole[XAxis])/debye2AU)).str());
+      % ((this->electronicDipoleEigenStates[groundState][YAxis]+this->coreDipole[YAxis])/debye2AU)
+      % ((this->electronicDipoleEigenStates[groundState][ZAxis]+this->coreDipole[ZAxis])/debye2AU)
+      % (magnitude/debye2AU)).str());
 
    // output electronic dipole moment 
+   temp = 0.0;
+   temp += pow(this->electronicDipoleEigenStates[groundState][XAxis],2.0);
+   temp += pow(this->electronicDipoleEigenStates[groundState][YAxis],2.0);
+   temp += pow(this->electronicDipoleEigenStates[groundState][ZAxis],2.0);
+   magnitude = sqrt(temp);
    this->OutputLog(this->messageElectronicDipole);
    this->OutputLog(this->messageElectronicDipoleTitleAU);
-   this->OutputLog((boost::format("\t\t%e\t%e\t%e\n\n") 
+   this->OutputLog((boost::format("\t\t%e\t%e\t%e\t%e\n\n") 
       % this->electronicDipoleEigenStates[groundState][XAxis]
       % this->electronicDipoleEigenStates[groundState][YAxis]
-      % this->electronicDipoleEigenStates[groundState][ZAxis]).str());
+      % this->electronicDipoleEigenStates[groundState][ZAxis]
+      % magnitude).str());
    this->OutputLog(this->messageElectronicDipoleTitleDebye);
-   this->OutputLog((boost::format("\t\t%e\t%e\t%e\n\n") 
+   this->OutputLog((boost::format("\t\t%e\t%e\t%e\t%e\n\n") 
       % (this->electronicDipoleEigenStates[groundState][XAxis]/debye2AU)
       % (this->electronicDipoleEigenStates[groundState][YAxis]/debye2AU)
-      % (this->electronicDipoleEigenStates[groundState][ZAxis]/debye2AU)).str());
+      % (this->electronicDipoleEigenStates[groundState][ZAxis]/debye2AU)
+      % (magnitude/debye2AU)).str());
 
    // output core dipole moment 
+   temp = 0.0;
+   temp += pow(this->electronicDipoleEigenStates[groundState][XAxis]+this->coreDipole[XAxis],2.0);
+   temp += pow(this->electronicDipoleEigenStates[groundState][YAxis]+this->coreDipole[YAxis],2.0);
+   temp += pow(this->electronicDipoleEigenStates[groundState][ZAxis]+this->coreDipole[ZAxis],2.0);
+   magnitude = sqrt(temp);
    this->OutputLog(this->messageCoreDipole);
    this->OutputLog(this->messageCoreDipoleTitleAU);
-   this->OutputLog((boost::format("\t\t%e\t%e\t%e\n\n") 
+   this->OutputLog((boost::format("\t\t%e\t%e\t%e\t%e\n\n") 
       % this->coreDipole[XAxis]
       % this->coreDipole[YAxis]
-      % this->coreDipole[ZAxis]).str());
+      % this->coreDipole[ZAxis]
+      % magnitude).str());
    this->OutputLog(this->messageCoreDipoleTitleDebye);
-   this->OutputLog((boost::format("\t\t%e\t%e\t%e\n\n") 
+   this->OutputLog((boost::format("\t\t%e\t%e\t%e\t%e\n\n") 
       % (this->coreDipole[XAxis]/debye2AU)
       % (this->coreDipole[YAxis]/debye2AU)
-      % (this->coreDipole[ZAxis]/debye2AU)).str());
+      % (this->coreDipole[ZAxis]/debye2AU)
+      % (magnitude/debye2AU)).str());
 }
 
 void Cndo2::OutputSCFMulliken() const{
@@ -1399,16 +1429,58 @@ void Cndo2::CalcGammaAB(double** gammaAB, const Molecule& molecule) const{
 
 }
 
-// calculate dipole moment between atomic orbitals. 
-// The analytic dipole is calculated with Gaussian expansion technique written in [DY_1977]
-void Cndo2::CalcDipoleByGTOExpansion(double*** dipole, 
-                                     const Molecule& molecule, 
-                                     STOnGType stonG) const{
+void Cndo2::CalcCoreDipole(double* coreDipole,
+                           const Molecule& molecule) const{
+
+   for(int i=0; i<CartesianType_end; i++){
+      coreDipole[i] = 0.0;
+      for(int A=0; A<molecule.GetNumberAtoms(); A++){
+         coreDipole[i] += molecule.GetAtom(A)->GetCoreCharge()
+                         *(molecule.GetAtom(A)->GetXyz()[i] - molecule.GetXyzCOM()[i]);
+      }
+   }
+}
+
+void Cndo2::CalcElectronicDipoleGroundState(double** electronicDipoleEigenStates,
+                                            double const* const* const* cartesianMatrix,
+                                            const Molecule& molecule,
+                                            double const* const* orbitalElectronPopulation) const{
+   int groundState = 0;
+   int totalAONumber = molecule.GetTotalNumberAOs();
+   stringstream ompErrors;
+   #pragma omp parallel for schedule(auto) 
+   for(int i=0; i<CartesianType_end; i++){
+      try{
+         electronicDipoleEigenStates[groundState][i] = 0.0;
+         for(int mu=0; mu<totalAONumber; mu++){
+            for(int nu=0; nu<totalAONumber; nu++){
+               electronicDipoleEigenStates[groundState][i] 
+                  -= orbitalElectronPopulation[mu][nu]
+                    *(cartesianMatrix[mu][nu][i]-molecule.GetXyzCOM()[i]*this->overlap[mu][nu]);
+            }
+         }
+      }
+      catch(MolDSException ex){
+         #pragma omp critical
+         ompErrors << ex.what() << endl ;
+      }
+   }
+   // Exception throwing for omp-region
+   if(!ompErrors.str().empty()){
+      throw MolDSException(ompErrors.str());
+   }
+}
+
+// calculate Cartesian matrix between atomic orbitals. 
+// The analytic Cartesian matrix is calculated with Gaussian expansion technique written in [DY_1977]
+void Cndo2::CalcCartesianMatrixByGTOExpansion(double*** cartesianMatrix, 
+                                              const Molecule& molecule, 
+                                              STOnGType stonG) const{
    int totalAONumber = molecule.GetTotalNumberAOs();
    int totalAtomNumber = molecule.GetNumberAtoms();
 
    stringstream ompErrors;
-//   #pragma omp parallel for schedule(auto) 
+   #pragma omp parallel for schedule(auto) 
    for(int A=0; A<totalAtomNumber; A++){
       try{
          const Atom& atomA = *molecule.GetAtom(A);
@@ -1421,20 +1493,20 @@ void Cndo2::CalcDipoleByGTOExpansion(double*** dipole,
                   int mu = firstAOIndexAtomA + a;      
                   int nu = firstAOIndexAtomB + b;      
                   for(int i=0; i<CartesianType_end; i++){
-                     double value = this->GetDipoleElementByGTOExpansion(atomA, 
-                                                                         a, 
-                                                                         atomB, 
-                                                                         b, 
-                                                                         static_cast<CartesianType>(i),
-                                                                         stonG);
-                     dipole[mu][nu][i] = value;
+                     double value = this->GetCartesianMatrixElementByGTOExpansion(atomA, 
+                                                                                  a, 
+                                                                                  atomB, 
+                                                                                  b, 
+                                                                                  static_cast<CartesianType>(i),
+                                                                                  stonG);
+                     cartesianMatrix[mu][nu][i] = value;
                   }
                }
             }
          }
       }
       catch(MolDSException ex){
-//         #pragma omp critical
+         #pragma omp critical
          ompErrors << ex.what() << endl ;
       }
    }
@@ -1444,12 +1516,12 @@ void Cndo2::CalcDipoleByGTOExpansion(double*** dipole,
    }
 }
 
-// Calculate elements of dipole moment between atomic orbitals. 
-// The analytic dipole is calculated with Gaussian expansion technique written in [DY_1977]
-double Cndo2::GetDipoleElementByGTOExpansion(const Atom& atomA, int valenceIndexA, 
-                                             const Atom& atomB, int valenceIndexB,
-                                             CartesianType axis,
-                                             STOnGType stonG) const{
+// Calculate elements of Cartesian matrix between atomic orbitals. 
+// The analytic Cartesian matrix is calculated with Gaussian expansion technique written in [DY_1977]
+double Cndo2::GetCartesianMatrixElementByGTOExpansion(const Atom& atomA, int valenceIndexA, 
+                                                      const Atom& atomB, int valenceIndexB,
+                                                      CartesianType axis,
+                                                      STOnGType stonG) const{
    double value = 0.0;
    ShellType shellTypeA = atomA.GetValenceShellType();
    ShellType shellTypeB = atomB.GetValenceShellType();
@@ -1485,31 +1557,31 @@ double Cndo2::GetDipoleElementByGTOExpansion(const Atom& atomA, int valenceIndex
                                                                          shellTypeB, 
                                                                          valenceOrbitalB, 
                                                                          j);
-         temp *= this->GetGaussianDipole(atomA.GetAtomType(), 
-                                         valenceOrbitalA, 
-                                         gaussianExponentA, 
-                                         atomA.GetXyz(),
-                                         atomB.GetAtomType(), 
-                                         valenceOrbitalB, 
-                                         gaussianExponentB,
-                                         atomB.GetXyz(),
-                                         axis);
+         temp *= this->GetGaussianCartesianMatrix(atomA.GetAtomType(), 
+                                                  valenceOrbitalA, 
+                                                  gaussianExponentA, 
+                                                  atomA.GetXyz(),
+                                                  atomB.GetAtomType(), 
+                                                  valenceOrbitalB, 
+                                                  gaussianExponentB,
+                                                  atomB.GetXyz(),
+                                                  axis);
          value += temp;
       }
    }
    return value;
 }
 
-// calculate gaussian dipole integrals. 
-double Cndo2::GetGaussianDipole(AtomType atomTypeA, 
-                                OrbitalType valenceOrbitalA, 
-                                double gaussianExponentA, 
-                                double const* xyzA,
-                                AtomType atomTypeB, 
-                                OrbitalType valenceOrbitalB, 
-                                double gaussianExponentB,
-                                double const* xyzB,
-                                CartesianType axis) const{
+// calculate gaussian Caretesian integrals. 
+double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA, 
+                                         OrbitalType valenceOrbitalA, 
+                                         double gaussianExponentA, 
+                                         double const* xyzA,
+                                         AtomType atomTypeB, 
+                                         OrbitalType valenceOrbitalB, 
+                                         double gaussianExponentB,
+                                         double const* xyzB,
+                                         CartesianType axis) const{
 
    double value = 0.0;
    if(valenceOrbitalA == s && valenceOrbitalB == s){
@@ -1690,7 +1762,7 @@ double Cndo2::GetGaussianDipole(AtomType atomTypeA,
    }
    else{
       stringstream ss;
-      ss << this->errorMessageGetGaussianDipoleOrbitalD;
+      ss << this->errorMessageGetGaussianCartesianMatrixOrbitalD;
       ss << this->errorMessageAtomA;
       ss << this->errorMessageAtomType << AtomTypeStr(atomTypeA) << endl;
       ss << this->errorMessageOrbitalType << OrbitalTypeStr(valenceOrbitalA) << endl;
@@ -1706,8 +1778,6 @@ double Cndo2::GetGaussianDipole(AtomType atomTypeA,
    double Rab = sqrt( pow(dx, 2.0) + pow(dy, 2.0) + pow(dz,2.0) );
    double sasb = this->GetGaussianOverlapSaSb(gaussianExponentA, gaussianExponentB, Rab);
    value *= sasb;
-   value *= -1.0;
-
    return value;
 }
 
