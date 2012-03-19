@@ -47,6 +47,7 @@ const double Parameters::gMolin2AU = pow(10.0,5.0)/(6.0221415*9.1095);
 const double Parameters::degree2Radian = M_PI / 180.0;
 const double Parameters::boltzmann = 3.166791*pow(10.0,-6.0);
 const double Parameters::avogadro = 6.0221415*pow(10.0, 23.0);
+const double Parameters::debye2AU = 0.393430191;
 
 Parameters::Parameters(){
    this->SetDefaultValues();
@@ -333,6 +334,10 @@ double Parameters::GetBoltzmann() const{
 
 double Parameters::GetAvogadro() const{
    return this->avogadro;
+}
+
+double Parameters::GetDebye2AU() const{
+   return this->debye2AU;
 }
 
 // methods for translation

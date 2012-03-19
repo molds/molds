@@ -195,10 +195,21 @@ private:
    std::string messageCoreRepulsion;
    std::string messageVdWCorrectionTitle;
    std::string messageVdWCorrection;
+   std::string messageElectronicDipoleTitleAU;
+   std::string messageElectronicDipoleTitleDebye;
+   std::string messageElectronicDipole;
+   std::string messageCoreDipoleTitleAU;
+   std::string messageCoreDipoleTitleDebye;
+   std::string messageCoreDipole;
+   std::string messageTotalDipoleTitleAU;
+   std::string messageTotalDipoleTitleDebye;
+   std::string messageTotalDipole;
    double elecSCFEnergy;
    double** gammaAB;
    double** overlap; // overlap integral between AOs
    double*** dipole; // dipole integral between AOs
+   double** electronicDipoleEigenStates; // electronic dipole moment of eqch eigen states.
+   double* coreDipole; // electronic dipole moment of eqch eigen states.
    double bondingAdjustParameterK[2]; //see (3.79) in J. A. Pople book
 
    // use Y[na][nb][la][lb][m][i][j] 

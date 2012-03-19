@@ -43,6 +43,7 @@ public:
    double GetFs2AU() const;
    double GetBoltzmann() const;
    double GetAvogadro() const;
+   double GetDebye2AU() const;
    // SCF
    double GetThresholdSCF() const;
    void SetThresholdSCF(double thresholdSCF);
@@ -200,6 +201,7 @@ private:
    static const double fs2AU;
    static const double boltzmann;
    static const double avogadro;
+   static const double debye2AU;
    // SCF
    double thresholdSCF;
    int maxIterationsSCF;
