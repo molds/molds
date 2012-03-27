@@ -86,50 +86,62 @@ void MOLogger::DrawMO(vector<int> moIndeces){
    this->CalcOrigin(origin);
 
    // MO output 
+   stringstream ompErrors;
+   #pragma omp parallel for schedule(auto) 
    for(int i=0; i<moIndeces.size(); i++){
-      // validate mo number
-      if(this->molecule->GetTotalNumberAOs() <= moIndeces[i]){
-         this->OutputLog((boost::format("%s%d\n") % this->messageSkippedMOIndex.c_str() 
-                                                  % moIndeces[i]).str()) ;
-         continue;
-      }
-
-      // open the cube file
-      int digit = 5;
-      string fileName = this->GetFileName(moIndeces[i], digit);
-      ofstream ofs(fileName.c_str());
-
-      // output feader and molecule to the cube file
-      this->OutputHeaderToFile(ofs, origin, dx, dy, dz);
-      this->OutputMoleculeToFile(ofs, *this->molecule);
-
-      // output grid data to the cube file
-      int lineBreakCounter=0;
-      for(int ix=0; ix<Parameters::GetInstance()->GetGridNumberMOPlot()[XAxis]; ix++){
-         double x = origin[XAxis] + dx*static_cast<double>(ix);
-         for(int iy=0; iy<Parameters::GetInstance()->GetGridNumberMOPlot()[YAxis]; iy++){
-            double y = origin[YAxis] + dy*static_cast<double>(iy);
-            for(int iz=0; iz<Parameters::GetInstance()->GetGridNumberMOPlot()[ZAxis]; iz++){
-               double z = origin[ZAxis] + dz*static_cast<double>(iz);
-
-               double moValue = this->GetMoValue(moIndeces[i], *this->molecule, this->fockMatrix, x, y, z);
-               ofs << (boost::format("\t%e") % moValue ).str();
-               lineBreakCounter++;
-               if(lineBreakCounter%6==0){
-                  ofs << endl;
-                  lineBreakCounter=0;
+      try{
+         // validate mo number
+         if(this->molecule->GetTotalNumberAOs() <= moIndeces[i]){
+            this->OutputLog((boost::format("%s%d\n") % this->messageSkippedMOIndex.c_str() 
+                                                     % moIndeces[i]).str()) ;
+            continue;
+         }
+      
+         // open the cube file
+         int digit = 5;
+         string fileName = this->GetFileName(moIndeces[i], digit);
+         ofstream ofs(fileName.c_str());
+      
+         // output feader and molecule to the cube file
+         this->OutputHeaderToFile(ofs, origin, dx, dy, dz);
+         this->OutputMoleculeToFile(ofs, *this->molecule);
+      
+         // output grid data to the cube file
+         int lineBreakCounter=0;
+         for(int ix=0; ix<Parameters::GetInstance()->GetGridNumberMOPlot()[XAxis]; ix++){
+            double x = origin[XAxis] + dx*static_cast<double>(ix);
+            for(int iy=0; iy<Parameters::GetInstance()->GetGridNumberMOPlot()[YAxis]; iy++){
+               double y = origin[YAxis] + dy*static_cast<double>(iy);
+               for(int iz=0; iz<Parameters::GetInstance()->GetGridNumberMOPlot()[ZAxis]; iz++){
+                  double z = origin[ZAxis] + dz*static_cast<double>(iz);
+      
+                  double moValue = this->GetMoValue(moIndeces[i], *this->molecule, this->fockMatrix, x, y, z);
+                  ofs << (boost::format("\t%e") % moValue ).str();
+                  lineBreakCounter++;
+                  if(lineBreakCounter%6==0){
+                     ofs << endl;
+                     lineBreakCounter=0;
+                  }
+      
                }
-
             }
          }
       }
+      catch(MolDSException ex){
+         #pragma omp critical
+         ompErrors << ex.what() << endl ;
+      }
    }
+   // Exception throwing for omp-region
+   if(!ompErrors.str().empty()){
+      throw MolDSException(ompErrors.str());
+   }
+
    double ompEndTime = omp_get_wtime();
    this->OutputLog((boost::format("%s%lf%s\n%s") % this->messageOmpElapsedTimeMOPlot.c_str()
                                                  % (ompEndTime - ompStartTime)
                                                  % this->messageUnitSec.c_str()
                                                  % this->messageEndMOPlot.c_str()).str());
-
 }
 
 string MOLogger::GetFileName(int moIndex, int digit) const{

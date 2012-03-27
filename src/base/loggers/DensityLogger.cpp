@@ -94,45 +94,57 @@ void DensityLogger::DrawDensity(vector<int> elecStateIndeces) const{
    this->CalcOrigin(origin);
 
    // Hole density output 
+   stringstream ompErrors;
+   #pragma omp parallel for schedule(auto) 
    for(int n=0; n<elecStateIndeces.size(); n++){
-      // validate electronic state
-      int groundState = 0;
-      if(Parameters::GetInstance()->GetNumberExcitedStatesCIS() < elecStateIndeces[n] || 
-         groundState == elecStateIndeces[n]){
-         this->OutputLog((boost::format("%s%d\n") % this->messageSkippedElecStateIndex.c_str() 
-                                                  % elecStateIndeces[n]).str()) ;
-         continue;
-      }
-
-      // open the cube file
-      int digit=5;
-      string fileName = this->GetFileName(elecStateIndeces[n], digit);
-      ofstream ofs(fileName.c_str());
-
-      // output feader and molecule to the cube file
-      this->OutputHeaderToFile(ofs, origin, dx, dy, dz);
-      this->OutputMoleculeToFile(ofs, *this->molecule);
-
-      // output grid data to the cube file
-      int lineBreakCounter=0;
-      for(int ix=0; ix<Parameters::GetInstance()->GetGridNumberHolePlot()[XAxis]; ix++){
-         double x = origin[XAxis] + dx*static_cast<double>(ix);
-         for(int iy=0; iy<Parameters::GetInstance()->GetGridNumberHolePlot()[YAxis]; iy++){
-            double y = origin[YAxis] + dy*static_cast<double>(iy);
-            for(int iz=0; iz<Parameters::GetInstance()->GetGridNumberHolePlot()[ZAxis]; iz++){
-               double z = origin[ZAxis] + dz*static_cast<double>(iz);
-
-               double density = this->GetDensityValue(elecStateIndeces[n], *this->molecule, this->cisMatrix, x, y, z);
-               ofs << (boost::format("\t%e") % density ).str();
-               lineBreakCounter++;
-               if(lineBreakCounter%6==0){
-                  ofs << endl;
-                  lineBreakCounter=0;
+      try{
+         // validate electronic state
+         int groundState = 0;
+         if(Parameters::GetInstance()->GetNumberExcitedStatesCIS() < elecStateIndeces[n] || 
+            groundState == elecStateIndeces[n]){
+            this->OutputLog((boost::format("%s%d\n") % this->messageSkippedElecStateIndex.c_str() 
+                                                     % elecStateIndeces[n]).str()) ;
+            continue;
+         }
+      
+         // open the cube file
+         int digit=5;
+         string fileName = this->GetFileName(elecStateIndeces[n], digit);
+         ofstream ofs(fileName.c_str());
+      
+         // output feader and molecule to the cube file
+         this->OutputHeaderToFile(ofs, origin, dx, dy, dz);
+         this->OutputMoleculeToFile(ofs, *this->molecule);
+      
+         // output grid data to the cube file
+         int lineBreakCounter=0;
+         for(int ix=0; ix<Parameters::GetInstance()->GetGridNumberHolePlot()[XAxis]; ix++){
+            double x = origin[XAxis] + dx*static_cast<double>(ix);
+            for(int iy=0; iy<Parameters::GetInstance()->GetGridNumberHolePlot()[YAxis]; iy++){
+               double y = origin[YAxis] + dy*static_cast<double>(iy);
+               for(int iz=0; iz<Parameters::GetInstance()->GetGridNumberHolePlot()[ZAxis]; iz++){
+                  double z = origin[ZAxis] + dz*static_cast<double>(iz);
+      
+                  double density = this->GetDensityValue(elecStateIndeces[n], *this->molecule, this->cisMatrix, x, y, z);
+                  ofs << (boost::format("\t%e") % density ).str();
+                  lineBreakCounter++;
+                  if(lineBreakCounter%6==0){
+                     ofs << endl;
+                     lineBreakCounter=0;
+                  }
+      
                }
-
             }
          }
       }
+      catch(MolDSException ex){
+         #pragma omp critical
+         ompErrors << ex.what() << endl ;
+      }
+   }
+   // Exception throwing for omp-region
+   if(!ompErrors.str().empty()){
+      throw MolDSException(ompErrors.str());
    }
    double ompEndTime = omp_get_wtime();
    this->OutputLog((boost::format("%s%lf%s\n%s") % this->messageOmpElapsedTimeDensityPlot.c_str()
