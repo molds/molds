@@ -84,31 +84,19 @@ double HoleDensityLogger::GetDensityValue(int elecStateIndex,
    int numberActiveOcc = Parameters::GetInstance()->GetActiveOccCIS();
    int numberActiveVir = Parameters::GetInstance()->GetActiveVirCIS();
    int numberOcc = molecule.GetTotalNumberValenceElectrons()/2;
-   stringstream ompErrors;
-   #pragma omp parallel for schedule(auto) reduction(+:density)
    for(int i=0; i<numberActiveOcc; i++){
-      try{
-         int moI = numberOcc - (i+1);
-         for(int j=0; j<numberActiveOcc; j++){
-            int moJ = numberOcc - (j+1);
-            for(int a=0; a<numberActiveVir; a++){
-               int slaterDeterminatIndexIA = i*numberActiveVir + a;
-               int slaterDeterminatIndexJA = j*numberActiveVir + a;
-               double moIValue = this->GetMOValue(moI, molecule, x, y, z);
-               double moJValue = this->GetMOValue(moJ, molecule, x, y, z);
-               density += moIValue*cisMatrix[excitedStateIndex][slaterDeterminatIndexIA]
-                         *moJValue*cisMatrix[excitedStateIndex][slaterDeterminatIndexJA];
-            }
+      int moI = numberOcc - (i+1);
+      for(int j=0; j<numberActiveOcc; j++){
+         int moJ = numberOcc - (j+1);
+         for(int a=0; a<numberActiveVir; a++){
+            int slaterDeterminatIndexIA = i*numberActiveVir + a;
+            int slaterDeterminatIndexJA = j*numberActiveVir + a;
+            double moIValue = this->GetMOValue(moI, molecule, x, y, z);
+            double moJValue = this->GetMOValue(moJ, molecule, x, y, z);
+            density += moIValue*cisMatrix[excitedStateIndex][slaterDeterminatIndexIA]
+                      *moJValue*cisMatrix[excitedStateIndex][slaterDeterminatIndexJA];
          }
       }
-      catch(MolDSException ex){
-         #pragma omp critical
-         ompErrors << ex.what() << endl ;
-      }  
-   }
-   // Exception throwing for omp-region
-   if(!ompErrors.str().empty()){
-      throw MolDSException(ompErrors.str());
    }
    return density;
 }
