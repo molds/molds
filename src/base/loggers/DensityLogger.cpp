@@ -93,7 +93,7 @@ void DensityLogger::DrawDensity(vector<int> elecStateIndeces) const{
    this->CalcGridDisplacement(&dx, &dy, &dz);
    this->CalcOrigin(origin);
 
-   // Hole density output 
+   // density output 
    stringstream ompErrors;
    #pragma omp parallel for schedule(auto) 
    for(int n=0; n<elecStateIndeces.size(); n++){
