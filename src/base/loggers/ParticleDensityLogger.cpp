@@ -109,4 +109,12 @@ string ParticleDensityLogger::GetFileName(int elecStateIndex, int digit) const{
    return fileName.str();
 }
 
+double const* ParticleDensityLogger::GetFrameLength() const{
+   return Parameters::GetInstance()->GetFrameLengthParticlePlot();
+}
+
+int const* ParticleDensityLogger::GetGridNumber() const{
+   return Parameters::GetInstance()->GetGridNumberParticlePlot();
+}
+
 }

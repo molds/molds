@@ -36,6 +36,8 @@ protected:
                           double y, 
                           double z) const;
    std::string GetFileName(int elecStateIndex, int digit) const;
+   double const* GetFrameLength() const;
+   int const* GetGridNumber() const;
 private:
    HoleDensityLogger();
 };

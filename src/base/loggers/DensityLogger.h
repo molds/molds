@@ -51,6 +51,8 @@ protected:
                                   double x, 
                                   double y, 
                                   double z) const =0;
+   virtual double const* GetFrameLength() const =0;
+   virtual int const* GetGridNumber() const =0;
 private:
    std::string messageCubeHeaderComment2;
    std::string messageSkippedElecStateIndex;

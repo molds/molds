@@ -75,13 +75,6 @@ void DensityLogger::DrawDensity(int elecStateIndex) const{
    this->DrawDensity(elecStateIndeces);
 }
 
-void DensityLogger::CalcOrigin(double* origin) const{
-   for(int i=0; i<CartesianType_end; i++){
-      origin[i] = this->molecule->GetXyzCOC()[i];
-      origin[i] -= 0.5*Parameters::GetInstance()->GetFrameLengthHolePlot()[i];
-   }
-}
-
 void DensityLogger::DrawDensity(vector<int> elecStateIndeces) const{
    this->MatricesNullCheck();
    this->OutputLog(this->messageStartDensityPlot);
@@ -92,6 +85,7 @@ void DensityLogger::DrawDensity(vector<int> elecStateIndeces) const{
    double origin[CartesianType_end] = {0.0, 0.0, 0.0};
    this->CalcGridDisplacement(&dx, &dy, &dz);
    this->CalcOrigin(origin);
+
 
    // density output 
    stringstream ompErrors;
@@ -118,11 +112,11 @@ void DensityLogger::DrawDensity(vector<int> elecStateIndeces) const{
       
          // output grid data to the cube file
          int lineBreakCounter=0;
-         for(int ix=0; ix<Parameters::GetInstance()->GetGridNumberHolePlot()[XAxis]; ix++){
+         for(int ix=0; ix<this->GetGridNumber()[XAxis]; ix++){
             double x = origin[XAxis] + dx*static_cast<double>(ix);
-            for(int iy=0; iy<Parameters::GetInstance()->GetGridNumberHolePlot()[YAxis]; iy++){
+            for(int iy=0; iy<this->GetGridNumber()[YAxis]; iy++){
                double y = origin[YAxis] + dy*static_cast<double>(iy);
-               for(int iz=0; iz<Parameters::GetInstance()->GetGridNumberHolePlot()[ZAxis]; iz++){
+               for(int iz=0; iz<this->GetGridNumber()[ZAxis]; iz++){
                   double z = origin[ZAxis] + dz*static_cast<double>(iz);
       
                   double density = this->GetDensityValue(elecStateIndeces[n], *this->molecule, this->cisMatrix, x, y, z);
@@ -154,12 +148,9 @@ void DensityLogger::DrawDensity(vector<int> elecStateIndeces) const{
 }
 
 void DensityLogger::CalcGridDisplacement(double* dx, double* dy, double* dz) const{
-   *dx = Parameters::GetInstance()->GetFrameLengthHolePlot()[XAxis]
-        /static_cast<double>(Parameters::GetInstance()->GetGridNumberHolePlot()[XAxis]);
-   *dy = Parameters::GetInstance()->GetFrameLengthHolePlot()[YAxis]
-        /static_cast<double>(Parameters::GetInstance()->GetGridNumberHolePlot()[YAxis]);
-   *dz = Parameters::GetInstance()->GetFrameLengthHolePlot()[ZAxis]
-        /static_cast<double>(Parameters::GetInstance()->GetGridNumberHolePlot()[ZAxis]);
+   *dx = this->GetFrameLength()[XAxis]/static_cast<double>(this->GetGridNumber()[XAxis]);
+   *dy = this->GetFrameLength()[YAxis]/static_cast<double>(this->GetGridNumber()[YAxis]);
+   *dz = this->GetFrameLength()[ZAxis]/static_cast<double>(this->GetGridNumber()[ZAxis]);
 }
 
 double DensityLogger::GetMOValue(int moIndex, const MolDS_base::Molecule& molecule, double x, double y, double z) const{
@@ -181,9 +172,9 @@ double DensityLogger::GetMOValue(int moIndex, const MolDS_base::Molecule& molecu
 }
 
 void DensityLogger::OutputHeaderToFile(ofstream& ofs, double const* origin, double dx, double dy, double dz) const{
-   int gridNumber[CartesianType_end] = {Parameters::GetInstance()->GetGridNumberHolePlot()[XAxis], 
-                                        Parameters::GetInstance()->GetGridNumberHolePlot()[YAxis],
-                                        Parameters::GetInstance()->GetGridNumberHolePlot()[ZAxis]};
+   int gridNumber[CartesianType_end] = {this->GetGridNumber()[XAxis], 
+                                        this->GetGridNumber()[YAxis],
+                                        this->GetGridNumber()[ZAxis]};
    char data[1000] = "";
    // output header to the cube file
    ofs << this->messageCubeHeaderComment1;
@@ -232,5 +223,13 @@ void DensityLogger::MatricesNullCheck() const{
       throw MolDSException(ss.str());
    }
 }
+
+void DensityLogger::CalcOrigin(double* origin) const{
+   for(int i=0; i<CartesianType_end; i++){
+      origin[i] = this->molecule->GetXyzCOC()[i];
+      origin[i] -= 0.5*this->GetFrameLength()[i];
+   }
+}
+
 
 }
