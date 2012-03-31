@@ -74,25 +74,23 @@ void HoleDensityLogger::SetMessages(){
 }
 
 double HoleDensityLogger::GetDensityValue(int elecStateIndex, 
-                                          const MolDS_base::Molecule& molecule, 
+                                          double const* const* const* const* activeOccMOs,
+                                          double const* const* const* const* activeVirMOs,
                                           double const* const* cisMatrix, 
-                                          double x, 
-                                          double y, 
-                                          double z)  const{
+                                          int ix, 
+                                          int iy, 
+                                          int iz)  const{
    double density = 0.0;
    int excitedStateIndex = elecStateIndex-1;
    int numberActiveOcc = Parameters::GetInstance()->GetActiveOccCIS();
    int numberActiveVir = Parameters::GetInstance()->GetActiveVirCIS();
-   int numberOcc = molecule.GetTotalNumberValenceElectrons()/2;
    for(int i=0; i<numberActiveOcc; i++){
-      int moI = numberOcc - (i+1);
       for(int j=0; j<numberActiveOcc; j++){
-         int moJ = numberOcc - (j+1);
          for(int a=0; a<numberActiveVir; a++){
             int slaterDeterminatIndexIA = i*numberActiveVir + a;
             int slaterDeterminatIndexJA = j*numberActiveVir + a;
-            double moIValue = this->GetMOValue(moI, molecule, x, y, z);
-            double moJValue = this->GetMOValue(moJ, molecule, x, y, z);
+            double moIValue = activeOccMOs[i][ix][iy][iz];
+            double moJValue = activeOccMOs[j][ix][iy][iz];
             density += moIValue*cisMatrix[excitedStateIndex][slaterDeterminatIndexIA]
                       *moJValue*cisMatrix[excitedStateIndex][slaterDeterminatIndexJA];
          }

@@ -30,11 +30,12 @@ public:
 protected:
    void SetMessages();
    double GetDensityValue(int elecStateIndex, 
-                          const MolDS_base::Molecule& molecule, 
+                          double const* const* const* const* activeOccMOs,
+                          double const* const* const* const* activeVirMOs,
                           double const* const* cisMatrix,
-                          double x, 
-                          double y, 
-                          double z) const;
+                          int ix, 
+                          int iy, 
+                          int iz) const;
    std::string GetFileName(int elecStateIndex, int digit) const;
    double const* GetFrameLength() const;
    int const* GetGridNumber() const;

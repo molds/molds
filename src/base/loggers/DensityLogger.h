@@ -41,16 +41,18 @@ protected:
    void SetMessages();
    double GetMOValue(int moIndex, 
                      const MolDS_base::Molecule& molecule, 
+                     double const* const* fockmatrix,
                      double x, 
                      double y, 
                      double z) const;
    virtual std::string GetFileName(int elecStateIndex, int digit) const = 0;
    virtual double GetDensityValue(int elecStateIndex, 
-                                  const MolDS_base::Molecule& molecule, 
+                                  double const* const* const* const* activeOccMOs,
+                                  double const* const* const* const* activeVirMOs,
                                   double const* const* cisMatrix,
-                                  double x, 
-                                  double y, 
-                                  double z) const =0;
+                                  int ix, 
+                                  int iy, 
+                                  int iz) const =0;
    virtual double const* GetFrameLength() const =0;
    virtual int const* GetGridNumber() const =0;
 private:
@@ -70,6 +72,15 @@ private:
                            double dy,
                            double dz) const;
    void OutputMoleculeToFile(std::ofstream& ofs, const MolDS_base::Molecule& molecule)const ;
+   void CalcActiveMOs(double**** activeOccMOs, 
+                      double**** activeVirMOs,
+                      double dx, double dy, double dz,
+                      double const* origin,
+                      const MolDS_base::Molecule& molecule, 
+                      double const* const* fockMatrix,
+                      double const* const* cisMatrix) const;
+   void MallocTemporaryActiveMOs(double***** activeOccMOs, double***** activeVirMOs) const;
+   void FreeTemporaryActiveMOs(double***** activeOccMOs, double***** activeVirMOs) const;
 };
 
 }

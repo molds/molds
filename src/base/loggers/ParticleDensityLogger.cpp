@@ -74,25 +74,23 @@ void ParticleDensityLogger::SetMessages(){
 }
 
 double ParticleDensityLogger::GetDensityValue(int elecStateIndex, 
-                                          const MolDS_base::Molecule& molecule, 
-                                          double const* const* cisMatrix, 
-                                          double x, 
-                                          double y, 
-                                          double z)  const{
+                                              double const* const* const* const* activeOccMOs,
+                                              double const* const* const* const* activeVirMOs,
+                                              double const* const* cisMatrix, 
+                                              int ix, 
+                                              int iy, 
+                                              int iz)  const{
    double density = 0.0;
    int excitedStateIndex = elecStateIndex-1;
    int numberActiveOcc = Parameters::GetInstance()->GetActiveOccCIS();
    int numberActiveVir = Parameters::GetInstance()->GetActiveVirCIS();
-   int numberOcc = molecule.GetTotalNumberValenceElectrons()/2;
    for(int i=0; i<numberActiveOcc; i++){
       for(int a=0; a<numberActiveVir; a++){
-         int moA = numberOcc + a;
          for(int b=0; b<numberActiveVir; b++){
-            int moB = numberOcc + b;
             int slaterDeterminatIndexIA = i*numberActiveVir + a;
             int slaterDeterminatIndexIB = i*numberActiveVir + b;
-            double moAValue = this->GetMOValue(moA, molecule, x, y, z);
-            double moBValue = this->GetMOValue(moB, molecule, x, y, z);
+            double moAValue = activeVirMOs[a][ix][iy][iz];
+            double moBValue = activeVirMOs[b][ix][iy][iz];
             density += moAValue*cisMatrix[excitedStateIndex][slaterDeterminatIndexIA]
                       *moBValue*cisMatrix[excitedStateIndex][slaterDeterminatIndexIB];
          }
