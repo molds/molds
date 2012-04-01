@@ -111,6 +111,7 @@ void InputParser::SetMessages(){
    this->messageCisNormTolerance = "\t\tNorm tolerance for the residual of the Davidson: ";
    this->messageCisMaxIterations = "\t\tMax iterations for the Davidson: ";
    this->messageCisMaxDimensions = "\t\tMax dimensions for the Davidson: ";
+   this->messageCisExcitonEnergies = "\t\tExciton energies: ";
    this->messageCisNumPrintCoefficients = "\t\tNumber of printed coefficients of CIS-eigenvector: ";
 
    // memory
@@ -268,6 +269,7 @@ void InputParser::SetMessages(){
    this->stringCISMaxIter = "max_iter";
    this->stringCISMaxDimensions = "max_dim";
    this->stringCISNormTolerance = "norm_tol";
+   this->stringCISExcitonEnergies = "exciton_energies";
    this->stringCISNumPrintCoefficients = "num_print_coefficients";
 
    // Memory
@@ -706,6 +708,16 @@ int InputParser::ParseConditionsCIS(vector<string>* inputTerms, int parseIndex) 
          parseIndex++;
       }
       parseIndex++;   
+      // exciton energies are calculated or not
+      if((*inputTerms)[parseIndex].compare(this->stringCISExcitonEnergies) == 0){
+         if((*inputTerms)[parseIndex+1].compare(this->stringYES) == 0){
+            Parameters::GetInstance()->SetRequiresExcitonEnergiesCIS(true);
+         }
+         else{
+            Parameters::GetInstance()->SetRequiresExcitonEnergiesCIS(false);
+         }
+         parseIndex++;
+      }
    }
    return parseIndex;
 }
@@ -1292,6 +1304,14 @@ void InputParser::OutputCisConditions() const{
    else{
       this->OutputLog((boost::format("%s\n") % this->stringNO.c_str()).str());
    }
+   this->OutputLog(this->messageCisExcitonEnergies);
+   if(Parameters::GetInstance()->RequiresExcitonEnergiesCIS()){
+      this->OutputLog(this->stringYES);
+   }
+   else{
+      this->OutputLog(this->stringNO);
+   }
+   this->OutputLog("\n");
 
    this->OutputLog("\n");
 }

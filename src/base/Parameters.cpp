@@ -156,6 +156,7 @@ void Parameters::SetDefaultValues(){
    this->maxDimensionsCIS = 100;
    this->normToleranceCIS = pow(10.0, -6.0);
    this->numberPrintCoefficientsCIS = 1;
+   this->requiresExcitonEnergiesCIS = false;
    // Memory
    this->limitHeapMemory = 256;
    // MD
@@ -630,6 +631,14 @@ int Parameters::GetNumberPrintCoefficientsCIS() const{
    
 void Parameters::SetNumberPrintCoefficientsCIS(int numberPrintCoefficientsCIS){
    this->numberPrintCoefficientsCIS = numberPrintCoefficientsCIS;
+}
+
+bool Parameters::RequiresExcitonEnergiesCIS() const{
+   return this->requiresExcitonEnergiesCIS;
+}
+
+void Parameters::SetRequiresExcitonEnergiesCIS(bool requiresExcitonEnergiesCIS){
+   this->requiresExcitonEnergiesCIS = requiresExcitonEnergiesCIS;
 }
 
 // methods for Memory

@@ -131,6 +131,8 @@ public:
    void SetNormToleranceCIS(double normToleranceCIS);
    int GetNumberPrintCoefficientsCIS() const;
    void SetNumberPrintCoefficientsCIS(int numberPrintCoefficientsCIS);
+   bool RequiresExcitonEnergiesCIS() const;
+   void SetRequiresExcitonEnergiesCIS(bool requiresExcitonEnergiesCIS);
    // Memory
    double GetLimitHeapMemory() const;
    void SetLimitHeapMemory(double limitHeap);
@@ -248,6 +250,7 @@ private:
    bool requiresCIS;
    bool isDavidsonCIS;
    int numberPrintCoefficientsCIS;
+   bool requiresExcitonEnergiesCIS;
    // Memory
    double limitHeapMemory;
    // MD
