@@ -41,6 +41,7 @@ protected:
    std::string messageDoneCalcCISMatrix;
    virtual void SetMessages();
    virtual void SetEnableAtomTypes();
+   virtual void CalcCISProperties();
    virtual void CalcGammaAB(double** gammaAB, const MolDS_base::Molecule& molecule) const;
    virtual double GetFockDiagElement(const MolDS_base_atoms::Atom& atomA, 
                                      int atomAIndex, 
@@ -103,6 +104,8 @@ private:
    std::string messageDavidsonGoToDirect;
    std::string messageExcitedStatesEnergies;
    std::string messageExcitedStatesEnergiesTitle;
+   std::string messageExcitonEnergiesCIS;
+   std::string messageExcitonEnergiesCISTitle;
    int matrixForceElecStatesNum;
    double nishimotoMatagaParamA;
    double nishimotoMatagaParamB;

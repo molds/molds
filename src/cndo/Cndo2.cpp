@@ -80,6 +80,7 @@ Cndo2::Cndo2(){
    this->vdWCorrectionEnergy = 0.0;
    this->matrixCIS = NULL;
    this->excitedEnergies = NULL;
+   this->freeExcitonEnergiesCIS = NULL;
    this->matrixCISdimension = 0;
    //this->OutputLog("Cndo created\n");
 }
@@ -140,7 +141,7 @@ void Cndo2::SetMessages(){
    this->errorMessageGetGaussianOverlapFirstDerivativeOrbitalD 
       = "Error in cndo::Cndo2::GetGaussiangOverlapFirstDerivative: d-orbital is not treatable. The d-orbital is contained in atom A or B.\n";
    this->errorMessageCISNotImplemented 
-      = "Error in cndo::Cndo2::DoCIS: CIS is not implemented for CNDO2.\n";
+      = "Error in cndo::Cndo2: CIS is not implemented for CNDO2.\n";
    this->errorMessageCalcForceNotImplemented
       = "Error in cndo::Cndo2::CalcForce: Force is not available in CNDO2.\n";
    this->errorMessageGetElectronicEnergyNumberCISStates 
@@ -553,6 +554,12 @@ void Cndo2::DoCIS(){
 }
 
 void Cndo2::OutputCISResults() const{
+   stringstream ss;
+   ss << this->errorMessageCISNotImplemented;
+   throw MolDSException(ss.str());
+}
+
+void Cndo2::CalcCISProperties(){
    stringstream ss;
    ss << this->errorMessageCISNotImplemented;
    throw MolDSException(ss.str());

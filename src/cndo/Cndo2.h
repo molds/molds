@@ -79,10 +79,12 @@ protected:
    double*   atomicElectronPopulation; //P_{AB} of (3.21) in J. A. Pople book.
    double** matrixCIS;
    double* excitedEnergies;
+   double* freeExcitonEnergiesCIS;
    int matrixCISdimension;
    virtual void SetMessages();
    virtual void SetEnableAtomTypes();
    virtual void CalcSCFProperties();
+   virtual void CalcCISProperties();
    double GetBondingAdjustParameterK(MolDS_base::ShellType shellA, 
                                      MolDS_base::ShellType shellB) const;
    virtual double GetDiatomCoreRepulsionEnergy(int indexAtomA, int indexAtomB) const;
