@@ -1841,8 +1841,8 @@ void Cndo2::CalcOverlap(double** overlap, const Molecule& molecule) const{
    }
    /*
    this->OutputLog("overlap matrix\n"); 
-   for(int o=0; o<this->molecule.GetTotalNumberAOs(); o++){
-      for(int p=0; p<this->molecule.GetTotalNumberAOs(); p++){
+   for(int o=0; o<molecule.GetTotalNumberAOs(); o++){
+      for(int p=0; p<molecule.GetTotalNumberAOs(); p++){
          this->OutputLog((boost::format("%lf\t") % overlap[o][p]).str());
       }
       this->OutputLog("\n");
@@ -1983,8 +1983,8 @@ void Cndo2::CalcOverlapByGTOExpansion(double** overlap,
    }
    /* 
    this->OutputLog("overlap matrix by STOnG\n"); 
-   for(int o=0; o<this->molecule->GetTotalNumberAOs(); o++){
-      for(int p=0; p<this->molecule->GetTotalNumberAOs(); p++){
+   for(int o=0; o<molecule.GetTotalNumberAOs(); o++){
+      for(int p=0; p<molecule.GetTotalNumberAOs(); p++){
          this->OutputLog((boost::format("%lf\t") % overlap[o][p]).str());
       }
       this->OutputLog("\n");
