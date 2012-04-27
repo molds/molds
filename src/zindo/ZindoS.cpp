@@ -818,26 +818,28 @@ void ZindoS::DoCIS(){
 }
 
 void ZindoS::CalcCISProperties(){
-   // malloc or initialize free exciton energies
-   if(this->freeExcitonEnergiesCIS == NULL){
-      MallocerFreer::GetInstance()->Malloc<double>(&this->freeExcitonEnergiesCIS,
-                                                   this->matrixCISdimension);
-   }
-   else{
-      MallocerFreer::GetInstance()->Initialize<double>(this->excitedEnergies, 
-                                                       this->matrixCISdimension);
-   }
-   // clac free exciton energies
-   int numberActiveVir = Parameters::GetInstance()->GetActiveVirCIS();
-   for(int k=0; k<this->matrixCISdimension; k++){
-      double value = 0.0;
-      for(int l=0; l<this->matrixCISdimension; l++){
-         // single excitation from I-th (occupied)MO to A-th (virtual)MO
-         int moI = this->molecule->GetTotalNumberValenceElectrons()/2 - (l/numberActiveVir) -1;
-         int moA = this->molecule->GetTotalNumberValenceElectrons()/2 + (l%numberActiveVir);
-         value += pow(this->matrixCIS[k][l],2.0)*(this->energiesMO[moA] - this->energiesMO[moI]);
+   if(Parameters::GetInstance()->RequiresExcitonEnergiesCIS()){
+      // malloc or initialize free exciton energies
+      if(this->freeExcitonEnergiesCIS == NULL){
+         MallocerFreer::GetInstance()->Malloc<double>(&this->freeExcitonEnergiesCIS,
+                                                      this->matrixCISdimension);
       }
-      this->freeExcitonEnergiesCIS[k] = value;
+      else{
+         MallocerFreer::GetInstance()->Initialize<double>(this->excitedEnergies, 
+                                                          this->matrixCISdimension);
+      }
+      // clac free exciton energies
+      int numberActiveVir = Parameters::GetInstance()->GetActiveVirCIS();
+      for(int k=0; k<this->matrixCISdimension; k++){
+         double value = 0.0;
+         for(int l=0; l<this->matrixCISdimension; l++){
+            // single excitation from I-th (occupied)MO to A-th (virtual)MO
+            int moI = this->molecule->GetTotalNumberValenceElectrons()/2 - (l/numberActiveVir) -1;
+            int moA = this->molecule->GetTotalNumberValenceElectrons()/2 + (l%numberActiveVir);
+            value += pow(this->matrixCIS[k][l],2.0)*(this->energiesMO[moA] - this->energiesMO[moI]);
+         }
+         this->freeExcitonEnergiesCIS[k] = value;
+      }
    }
 }
 
@@ -865,14 +867,17 @@ void ZindoS::OutputCISResults() const{
    }
    this->OutputLog("\n");
    // output exciton energies
-   this->OutputLog(this->messageExcitonEnergiesCIS);
-   this->OutputLog(this->messageExcitonEnergiesCISTitle);
-   for(int k=0; k<Parameters::GetInstance()->GetNumberExcitedStatesCIS(); k++){
-      this->OutputLog((boost::format("\t\t %d\t%e\t%e\t%e\t%e\n") % (k+1) 
-                                                          %  this->freeExcitonEnergiesCIS[k]
-                                                          % (this->freeExcitonEnergiesCIS[k]/eV2AU)
-                                                          % (this->excitedEnergies[k]-this->freeExcitonEnergiesCIS[k])
-                                                          %((this->excitedEnergies[k]-this->freeExcitonEnergiesCIS[k])/eV2AU)).str());
+   if(Parameters::GetInstance()->RequiresExcitonEnergiesCIS()){
+      this->OutputLog(this->messageExcitonEnergiesCIS);
+      this->OutputLog(this->messageExcitonEnergiesCISTitle);
+      for(int k=0; k<Parameters::GetInstance()->GetNumberExcitedStatesCIS(); k++){
+         this->OutputLog((boost::format("\t\t %d\t%e\t%e\t%e\t%e\n") 
+                           % (k+1) 
+                           %  this->freeExcitonEnergiesCIS[k]
+                           % (this->freeExcitonEnergiesCIS[k]/eV2AU)
+                           % (this->excitedEnergies[k]-this->freeExcitonEnergiesCIS[k])
+                           %((this->excitedEnergies[k]-this->freeExcitonEnergiesCIS[k])/eV2AU)).str());
+      }
    }
    this->OutputLog("\n");
    // output Hole density
