@@ -404,7 +404,7 @@ void Cndo2::DoSCF(bool requiresGuess){
       // calculate electron integral
       this->CalcGammaAB(this->gammaAB, *this->molecule);
       this->CalcOverlap(this->overlap, *this->molecule);
-      //this->CalcCartesianMatrixByGTOExpansion(this->cartesianMatrix, *this->molecule, STO6G);
+      this->CalcCartesianMatrixByGTOExpansion(this->cartesianMatrix, *this->molecule, STO6G);
       this->CalcTwoElecTwoCore(this->twoElecTwoCore, *this->molecule);
 
       // SCF
@@ -1522,7 +1522,6 @@ void Cndo2::CalcCartesianMatrixByGTOExpansion(double*** cartesianMatrix,
       throw MolDSException(ompErrors.str());
    }
    
-   /*
    this->OutputLog("cartesian matrix\n"); 
    for(int o=0; o<molecule.GetTotalNumberAOs(); o++){
       for(int p=0; p<molecule.GetTotalNumberAOs(); p++){
@@ -1534,7 +1533,7 @@ void Cndo2::CalcCartesianMatrixByGTOExpansion(double*** cartesianMatrix,
       this->OutputLog("\n");
    }
    this->OutputLog("\n");
-   */
+   
 }
 
 // Calculate elements of Cartesian matrix between atomic orbitals. 
@@ -1556,6 +1555,9 @@ double Cndo2::GetCartesianMatrixElementByGTOExpansion(const Atom& atomA, int val
                                                       this->theory);
    double gaussianExponentA = 0.0;
    double gaussianExponentB = 0.0;
+   double Rab = sqrt( pow(atomA.GetXyz()[XAxis]-atomB.GetXyz()[XAxis], 2.0) 
+                     +pow(atomA.GetXyz()[YAxis]-atomB.GetXyz()[YAxis], 2.0) 
+                     +pow(atomA.GetXyz()[ZAxis]-atomB.GetXyz()[ZAxis], 2.0) );
 
    double temp = 0.0;
    for(int i=0; i<=stonG; i++){
@@ -1585,7 +1587,8 @@ double Cndo2::GetCartesianMatrixElementByGTOExpansion(const Atom& atomA, int val
                                                   atomB.GetAtomType(), 
                                                   valenceOrbitalB, 
                                                   gaussianExponentB,
-                                                  atomB.GetXyz(),
+                                                  atomB.GetXyz(), 
+                                                  Rab,
                                                   axis);
          value += temp;
       }
@@ -1602,76 +1605,93 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
                                          OrbitalType valenceOrbitalB, 
                                          double gaussianExponentB,
                                          double const* xyzB,
+                                         double Rab,
                                          CartesianType axis) const{
 
    double value = 0.0;
+   double beta = gaussianExponentA + gaussianExponentB;
+   double dx = xyzA[XAxis] - xyzB[XAxis];
+   double dy = xyzA[YAxis] - xyzB[YAxis];
+   double dz = xyzA[ZAxis] - xyzB[ZAxis];
    if(valenceOrbitalA == s && valenceOrbitalB == s){
       value = gaussianExponentA*xyzA[axis] + gaussianExponentB*xyzB[axis];
-      value /= gaussianExponentA + gaussianExponentB;
+      value /= beta;
+      double sasb = this->GetGaussianOverlapSaSb(gaussianExponentA, gaussianExponentB, Rab);
+      value *= sasb;
    }
    else if( (valenceOrbitalA == s && axis == XAxis && valenceOrbitalB == px) || 
+            (valenceOrbitalA == s && axis == XAxis && valenceOrbitalB == py) || 
+            (valenceOrbitalA == s && axis == XAxis && valenceOrbitalB == pz) || 
+            (valenceOrbitalA == s && axis == YAxis && valenceOrbitalB == px) || 
             (valenceOrbitalA == s && axis == YAxis && valenceOrbitalB == py) || 
+            (valenceOrbitalA == s && axis == YAxis && valenceOrbitalB == pz) ||
+            (valenceOrbitalA == s && axis == ZAxis && valenceOrbitalB == px) || 
+            (valenceOrbitalA == s && axis == ZAxis && valenceOrbitalB == py) || 
             (valenceOrbitalA == s && axis == ZAxis && valenceOrbitalB == pz) ){
-      double temp = gaussianExponentA*xyzA[axis] + gaussianExponentB*xyzB[axis];
-      temp *= gaussianExponentA*xyzA[axis] - gaussianExponentA*xyzB[axis]; 
-      temp /= gaussianExponentA + gaussianExponentB;
-      value = 0.5;
-      value += temp;
-      value *= 2.0*sqrt(gaussianExponentB);
-      value /= gaussianExponentA + gaussianExponentB;
+      double overlap1=0.0; 
+      overlap1 = this->GetGaussianOverlap(atomTypeA,
+                                          valenceOrbitalA, 
+                                          gaussianExponentA, 
+                                          atomTypeB, 
+                                          valenceOrbitalB, 
+                                          gaussianExponentB,
+                                          dx, dy, dz, Rab);
+      OrbitalType pOrbital;
+      if(axis == XAxis){
+         pOrbital = px;
+      }
+      else if(axis == YAxis){
+         pOrbital = py;
+      }
+      else if(axis == ZAxis){
+         pOrbital = pz;
+      }
+      double overlap2=0.0; 
+      overlap2 = this->GetGaussianOverlap(atomTypeA,
+                                          pOrbital, 
+                                          gaussianExponentA, 
+                                          atomTypeB, 
+                                          valenceOrbitalB, 
+                                          gaussianExponentB,
+                                          dx, dy, dz, Rab);
+      value = overlap2/(2.0*sqrt(gaussianExponentA))+xyzA[axis]*overlap1;
    }
    else if( (valenceOrbitalA == px && axis == XAxis && valenceOrbitalB == s) || 
-            (valenceOrbitalA == py && axis == YAxis && valenceOrbitalB == s) || 
-            (valenceOrbitalA == pz && axis == ZAxis && valenceOrbitalB == s) ){
-      double temp = gaussianExponentA*xyzA[axis] + gaussianExponentB*xyzB[axis];
-      temp *= gaussianExponentB*xyzA[axis] - gaussianExponentB*xyzB[axis]; 
-      temp /= gaussianExponentA + gaussianExponentB;
-      value = 0.5;
-      value -= temp;
-      value *= 2.0*sqrt(gaussianExponentA);
-      value /= gaussianExponentA + gaussianExponentB;
-   }
-   else if( (valenceOrbitalA == s && axis == YAxis && valenceOrbitalB == px) || 
-            (valenceOrbitalA == s && axis == ZAxis && valenceOrbitalB == px) || 
-            (valenceOrbitalA == s && axis == XAxis && valenceOrbitalB == py) || 
-            (valenceOrbitalA == s && axis == ZAxis && valenceOrbitalB == py) || 
-            (valenceOrbitalA == s && axis == XAxis && valenceOrbitalB == pz) || 
-            (valenceOrbitalA == s && axis == YAxis && valenceOrbitalB == pz) ){
-      CartesianType piDirectionB;
-      if(valenceOrbitalB == px){
-         piDirectionB = XAxis;
-      }
-      else if(valenceOrbitalB == py){
-         piDirectionB = YAxis;
-      }
-      else if(valenceOrbitalB == pz){
-         piDirectionB = ZAxis;
-      }
-      double temp1 = gaussianExponentA*xyzA[piDirectionB] - gaussianExponentA*xyzB[piDirectionB];
-      double temp2 = gaussianExponentA*xyzA[axis]         + gaussianExponentB*xyzB[axis];
-      value = 2.0*sqrt(gaussianExponentB)*pow(gaussianExponentA+gaussianExponentB,-2.0);
-      value *= temp1*temp2;
-   }
-   else if( (valenceOrbitalA == px && axis == YAxis && valenceOrbitalB == s) || 
-            (valenceOrbitalA == px && axis == ZAxis && valenceOrbitalB == s) || 
             (valenceOrbitalA == py && axis == XAxis && valenceOrbitalB == s) || 
-            (valenceOrbitalA == py && axis == ZAxis && valenceOrbitalB == s) || 
             (valenceOrbitalA == pz && axis == XAxis && valenceOrbitalB == s) || 
-            (valenceOrbitalA == pz && axis == YAxis && valenceOrbitalB == s) ){
-      CartesianType piDirectionA;
-      if(valenceOrbitalA == px){
-         piDirectionA = XAxis;
+            (valenceOrbitalA == px && axis == YAxis && valenceOrbitalB == s) || 
+            (valenceOrbitalA == py && axis == YAxis && valenceOrbitalB == s) || 
+            (valenceOrbitalA == pz && axis == YAxis && valenceOrbitalB == s) ||
+            (valenceOrbitalA == px && axis == ZAxis && valenceOrbitalB == s) || 
+            (valenceOrbitalA == py && axis == ZAxis && valenceOrbitalB == s) || 
+            (valenceOrbitalA == pz && axis == ZAxis && valenceOrbitalB == s) ){
+      double overlap1=0.0; 
+      overlap1 = this->GetGaussianOverlap(atomTypeA,
+                                          valenceOrbitalA, 
+                                          gaussianExponentA, 
+                                          atomTypeB, 
+                                          valenceOrbitalB, 
+                                          gaussianExponentB,
+                                          dx, dy, dz, Rab);
+      OrbitalType pOrbital;
+      if(axis == XAxis){
+         pOrbital = px;
       }
-      else if(valenceOrbitalA == py){
-         piDirectionA = YAxis;
+      else if(axis == YAxis){
+         pOrbital = py;
       }
-      else if(valenceOrbitalA == pz){
-         piDirectionA = ZAxis;
+      else if(axis == ZAxis){
+         pOrbital = pz;
       }
-      double temp1 = gaussianExponentB*xyzA[piDirectionA] - gaussianExponentB*xyzB[piDirectionA];
-      double temp2 = gaussianExponentA*xyzA[axis]         + gaussianExponentB*xyzB[axis];
-      value = -2.0*sqrt(gaussianExponentA)*pow(gaussianExponentA+gaussianExponentB,-2.0);
-      value *= temp1*temp2;
+      double overlap2=0.0; 
+      overlap2 = this->GetGaussianOverlap(atomTypeA,
+                                          valenceOrbitalA, 
+                                          gaussianExponentA, 
+                                          atomTypeB, 
+                                          pOrbital, 
+                                          gaussianExponentB,
+                                          dx, dy, dz, Rab);
+      value = overlap2/(2.0*sqrt(gaussianExponentB))+xyzB[axis]*overlap1;
    }
    else if( (valenceOrbitalA == px && axis == XAxis && valenceOrbitalB == valenceOrbitalA) || 
             (valenceOrbitalA == py && axis == YAxis && valenceOrbitalB == valenceOrbitalA) || 
@@ -1679,9 +1699,11 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
       double temp1 = gaussianExponentA*xyzA[axis] + gaussianExponentB*xyzB[axis];
       double temp2 = gaussianExponentA*xyzA[axis] - gaussianExponentA*xyzB[axis];
       double temp3 = gaussianExponentB*xyzA[axis] - gaussianExponentB*xyzB[axis];
+      double sasb = this->GetGaussianOverlapSaSb(gaussianExponentA, gaussianExponentB, Rab);
       value = 0.5*(temp1+temp2-temp3);
-      value -= temp1*temp2*temp3*pow(gaussianExponentA+gaussianExponentB,-1.0);
-      value *= 4.0*sqrt(gaussianExponentA*gaussianExponentB)*pow(gaussianExponentA+gaussianExponentB,-2.0);
+      value -= temp1*temp2*temp3*pow(beta,-1.0);
+      value *= 4.0*sqrt(gaussianExponentA*gaussianExponentB)*pow(beta,-2.0);
+      value *= sasb;
    }
    else if( (valenceOrbitalA == px && axis == YAxis && valenceOrbitalB == valenceOrbitalA) || 
             (valenceOrbitalA == px && axis == ZAxis && valenceOrbitalB == valenceOrbitalA) || 
@@ -1701,9 +1723,11 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
       }
       double temp1 = gaussianExponentA*xyzA[piDirection] - gaussianExponentA*xyzB[piDirection];
       double temp2 = gaussianExponentB*xyzA[piDirection] - gaussianExponentB*xyzB[piDirection];
-      value = 0.5 - temp1*temp2*pow(gaussianExponentA+gaussianExponentB,-1.0);
+      double sasb = this->GetGaussianOverlapSaSb(gaussianExponentA, gaussianExponentB, Rab);
+      value = 0.5 - temp1*temp2*pow(beta,-1.0);
       value *= gaussianExponentA*xyzA[axis] + gaussianExponentB*xyzB[axis];
-      value *= 4.0*sqrt(gaussianExponentA*gaussianExponentB)*pow(gaussianExponentA+gaussianExponentB,-2.0);
+      value *= 4.0*sqrt(gaussianExponentA*gaussianExponentB)*pow(beta,-2.0);
+      value *= sasb;
    }
    else if( (valenceOrbitalA == px && axis == YAxis && valenceOrbitalB == py) || 
             (valenceOrbitalA == px && axis == ZAxis && valenceOrbitalB == pz) || 
@@ -1723,9 +1747,11 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
       }
       double temp1 = gaussianExponentA*xyzA[axis] + gaussianExponentB*xyzB[axis];
       double temp2 = gaussianExponentA*xyzA[axis] - gaussianExponentA*xyzB[axis];
-      value = 0.5 + temp1*temp2*pow(gaussianExponentA+gaussianExponentB,-1.0);
+      double sasb = this->GetGaussianOverlapSaSb(gaussianExponentA, gaussianExponentB, Rab);
+      value = 0.5 + temp1*temp2*pow(beta,-1.0);
       value *= gaussianExponentB*xyzA[piDirectionA] - gaussianExponentB*xyzB[piDirectionA];
-      value *= -4.0*sqrt(gaussianExponentA*gaussianExponentB)*pow(gaussianExponentA+gaussianExponentB,-2.0);
+      value *= -4.0*sqrt(gaussianExponentA*gaussianExponentB)*pow(beta,-2.0);
+      value *= sasb;
    }
    else if( (valenceOrbitalA == py && axis == YAxis && valenceOrbitalB == px) || 
             (valenceOrbitalA == py && axis == YAxis && valenceOrbitalB == pz) || 
@@ -1745,9 +1771,11 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
       }
       double temp1 = gaussianExponentA*xyzA[axis] + gaussianExponentB*xyzB[axis];
       double temp2 = gaussianExponentB*xyzA[axis] - gaussianExponentB*xyzB[axis];
-      value = 0.5 - temp1*temp2*pow(gaussianExponentA+gaussianExponentB,-1.0);
+      double sasb = this->GetGaussianOverlapSaSb(gaussianExponentA, gaussianExponentB, Rab);
+      value = 0.5 - temp1*temp2*pow(beta,-1.0);
       value *= gaussianExponentA*xyzA[piDirectionB] - gaussianExponentA*xyzB[piDirectionB];
-      value *= 4.0*sqrt(gaussianExponentA*gaussianExponentB)*pow(gaussianExponentA+gaussianExponentB,-2.0);
+      value *= 4.0*sqrt(gaussianExponentA*gaussianExponentB)*pow(beta,-2.0);
+      value *= sasb;
    }
    else if( (valenceOrbitalA == px && axis == YAxis && valenceOrbitalB == pz) || 
             (valenceOrbitalA == py && axis == ZAxis && valenceOrbitalB == px) || 
@@ -1778,8 +1806,10 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
       double temp1 = gaussianExponentB*xyzA[piDirectionA] - gaussianExponentB*xyzB[piDirectionA];
       double temp2 = gaussianExponentA*xyzA[axis]         + gaussianExponentB*xyzB[axis];
       double temp3 = gaussianExponentA*xyzA[piDirectionB] - gaussianExponentA*xyzB[piDirectionB];
-      value = -4.0*sqrt(gaussianExponentA*gaussianExponentB)*pow(gaussianExponentA+gaussianExponentB,-3.0);
+      double sasb = this->GetGaussianOverlapSaSb(gaussianExponentA, gaussianExponentB, Rab);
+      value = -4.0*sqrt(gaussianExponentA*gaussianExponentB)*pow(beta,-3.0);
       value *= temp1*temp2*temp3;
+      value *= sasb;
    }
    else{
       stringstream ss;
@@ -1793,12 +1823,6 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
       ss << this->errorMessageCartesianType << CartesianTypeStr(axis) << endl;
       throw MolDSException(ss.str());
    }
-   double dx = xyzA[XAxis] - xyzB[XAxis];
-   double dy = xyzA[YAxis] - xyzB[YAxis];
-   double dz = xyzA[ZAxis] - xyzB[ZAxis];
-   double Rab = sqrt( pow(dx, 2.0) + pow(dy, 2.0) + pow(dz,2.0) );
-   double sasb = this->GetGaussianOverlapSaSb(gaussianExponentA, gaussianExponentB, Rab);
-   value *= sasb;
    return value;
 }
 

@@ -270,6 +270,7 @@ private:
                                      MolDS_base::OrbitalType valenceOrbitalB, 
                                      double gaussianExponentB, 
                                      double const* xyzB,
+                                     double Rab,
                                      MolDS_base::CartesianType axis) const;
    void CalcOverlap(double** overlap, const MolDS_base::Molecule& molecule) const;
    void CalcOverlapByGTOExpansion(double** overlap, 
