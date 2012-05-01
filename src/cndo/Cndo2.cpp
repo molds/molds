@@ -1463,7 +1463,7 @@ void Cndo2::CalcElectronicDipoleGroundState(double** electronicDipoleEigenStates
             for(int nu=0; nu<totalAONumber; nu++){
                electronicDipoleEigenStates[groundState][i] 
                   -= orbitalElectronPopulation[mu][nu]
-                    *(cartesianMatrix[mu][nu][i]-molecule.GetXyzCOM()[i]*this->overlap[mu][nu]);
+                    *(cartesianMatrix[mu][nu][i]-molecule.GetXyzCOC()[i]*this->overlap[mu][nu]);
             }
          }
       }
