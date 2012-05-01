@@ -107,8 +107,7 @@ HOW TO WRITE INPUT:
       "pm3/pddg", or "pm3/pddg" in theory-directive.
       This theory-directive indicate a electronic structure theory used in your simulations.
       MNDO only supports (can calculate) Heats of formation.
-      SCF module outputs also the dipole moment arrond the center of mass of the molecule.
-      The center of mass is calculated under the classical atomic mass. 
+      SCF module outputs also the dipole moment arrond the center of cores of the molecule.
       To calculate the dipole moment, STO-6G [DY_1977] is used.
 
       E.g. 
