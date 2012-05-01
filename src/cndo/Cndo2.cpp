@@ -1521,6 +1521,20 @@ void Cndo2::CalcCartesianMatrixByGTOExpansion(double*** cartesianMatrix,
    if(!ompErrors.str().empty()){
       throw MolDSException(ompErrors.str());
    }
+   
+   /*
+   this->OutputLog("cartesian matrix\n"); 
+   for(int o=0; o<molecule.GetTotalNumberAOs(); o++){
+      for(int p=0; p<molecule.GetTotalNumberAOs(); p++){
+         for(int i=0; i<CartesianType_end; i++){
+            this->OutputLog((boost::format("%lf\t") % cartesianMatrix[o][p][i]).str());
+         }
+         this->OutputLog("\n");
+      }
+      this->OutputLog("\n");
+   }
+   this->OutputLog("\n");
+   */
 }
 
 // Calculate elements of Cartesian matrix between atomic orbitals. 
