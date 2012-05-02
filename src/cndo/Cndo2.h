@@ -357,6 +357,11 @@ private:
                                  double**** diisStoredErrorVect,
                                  double*** diisErrorProducts,
                                  double** diisErrorCoefficients) const;
+   void MallocSCFTemporaryMatrices(double*** oldOrbitalElectronPopulation,
+                                   double**** diisStoredDensityMatrix,
+                                   double**** diisStoredErrorVect,
+                                   double*** diisErrorProducts,
+                                   double** diisErrorCoefficients);
 };
 
 
