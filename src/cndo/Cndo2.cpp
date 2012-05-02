@@ -612,7 +612,7 @@ double** Cndo2::GetForce(int elecState){
 void Cndo2::CalcTwoElecTwoCore(double****** twoElecTwoCore, 
                                const Molecule& molecule) const{
    // do nothing for CNDO, INDO, and ZINDO/S.
-   // two electron two core integrals are needed for CNDO, INDO, and ZINDO/S.
+   // two electron two core integrals are not needed for CNDO, INDO, and ZINDO/S.
 }
 
 void Cndo2::CalcForce(const vector<int>& elecStates){
