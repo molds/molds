@@ -377,9 +377,9 @@ void Cndo2::DoSCF(bool requiresGuess){
 
    // diis parameters
    int diisNumErrorVect = Parameters::GetInstance()->GetDiisNumErrorVectSCF();
-   // malloc temporary matrices for scf
+   // temporary matrices for scf
    double** oldOrbitalElectronPopulation = NULL;
-   // malloc temporary matrices for diis
+   // temporary matrices for diis
    double*** diisStoredDensityMatrix = NULL;
    double*** diisStoredErrorVect = NULL;
    double** diisErrorProducts = NULL;
@@ -1521,7 +1521,7 @@ void Cndo2::CalcCartesianMatrixByGTOExpansion(double*** cartesianMatrix,
    if(!ompErrors.str().empty()){
       throw MolDSException(ompErrors.str());
    }
-   
+   /* 
    this->OutputLog("cartesian matrix\n"); 
    for(int o=0; o<molecule.GetTotalNumberAOs(); o++){
       for(int p=0; p<molecule.GetTotalNumberAOs(); p++){
@@ -1533,7 +1533,7 @@ void Cndo2::CalcCartesianMatrixByGTOExpansion(double*** cartesianMatrix,
       this->OutputLog("\n");
    }
    this->OutputLog("\n");
-   
+   */
 }
 
 // Calculate elements of Cartesian matrix between atomic orbitals. 
