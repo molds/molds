@@ -1443,7 +1443,7 @@ void Cndo2::CalcCoreDipole(double* coreDipole,
       coreDipole[i] = 0.0;
       for(int A=0; A<molecule.GetNumberAtoms(); A++){
          coreDipole[i] += molecule.GetAtom(A)->GetCoreCharge()
-                         *(molecule.GetAtom(A)->GetXyz()[i] - molecule.GetXyzCOM()[i]);
+                         *(molecule.GetAtom(A)->GetXyz()[i] - molecule.GetXyzCOC()[i]);
       }
    }
 }
