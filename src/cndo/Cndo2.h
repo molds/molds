@@ -52,7 +52,7 @@ protected:
    std::string errorMessageCoulombInt;
    std::string errorMessageExchangeInt;
    std::string errorMessageMolecularIntegralElement;
-   std::string errorMessageGetGaussianCartesianMatrixOrbitalD;
+   std::string errorMessageGetGaussianCartesianMatrixBadOrbital;
    std::string errorMessageGetGaussianOverlapBadOrbital;
    std::string errorMessageGetGaussianOverlapFirstDerivativeOrbitalD;
    std::string errorMessageCISNotImplemented;
