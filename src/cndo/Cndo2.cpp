@@ -2338,6 +2338,143 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
       value *= sasb;
       value += xyzB[axis]*overlap1;
    }
+   else if( (valenceOrbitalA == dxy && axis == XAxis && valenceOrbitalB == valenceOrbitalA) || 
+            (valenceOrbitalA == dxy && axis == YAxis && valenceOrbitalB == valenceOrbitalA) || 
+            (valenceOrbitalA == dyz && axis == YAxis && valenceOrbitalB == valenceOrbitalA) || 
+            (valenceOrbitalA == dyz && axis == ZAxis && valenceOrbitalB == valenceOrbitalA) || 
+            (valenceOrbitalA == dzx && axis == ZAxis && valenceOrbitalB == valenceOrbitalA) || 
+            (valenceOrbitalA == dzx && axis == XAxis && valenceOrbitalB == valenceOrbitalA) ){
+      CartesianType anotherAxis;
+      if(valenceOrbitalB == dxy){
+         if(axis == XAxis){
+            anotherAxis = YAxis;
+         }
+         else{
+            anotherAxis = XAxis;
+         }
+      }
+      else if(valenceOrbitalB == dyz){
+         if(axis == YAxis){
+            anotherAxis = ZAxis;
+         }
+         else{
+            anotherAxis = YAxis;
+         }
+      }
+      else if(valenceOrbitalB == dzx){
+         if(axis == ZAxis){
+            anotherAxis = XAxis;
+         }
+         else{
+            anotherAxis = ZAxis;
+         }
+      }
+      double axisAverage = (gaussianExponentA*xyzA[axis]+gaussianExponentB*xyzB[axis])/beta;
+      double overlap1 = this->GetGaussianOverlap(atomTypeA,
+                                                 valenceOrbitalA, 
+                                                 gaussianExponentA, 
+                                                 atomTypeB, 
+                                                 valenceOrbitalB, 
+                                                 gaussianExponentB,
+                                                 dxyz[XAxis], 
+                                                 dxyz[YAxis], 
+                                                 dxyz[ZAxis], 
+                                                 Rab);
+      double sasb = this->GetGaussianOverlapSaSb(gaussianExponentA, gaussianExponentB, Rab);
+      value = 0.5*(gaussianExponentA-gaussianExponentB)*dxyz[axis]
+             +(gaussianExponentA-gaussianExponentB)*(gaussianExponentA*gaussianExponentB)
+              *dxyz[axis]*pow(dxyz[anotherAxis],2.0)/beta;
+      value *= 8.0*(gaussianExponentA*gaussianExponentB)*pow(beta,-3.0);
+      value *= sasb;
+      value += axisAverage*overlap1;
+   }
+   else if( (valenceOrbitalA == dxy   && axis == ZAxis && valenceOrbitalB == valenceOrbitalA) || 
+            (valenceOrbitalA == dyz   && axis == XAxis && valenceOrbitalB == valenceOrbitalA) || 
+            (valenceOrbitalA == dzx   && axis == YAxis && valenceOrbitalB == valenceOrbitalA) ||
+            (valenceOrbitalA == dxxyy && axis == ZAxis && valenceOrbitalB == valenceOrbitalA) ){
+      double axisAverage = (gaussianExponentA*xyzA[axis]+gaussianExponentB*xyzB[axis])/beta;
+      double overlap1 = this->GetGaussianOverlap(atomTypeA,
+                                                 valenceOrbitalA, 
+                                                 gaussianExponentA, 
+                                                 atomTypeB, 
+                                                 valenceOrbitalB, 
+                                                 gaussianExponentB,
+                                                 dxyz[XAxis], 
+                                                 dxyz[YAxis], 
+                                                 dxyz[ZAxis], 
+                                                 Rab);
+      value = axisAverage*overlap1;
+   }
+   else if( (valenceOrbitalA == dxxyy && axis == XAxis && valenceOrbitalB == valenceOrbitalA) ||
+            (valenceOrbitalA == dxxyy && axis == YAxis && valenceOrbitalB == valenceOrbitalA) ){
+      CartesianType anotherAxis;
+      if(axis == XAxis){
+         anotherAxis = YAxis;
+      }
+      else{
+         anotherAxis = XAxis;
+      }
+      double axisAverage = (gaussianExponentA*xyzA[axis]+gaussianExponentB*xyzB[axis])/beta;
+      double overlap1 = this->GetGaussianOverlap(atomTypeA,
+                                                 valenceOrbitalA, 
+                                                 gaussianExponentA, 
+                                                 atomTypeB, 
+                                                 valenceOrbitalB, 
+                                                 gaussianExponentB,
+                                                 dxyz[XAxis], 
+                                                 dxyz[YAxis], 
+                                                 dxyz[ZAxis], 
+                                                 Rab);
+      double sasb = this->GetGaussianOverlapSaSb(gaussianExponentA, gaussianExponentB, Rab);
+      value = (gaussianExponentA-gaussianExponentB)*dxyz[axis]
+             -(gaussianExponentA-gaussianExponentB)*(gaussianExponentA*gaussianExponentB)
+              *(pow(dxyz[axis],2.0) - pow(dxyz[anotherAxis],2.0))*dxyz[axis]/beta;
+      value *= 4.0*(gaussianExponentA*gaussianExponentB)*pow(beta,-3.0);
+      value *= sasb;
+      value += axisAverage*overlap1;
+   }
+   else if( (valenceOrbitalA == dzz && axis == XAxis && valenceOrbitalB == valenceOrbitalA) ||
+            (valenceOrbitalA == dzz && axis == YAxis && valenceOrbitalB == valenceOrbitalA) ){
+      double axisAverage = (gaussianExponentA*xyzA[axis]+gaussianExponentB*xyzB[axis])/beta;
+      double overlap1 = this->GetGaussianOverlap(atomTypeA,
+                                                 valenceOrbitalA, 
+                                                 gaussianExponentA, 
+                                                 atomTypeB, 
+                                                 valenceOrbitalB, 
+                                                 gaussianExponentB,
+                                                 dxyz[XAxis], 
+                                                 dxyz[YAxis], 
+                                                 dxyz[ZAxis], 
+                                                 Rab);
+      double sasb = this->GetGaussianOverlapSaSb(gaussianExponentA, gaussianExponentB, Rab);
+      value = (gaussianExponentA-gaussianExponentB)*dxyz[axis]
+             -(gaussianExponentA-gaussianExponentB)*(gaussianExponentA*gaussianExponentB)
+              *(2.0*pow(dxyz[ZAxis],2.0) - pow(dxyz[XAxis],2.0) - pow(dxyz[YAxis],2.0))*dxyz[axis]/beta;
+      value *= 4.0*(gaussianExponentA*gaussianExponentB)*pow(beta,-3.0)/3.0;
+      value *= sasb;
+      value += axisAverage*overlap1;
+   }
+   else if( valenceOrbitalA == dzz && axis == ZAxis && valenceOrbitalB == valenceOrbitalA) {
+      double axisAverage = (gaussianExponentA*xyzA[axis]+gaussianExponentB*xyzB[axis])/beta;
+      double overlap1 = this->GetGaussianOverlap(atomTypeA,
+                                                 valenceOrbitalA, 
+                                                 gaussianExponentA, 
+                                                 atomTypeB, 
+                                                 valenceOrbitalB, 
+                                                 gaussianExponentB,
+                                                 dxyz[XAxis], 
+                                                 dxyz[YAxis], 
+                                                 dxyz[ZAxis], 
+                                                 Rab);
+      double sasb = this->GetGaussianOverlapSaSb(gaussianExponentA, gaussianExponentB, Rab);
+      value = 2.0*(gaussianExponentA-gaussianExponentB)*dxyz[axis]
+             -(gaussianExponentA-gaussianExponentB)*(gaussianExponentA*gaussianExponentB)
+              *(2.0*pow(dxyz[ZAxis],2.0) - pow(dxyz[XAxis],2.0) - pow(dxyz[YAxis],2.0))*dxyz[axis]/beta;
+      value *= 8.0*(gaussianExponentA*gaussianExponentB)*pow(beta,-3.0)/3.0;
+      value *= sasb;
+      value += axisAverage*overlap1;
+   }
+
    else{
       stringstream ss;
       ss << this->errorMessageGetGaussianCartesianMatrixBadOrbital;
