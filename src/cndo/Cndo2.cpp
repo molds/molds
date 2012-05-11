@@ -1507,8 +1507,6 @@ void Cndo2::CalcCartesianMatrixByGTOExpansion(double*** cartesianMatrix,
          const Atom& atomA = *molecule.GetAtom(A);
          int firstAOIndexAtomA = atomA.GetFirstAOIndex();
          for(int B=0; B<totalAtomNumber; B++){
-                     cout << "A=" << A << "  " << "B=" << B << endl;
-            
             const Atom& atomB = *molecule.GetAtom(B);
             int firstAOIndexAtomB = atomB.GetFirstAOIndex();
             for(int a=0; a<atomA.GetValenceSize(); a++){
