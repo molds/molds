@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/3/17(Sat.) 1:4:7  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/5/11(Fri.) 23:52:35  <<<<<
 
 
 **********  START: Parse input  **********
@@ -62,6 +62,7 @@
 		Number of excited states: 49
 		Number of printed coefficients of CIS-eigenvector: 1
 		CIS-Davidson: no
+		Exciton energies: no
 
 	MD conditions:
 		Electronic eigenstate: 1
@@ -126,6 +127,27 @@ SCF iter=11: RMS density=0.000000358204689
 		| [a.u.] | [eV] |
 		2.207380e+01	6.006635e+02
 
+	Total Dipole moment:
+		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
+		-1.995892e-02	-3.192733e-02	-1.222811e-02	3.958838e-02
+
+		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
+		-5.073051e-02	-8.115121e-02	-3.108077e-02	1.006236e-01
+
+	Electronic Dipole moment:
+		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
+		7.727997e-03	-2.059175e-02	1.916286e-03	2.207746e-02
+
+		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
+		1.964261e-02	-5.233902e-02	4.870714e-03	5.611532e-02
+
+	Core Dipole moment:
+		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
+		-2.768691e-02	-1.133558e-02	-1.414440e-02	3.958838e-02
+
+		| x[Debye] | y[Debye] | z[Debye] | magnitude[debye] |
+		-7.037313e-02	-2.881219e-02	-3.595149e-02	1.006236e-01
+
 	Mulliken charge on each Atom:
 		| i-th | atom type | core charge | Mulliken charge | 
 		0	C	4.000000e+00	1.051263e-02
@@ -141,13 +163,13 @@ SCF iter=11: RMS density=0.000000358204689
 		| [a.u.] | [Kcal/mol] | 
 		-2.736798e-02	-1.717367e+01
 
-	Elapsed time(omp) for the SCF = 0.036561[s].
+	Elapsed time(omp) for the SCF = 0.045378[s].
 **********  DONE: MNDO-SCF  **********
 
 
 **********  START: MNDO-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.039258[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.040159[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Direct-CIS  =====
@@ -207,7 +229,8 @@ SCF iter=11: RMS density=0.000000358204689
 		 48	1.251950e+00	3.406757e+01	8.966802e-01 (0 -> 13)	
 		 49	1.264508e+00	3.440928e+01	9.869166e-01 (0 -> 12)	
 
-	Elapsed time(omp) for the CIS = 0.042383[s].
+
+	Elapsed time(omp) for the CIS = 0.043394[s].
 **********  DONE: MNDO-CIS  **********
 
 
@@ -315,6 +338,27 @@ SCF iter=3: RMS density=0.000000754773590
 		| [a.u.] | [eV] |
 		2.207368e+01	6.006601e+02
 
+	Total Dipole moment:
+		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
+		-1.994833e-02	-3.191784e-02	-1.222415e-02	3.957417e-02
+
+		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
+		-5.070361e-02	-8.112709e-02	-3.107070e-02	1.005875e-01
+
+	Electronic Dipole moment:
+		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
+		7.735150e-03	-2.058917e-02	1.918208e-03	2.207772e-02
+
+		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
+		1.966080e-02	-5.233245e-02	4.875599e-03	5.611598e-02
+
+	Core Dipole moment:
+		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
+		-2.768348e-02	-1.132868e-02	-1.414236e-02	3.957417e-02
+
+		| x[Debye] | y[Debye] | z[Debye] | magnitude[debye] |
+		-7.036440e-02	-2.879464e-02	-3.594630e-02	1.005875e-01
+
 	Mulliken charge on each Atom:
 		| i-th | atom type | core charge | Mulliken charge | 
 		0	C	4.000000e+00	1.051238e-02
@@ -330,13 +374,13 @@ SCF iter=3: RMS density=0.000000754773590
 		| [a.u.] | [Kcal/mol] | 
 		-2.736965e-02	-1.717471e+01
 
-	Elapsed time(omp) for the SCF = 0.028002[s].
+	Elapsed time(omp) for the SCF = 0.038177[s].
 **********  DONE: MNDO-SCF  **********
 
 
 **********  START: MNDO-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.037705[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.039570[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Direct-CIS  =====
@@ -396,7 +440,8 @@ SCF iter=3: RMS density=0.000000754773590
 		 48	1.251939e+00	3.406726e+01	8.966655e-01 (0 -> 13)	
 		 49	1.264497e+00	3.440898e+01	9.869216e-01 (0 -> 12)	
 
-	Elapsed time(omp) for the CIS = 0.040521[s].
+
+	Elapsed time(omp) for the CIS = 0.042407[s].
 **********  DONE: MNDO-CIS  **********
 
 
@@ -407,7 +452,7 @@ SCF iter=3: RMS density=0.000000754773590
 		Electronic
 		(inc. core rep.)	-1.225091e+01	-3.333670e+02
 		Total            	-1.225091e+01	-3.333668e+02
-		Error            	-5.259743e-09	-1.431260e-07
+		Error            	-5.259736e-09	-1.431258e-07
 
 	Molecular configuration:
 		| i-th | atom type | x[angst.] | y[angst.] | z[angst.] |
@@ -472,9 +517,9 @@ SCF iter=3: RMS density=0.000000754773590
 **********  START: MNDO-SCF  **********
 SCF iter=0: RMS density=0.000059688819489
 SCF iter=1: RMS density=0.000018105243074
-SCF iter=2: RMS density=0.000006173798242
-SCF iter=3: RMS density=0.000002269190386
-SCF iter=4: RMS density=0.000000880710306
+SCF iter=2: RMS density=0.000006173798244
+SCF iter=3: RMS density=0.000002269190384
+SCF iter=4: RMS density=0.000000880710307
 
 
 
@@ -506,6 +551,27 @@ SCF iter=4: RMS density=0.000000880710306
 		| [a.u.] | [eV] |
 		2.207330e+01	6.006498e+02
 
+	Total Dipole moment:
+		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
+		-1.991679e-02	-3.188998e-02	-1.221261e-02	3.953223e-02
+
+		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
+		-5.062344e-02	-8.105626e-02	-3.104135e-02	1.004809e-01
+
+	Electronic Dipole moment:
+		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
+		7.756398e-03	-2.058201e-02	1.923626e-03	2.207897e-02
+
+		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
+		1.971480e-02	-5.231426e-02	4.889371e-03	5.611917e-02
+
+	Core Dipole moment:
+		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
+		-2.767319e-02	-1.130797e-02	-1.413623e-02	3.953223e-02
+
+		| x[Debye] | y[Debye] | z[Debye] | magnitude[debye] |
+		-7.033824e-02	-2.874200e-02	-3.593072e-02	1.004809e-01
+
 	Mulliken charge on each Atom:
 		| i-th | atom type | core charge | Mulliken charge | 
 		0	C	4.000000e+00	1.051248e-02
@@ -521,13 +587,13 @@ SCF iter=4: RMS density=0.000000880710306
 		| [a.u.] | [Kcal/mol] | 
 		-2.737462e-02	-1.717783e+01
 
-	Elapsed time(omp) for the SCF = 0.028556[s].
+	Elapsed time(omp) for the SCF = 0.038609[s].
 **********  DONE: MNDO-SCF  **********
 
 
 **********  START: MNDO-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.037645[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.039702[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Direct-CIS  =====
@@ -587,7 +653,8 @@ SCF iter=4: RMS density=0.000000880710306
 		 48	1.251905e+00	3.406634e+01	8.966208e-01 (0 -> 13)	
 		 49	1.264464e+00	3.440809e+01	9.869364e-01 (0 -> 12)	
 
-	Elapsed time(omp) for the CIS = 0.040427[s].
+
+	Elapsed time(omp) for the CIS = 0.042549[s].
 **********  DONE: MNDO-CIS  **********
 
 
@@ -598,7 +665,7 @@ SCF iter=4: RMS density=0.000000880710306
 		Electronic
 		(inc. core rep.)	-1.225093e+01	-3.333674e+02
 		Total            	-1.225091e+01	-3.333668e+02
-		Error            	-2.813852e-09	-7.656943e-08
+		Error            	-2.813861e-09	-7.656967e-08
 
 	Molecular configuration:
 		| i-th | atom type | x[angst.] | y[angst.] | z[angst.] |
@@ -661,12 +728,12 @@ SCF iter=4: RMS density=0.000000880710306
 
 	========== START: MD step 3
 **********  START: MNDO-SCF  **********
-SCF iter=0: RMS density=0.000099316550512
+SCF iter=0: RMS density=0.000099316550511
 SCF iter=1: RMS density=0.000030114858302
-SCF iter=2: RMS density=0.000010266356304
-SCF iter=3: RMS density=0.000003772624777
+SCF iter=2: RMS density=0.000010266356306
+SCF iter=3: RMS density=0.000003772624778
 SCF iter=4: RMS density=0.000001463933858
-SCF iter=5: RMS density=0.000000593352779
+SCF iter=5: RMS density=0.000000593352778
 
 
 
@@ -698,6 +765,27 @@ SCF iter=5: RMS density=0.000000593352779
 		| [a.u.] | [eV] |
 		2.207267e+01	6.006326e+02
 
+	Total Dipole moment:
+		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
+		-1.986427e-02	-3.184361e-02	-1.219339e-02	3.946244e-02
+
+		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
+		-5.048996e-02	-8.093841e-02	-3.099252e-02	1.003035e-01
+
+	Electronic Dipole moment:
+		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
+		7.791761e-03	-2.057013e-02	1.932633e-03	2.208114e-02
+
+		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
+		1.980469e-02	-5.228407e-02	4.912264e-03	5.612468e-02
+
+	Core Dipole moment:
+		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
+		-2.765603e-02	-1.127348e-02	-1.412603e-02	3.946244e-02
+
+		| x[Debye] | y[Debye] | z[Debye] | magnitude[debye] |
+		-7.029464e-02	-2.865434e-02	-3.590478e-02	1.003035e-01
+
 	Mulliken charge on each Atom:
 		| i-th | atom type | core charge | Mulliken charge | 
 		0	C	4.000000e+00	1.051287e-02
@@ -713,13 +801,13 @@ SCF iter=5: RMS density=0.000000593352779
 		| [a.u.] | [Kcal/mol] | 
 		-2.738286e-02	-1.718300e+01
 
-	Elapsed time(omp) for the SCF = 0.028737[s].
+	Elapsed time(omp) for the SCF = 0.039298[s].
 **********  DONE: MNDO-SCF  **********
 
 
 **********  START: MNDO-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.038257[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.039811[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Direct-CIS  =====
@@ -779,7 +867,8 @@ SCF iter=5: RMS density=0.000000593352779
 		 48	1.251848e+00	3.406480e+01	8.965462e-01 (0 -> 13)	
 		 49	1.264409e+00	3.440660e+01	9.869610e-01 (0 -> 12)	
 
-	Elapsed time(omp) for the CIS = 0.040979[s].
+
+	Elapsed time(omp) for the CIS = 0.042579[s].
 **********  DONE: MNDO-CIS  **********
 
 
@@ -790,7 +879,7 @@ SCF iter=5: RMS density=0.000000593352779
 		Electronic
 		(inc. core rep.)	-1.225095e+01	-3.333681e+02
 		Total            	-1.225091e+01	-3.333668e+02
-		Error            	5.605541e-09	1.525358e-07
+		Error            	5.605548e-09	1.525359e-07
 
 	Molecular configuration:
 		| i-th | atom type | x[angst.] | y[angst.] | z[angst.] |
@@ -854,11 +943,11 @@ SCF iter=5: RMS density=0.000000593352779
 	========== START: MD step 4
 **********  START: MNDO-SCF  **********
 SCF iter=0: RMS density=0.000138771223083
-SCF iter=1: RMS density=0.000042052627729
-SCF iter=2: RMS density=0.000014327427501
-SCF iter=3: RMS density=0.000005261786472
-SCF iter=4: RMS density=0.000002040544262
-SCF iter=5: RMS density=0.000000826577902
+SCF iter=1: RMS density=0.000042052627730
+SCF iter=2: RMS density=0.000014327427502
+SCF iter=3: RMS density=0.000005261786469
+SCF iter=4: RMS density=0.000002040544263
+SCF iter=5: RMS density=0.000000826577904
 
 
 
@@ -890,6 +979,27 @@ SCF iter=5: RMS density=0.000000826577902
 		| [a.u.] | [eV] |
 		2.207178e+01	6.006086e+02
 
+	Total Dipole moment:
+		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
+		-1.979078e-02	-3.177871e-02	-1.216650e-02	3.936477e-02
+
+		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
+		-5.030316e-02	-8.077344e-02	-3.092416e-02	1.000553e-01
+
+	Electronic Dipole moment:
+		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
+		7.841246e-03	-2.055346e-02	1.945248e-03	2.208425e-02
+
+		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
+		1.993046e-02	-5.224170e-02	4.944327e-03	5.613257e-02
+
+	Core Dipole moment:
+		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
+		-2.763203e-02	-1.122525e-02	-1.411175e-02	3.936477e-02
+
+		| x[Debye] | y[Debye] | z[Debye] | magnitude[debye] |
+		-7.023363e-02	-2.853174e-02	-3.586849e-02	1.000553e-01
+
 	Mulliken charge on each Atom:
 		| i-th | atom type | core charge | Mulliken charge | 
 		0	C	4.000000e+00	1.051326e-02
@@ -905,13 +1015,13 @@ SCF iter=5: RMS density=0.000000826577902
 		| [a.u.] | [Kcal/mol] | 
 		-2.739430e-02	-1.719018e+01
 
-	Elapsed time(omp) for the SCF = 0.028618[s].
+	Elapsed time(omp) for the SCF = 0.038892[s].
 **********  DONE: MNDO-SCF  **********
 
 
 **********  START: MNDO-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.039147[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.039795[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Direct-CIS  =====
@@ -971,7 +1081,8 @@ SCF iter=5: RMS density=0.000000826577902
 		 48	1.251769e+00	3.406264e+01	8.964417e-01 (0 -> 13)	
 		 49	1.264332e+00	3.440451e+01	9.869952e-01 (0 -> 12)	
 
-	Elapsed time(omp) for the CIS = 0.041974[s].
+
+	Elapsed time(omp) for the CIS = 0.042613[s].
 **********  DONE: MNDO-CIS  **********
 
 
@@ -982,7 +1093,7 @@ SCF iter=5: RMS density=0.000000826577902
 		Electronic
 		(inc. core rep.)	-1.225099e+01	-3.333690e+02
 		Total            	-1.225091e+01	-3.333668e+02
-		Error            	1.006210e-08	2.738058e-07
+		Error            	1.006208e-08	2.738052e-07
 
 	Molecular configuration:
 		| i-th | atom type | x[angst.] | y[angst.] | z[angst.] |
@@ -1047,11 +1158,11 @@ SCF iter=5: RMS density=0.000000826577902
 **********  START: MNDO-SCF  **********
 SCF iter=0: RMS density=0.000178272456061
 SCF iter=1: RMS density=0.000054029949345
-SCF iter=2: RMS density=0.000018409465220
+SCF iter=2: RMS density=0.000018409465219
 SCF iter=3: RMS density=0.000006761008067
-SCF iter=4: RMS density=0.000002621853654
+SCF iter=4: RMS density=0.000002621853653
 SCF iter=5: RMS density=0.000001061977522
-SCF iter=6: RMS density=0.000000004595350
+SCF iter=6: RMS density=0.000000004595348
 
 
 
@@ -1083,6 +1194,27 @@ SCF iter=6: RMS density=0.000000004595350
 		| [a.u.] | [eV] |
 		2.207065e+01	6.005778e+02
 
+	Total Dipole moment:
+		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
+		-1.969643e-02	-3.169543e-02	-1.213198e-02	3.923945e-02
+
+		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
+		-5.006334e-02	-8.056176e-02	-3.083642e-02	9.973675e-02
+
+	Electronic Dipole moment:
+		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
+		7.904750e-03	-2.053211e-02	1.961425e-03	2.208846e-02
+
+		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
+		2.009187e-02	-5.218743e-02	4.985447e-03	5.614326e-02
+
+	Core Dipole moment:
+		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
+		-2.760118e-02	-1.116332e-02	-1.409341e-02	3.923945e-02
+
+		| x[Debye] | y[Debye] | z[Debye] | magnitude[debye] |
+		-7.015521e-02	-2.837433e-02	-3.582187e-02	9.973675e-02
+
 	Mulliken charge on each Atom:
 		| i-th | atom type | core charge | Mulliken charge | 
 		0	C	4.000000e+00	1.051418e-02
@@ -1098,13 +1230,13 @@ SCF iter=6: RMS density=0.000000004595350
 		| [a.u.] | [Kcal/mol] | 
 		-2.740883e-02	-1.719930e+01
 
-	Elapsed time(omp) for the SCF = 0.028451[s].
+	Elapsed time(omp) for the SCF = 0.038748[s].
 **********  DONE: MNDO-SCF  **********
 
 
 **********  START: MNDO-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.038730[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.039796[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Direct-CIS  =====
@@ -1164,7 +1296,8 @@ SCF iter=6: RMS density=0.000000004595350
 		 48	1.251667e+00	3.405987e+01	8.963069e-01 (0 -> 13)	
 		 49	1.264234e+00	3.440183e+01	9.870391e-01 (0 -> 12)	
 
-	Elapsed time(omp) for the CIS = 0.041609[s].
+
+	Elapsed time(omp) for the CIS = 0.042676[s].
 **********  DONE: MNDO-CIS  **********
 
 
@@ -1175,7 +1308,7 @@ SCF iter=6: RMS density=0.000000004595350
 		Electronic
 		(inc. core rep.)	-1.225103e+01	-3.333703e+02
 		Total            	-1.225091e+01	-3.333668e+02
-		Error            	2.624772e-08	7.142425e-07
+		Error            	2.624772e-08	7.142424e-07
 
 	Molecular configuration:
 		| i-th | atom type | x[angst.] | y[angst.] | z[angst.] |
@@ -1237,14 +1370,14 @@ SCF iter=6: RMS density=0.000000004595350
 	========== DONE: MD step 5
 **********  DONE: Molecular dynamics  **********
 	Summary for memory usage:
-		Max Heap: 0.204952[MB].
+		Max Heap: 0.210880[MB].
 		Current Heap(Leaked): 0.000000[MB].
 
 
      >>>>>  The MolDS finished normally!  <<<<<
-     >>>>>  CPU time: 6.65[s].  <<<<<
+     >>>>>  CPU time: 6.85[s].  <<<<<
      >>>>>  Elapsed time: 7[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 6.67438[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 6.87446[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

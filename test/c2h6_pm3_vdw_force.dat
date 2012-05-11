@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/3/17(Sat.) 1:9:38  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/5/11(Fri.) 23:55:30  <<<<<
 
 
 **********  START: Parse input  **********
@@ -77,19 +77,19 @@ h | -0.3700 | -0.5208 | 0.9016 | h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 |
 
 **********  START: Molecular dynamics  **********
 **********  START: PM3-SCF  **********
-SCF iter=0: RMS density=5.291502622129181
-SCF iter=1: RMS density=1.910456125626946
-SCF iter=2: RMS density=1.044203238495392
-SCF iter=3: RMS density=0.569275110921828
-SCF iter=4: RMS density=0.308641545774631
+SCF iter=0: RMS density=5.291502622129180
+SCF iter=1: RMS density=1.910456125626943
+SCF iter=2: RMS density=1.044203238495390
+SCF iter=3: RMS density=0.569275110921830
+SCF iter=4: RMS density=0.308641545774630
 SCF iter=5: RMS density=0.166813060251973
-SCF iter=6: RMS density=0.000657312351884
-SCF iter=7: RMS density=0.000224796079740
-SCF iter=8: RMS density=0.000083564976808
-SCF iter=9: RMS density=0.000026986732830
-SCF iter=10: RMS density=0.000004938275856
-SCF iter=11: RMS density=0.000002003884715
-SCF iter=12: RMS density=0.000000169506348
+SCF iter=6: RMS density=0.000657312351886
+SCF iter=7: RMS density=0.000224796079705
+SCF iter=8: RMS density=0.000083564977040
+SCF iter=9: RMS density=0.000026986732818
+SCF iter=10: RMS density=0.000004938275857
+SCF iter=11: RMS density=0.000002003884717
+SCF iter=12: RMS density=0.000000169506349
 
 
 
@@ -125,6 +125,27 @@ SCF iter=12: RMS density=0.000000169506348
 		| [a.u.] | [eV] |
 		-3.223663e-03	-8.772102e-02
 
+	Total Dipole moment:
+		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
+		-1.756074e-02	-3.270080e-02	-1.363454e-02	3.954266e-02
+
+		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
+		-4.463495e-02	-8.311715e-02	-3.465556e-02	1.005074e-01
+
+	Electronic Dipole moment:
+		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
+		1.012618e-02	-2.136521e-02	5.098589e-04	2.364893e-02
+
+		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
+		2.573818e-02	-5.430496e-02	1.295932e-03	6.010958e-02
+
+	Core Dipole moment:
+		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
+		-2.768691e-02	-1.133558e-02	-1.414440e-02	3.954266e-02
+
+		| x[Debye] | y[Debye] | z[Debye] | magnitude[debye] |
+		-7.037313e-02	-2.881219e-02	-3.595149e-02	1.005074e-01
+
 	Mulliken charge on each Atom:
 		| i-th | atom type | core charge | Mulliken charge | 
 		0	C	4.000000e+00	-1.174103e-01
@@ -136,7 +157,7 @@ SCF iter=12: RMS density=0.000000169506348
 		6	H	1.000000e+00	3.744313e-02
 		7	H	1.000000e+00	4.258006e-02
 
-	Elapsed time(omp) for the SCF = 0.036143[s].
+	Elapsed time(omp) for the SCF = 0.044846[s].
 **********  DONE: PM3-SCF  **********
 
 
@@ -210,9 +231,9 @@ SCF iter=12: RMS density=0.000000169506348
 
 	========== START: MD step 1
 **********  START: PM3-SCF  **********
-SCF iter=0: RMS density=0.000006724144803
+SCF iter=0: RMS density=0.000006724144804
 SCF iter=1: RMS density=0.000002021121654
-SCF iter=2: RMS density=0.000000707878693
+SCF iter=2: RMS density=0.000000707878692
 
 
 
@@ -248,6 +269,27 @@ SCF iter=2: RMS density=0.000000707878693
 		| [a.u.] | [eV] |
 		-3.223614e-03	-8.771972e-02
 
+	Total Dipole moment:
+		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
+		-1.755082e-02	-3.269056e-02	-1.362942e-02	3.952803e-02
+
+		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
+		-4.460974e-02	-8.309113e-02	-3.464255e-02	1.004702e-01
+
+	Electronic Dipole moment:
+		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
+		1.013227e-02	-2.136458e-02	5.097256e-04	2.365096e-02
+
+		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
+		2.575367e-02	-5.430336e-02	1.295593e-03	6.011476e-02
+
+	Core Dipole moment:
+		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
+		-2.768309e-02	-1.132598e-02	-1.413915e-02	3.952803e-02
+
+		| x[Debye] | y[Debye] | z[Debye] | magnitude[debye] |
+		-7.036341e-02	-2.878777e-02	-3.593814e-02	1.004702e-01
+
 	Mulliken charge on each Atom:
 		| i-th | atom type | core charge | Mulliken charge | 
 		0	C	4.000000e+00	-1.174095e-01
@@ -259,7 +301,7 @@ SCF iter=2: RMS density=0.000000707878693
 		6	H	1.000000e+00	3.744286e-02
 		7	H	1.000000e+00	4.257961e-02
 
-	Elapsed time(omp) for the SCF = 0.028473[s].
+	Elapsed time(omp) for the SCF = 0.038655[s].
 **********  DONE: PM3-SCF  **********
 
 
@@ -271,7 +313,7 @@ SCF iter=2: RMS density=0.000000707878693
 		Electronic
 		(inc. core rep. and vdW)	-1.212918e+01	-3.300545e+02
 		Total            	-1.212918e+01	-3.300545e+02
-		Error            	1.801084e-10	4.901037e-09
+		Error            	1.801155e-10	4.901231e-09
 
 	Molecular configuration:
 		| i-th | atom type | x[angst.] | y[angst.] | z[angst.] |
@@ -336,7 +378,7 @@ SCF iter=2: RMS density=0.000000707878693
 **********  START: PM3-SCF  **********
 SCF iter=0: RMS density=0.000020389637077
 SCF iter=1: RMS density=0.000006174284122
-SCF iter=2: RMS density=0.000002182572132
+SCF iter=2: RMS density=0.000002182572133
 SCF iter=3: RMS density=0.000000879095867
 
 
@@ -373,6 +415,27 @@ SCF iter=3: RMS density=0.000000879095867
 		| [a.u.] | [eV] |
 		-3.223471e-03	-8.771580e-02
 
+	Total Dipole moment:
+		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
+		-1.752127e-02	-3.266028e-02	-1.361438e-02	3.948468e-02
+
+		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
+		-4.453463e-02	-8.301416e-02	-3.460431e-02	1.003601e-01
+
+	Electronic Dipole moment:
+		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
+		1.015035e-02	-2.136311e-02	5.090161e-04	2.365737e-02
+
+		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
+		2.579963e-02	-5.429962e-02	1.293790e-03	6.013106e-02
+
+	Core Dipole moment:
+		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
+		-2.767162e-02	-1.129717e-02	-1.412340e-02	3.948468e-02
+
+		| x[Debye] | y[Debye] | z[Debye] | magnitude[debye] |
+		-7.033426e-02	-2.871454e-02	-3.589810e-02	1.003601e-01
+
 	Mulliken charge on each Atom:
 		| i-th | atom type | core charge | Mulliken charge | 
 		0	C	4.000000e+00	-1.174067e-01
@@ -384,7 +447,7 @@ SCF iter=3: RMS density=0.000000879095867
 		6	H	1.000000e+00	3.744205e-02
 		7	H	1.000000e+00	4.257799e-02
 
-	Elapsed time(omp) for the SCF = 0.028360[s].
+	Elapsed time(omp) for the SCF = 0.038339[s].
 **********  DONE: PM3-SCF  **********
 
 
@@ -396,7 +459,7 @@ SCF iter=3: RMS density=0.000000879095867
 		Electronic
 		(inc. core rep. and vdW)	-1.212919e+01	-3.300546e+02
 		Total            	-1.212918e+01	-3.300545e+02
-		Error            	7.201102e-10	1.959535e-08
+		Error            	7.201244e-10	1.959574e-08
 
 	Molecular configuration:
 		| i-th | atom type | x[angst.] | y[angst.] | z[angst.] |
@@ -461,8 +524,8 @@ SCF iter=3: RMS density=0.000000879095867
 **********  START: PM3-SCF  **********
 SCF iter=0: RMS density=0.000033859836381
 SCF iter=1: RMS density=0.000010250630853
-SCF iter=2: RMS density=0.000003623890708
-SCF iter=3: RMS density=0.000001460100634
+SCF iter=2: RMS density=0.000003623890707
+SCF iter=3: RMS density=0.000001460100635
 SCF iter=4: RMS density=0.000000644540620
 
 
@@ -499,6 +562,27 @@ SCF iter=4: RMS density=0.000000644540620
 		| [a.u.] | [eV] |
 		-3.223231e-03	-8.770927e-02
 
+	Total Dipole moment:
+		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
+		-1.747212e-02	-3.260997e-02	-1.358942e-02	3.941266e-02
+
+		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
+		-4.440971e-02	-8.288630e-02	-3.454088e-02	1.001770e-01
+
+	Electronic Dipole moment:
+		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
+		1.018039e-02	-2.136080e-02	5.077249e-04	2.366816e-02
+
+		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
+		2.587598e-02	-5.429374e-02	1.290508e-03	6.015848e-02
+
+	Core Dipole moment:
+		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
+		-2.765251e-02	-1.124918e-02	-1.409715e-02	3.941266e-02
+
+		| x[Debye] | y[Debye] | z[Debye] | magnitude[debye] |
+		-7.028570e-02	-2.859256e-02	-3.583139e-02	1.001770e-01
+
 	Mulliken charge on each Atom:
 		| i-th | atom type | core charge | Mulliken charge | 
 		0	C	4.000000e+00	-1.174019e-01
@@ -510,7 +594,7 @@ SCF iter=4: RMS density=0.000000644540620
 		6	H	1.000000e+00	3.744069e-02
 		7	H	1.000000e+00	4.257512e-02
 
-	Elapsed time(omp) for the SCF = 0.028581[s].
+	Elapsed time(omp) for the SCF = 0.039658[s].
 **********  DONE: PM3-SCF  **********
 
 
@@ -522,7 +606,7 @@ SCF iter=4: RMS density=0.000000644540620
 		Electronic
 		(inc. core rep. and vdW)	-1.212919e+01	-3.300548e+02
 		Total            	-1.212918e+01	-3.300545e+02
-		Error            	1.617856e-09	4.402446e-08
+		Error            	1.617863e-09	4.402465e-08
 
 	Molecular configuration:
 		| i-th | atom type | x[angst.] | y[angst.] | z[angst.] |
@@ -585,9 +669,9 @@ SCF iter=4: RMS density=0.000000644540620
 
 	========== START: MD step 4
 **********  START: PM3-SCF  **********
-SCF iter=0: RMS density=0.000047200192872
+SCF iter=0: RMS density=0.000047200192871
 SCF iter=1: RMS density=0.000014258070110
-SCF iter=2: RMS density=0.000005027468626
+SCF iter=2: RMS density=0.000005027468627
 SCF iter=3: RMS density=0.000002020834846
 SCF iter=4: RMS density=0.000000890542150
 
@@ -625,6 +709,27 @@ SCF iter=4: RMS density=0.000000890542150
 		| [a.u.] | [eV] |
 		-3.222895e-03	-8.770014e-02
 
+	Total Dipole moment:
+		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
+		-1.740330e-02	-3.253953e-02	-1.355445e-02	3.931181e-02
+
+		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
+		-4.423478e-02	-8.270725e-02	-3.445198e-02	9.992069e-02
+
+	Electronic Dipole moment:
+		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
+		1.022247e-02	-2.135749e-02	5.059795e-04	2.368327e-02
+
+		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
+		2.598294e-02	-5.428533e-02	1.286072e-03	6.019688e-02
+
+	Core Dipole moment:
+		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
+		-2.762577e-02	-1.118204e-02	-1.406043e-02	3.931181e-02
+
+		| x[Debye] | y[Debye] | z[Debye] | magnitude[debye] |
+		-7.021773e-02	-2.842192e-02	-3.573805e-02	9.992069e-02
+
 	Mulliken charge on each Atom:
 		| i-th | atom type | core charge | Mulliken charge | 
 		0	C	4.000000e+00	-1.173952e-01
@@ -636,7 +741,7 @@ SCF iter=4: RMS density=0.000000890542150
 		6	H	1.000000e+00	3.743878e-02
 		7	H	1.000000e+00	4.257123e-02
 
-	Elapsed time(omp) for the SCF = 0.028320[s].
+	Elapsed time(omp) for the SCF = 0.041658[s].
 **********  DONE: PM3-SCF  **********
 
 
@@ -648,7 +753,7 @@ SCF iter=4: RMS density=0.000000890542150
 		Electronic
 		(inc. core rep. and vdW)	-1.212920e+01	-3.300550e+02
 		Total            	-1.212918e+01	-3.300545e+02
-		Error            	2.871129e-09	7.812802e-08
+		Error            	2.871143e-09	7.812841e-08
 
 	Molecular configuration:
 		| i-th | atom type | x[angst.] | y[angst.] | z[angst.] |
@@ -714,8 +819,8 @@ SCF iter=4: RMS density=0.000000890542150
 SCF iter=0: RMS density=0.000060654637795
 SCF iter=1: RMS density=0.000018328882181
 SCF iter=2: RMS density=0.000006465526304
-SCF iter=3: RMS density=0.000002599824947
-SCF iter=4: RMS density=0.000001145999577
+SCF iter=3: RMS density=0.000002599824948
+SCF iter=4: RMS density=0.000001145999576
 SCF iter=5: RMS density=0.000000534498520
 
 
@@ -752,6 +857,27 @@ SCF iter=5: RMS density=0.000000534498520
 		| [a.u.] | [eV] |
 		-3.222464e-03	-8.768841e-02
 
+	Total Dipole moment:
+		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
+		-1.731496e-02	-3.244918e-02	-1.350962e-02	3.918248e-02
+
+		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
+		-4.401024e-02	-8.247760e-02	-3.433805e-02	9.959195e-02
+
+	Electronic Dipole moment:
+		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
+		1.027645e-02	-2.135336e-02	5.036249e-04	2.370285e-02
+
+		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
+		2.612014e-02	-5.427484e-02	1.280087e-03	6.024665e-02
+
+	Core Dipole moment:
+		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
+		-2.759141e-02	-1.109582e-02	-1.401325e-02	3.918248e-02
+
+		| x[Debye] | y[Debye] | z[Debye] | magnitude[debye] |
+		-7.013037e-02	-2.820276e-02	-3.561813e-02	9.959195e-02
+
 	Mulliken charge on each Atom:
 		| i-th | atom type | core charge | Mulliken charge | 
 		0	C	4.000000e+00	-1.173865e-01
@@ -763,7 +889,7 @@ SCF iter=5: RMS density=0.000000534498520
 		6	H	1.000000e+00	3.743632e-02
 		7	H	1.000000e+00	4.256603e-02
 
-	Elapsed time(omp) for the SCF = 0.029586[s].
+	Elapsed time(omp) for the SCF = 0.038640[s].
 **********  DONE: PM3-SCF  **********
 
 
@@ -775,7 +901,7 @@ SCF iter=5: RMS density=0.000000534498520
 		Electronic
 		(inc. core rep. and vdW)	-1.212921e+01	-3.300553e+02
 		Total            	-1.212918e+01	-3.300545e+02
-		Error            	4.476226e-09	1.218053e-07
+		Error            	4.476219e-09	1.218051e-07
 
 	Molecular configuration:
 		| i-th | atom type | x[angst.] | y[angst.] | z[angst.] |
@@ -837,14 +963,14 @@ SCF iter=5: RMS density=0.000000534498520
 	========== DONE: MD step 5
 **********  DONE: Molecular dynamics  **********
 	Summary for memory usage:
-		Max Heap: 0.158928[MB].
+		Max Heap: 0.163680[MB].
 		Current Heap(Leaked): 0.000000[MB].
 
 
      >>>>>  The MolDS finished normally!  <<<<<
-     >>>>>  CPU time: 5.4[s].  <<<<<
+     >>>>>  CPU time: 5.65[s].  <<<<<
      >>>>>  Elapsed time: 6[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 5.41804[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 5.67063[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/3/17(Sat.) 1:4:29  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/5/11(Fri.) 23:52:50  <<<<<
 
 
 **********  START: Parse input  **********
@@ -65,6 +65,7 @@
 		Max iterations for the Davidson: 200
 		Max dimensions for the Davidson: 49
 		Norm tolerance for the residual of the Davidson: 1.000000e-06
+		Exciton energies: no
 
 Input terms:
 theory | am1 | theory_end | scf | max_iter | 50 | rms_density | 0.000001 | damping_thresh | 1.0 | 
@@ -122,6 +123,27 @@ SCF iter=11: RMS density=0.000000372121780
 		| [a.u.] | [eV] |
 		2.193282e+01	5.968271e+02
 
+	Total Dipole moment:
+		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
+		-1.974246e-02	-3.319339e-02	-1.358351e-02	4.093992e-02
+
+		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
+		-5.018033e-02	-8.436919e-02	-3.452586e-02	1.040589e-01
+
+	Electronic Dipole moment:
+		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
+		7.944456e-03	-2.185780e-02	5.608872e-04	2.326355e-02
+
+		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
+		2.019280e-02	-5.555701e-02	1.425633e-03	5.913005e-02
+
+	Core Dipole moment:
+		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
+		-2.768691e-02	-1.133558e-02	-1.414440e-02	4.093992e-02
+
+		| x[Debye] | y[Debye] | z[Debye] | magnitude[debye] |
+		-7.037313e-02	-2.881219e-02	-3.595149e-02	1.040589e-01
+
 	Mulliken charge on each Atom:
 		| i-th | atom type | core charge | Mulliken charge | 
 		0	C	4.000000e+00	-2.164414e-01
@@ -133,13 +155,13 @@ SCF iter=11: RMS density=0.000000372121780
 		6	H	1.000000e+00	7.029841e-02
 		7	H	1.000000e+00	7.579838e-02
 
-	Elapsed time(omp) for the SCF = 0.033713[s].
+	Elapsed time(omp) for the SCF = 0.047836[s].
 **********  DONE: AM1-SCF  **********
 
 
 **********  START: AM1-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.038116[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.039790[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -230,19 +252,20 @@ SCF iter=11: RMS density=0.000000372121780
 		 3	3.114695e-01	8.475583e+00	5.187700e-01 (5 -> 11)	
 		 4	3.126553e-01	8.507851e+00	6.431089e-01 (6 -> 12)	
 
-	Elapsed time(omp) for the CIS = 0.170576[s].
+
+	Elapsed time(omp) for the CIS = 0.171955[s].
 **********  DONE: AM1-CIS  **********
 
 
 	Summary for memory usage:
-		Max Heap: 0.192536[MB].
+		Max Heap: 0.197384[MB].
 		Current Heap(Leaked): 0.000000[MB].
 
 
      >>>>>  The MolDS finished normally!  <<<<<
-     >>>>>  CPU time: 0.2[s].  <<<<<
+     >>>>>  CPU time: 0.22[s].  <<<<<
      >>>>>  Elapsed time: 1[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 0.206064[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 0.225906[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/3/17(Sat.) 1:5:9  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/5/11(Fri.) 23:53:11  <<<<<
 
 
 **********  START: Parse input  **********
@@ -62,6 +62,7 @@
 		Number of excited states: 49
 		Number of printed coefficients of CIS-eigenvector: 1
 		CIS-Davidson: no
+		Exciton energies: no
 
 Input terms:
 theory | pm3 | theory_end | scf | max_iter | 50 | rms_density | 0.000001 | damping_thresh | 1.0 | 
@@ -120,6 +121,27 @@ SCF iter=12: RMS density=0.000000169506348
 		| [a.u.] | [eV] |
 		2.185489e+01	5.947066e+02
 
+	Total Dipole moment:
+		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
+		-1.756074e-02	-3.270080e-02	-1.363454e-02	3.954266e-02
+
+		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
+		-4.463495e-02	-8.311715e-02	-3.465556e-02	1.005074e-01
+
+	Electronic Dipole moment:
+		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
+		1.012618e-02	-2.136521e-02	5.098589e-04	2.364893e-02
+
+		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
+		2.573818e-02	-5.430496e-02	1.295932e-03	6.010958e-02
+
+	Core Dipole moment:
+		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
+		-2.768691e-02	-1.133558e-02	-1.414440e-02	3.954266e-02
+
+		| x[Debye] | y[Debye] | z[Debye] | magnitude[debye] |
+		-7.037313e-02	-2.881219e-02	-3.595149e-02	1.005074e-01
+
 	Mulliken charge on each Atom:
 		| i-th | atom type | core charge | Mulliken charge | 
 		0	C	4.000000e+00	-1.174103e-01
@@ -131,13 +153,13 @@ SCF iter=12: RMS density=0.000000169506348
 		6	H	1.000000e+00	3.744313e-02
 		7	H	1.000000e+00	4.258006e-02
 
-	Elapsed time(omp) for the SCF = 0.035427[s].
+	Elapsed time(omp) for the SCF = 0.045628[s].
 **********  DONE: PM3-SCF  **********
 
 
 **********  START: PM3-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.040237[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.039708[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Direct-CIS  =====
@@ -197,19 +219,20 @@ SCF iter=12: RMS density=0.000000169506348
 		 48	1.176330e+00	3.200982e+01	9.933799e-01 (0 -> 12)	
 		 49	1.181425e+00	3.214846e+01	9.928423e-01 (0 -> 13)	
 
-	Elapsed time(omp) for the CIS = 0.043363[s].
+
+	Elapsed time(omp) for the CIS = 0.042861[s].
 **********  DONE: PM3-CIS  **********
 
 
 	Summary for memory usage:
-		Max Heap: 0.158736[MB].
+		Max Heap: 0.164664[MB].
 		Current Heap(Leaked): 0.000000[MB].
 
 
      >>>>>  The MolDS finished normally!  <<<<<
-     >>>>>  CPU time: 0.08[s].  <<<<<
+     >>>>>  CPU time: 0.09[s].  <<<<<
      >>>>>  Elapsed time: 0[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 0.0804441[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 0.0902829[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 
