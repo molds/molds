@@ -574,22 +574,22 @@ double Mndo::GetMolecularIntegralElement(int moI, int moJ, int moK, int moL,
 }
 
 // right-upper part is only calculated by this method.
-void Mndo::CalcCISMatrix(double** matrixCIS, int numberActiveOcc, int numberActiveVir) const{
+void Mndo::CalcCISMatrix(double** matrixCIS) const{
    this->OutputLog(this->messageStartCalcCISMatrix);
    double ompStartTime = omp_get_wtime();
 
    stringstream ompErrors;
    #pragma omp parallel for schedule(auto)
-   for(int k=0; k<numberActiveOcc*numberActiveVir; k++){
+   for(int k=0; k<this->matrixCISdimension; k++){
       try{
          // single excitation from I-th (occupied)MO to A-th (virtual)MO
-         int moI = this->molecule->GetTotalNumberValenceElectrons()/2 - (k/numberActiveVir) -1;
-         int moA = this->molecule->GetTotalNumberValenceElectrons()/2 + (k%numberActiveVir);
+         int moI = this->GetActiveOccIndex(*this->molecule, k);
+         int moA = this->GetActiveVirIndex(*this->molecule, k);
 
-         for(int l=k; l<numberActiveOcc*numberActiveVir; l++){
+         for(int l=k; l<this->matrixCISdimension; l++){
             // single excitation from J-th (occupied)MO to B-th (virtual)MO
-            int moJ = this->molecule->GetTotalNumberValenceElectrons()/2 - (l/numberActiveVir) -1;
-            int moB = this->molecule->GetTotalNumberValenceElectrons()/2 + (l%numberActiveVir);
+            int moJ = this->GetActiveOccIndex(*this->molecule, l);
+            int moB = this->GetActiveVirIndex(*this->molecule, l);
             double value=0.0;
           
             // Fast algorith, but this is not easy to read. 
@@ -883,8 +883,8 @@ void Mndo::FreeTempMatrixForZMatrix(double** delta,
 double Mndo::GetCISCoefficientMOEnergy(int k, int l, int r, int numberActiveVir) const{
    double value=0.0;
    if(k==l){
-      int moI = this->molecule->GetTotalNumberValenceElectrons()/2 - (k/numberActiveVir) -1;
-      int moA = this->molecule->GetTotalNumberValenceElectrons()/2 + (k%numberActiveVir);
+      int moI = this->GetActiveOccIndex(*this->molecule, k);
+      int moA = this->GetActiveVirIndex(*this->molecule, k);
       if(r==moI){
          // r is index of occupied MO.
          value = -1.0;
@@ -908,11 +908,11 @@ double Mndo::GetCISCoefficientTwoElecIntegral(int k,
                                               int numberActiveVir) const{
    double value=0.0;
    // single excitation from I-th (occupied)MO to A-th (virtual)MO
-   int moI = this->molecule->GetTotalNumberValenceElectrons()/2 - (k/numberActiveVir) -1;
-   int moA = this->molecule->GetTotalNumberValenceElectrons()/2 + (k%numberActiveVir);
+   int moI = this->GetActiveOccIndex(*this->molecule, k);
+   int moA = this->GetActiveVirIndex(*this->molecule, k);
    // single excitation from J-th (occupied)MO to B-th (virtual)MO
-   int moJ = this->molecule->GetTotalNumberValenceElectrons()/2 - (l/numberActiveVir) -1;
-   int moB = this->molecule->GetTotalNumberValenceElectrons()/2 + (l%numberActiveVir);
+   int moJ = this->GetActiveOccIndex(*this->molecule, l);
+   int moB = this->GetActiveVirIndex(*this->molecule, l);
    if(p==moI && q==moA && r==moJ && s==moB ){
       value = 2.0;
    }

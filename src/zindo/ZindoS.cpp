@@ -799,7 +799,7 @@ void ZindoS::DoCIS(){
                                                        this->matrixCISdimension);
    }
    // calculate CIS matrix
-   this->CalcCISMatrix(matrixCIS, numberActiveOcc, numberActiveVir);
+   this->CalcCISMatrix(matrixCIS);
    // calculate excited energies
    if(Parameters::GetInstance()->IsDavidsonCIS()){
       this->DoCISDavidson();
@@ -829,13 +829,12 @@ void ZindoS::CalcCISProperties(){
                                                           this->matrixCISdimension);
       }
       // clac free exciton energies
-      int numberActiveVir = Parameters::GetInstance()->GetActiveVirCIS();
       for(int k=0; k<this->matrixCISdimension; k++){
          double value = 0.0;
          for(int l=0; l<this->matrixCISdimension; l++){
             // single excitation from I-th (occupied)MO to A-th (virtual)MO
-            int moI = this->molecule->GetTotalNumberValenceElectrons()/2 - (l/numberActiveVir) -1;
-            int moA = this->molecule->GetTotalNumberValenceElectrons()/2 + (l%numberActiveVir);
+            int moI = this->GetActiveOccIndex(*this->molecule, l);
+            int moA = this->GetActiveVirIndex(*this->molecule, l);
             value += pow(this->matrixCIS[k][l],2.0)*(this->energiesMO[moA] - this->energiesMO[moI]);
          }
          this->freeExcitonEnergiesCIS[k] = value;
@@ -904,12 +903,10 @@ void ZindoS::OutputCISResults() const{
 
 void ZindoS::SortCISEigenVectorCoefficients(vector<CISEigenVectorCoefficient>* cisEigenVectorCoefficients,
                                             double* cisEigenVector) const{
-   int numberOcc = Parameters::GetInstance()->GetActiveOccCIS();
-   int numberVir = Parameters::GetInstance()->GetActiveVirCIS();
-   for(int l=0; l<numberOcc*numberVir; l++){
+   for(int l=0; l<this->matrixCISdimension; l++){
       // single excitation from I-th (occupied)MO to A-th (virtual)MO
-      int moI = this->molecule->GetTotalNumberValenceElectrons()/2 - (l/numberVir) -1;
-      int moA = this->molecule->GetTotalNumberValenceElectrons()/2 + (l%numberVir);
+      int moI = this->GetActiveOccIndex(*this->molecule, l);
+      int moA = this->GetActiveVirIndex(*this->molecule, l);
       CISEigenVectorCoefficient cisEigenVectorCoefficient = {cisEigenVector[l], moI, moA, k};
       cisEigenVectorCoefficients->push_back(cisEigenVectorCoefficient);
    }
@@ -919,12 +916,10 @@ void ZindoS::SortCISEigenVectorCoefficients(vector<CISEigenVectorCoefficient>* c
 }
 
 void ZindoS::SortSingleExcitationSlaterDeterminants(vector<MoEnergyGap>* moEnergyGaps) const{
-   int numberOcc = Parameters::GetInstance()->GetActiveOccCIS();
-   int numberVir = Parameters::GetInstance()->GetActiveVirCIS();
-   for(int k=0; k<numberOcc*numberVir; k++){
+   for(int k=0; k<this->matrixCISdimension; k++){
       // single excitation from I-th (occupied)MO to A-th (virtual)MO
-      int moI = this->molecule->GetTotalNumberValenceElectrons()/2 - (k/numberVir) -1;
-      int moA = this->molecule->GetTotalNumberValenceElectrons()/2 + (k%numberVir);
+      int moI = this->GetActiveOccIndex(*this->molecule, k);
+      int moA = this->GetActiveVirIndex(*this->molecule, k);
       MoEnergyGap moEnergyGap = {this->energiesMO[moA]-this->energiesMO[moI], moI, moA, k};
       moEnergyGaps->push_back(moEnergyGap);
    }
@@ -1257,22 +1252,22 @@ void ZindoS::DoCISDirect(){
    this->OutputLog(this->messageDoneDirectCIS);
 }
 
-void ZindoS::CalcCISMatrix(double** matrixCIS, int numberActiveOcc, int numberActiveVir) const{
+void ZindoS::CalcCISMatrix(double** matrixCIS) const{
    this->OutputLog(this->messageStartCalcCISMatrix);
    double ompStartTime = omp_get_wtime();
 
    stringstream ompErrors;
    #pragma omp parallel for schedule(auto)
-   for(int k=0; k<numberActiveOcc*numberActiveVir; k++){
+   for(int k=0; k<this->matrixCISdimension; k++){
       try{
          // single excitation from I-th (occupied)MO to A-th (virtual)MO
-         int moI = this->molecule->GetTotalNumberValenceElectrons()/2 - (k/numberActiveVir) -1;
-         int moA = this->molecule->GetTotalNumberValenceElectrons()/2 + (k%numberActiveVir);
+         int moI = this->GetActiveOccIndex(*this->molecule, k);
+         int moA = this->GetActiveVirIndex(*this->molecule, k);
 
-         for(int l=k; l<numberActiveOcc*numberActiveVir; l++){
+         for(int l=k; l<this->matrixCISdimension; l++){
             // single excitation from J-th (occupied)MO to B-th (virtual)MO
-            int moJ = this->molecule->GetTotalNumberValenceElectrons()/2 - (l/numberActiveVir) -1;
-            int moB = this->molecule->GetTotalNumberValenceElectrons()/2 + (l%numberActiveVir);
+            int moJ = this->GetActiveOccIndex(*this->molecule, l);
+            int moB = this->GetActiveVirIndex(*this->molecule, l);
             double value=0.0;
          
             // Fast algorith, but this is not easy to read. 
@@ -1559,6 +1554,20 @@ int ZindoS::GetSlaterDeterminantIndex(int activeOccIndex,
    return Parameters::GetInstance()->GetActiveVirCIS()
          *activeOccIndex
          +activeVirIndex; 
+}
+
+// Note taht activeOccIndex and activeVirIndex are not MO's number.
+// activeOccIndex=0 means HOMO and activeVirIndex=0 means LUMO.
+int ZindoS::GetActiveOccIndex(const MolDS_base::Molecule& molecule, int matrixCISIndex) const{
+   return molecule.GetTotalNumberValenceElectrons()/2 
+         -(matrixCISIndex/Parameters::GetInstance()->GetActiveVirCIS()) -1;
+}
+
+// Note taht activeOccIndex and activeVirIndex are not MO's number.
+// activeOccIndex=0 means HOMO and activeVirIndex=0 means LUMO.
+int ZindoS::GetActiveVirIndex(const MolDS_base::Molecule& molecule, int matrixCISIndex) const{
+   return molecule.GetTotalNumberValenceElectrons()/2
+         +(matrixCISIndex%Parameters::GetInstance()->GetActiveVirCIS());
 }
 
 // elecStates is indeces of the electroinc eigen states.

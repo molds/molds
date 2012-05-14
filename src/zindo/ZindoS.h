@@ -82,11 +82,11 @@ protected:
                                               const MolDS_base::Molecule& molecule, 
                                               double const* const* fockMatrix, 
                                               double const* const* gammaAB) const;
-   virtual void CalcCISMatrix(double** matrixCIS, 
-                              int numberActiveOcc, 
-                              int numberActiveVir) const;
+   virtual void CalcCISMatrix(double** matrixCIS) const;
    virtual void CalcForce(const std::vector<int>& elecStates);
    int GetSlaterDeterminantIndex(int activeOccIndex, int activeVirIndex) const;
+   int GetActiveOccIndex(const MolDS_base::Molecule& molecule, int matrixCISIndex) const;
+   int GetActiveVirIndex(const MolDS_base::Molecule& molecule, int matrixCISIndex) const;
    void CheckMatrixForce(const std::vector<int>& elecStates);
 private:
    std::string errorMessageCalcForceNotGroundState;
