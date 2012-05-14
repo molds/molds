@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/5/14(Mon.) 15:40:35  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/5/14(Mon.) 16:46:25  <<<<<
 
 
 **********  START: Parse input  **********
@@ -100,14 +100,14 @@ SCF iter=8: RMS density=0.000000521835814
 		| [a.u.] | [eV] |
 		4.873186e+00	1.326072e+02
 
-	Total Dipole moment:
+	Total Dipole moment (ground state):
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
 		-7.306092e-01	-8.681708e-01	5.892166e-01	1.278549e+00
 
 		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
 		-1.857024e+00	-2.206670e+00	1.497640e+00	3.249747e+00
 
-	Electronic Dipole moment:
+	Electronic Dipole moment (ground state):
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
 		-1.989774e+00	-2.649847e+00	1.743470e+00	3.744407e+00
 
@@ -127,13 +127,13 @@ SCF iter=8: RMS density=0.000000521835814
 		1	H	1.000000e+00	1.436080e-01
 		2	H	1.000000e+00	1.436792e-01
 
-	Elapsed time(omp) for the SCF = 0.013867[s].
+	Elapsed time(omp) for the SCF = 0.012152[s].
 **********  DONE: ZINDO/S-SCF  **********
 
 
 **********  START: ZINDO/S-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.000244[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.000247[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -182,19 +182,19 @@ SCF iter=8: RMS density=0.000000521835814
 		 3	3.424713e-01	9.319192e+00	9.818146e-01 (2 -> 4)	
 
 
-	Elapsed time(omp) for the CIS = 0.001209[s].
+	Elapsed time(omp) for the CIS = 0.001158[s].
 **********  DONE: ZINDO/S-CIS  **********
 
 
 	Summary for memory usage:
-		Max Heap: 0.007560[MB].
+		Max Heap: 0.007848[MB].
 		Current Heap(Leaked): 0.000000[MB].
 
 
      >>>>>  The MolDS finished normally!  <<<<<
-     >>>>>  CPU time: 0[s].  <<<<<
+     >>>>>  CPU time: 0.02[s].  <<<<<
      >>>>>  Elapsed time: 0[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 0.018503[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 0.0164111[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

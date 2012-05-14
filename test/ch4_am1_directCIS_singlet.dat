@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/5/14(Mon.) 15:41:4  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/5/14(Mon.) 16:46:53  <<<<<
 
 
 **********  START: Parse input  **********
@@ -106,14 +106,14 @@ SCF iter=10: RMS density=0.000000031134656
 		| [a.u.] | [eV] |
 		7.573936e+00	2.060989e+02
 
-	Total Dipole moment:
+	Total Dipole moment (ground state):
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
 		-1.552321e-05	-1.846467e-05	2.324529e-16	2.412290e-05
 
 		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
 		-3.945607e-05	-4.693252e-05	5.908366e-16	6.131430e-05
 
-	Electronic Dipole moment:
+	Electronic Dipole moment (ground state):
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
 		-1.552321e-05	-1.752453e-05	2.324529e-16	2.341109e-05
 
@@ -135,13 +135,13 @@ SCF iter=10: RMS density=0.000000031134656
 		3	H	1.000000e+00	6.455701e-02
 		4	H	1.000000e+00	6.455694e-02
 
-	Elapsed time(omp) for the SCF = 0.025733[s].
+	Elapsed time(omp) for the SCF = 0.025639[s].
 **********  DONE: AM1-SCF  **********
 
 
 **********  START: AM1-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.001940[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.001947[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Direct-CIS  =====
@@ -169,19 +169,19 @@ SCF iter=10: RMS density=0.000000031134656
 		 16	9.813499e-01	2.670410e+01	9.978466e-01 (0 -> 7)	
 
 
-	Elapsed time(omp) for the CIS = 0.002829[s].
+	Elapsed time(omp) for the CIS = 0.002810[s].
 **********  DONE: AM1-CIS  **********
 
 
 	Summary for memory usage:
-		Max Heap: 0.064408[MB].
+		Max Heap: 0.070936[MB].
 		Current Heap(Leaked): 0.000000[MB].
 
 
      >>>>>  The MolDS finished normally!  <<<<<
      >>>>>  CPU time: 0.04[s].  <<<<<
      >>>>>  Elapsed time: 0[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 0.032203[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 0.0325968[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

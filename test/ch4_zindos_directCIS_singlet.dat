@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/5/14(Mon.) 15:40:35  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/5/14(Mon.) 16:46:24  <<<<<
 
 
 **********  START: Parse input  **********
@@ -103,14 +103,14 @@ SCF iter=7: RMS density=0.000000025983597
 		| [a.u.] | [eV] |
 		9.730051e+00	2.647703e+02
 
-	Total Dipole moment:
+	Total Dipole moment (ground state):
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
 		-2.671237e-05	-3.257342e-05	2.016399e-15	4.212575e-05
 
 		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
 		-6.789610e-05	-8.279338e-05	5.125177e-15	1.070730e-04
 
-	Electronic Dipole moment:
+	Electronic Dipole moment (ground state):
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
 		-2.671237e-05	-3.163328e-05	2.016399e-15	4.140308e-05
 
@@ -132,13 +132,13 @@ SCF iter=7: RMS density=0.000000025983597
 		3	H	1.000000e+00	2.223536e-02
 		4	H	1.000000e+00	2.223536e-02
 
-	Elapsed time(omp) for the SCF = 0.014577[s].
+	Elapsed time(omp) for the SCF = 0.013529[s].
 **********  DONE: ZINDO/S-SCF  **********
 
 
 **********  START: ZINDO/S-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.001452[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.001457[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Direct-CIS  =====
@@ -166,19 +166,19 @@ SCF iter=7: RMS density=0.000000025983597
 		 16	1.272297e+00	3.462124e+01	9.979028e-01 (0 -> 7)	
 
 
-	Elapsed time(omp) for the CIS = 0.002346[s].
+	Elapsed time(omp) for the CIS = 0.002478[s].
 **********  DONE: ZINDO/S-CIS  **********
 
 
 	Summary for memory usage:
-		Max Heap: 0.011808[MB].
+		Max Heap: 0.018336[MB].
 		Current Heap(Leaked): 0.000000[MB].
 
 
      >>>>>  The MolDS finished normally!  <<<<<
-     >>>>>  CPU time: 0.03[s].  <<<<<
+     >>>>>  CPU time: 0.02[s].  <<<<<
      >>>>>  Elapsed time: 0[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 0.0201681[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 0.0193291[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

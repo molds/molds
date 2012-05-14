@@ -197,12 +197,12 @@ private:
    std::string messageCoreRepulsion;
    std::string messageVdWCorrectionTitle;
    std::string messageVdWCorrection;
-   std::string messageElectronicDipoleTitleAU;
-   std::string messageElectronicDipoleTitleDebye;
-   std::string messageElectronicDipole;
-   std::string messageCoreDipoleTitleAU;
-   std::string messageCoreDipoleTitleDebye;
-   std::string messageCoreDipole;
+   std::string messageElectronicDipoleMomentsTitleAU;
+   std::string messageElectronicDipoleMomentsTitleDebye;
+   std::string messageElectronicDipoleMoments;
+   std::string messageCoreDipoleMomentTitleAU;
+   std::string messageCoreDipoleMomentTitleDebye;
+   std::string messageCoreDipoleMoment;
    std::string messageTotalDipoleTitleAU;
    std::string messageTotalDipoleTitleDebye;
    std::string messageTotalDipole;
@@ -210,8 +210,8 @@ private:
    double** gammaAB;
    double** overlap; // overlap integral between AOs
    double*** cartesianMatrix; // cartesian matrix represented by AOs
-   double** electronicDipoleEigenStates; // electronic dipole moment of eqch eigen states.
-   double* coreDipole; // electronic dipole moment of eqch eigen states.
+   double*** electronicDipoleMoments; // Diagnonal terms are electronic dipole moments of each eigenstates (i.e. electronicDipole[0][0][XAxis] is the x-component of the electronic dipole moment of the ground state. electronicDipole[10][10][XAxis] is the x-component of the electronic dipole moment of the 10-th excited state). Off-diagonal terms are transition dipole moments between eigenstates (i.e. electronicDipole[10][0][XAxis] is the x-component of the transition dipole moment from the ground state to 10-th excited state.).
+   double* coreDipoleMoment; // dipole moment of configuration.
    double bondingAdjustParameterK[2]; //see (3.79) in J. A. Pople book
 
    // use Y[na][nb][la][lb][m][i][j] 
@@ -247,12 +247,12 @@ private:
    void CalcAtomicElectronPopulation(double* atomicElectronPopulation,
                                      double const* const* orbitalElectronPopulation, 
                                      const MolDS_base::Molecule& molecule) const;
-   void CalcCoreDipole(double* coreDipole,
+   void CalcCoreDipoleMoment(double* coreDipoleMoment,
                        const MolDS_base::Molecule& molecule) const;
-   void CalcElectronicDipoleGroundState(double** electronicDipoleEigenStates,
-                                        double const* const* const* cartesianMatrix,
-                                        const MolDS_base::Molecule& molecule, 
-                                        double const* const* orbitalElectronPopulation) const;
+   void CalcElectronicDipoleMomentsGroundState(double*** electronicDipoleMoments,
+                                               double const* const* const* cartesianMatrix,
+                                               const MolDS_base::Molecule& molecule, 
+                                               double const* const* orbitalElectronPopulation) const;
    void CalcCartesianMatrixByGTOExpansion(double*** cartesianMatrix,
                                           const MolDS_base::Molecule& molecule, 
                                           MolDS_base::STOnGType stonG) const; 

@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/5/14(Mon.) 15:40:36  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/5/14(Mon.) 16:46:26  <<<<<
 
 
 **********  START: Parse input  **********
@@ -120,14 +120,14 @@ SCF iter=11: RMS density=0.000000358204691
 		| [a.u.] | [eV] |
 		2.207380e+01	6.006635e+02
 
-	Total Dipole moment:
+	Total Dipole moment (ground state):
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
 		-1.995892e-02	-3.192733e-02	-1.222811e-02	3.958838e-02
 
 		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
 		-5.073051e-02	-8.115121e-02	-3.108077e-02	1.006236e-01
 
-	Electronic Dipole moment:
+	Electronic Dipole moment (ground state):
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
 		7.727997e-03	-2.059175e-02	1.916286e-03	2.207746e-02
 
@@ -156,13 +156,13 @@ SCF iter=11: RMS density=0.000000358204691
 		| [a.u.] | [Kcal/mol] | 
 		-2.736798e-02	-1.717367e+01
 
-	Elapsed time(omp) for the SCF = 0.059384[s].
+	Elapsed time(omp) for the SCF = 0.062615[s].
 **********  DONE: MNDO-SCF  **********
 
 
 **********  START: MNDO-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.055432[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.055305[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Direct-CIS  =====
@@ -223,19 +223,19 @@ SCF iter=11: RMS density=0.000000358204691
 		 49	1.264508e+00	3.440928e+01	9.869166e-01 (0 -> 12)	
 
 
-	Elapsed time(omp) for the CIS = 0.059849[s].
+	Elapsed time(omp) for the CIS = 0.059788[s].
 **********  DONE: MNDO-CIS  **********
 
 
 	Summary for memory usage:
-		Max Heap: 0.164664[MB].
+		Max Heap: 0.223464[MB].
 		Current Heap(Leaked): 0.000000[MB].
 
 
      >>>>>  The MolDS finished normally!  <<<<<
-     >>>>>  CPU time: 0.13[s].  <<<<<
+     >>>>>  CPU time: 0.12[s].  <<<<<
      >>>>>  Elapsed time: 0[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 0.123947[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 0.127387[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

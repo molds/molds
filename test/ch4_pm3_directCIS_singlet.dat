@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/5/14(Mon.) 15:41:31  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/5/14(Mon.) 16:47:20  <<<<<
 
 
 **********  START: Parse input  **********
@@ -105,14 +105,14 @@ SCF iter=9: RMS density=0.000000192390686
 		| [a.u.] | [eV] |
 		7.595474e+00	2.066850e+02
 
-	Total Dipole moment:
+	Total Dipole moment (ground state):
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
 		8.597334e-05	1.100474e-04	3.339343e-16	1.396490e-04
 
 		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
 		2.185225e-04	2.797127e-04	8.487764e-16	3.549525e-04
 
-	Electronic Dipole moment:
+	Electronic Dipole moment (ground state):
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
 		8.597334e-05	1.109875e-04	3.339343e-16	1.403911e-04
 
@@ -134,13 +134,13 @@ SCF iter=9: RMS density=0.000000192390686
 		3	H	1.000000e+00	2.643250e-02
 		4	H	1.000000e+00	2.643241e-02
 
-	Elapsed time(omp) for the SCF = 0.029113[s].
+	Elapsed time(omp) for the SCF = 0.026371[s].
 **********  DONE: PM3-SCF  **********
 
 
 **********  START: PM3-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.001972[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.001964[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Direct-CIS  =====
@@ -168,19 +168,19 @@ SCF iter=9: RMS density=0.000000192390686
 		 16	9.671719e-01	2.631830e+01	9.958662e-01 (0 -> 6)	
 
 
-	Elapsed time(omp) for the CIS = 0.002845[s].
+	Elapsed time(omp) for the CIS = 0.002880[s].
 **********  DONE: PM3-CIS  **********
 
 
 	Summary for memory usage:
-		Max Heap: 0.064408[MB].
+		Max Heap: 0.070936[MB].
 		Current Heap(Leaked): 0.000000[MB].
 
 
      >>>>>  The MolDS finished normally!  <<<<<
      >>>>>  CPU time: 0.03[s].  <<<<<
      >>>>>  Elapsed time: 0[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 0.036731[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 0.0328162[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

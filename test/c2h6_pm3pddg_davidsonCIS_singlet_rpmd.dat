@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/5/14(Mon.) 15:43:39  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/5/14(Mon.) 16:49:26  <<<<<
 
 
 **********  START: Parse input  **********
@@ -139,14 +139,14 @@ SCF iter=12: RMS density=0.000000186813138
 		| [a.u.] | [eV] |
 		2.185904e+01	5.948195e+02
 
-	Total Dipole moment:
+	Total Dipole moment (ground state):
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
 		-2.402157e-02	-3.563058e-02	-1.571364e-03	4.300051e-02
 
 		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
 		-6.105677e-02	-9.056393e-02	-3.994010e-03	1.092964e-01
 
-	Electronic Dipole moment:
+	Electronic Dipole moment (ground state):
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
 		-7.772899e-03	-7.339908e-03	2.354550e-02	2.585890e-02
 
@@ -171,13 +171,13 @@ SCF iter=12: RMS density=0.000000186813138
 		6	H	1.000000e+00	8.868777e-02
 		7	H	1.000000e+00	9.307152e-02
 
-	Elapsed time(omp) for the SCF = 0.053755[s].
+	Elapsed time(omp) for the SCF = 0.059097[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.056377[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.055360[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -263,7 +263,7 @@ SCF iter=12: RMS density=0.000000186813138
 		 4	2.900239e-01	7.892015e+00	8.648975e-01 (6 -> 8)	
 
 
-	Elapsed time(omp) for the CIS = 0.203602[s].
+	Elapsed time(omp) for the CIS = 0.199464[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
@@ -313,14 +313,14 @@ SCF iter=12: RMS density=0.000000147167387
 		| [a.u.] | [eV] |
 		2.186102e+01	5.948735e+02
 
-	Total Dipole moment:
+	Total Dipole moment (ground state):
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
 		-2.919028e-02	-3.832859e-02	-3.165667e-02	5.764806e-02
 
 		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
 		-7.419430e-02	-9.742158e-02	-8.046325e-02	1.465268e-01
 
-	Electronic Dipole moment:
+	Electronic Dipole moment (ground state):
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
 		3.333723e-02	-1.881807e-02	2.588940e-02	4.621419e-02
 
@@ -345,13 +345,13 @@ SCF iter=12: RMS density=0.000000147167387
 		6	H	1.000000e+00	8.975525e-02
 		7	H	1.000000e+00	9.209319e-02
 
-	Elapsed time(omp) for the SCF = 0.059080[s].
+	Elapsed time(omp) for the SCF = 0.063270[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.057808[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.056158[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -431,7 +431,7 @@ SCF iter=12: RMS density=0.000000147167387
 		 4	2.906637e-01	7.909425e+00	8.425816e-01 (6 -> 8)	
 
 
-	Elapsed time(omp) for the CIS = 0.176074[s].
+	Elapsed time(omp) for the CIS = 0.168689[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
@@ -480,14 +480,14 @@ SCF iter=11: RMS density=0.000000636082910
 		| [a.u.] | [eV] |
 		2.184706e+01	5.944935e+02
 
-	Total Dipole moment:
+	Total Dipole moment (ground state):
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
 		5.488328e-03	-1.377830e-02	-1.817581e-02	2.345897e-02
 
 		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
 		1.394994e-02	-3.502095e-02	-4.619831e-02	5.962677e-02
 
-	Electronic Dipole moment:
+	Electronic Dipole moment (ground state):
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
 		5.524804e-03	-6.154031e-03	-1.299421e-02	1.540276e-02
 
@@ -512,13 +512,13 @@ SCF iter=11: RMS density=0.000000636082910
 		6	H	1.000000e+00	8.764107e-02
 		7	H	1.000000e+00	9.254755e-02
 
-	Elapsed time(omp) for the SCF = 0.054147[s].
+	Elapsed time(omp) for the SCF = 0.058231[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.056725[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.055224[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -604,7 +604,7 @@ SCF iter=11: RMS density=0.000000636082910
 		 4	2.893216e-01	7.872905e+00	8.724949e-01 (6 -> 8)	
 
 
-	Elapsed time(omp) for the CIS = 0.200088[s].
+	Elapsed time(omp) for the CIS = 0.196010[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
@@ -667,14 +667,14 @@ SCF iter=12: RMS density=0.000000186827213
 		| [a.u.] | [eV] |
 		2.185902e+01	5.948189e+02
 
-	Total Dipole moment:
+	Total Dipole moment (ground state):
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
 		-2.401598e-02	-3.561987e-02	-1.571904e-03	4.298853e-02
 
 		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
 		-6.104254e-02	-9.053671e-02	-3.995382e-03	1.092660e-01
 
-	Electronic Dipole moment:
+	Electronic Dipole moment (ground state):
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
 		-7.768085e-03	-7.338109e-03	2.354646e-02	2.585782e-02
 
@@ -699,13 +699,13 @@ SCF iter=12: RMS density=0.000000186827213
 		6	H	1.000000e+00	8.868726e-02
 		7	H	1.000000e+00	9.307083e-02
 
-	Elapsed time(omp) for the SCF = 0.051787[s].
+	Elapsed time(omp) for the SCF = 0.058730[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.056019[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.055901[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -791,7 +791,7 @@ SCF iter=12: RMS density=0.000000186827213
 		 4	2.900236e-01	7.892007e+00	8.648968e-01 (6 -> 8)	
 
 
-	Elapsed time(omp) for the CIS = 0.201536[s].
+	Elapsed time(omp) for the CIS = 0.200545[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
@@ -841,14 +841,14 @@ SCF iter=12: RMS density=0.000000147148771
 		| [a.u.] | [eV] |
 		2.186101e+01	5.948730e+02
 
-	Total Dipole moment:
+	Total Dipole moment (ground state):
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
 		-2.917921e-02	-3.831983e-02	-3.164862e-02	5.763220e-02
 
 		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
 		-7.416618e-02	-9.739930e-02	-8.044279e-02	1.464865e-01
 
-	Electronic Dipole moment:
+	Electronic Dipole moment (ground state):
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
 		3.334205e-02	-1.881461e-02	2.589444e-02	4.621909e-02
 
@@ -873,13 +873,13 @@ SCF iter=12: RMS density=0.000000147148771
 		6	H	1.000000e+00	8.975468e-02
 		7	H	1.000000e+00	9.209257e-02
 
-	Elapsed time(omp) for the SCF = 0.051893[s].
+	Elapsed time(omp) for the SCF = 0.059257[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.055687[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.055638[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -959,7 +959,7 @@ SCF iter=12: RMS density=0.000000147148771
 		 4	2.906632e-01	7.909411e+00	8.425855e-01 (6 -> 8)	
 
 
-	Elapsed time(omp) for the CIS = 0.167559[s].
+	Elapsed time(omp) for the CIS = 0.171703[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
@@ -1008,14 +1008,14 @@ SCF iter=11: RMS density=0.000000635556043
 		| [a.u.] | [eV] |
 		2.184704e+01	5.944931e+02
 
-	Total Dipole moment:
+	Total Dipole moment (ground state):
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
 		5.483781e-03	-1.377505e-02	-1.817261e-02	2.345352e-02
 
 		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
 		1.393838e-02	-3.501269e-02	-4.619016e-02	5.961291e-02
 
-	Electronic Dipole moment:
+	Electronic Dipole moment (ground state):
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
 		5.522687e-03	-6.153639e-03	-1.299154e-02	1.539959e-02
 
@@ -1040,13 +1040,13 @@ SCF iter=11: RMS density=0.000000635556043
 		6	H	1.000000e+00	8.764054e-02
 		7	H	1.000000e+00	9.254697e-02
 
-	Elapsed time(omp) for the SCF = 0.051224[s].
+	Elapsed time(omp) for the SCF = 0.058517[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.055856[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.055682[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -1132,7 +1132,7 @@ SCF iter=11: RMS density=0.000000635556043
 		 4	2.893215e-01	7.872901e+00	8.724934e-01 (6 -> 8)	
 
 
-	Elapsed time(omp) for the CIS = 0.198473[s].
+	Elapsed time(omp) for the CIS = 0.197466[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
@@ -1194,14 +1194,14 @@ SCF iter=12: RMS density=0.000000186869420
 		| [a.u.] | [eV] |
 		2.185895e+01	5.948172e+02
 
-	Total Dipole moment:
+	Total Dipole moment (ground state):
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
 		-2.399919e-02	-3.558775e-02	-1.573523e-03	4.295260e-02
 
 		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
 		-6.099988e-02	-9.045506e-02	-3.999498e-03	1.091746e-01
 
-	Electronic Dipole moment:
+	Electronic Dipole moment (ground state):
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
 		-7.753645e-03	-7.332712e-03	2.354934e-02	2.585458e-02
 
@@ -1226,13 +1226,13 @@ SCF iter=12: RMS density=0.000000186869420
 		6	H	1.000000e+00	8.868572e-02
 		7	H	1.000000e+00	9.306875e-02
 
-	Elapsed time(omp) for the SCF = 0.051861[s].
+	Elapsed time(omp) for the SCF = 0.058865[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.056658[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.055474[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -1318,7 +1318,7 @@ SCF iter=12: RMS density=0.000000186869420
 		 4	2.900227e-01	7.891984e+00	8.648949e-01 (6 -> 8)	
 
 
-	Elapsed time(omp) for the CIS = 0.200980[s].
+	Elapsed time(omp) for the CIS = 0.200393[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
@@ -1368,14 +1368,14 @@ SCF iter=12: RMS density=0.000000147093055
 		| [a.u.] | [eV] |
 		2.186095e+01	5.948716e+02
 
-	Total Dipole moment:
+	Total Dipole moment (ground state):
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
 		-2.914603e-02	-3.829353e-02	-3.162447e-02	5.758465e-02
 
 		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
 		-7.408183e-02	-9.733247e-02	-8.038139e-02	1.463656e-01
 
-	Electronic Dipole moment:
+	Electronic Dipole moment (ground state):
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
 		3.335650e-02	-1.880425e-02	2.590954e-02	4.623376e-02
 
@@ -1400,13 +1400,13 @@ SCF iter=12: RMS density=0.000000147093055
 		6	H	1.000000e+00	8.975300e-02
 		7	H	1.000000e+00	9.209071e-02
 
-	Elapsed time(omp) for the SCF = 0.051599[s].
+	Elapsed time(omp) for the SCF = 0.058250[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.056100[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.055768[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -1486,7 +1486,7 @@ SCF iter=12: RMS density=0.000000147093055
 		 4	2.906616e-01	7.909368e+00	8.425972e-01 (6 -> 8)	
 
 
-	Elapsed time(omp) for the CIS = 0.167345[s].
+	Elapsed time(omp) for the CIS = 0.172486[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
@@ -1535,14 +1535,14 @@ SCF iter=11: RMS density=0.000000633975473
 		| [a.u.] | [eV] |
 		2.184700e+01	5.944918e+02
 
-	Total Dipole moment:
+	Total Dipole moment (ground state):
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
 		5.470142e-03	-1.376531e-02	-1.816299e-02	2.343716e-02
 
 		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
 		1.390372e-02	-3.498795e-02	-4.616573e-02	5.957134e-02
 
-	Electronic Dipole moment:
+	Electronic Dipole moment (ground state):
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
 		5.516339e-03	-6.152462e-03	-1.298354e-02	1.539009e-02
 
@@ -1567,13 +1567,13 @@ SCF iter=11: RMS density=0.000000633975473
 		6	H	1.000000e+00	8.763893e-02
 		7	H	1.000000e+00	9.254524e-02
 
-	Elapsed time(omp) for the SCF = 0.051590[s].
+	Elapsed time(omp) for the SCF = 0.058544[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.056145[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.055893[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -1659,7 +1659,7 @@ SCF iter=11: RMS density=0.000000633975473
 		 4	2.893209e-01	7.872886e+00	8.724889e-01 (6 -> 8)	
 
 
-	Elapsed time(omp) for the CIS = 0.198274[s].
+	Elapsed time(omp) for the CIS = 0.197786[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
@@ -1721,14 +1721,14 @@ SCF iter=12: RMS density=0.000000186939718
 		| [a.u.] | [eV] |
 		2.185885e+01	5.948143e+02
 
-	Total Dipole moment:
+	Total Dipole moment (ground state):
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
 		-2.397123e-02	-3.553424e-02	-1.576225e-03	4.289274e-02
 
 		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
 		-6.092881e-02	-9.031906e-02	-4.006366e-03	1.090225e-01
 
-	Electronic Dipole moment:
+	Electronic Dipole moment (ground state):
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
 		-7.729586e-03	-7.323715e-03	2.355415e-02	2.584920e-02
 
@@ -1753,13 +1753,13 @@ SCF iter=12: RMS density=0.000000186939718
 		6	H	1.000000e+00	8.868317e-02
 		7	H	1.000000e+00	9.306530e-02
 
-	Elapsed time(omp) for the SCF = 0.052453[s].
+	Elapsed time(omp) for the SCF = 0.058863[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.055774[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.055369[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -1845,7 +1845,7 @@ SCF iter=12: RMS density=0.000000186939718
 		 4	2.900213e-01	7.891944e+00	8.648917e-01 (6 -> 8)	
 
 
-	Elapsed time(omp) for the CIS = 0.202161[s].
+	Elapsed time(omp) for the CIS = 0.200201[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
@@ -1895,14 +1895,14 @@ SCF iter=12: RMS density=0.000000147000663
 		| [a.u.] | [eV] |
 		2.186087e+01	5.948692e+02
 
-	Total Dipole moment:
+	Total Dipole moment (ground state):
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
 		-2.909075e-02	-3.824973e-02	-3.158423e-02	5.750545e-02
 
 		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
 		-7.394134e-02	-9.722113e-02	-8.027911e-02	1.461643e-01
 
-	Electronic Dipole moment:
+	Electronic Dipole moment (ground state):
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
 		3.338057e-02	-1.878698e-02	2.593471e-02	4.625822e-02
 
@@ -1927,13 +1927,13 @@ SCF iter=12: RMS density=0.000000147000663
 		6	H	1.000000e+00	8.975020e-02
 		7	H	1.000000e+00	9.208762e-02
 
-	Elapsed time(omp) for the SCF = 0.051596[s].
+	Elapsed time(omp) for the SCF = 0.058922[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.056120[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.058320[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -2013,7 +2013,7 @@ SCF iter=12: RMS density=0.000000147000663
 		 4	2.906590e-01	7.909297e+00	8.426167e-01 (6 -> 8)	
 
 
-	Elapsed time(omp) for the CIS = 0.168456[s].
+	Elapsed time(omp) for the CIS = 0.170814[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
@@ -2062,14 +2062,14 @@ SCF iter=11: RMS density=0.000000631341268
 		| [a.u.] | [eV] |
 		2.184692e+01	5.944898e+02
 
-	Total Dipole moment:
+	Total Dipole moment (ground state):
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
 		5.447421e-03	-1.374910e-02	-1.814698e-02	2.340993e-02
 
 		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
 		1.384597e-02	-3.494672e-02	-4.612503e-02	5.950212e-02
 
-	Electronic Dipole moment:
+	Electronic Dipole moment (ground state):
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
 		5.505768e-03	-6.150498e-03	-1.297020e-02	1.537427e-02
 
@@ -2094,13 +2094,13 @@ SCF iter=11: RMS density=0.000000631341268
 		6	H	1.000000e+00	8.763626e-02
 		7	H	1.000000e+00	9.254236e-02
 
-	Elapsed time(omp) for the SCF = 0.051254[s].
+	Elapsed time(omp) for the SCF = 0.058559[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.056099[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.056062[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -2186,7 +2186,7 @@ SCF iter=11: RMS density=0.000000631341268
 		 4	2.893201e-01	7.872863e+00	8.724813e-01 (6 -> 8)	
 
 
-	Elapsed time(omp) for the CIS = 0.198795[s].
+	Elapsed time(omp) for the CIS = 0.198080[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
@@ -2248,14 +2248,14 @@ SCF iter=12: RMS density=0.000000187038034
 		| [a.u.] | [eV] |
 		2.185870e+01	5.948102e+02
 
-	Total Dipole moment:
+	Total Dipole moment (ground state):
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
 		-2.393212e-02	-3.545938e-02	-1.580013e-03	4.280900e-02
 
 		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
 		-6.082939e-02	-9.012878e-02	-4.015994e-03	1.088097e-01
 
-	Electronic Dipole moment:
+	Electronic Dipole moment (ground state):
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
 		-7.695920e-03	-7.311116e-03	2.356089e-02	2.584173e-02
 
@@ -2280,13 +2280,13 @@ SCF iter=12: RMS density=0.000000187038034
 		6	H	1.000000e+00	8.867960e-02
 		7	H	1.000000e+00	9.306046e-02
 
-	Elapsed time(omp) for the SCF = 0.052113[s].
+	Elapsed time(omp) for the SCF = 0.058479[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.055792[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.055613[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -2372,7 +2372,7 @@ SCF iter=12: RMS density=0.000000187038034
 		 4	2.900193e-01	7.891889e+00	8.648872e-01 (6 -> 8)	
 
 
-	Elapsed time(omp) for the CIS = 0.199135[s].
+	Elapsed time(omp) for the CIS = 0.198790[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
@@ -2422,14 +2422,14 @@ SCF iter=12: RMS density=0.000000146872302
 		| [a.u.] | [eV] |
 		2.186074e+01	5.948659e+02
 
-	Total Dipole moment:
+	Total Dipole moment (ground state):
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
 		-2.901343e-02	-3.818844e-02	-3.152792e-02	5.739465e-02
 
 		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
 		-7.374481e-02	-9.706534e-02	-8.013600e-02	1.458827e-01
 
-	Electronic Dipole moment:
+	Electronic Dipole moment (ground state):
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
 		3.341424e-02	-1.876279e-02	2.596995e-02	4.629246e-02
 
@@ -2454,13 +2454,13 @@ SCF iter=12: RMS density=0.000000146872302
 		6	H	1.000000e+00	8.974627e-02
 		7	H	1.000000e+00	9.208330e-02
 
-	Elapsed time(omp) for the SCF = 0.051607[s].
+	Elapsed time(omp) for the SCF = 0.058361[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.055731[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.059362[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -2540,7 +2540,7 @@ SCF iter=12: RMS density=0.000000146872302
 		 4	2.906553e-01	7.909197e+00	8.426440e-01 (6 -> 8)	
 
 
-	Elapsed time(omp) for the CIS = 0.167325[s].
+	Elapsed time(omp) for the CIS = 0.171315[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
@@ -2589,14 +2589,14 @@ SCF iter=11: RMS density=0.000000627653580
 		| [a.u.] | [eV] |
 		2.184681e+01	5.944868e+02
 
-	Total Dipole moment:
+	Total Dipole moment (ground state):
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
 		5.415631e-03	-1.372641e-02	-1.812457e-02	2.337185e-02
 
 		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
 		1.376516e-02	-3.488905e-02	-4.606808e-02	5.940533e-02
 
-	Electronic Dipole moment:
+	Electronic Dipole moment (ground state):
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
 		5.490985e-03	-6.147744e-03	-1.295152e-02	1.535212e-02
 
@@ -2621,13 +2621,13 @@ SCF iter=11: RMS density=0.000000627653580
 		6	H	1.000000e+00	8.763251e-02
 		7	H	1.000000e+00	9.253833e-02
 
-	Elapsed time(omp) for the SCF = 0.051697[s].
+	Elapsed time(omp) for the SCF = 0.058222[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.057230[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.055923[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -2713,7 +2713,7 @@ SCF iter=11: RMS density=0.000000627653580
 		 4	2.893189e-01	7.872830e+00	8.724706e-01 (6 -> 8)	
 
 
-	Elapsed time(omp) for the CIS = 0.200764[s].
+	Elapsed time(omp) for the CIS = 0.197117[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
@@ -2775,14 +2775,14 @@ SCF iter=12: RMS density=0.000000187164280
 		| [a.u.] | [eV] |
 		2.185851e+01	5.948050e+02
 
-	Total Dipole moment:
+	Total Dipole moment (ground state):
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
 		-2.388188e-02	-3.536323e-02	-1.584893e-03	4.270145e-02
 
 		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
 		-6.070169e-02	-8.988439e-02	-4.028397e-03	1.085363e-01
 
-	Electronic Dipole moment:
+	Electronic Dipole moment (ground state):
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
 		-7.652664e-03	-7.294911e-03	2.356957e-02	2.583222e-02
 
@@ -2807,13 +2807,13 @@ SCF iter=12: RMS density=0.000000187164280
 		6	H	1.000000e+00	8.867500e-02
 		7	H	1.000000e+00	9.305424e-02
 
-	Elapsed time(omp) for the SCF = 0.052032[s].
+	Elapsed time(omp) for the SCF = 0.059096[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.056111[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.056539[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -2899,7 +2899,7 @@ SCF iter=12: RMS density=0.000000187164280
 		 4	2.900166e-01	7.891817e+00	8.648814e-01 (6 -> 8)	
 
 
-	Elapsed time(omp) for the CIS = 0.201740[s].
+	Elapsed time(omp) for the CIS = 0.203381[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
@@ -2949,14 +2949,14 @@ SCF iter=12: RMS density=0.000000146708944
 		| [a.u.] | [eV] |
 		2.186059e+01	5.948616e+02
 
-	Total Dipole moment:
+	Total Dipole moment (ground state):
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
 		-2.891413e-02	-3.810970e-02	-3.145559e-02	5.725234e-02
 
 		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
 		-7.349241e-02	-9.686522e-02	-7.995215e-02	1.455210e-01
 
-	Electronic Dipole moment:
+	Electronic Dipole moment (ground state):
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
 		3.345746e-02	-1.873169e-02	2.601524e-02	4.633649e-02
 
@@ -2981,13 +2981,13 @@ SCF iter=12: RMS density=0.000000146708944
 		6	H	1.000000e+00	8.974122e-02
 		7	H	1.000000e+00	9.207774e-02
 
-	Elapsed time(omp) for the SCF = 0.052245[s].
+	Elapsed time(omp) for the SCF = 0.062777[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.056316[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.056703[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -3067,7 +3067,7 @@ SCF iter=12: RMS density=0.000000146708944
 		 4	2.906506e-01	7.909068e+00	8.426791e-01 (6 -> 8)	
 
 
-	Elapsed time(omp) for the CIS = 0.168547[s].
+	Elapsed time(omp) for the CIS = 0.170419[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
@@ -3116,14 +3116,14 @@ SCF iter=11: RMS density=0.000000622912656
 		| [a.u.] | [eV] |
 		2.184668e+01	5.944831e+02
 
-	Total Dipole moment:
+	Total Dipole moment (ground state):
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
 		5.374792e-03	-1.369726e-02	-1.809578e-02	2.332297e-02
 
 		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
 		1.366136e-02	-3.481497e-02	-4.599490e-02	5.928108e-02
 
-	Electronic Dipole moment:
+	Electronic Dipole moment (ground state):
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
 		5.472008e-03	-6.144196e-03	-1.292751e-02	1.532366e-02
 
@@ -3148,13 +3148,13 @@ SCF iter=11: RMS density=0.000000622912656
 		6	H	1.000000e+00	8.762769e-02
 		7	H	1.000000e+00	9.253315e-02
 
-	Elapsed time(omp) for the SCF = 0.051670[s].
+	Elapsed time(omp) for the SCF = 0.058931[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.055961[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.055991[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -3240,7 +3240,7 @@ SCF iter=11: RMS density=0.000000622912656
 		 4	2.893173e-01	7.872787e+00	8.724570e-01 (6 -> 8)	
 
 
-	Elapsed time(omp) for the CIS = 0.197608[s].
+	Elapsed time(omp) for the CIS = 0.199617[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
@@ -3256,14 +3256,14 @@ SCF iter=11: RMS density=0.000000622912656
 ==========  DONE: RPMD step 5
 **********  DONE: Ring Polymer Molecular dynamics  **********
 	Summary for memory usage:
-		Max Heap: 0.781192[MB].
+		Max Heap: 0.783592[MB].
 		Current Heap(Leaked): 0.000000[MB].
 
 
      >>>>>  The MolDS finished normally!  <<<<<
-     >>>>>  CPU time: 52.64[s].  <<<<<
+     >>>>>  CPU time: 52.56[s].  <<<<<
      >>>>>  Elapsed time: 52[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 52.6338[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 52.6018[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

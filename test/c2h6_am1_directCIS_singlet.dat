@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/5/14(Mon.) 15:41:4  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/5/14(Mon.) 16:46:53  <<<<<
 
 
 **********  START: Parse input  **********
@@ -120,14 +120,14 @@ SCF iter=11: RMS density=0.000000372121777
 		| [a.u.] | [eV] |
 		2.193282e+01	5.968271e+02
 
-	Total Dipole moment:
+	Total Dipole moment (ground state):
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
 		-1.974246e-02	-3.319339e-02	-1.358351e-02	4.093992e-02
 
 		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
 		-5.018033e-02	-8.436919e-02	-3.452586e-02	1.040589e-01
 
-	Electronic Dipole moment:
+	Electronic Dipole moment (ground state):
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
 		7.944456e-03	-2.185780e-02	5.608872e-04	2.326355e-02
 
@@ -152,13 +152,13 @@ SCF iter=11: RMS density=0.000000372121777
 		6	H	1.000000e+00	7.029841e-02
 		7	H	1.000000e+00	7.579838e-02
 
-	Elapsed time(omp) for the SCF = 0.060882[s].
+	Elapsed time(omp) for the SCF = 0.059339[s].
 **********  DONE: AM1-SCF  **********
 
 
 **********  START: AM1-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.055458[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.055697[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Direct-CIS  =====
@@ -219,19 +219,19 @@ SCF iter=11: RMS density=0.000000372121777
 		 49	1.166002e+00	3.172878e+01	9.140273e-01 (0 -> 13)	
 
 
-	Elapsed time(omp) for the CIS = 0.060131[s].
+	Elapsed time(omp) for the CIS = 0.060084[s].
 **********  DONE: AM1-CIS  **********
 
 
 	Summary for memory usage:
-		Max Heap: 0.164664[MB].
+		Max Heap: 0.223464[MB].
 		Current Heap(Leaked): 0.000000[MB].
 
 
      >>>>>  The MolDS finished normally!  <<<<<
      >>>>>  CPU time: 0.13[s].  <<<<<
      >>>>>  Elapsed time: 0[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 0.126261[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 0.125014[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

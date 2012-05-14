@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/5/14(Mon.) 15:40:34  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/5/14(Mon.) 16:46:24  <<<<<
 
 
 **********  START: Parse input  **********
@@ -93,14 +93,14 @@ SCF iter=6: RMS density=0.000000002698422
 		| [a.u.] | [eV] |
 		9.730053e+00	2.647703e+02
 
-	Total Dipole moment:
+	Total Dipole moment (ground state):
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
 		-2.615793e-05	-3.261703e-05	-5.837344e-16	4.181038e-05
 
 		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
 		-6.648683e-05	-8.290425e-05	-1.483705e-15	1.062714e-04
 
-	Electronic Dipole moment:
+	Electronic Dipole moment (ground state):
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
 		-2.625194e-05	-3.220337e-05	-5.837344e-16	4.154782e-05
 
@@ -122,7 +122,7 @@ SCF iter=6: RMS density=0.000000002698422
 		3	H	1.000000e+00	-8.458949e-03
 		4	H	1.000000e+00	-8.458952e-03
 
-	Elapsed time(omp) for the SCF = 0.021497[s].
+	Elapsed time(omp) for the SCF = 0.013647[s].
 **********  DONE: INDO-SCF  **********
 
 
@@ -132,9 +132,9 @@ SCF iter=6: RMS density=0.000000002698422
 
 
      >>>>>  The MolDS finished normally!  <<<<<
-     >>>>>  CPU time: 0.02[s].  <<<<<
-     >>>>>  Elapsed time: 1[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 0.0248249[s].  <<<<<
+     >>>>>  CPU time: 0[s].  <<<<<
+     >>>>>  Elapsed time: 0[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 0.0169208[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

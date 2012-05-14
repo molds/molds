@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/5/14(Mon.) 15:41:59  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/5/14(Mon.) 16:47:47  <<<<<
 
 
 **********  START: Parse input  **********
@@ -119,14 +119,14 @@ SCF iter=12: RMS density=0.000000190761143
 		| [a.u.] | [eV] |
 		2.185547e+01	5.947222e+02
 
-	Total Dipole moment:
+	Total Dipole moment (ground state):
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
 		-1.965914e-02	-3.375519e-02	-1.470551e-02	4.173903e-02
 
 		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
 		-4.996855e-02	-8.579714e-02	-3.737769e-02	1.060900e-01
 
-	Electronic Dipole moment:
+	Electronic Dipole moment (ground state):
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
 		8.027778e-03	-2.241960e-02	-5.611121e-04	2.382013e-02
 
@@ -151,7 +151,7 @@ SCF iter=12: RMS density=0.000000190761143
 		6	H	1.000000e+00	8.849413e-02
 		7	H	1.000000e+00	9.338598e-02
 
-	Elapsed time(omp) for the SCF = 0.071919[s].
+	Elapsed time(omp) for the SCF = 0.061469[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
@@ -258,14 +258,14 @@ SCF iter=2: RMS density=0.000000769803863
 		| [a.u.] | [eV] |
 		2.185549e+01	5.947230e+02
 
-	Total Dipole moment:
+	Total Dipole moment (ground state):
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
 		-1.965045e-02	-3.374533e-02	-1.470043e-02	4.172517e-02
 
 		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
 		-4.994646e-02	-8.577209e-02	-3.736477e-02	1.060548e-01
 
-	Electronic Dipole moment:
+	Electronic Dipole moment (ground state):
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
 		8.032890e-03	-2.241896e-02	-5.611049e-04	2.382125e-02
 
@@ -290,7 +290,7 @@ SCF iter=2: RMS density=0.000000769803863
 		6	H	1.000000e+00	8.849381e-02
 		7	H	1.000000e+00	9.338545e-02
 
-	Elapsed time(omp) for the SCF = 0.049931[s].
+	Elapsed time(omp) for the SCF = 0.049659[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
@@ -399,14 +399,14 @@ SCF iter=3: RMS density=0.000000948415661
 		| [a.u.] | [eV] |
 		2.185558e+01	5.947254e+02
 
-	Total Dipole moment:
+	Total Dipole moment (ground state):
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
 		-1.962463e-02	-3.371631e-02	-1.468556e-02	4.168430e-02
 
 		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
 		-4.988083e-02	-8.569833e-02	-3.732697e-02	1.059509e-01
 
-	Electronic Dipole moment:
+	Electronic Dipole moment (ground state):
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
 		8.047980e-03	-2.241759e-02	-5.614572e-04	2.382506e-02
 
@@ -431,7 +431,7 @@ SCF iter=3: RMS density=0.000000948415661
 		6	H	1.000000e+00	8.849286e-02
 		7	H	1.000000e+00	9.338363e-02
 
-	Elapsed time(omp) for the SCF = 0.049868[s].
+	Elapsed time(omp) for the SCF = 0.051676[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
@@ -541,14 +541,14 @@ SCF iter=4: RMS density=0.000000691050651
 		| [a.u.] | [eV] |
 		2.185573e+01	5.947293e+02
 
-	Total Dipole moment:
+	Total Dipole moment (ground state):
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
 		-1.958171e-02	-3.366815e-02	-1.466091e-02	4.161646e-02
 
 		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
 		-4.977174e-02	-8.557591e-02	-3.726431e-02	1.057785e-01
 
-	Electronic Dipole moment:
+	Electronic Dipole moment (ground state):
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
 		8.073021e-03	-2.241548e-02	-5.621760e-04	2.383156e-02
 
@@ -573,7 +573,7 @@ SCF iter=4: RMS density=0.000000691050651
 		6	H	1.000000e+00	8.849129e-02
 		7	H	1.000000e+00	9.338044e-02
 
-	Elapsed time(omp) for the SCF = 0.049781[s].
+	Elapsed time(omp) for the SCF = 0.049819[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
@@ -683,14 +683,14 @@ SCF iter=4: RMS density=0.000000955047321
 		| [a.u.] | [eV] |
 		2.185593e+01	5.947349e+02
 
-	Total Dipole moment:
+	Total Dipole moment (ground state):
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
 		-1.952157e-02	-3.360067e-02	-1.462634e-02	4.152139e-02
 
 		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
 		-4.961889e-02	-8.540439e-02	-3.717645e-02	1.055369e-01
 
-	Electronic Dipole moment:
+	Electronic Dipole moment (ground state):
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
 		8.108133e-03	-2.241242e-02	-5.631048e-04	2.384063e-02
 
@@ -715,7 +715,7 @@ SCF iter=4: RMS density=0.000000955047321
 		6	H	1.000000e+00	8.848909e-02
 		7	H	1.000000e+00	9.337608e-02
 
-	Elapsed time(omp) for the SCF = 0.050303[s].
+	Elapsed time(omp) for the SCF = 0.051805[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
@@ -826,14 +826,14 @@ SCF iter=5: RMS density=0.000000568972389
 		| [a.u.] | [eV] |
 		2.185619e+01	5.947420e+02
 
-	Total Dipole moment:
+	Total Dipole moment (ground state):
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
 		-1.944439e-02	-3.351416e-02	-1.458205e-02	4.139951e-02
 
 		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
 		-4.942271e-02	-8.518452e-02	-3.706389e-02	1.052271e-01
 
-	Electronic Dipole moment:
+	Electronic Dipole moment (ground state):
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
 		8.153154e-03	-2.240867e-02	-5.644300e-04	2.385248e-02
 
@@ -858,7 +858,7 @@ SCF iter=5: RMS density=0.000000568972389
 		6	H	1.000000e+00	8.848625e-02
 		7	H	1.000000e+00	9.337029e-02
 
-	Elapsed time(omp) for the SCF = 0.053003[s].
+	Elapsed time(omp) for the SCF = 0.050217[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
@@ -936,9 +936,9 @@ SCF iter=5: RMS density=0.000000568972389
 
 
      >>>>>  The MolDS finished normally!  <<<<<
-     >>>>>  CPU time: 7.19[s].  <<<<<
+     >>>>>  CPU time: 7.1[s].  <<<<<
      >>>>>  Elapsed time: 7[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 7.19874[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 7.10712[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

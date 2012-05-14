@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/5/14(Mon.) 15:41:59  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/5/14(Mon.) 16:47:47  <<<<<
 
 
 **********  START: Parse input  **********
@@ -124,14 +124,14 @@ SCF iter=12: RMS density=0.000000190761143
 		| [a.u.] | [eV] |
 		2.185547e+01	5.947222e+02
 
-	Total Dipole moment:
+	Total Dipole moment (ground state):
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
 		-1.965914e-02	-3.375519e-02	-1.470551e-02	4.173903e-02
 
 		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
 		-4.996855e-02	-8.579714e-02	-3.737769e-02	1.060900e-01
 
-	Electronic Dipole moment:
+	Electronic Dipole moment (ground state):
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
 		8.027778e-03	-2.241960e-02	-5.611121e-04	2.382013e-02
 
@@ -156,13 +156,13 @@ SCF iter=12: RMS density=0.000000190761143
 		6	H	1.000000e+00	8.849413e-02
 		7	H	1.000000e+00	9.338598e-02
 
-	Elapsed time(omp) for the SCF = 0.060922[s].
+	Elapsed time(omp) for the SCF = 0.059981[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.055739[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.055694[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -248,19 +248,19 @@ SCF iter=12: RMS density=0.000000190761143
 		 4	2.901091e-01	7.894334e+00	8.681948e-01 (6 -> 8)	
 
 
-	Elapsed time(omp) for the CIS = 0.199206[s].
+	Elapsed time(omp) for the CIS = 0.199167[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
 	Summary for memory usage:
-		Max Heap: 0.194600[MB].
+		Max Heap: 0.195080[MB].
 		Current Heap(Leaked): 0.000000[MB].
 
 
      >>>>>  The MolDS finished normally!  <<<<<
-     >>>>>  CPU time: 0.26[s].  <<<<<
+     >>>>>  CPU time: 0.27[s].  <<<<<
      >>>>>  Elapsed time: 0[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 0.265267[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 0.263797[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 
