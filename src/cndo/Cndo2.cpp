@@ -137,9 +137,9 @@ void Cndo2::SetMessages(){
    this->errorMessageGetGaussianCartesianMatrixBadOrbital 
       = "Error in cndo::Cndo2::GetGaussianCartesianMatrix: Untreatable orbital is contained in atom A or B.\n";
    this->errorMessageGetGaussianOverlapBadOrbital 
-      = "Error in cndo::Cndo2::GetGaussiangOverlap: Untreatable orbital is contained in atom A or B.\n";
+      = "Error in cndo::Cndo2::GetGaussianOverlap: Untreatable orbital is contained in atom A or B.\n";
    this->errorMessageGetGaussianOverlapFirstDerivativeOrbitalD 
-      = "Error in cndo::Cndo2::GetGaussiangOverlapFirstDerivative: d-orbital is not treatable. The d-orbital is contained in atom A or B.\n";
+      = "Error in cndo::Cndo2::GetGaussianOverlapFirstDerivative: d-orbital is not treatable. The d-orbital is contained in atom A or B.\n";
    this->errorMessageCISNotImplemented 
       = "Error in cndo::Cndo2: CIS is not implemented for CNDO2.\n";
    this->errorMessageCalcForceNotImplemented
