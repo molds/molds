@@ -818,26 +818,39 @@ void ZindoS::DoCIS(){
 }
 
 void ZindoS::CalcCISProperties(){
+   // free exciton energies
+   this->CalcFreeExcitonEnergies(&this->freeExcitonEnergiesCIS, 
+                                 *this->molecule, 
+                                 this->energiesMO, 
+                                 this->matrixCIS,
+                                 this->matrixCISdimension);
+}
+
+void ZindoS::CalcFreeExcitonEnergies(double** freeExcitonEnergiesCIS, 
+                                     const Molecule& molecule, 
+                                     double const* energiesMO, 
+                                     double const* const* matrixCIS,
+                                     int matrixCISdimension) const{
    if(Parameters::GetInstance()->RequiresExcitonEnergiesCIS()){
       // malloc or initialize free exciton energies
-      if(this->freeExcitonEnergiesCIS == NULL){
-         MallocerFreer::GetInstance()->Malloc<double>(&this->freeExcitonEnergiesCIS,
-                                                      this->matrixCISdimension);
+      if(*freeExcitonEnergiesCIS == NULL){
+         MallocerFreer::GetInstance()->Malloc<double>(freeExcitonEnergiesCIS,
+                                                      matrixCISdimension);
       }
       else{
-         MallocerFreer::GetInstance()->Initialize<double>(this->excitedEnergies, 
-                                                          this->matrixCISdimension);
+         MallocerFreer::GetInstance()->Initialize<double>(*freeExcitonEnergiesCIS, 
+                                                          matrixCISdimension);
       }
       // clac free exciton energies
-      for(int k=0; k<this->matrixCISdimension; k++){
+      for(int k=0; k<matrixCISdimension; k++){
          double value = 0.0;
-         for(int l=0; l<this->matrixCISdimension; l++){
+         for(int l=0; l<matrixCISdimension; l++){
             // single excitation from I-th (occupied)MO to A-th (virtual)MO
-            int moI = this->GetActiveOccIndex(*this->molecule, l);
-            int moA = this->GetActiveVirIndex(*this->molecule, l);
-            value += pow(this->matrixCIS[k][l],2.0)*(this->energiesMO[moA] - this->energiesMO[moI]);
+            int moI = this->GetActiveOccIndex(molecule, l);
+            int moA = this->GetActiveVirIndex(molecule, l);
+            value += pow(matrixCIS[k][l],2.0)*(energiesMO[moA] - energiesMO[moI]);
          }
-         this->freeExcitonEnergiesCIS[k] = value;
+         (*freeExcitonEnergiesCIS)[k] = value;
       }
    }
 }

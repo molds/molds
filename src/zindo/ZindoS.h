@@ -113,6 +113,14 @@ private:
    double overlapCorrectionPi;
    void DoCISDirect();
    void DoCISDavidson();
+   void CalcFreeExcitonEnergies(double** freeExcitonEnergiesCIS, 
+                                const MolDS_base::Molecule& molecule, 
+                                double const* energiesMO, 
+                                double const* const* matrixCIS,
+                                int matrixCISdimension) const;
+   void CalcElectronicTransitionDipoleMomentsFromGroundState(double*** electronicDipoleMoments,
+                                                             double const* const* const* cartesianMatrix,
+                                                             const MolDS_base::Molecule& molecule) const;
    double GetNishimotoMatagaTwoEleInt(const MolDS_base_atoms::Atom& atomA, 
                                       MolDS_base::OrbitalType orbitalA, 
                                       const MolDS_base_atoms::Atom& atomB, 
