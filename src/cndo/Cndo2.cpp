@@ -2122,16 +2122,16 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
             (valenceOrbitalA == dzz   && axis == XAxis && valenceOrbitalB == pz) || 
             (valenceOrbitalA == dzz   && axis == YAxis && valenceOrbitalB == pz) ){
       OrbitalType dOrbital;
-      if( (valenceOrbitalA == py && axis == XAxis) || 
-          (valenceOrbitalA == px && axis == YAxis) ){
+      if( (valenceOrbitalB == py && axis == XAxis) || 
+          (valenceOrbitalB == px && axis == YAxis) ){
          dOrbital = dxy;
       }
-      else if( (valenceOrbitalA == py && axis == ZAxis) || 
-               (valenceOrbitalA == pz && axis == YAxis) ){
+      else if( (valenceOrbitalB == py && axis == ZAxis) || 
+               (valenceOrbitalB == pz && axis == YAxis) ){
          dOrbital = dyz;
       }
-      else if( (valenceOrbitalA == px && axis == ZAxis) || 
-               (valenceOrbitalA == pz && axis == XAxis) ){
+      else if( (valenceOrbitalB == px && axis == ZAxis) || 
+               (valenceOrbitalB == pz && axis == XAxis) ){
          dOrbital = dzx;
       }
       double overlap1 = this->GetGaussianOverlap(atomTypeA,
