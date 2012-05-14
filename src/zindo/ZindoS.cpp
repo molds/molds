@@ -1569,15 +1569,13 @@ int ZindoS::GetSlaterDeterminantIndex(int activeOccIndex,
          +activeVirIndex; 
 }
 
-// Note taht activeOccIndex and activeVirIndex are not MO's number.
-// activeOccIndex=0 means HOMO and activeVirIndex=0 means LUMO.
+// This returns an index of occupied MO. Generally, This index=0 means the lowest energy MO;
 int ZindoS::GetActiveOccIndex(const MolDS_base::Molecule& molecule, int matrixCISIndex) const{
    return molecule.GetTotalNumberValenceElectrons()/2 
          -(matrixCISIndex/Parameters::GetInstance()->GetActiveVirCIS()) -1;
 }
 
-// Note taht activeOccIndex and activeVirIndex are not MO's number.
-// activeOccIndex=0 means HOMO and activeVirIndex=0 means LUMO.
+// This returns an index of virtual MO. Generally, This index=0 means the lowest energy MO;
 int ZindoS::GetActiveVirIndex(const MolDS_base::Molecule& molecule, int matrixCISIndex) const{
    return molecule.GetTotalNumberValenceElectrons()/2
          +(matrixCISIndex%Parameters::GetInstance()->GetActiveVirCIS());
