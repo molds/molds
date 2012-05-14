@@ -80,6 +80,10 @@ protected:
    double** matrixCIS;
    double* excitedEnergies;
    double* freeExcitonEnergiesCIS;
+   double** overlap; // overlap integral between AOs
+   double*** cartesianMatrix; // cartesian matrix represented by AOs
+   double*** electronicDipoleMoments; // Diagnonal terms are electronic dipole moments of each eigenstates (i.e. electronicDipole[0][0][XAxis] is the x-component of the electronic dipole moment of the ground state. electronicDipole[10][10][XAxis] is the x-component of the electronic dipole moment of the 10-th excited state). Off-diagonal terms are transition dipole moments between eigenstates (i.e. electronicDipole[10][0][XAxis] is the x-component of the transition dipole moment from the ground state to 10-th excited state.).
+   double* coreDipoleMoment; // dipole moment of configuration.
    int matrixCISdimension;
    virtual void SetMessages();
    virtual void SetEnableAtomTypes();
@@ -208,10 +212,6 @@ private:
    std::string messageTotalDipole;
    double elecSCFEnergy;
    double** gammaAB;
-   double** overlap; // overlap integral between AOs
-   double*** cartesianMatrix; // cartesian matrix represented by AOs
-   double*** electronicDipoleMoments; // Diagnonal terms are electronic dipole moments of each eigenstates (i.e. electronicDipole[0][0][XAxis] is the x-component of the electronic dipole moment of the ground state. electronicDipole[10][10][XAxis] is the x-component of the electronic dipole moment of the 10-th excited state). Off-diagonal terms are transition dipole moments between eigenstates (i.e. electronicDipole[10][0][XAxis] is the x-component of the transition dipole moment from the ground state to 10-th excited state.).
-   double* coreDipoleMoment; // dipole moment of configuration.
    double bondingAdjustParameterK[2]; //see (3.79) in J. A. Pople book
 
    // use Y[na][nb][la][lb][m][i][j] 

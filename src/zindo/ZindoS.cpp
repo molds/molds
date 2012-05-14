@@ -818,6 +818,54 @@ void ZindoS::DoCIS(){
 }
 
 void ZindoS::CalcCISProperties(){
+   int groundState = 0;
+   int excitedState = 0;
+
+   // transition dipole moments from ground state to excited states
+   for(int k=0; k<this->matrixCISdimension; k++){
+      int excitedState = k+1; // (k+1)-th excited state
+      for(int i=0; i<CartesianType_end; i++){
+         this->electronicDipoleMoments[excitedState][groundState][i] = 0.0;
+         for(int l=0; l<this->matrixCISdimension; l++){
+            double temp = 0.0;
+            // single excitation from I-th (occupied)MO to A-th (virtual)MO
+            int moI = this->GetActiveOccIndex(*this->molecule, l);
+            int moA = this->GetActiveVirIndex(*this->molecule, l);
+            for(int mu=0; mu<this->molecule->GetTotalNumberAOs(); mu++){
+               for(int nu=0; nu<this->molecule->GetTotalNumberAOs(); nu++){
+                  temp += this->fockMatrix[moA][mu]
+                          *(this->cartesianMatrix[mu][nu][i] - this->molecule->GetXyzCOC()[i]*this->overlap[mu][nu])
+                          *this->fockMatrix[moI][nu];
+               }
+            }
+            this->electronicDipoleMoments[excitedState][groundState][i] += this->matrixCIS[k][l]*sqrt(2.0)*temp;
+         }
+      }
+   }
+
+   // transition dipole moments from excited states to ground state
+   for(int k=0; k<this->matrixCISdimension; k++){
+      int excitedState = k+1; // (k+1)-th excited state
+      for(int i=0; i<CartesianType_end; i++){
+         this->electronicDipoleMoments[groundState][excitedState][i] = 0.0;
+         for(int l=0; l<this->matrixCISdimension; l++){
+            double temp = 0.0;
+            // single excitation from I-th (occupied)MO to A-th (virtual)MO
+            int moI = this->GetActiveOccIndex(*this->molecule, l);
+            int moA = this->GetActiveVirIndex(*this->molecule, l);
+            for(int mu=0; mu<this->molecule->GetTotalNumberAOs(); mu++){
+               for(int nu=0; nu<this->molecule->GetTotalNumberAOs(); nu++){
+                  temp += this->fockMatrix[moI][mu]
+                          *(this->cartesianMatrix[mu][nu][i] - this->molecule->GetXyzCOC()[i]*this->overlap[mu][nu])
+                          *this->fockMatrix[moA][nu];
+               }
+            }
+            this->electronicDipoleMoments[groundState][excitedState][i] += this->matrixCIS[k][l]*sqrt(2.0)*temp;
+         }
+      }
+   }
+
+
    // free exciton energies
    this->CalcFreeExcitonEnergies(&this->freeExcitonEnergiesCIS, 
                                  *this->molecule, 
