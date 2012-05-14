@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/5/11(Fri.) 23:54:49  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/5/14(Mon.) 15:43:39  <<<<<
 
 
 **********  START: Parse input  **********
@@ -95,17 +95,17 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 **********  START: Initial calculation of electronic structure of each bead  ********* 
 ----------  Beads number 0
 **********  START: PM3/PDDG-SCF  **********
-SCF iter=0: RMS density=5.291502622129187
-SCF iter=1: RMS density=1.862420700981514
+SCF iter=0: RMS density=5.291502622129181
+SCF iter=1: RMS density=1.862420700981515
 SCF iter=2: RMS density=0.993065847372718
 SCF iter=3: RMS density=0.533366592731295
 SCF iter=4: RMS density=0.285565038540090
-SCF iter=5: RMS density=0.152486080389886
-SCF iter=6: RMS density=0.000628901679961
-SCF iter=7: RMS density=0.000184624768883
-SCF iter=8: RMS density=0.000057780448253
-SCF iter=9: RMS density=0.000020773464571
-SCF iter=10: RMS density=0.000003698771633
+SCF iter=5: RMS density=0.152486080389887
+SCF iter=6: RMS density=0.000628901679965
+SCF iter=7: RMS density=0.000184624768950
+SCF iter=8: RMS density=0.000057780448296
+SCF iter=9: RMS density=0.000020773464556
+SCF iter=10: RMS density=0.000003698771612
 SCF iter=11: RMS density=0.000001735631711
 SCF iter=12: RMS density=0.000000186813138
 
@@ -171,13 +171,13 @@ SCF iter=12: RMS density=0.000000186813138
 		6	H	1.000000e+00	8.868777e-02
 		7	H	1.000000e+00	9.307152e-02
 
-	Elapsed time(omp) for the SCF = 0.040220[s].
+	Elapsed time(omp) for the SCF = 0.053755[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.040192[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.056377[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -263,23 +263,23 @@ SCF iter=12: RMS density=0.000000186813138
 		 4	2.900239e-01	7.892015e+00	8.648975e-01 (6 -> 8)	
 
 
-	Elapsed time(omp) for the CIS = 0.144600[s].
+	Elapsed time(omp) for the CIS = 0.203602[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
 ----------  Beads number 1
 **********  START: PM3/PDDG-SCF  **********
-SCF iter=0: RMS density=5.291502622129181
-SCF iter=1: RMS density=1.865988336217737
-SCF iter=2: RMS density=0.994529576897673
-SCF iter=3: RMS density=0.533371488030118
-SCF iter=4: RMS density=0.285095206176204
+SCF iter=0: RMS density=5.291502622129180
+SCF iter=1: RMS density=1.865988336217739
+SCF iter=2: RMS density=0.994529576897676
+SCF iter=3: RMS density=0.533371488030116
+SCF iter=4: RMS density=0.285095206176202
 SCF iter=5: RMS density=0.151977375008307
-SCF iter=6: RMS density=0.000733580757652
-SCF iter=7: RMS density=0.000248955925977
-SCF iter=8: RMS density=0.000081466922275
-SCF iter=9: RMS density=0.000028877781581
-SCF iter=10: RMS density=0.000005647086584
+SCF iter=6: RMS density=0.000733580757657
+SCF iter=7: RMS density=0.000248955926008
+SCF iter=8: RMS density=0.000081466922276
+SCF iter=9: RMS density=0.000028877781576
+SCF iter=10: RMS density=0.000005647086567
 SCF iter=11: RMS density=0.000002231024048
 SCF iter=12: RMS density=0.000000147167387
 
@@ -345,13 +345,13 @@ SCF iter=12: RMS density=0.000000147167387
 		6	H	1.000000e+00	8.975525e-02
 		7	H	1.000000e+00	9.209319e-02
 
-	Elapsed time(omp) for the SCF = 0.040662[s].
+	Elapsed time(omp) for the SCF = 0.059080[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.041055[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.057808[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -431,24 +431,24 @@ SCF iter=12: RMS density=0.000000147167387
 		 4	2.906637e-01	7.909425e+00	8.425816e-01 (6 -> 8)	
 
 
-	Elapsed time(omp) for the CIS = 0.122094[s].
+	Elapsed time(omp) for the CIS = 0.176074[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
 ----------  Beads number 2
 **********  START: PM3/PDDG-SCF  **********
-SCF iter=0: RMS density=5.291502622129176
-SCF iter=1: RMS density=1.866449441913809
-SCF iter=2: RMS density=0.994602655642709
-SCF iter=3: RMS density=0.533363585976307
+SCF iter=0: RMS density=5.291502622129189
+SCF iter=1: RMS density=1.866449441913811
+SCF iter=2: RMS density=0.994602655642711
+SCF iter=3: RMS density=0.533363585976309
 SCF iter=4: RMS density=0.285053896199431
 SCF iter=5: RMS density=0.151927132530237
-SCF iter=6: RMS density=0.000587258483706
-SCF iter=7: RMS density=0.000157963874401
-SCF iter=8: RMS density=0.000043539411028
-SCF iter=9: RMS density=0.000012590973705
-SCF iter=10: RMS density=0.000001354489279
-SCF iter=11: RMS density=0.000000636082909
+SCF iter=6: RMS density=0.000587258483708
+SCF iter=7: RMS density=0.000157963874523
+SCF iter=8: RMS density=0.000043539411125
+SCF iter=9: RMS density=0.000012590973716
+SCF iter=10: RMS density=0.000001354489267
+SCF iter=11: RMS density=0.000000636082910
 
 
 
@@ -512,13 +512,13 @@ SCF iter=11: RMS density=0.000000636082909
 		6	H	1.000000e+00	8.764107e-02
 		7	H	1.000000e+00	9.254755e-02
 
-	Elapsed time(omp) for the SCF = 0.040533[s].
+	Elapsed time(omp) for the SCF = 0.054147[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.039637[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.056725[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -604,7 +604,7 @@ SCF iter=11: RMS density=0.000000636082909
 		 4	2.893216e-01	7.872905e+00	8.724949e-01 (6 -> 8)	
 
 
-	Elapsed time(omp) for the CIS = 0.142987[s].
+	Elapsed time(omp) for the CIS = 0.200088[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
@@ -623,18 +623,18 @@ SCF iter=11: RMS density=0.000000636082909
 ==========  START: RPMD step 1
 ----------  Beads number 0
 **********  START: PM3/PDDG-SCF  **********
-SCF iter=0: RMS density=3.724404043269617
-SCF iter=1: RMS density=1.862427967055877
-SCF iter=2: RMS density=0.993068173810479
-SCF iter=3: RMS density=0.533366465122006
-SCF iter=4: RMS density=0.285564150802721
-SCF iter=5: RMS density=0.152485143965894
-SCF iter=6: RMS density=0.000628843950197
-SCF iter=7: RMS density=0.000184604202006
-SCF iter=8: RMS density=0.000057774621871
-SCF iter=9: RMS density=0.000020771911179
-SCF iter=10: RMS density=0.000003698177857
-SCF iter=11: RMS density=0.000001735365318
+SCF iter=0: RMS density=3.724404043269612
+SCF iter=1: RMS density=1.862427967055879
+SCF iter=2: RMS density=0.993068173810478
+SCF iter=3: RMS density=0.533366465122003
+SCF iter=4: RMS density=0.285564150802723
+SCF iter=5: RMS density=0.152485143965893
+SCF iter=6: RMS density=0.000628843950206
+SCF iter=7: RMS density=0.000184604202077
+SCF iter=8: RMS density=0.000057774621970
+SCF iter=9: RMS density=0.000020771911156
+SCF iter=10: RMS density=0.000003698177809
+SCF iter=11: RMS density=0.000001735365316
 SCF iter=12: RMS density=0.000000186827213
 
 
@@ -699,13 +699,13 @@ SCF iter=12: RMS density=0.000000186827213
 		6	H	1.000000e+00	8.868726e-02
 		7	H	1.000000e+00	9.307083e-02
 
-	Elapsed time(omp) for the SCF = 0.040342[s].
+	Elapsed time(omp) for the SCF = 0.051787[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.039961[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.056019[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -791,25 +791,25 @@ SCF iter=12: RMS density=0.000000186827213
 		 4	2.900236e-01	7.892007e+00	8.648968e-01 (6 -> 8)	
 
 
-	Elapsed time(omp) for the CIS = 0.146282[s].
+	Elapsed time(omp) for the CIS = 0.201536[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
 ----------  Beads number 1
 **********  START: PM3/PDDG-SCF  **********
-SCF iter=0: RMS density=3.726780343689739
-SCF iter=1: RMS density=1.865994733610306
-SCF iter=2: RMS density=0.994531604026399
-SCF iter=3: RMS density=0.533371380602383
-SCF iter=4: RMS density=0.285094436816699
-SCF iter=5: RMS density=0.151976562368298
+SCF iter=0: RMS density=3.726780343689733
+SCF iter=1: RMS density=1.865994733610305
+SCF iter=2: RMS density=0.994531604026395
+SCF iter=3: RMS density=0.533371380602385
+SCF iter=4: RMS density=0.285094436816697
+SCF iter=5: RMS density=0.151976562368299
 SCF iter=6: RMS density=0.000733509330225
-SCF iter=7: RMS density=0.000248927456056
-SCF iter=8: RMS density=0.000081458677425
-SCF iter=9: RMS density=0.000028875174846
-SCF iter=10: RMS density=0.000005646258100
-SCF iter=11: RMS density=0.000002230819695
-SCF iter=12: RMS density=0.000000147148770
+SCF iter=7: RMS density=0.000248927456021
+SCF iter=8: RMS density=0.000081458677369
+SCF iter=9: RMS density=0.000028875174853
+SCF iter=10: RMS density=0.000005646258132
+SCF iter=11: RMS density=0.000002230819691
+SCF iter=12: RMS density=0.000000147148771
 
 
 
@@ -873,13 +873,13 @@ SCF iter=12: RMS density=0.000000147148770
 		6	H	1.000000e+00	8.975468e-02
 		7	H	1.000000e+00	9.209257e-02
 
-	Elapsed time(omp) for the SCF = 0.040821[s].
+	Elapsed time(omp) for the SCF = 0.051893[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.041198[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.055687[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -959,24 +959,24 @@ SCF iter=12: RMS density=0.000000147148770
 		 4	2.906632e-01	7.909411e+00	8.425855e-01 (6 -> 8)	
 
 
-	Elapsed time(omp) for the CIS = 0.123401[s].
+	Elapsed time(omp) for the CIS = 0.167559[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
 ----------  Beads number 2
 **********  START: PM3/PDDG-SCF  **********
-SCF iter=0: RMS density=3.727024881217585
-SCF iter=1: RMS density=1.866455743402928
-SCF iter=2: RMS density=0.994604621662425
-SCF iter=3: RMS density=0.533363462391927
+SCF iter=0: RMS density=3.727024881217590
+SCF iter=1: RMS density=1.866455743402929
+SCF iter=2: RMS density=0.994604621662423
+SCF iter=3: RMS density=0.533363462391928
 SCF iter=4: RMS density=0.285053132632050
 SCF iter=5: RMS density=0.151926331946847
-SCF iter=6: RMS density=0.000587205859314
-SCF iter=7: RMS density=0.000157944874084
-SCF iter=8: RMS density=0.000043532831070
-SCF iter=9: RMS density=0.000012588153862
-SCF iter=10: RMS density=0.000001353713963
-SCF iter=11: RMS density=0.000000635556046
+SCF iter=6: RMS density=0.000587205859320
+SCF iter=7: RMS density=0.000157944874172
+SCF iter=8: RMS density=0.000043532830950
+SCF iter=9: RMS density=0.000012588153903
+SCF iter=10: RMS density=0.000001353713945
+SCF iter=11: RMS density=0.000000635556043
 
 
 
@@ -1040,13 +1040,13 @@ SCF iter=11: RMS density=0.000000635556046
 		6	H	1.000000e+00	8.764054e-02
 		7	H	1.000000e+00	9.254697e-02
 
-	Elapsed time(omp) for the SCF = 0.040202[s].
+	Elapsed time(omp) for the SCF = 0.051224[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.040071[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.055856[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -1132,7 +1132,7 @@ SCF iter=11: RMS density=0.000000635556046
 		 4	2.893215e-01	7.872901e+00	8.724934e-01 (6 -> 8)	
 
 
-	Elapsed time(omp) for the CIS = 0.143885[s].
+	Elapsed time(omp) for the CIS = 0.198473[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
@@ -1143,26 +1143,26 @@ SCF iter=11: RMS density=0.000000635556046
 		Electronic
 		(inc. core rep.)	-3.605386e+01	-9.810833e+02
 		Total            	-3.605372e+01	-9.810794e+02
-		Error            	2.472902e-10	6.729162e-09
+		Error            	2.472760e-10	6.728776e-09
 
 ==========  DONE: RPMD step 1
 
 ==========  START: RPMD step 2
 ----------  Beads number 0
 **********  START: PM3/PDDG-SCF  **********
-SCF iter=0: RMS density=3.724411453216251
-SCF iter=1: RMS density=1.862449763794543
-SCF iter=2: RMS density=0.993075152597618
-SCF iter=3: RMS density=0.533366082167527
-SCF iter=4: RMS density=0.285561487665389
-SCF iter=5: RMS density=0.152482334847556
-SCF iter=6: RMS density=0.000628670858019
-SCF iter=7: RMS density=0.000184542531746
-SCF iter=8: RMS density=0.000057757146270
-SCF iter=9: RMS density=0.000020767250241
-SCF iter=10: RMS density=0.000003696397000
-SCF iter=11: RMS density=0.000001734566204
-SCF iter=12: RMS density=0.000000186869421
+SCF iter=0: RMS density=3.724411453216247
+SCF iter=1: RMS density=1.862449763794545
+SCF iter=2: RMS density=0.993075152597619
+SCF iter=3: RMS density=0.533366082167526
+SCF iter=4: RMS density=0.285561487665391
+SCF iter=5: RMS density=0.152482334847557
+SCF iter=6: RMS density=0.000628670858025
+SCF iter=7: RMS density=0.000184542531709
+SCF iter=8: RMS density=0.000057757146192
+SCF iter=9: RMS density=0.000020767250227
+SCF iter=10: RMS density=0.000003696397005
+SCF iter=11: RMS density=0.000001734566202
+SCF iter=12: RMS density=0.000000186869420
 
 
 
@@ -1226,13 +1226,13 @@ SCF iter=12: RMS density=0.000000186869421
 		6	H	1.000000e+00	8.868572e-02
 		7	H	1.000000e+00	9.306875e-02
 
-	Elapsed time(omp) for the SCF = 0.039798[s].
+	Elapsed time(omp) for the SCF = 0.051861[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.039984[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.056658[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -1318,25 +1318,25 @@ SCF iter=12: RMS density=0.000000186869421
 		 4	2.900227e-01	7.891984e+00	8.648949e-01 (6 -> 8)	
 
 
-	Elapsed time(omp) for the CIS = 0.144424[s].
+	Elapsed time(omp) for the CIS = 0.200980[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
 ----------  Beads number 1
 **********  START: PM3/PDDG-SCF  **********
-SCF iter=0: RMS density=3.726786542900900
+SCF iter=0: RMS density=3.726786542900896
 SCF iter=1: RMS density=1.866013924557486
-SCF iter=2: RMS density=0.994537684926669
-SCF iter=3: RMS density=0.533371058176094
+SCF iter=2: RMS density=0.994537684926668
+SCF iter=3: RMS density=0.533371058176093
 SCF iter=4: RMS density=0.285092128775136
-SCF iter=5: RMS density=0.151974124558706
-SCF iter=6: RMS density=0.000733295128708
-SCF iter=7: RMS density=0.000248842067856
-SCF iter=8: RMS density=0.000081433944881
-SCF iter=9: RMS density=0.000028867355530
-SCF iter=10: RMS density=0.000005643773711
-SCF iter=11: RMS density=0.000002230206663
-SCF iter=12: RMS density=0.000000147093053
+SCF iter=5: RMS density=0.151974124558707
+SCF iter=6: RMS density=0.000733295128709
+SCF iter=7: RMS density=0.000248842067871
+SCF iter=8: RMS density=0.000081433944868
+SCF iter=9: RMS density=0.000028867355483
+SCF iter=10: RMS density=0.000005643773704
+SCF iter=11: RMS density=0.000002230206660
+SCF iter=12: RMS density=0.000000147093055
 
 
 
@@ -1400,13 +1400,13 @@ SCF iter=12: RMS density=0.000000147093053
 		6	H	1.000000e+00	8.975300e-02
 		7	H	1.000000e+00	9.209071e-02
 
-	Elapsed time(omp) for the SCF = 0.040139[s].
+	Elapsed time(omp) for the SCF = 0.051599[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.042913[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.056100[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -1486,24 +1486,24 @@ SCF iter=12: RMS density=0.000000147093053
 		 4	2.906616e-01	7.909368e+00	8.425972e-01 (6 -> 8)	
 
 
-	Elapsed time(omp) for the CIS = 0.124321[s].
+	Elapsed time(omp) for the CIS = 0.167345[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
 ----------  Beads number 2
 **********  START: PM3/PDDG-SCF  **********
-SCF iter=0: RMS density=3.727030770121689
-SCF iter=1: RMS density=1.866474646826756
-SCF iter=2: RMS density=0.994610519387022
-SCF iter=3: RMS density=0.533363091559709
-SCF iter=4: RMS density=0.285050841989062
-SCF iter=5: RMS density=0.151923930315335
-SCF iter=6: RMS density=0.000587048115301
-SCF iter=7: RMS density=0.000157887927147
-SCF iter=8: RMS density=0.000043513107472
-SCF iter=9: RMS density=0.000012579697957
-SCF iter=10: RMS density=0.000001351389563
-SCF iter=11: RMS density=0.000000633975474
+SCF iter=0: RMS density=3.727030770121694
+SCF iter=1: RMS density=1.866474646826758
+SCF iter=2: RMS density=0.994610519387021
+SCF iter=3: RMS density=0.533363091559708
+SCF iter=4: RMS density=0.285050841989061
+SCF iter=5: RMS density=0.151923930315337
+SCF iter=6: RMS density=0.000587048115299
+SCF iter=7: RMS density=0.000157887927032
+SCF iter=8: RMS density=0.000043513107404
+SCF iter=9: RMS density=0.000012579697940
+SCF iter=10: RMS density=0.000001351389624
+SCF iter=11: RMS density=0.000000633975473
 
 
 
@@ -1567,13 +1567,13 @@ SCF iter=11: RMS density=0.000000633975474
 		6	H	1.000000e+00	8.763893e-02
 		7	H	1.000000e+00	9.254524e-02
 
-	Elapsed time(omp) for the SCF = 0.040201[s].
+	Elapsed time(omp) for the SCF = 0.051590[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.039621[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.056145[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -1639,7 +1639,7 @@ SCF iter=11: RMS density=0.000000633975474
 
 	Davidson iter=10
 	  1-th excited: norm of the residual = 1.694199e-07
-	  2-th excited: norm of the residual = 4.585862e-08
+	  2-th excited: norm of the residual = 4.585861e-08
 	  3-th excited: norm of the residual = 1.576332e-08
 	  4-th excited: norm of the residual = 2.993184e-08
 
@@ -1659,7 +1659,7 @@ SCF iter=11: RMS density=0.000000633975474
 		 4	2.893209e-01	7.872886e+00	8.724889e-01 (6 -> 8)	
 
 
-	Elapsed time(omp) for the CIS = 0.143896[s].
+	Elapsed time(omp) for the CIS = 0.198274[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
@@ -1670,25 +1670,25 @@ SCF iter=11: RMS density=0.000000633975474
 		Electronic
 		(inc. core rep.)	-3.605387e+01	-9.810836e+02
 		Total            	-3.605372e+01	-9.810794e+02
-		Error            	9.873844e-10	2.686831e-08
+		Error            	9.873773e-10	2.686812e-08
 
 ==========  DONE: RPMD step 2
 
 ==========  START: RPMD step 3
 ----------  Beads number 0
 **********  START: PM3/PDDG-SCF  **********
-SCF iter=0: RMS density=3.724427644185948
-SCF iter=1: RMS density=1.862486086744745
-SCF iter=2: RMS density=0.993086782155641
+SCF iter=0: RMS density=3.724427644185946
+SCF iter=1: RMS density=1.862486086744746
+SCF iter=2: RMS density=0.993086782155638
 SCF iter=3: RMS density=0.533365443488125
-SCF iter=4: RMS density=0.285557049352388
-SCF iter=5: RMS density=0.152477653495741
-SCF iter=6: RMS density=0.000628382694954
-SCF iter=7: RMS density=0.000184439850108
-SCF iter=8: RMS density=0.000057728031903
-SCF iter=9: RMS density=0.000020759479428
-SCF iter=10: RMS density=0.000003693430559
-SCF iter=11: RMS density=0.000001733234576
+SCF iter=4: RMS density=0.285557049352386
+SCF iter=5: RMS density=0.152477653495742
+SCF iter=6: RMS density=0.000628382694955
+SCF iter=7: RMS density=0.000184439850071
+SCF iter=8: RMS density=0.000057728031860
+SCF iter=9: RMS density=0.000020759479408
+SCF iter=10: RMS density=0.000003693430619
+SCF iter=11: RMS density=0.000001733234573
 SCF iter=12: RMS density=0.000000186939718
 
 
@@ -1753,13 +1753,13 @@ SCF iter=12: RMS density=0.000000186939718
 		6	H	1.000000e+00	8.868317e-02
 		7	H	1.000000e+00	9.306530e-02
 
-	Elapsed time(omp) for the SCF = 0.040125[s].
+	Elapsed time(omp) for the SCF = 0.052453[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.039994[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.055774[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -1826,7 +1826,7 @@ SCF iter=12: RMS density=0.000000186939718
 	Davidson iter=10
 	  1-th excited: norm of the residual = 1.618446e-07
 	  2-th excited: norm of the residual = 2.420797e-08
-	  3-th excited: norm of the residual = 8.105592e-09
+	  3-th excited: norm of the residual = 8.105591e-09
 	  4-th excited: norm of the residual = 5.050430e-08
 
 
@@ -1845,24 +1845,24 @@ SCF iter=12: RMS density=0.000000186939718
 		 4	2.900213e-01	7.891944e+00	8.648917e-01 (6 -> 8)	
 
 
-	Elapsed time(omp) for the CIS = 0.145270[s].
+	Elapsed time(omp) for the CIS = 0.202161[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
 ----------  Beads number 1
 **********  START: PM3/PDDG-SCF  **********
-SCF iter=0: RMS density=3.726800523818866
-SCF iter=1: RMS density=1.866045905367931
+SCF iter=0: RMS density=3.726800523818862
+SCF iter=1: RMS density=1.866045905367928
 SCF iter=2: RMS density=0.994547818140780
-SCF iter=3: RMS density=0.533370520322035
-SCF iter=4: RMS density=0.285088282162423
+SCF iter=3: RMS density=0.533370520322036
+SCF iter=4: RMS density=0.285088282162424
 SCF iter=5: RMS density=0.151970061910843
-SCF iter=6: RMS density=0.000732938395559
-SCF iter=7: RMS density=0.000248699826912
-SCF iter=8: RMS density=0.000081392731268
+SCF iter=6: RMS density=0.000732938395556
+SCF iter=7: RMS density=0.000248699826913
+SCF iter=8: RMS density=0.000081392731235
 SCF iter=9: RMS density=0.000028854326500
-SCF iter=10: RMS density=0.000005639636034
-SCF iter=11: RMS density=0.000002229185088
+SCF iter=10: RMS density=0.000005639636033
+SCF iter=11: RMS density=0.000002229185089
 SCF iter=12: RMS density=0.000000147000663
 
 
@@ -1927,13 +1927,13 @@ SCF iter=12: RMS density=0.000000147000663
 		6	H	1.000000e+00	8.975020e-02
 		7	H	1.000000e+00	9.208762e-02
 
-	Elapsed time(omp) for the SCF = 0.040267[s].
+	Elapsed time(omp) for the SCF = 0.051596[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.040859[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.056120[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -2013,23 +2013,23 @@ SCF iter=12: RMS density=0.000000147000663
 		 4	2.906590e-01	7.909297e+00	8.426167e-01 (6 -> 8)	
 
 
-	Elapsed time(omp) for the CIS = 0.122017[s].
+	Elapsed time(omp) for the CIS = 0.168456[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
 ----------  Beads number 2
 **********  START: PM3/PDDG-SCF  **********
-SCF iter=0: RMS density=3.727044239854409
-SCF iter=1: RMS density=1.866506149054912
-SCF iter=2: RMS density=0.994620347812549
-SCF iter=3: RMS density=0.533362473242301
-SCF iter=4: RMS density=0.285047024447886
-SCF iter=5: RMS density=0.151919927991623
-SCF iter=6: RMS density=0.000586785639236
-SCF iter=7: RMS density=0.000157793195483
-SCF iter=8: RMS density=0.000043480289340
-SCF iter=9: RMS density=0.000012565616715
-SCF iter=10: RMS density=0.000001347521374
+SCF iter=0: RMS density=3.727044239854412
+SCF iter=1: RMS density=1.866506149054915
+SCF iter=2: RMS density=0.994620347812547
+SCF iter=3: RMS density=0.533362473242302
+SCF iter=4: RMS density=0.285047024447887
+SCF iter=5: RMS density=0.151919927991625
+SCF iter=6: RMS density=0.000586785639243
+SCF iter=7: RMS density=0.000157793195505
+SCF iter=8: RMS density=0.000043480289451
+SCF iter=9: RMS density=0.000012565616711
+SCF iter=10: RMS density=0.000001347521290
 SCF iter=11: RMS density=0.000000631341268
 
 
@@ -2094,13 +2094,13 @@ SCF iter=11: RMS density=0.000000631341268
 		6	H	1.000000e+00	8.763626e-02
 		7	H	1.000000e+00	9.254236e-02
 
-	Elapsed time(omp) for the SCF = 0.040251[s].
+	Elapsed time(omp) for the SCF = 0.051254[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.040952[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.056099[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -2186,7 +2186,7 @@ SCF iter=11: RMS density=0.000000631341268
 		 4	2.893201e-01	7.872863e+00	8.724813e-01 (6 -> 8)	
 
 
-	Elapsed time(omp) for the CIS = 0.150634[s].
+	Elapsed time(omp) for the CIS = 0.198795[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
@@ -2197,26 +2197,26 @@ SCF iter=11: RMS density=0.000000631341268
 		Electronic
 		(inc. core rep.)	-3.605389e+01	-9.810842e+02
 		Total            	-3.605372e+01	-9.810794e+02
-		Error            	2.216389e-09	6.031149e-08
+		Error            	2.216325e-09	6.030975e-08
 
 ==========  DONE: RPMD step 3
 
 ==========  START: RPMD step 4
 ----------  Beads number 0
 **********  START: PM3/PDDG-SCF  **********
-SCF iter=0: RMS density=3.724452611419651
-SCF iter=1: RMS density=1.862536928487263
-SCF iter=2: RMS density=0.993103059853234
-SCF iter=3: RMS density=0.533364548450833
-SCF iter=4: RMS density=0.285550836237521
-SCF iter=5: RMS density=0.152471100678398
-SCF iter=6: RMS density=0.000627979947305
-SCF iter=7: RMS density=0.000184296310843
-SCF iter=8: RMS density=0.000057687296605
-SCF iter=9: RMS density=0.000020748594975
-SCF iter=10: RMS density=0.000003689281281
-SCF iter=11: RMS density=0.000001731370802
-SCF iter=12: RMS density=0.000000187038041
+SCF iter=0: RMS density=3.724452611419652
+SCF iter=1: RMS density=1.862536928487266
+SCF iter=2: RMS density=0.993103059853235
+SCF iter=3: RMS density=0.533364548450835
+SCF iter=4: RMS density=0.285550836237519
+SCF iter=5: RMS density=0.152471100678397
+SCF iter=6: RMS density=0.000627979947303
+SCF iter=7: RMS density=0.000184296310740
+SCF iter=8: RMS density=0.000057687296586
+SCF iter=9: RMS density=0.000020748594911
+SCF iter=10: RMS density=0.000003689281318
+SCF iter=11: RMS density=0.000001731370799
+SCF iter=12: RMS density=0.000000187038034
 
 
 
@@ -2280,13 +2280,13 @@ SCF iter=12: RMS density=0.000000187038041
 		6	H	1.000000e+00	8.867960e-02
 		7	H	1.000000e+00	9.306046e-02
 
-	Elapsed time(omp) for the SCF = 0.044315[s].
+	Elapsed time(omp) for the SCF = 0.052113[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.043351[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.055792[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -2353,7 +2353,7 @@ SCF iter=12: RMS density=0.000000187038041
 	Davidson iter=10
 	  1-th excited: norm of the residual = 1.620667e-07
 	  2-th excited: norm of the residual = 2.449656e-08
-	  3-th excited: norm of the residual = 8.041414e-09
+	  3-th excited: norm of the residual = 8.041415e-09
 	  4-th excited: norm of the residual = 5.102637e-08
 
 
@@ -2372,24 +2372,24 @@ SCF iter=12: RMS density=0.000000187038041
 		 4	2.900193e-01	7.891889e+00	8.648872e-01 (6 -> 8)	
 
 
-	Elapsed time(omp) for the CIS = 0.160685[s].
+	Elapsed time(omp) for the CIS = 0.199135[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
 ----------  Beads number 1
 **********  START: PM3/PDDG-SCF  **********
-SCF iter=0: RMS density=3.726822282151793
-SCF iter=1: RMS density=1.866090669890423
-SCF iter=2: RMS density=0.994562001239197
-SCF iter=3: RMS density=0.533369766325029
+SCF iter=0: RMS density=3.726822282151788
+SCF iter=1: RMS density=1.866090669890424
+SCF iter=2: RMS density=0.994562001239199
+SCF iter=3: RMS density=0.533369766325027
 SCF iter=4: RMS density=0.285082897163535
-SCF iter=5: RMS density=0.151964374976920
-SCF iter=6: RMS density=0.000732439535513
-SCF iter=7: RMS density=0.000248500843045
-SCF iter=8: RMS density=0.000081335047507
-SCF iter=9: RMS density=0.000028836092539
-SCF iter=10: RMS density=0.000005633849728
-SCF iter=11: RMS density=0.000002227755188
+SCF iter=5: RMS density=0.151964374976921
+SCF iter=6: RMS density=0.000732439535508
+SCF iter=7: RMS density=0.000248500842967
+SCF iter=8: RMS density=0.000081335047441
+SCF iter=9: RMS density=0.000028836092582
+SCF iter=10: RMS density=0.000005633849713
+SCF iter=11: RMS density=0.000002227755189
 SCF iter=12: RMS density=0.000000146872302
 
 
@@ -2454,13 +2454,13 @@ SCF iter=12: RMS density=0.000000146872302
 		6	H	1.000000e+00	8.974627e-02
 		7	H	1.000000e+00	9.208330e-02
 
-	Elapsed time(omp) for the SCF = 0.041721[s].
+	Elapsed time(omp) for the SCF = 0.051607[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.045446[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.055731[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -2540,24 +2540,24 @@ SCF iter=12: RMS density=0.000000146872302
 		 4	2.906553e-01	7.909197e+00	8.426440e-01 (6 -> 8)	
 
 
-	Elapsed time(omp) for the CIS = 0.134328[s].
+	Elapsed time(omp) for the CIS = 0.167325[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
 ----------  Beads number 2
 **********  START: PM3/PDDG-SCF  **********
-SCF iter=0: RMS density=3.727065287185533
-SCF iter=1: RMS density=1.866550244871193
-SCF iter=2: RMS density=0.994634105264500
+SCF iter=0: RMS density=3.727065287185535
+SCF iter=1: RMS density=1.866550244871192
+SCF iter=2: RMS density=0.994634105264503
 SCF iter=3: RMS density=0.533361607043602
-SCF iter=4: RMS density=0.285041680304012
-SCF iter=5: RMS density=0.151914325568719
-SCF iter=6: RMS density=0.000586419077743
-SCF iter=7: RMS density=0.000157660950727
-SCF iter=8: RMS density=0.000043434459362
-SCF iter=9: RMS density=0.000012545928427
-SCF iter=10: RMS density=0.000001342117598
-SCF iter=11: RMS density=0.000000627653579
+SCF iter=4: RMS density=0.285041680304011
+SCF iter=5: RMS density=0.151914325568720
+SCF iter=6: RMS density=0.000586419077752
+SCF iter=7: RMS density=0.000157660950736
+SCF iter=8: RMS density=0.000043434459512
+SCF iter=9: RMS density=0.000012545928423
+SCF iter=10: RMS density=0.000001342117539
+SCF iter=11: RMS density=0.000000627653580
 
 
 
@@ -2621,13 +2621,13 @@ SCF iter=11: RMS density=0.000000627653579
 		6	H	1.000000e+00	8.763251e-02
 		7	H	1.000000e+00	9.253833e-02
 
-	Elapsed time(omp) for the SCF = 0.041355[s].
+	Elapsed time(omp) for the SCF = 0.051697[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.039912[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.057230[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -2713,7 +2713,7 @@ SCF iter=11: RMS density=0.000000627653579
 		 4	2.893189e-01	7.872830e+00	8.724706e-01 (6 -> 8)	
 
 
-	Elapsed time(omp) for the CIS = 0.143571[s].
+	Elapsed time(omp) for the CIS = 0.200764[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
@@ -2724,26 +2724,26 @@ SCF iter=11: RMS density=0.000000627653579
 		Electronic
 		(inc. core rep.)	-3.605392e+01	-9.810850e+02
 		Total            	-3.605372e+01	-9.810794e+02
-		Error            	3.927752e-09	1.068804e-07
+		Error            	3.927724e-09	1.068797e-07
 
 ==========  DONE: RPMD step 4
 
 ==========  START: RPMD step 5
 ----------  Beads number 0
 **********  START: PM3/PDDG-SCF  **********
-SCF iter=0: RMS density=3.724486348007216
+SCF iter=0: RMS density=3.724486348007221
 SCF iter=1: RMS density=1.862602278639417
-SCF iter=2: RMS density=0.993123982005613
-SCF iter=3: RMS density=0.533363396169441
-SCF iter=4: RMS density=0.285542848844052
-SCF iter=5: RMS density=0.152462677470296
-SCF iter=6: RMS density=0.000627463296782
-SCF iter=7: RMS density=0.000184112130120
-SCF iter=8: RMS density=0.000057634965962
-SCF iter=9: RMS density=0.000020734591542
-SCF iter=10: RMS density=0.000003683952691
-SCF iter=11: RMS density=0.000001728975415
-SCF iter=12: RMS density=0.000000187164276
+SCF iter=2: RMS density=0.993123982005614
+SCF iter=3: RMS density=0.533363396169443
+SCF iter=4: RMS density=0.285542848844053
+SCF iter=5: RMS density=0.152462677470297
+SCF iter=6: RMS density=0.000627463296792
+SCF iter=7: RMS density=0.000184112130126
+SCF iter=8: RMS density=0.000057634965829
+SCF iter=9: RMS density=0.000020734591544
+SCF iter=10: RMS density=0.000003683952668
+SCF iter=11: RMS density=0.000001728975413
+SCF iter=12: RMS density=0.000000187164280
 
 
 
@@ -2807,13 +2807,13 @@ SCF iter=12: RMS density=0.000000187164276
 		6	H	1.000000e+00	8.867500e-02
 		7	H	1.000000e+00	9.305424e-02
 
-	Elapsed time(omp) for the SCF = 0.041747[s].
+	Elapsed time(omp) for the SCF = 0.052032[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.042971[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.056111[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -2899,25 +2899,25 @@ SCF iter=12: RMS density=0.000000187164276
 		 4	2.900166e-01	7.891817e+00	8.648814e-01 (6 -> 8)	
 
 
-	Elapsed time(omp) for the CIS = 0.155992[s].
+	Elapsed time(omp) for the CIS = 0.201740[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
 ----------  Beads number 1
 **********  START: PM3/PDDG-SCF  **********
-SCF iter=0: RMS density=3.726851811538179
-SCF iter=1: RMS density=1.866148209515301
-SCF iter=2: RMS density=0.994580230820594
-SCF iter=3: RMS density=0.533368795184244
+SCF iter=0: RMS density=3.726851811538176
+SCF iter=1: RMS density=1.866148209515304
+SCF iter=2: RMS density=0.994580230820593
+SCF iter=3: RMS density=0.533368795184245
 SCF iter=4: RMS density=0.285075974037750
-SCF iter=5: RMS density=0.151957064530081
-SCF iter=6: RMS density=0.000731799116273
-SCF iter=7: RMS density=0.000248245270361
-SCF iter=8: RMS density=0.000081260908929
-SCF iter=9: RMS density=0.000028812660407
-SCF iter=10: RMS density=0.000005626421179
-SCF iter=11: RMS density=0.000002225917288
-SCF iter=12: RMS density=0.000000146708942
+SCF iter=5: RMS density=0.151957064530080
+SCF iter=6: RMS density=0.000731799116266
+SCF iter=7: RMS density=0.000248245270314
+SCF iter=8: RMS density=0.000081260908920
+SCF iter=9: RMS density=0.000028812660413
+SCF iter=10: RMS density=0.000005626421174
+SCF iter=11: RMS density=0.000002225917287
+SCF iter=12: RMS density=0.000000146708944
 
 
 
@@ -2981,13 +2981,13 @@ SCF iter=12: RMS density=0.000000146708942
 		6	H	1.000000e+00	8.974122e-02
 		7	H	1.000000e+00	9.207774e-02
 
-	Elapsed time(omp) for the SCF = 0.042984[s].
+	Elapsed time(omp) for the SCF = 0.052245[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.041899[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.056316[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -3067,24 +3067,24 @@ SCF iter=12: RMS density=0.000000146708942
 		 4	2.906506e-01	7.909068e+00	8.426791e-01 (6 -> 8)	
 
 
-	Elapsed time(omp) for the CIS = 0.128018[s].
+	Elapsed time(omp) for the CIS = 0.168547[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
 ----------  Beads number 2
 **********  START: PM3/PDDG-SCF  **********
-SCF iter=0: RMS density=3.727093907467765
-SCF iter=1: RMS density=1.866606926975638
-SCF iter=2: RMS density=0.994651789395723
+SCF iter=0: RMS density=3.727093907467766
+SCF iter=1: RMS density=1.866606926975641
+SCF iter=2: RMS density=0.994651789395722
 SCF iter=3: RMS density=0.533360492407847
-SCF iter=4: RMS density=0.285034809970574
-SCF iter=5: RMS density=0.151907123876417
-SCF iter=6: RMS density=0.000585949337365
-SCF iter=7: RMS density=0.000157491573770
-SCF iter=8: RMS density=0.000043375734305
-SCF iter=9: RMS density=0.000012520659395
-SCF iter=10: RMS density=0.000001335190628
-SCF iter=11: RMS density=0.000000622912657
+SCF iter=4: RMS density=0.285034809970571
+SCF iter=5: RMS density=0.151907123876418
+SCF iter=6: RMS density=0.000585949337374
+SCF iter=7: RMS density=0.000157491573751
+SCF iter=8: RMS density=0.000043375734392
+SCF iter=9: RMS density=0.000012520659440
+SCF iter=10: RMS density=0.000001335190576
+SCF iter=11: RMS density=0.000000622912656
 
 
 
@@ -3148,13 +3148,13 @@ SCF iter=11: RMS density=0.000000622912657
 		6	H	1.000000e+00	8.762769e-02
 		7	H	1.000000e+00	9.253315e-02
 
-	Elapsed time(omp) for the SCF = 0.047364[s].
+	Elapsed time(omp) for the SCF = 0.051670[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.044871[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.055961[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -3240,7 +3240,7 @@ SCF iter=11: RMS density=0.000000622912657
 		 4	2.893173e-01	7.872787e+00	8.724570e-01 (6 -> 8)	
 
 
-	Elapsed time(omp) for the CIS = 0.147638[s].
+	Elapsed time(omp) for the CIS = 0.197608[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
@@ -3251,7 +3251,7 @@ SCF iter=11: RMS density=0.000000622912657
 		Electronic
 		(inc. core rep.)	-3.605396e+01	-9.810860e+02
 		Total            	-3.605372e+01	-9.810794e+02
-		Error            	6.112096e-09	1.663199e-07
+		Error            	6.112074e-09	1.663193e-07
 
 ==========  DONE: RPMD step 5
 **********  DONE: Ring Polymer Molecular dynamics  **********
@@ -3261,9 +3261,9 @@ SCF iter=11: RMS density=0.000000622912657
 
 
      >>>>>  The MolDS finished normally!  <<<<<
-     >>>>>  CPU time: 40.67[s].  <<<<<
-     >>>>>  Elapsed time: 41[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 40.7686[s].  <<<<<
+     >>>>>  CPU time: 52.64[s].  <<<<<
+     >>>>>  Elapsed time: 52[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 52.6338[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

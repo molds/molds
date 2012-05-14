@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/5/11(Fri.) 23:52:28  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/5/14(Mon.) 15:40:34  <<<<<
 
 
 **********  START: Parse input  **********
@@ -61,13 +61,13 @@ geometry_end |
 
 
 **********  START: CNDO/2-SCF  **********
-SCF iter=0: RMS density=4.000000000000001
-SCF iter=1: RMS density=0.012446303426798
-SCF iter=2: RMS density=0.002189639028953
-SCF iter=3: RMS density=0.000494294559954
-SCF iter=4: RMS density=0.000137611656594
-SCF iter=5: RMS density=0.000042009095380
-SCF iter=6: RMS density=0.000000000044139
+SCF iter=0: RMS density=4.000000000000000
+SCF iter=1: RMS density=0.012446303426799
+SCF iter=2: RMS density=0.002189639028957
+SCF iter=3: RMS density=0.000494294559952
+SCF iter=4: RMS density=0.000137611656595
+SCF iter=5: RMS density=0.000042009095381
+SCF iter=6: RMS density=0.000000000044171
 
 
 
@@ -95,17 +95,17 @@ SCF iter=6: RMS density=0.000000000044139
 
 	Total Dipole moment:
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
-		1.233183e-05	-1.069044e-04	2.564355e-15	1.076133e-04
+		1.233183e-05	-1.069044e-04	-2.148672e-15	1.076133e-04
 
 		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
-		3.134440e-05	-2.717238e-04	6.517942e-15	2.735257e-04
+		3.134440e-05	-2.717238e-04	-5.461380e-15	2.735257e-04
 
 	Electronic Dipole moment:
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
-		1.223782e-05	-1.065001e-04	2.564355e-15	1.072009e-04
+		1.223782e-05	-1.065001e-04	-2.148672e-15	1.072009e-04
 
 		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
-		3.110544e-05	-2.706963e-04	6.517942e-15	2.724776e-04
+		3.110544e-05	-2.706963e-04	-5.461380e-15	2.724776e-04
 
 	Core Dipole moment:
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
@@ -122,7 +122,7 @@ SCF iter=6: RMS density=0.000000000044139
 		3	H	1.000000e+00	1.386166e-02
 		4	H	1.000000e+00	1.386166e-02
 
-	Elapsed time(omp) for the SCF = 0.015458[s].
+	Elapsed time(omp) for the SCF = 0.013480[s].
 **********  DONE: CNDO/2-SCF  **********
 
 
@@ -132,9 +132,9 @@ SCF iter=6: RMS density=0.000000000044139
 
 
      >>>>>  The MolDS finished normally!  <<<<<
-     >>>>>  CPU time: 0.01[s].  <<<<<
+     >>>>>  CPU time: 0.02[s].  <<<<<
      >>>>>  Elapsed time: 0[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 0.0164542[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 0.0165341[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/5/11(Fri.) 23:54:20  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/5/14(Mon.) 15:43:1  <<<<<
 
 
 **********  START: Parse input  **********
@@ -86,19 +86,19 @@ h | 1.8600 | -1.0401 | 0.0000 | geometry_end |
 
 **********  START: Monte Carlo  **********
 **********  START: PM3-SCF  **********
-SCF iter=0: RMS density=5.291502622129180
-SCF iter=1: RMS density=1.910456125626943
-SCF iter=2: RMS density=1.044203238495390
-SCF iter=3: RMS density=0.569275110921830
-SCF iter=4: RMS density=0.308641545774630
-SCF iter=5: RMS density=0.166813060251973
-SCF iter=6: RMS density=0.000657312351886
-SCF iter=7: RMS density=0.000224796079705
-SCF iter=8: RMS density=0.000083564977040
-SCF iter=9: RMS density=0.000026986732818
-SCF iter=10: RMS density=0.000004938275857
-SCF iter=11: RMS density=0.000002003884717
-SCF iter=12: RMS density=0.000000169506349
+SCF iter=0: RMS density=5.291502622129181
+SCF iter=1: RMS density=1.910456125626944
+SCF iter=2: RMS density=1.044203238495394
+SCF iter=3: RMS density=0.569275110921829
+SCF iter=4: RMS density=0.308641545774633
+SCF iter=5: RMS density=0.166813060251972
+SCF iter=6: RMS density=0.000657312351881
+SCF iter=7: RMS density=0.000224796079678
+SCF iter=8: RMS density=0.000083564976942
+SCF iter=9: RMS density=0.000026986732815
+SCF iter=10: RMS density=0.000004938275865
+SCF iter=11: RMS density=0.000002003884715
+SCF iter=12: RMS density=0.000000169506348
 
 
 
@@ -162,13 +162,13 @@ SCF iter=12: RMS density=0.000000169506349
 		6	H	1.000000e+00	3.744313e-02
 		7	H	1.000000e+00	4.258006e-02
 
-	Elapsed time(omp) for the SCF = 0.045100[s].
+	Elapsed time(omp) for the SCF = 0.065355[s].
 **********  DONE: PM3-SCF  **********
 
 
 **********  START: PM3-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.040062[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.056247[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Direct-CIS  =====
@@ -229,7 +229,7 @@ SCF iter=12: RMS density=0.000000169506349
 		 49	1.181425e+00	3.214846e+01	9.928423e-01 (0 -> 13)	
 
 
-	Elapsed time(omp) for the CIS = 0.043336[s].
+	Elapsed time(omp) for the CIS = 0.060921[s].
 **********  DONE: PM3-CIS  **********
 
 
@@ -273,19 +273,19 @@ SCF iter=12: RMS density=0.000000169506349
 	========== START: MC step 1
 
 **********  START: PM3-SCF  **********
-SCF iter=0: RMS density=5.291502622129180
-SCF iter=1: RMS density=1.903193717221936
+SCF iter=0: RMS density=5.291502622129181
+SCF iter=1: RMS density=1.903193717221935
 SCF iter=2: RMS density=1.041663226876396
 SCF iter=3: RMS density=0.569732144751600
 SCF iter=4: RMS density=0.310012794711905
 SCF iter=5: RMS density=0.168187496154966
-SCF iter=6: RMS density=0.000957818190245
-SCF iter=7: RMS density=0.000407933075951
-SCF iter=8: RMS density=0.000143630981143
-SCF iter=9: RMS density=0.000046259144704
-SCF iter=10: RMS density=0.000008336690910
+SCF iter=6: RMS density=0.000957818190233
+SCF iter=7: RMS density=0.000407933075954
+SCF iter=8: RMS density=0.000143630981186
+SCF iter=9: RMS density=0.000046259144677
+SCF iter=10: RMS density=0.000008336690898
 SCF iter=11: RMS density=0.000002748787966
-SCF iter=12: RMS density=0.000000330165341
+SCF iter=12: RMS density=0.000000330165340
 
 
 
@@ -349,13 +349,13 @@ SCF iter=12: RMS density=0.000000330165341
 		6	H	1.000000e+00	3.876166e-02
 		7	H	1.000000e+00	4.011921e-02
 
-	Elapsed time(omp) for the SCF = 0.040248[s].
+	Elapsed time(omp) for the SCF = 0.051980[s].
 **********  DONE: PM3-SCF  **********
 
 
 **********  START: PM3-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.039498[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.055812[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Direct-CIS  =====
@@ -416,7 +416,7 @@ SCF iter=12: RMS density=0.000000330165341
 		 49	1.184753e+00	3.223904e+01	9.851068e-01 (0 -> 13)	
 
 
-	Elapsed time(omp) for the CIS = 0.042351[s].
+	Elapsed time(omp) for the CIS = 0.059722[s].
 **********  DONE: PM3-CIS  **********
 
 
@@ -462,11 +462,11 @@ SCF iter=12: RMS density=0.000000330165341
 **********  START: PM3-SCF  **********
 SCF iter=0: RMS density=0.020355665157565
 SCF iter=1: RMS density=0.007503243042569
-SCF iter=2: RMS density=0.003176480683967
-SCF iter=3: RMS density=0.001440267560210
+SCF iter=2: RMS density=0.003176480683968
+SCF iter=3: RMS density=0.001440267560209
 SCF iter=4: RMS density=0.000674519468047
 SCF iter=5: RMS density=0.000321084866702
-SCF iter=6: RMS density=0.000001271066001
+SCF iter=6: RMS density=0.000001271065995
 SCF iter=7: RMS density=0.000000485534181
 
 
@@ -531,13 +531,13 @@ SCF iter=7: RMS density=0.000000485534181
 		6	H	1.000000e+00	3.956646e-02
 		7	H	1.000000e+00	4.000530e-02
 
-	Elapsed time(omp) for the SCF = 0.039319[s].
+	Elapsed time(omp) for the SCF = 0.051007[s].
 **********  DONE: PM3-SCF  **********
 
 
 **********  START: PM3-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.039675[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.055492[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Direct-CIS  =====
@@ -598,7 +598,7 @@ SCF iter=7: RMS density=0.000000485534181
 		 49	1.183468e+00	3.220405e+01	9.824966e-01 (0 -> 13)	
 
 
-	Elapsed time(omp) for the CIS = 0.042638[s].
+	Elapsed time(omp) for the CIS = 0.059298[s].
 **********  DONE: PM3-CIS  **********
 
 
@@ -643,14 +643,14 @@ SCF iter=7: RMS density=0.000000485534181
 
 **********  START: PM3-SCF  **********
 SCF iter=0: RMS density=0.020858990565729
-SCF iter=1: RMS density=0.007746384946864
+SCF iter=1: RMS density=0.007746384946865
 SCF iter=2: RMS density=0.003337747993104
-SCF iter=3: RMS density=0.001540462674215
-SCF iter=4: RMS density=0.000731201243671
+SCF iter=3: RMS density=0.001540462674214
+SCF iter=4: RMS density=0.000731201243672
 SCF iter=5: RMS density=0.000351360743812
-SCF iter=6: RMS density=0.000002243952169
+SCF iter=6: RMS density=0.000002243952170
 SCF iter=7: RMS density=0.000001018835583
-SCF iter=8: RMS density=0.000000182665938
+SCF iter=8: RMS density=0.000000182665937
 
 
 
@@ -714,13 +714,13 @@ SCF iter=8: RMS density=0.000000182665938
 		6	H	1.000000e+00	3.940052e-02
 		7	H	1.000000e+00	4.004738e-02
 
-	Elapsed time(omp) for the SCF = 0.040106[s].
+	Elapsed time(omp) for the SCF = 0.053991[s].
 **********  DONE: PM3-SCF  **********
 
 
 **********  START: PM3-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.039247[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.055573[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Direct-CIS  =====
@@ -781,7 +781,7 @@ SCF iter=8: RMS density=0.000000182665938
 		 49	1.180059e+00	3.211130e+01	9.823496e-01 (0 -> 13)	
 
 
-	Elapsed time(omp) for the CIS = 0.042016[s].
+	Elapsed time(omp) for the CIS = 0.059357[s].
 **********  DONE: PM3-CIS  **********
 
 
@@ -826,13 +826,13 @@ SCF iter=8: RMS density=0.000000182665938
 
 **********  START: PM3-SCF  **********
 SCF iter=0: RMS density=0.022985499982069
-SCF iter=1: RMS density=0.006753550137733
-SCF iter=2: RMS density=0.002525932616756
+SCF iter=1: RMS density=0.006753550137732
+SCF iter=2: RMS density=0.002525932616757
 SCF iter=3: RMS density=0.001095254671451
-SCF iter=4: RMS density=0.000506988602793
+SCF iter=4: RMS density=0.000506988602794
 SCF iter=5: RMS density=0.000240999823945
-SCF iter=6: RMS density=0.000001584274498
-SCF iter=7: RMS density=0.000000653205128
+SCF iter=6: RMS density=0.000001584274511
+SCF iter=7: RMS density=0.000000653205124
 
 
 
@@ -896,13 +896,13 @@ SCF iter=7: RMS density=0.000000653205128
 		6	H	1.000000e+00	3.963294e-02
 		7	H	1.000000e+00	4.006195e-02
 
-	Elapsed time(omp) for the SCF = 0.039440[s].
+	Elapsed time(omp) for the SCF = 0.050952[s].
 **********  DONE: PM3-SCF  **********
 
 
 **********  START: PM3-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.039186[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.055347[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Direct-CIS  =====
@@ -963,7 +963,7 @@ SCF iter=7: RMS density=0.000000653205128
 		 49	1.177925e+00	3.205323e+01	9.862241e-01 (0 -> 13)	
 
 
-	Elapsed time(omp) for the CIS = 0.041930[s].
+	Elapsed time(omp) for the CIS = 0.059009[s].
 **********  DONE: PM3-CIS  **********
 
 
@@ -1008,13 +1008,13 @@ SCF iter=7: RMS density=0.000000653205128
 
 **********  START: PM3-SCF  **********
 SCF iter=0: RMS density=0.018168455583591
-SCF iter=1: RMS density=0.004833996724618
+SCF iter=1: RMS density=0.004833996724619
 SCF iter=2: RMS density=0.001636907865471
 SCF iter=3: RMS density=0.000674060791771
 SCF iter=4: RMS density=0.000310587160216
-SCF iter=5: RMS density=0.000151426385086
-SCF iter=6: RMS density=0.000002843091925
-SCF iter=7: RMS density=0.000000865976554
+SCF iter=5: RMS density=0.000151426385088
+SCF iter=6: RMS density=0.000002843091924
+SCF iter=7: RMS density=0.000000865976555
 
 
 
@@ -1078,13 +1078,13 @@ SCF iter=7: RMS density=0.000000865976554
 		6	H	1.000000e+00	3.983954e-02
 		7	H	1.000000e+00	3.965667e-02
 
-	Elapsed time(omp) for the SCF = 0.039110[s].
+	Elapsed time(omp) for the SCF = 0.050767[s].
 **********  DONE: PM3-SCF  **********
 
 
 **********  START: PM3-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.039373[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.055381[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Direct-CIS  =====
@@ -1145,7 +1145,7 @@ SCF iter=7: RMS density=0.000000865976554
 		 49	1.181690e+00	3.215568e+01	9.896218e-01 (0 -> 13)	
 
 
-	Elapsed time(omp) for the CIS = 0.042246[s].
+	Elapsed time(omp) for the CIS = 0.059078[s].
 **********  DONE: PM3-CIS  **********
 
 
@@ -1195,9 +1195,9 @@ SCF iter=7: RMS density=0.000000865976554
 
 
      >>>>>  The MolDS finished normally!  <<<<<
-     >>>>>  CPU time: 0.5[s].  <<<<<
-     >>>>>  Elapsed time: 0[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 0.50269[s].  <<<<<
+     >>>>>  CPU time: 0.69[s].  <<<<<
+     >>>>>  Elapsed time: 1[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 0.695651[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

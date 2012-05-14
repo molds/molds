@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/5/11(Fri.) 23:52:50  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/5/14(Mon.) 15:41:4  <<<<<
 
 
 **********  START: Parse input  **********
@@ -81,17 +81,17 @@ h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 | -1.0401 | 0.0000 | geometry_end |
 
 **********  START: AM1-SCF  **********
 SCF iter=0: RMS density=5.291502622129176
-SCF iter=1: RMS density=2.251392923186923
+SCF iter=1: RMS density=2.251392923186922
 SCF iter=2: RMS density=1.066360223936914
 SCF iter=3: RMS density=0.485163652173428
-SCF iter=4: RMS density=0.221525604336857
-SCF iter=5: RMS density=0.101527699951395
-SCF iter=6: RMS density=0.000475612652614
-SCF iter=7: RMS density=0.000114151272382
-SCF iter=8: RMS density=0.000045086399349
-SCF iter=9: RMS density=0.000008220727840
-SCF iter=10: RMS density=0.000002287341923
-SCF iter=11: RMS density=0.000000372121780
+SCF iter=4: RMS density=0.221525604336856
+SCF iter=5: RMS density=0.101527699951394
+SCF iter=6: RMS density=0.000475612652606
+SCF iter=7: RMS density=0.000114151272446
+SCF iter=8: RMS density=0.000045086399360
+SCF iter=9: RMS density=0.000008220727844
+SCF iter=10: RMS density=0.000002287341942
+SCF iter=11: RMS density=0.000000372121777
 
 
 
@@ -155,13 +155,13 @@ SCF iter=11: RMS density=0.000000372121780
 		6	H	1.000000e+00	7.029841e-02
 		7	H	1.000000e+00	7.579838e-02
 
-	Elapsed time(omp) for the SCF = 0.047836[s].
+	Elapsed time(omp) for the SCF = 0.060696[s].
 **********  DONE: AM1-SCF  **********
 
 
 **********  START: AM1-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.039790[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.055547[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -253,7 +253,7 @@ SCF iter=11: RMS density=0.000000372121780
 		 4	3.126553e-01	8.507851e+00	6.431089e-01 (6 -> 12)	
 
 
-	Elapsed time(omp) for the CIS = 0.171955[s].
+	Elapsed time(omp) for the CIS = 0.239998[s].
 **********  DONE: AM1-CIS  **********
 
 
@@ -263,9 +263,9 @@ SCF iter=11: RMS density=0.000000372121780
 
 
      >>>>>  The MolDS finished normally!  <<<<<
-     >>>>>  CPU time: 0.22[s].  <<<<<
+     >>>>>  CPU time: 0.31[s].  <<<<<
      >>>>>  Elapsed time: 1[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 0.225906[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 0.305591[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

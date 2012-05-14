@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/5/11(Fri.) 23:53:11  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/5/14(Mon.) 15:41:31  <<<<<
 
 
 **********  START: Parse input  **********
@@ -69,16 +69,16 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 
 **********  START: PM3-SCF  **********
 SCF iter=0: RMS density=5.291502622129181
-SCF iter=1: RMS density=1.910456125626946
-SCF iter=2: RMS density=1.044203238495392
-SCF iter=3: RMS density=0.569275110921828
-SCF iter=4: RMS density=0.308641545774631
-SCF iter=5: RMS density=0.166813060251973
-SCF iter=6: RMS density=0.000657312351884
-SCF iter=7: RMS density=0.000224796079740
-SCF iter=8: RMS density=0.000083564976808
-SCF iter=9: RMS density=0.000026986732830
-SCF iter=10: RMS density=0.000004938275856
+SCF iter=1: RMS density=1.910456125626944
+SCF iter=2: RMS density=1.044203238495394
+SCF iter=3: RMS density=0.569275110921829
+SCF iter=4: RMS density=0.308641545774633
+SCF iter=5: RMS density=0.166813060251972
+SCF iter=6: RMS density=0.000657312351881
+SCF iter=7: RMS density=0.000224796079678
+SCF iter=8: RMS density=0.000083564976942
+SCF iter=9: RMS density=0.000026986732815
+SCF iter=10: RMS density=0.000004938275865
 SCF iter=11: RMS density=0.000002003884715
 SCF iter=12: RMS density=0.000000169506348
 
@@ -144,7 +144,7 @@ SCF iter=12: RMS density=0.000000169506348
 		6	H	1.000000e+00	3.744313e-02
 		7	H	1.000000e+00	4.258006e-02
 
-	Elapsed time(omp) for the SCF = 0.048580[s].
+	Elapsed time(omp) for the SCF = 0.061625[s].
 **********  DONE: PM3-SCF  **********
 
 
@@ -154,9 +154,9 @@ SCF iter=12: RMS density=0.000000169506348
 
 
      >>>>>  The MolDS finished normally!  <<<<<
-     >>>>>  CPU time: 0.05[s].  <<<<<
+     >>>>>  CPU time: 0.06[s].  <<<<<
      >>>>>  Elapsed time: 0[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 0.0502112[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 0.066397[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

@@ -32,14 +32,14 @@ class TesterOmp
       system("echo OMP_NUM_THREADS:$OMP_NUM_THREADS")
       print @@command + @moldsCommand + "\n"
       system(@moldsCommand)
-      print @@command + @diffCommand + @@deleteDiff + "\n"
-      system(@diffCommand + @@deleteDiff)
-      system("echo '\n\n'")
+      #print @@command + @diffCommand + @@deleteDiff + "\n"
+      #system(@diffCommand + @@deleteDiff)
+      #system("echo '\n\n'")
    end
    def setPrefix(prefix)
       @inputFile = prefix + @@surfixInp
       @outputFile = prefix + @@surfixDat
-      @moldsCommand = @@moldsBin + " < " + @inputFile + " > " + @@tempFile 
+      @moldsCommand = @@moldsBin + " < " + @inputFile + " > " + @outputFile 
       @diffCommand = "diff " + @outputFile + " " + @@tempFile
    end
    private :setPrefix
@@ -91,26 +91,17 @@ prefix = "ch4_cndo2"
 mklNumThreads = "1"
 ompNumThreads = "1"
 testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
-mklNumThreads = "2"
-ompNumThreads = "2"
-testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
 
 system("echo '\t\t\t>>> C2H6 <<<\n'")
 prefix = "c2h6_cndo2"
 mklNumThreads = "1"
 ompNumThreads = "1"
 testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
-mklNumThreads = "2"
-ompNumThreads = "2"
-testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
 
 system("echo '\t\t\t>>> H2S <<<\n'")
 prefix = "h2s_cndo2"
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
-mklNumThreads = "2"
-ompNumThreads = "2"
 testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
 
 system("echo '-------------------------------------------'")
@@ -121,17 +112,11 @@ prefix = "ch4_indo"
 mklNumThreads = "1"
 ompNumThreads = "1"
 testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
-mklNumThreads = "2"
-ompNumThreads = "2"
-testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
 
 system("echo '\t\t\t>>> C2H6 <<<\n'")
 prefix = "c2h6_indo"
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
-mklNumThreads = "2"
-ompNumThreads = "2"
 testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
 
 system("echo '---------------------------------------------------'")
@@ -143,17 +128,11 @@ prefix = "ch4_zindos_directCIS_singlet"
 mklNumThreads = "1"
 ompNumThreads = "1"
 testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
-mklNumThreads = "2"
-ompNumThreads = "2"
-testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
 
 system("echo '\t\t\t>>> C2H6 <<<\n'")
 prefix = "c2h6_zindos_directCIS_singlet"
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
-mklNumThreads = "2"
-ompNumThreads = "2"
 testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
 
 system("echo '\t\t\t>>> H2S <<<\n'")
@@ -161,17 +140,11 @@ prefix = "h2s_zindos_directCIS_singlet"
 mklNumThreads = "1"
 ompNumThreads = "1"
 testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
-mklNumThreads = "2"
-ompNumThreads = "2"
-testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
 
 system("echo '\t\t\t>>> H2O <<<\n'")
 prefix = "h2o_zindos_directCIS_singlet"
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
-mklNumThreads = "2"
-ompNumThreads = "2"
 testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
 
 system("echo '------------------------------------------------'")
@@ -183,26 +156,17 @@ prefix = "ch4_zindos_davidsonCIS_singlet"
 mklNumThreads = "1"
 ompNumThreads = "1"
 testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
-mklNumThreads = "2"
-ompNumThreads = "2"
-testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
 
 system("echo '\t\t\t>>> C2H6 <<<\n'")
 prefix = "c2h6_zindos_davidsonCIS_singlet"
 mklNumThreads = "1"
 ompNumThreads = "1"
 testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
-mklNumThreads = "2"
-ompNumThreads = "2"
-testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
 
 system("echo '\t\t\t>>> H2S <<<\n'")
 prefix = "h2s_zindos_davidsonCIS_singlet"
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
-mklNumThreads = "2"
-ompNumThreads = "2"
 testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
 
 system("echo '------------------------------------------------'")
@@ -213,9 +177,6 @@ prefix = "c2h6_zindos_force"
 mklNumThreads = "1"
 ompNumThreads = "1"
 testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
-mklNumThreads = "2"
-ompNumThreads = "2"
-testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
 
 system("echo '-------------------------------------------'")
 system("echo '----------   Test of MNDO/HF     ----------'")
@@ -225,17 +186,11 @@ prefix = "ch4_mndo"
 mklNumThreads = "1"
 ompNumThreads = "1"
 testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
-mklNumThreads = "2"
-ompNumThreads = "2"
-testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
 
 system("echo '\t\t\t>>> C2H6 <<<\n'")
 prefix = "c2h6_mndo"
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
-mklNumThreads = "2"
-ompNumThreads = "2"
 testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
 
 system("echo '---------------------------------------------------'")
@@ -247,17 +202,11 @@ prefix = "ch4_mndo_directCIS_singlet"
 mklNumThreads = "1"
 ompNumThreads = "1"
 testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
-mklNumThreads = "2"
-ompNumThreads = "2"
-testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
 
 system("echo '\t\t\t>>> C2H6 <<<\n'")
 prefix = "c2h6_mndo_directCIS_singlet"
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
-mklNumThreads = "2"
-ompNumThreads = "2"
 testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
 
 system("echo '---------------------------------------------------'")
@@ -269,17 +218,11 @@ prefix = "ch4_mndo_davidsonCIS_singlet"
 mklNumThreads = "1"
 ompNumThreads = "1"
 testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
-mklNumThreads = "2"
-ompNumThreads = "2"
-testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
 
 system("echo '\t\t\t>>> C2H6 <<<\n'")
 prefix = "c2h6_mndo_davidsonCIS_singlet"
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
-mklNumThreads = "2"
-ompNumThreads = "2"
 testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
 
 system("echo '------------------------------------------------'")
@@ -289,9 +232,6 @@ system("echo '\t\t\t>>> C2H6 <<<\n'")
 prefix = "c2h6_mndo_force"
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
-mklNumThreads = "2"
-ompNumThreads = "2"
 testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
 
 system("echo '---------------------------------------------------'")
@@ -303,9 +243,6 @@ prefix = "c2h6_mndo_directCIS_singlet_force"
 mklNumThreads = "1"
 ompNumThreads = "1"
 testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
-mklNumThreads = "2"
-ompNumThreads = "2"
-testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
 
 system("echo '---------------------------------------------------'")
 system("echo '----------  Test of MNDO/CIS-singlet-force --------'")
@@ -316,9 +253,6 @@ prefix = "c2h6_mndo_davidsonCIS_singlet_force"
 mklNumThreads = "1"
 ompNumThreads = "1"
 testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
-mklNumThreads = "2"
-ompNumThreads = "2"
-testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
 
 system("echo '-------------------------------------------'")
 system("echo '----------   Test of AM1/HF    ------------'")
@@ -328,17 +262,11 @@ prefix = "ch4_am1"
 mklNumThreads = "1"
 ompNumThreads = "1"
 testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
-mklNumThreads = "2"
-ompNumThreads = "2"
-testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
 
 system("echo '\t\t\t>>> C2H6 <<<\n'")
 prefix = "c2h6_am1"
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
-mklNumThreads = "2"
-ompNumThreads = "2"
 testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
 
 system("echo '---------------------------------------------------'")
@@ -350,17 +278,11 @@ prefix = "ch4_am1_directCIS_singlet"
 mklNumThreads = "1"
 ompNumThreads = "1"
 testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
-mklNumThreads = "2"
-ompNumThreads = "2"
-testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
 
 system("echo '\t\t\t>>> C2H6 <<<\n'")
 prefix = "c2h6_am1_directCIS_singlet"
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
-mklNumThreads = "2"
-ompNumThreads = "2"
 testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
 
 system("echo '---------------------------------------------------'")
@@ -372,17 +294,11 @@ prefix = "ch4_am1_davidsonCIS_singlet"
 mklNumThreads = "1"
 ompNumThreads = "1"
 testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
-mklNumThreads = "2"
-ompNumThreads = "2"
-testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
 
 system("echo '\t\t\t>>> C2H6 <<<\n'")
 prefix = "c2h6_am1_davidsonCIS_singlet"
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
-mklNumThreads = "2"
-ompNumThreads = "2"
 testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
 
 system("echo '------------------------------------------------'")
@@ -392,9 +308,6 @@ system("echo '\t\t\t>>> C2H6 <<<\n'")
 prefix = "c2h6_am1_force"
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
-mklNumThreads = "2"
-ompNumThreads = "2"
 testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
 
 system("echo '---------------------------------------------------'")
@@ -406,9 +319,6 @@ prefix = "c2h6_am1_directCIS_singlet_force"
 mklNumThreads = "1"
 ompNumThreads = "1"
 testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
-mklNumThreads = "2"
-ompNumThreads = "2"
-testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
 
 system("echo '---------------------------------------------------'")
 system("echo '----------  Test of AM1/CIS-singlet-force  --------'")
@@ -419,9 +329,6 @@ prefix = "c2h6_am1_davidsonCIS_singlet_force"
 mklNumThreads = "1"
 ompNumThreads = "1"
 testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
-mklNumThreads = "2"
-ompNumThreads = "2"
-testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
 
 system("echo '-------------------------------------------'")
 system("echo '----------   Test of PM3/HF    ------------'")
@@ -431,17 +338,11 @@ prefix = "ch4_pm3"
 mklNumThreads = "1"
 ompNumThreads = "1"
 testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
-mklNumThreads = "2"
-ompNumThreads = "2"
-testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
 
 system("echo '\t\t\t>>> C2H6 <<<\n'")
 prefix = "c2h6_pm3"
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
-mklNumThreads = "2"
-ompNumThreads = "2"
 testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
 
 system("echo '---------------------------------------------------'")
@@ -453,17 +354,11 @@ prefix = "ch4_pm3_directCIS_singlet"
 mklNumThreads = "1"
 ompNumThreads = "1"
 testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
-mklNumThreads = "2"
-ompNumThreads = "2"
-testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
 
 system("echo '\t\t\t>>> C2H6 <<<\n'")
 prefix = "c2h6_pm3_directCIS_singlet"
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
-mklNumThreads = "2"
-ompNumThreads = "2"
 testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
 
 system("echo '---------------------------------------------------'")
@@ -475,17 +370,11 @@ prefix = "ch4_pm3_davidsonCIS_singlet"
 mklNumThreads = "1"
 ompNumThreads = "1"
 testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
-mklNumThreads = "2"
-ompNumThreads = "2"
-testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
 
 system("echo '\t\t\t>>> C2H6 <<<\n'")
 prefix = "c2h6_pm3_davidsonCIS_singlet"
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
-mklNumThreads = "2"
-ompNumThreads = "2"
 testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
 
 system("echo '------------------------------------------------'")
@@ -495,9 +384,6 @@ system("echo '\t\t\t>>> C2H6 <<<\n'")
 prefix = "c2h6_pm3_force"
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
-mklNumThreads = "2"
-ompNumThreads = "2"
 testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
 
 system("echo '---------------------------------------------------'")
@@ -509,9 +395,6 @@ prefix = "c2h6_pm3_directCIS_singlet_force"
 mklNumThreads = "1"
 ompNumThreads = "1"
 testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
-mklNumThreads = "2"
-ompNumThreads = "2"
-testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
 
 system("echo '---------------------------------------------------'")
 system("echo '----------  Test of PM3/CIS-singlet-force  --------'")
@@ -522,9 +405,6 @@ prefix = "c2h6_pm3_davidsonCIS_singlet_force"
 mklNumThreads = "1"
 ompNumThreads = "1"
 testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
-mklNumThreads = "2"
-ompNumThreads = "2"
-testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
 
 system("echo '-------------------------------------------'")
 system("echo '---------- Test of PM3/PDDG/HF ------------'")
@@ -533,9 +413,6 @@ system("echo '\t\t\t>>> C2H6 <<<\n'")
 prefix = "c2h6_pm3pddg"
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
-mklNumThreads = "2"
-ompNumThreads = "2"
 testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
 
 system("echo '---------------------------------------------------'")
@@ -547,9 +424,6 @@ prefix = "c2h6_pm3pddg_directCIS_singlet"
 mklNumThreads = "1"
 ompNumThreads = "1"
 testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
-mklNumThreads = "2"
-ompNumThreads = "2"
-testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
 
 system("echo '---------------------------------------------------'")
 system("echo '----------  Test of PM3/PDDG/CIS-singlet  ---------'")
@@ -560,9 +434,6 @@ prefix = "c2h6_pm3pddg_davidsonCIS_singlet"
 mklNumThreads = "1"
 ompNumThreads = "1"
 testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
-mklNumThreads = "2"
-ompNumThreads = "2"
-testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
 
 system("echo '------------------------------------------------'")
 system("echo '----------  Test of PM3/PDDG/HF-Force  ---------'")
@@ -571,9 +442,6 @@ system("echo '\t\t\t>>> C2H6 <<<\n'")
 prefix = "c2h6_pm3pddg_force"
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
-mklNumThreads = "2"
-ompNumThreads = "2"
 testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
 
 system("echo '---------------------------------------------------'")
@@ -585,9 +453,6 @@ prefix = "c2h6_pm3pddg_directCIS_singlet_force"
 mklNumThreads = "1"
 ompNumThreads = "1"
 testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
-mklNumThreads = "2"
-ompNumThreads = "2"
-testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
 
 system("echo '---------------------------------------------------'")
 system("echo '---------  Test of PM3/PDDG/CIS-singlet-force  ----'")
@@ -598,9 +463,6 @@ prefix = "c2h6_pm3pddg_davidsonCIS_singlet_force"
 mklNumThreads = "1"
 ompNumThreads = "1"
 testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
-mklNumThreads = "2"
-ompNumThreads = "2"
-testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
 
 system("echo '------------------------------------------------'")
 system("echo '------  Test of PM3/PDDG/Steepest Descent ------'")
@@ -610,9 +472,6 @@ prefix = "c2h6_pm3pddg_opt_steepest"
 mklNumThreads = "1"
 ompNumThreads = "1"
 testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
-mklNumThreads = "2"
-ompNumThreads = "2"
-testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
 
 system("echo '---------------------------------------------------'")
 system("echo '---------  Test of PM3/HF-MC  ---------------------'")
@@ -621,9 +480,6 @@ system("echo '\t\t\t>>> C2H6 <<<\n'")
 prefix = "c2h6_pm3_MC"
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
-mklNumThreads = "2"
-ompNumThreads = "2"
 testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
 
 system("echo '---------------------------------------------------'")
@@ -635,9 +491,6 @@ prefix = "c2h6_pm3_directCIS_singlet_MC"
 mklNumThreads = "1"
 ompNumThreads = "1"
 testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
-mklNumThreads = "2"
-ompNumThreads = "2"
-testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
 
 system("echo '------------------------------------------------'")
 system("echo '----------  Test of PM3/PDDG/RPMD  -------------'")
@@ -646,9 +499,6 @@ system("echo '\t\t\t>>> C2H6 <<<\n'")
 prefix = "c2h6_pm3pddg_rpmd"
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
-mklNumThreads = "2"
-ompNumThreads = "2"
 testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
 
 system("echo '---------------------------------------------------'")
@@ -660,9 +510,6 @@ prefix = "c2h6_pm3pddg_davidsonCIS_singlet_rpmd"
 mklNumThreads = "1"
 ompNumThreads = "1"
 testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
-mklNumThreads = "2"
-ompNumThreads = "2"
-testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
 
 system("echo '---------------------------------------------------'")
 system("echo '------  Test of vdw correction in PM3/HF  ---------'")
@@ -672,9 +519,6 @@ prefix = "c2h6_pm3_vdw"
 mklNumThreads = "1"
 ompNumThreads = "1"
 testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
-mklNumThreads = "2"
-ompNumThreads = "2"
-testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
 system("echo '---------------------------------------------------'")
 system("echo '----  Test of vdw correction in PM3/HF-Force  -----'")
 system("echo '---------------------------------------------------\n'")
@@ -682,9 +526,6 @@ system("echo '\t\t\t>>> C2H6 <<<\n'")
 prefix = "c2h6_pm3_vdw_force"
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
-mklNumThreads = "2"
-ompNumThreads = "2"
 testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
 system("echo '---------------------------------------------------'")
 system("echo '------  Test of vdw correction in PM3/HF-MC  ------'")
@@ -694,9 +535,6 @@ prefix = "c2h6_pm3_vdw_MC"
 mklNumThreads = "1"
 ompNumThreads = "1"
 testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
-mklNumThreads = "2"
-ompNumThreads = "2"
-testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
 
 system("echo '---------------------------------------------------'")
 system("echo '-----------  Test of limitation of Heap  ----------'")
@@ -705,9 +543,6 @@ system("echo '\t\t\t>>> C2H6 <<<\n'")
 prefix = "c2h6_mndo_directCIS_singlet_force_heap_limit"
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
-mklNumThreads = "2"
-ompNumThreads = "2"
 testerOmp.doesTestOmp(prefix, mklNumThreads,ompNumThreads)
 
 

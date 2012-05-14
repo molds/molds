@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/5/11(Fri.) 23:52:28  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/5/14(Mon.) 15:40:35  <<<<<
 
 
 **********  START: Parse input  **********
@@ -74,13 +74,13 @@ h | 1.004043 | -0.188679 | 0.000000 | h | 1.004062 | 1.324529 | 0.873652 | h | 1
 
 **********  START: ZINDO/S-SCF  **********
 SCF iter=0: RMS density=4.000000000000001
-SCF iter=1: RMS density=3.097217959517268
+SCF iter=1: RMS density=3.097217959517267
 SCF iter=2: RMS density=0.566569862085651
 SCF iter=3: RMS density=0.100842032032174
 SCF iter=4: RMS density=0.018517626285132
-SCF iter=5: RMS density=0.003277687282699
+SCF iter=5: RMS density=0.003277687282698
 SCF iter=6: RMS density=0.000006005767753
-SCF iter=7: RMS density=0.000000025983611
+SCF iter=7: RMS density=0.000000025983597
 
 
 
@@ -108,17 +108,17 @@ SCF iter=7: RMS density=0.000000025983611
 
 	Total Dipole moment:
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
-		-2.671237e-05	-3.257342e-05	1.799776e-16	4.212575e-05
+		-2.671237e-05	-3.257342e-05	2.016399e-15	4.212575e-05
 
 		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
-		-6.789610e-05	-8.279338e-05	4.574574e-16	1.070730e-04
+		-6.789610e-05	-8.279338e-05	5.125177e-15	1.070730e-04
 
 	Electronic Dipole moment:
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
-		-2.671237e-05	-3.163328e-05	1.799776e-16	4.140308e-05
+		-2.671237e-05	-3.163328e-05	2.016399e-15	4.140308e-05
 
 		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
-		-6.789610e-05	-8.040379e-05	4.574574e-16	1.052362e-04
+		-6.789610e-05	-8.040379e-05	5.125177e-15	1.052362e-04
 
 	Core Dipole moment:
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
@@ -135,13 +135,13 @@ SCF iter=7: RMS density=0.000000025983611
 		3	H	1.000000e+00	2.223536e-02
 		4	H	1.000000e+00	2.223536e-02
 
-	Elapsed time(omp) for the SCF = 0.009442[s].
+	Elapsed time(omp) for the SCF = 0.021233[s].
 **********  DONE: ZINDO/S-SCF  **********
 
 
 **********  START: ZINDO/S-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.001112[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.001451[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -164,10 +164,10 @@ SCF iter=7: RMS density=0.000000025983611
 	  4-th excited: norm of the residual = 4.897692e-03
 
 	Davidson iter=3
-	  1-th excited: norm of the residual = 4.717254e-10
-	  2-th excited: norm of the residual = 4.070368e-10
-	  3-th excited: norm of the residual = 2.110191e-14
-	  4-th excited: norm of the residual = 3.928526e-10
+	  1-th excited: norm of the residual = 8.178435e-09
+	  2-th excited: norm of the residual = 2.570607e-09
+	  3-th excited: norm of the residual = 7.748384e-12
+	  4-th excited: norm of the residual = 4.231799e-08
 
 
 
@@ -182,10 +182,10 @@ SCF iter=7: RMS density=0.000000025983611
 		 1	5.274566e-01	1.435294e+01	9.485688e-01 (3 -> 4)	
 		 2	5.274567e-01	1.435294e+01	9.485687e-01 (2 -> 4)	
 		 3	5.274569e-01	1.435295e+01	9.761774e-01 (1 -> 4)	
-		 4	5.898275e-01	1.605015e+01	6.764243e-01 (3 -> 7)	
+		 4	5.898275e-01	1.605015e+01	-6.449460e-01 (3 -> 7)	
 
 
-	Elapsed time(omp) for the CIS = 0.002541[s].
+	Elapsed time(omp) for the CIS = 0.003493[s].
 **********  DONE: ZINDO/S-CIS  **********
 
 
@@ -195,9 +195,9 @@ SCF iter=7: RMS density=0.000000025983611
 
 
      >>>>>  The MolDS finished normally!  <<<<<
-     >>>>>  CPU time: 0.01[s].  <<<<<
+     >>>>>  CPU time: 0.02[s].  <<<<<
      >>>>>  Elapsed time: 0[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 0.013062[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 0.0284071[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/5/11(Fri.) 23:52:50  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/5/14(Mon.) 15:41:4  <<<<<
 
 
 **********  START: Parse input  **********
@@ -61,17 +61,17 @@ geometry_end |
 
 
 **********  START: AM1-SCF  **********
-SCF iter=0: RMS density=4.000000000000000
+SCF iter=0: RMS density=3.999999999999999
 SCF iter=1: RMS density=1.697713561546780
 SCF iter=2: RMS density=0.860600720346228
 SCF iter=3: RMS density=0.427636051427985
-SCF iter=4: RMS density=0.212526145245565
-SCF iter=5: RMS density=0.105650646144011
-SCF iter=6: RMS density=0.000938957121280
-SCF iter=7: RMS density=0.000217809765836
-SCF iter=8: RMS density=0.000041259419951
-SCF iter=9: RMS density=0.000009909392662
-SCF iter=10: RMS density=0.000000031136173
+SCF iter=4: RMS density=0.212526145245564
+SCF iter=5: RMS density=0.105650646144012
+SCF iter=6: RMS density=0.000938957121731
+SCF iter=7: RMS density=0.000217809915957
+SCF iter=8: RMS density=0.000041259408029
+SCF iter=9: RMS density=0.000009909396067
+SCF iter=10: RMS density=0.000000031135079
 
 
 
@@ -99,17 +99,17 @@ SCF iter=10: RMS density=0.000000031136173
 
 	Total Dipole moment:
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
-		7.249513e-06	-6.298153e-05	1.446759e-15	6.339739e-05
+		7.249513e-06	-6.298153e-05	1.782428e-15	6.339739e-05
 
 		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
-		1.842643e-05	-1.600831e-04	3.677296e-15	1.611401e-04
+		1.842643e-05	-1.600831e-04	4.530482e-15	1.611401e-04
 
 	Electronic Dipole moment:
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
-		7.155499e-06	-6.257727e-05	1.446759e-15	6.298505e-05
+		7.155499e-06	-6.257727e-05	1.782428e-15	6.298505e-05
 
 		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
-		1.818747e-05	-1.590556e-04	3.677296e-15	1.600920e-04
+		1.818747e-05	-1.590556e-04	4.530482e-15	1.600920e-04
 
 	Core Dipole moment:
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
@@ -126,7 +126,7 @@ SCF iter=10: RMS density=0.000000031136173
 		3	H	1.000000e+00	6.455696e-02
 		4	H	1.000000e+00	6.455695e-02
 
-	Elapsed time(omp) for the SCF = 0.024739[s].
+	Elapsed time(omp) for the SCF = 0.026397[s].
 **********  DONE: AM1-SCF  **********
 
 
@@ -138,7 +138,7 @@ SCF iter=10: RMS density=0.000000031136173
      >>>>>  The MolDS finished normally!  <<<<<
      >>>>>  CPU time: 0.02[s].  <<<<<
      >>>>>  Elapsed time: 0[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 0.0259831[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 0.03001[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

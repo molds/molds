@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/5/11(Fri.) 23:53:32  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/5/14(Mon.) 15:41:59  <<<<<
 
 
 **********  START: Parse input  **********
@@ -77,19 +77,19 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 
 
 **********  START: PM3/PDDG-SCF  **********
-SCF iter=0: RMS density=5.291502622129180
-SCF iter=1: RMS density=1.862872189503767
-SCF iter=2: RMS density=0.993239189796953
+SCF iter=0: RMS density=5.291502622129182
+SCF iter=1: RMS density=1.862872189503770
+SCF iter=2: RMS density=0.993239189796954
 SCF iter=3: RMS density=0.533349207055902
 SCF iter=4: RMS density=0.285488533225345
 SCF iter=5: RMS density=0.152407528472138
-SCF iter=6: RMS density=0.000620521117899
-SCF iter=7: RMS density=0.000181786594206
-SCF iter=8: RMS density=0.000057887199666
-SCF iter=9: RMS density=0.000021427661569
-SCF iter=10: RMS density=0.000003665762871
-SCF iter=11: RMS density=0.000001692271511
-SCF iter=12: RMS density=0.000000190761141
+SCF iter=6: RMS density=0.000620521117905
+SCF iter=7: RMS density=0.000181786594263
+SCF iter=8: RMS density=0.000057887199688
+SCF iter=9: RMS density=0.000021427661561
+SCF iter=10: RMS density=0.000003665762839
+SCF iter=11: RMS density=0.000001692271513
+SCF iter=12: RMS density=0.000000190761143
 
 
 
@@ -153,13 +153,13 @@ SCF iter=12: RMS density=0.000000190761141
 		6	H	1.000000e+00	8.849413e-02
 		7	H	1.000000e+00	9.338598e-02
 
-	Elapsed time(omp) for the SCF = 0.050438[s].
+	Elapsed time(omp) for the SCF = 0.067896[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.039390[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.056020[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Direct-CIS  =====
@@ -220,7 +220,7 @@ SCF iter=12: RMS density=0.000000190761141
 		 49	1.223486e+00	3.329300e+01	9.936152e-01 (0 -> 13)	
 
 
-	Elapsed time(omp) for the CIS = 0.042671[s].
+	Elapsed time(omp) for the CIS = 0.060614[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
@@ -230,9 +230,9 @@ SCF iter=12: RMS density=0.000000190761141
 
 
      >>>>>  The MolDS finished normally!  <<<<<
-     >>>>>  CPU time: 0.09[s].  <<<<<
+     >>>>>  CPU time: 0.13[s].  <<<<<
      >>>>>  Elapsed time: 0[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 0.0949159[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 0.133424[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

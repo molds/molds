@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/5/11(Fri.) 23:52:28  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/5/14(Mon.) 15:40:34  <<<<<
 
 
 **********  START: Parse input  **********
@@ -61,13 +61,13 @@ geometry_end |
 
 
 **********  START: INDO-SCF  **********
-SCF iter=0: RMS density=3.999999999999998
+SCF iter=0: RMS density=3.999999999999999
 SCF iter=1: RMS density=0.077879476059234
-SCF iter=2: RMS density=0.021116870665141
-SCF iter=3: RMS density=0.005781271445062
-SCF iter=4: RMS density=0.001592992793299
-SCF iter=5: RMS density=0.000440848160891
-SCF iter=6: RMS density=0.000000002697898
+SCF iter=2: RMS density=0.021116870665142
+SCF iter=3: RMS density=0.005781271445061
+SCF iter=4: RMS density=0.001592992793298
+SCF iter=5: RMS density=0.000440848160890
+SCF iter=6: RMS density=0.000000002698422
 
 
 
@@ -95,17 +95,17 @@ SCF iter=6: RMS density=0.000000002697898
 
 	Total Dipole moment:
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
-		-2.615793e-05	-3.261703e-05	1.695692e-15	4.181038e-05
+		-2.615793e-05	-3.261703e-05	-5.837344e-16	4.181038e-05
 
 		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
-		-6.648683e-05	-8.290425e-05	4.310021e-15	1.062714e-04
+		-6.648683e-05	-8.290425e-05	-1.483705e-15	1.062714e-04
 
 	Electronic Dipole moment:
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
-		-2.625194e-05	-3.220337e-05	1.695692e-15	4.154782e-05
+		-2.625194e-05	-3.220337e-05	-5.837344e-16	4.154782e-05
 
 		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
-		-6.672579e-05	-8.185283e-05	4.310021e-15	1.056041e-04
+		-6.672579e-05	-8.185283e-05	-1.483705e-15	1.056041e-04
 
 	Core Dipole moment:
 		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
@@ -122,7 +122,7 @@ SCF iter=6: RMS density=0.000000002697898
 		3	H	1.000000e+00	-8.458949e-03
 		4	H	1.000000e+00	-8.458952e-03
 
-	Elapsed time(omp) for the SCF = 0.013767[s].
+	Elapsed time(omp) for the SCF = 0.021497[s].
 **********  DONE: INDO-SCF  **********
 
 
@@ -132,9 +132,9 @@ SCF iter=6: RMS density=0.000000002697898
 
 
      >>>>>  The MolDS finished normally!  <<<<<
-     >>>>>  CPU time: 0.01[s].  <<<<<
-     >>>>>  Elapsed time: 0[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 0.0147209[s].  <<<<<
+     >>>>>  CPU time: 0.02[s].  <<<<<
+     >>>>>  Elapsed time: 1[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 0.0248249[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 
