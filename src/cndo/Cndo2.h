@@ -61,6 +61,7 @@ protected:
    std::string errorMessageGetElectronicEnergyEnergyNotCalculated;
    std::string errorMessageGetElectronicEnergyNumberCISStates;
    std::string errorMessageGetElectronicEnergySetElecState;
+   std::string errorMessageGetElectronicTransitionDipoleMomentBadState;
    std::string messageSCFMetConvergence;
    std::string messageStartSCF;
    std::string messageDoneSCF;
@@ -89,6 +90,13 @@ protected:
    virtual void SetEnableAtomTypes();
    virtual void CalcSCFProperties();
    virtual void CalcCISProperties();
+   virtual double GetElectronicTransitionDipoleMoment(int from, int to, MolDS_base::CartesianType axis,
+                                                      double const* const* fockMatrix,
+                                                      double const* const* matrixCIS,
+                                                      double const* const* const* cartesianMatrix,
+                                                      const MolDS_base::Molecule& molecule, 
+                                                      double const* const* orbitalElectronPopulation,
+                                                      double const* const* overlap) const;
    double GetBondingAdjustParameterK(MolDS_base::ShellType shellA, 
                                      MolDS_base::ShellType shellB) const;
    virtual double GetDiatomCoreRepulsionEnergy(int indexAtomA, int indexAtomB) const;
@@ -186,6 +194,8 @@ private:
    std::string errorMessageRotDiaOverlapToSpaceFrameNullDiaMatrix;
    std::string errorMessageRotDiaOverlapToSpaceFrameNullRotMatrix;
    std::string errorMessageSetOverlapElementNullDiaMatrix;
+   std::string errorMessageFromState;
+   std::string errorMessageToState;
    std::string messageIterSCF;
    std::string messageDensityRMS;
    std::string messageEnergiesMOs;
@@ -233,6 +243,11 @@ private:
    void OutputSCFMulliken() const;
    void CalcCoreRepulsionEnergy();
    void CalcVdWCorrectionEnergy();
+   void CalcElectronicDipoleMomentGroundState(double*** electronicDipoleMoments,
+                                              double const* const* const* cartesianMatrix,
+                                              const MolDS_base::Molecule& molecule, 
+                                              double const* const* orbitalElectronPopulation,
+                                              double const* const* overlap) const;
    bool SatisfyConvergenceCriterion(double const* const* oldOrbitalElectronPopulation, 
                                     double const* const* orbitalElectronPopulation,
                                     int numberAOs, 
@@ -249,10 +264,6 @@ private:
                                      const MolDS_base::Molecule& molecule) const;
    void CalcCoreDipoleMoment(double* coreDipoleMoment,
                        const MolDS_base::Molecule& molecule) const;
-   void CalcElectronicDipoleMomentsGroundState(double*** electronicDipoleMoments,
-                                               double const* const* const* cartesianMatrix,
-                                               const MolDS_base::Molecule& molecule, 
-                                               double const* const* orbitalElectronPopulation) const;
    void CalcCartesianMatrixByGTOExpansion(double*** cartesianMatrix,
                                           const MolDS_base::Molecule& molecule, 
                                           MolDS_base::STOnGType stonG) const; 

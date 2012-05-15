@@ -163,6 +163,10 @@ void Cndo2::SetMessages(){
       = "Error in cndo::Cndo2::RotateDiatmicOverlapToSpaceFrame: rotatingMatrix is NULL.\n";
    this->errorMessageSetOverlapElementNullDiaMatrix 
       = "Error in cndo::Cndo2::SetOverlapElement: diatomicOverlap is NULL.\n";
+   this->errorMessageGetElectronicTransitionDipoleMomentBadState
+      = "Error in cndo::Cndo2::GetElectronicTransitionDipoleMoment: Bad eigen state is set. In SCF module, the transition dipole moment of only between ground states can be calculated. Note taht state=0 means the ground state and other state = i means the i-th excited state in below.\n";
+   this->errorMessageFromState = "\tfrom state = ";
+   this->errorMessageToState = "\tto state = ";
    this->messageSCFMetConvergence = "\n\n\n\t\tCNDO/2-SCF met convergence criterion(^^b\n\n\n";
    this->messageStartSCF = "**********  START: CNDO/2-SCF  **********\n";
    this->messageDoneSCF = "**********  DONE: CNDO/2-SCF  **********\n\n\n";
@@ -525,10 +529,11 @@ void Cndo2::CalcSCFProperties(){
                           this->coreRepulsionEnergy,
                           this->vdWCorrectionEnergy);
    this->CalcCoreDipoleMoment(this->coreDipoleMoment, *this->molecule);
-   this->CalcElectronicDipoleMomentsGroundState(this->electronicDipoleMoments, 
-                                                this->cartesianMatrix,
-                                                *this->molecule, 
-                                                this->orbitalElectronPopulation);
+   this->CalcElectronicDipoleMomentGroundState(this->electronicDipoleMoments, 
+                                               this->cartesianMatrix,
+                                               *this->molecule, 
+                                               this->orbitalElectronPopulation,
+                                               this->overlap);
 }
 
 double Cndo2::GetBondingAdjustParameterK(ShellType shellA, ShellType shellB) const{
@@ -1464,24 +1469,26 @@ void Cndo2::CalcCoreDipoleMoment(double* coreDipoleMoment,
    }
 }
 
-void Cndo2::CalcElectronicDipoleMomentsGroundState(double*** electronicDipoleMoments,
-                                                   double const* const* const* cartesianMatrix,
-                                                   const Molecule& molecule,
-                                                   double const* const* orbitalElectronPopulation) const{
+void Cndo2::CalcElectronicDipoleMomentGroundState(double*** electronicDipoleMoments,
+                                                  double const* const* const* cartesianMatrix,
+                                                  const Molecule& molecule,
+                                                  double const* const* orbitalElectronPopulation,
+                                                  double const* const* overlap) const{
    int groundState = 0;
-   int totalAONumber = molecule.GetTotalNumberAOs();
    stringstream ompErrors;
    #pragma omp parallel for schedule(auto) 
-   for(int i=0; i<CartesianType_end; i++){
+   for(int axis=0; axis<CartesianType_end; axis++){
       try{
-         electronicDipoleMoments[groundState][groundState][i] = 0.0;
-         for(int mu=0; mu<totalAONumber; mu++){
-            for(int nu=0; nu<totalAONumber; nu++){
-               electronicDipoleMoments[groundState][groundState][i] 
-                  -= orbitalElectronPopulation[mu][nu]
-                    *(cartesianMatrix[mu][nu][i]-molecule.GetXyzCOC()[i]*this->overlap[mu][nu]);
-            }
-         }
+         electronicDipoleMoments[groundState][groundState][axis] = this->GetElectronicTransitionDipoleMoment(
+                                                                         groundState,
+                                                                         groundState,
+                                                                         static_cast<CartesianType>(axis),
+                                                                         NULL,
+                                                                         NULL,
+                                                                         cartesianMatrix,
+                                                                         molecule,
+                                                                         orbitalElectronPopulation,
+                                                                         overlap);
       }
       catch(MolDSException ex){
          #pragma omp critical
@@ -1492,6 +1499,35 @@ void Cndo2::CalcElectronicDipoleMomentsGroundState(double*** electronicDipoleMom
    if(!ompErrors.str().empty()){
       throw MolDSException(ompErrors.str());
    }
+}
+
+double Cndo2::GetElectronicTransitionDipoleMoment(int from, int to, CartesianType axis,
+                                                  double const* const* fockMatrix,
+                                                  double const* const* matrixCIS,
+                                                  double const* const* const* cartesianMatrix,
+                                                  const MolDS_base::Molecule& molecule, 
+                                                  double const* const* orbitalElectronPopulation,
+                                                  double const* const* overlap) const{
+   double value = 0.0;
+   int groundState = 0;
+   if(from == groundState && to == groundState){
+      int totalAONumber = molecule.GetTotalNumberAOs();
+      for(int mu=0; mu<totalAONumber; mu++){
+         for(int nu=0; nu<totalAONumber; nu++){
+            value -= orbitalElectronPopulation[mu][nu]
+                    *(cartesianMatrix[mu][nu][axis]-molecule.GetXyzCOC()[axis]*overlap[mu][nu]);
+         }
+      }
+   }
+   else{
+      stringstream ss;
+      ss << this->errorMessageGetElectronicTransitionDipoleMomentBadState;
+      ss << this->errorMessageFromState << from << endl;
+      ss << this->errorMessageToState << to << endl;
+      ss << this->errorMessageCartesianType << CartesianTypeStr(axis) << endl;
+      throw MolDSException(ss.str());
+   }
+   return value;
 }
 
 // calculate Cartesian matrix between atomic orbitals. 
