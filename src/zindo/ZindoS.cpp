@@ -820,52 +820,24 @@ void ZindoS::DoCIS(){
 }
 
 void ZindoS::CalcCISProperties(){
-   int groundState = 0;
-   int excitedState = 0;
 
-   // transition dipole moments from ground state to excited states
-   for(int k=0; k<this->matrixCISdimension; k++){
-      int excitedState = k+1; // (k+1)-th excited state
-      for(int i=0; i<CartesianType_end; i++){
-         this->electronicDipoleMoments[excitedState][groundState][i] = 0.0;
-         for(int l=0; l<this->matrixCISdimension; l++){
-            double temp = 0.0;
-            // single excitation from I-th (occupied)MO to A-th (virtual)MO
-            int moI = this->GetActiveOccIndex(*this->molecule, l);
-            int moA = this->GetActiveVirIndex(*this->molecule, l);
-            for(int mu=0; mu<this->molecule->GetTotalNumberAOs(); mu++){
-               for(int nu=0; nu<this->molecule->GetTotalNumberAOs(); nu++){
-                  temp += this->fockMatrix[moA][mu]
-                          *(this->cartesianMatrix[mu][nu][i] - this->molecule->GetXyzCOC()[i]*this->overlap[mu][nu])
-                          *this->fockMatrix[moI][nu];
-               }
-            }
-            this->electronicDipoleMoments[excitedState][groundState][i] += this->matrixCIS[k][l]*sqrt(2.0)*temp;
-         }
-      }
-   }
-
-   // transition dipole moments from excited states to ground state
-   for(int k=0; k<this->matrixCISdimension; k++){
-      int excitedState = k+1; // (k+1)-th excited state
-      for(int i=0; i<CartesianType_end; i++){
-         this->electronicDipoleMoments[groundState][excitedState][i] = 0.0;
-         for(int l=0; l<this->matrixCISdimension; l++){
-            double temp = 0.0;
-            // single excitation from I-th (occupied)MO to A-th (virtual)MO
-            int moI = this->GetActiveOccIndex(*this->molecule, l);
-            int moA = this->GetActiveVirIndex(*this->molecule, l);
-            for(int mu=0; mu<this->molecule->GetTotalNumberAOs(); mu++){
-               for(int nu=0; nu<this->molecule->GetTotalNumberAOs(); nu++){
-                  temp += this->fockMatrix[moI][mu]
-                          *(this->cartesianMatrix[mu][nu][i] - this->molecule->GetXyzCOC()[i]*this->overlap[mu][nu])
-                          *this->fockMatrix[moA][nu];
-               }
-            }
-            this->electronicDipoleMoments[groundState][excitedState][i] += this->matrixCIS[k][l]*sqrt(2.0)*temp;
-         }
-      }
-   }
+   // dipole moments of excited states
+   this->CalcElectronicDipoleMomentsExcitedState(this->electronicTransitionDipoleMoments,
+                                                 this->fockMatrix,
+                                                 this->matrixCIS,
+                                                 this->cartesianMatrix,
+                                                 *this->molecule, 
+                                                 this->orbitalElectronPopulation,
+                                                 this->overlap);
+   
+   // transition dipole moment
+   this->CalcElectronicTransitionDipoleMoments(this->electronicTransitionDipoleMoments,
+                                               this->fockMatrix,
+                                               this->matrixCIS,
+                                               this->cartesianMatrix,
+                                               *this->molecule, 
+                                               this->orbitalElectronPopulation,
+                                               this->overlap);
 
 
    // free exciton energies
@@ -874,6 +846,210 @@ void ZindoS::CalcCISProperties(){
                                  this->energiesMO, 
                                  this->matrixCIS,
                                  this->matrixCISdimension);
+}
+
+void ZindoS::CalcElectronicDipoleMomentsExcitedState(double*** electronicTransitionDipoleMoments,
+                                                     double const* const* fockMatrix,
+                                                     double const* const* matrixCIS,
+                                                     double const* const* const* cartesianMatrix,
+                                                     const MolDS_base::Molecule& molecule, 
+                                                     double const* const* orbitalElectronPopulation,
+                                                     double const* const* overlap) const{
+   int groundState = 0;
+   // dipole moment of excited states
+   for(int k=0; k<Parameters::GetInstance()->GetNumberExcitedStatesCIS(); k++){
+      int excitedState = k+1; // (k+1)-th excited state
+      for(int axis=0; axis<CartesianType_end; axis++){
+         electronicTransitionDipoleMoments[excitedState][excitedState][axis] = this->GetElectronicTransitionDipoleMoment(
+                                                                                     excitedState,
+                                                                                     excitedState,
+                                                                                     static_cast<CartesianType>(axis),
+                                                                                     fockMatrix,
+                                                                                     matrixCIS,
+                                                                                     cartesianMatrix,
+                                                                                     molecule,
+                                                                                     orbitalElectronPopulation,
+                                                                                     overlap,
+                                                                                     electronicTransitionDipoleMoments[groundState][groundState]);
+      }
+   }
+}
+
+void ZindoS::CalcElectronicTransitionDipoleMoments(double*** electronicTransitionDipoleMoments,
+                                                   double const* const* fockMatrix,
+                                                   double const* const* matrixCIS,
+                                                   double const* const* const* cartesianMatrix,
+                                                   const MolDS_base::Molecule& molecule, 
+                                                   double const* const* orbitalElectronPopulation,
+                                                   double const* const* overlap) const{
+   int groundState = 0;
+   // transition dipole moments between excited states
+   for(int k=0; k<Parameters::GetInstance()->GetNumberExcitedStatesCIS(); k++){
+      int departureExcitedState = k+1; // (k+1)-th excited state
+      for(int l=0; l<Parameters::GetInstance()->GetNumberExcitedStatesCIS(); l++){
+         if(k != l){
+            int destinationExcitedState = l+1; // (l+1)-th excited state
+            for(int axis=0; axis<CartesianType_end; axis++){
+               this->electronicTransitionDipoleMoments[destinationExcitedState][departureExcitedState][axis] 
+                  = this->GetElectronicTransitionDipoleMoment(destinationExcitedState,
+                                                              departureExcitedState,
+                                                              static_cast<CartesianType>(axis),
+                                                              this->fockMatrix,
+                                                              this->matrixCIS,
+                                                              this->cartesianMatrix,
+                                                              *this->molecule,
+                                                              this->orbitalElectronPopulation,
+                                                              this->overlap,
+                                                              this->electronicTransitionDipoleMoments[groundState][groundState]);
+            }
+         }
+      }
+   }
+
+   // transition dipole moments from ground state to excited states
+   for(int k=0; k<Parameters::GetInstance()->GetNumberExcitedStatesCIS(); k++){
+      int excitedState = k+1; // (k+1)-th excited state
+      for(int axis=0; axis<CartesianType_end; axis++){
+         this->electronicTransitionDipoleMoments[excitedState][groundState][axis] = this->GetElectronicTransitionDipoleMoment(
+                                                                                          excitedState,
+                                                                                          groundState,
+                                                                                          static_cast<CartesianType>(axis),
+                                                                                          this->fockMatrix,
+                                                                                          this->matrixCIS,
+                                                                                          this->cartesianMatrix,
+                                                                                          *this->molecule,
+                                                                                          this->orbitalElectronPopulation,
+                                                                                          this->overlap,
+                                                                                          this->electronicTransitionDipoleMoments[groundState][groundState]);
+      }
+   }
+
+   // transition dipole moments from excited states to ground state
+   for(int k=0; k<Parameters::GetInstance()->GetNumberExcitedStatesCIS(); k++){
+      int excitedState = k+1; // (k+1)-th excited state
+      for(int axis=0; axis<CartesianType_end; axis++){
+         this->electronicTransitionDipoleMoments[groundState][excitedState][axis] = this->GetElectronicTransitionDipoleMoment(
+                                                                                          groundState,
+                                                                                          excitedState,
+                                                                                          static_cast<CartesianType>(axis),
+                                                                                          this->fockMatrix,
+                                                                                          this->matrixCIS,
+                                                                                          this->cartesianMatrix,
+                                                                                          *this->molecule,
+                                                                                          this->orbitalElectronPopulation,
+                                                                                          this->overlap,
+                                                                                          this->electronicTransitionDipoleMoments[groundState][groundState]);
+      }
+   }
+
+
+}
+
+double ZindoS::GetElectronicTransitionDipoleMoment(int to, int from, CartesianType axis,
+                                                   double const* const* fockMatrix,
+                                                   double const* const* matrixCIS,
+                                                   double const* const* const* cartesianMatrix,
+                                                   const MolDS_base::Molecule& molecule, 
+                                                   double const* const* orbitalElectronPopulation,
+                                                   double const* const* overlap,
+                                                   double const* groundStateDipole) const{
+   double value = 0.0;
+   int groundState = 0;
+
+   if(Parameters::GetInstance()->GetNumberExcitedStatesCIS() < from ||
+      Parameters::GetInstance()->GetNumberExcitedStatesCIS() < to ){
+      stringstream ss;
+      ss << this->errorMessageGetElectronicTransitionDipoleMomentBadState;
+      ss << this->errorMessageFromState << from << endl;
+      ss << this->errorMessageToState << to << endl;
+      ss << this->errorMessageCartesianType << CartesianTypeStr(axis) << endl;
+      throw MolDSException(ss.str());
+   }
+
+   if(from != groundState && to != groundState && from != to){
+      // transition dipole moment between excited states
+      for(int l=0; l<this->matrixCISdimension; l++){
+         double temp = 0.0;
+         // single excitation from I-th (occupied)MO to A-th (virtual)MO
+         int moI = this->GetActiveOccIndex(molecule, l);
+         int moA = this->GetActiveVirIndex(molecule, l);
+         for(int mu=0; mu<molecule.GetTotalNumberAOs(); mu++){
+            for(int nu=0; nu<molecule.GetTotalNumberAOs(); nu++){
+               temp += (-1.0*fockMatrix[moI][mu]*fockMatrix[moI][nu] + fockMatrix[moA][mu]*fockMatrix[moA][nu])
+                       *(cartesianMatrix[mu][nu][axis] - molecule.GetXyzCOC()[axis]*overlap[mu][nu]);
+            }
+         }
+         value += matrixCIS[from-1][l]*matrixCIS[to-1][l]*temp;
+      }
+   }
+   else if(from == groundState && to != groundState){
+      // transition dipole moment from the ground to excited states
+      for(int l=0; l<this->matrixCISdimension; l++){
+         double temp = 0.0;
+         // single excitation from I-th (occupied)MO to A-th (virtual)MO
+         int moI = this->GetActiveOccIndex(molecule, l);
+         int moA = this->GetActiveVirIndex(molecule, l);
+         for(int mu=0; mu<molecule.GetTotalNumberAOs(); mu++){
+            for(int nu=0; nu<molecule.GetTotalNumberAOs(); nu++){
+               temp += fockMatrix[moA][mu]
+                       *(cartesianMatrix[mu][nu][axis] - molecule.GetXyzCOC()[axis]*overlap[mu][nu])
+                       *fockMatrix[moI][nu];
+            }
+         }
+         value += this->matrixCIS[to-1][l]*sqrt(2.0)*temp;
+      }
+   }
+   else if(from != groundState && to == groundState){
+      // transition dipole moment from the excited to ground states
+      for(int l=0; l<this->matrixCISdimension; l++){
+         double temp = 0.0;
+         // single excitation from I-th (occupied)MO to A-th (virtual)MO
+         int moI = this->GetActiveOccIndex(molecule, l);
+         int moA = this->GetActiveVirIndex(molecule, l);
+         for(int mu=0; mu<molecule.GetTotalNumberAOs(); mu++){
+            for(int nu=0; nu<molecule.GetTotalNumberAOs(); nu++){
+               temp += fockMatrix[moI][mu]
+                       *(cartesianMatrix[mu][nu][axis] - molecule.GetXyzCOC()[axis]*overlap[mu][nu])
+                       *fockMatrix[moA][nu];
+            }
+         }
+         value += matrixCIS[from-1][l]*sqrt(2.0)*temp;
+      }
+   }
+   else if(from == to){
+      if(from != groundState){
+         // dipole moment of the excited state. It is needed that the dipole of ground state has been already calculated!!
+         for(int l=0; l<this->matrixCISdimension; l++){
+            double temp = 0.0;
+            // single excitation from I-th (occupied)MO to A-th (virtual)MO
+            int moI = this->GetActiveOccIndex(molecule, l);
+            int moA = this->GetActiveVirIndex(molecule, l);
+            for(int mu=0; mu<molecule.GetTotalNumberAOs(); mu++){
+               for(int nu=0; nu<molecule.GetTotalNumberAOs(); nu++){
+                  temp += (-1.0*fockMatrix[moI][mu]*fockMatrix[moI][nu] + fockMatrix[moA][mu]*fockMatrix[moA][nu])
+                          *(cartesianMatrix[mu][nu][axis] - molecule.GetXyzCOC()[axis]*overlap[mu][nu]);
+               }
+            }
+            value += matrixCIS[from-1][l]*matrixCIS[to-1][l]*temp;
+         }
+         value += groundStateDipole[axis];
+      }
+      else{
+         // dipole moment of the ground state
+         value = Cndo2::GetElectronicTransitionDipoleMoment(to,
+                                                            from,
+                                                            axis,
+                                                            fockMatrix,
+                                                            matrixCIS,
+                                                            cartesianMatrix,
+                                                            molecule,
+                                                            orbitalElectronPopulation,
+                                                            overlap,
+                                                            NULL);
+         }
+   }
+
+   return value;
 }
 
 void ZindoS::CalcFreeExcitonEnergies(double** freeExcitonEnergiesCIS, 

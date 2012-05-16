@@ -62,6 +62,8 @@ protected:
    std::string errorMessageGetElectronicEnergyNumberCISStates;
    std::string errorMessageGetElectronicEnergySetElecState;
    std::string errorMessageGetElectronicTransitionDipoleMomentBadState;
+   std::string errorMessageFromState;
+   std::string errorMessageToState;
    std::string messageSCFMetConvergence;
    std::string messageStartSCF;
    std::string messageDoneSCF;
@@ -83,20 +85,21 @@ protected:
    double* freeExcitonEnergiesCIS;
    double** overlap; // overlap integral between AOs
    double*** cartesianMatrix; // cartesian matrix represented by AOs
-   double*** electronicDipoleMoments; // Diagnonal terms are electronic dipole moments of each eigenstates (i.e. electronicDipole[0][0][XAxis] is the x-component of the electronic dipole moment of the ground state. electronicDipole[10][10][XAxis] is the x-component of the electronic dipole moment of the 10-th excited state). Off-diagonal terms are transition dipole moments between eigenstates (i.e. electronicDipole[10][0][XAxis] is the x-component of the transition dipole moment from the ground state to 10-th excited state.).
+   double*** electronicTransitionDipoleMoments; // Diagnonal terms are electronic dipole moments of each eigenstates (i.e. electronicDipole[0][0][XAxis] is the x-component of the electronic dipole moment of the ground state. electronicDipole[10][10][XAxis] is the x-component of the electronic dipole moment of the 10-th excited state). Off-diagonal terms are transition dipole moments between eigenstates (i.e. electronicDipole[10][0][XAxis] is the x-component of the transition dipole moment from the ground state to 10-th excited state.).
    double* coreDipoleMoment; // dipole moment of configuration.
    int matrixCISdimension;
    virtual void SetMessages();
    virtual void SetEnableAtomTypes();
    virtual void CalcSCFProperties();
    virtual void CalcCISProperties();
-   virtual double GetElectronicTransitionDipoleMoment(int from, int to, MolDS_base::CartesianType axis,
+   virtual double GetElectronicTransitionDipoleMoment(int to, int from, MolDS_base::CartesianType axis,
                                                       double const* const* fockMatrix,
                                                       double const* const* matrixCIS,
                                                       double const* const* const* cartesianMatrix,
                                                       const MolDS_base::Molecule& molecule, 
                                                       double const* const* orbitalElectronPopulation,
-                                                      double const* const* overlap) const;
+                                                      double const* const* overlap,
+                                                      double const* groundStateDipole) const;
    double GetBondingAdjustParameterK(MolDS_base::ShellType shellA, 
                                      MolDS_base::ShellType shellB) const;
    virtual double GetDiatomCoreRepulsionEnergy(int indexAtomA, int indexAtomB) const;
@@ -194,8 +197,6 @@ private:
    std::string errorMessageRotDiaOverlapToSpaceFrameNullDiaMatrix;
    std::string errorMessageRotDiaOverlapToSpaceFrameNullRotMatrix;
    std::string errorMessageSetOverlapElementNullDiaMatrix;
-   std::string errorMessageFromState;
-   std::string errorMessageToState;
    std::string messageIterSCF;
    std::string messageDensityRMS;
    std::string messageEnergiesMOs;
@@ -243,7 +244,7 @@ private:
    void OutputSCFMulliken() const;
    void CalcCoreRepulsionEnergy();
    void CalcVdWCorrectionEnergy();
-   void CalcElectronicDipoleMomentGroundState(double*** electronicDipoleMoments,
+   void CalcElectronicDipoleMomentGroundState(double*** electronicTransitionDipoleMoments,
                                               double const* const* const* cartesianMatrix,
                                               const MolDS_base::Molecule& molecule, 
                                               double const* const* orbitalElectronPopulation,

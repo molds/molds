@@ -42,6 +42,14 @@ protected:
    virtual void SetMessages();
    virtual void SetEnableAtomTypes();
    virtual void CalcCISProperties();
+   virtual double GetElectronicTransitionDipoleMoment(int to, int from, MolDS_base::CartesianType axis,
+                                                      double const* const* fockMatrix,
+                                                      double const* const* matrixCIS,
+                                                      double const* const* const* cartesianMatrix,
+                                                      const MolDS_base::Molecule& molecule, 
+                                                      double const* const* orbitalElectronPopulation,
+                                                      double const* const* overlap,
+                                                      double const* groundStateDipole) const;
    virtual void CalcGammaAB(double** gammaAB, const MolDS_base::Molecule& molecule) const;
    virtual double GetFockDiagElement(const MolDS_base_atoms::Atom& atomA, 
                                      int atomAIndex, 
@@ -118,9 +126,20 @@ private:
                                 double const* energiesMO, 
                                 double const* const* matrixCIS,
                                 int matrixCISdimension) const;
-   void CalcElectronicTransitionDipoleMomentsFromGroundState(double*** electronicDipoleMoments,
-                                                             double const* const* const* cartesianMatrix,
-                                                             const MolDS_base::Molecule& molecule) const;
+   void CalcElectronicDipoleMomentsExcitedState(double*** electronicTransitionDipoleMoments,
+                                                double const* const* fockMatrix,
+                                                double const* const* matrixCIS,
+                                                double const* const* const* cartesianMatrix,
+                                                const MolDS_base::Molecule& molecule, 
+                                                double const* const* orbitalElectronPopulation,
+                                                double const* const* overlap) const;
+   void CalcElectronicTransitionDipoleMoments(double*** electronicTransitionDipoleMoments,
+                                              double const* const* fockMatrix,
+                                              double const* const* matrixCIS,
+                                              double const* const* const* cartesianMatrix,
+                                              const MolDS_base::Molecule& molecule, 
+                                              double const* const* orbitalElectronPopulation,
+                                              double const* const* overlap) const;
    double GetNishimotoMatagaTwoEleInt(const MolDS_base_atoms::Atom& atomA, 
                                       MolDS_base::OrbitalType orbitalA, 
                                       const MolDS_base_atoms::Atom& atomB, 

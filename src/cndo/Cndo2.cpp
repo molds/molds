@@ -64,7 +64,7 @@ Cndo2::Cndo2(){
    this->gammaAB = NULL;
    this->overlap = NULL;
    this->cartesianMatrix = NULL;
-   this->electronicDipoleMoments = NULL;
+   this->electronicTransitionDipoleMoments = NULL;
    this->coreDipoleMoment = NULL;
    this->twoElecTwoCore = NULL;
    this->orbitalElectronPopulation = NULL;
@@ -96,13 +96,13 @@ Cndo2::~Cndo2(){
                                               this->molecule->GetTotalNumberAOs(),
                                               this->molecule->GetTotalNumberAOs(),
                                               CartesianType_end);
-   int electronicDipoleMomentsDim = 1;
+   int electronicTransitionDipoleMomentsDim = 1;
    if(Parameters::GetInstance()->RequiresCIS()){
-      electronicDipoleMomentsDim += Parameters::GetInstance()->GetNumberExcitedStatesCIS();
+      electronicTransitionDipoleMomentsDim += Parameters::GetInstance()->GetNumberExcitedStatesCIS();
    }
-   MallocerFreer::GetInstance()->Free<double>(&this->electronicDipoleMoments, 
-                                              electronicDipoleMomentsDim,
-                                              electronicDipoleMomentsDim,
+   MallocerFreer::GetInstance()->Free<double>(&this->electronicTransitionDipoleMoments, 
+                                              electronicTransitionDipoleMomentsDim,
+                                              electronicTransitionDipoleMomentsDim,
                                               CartesianType_end);
    MallocerFreer::GetInstance()->Free<double>(&this->coreDipoleMoment, 
                                               CartesianType_end);
@@ -242,13 +242,13 @@ void Cndo2::SetMolecule(Molecule* molecule){
                                                 this->molecule->GetTotalNumberAOs(), 
                                                 this->molecule->GetTotalNumberAOs(),
                                                 CartesianType_end);
-   int electronicDipoleMomentsDim = 1;
+   int electronicTransitionDipoleMomentsDim = 1;
    if(Parameters::GetInstance()->RequiresCIS()){
-      electronicDipoleMomentsDim += Parameters::GetInstance()->GetNumberExcitedStatesCIS();
+      electronicTransitionDipoleMomentsDim += Parameters::GetInstance()->GetNumberExcitedStatesCIS();
    }
-   MallocerFreer::GetInstance()->Malloc<double>(&this->electronicDipoleMoments, 
-                                                electronicDipoleMomentsDim,
-                                                electronicDipoleMomentsDim,
+   MallocerFreer::GetInstance()->Malloc<double>(&this->electronicTransitionDipoleMoments, 
+                                                electronicTransitionDipoleMomentsDim,
+                                                electronicTransitionDipoleMomentsDim,
                                                 CartesianType_end);
    MallocerFreer::GetInstance()->Malloc<double>(&this->coreDipoleMoment, 
                                                 CartesianType_end);
@@ -529,7 +529,7 @@ void Cndo2::CalcSCFProperties(){
                           this->coreRepulsionEnergy,
                           this->vdWCorrectionEnergy);
    this->CalcCoreDipoleMoment(this->coreDipoleMoment, *this->molecule);
-   this->CalcElectronicDipoleMomentGroundState(this->electronicDipoleMoments, 
+   this->CalcElectronicDipoleMomentGroundState(this->electronicTransitionDipoleMoments, 
                                                this->cartesianMatrix,
                                                *this->molecule, 
                                                this->orbitalElectronPopulation,
@@ -871,49 +871,49 @@ void Cndo2::OutputSCFDipole() const{
 
    // output total dipole moment 
    temp = 0.0;
-   temp += pow(this->electronicDipoleMoments[groundState][groundState][XAxis]+this->coreDipoleMoment[XAxis],2.0);
-   temp += pow(this->electronicDipoleMoments[groundState][groundState][YAxis]+this->coreDipoleMoment[YAxis],2.0);
-   temp += pow(this->electronicDipoleMoments[groundState][groundState][ZAxis]+this->coreDipoleMoment[ZAxis],2.0);
+   temp += pow(this->electronicTransitionDipoleMoments[groundState][groundState][XAxis]+this->coreDipoleMoment[XAxis],2.0);
+   temp += pow(this->electronicTransitionDipoleMoments[groundState][groundState][YAxis]+this->coreDipoleMoment[YAxis],2.0);
+   temp += pow(this->electronicTransitionDipoleMoments[groundState][groundState][ZAxis]+this->coreDipoleMoment[ZAxis],2.0);
    magnitude = sqrt(temp);
    this->OutputLog(this->messageTotalDipole);
    this->OutputLog(this->messageTotalDipoleTitleAU);
    this->OutputLog((boost::format("\t\t%e\t%e\t%e\t%e\n\n") 
-      % (this->electronicDipoleMoments[groundState][groundState][XAxis]+this->coreDipoleMoment[XAxis])
-      % (this->electronicDipoleMoments[groundState][groundState][YAxis]+this->coreDipoleMoment[YAxis])
-      % (this->electronicDipoleMoments[groundState][groundState][ZAxis]+this->coreDipoleMoment[ZAxis])
+      % (this->electronicTransitionDipoleMoments[groundState][groundState][XAxis]+this->coreDipoleMoment[XAxis])
+      % (this->electronicTransitionDipoleMoments[groundState][groundState][YAxis]+this->coreDipoleMoment[YAxis])
+      % (this->electronicTransitionDipoleMoments[groundState][groundState][ZAxis]+this->coreDipoleMoment[ZAxis])
       % magnitude).str());
    this->OutputLog(this->messageTotalDipoleTitleDebye);
    this->OutputLog((boost::format("\t\t%e\t%e\t%e\t%e\n\n") 
-      % ((this->electronicDipoleMoments[groundState][groundState][XAxis]+this->coreDipoleMoment[XAxis])/debye2AU)
-      % ((this->electronicDipoleMoments[groundState][groundState][YAxis]+this->coreDipoleMoment[YAxis])/debye2AU)
-      % ((this->electronicDipoleMoments[groundState][groundState][ZAxis]+this->coreDipoleMoment[ZAxis])/debye2AU)
+      % ((this->electronicTransitionDipoleMoments[groundState][groundState][XAxis]+this->coreDipoleMoment[XAxis])/debye2AU)
+      % ((this->electronicTransitionDipoleMoments[groundState][groundState][YAxis]+this->coreDipoleMoment[YAxis])/debye2AU)
+      % ((this->electronicTransitionDipoleMoments[groundState][groundState][ZAxis]+this->coreDipoleMoment[ZAxis])/debye2AU)
       % (magnitude/debye2AU)).str());
 
    // output electronic dipole moment 
    temp = 0.0;
-   temp += pow(this->electronicDipoleMoments[groundState][groundState][XAxis],2.0);
-   temp += pow(this->electronicDipoleMoments[groundState][groundState][YAxis],2.0);
-   temp += pow(this->electronicDipoleMoments[groundState][groundState][ZAxis],2.0);
+   temp += pow(this->electronicTransitionDipoleMoments[groundState][groundState][XAxis],2.0);
+   temp += pow(this->electronicTransitionDipoleMoments[groundState][groundState][YAxis],2.0);
+   temp += pow(this->electronicTransitionDipoleMoments[groundState][groundState][ZAxis],2.0);
    magnitude = sqrt(temp);
    this->OutputLog(this->messageElectronicDipoleMoments);
    this->OutputLog(this->messageElectronicDipoleMomentsTitleAU);
    this->OutputLog((boost::format("\t\t%e\t%e\t%e\t%e\n\n") 
-      % this->electronicDipoleMoments[groundState][groundState][XAxis]
-      % this->electronicDipoleMoments[groundState][groundState][YAxis]
-      % this->electronicDipoleMoments[groundState][groundState][ZAxis]
+      % this->electronicTransitionDipoleMoments[groundState][groundState][XAxis]
+      % this->electronicTransitionDipoleMoments[groundState][groundState][YAxis]
+      % this->electronicTransitionDipoleMoments[groundState][groundState][ZAxis]
       % magnitude).str());
    this->OutputLog(this->messageElectronicDipoleMomentsTitleDebye);
    this->OutputLog((boost::format("\t\t%e\t%e\t%e\t%e\n\n") 
-      % (this->electronicDipoleMoments[groundState][groundState][XAxis]/debye2AU)
-      % (this->electronicDipoleMoments[groundState][groundState][YAxis]/debye2AU)
-      % (this->electronicDipoleMoments[groundState][groundState][ZAxis]/debye2AU)
+      % (this->electronicTransitionDipoleMoments[groundState][groundState][XAxis]/debye2AU)
+      % (this->electronicTransitionDipoleMoments[groundState][groundState][YAxis]/debye2AU)
+      % (this->electronicTransitionDipoleMoments[groundState][groundState][ZAxis]/debye2AU)
       % (magnitude/debye2AU)).str());
 
    // output core dipole moment 
    temp = 0.0;
-   temp += pow(this->electronicDipoleMoments[groundState][groundState][XAxis]+this->coreDipoleMoment[XAxis],2.0);
-   temp += pow(this->electronicDipoleMoments[groundState][groundState][YAxis]+this->coreDipoleMoment[YAxis],2.0);
-   temp += pow(this->electronicDipoleMoments[groundState][groundState][ZAxis]+this->coreDipoleMoment[ZAxis],2.0);
+   temp += pow(this->electronicTransitionDipoleMoments[groundState][groundState][XAxis]+this->coreDipoleMoment[XAxis],2.0);
+   temp += pow(this->electronicTransitionDipoleMoments[groundState][groundState][YAxis]+this->coreDipoleMoment[YAxis],2.0);
+   temp += pow(this->electronicTransitionDipoleMoments[groundState][groundState][ZAxis]+this->coreDipoleMoment[ZAxis],2.0);
    magnitude = sqrt(temp);
    this->OutputLog(this->messageCoreDipoleMoment);
    this->OutputLog(this->messageCoreDipoleMomentTitleAU);
@@ -1469,7 +1469,7 @@ void Cndo2::CalcCoreDipoleMoment(double* coreDipoleMoment,
    }
 }
 
-void Cndo2::CalcElectronicDipoleMomentGroundState(double*** electronicDipoleMoments,
+void Cndo2::CalcElectronicDipoleMomentGroundState(double*** electronicTransitionDipoleMoments,
                                                   double const* const* const* cartesianMatrix,
                                                   const Molecule& molecule,
                                                   double const* const* orbitalElectronPopulation,
@@ -1479,16 +1479,17 @@ void Cndo2::CalcElectronicDipoleMomentGroundState(double*** electronicDipoleMome
    #pragma omp parallel for schedule(auto) 
    for(int axis=0; axis<CartesianType_end; axis++){
       try{
-         electronicDipoleMoments[groundState][groundState][axis] = this->GetElectronicTransitionDipoleMoment(
-                                                                         groundState,
-                                                                         groundState,
-                                                                         static_cast<CartesianType>(axis),
-                                                                         NULL,
-                                                                         NULL,
-                                                                         cartesianMatrix,
-                                                                         molecule,
-                                                                         orbitalElectronPopulation,
-                                                                         overlap);
+         electronicTransitionDipoleMoments[groundState][groundState][axis] = this->GetElectronicTransitionDipoleMoment(
+                                                                                   groundState,
+                                                                                   groundState,
+                                                                                   static_cast<CartesianType>(axis),
+                                                                                   NULL,
+                                                                                   NULL,
+                                                                                   cartesianMatrix,
+                                                                                   molecule,
+                                                                                   orbitalElectronPopulation,
+                                                                                   overlap,
+                                                                                   NULL);
       }
       catch(MolDSException ex){
          #pragma omp critical
@@ -1501,13 +1502,14 @@ void Cndo2::CalcElectronicDipoleMomentGroundState(double*** electronicDipoleMome
    }
 }
 
-double Cndo2::GetElectronicTransitionDipoleMoment(int from, int to, CartesianType axis,
+double Cndo2::GetElectronicTransitionDipoleMoment(int to, int from, CartesianType axis,
                                                   double const* const* fockMatrix,
                                                   double const* const* matrixCIS,
                                                   double const* const* const* cartesianMatrix,
                                                   const MolDS_base::Molecule& molecule, 
                                                   double const* const* orbitalElectronPopulation,
-                                                  double const* const* overlap) const{
+                                                  double const* const* overlap,
+                                                  double const* groundStateDipole) const{
    double value = 0.0;
    int groundState = 0;
    if(from == groundState && to == groundState){
