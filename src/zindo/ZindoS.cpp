@@ -1201,16 +1201,6 @@ void ZindoS::OutputCISDipole() const{
          % (magnitude/debye2AU)).str());
    }
 
-
-/* 
-      // electronic dipole
-      temp = 0.0;
-      temp += pow(this->electronicTransitionDipoleMoments[k][k]+this->coreDipoleMoment[XAxis],2.0);
-      temp += pow(this->electronicTransitionDipoleMoments[k][k]+this->coreDipoleMoment[YAxis],2.0);
-      temp += pow(this->electronicTransitionDipoleMoments[k][k]+this->coreDipoleMoment[ZAxis],2.0);
-      electronicMagnitude = 0.0;
-      this->OutputLog("\t\t\t
-*/
 }
 
 void ZindoS::SortCISEigenVectorCoefficients(vector<CISEigenVectorCoefficient>* cisEigenVectorCoefficients,
