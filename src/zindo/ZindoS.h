@@ -115,9 +115,11 @@ private:
    std::string messageExcitonEnergiesCIS;
    std::string messageExcitonEnergiesCISTitle;
    std::string messageTotalDipoleMomentsTitle;
-   std::string messageTotalDipoleMoments;
+   std::string messageTotalDipoleMoment;
    std::string messageElectronicDipoleMomentsTitle;
-   std::string messageElectronicDipoleMoments;
+   std::string messageElectronicDipoleMoment;
+   std::string messageTransitionDipoleMomentsTitle;
+   std::string messageTransitionDipoleMoment;
    int matrixForceElecStatesNum;
    double nishimotoMatagaParamA;
    double nishimotoMatagaParamB;
@@ -126,6 +128,7 @@ private:
    void DoCISDirect();
    void DoCISDavidson();
    void OutputCISDipole() const;
+   void OutputCISTransitionDipole() const;
    void CalcFreeExcitonEnergies(double** freeExcitonEnergiesCIS, 
                                 const MolDS_base::Molecule& molecule, 
                                 double const* energiesMO, 

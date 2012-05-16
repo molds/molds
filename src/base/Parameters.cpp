@@ -157,6 +157,7 @@ void Parameters::SetDefaultValues(){
    this->normToleranceCIS = pow(10.0, -6.0);
    this->numberPrintCoefficientsCIS = 1;
    this->requiresExcitonEnergiesCIS = false;
+   this->requiresAllTransitionDipoleMomentsCIS = false;
    // Memory
    this->limitHeapMemory = 256;
    // MD
@@ -639,6 +640,14 @@ bool Parameters::RequiresExcitonEnergiesCIS() const{
 
 void Parameters::SetRequiresExcitonEnergiesCIS(bool requiresExcitonEnergiesCIS){
    this->requiresExcitonEnergiesCIS = requiresExcitonEnergiesCIS;
+}
+
+bool Parameters::RequiresAllTransitionDipoleMomentsCIS() const{
+   return this->requiresAllTransitionDipoleMomentsCIS;
+}
+
+void Parameters::SetRequiresAllTransitionDipoleMomentsCIS(bool requiresAllTransitionDipoleMomentsCIS){
+   this->requiresAllTransitionDipoleMomentsCIS = requiresAllTransitionDipoleMomentsCIS;
 }
 
 // methods for Memory

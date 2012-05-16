@@ -133,6 +133,8 @@ public:
    void SetNumberPrintCoefficientsCIS(int numberPrintCoefficientsCIS);
    bool RequiresExcitonEnergiesCIS() const;
    void SetRequiresExcitonEnergiesCIS(bool requiresExcitonEnergiesCIS);
+   bool RequiresAllTransitionDipoleMomentsCIS() const;
+   void SetRequiresAllTransitionDipoleMomentsCIS(bool requiresAllTransitionDipoleMomentsCIS);
    // Memory
    double GetLimitHeapMemory() const;
    void SetLimitHeapMemory(double limitHeap);
@@ -251,6 +253,7 @@ private:
    bool isDavidsonCIS;
    int numberPrintCoefficientsCIS;
    bool requiresExcitonEnergiesCIS;
+   bool requiresAllTransitionDipoleMomentsCIS;
    // Memory
    double limitHeapMemory;
    // MD

@@ -112,6 +112,7 @@ void InputParser::SetMessages(){
    this->messageCisMaxIterations = "\t\tMax iterations for the Davidson: ";
    this->messageCisMaxDimensions = "\t\tMax dimensions for the Davidson: ";
    this->messageCisExcitonEnergies = "\t\tExciton energies: ";
+   this->messageCisAllTransitionDipoleMoments = "\t\tAll transition dipole moments: ";
    this->messageCisNumPrintCoefficients = "\t\tNumber of printed coefficients of CIS-eigenvector: ";
 
    // memory
@@ -270,6 +271,7 @@ void InputParser::SetMessages(){
    this->stringCISMaxDimensions = "max_dim";
    this->stringCISNormTolerance = "norm_tol";
    this->stringCISExcitonEnergies = "exciton_energies";
+   this->stringCISAllTransitionDipoleMoments = "all_transition_dipole_moments";
    this->stringCISNumPrintCoefficients = "num_print_coefficients";
 
    // Memory
@@ -707,7 +709,6 @@ int InputParser::ParseConditionsCIS(vector<string>* inputTerms, int parseIndex) 
          Parameters::GetInstance()->SetNumberPrintCoefficientsCIS(numPrintCoeff);
          parseIndex++;
       }
-      parseIndex++;   
       // exciton energies are calculated or not
       if((*inputTerms)[parseIndex].compare(this->stringCISExcitonEnergies) == 0){
          if((*inputTerms)[parseIndex+1].compare(this->stringYES) == 0){
@@ -718,6 +719,17 @@ int InputParser::ParseConditionsCIS(vector<string>* inputTerms, int parseIndex) 
          }
          parseIndex++;
       }
+      // all transition dipole moments are calculated or not
+      if((*inputTerms)[parseIndex].compare(this->stringCISAllTransitionDipoleMoments) == 0){
+         if((*inputTerms)[parseIndex+1].compare(this->stringYES) == 0){
+            Parameters::GetInstance()->SetRequiresAllTransitionDipoleMomentsCIS(true);
+         }
+         else{
+            Parameters::GetInstance()->SetRequiresAllTransitionDipoleMomentsCIS(false);
+         }
+         parseIndex++;
+      }
+      parseIndex++;   
    }
    return parseIndex;
 }
@@ -1291,6 +1303,7 @@ void InputParser::OutputCisConditions() const{
                                             % Parameters::GetInstance()->GetNumberExcitedStatesCIS()).str());
    this->OutputLog((boost::format("%s%d\n") % this->messageCisNumPrintCoefficients.c_str() 
                                             % Parameters::GetInstance()->GetNumberPrintCoefficientsCIS()).str());
+
    this->OutputLog(this->messageCisDavidson);
    if(Parameters::GetInstance()->IsDavidsonCIS()){
       this->OutputLog((boost::format("%s\n") % this->stringYES.c_str()).str());
@@ -1304,8 +1317,18 @@ void InputParser::OutputCisConditions() const{
    else{
       this->OutputLog((boost::format("%s\n") % this->stringNO.c_str()).str());
    }
+
    this->OutputLog(this->messageCisExcitonEnergies);
    if(Parameters::GetInstance()->RequiresExcitonEnergiesCIS()){
+      this->OutputLog(this->stringYES);
+   }
+   else{
+      this->OutputLog(this->stringNO);
+   }
+   this->OutputLog("\n");
+
+   this->OutputLog(this->messageCisAllTransitionDipoleMoments);
+   if(Parameters::GetInstance()->RequiresAllTransitionDipoleMomentsCIS()){
       this->OutputLog(this->stringYES);
    }
    else{
