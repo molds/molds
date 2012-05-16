@@ -121,6 +121,7 @@ private:
    double overlapCorrectionPi;
    void DoCISDirect();
    void DoCISDavidson();
+   void OutputCISDipole() const;
    void CalcFreeExcitonEnergies(double** freeExcitonEnergiesCIS, 
                                 const MolDS_base::Molecule& molecule, 
                                 double const* energiesMO, 

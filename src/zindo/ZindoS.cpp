@@ -1084,6 +1084,7 @@ void ZindoS::CalcFreeExcitonEnergies(double** freeExcitonEnergiesCIS,
 void ZindoS::OutputCISResults() const{
    int numberActiveOcc = Parameters::GetInstance()->GetActiveOccCIS();
    int numberActiveVir = Parameters::GetInstance()->GetActiveVirCIS();
+
    // output cis eigen energies
    this->OutputLog(this->messageExcitedStatesEnergies);
    this->OutputLog(this->messageExcitedStatesEnergiesTitle);
@@ -1104,6 +1105,10 @@ void ZindoS::OutputCISResults() const{
       this->OutputLog("\n");
    }
    this->OutputLog("\n");
+
+   // output dipole moment
+   this->OutputCISDipole();
+
    // output exciton energies
    if(Parameters::GetInstance()->RequiresExcitonEnergiesCIS()){
       this->OutputLog(this->messageExcitonEnergiesCIS);
@@ -1118,6 +1123,7 @@ void ZindoS::OutputCISResults() const{
       }
    }
    this->OutputLog("\n");
+
    // output Hole density
    if(Parameters::GetInstance()->RequiresHolePlot()){
       MolDS_base_loggers::DensityLogger* holeDensityLogger = new MolDS_base_loggers::HoleDensityLogger(
@@ -1128,6 +1134,7 @@ void ZindoS::OutputCISResults() const{
       holeDensityLogger->DrawDensity(*(Parameters::GetInstance()->GetElecIndecesHolePlot()));
       delete holeDensityLogger;
    }
+
    // output particle density
    if(Parameters::GetInstance()->RequiresParticlePlot()){
       MolDS_base_loggers::DensityLogger* particleDensityLogger = new MolDS_base_loggers::ParticleDensityLogger(
@@ -1138,6 +1145,68 @@ void ZindoS::OutputCISResults() const{
       particleDensityLogger->DrawDensity(*(Parameters::GetInstance()->GetElecIndecesParticlePlot()));
       delete particleDensityLogger;
    }
+}
+
+// this module output ground and excited state dipole moments.
+void ZindoS::OutputCISDipole() const{
+   int groundState=0;
+   double debye2AU = Parameters::GetInstance()->GetDebye2AU();
+
+   // total dipole (electronic + core dipole)
+   this->OutputLog("\t\t\t\t| i-th eigenstate |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |\t\t|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |\n");
+   for(int k=0; k<=Parameters::GetInstance()->GetNumberExcitedStatesCIS(); k++){
+      double magnitude = 0.0; 
+      double temp = 0.0;
+      temp += pow(this->electronicTransitionDipoleMoments[k][k][XAxis]+this->coreDipoleMoment[XAxis],2.0);
+      temp += pow(this->electronicTransitionDipoleMoments[k][k][YAxis]+this->coreDipoleMoment[YAxis],2.0);
+      temp += pow(this->electronicTransitionDipoleMoments[k][k][ZAxis]+this->coreDipoleMoment[ZAxis],2.0);
+      magnitude = sqrt(temp);
+      this->OutputLog((boost::format("\t%s\t%d\t%e\t%e\t%e\t%e\t\t%e\t%e\t%e\t%e\n") 
+         % "Total dipole moment:"
+         % k
+         % (this->electronicTransitionDipoleMoments[k][k][XAxis]+this->coreDipoleMoment[XAxis])
+         % (this->electronicTransitionDipoleMoments[k][k][YAxis]+this->coreDipoleMoment[YAxis])
+         % (this->electronicTransitionDipoleMoments[k][k][ZAxis]+this->coreDipoleMoment[ZAxis])
+         % magnitude
+         % ((this->electronicTransitionDipoleMoments[k][k][XAxis]+this->coreDipoleMoment[XAxis])/debye2AU)
+         % ((this->electronicTransitionDipoleMoments[k][k][YAxis]+this->coreDipoleMoment[YAxis])/debye2AU)
+         % ((this->electronicTransitionDipoleMoments[k][k][ZAxis]+this->coreDipoleMoment[ZAxis])/debye2AU)
+         % (magnitude/debye2AU)).str());
+   }
+   this->OutputLog("\n");
+
+   // electronic dipole
+   this->OutputLog("\t\t\t\t| i-th eigenstate |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |\t\t|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |\n");
+   for(int k=0; k<=Parameters::GetInstance()->GetNumberExcitedStatesCIS(); k++){
+      double magnitude = 0.0; 
+      double temp = 0.0;
+      temp += pow(this->electronicTransitionDipoleMoments[k][k][XAxis],2.0);
+      temp += pow(this->electronicTransitionDipoleMoments[k][k][YAxis],2.0);
+      temp += pow(this->electronicTransitionDipoleMoments[k][k][ZAxis],2.0);
+      magnitude = sqrt(temp);
+      this->OutputLog((boost::format("\t%s\t\t%d\t%e\t%e\t%e\t%e\t\t%e\t%e\t%e\t%e\n") 
+         % "Electronic dipole moment:"
+         % k
+         % (this->electronicTransitionDipoleMoments[k][k][XAxis])
+         % (this->electronicTransitionDipoleMoments[k][k][YAxis])
+         % (this->electronicTransitionDipoleMoments[k][k][ZAxis])
+         % magnitude
+         % (this->electronicTransitionDipoleMoments[k][k][XAxis]/debye2AU)
+         % (this->electronicTransitionDipoleMoments[k][k][YAxis]/debye2AU)
+         % (this->electronicTransitionDipoleMoments[k][k][ZAxis]/debye2AU)
+         % (magnitude/debye2AU)).str());
+   }
+
+
+/* 
+      // electronic dipole
+      temp = 0.0;
+      temp += pow(this->electronicTransitionDipoleMoments[k][k]+this->coreDipoleMoment[XAxis],2.0);
+      temp += pow(this->electronicTransitionDipoleMoments[k][k]+this->coreDipoleMoment[YAxis],2.0);
+      temp += pow(this->electronicTransitionDipoleMoments[k][k]+this->coreDipoleMoment[ZAxis],2.0);
+      electronicMagnitude = 0.0;
+      this->OutputLog("\t\t\t
+*/
 }
 
 void ZindoS::SortCISEigenVectorCoefficients(vector<CISEigenVectorCoefficient>* cisEigenVectorCoefficients,
