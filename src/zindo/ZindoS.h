@@ -114,6 +114,10 @@ private:
    std::string messageExcitedStatesEnergiesTitle;
    std::string messageExcitonEnergiesCIS;
    std::string messageExcitonEnergiesCISTitle;
+   std::string messageTotalDipoleMomentsTitle;
+   std::string messageTotalDipoleMoments;
+   std::string messageElectronicDipoleMomentsTitle;
+   std::string messageElectronicDipoleMoments;
    int matrixForceElecStatesNum;
    double nishimotoMatagaParamA;
    double nishimotoMatagaParamB;

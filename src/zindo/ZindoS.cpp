@@ -135,6 +135,10 @@ void ZindoS::SetMessages(){
    this->messageExcitedStatesEnergiesTitle = "\t\t| i-th | e[a.u.] | e[eV] | dominant eigenvector coefficients (occ. -> vir.) |\n";
    this->messageExcitonEnergiesCIS = "\tFree exciton (Ef) and exciton binding (Eb) energies:\n";
    this->messageExcitonEnergiesCISTitle = "\t\t| i-th | Ef[a.u.] | Ef[eV] | Eb[a.u.] | Eb[eV] |\n";
+   this->messageTotalDipoleMomentsTitle = "\t\t\t\t| i-th eigenstate |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |\t\t|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |\n";
+   this->messageTotalDipoleMoments = "Total dipole moment:";
+   this->messageElectronicDipoleMomentsTitle = "\t\t\t\t| i-th eigenstate |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |\t\t|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |\n";
+   this->messageElectronicDipoleMoments = "Electronic dipole moment:";
 }
 
 void ZindoS::SetEnableAtomTypes(){
@@ -1153,7 +1157,7 @@ void ZindoS::OutputCISDipole() const{
    double debye2AU = Parameters::GetInstance()->GetDebye2AU();
 
    // total dipole (electronic + core dipole)
-   this->OutputLog("\t\t\t\t| i-th eigenstate |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |\t\t|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |\n");
+   this->OutputLog(this->messageTotalDipoleMomentsTitle);
    for(int k=0; k<=Parameters::GetInstance()->GetNumberExcitedStatesCIS(); k++){
       double magnitude = 0.0; 
       double temp = 0.0;
@@ -1162,7 +1166,7 @@ void ZindoS::OutputCISDipole() const{
       temp += pow(this->electronicTransitionDipoleMoments[k][k][ZAxis]+this->coreDipoleMoment[ZAxis],2.0);
       magnitude = sqrt(temp);
       this->OutputLog((boost::format("\t%s\t%d\t%e\t%e\t%e\t%e\t\t%e\t%e\t%e\t%e\n") 
-         % "Total dipole moment:"
+         % this->messageTotalDipoleMoments
          % k
          % (this->electronicTransitionDipoleMoments[k][k][XAxis]+this->coreDipoleMoment[XAxis])
          % (this->electronicTransitionDipoleMoments[k][k][YAxis]+this->coreDipoleMoment[YAxis])
@@ -1176,7 +1180,7 @@ void ZindoS::OutputCISDipole() const{
    this->OutputLog("\n");
 
    // electronic dipole
-   this->OutputLog("\t\t\t\t| i-th eigenstate |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |\t\t|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |\n");
+   this->OutputLog(this->messageElectronicDipoleMomentsTitle);
    for(int k=0; k<=Parameters::GetInstance()->GetNumberExcitedStatesCIS(); k++){
       double magnitude = 0.0; 
       double temp = 0.0;
@@ -1185,7 +1189,7 @@ void ZindoS::OutputCISDipole() const{
       temp += pow(this->electronicTransitionDipoleMoments[k][k][ZAxis],2.0);
       magnitude = sqrt(temp);
       this->OutputLog((boost::format("\t%s\t\t%d\t%e\t%e\t%e\t%e\t\t%e\t%e\t%e\t%e\n") 
-         % "Electronic dipole moment:"
+         % this->messageElectronicDipoleMoments
          % k
          % (this->electronicTransitionDipoleMoments[k][k][XAxis])
          % (this->electronicTransitionDipoleMoments[k][k][YAxis])
