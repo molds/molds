@@ -213,7 +213,7 @@ HOW TO WRITE INPUT:
    
       -options
        "davidson", "active_occ", "active_vir", "max_iter", "max_dim", "norm_tol", 
-       "nstates", "exciton_energies", and "num_print_coefficients" are prepared as options.
+       "nstates", "exciton_energies", "all_transition_dipole_moments", and "num_print_coefficients" are prepared as options.
 
        "davidson" should be set as "yes" or "no". 
        The default value of the "davidson" is "yes".
@@ -246,6 +246,12 @@ HOW TO WRITE INPUT:
        In the case "yes" is set, free exciton and exciton biding energies are calculated 
        for each excited states.
        The default value of the "exciton_energies" is "no".
+
+       "all_transition_dipole_moments" should be set as "yes" or "no". 
+       The default value of the "all_transition_dipole" is "no".
+       If user set this "all_transition_dipole" as "yes", all transition dipole moments 
+       including between excited states would be calculated. 
+       Otherwise "no", transition dipole moments from ground state to each excited state are calculated.
 
        "num_print_coefficients" is a number of the coefficients of CIS-eigenvector shown in output.
        The default value of the "num_print_coefficients" is 1.
