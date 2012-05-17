@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/5/14(Mon.) 16:48:49  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/5/17(Thu.) 10:34:18  <<<<<
 
 
 **********  START: Parse input  **********
@@ -158,7 +158,7 @@ SCF iter=12: RMS density=0.000000208044930
 		6	H	1.000000e+00	8.795855e-02
 		7	H	1.000000e+00	9.365443e-02
 
-	Elapsed time(omp) for the SCF = 0.060815[s].
+	Elapsed time(omp) for the SCF = 0.052074[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
@@ -240,7 +240,7 @@ SCF iter=12: RMS density=0.000000172780661
 		6	H	1.000000e+00	8.864300e-02
 		7	H	1.000000e+00	9.446856e-02
 
-	Elapsed time(omp) for the SCF = 0.059144[s].
+	Elapsed time(omp) for the SCF = 0.054339[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
@@ -322,7 +322,7 @@ SCF iter=12: RMS density=0.000000242311105
 		6	H	1.000000e+00	8.848772e-02
 		7	H	1.000000e+00	9.308310e-02
 
-	Elapsed time(omp) for the SCF = 0.058538[s].
+	Elapsed time(omp) for the SCF = 0.052915[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
@@ -417,7 +417,7 @@ SCF iter=12: RMS density=0.000000208047380
 		6	H	1.000000e+00	8.795832e-02
 		7	H	1.000000e+00	9.365380e-02
 
-	Elapsed time(omp) for the SCF = 0.058950[s].
+	Elapsed time(omp) for the SCF = 0.052824[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
@@ -499,7 +499,7 @@ SCF iter=12: RMS density=0.000000172792203
 		6	H	1.000000e+00	8.864265e-02
 		7	H	1.000000e+00	9.446782e-02
 
-	Elapsed time(omp) for the SCF = 0.059157[s].
+	Elapsed time(omp) for the SCF = 0.052427[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
@@ -581,7 +581,7 @@ SCF iter=12: RMS density=0.000000242301511
 		6	H	1.000000e+00	8.848739e-02
 		7	H	1.000000e+00	9.308251e-02
 
-	Elapsed time(omp) for the SCF = 0.059233[s].
+	Elapsed time(omp) for the SCF = 0.052442[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
@@ -675,7 +675,7 @@ SCF iter=12: RMS density=0.000000208054708
 		6	H	1.000000e+00	8.795762e-02
 		7	H	1.000000e+00	9.365191e-02
 
-	Elapsed time(omp) for the SCF = 0.058788[s].
+	Elapsed time(omp) for the SCF = 0.052372[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
@@ -757,7 +757,7 @@ SCF iter=12: RMS density=0.000000172826869
 		6	H	1.000000e+00	8.864161e-02
 		7	H	1.000000e+00	9.446560e-02
 
-	Elapsed time(omp) for the SCF = 0.058204[s].
+	Elapsed time(omp) for the SCF = 0.087067[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
@@ -839,7 +839,7 @@ SCF iter=12: RMS density=0.000000242272667
 		6	H	1.000000e+00	8.848641e-02
 		7	H	1.000000e+00	9.308071e-02
 
-	Elapsed time(omp) for the SCF = 0.058632[s].
+	Elapsed time(omp) for the SCF = 0.051909[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
@@ -933,7 +933,7 @@ SCF iter=12: RMS density=0.000000208066830
 		6	H	1.000000e+00	8.795645e-02
 		7	H	1.000000e+00	9.364876e-02
 
-	Elapsed time(omp) for the SCF = 0.060427[s].
+	Elapsed time(omp) for the SCF = 0.052583[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
@@ -1015,7 +1015,7 @@ SCF iter=12: RMS density=0.000000172884799
 		6	H	1.000000e+00	8.863989e-02
 		7	H	1.000000e+00	9.446189e-02
 
-	Elapsed time(omp) for the SCF = 0.059754[s].
+	Elapsed time(omp) for the SCF = 0.078507[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
@@ -1097,7 +1097,7 @@ SCF iter=12: RMS density=0.000000242224398
 		6	H	1.000000e+00	8.848476e-02
 		7	H	1.000000e+00	9.307773e-02
 
-	Elapsed time(omp) for the SCF = 0.059646[s].
+	Elapsed time(omp) for the SCF = 0.080544[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
@@ -1191,7 +1191,7 @@ SCF iter=12: RMS density=0.000000208083592
 		6	H	1.000000e+00	8.795482e-02
 		7	H	1.000000e+00	9.364435e-02
 
-	Elapsed time(omp) for the SCF = 0.059752[s].
+	Elapsed time(omp) for the SCF = 0.052341[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
@@ -1273,7 +1273,7 @@ SCF iter=12: RMS density=0.000000172966206
 		6	H	1.000000e+00	8.863747e-02
 		7	H	1.000000e+00	9.445671e-02
 
-	Elapsed time(omp) for the SCF = 0.060488[s].
+	Elapsed time(omp) for the SCF = 0.051598[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
@@ -1355,7 +1355,7 @@ SCF iter=12: RMS density=0.000000242156381
 		6	H	1.000000e+00	8.848246e-02
 		7	H	1.000000e+00	9.307354e-02
 
-	Elapsed time(omp) for the SCF = 0.060327[s].
+	Elapsed time(omp) for the SCF = 0.052265[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
@@ -1449,7 +1449,7 @@ SCF iter=12: RMS density=0.000000208104786
 		6	H	1.000000e+00	8.795271e-02
 		7	H	1.000000e+00	9.363868e-02
 
-	Elapsed time(omp) for the SCF = 0.059531[s].
+	Elapsed time(omp) for the SCF = 0.052351[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
@@ -1531,7 +1531,7 @@ SCF iter=12: RMS density=0.000000173071403
 		6	H	1.000000e+00	8.863436e-02
 		7	H	1.000000e+00	9.445004e-02
 
-	Elapsed time(omp) for the SCF = 0.059103[s].
+	Elapsed time(omp) for the SCF = 0.051525[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
@@ -1613,7 +1613,7 @@ SCF iter=12: RMS density=0.000000242068196
 		6	H	1.000000e+00	8.847950e-02
 		7	H	1.000000e+00	9.306816e-02
 
-	Elapsed time(omp) for the SCF = 0.059062[s].
+	Elapsed time(omp) for the SCF = 0.051888[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
@@ -1634,9 +1634,9 @@ SCF iter=12: RMS density=0.000000242068196
 
 
      >>>>>  The MolDS finished normally!  <<<<<
-     >>>>>  CPU time: 36.62[s].  <<<<<
+     >>>>>  CPU time: 36.83[s].  <<<<<
      >>>>>  Elapsed time: 37[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 36.7332[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 36.8829[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

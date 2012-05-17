@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/5/14(Mon.) 16:47:47  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/5/17(Thu.) 10:33:13  <<<<<
 
 
 **********  START: Parse input  **********
@@ -66,6 +66,7 @@
 		Max dimensions for the Davidson: 49
 		Norm tolerance for the residual of the Davidson: 1.000000e-06
 		Exciton energies: no
+		All transition dipole moments: no
 
 Input terms:
 theory | pm3/pddg | theory_end | scf | max_iter | 50 | rms_density | 0.000001 | damping_thresh | 1.0 | 
@@ -156,13 +157,13 @@ SCF iter=12: RMS density=0.000000190761143
 		6	H	1.000000e+00	8.849413e-02
 		7	H	1.000000e+00	9.338598e-02
 
-	Elapsed time(omp) for the SCF = 0.059981[s].
+	Elapsed time(omp) for the SCF = 0.065303[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.055694[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.055820[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -247,8 +248,28 @@ SCF iter=12: RMS density=0.000000190761143
 		 3	2.837531e-01	7.721377e+00	9.016328e-01 (5 -> 7)	
 		 4	2.901091e-01	7.894334e+00	8.681948e-01 (6 -> 8)	
 
+				| i-th eigenstate |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
+	Total dipole moment:	0	-1.965914e-02	-3.375519e-02	-1.470551e-02	4.173903e-02		-4.996855e-02	-8.579714e-02	-3.737769e-02	1.060900e-01
+	Total dipole moment:	1	-1.964841e-02	-2.163828e-02	3.907511e-03	2.948803e-02		-4.994127e-02	-5.499904e-02	9.931903e-03	7.495111e-02
+	Total dipole moment:	2	-7.458374e-03	-3.608263e-02	-1.061645e-02	3.834440e-02		-1.895730e-02	-9.171293e-02	-2.698433e-02	9.746176e-02
+	Total dipole moment:	3	-6.840506e-02	-3.949568e-02	-2.066972e-02	8.164802e-02		-1.738684e-01	-1.003880e-01	-5.253720e-02	2.075286e-01
+	Total dipole moment:	4	4.241546e-02	-6.024317e-02	-3.958662e-02	8.363857e-02		1.078094e-01	-1.531229e-01	-1.006192e-01	2.125881e-01
 
-	Elapsed time(omp) for the CIS = 0.199167[s].
+				| i-th eigenstate |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
+	Electronic dipole moment:		0	8.027778e-03	-2.241960e-02	-5.611121e-04	2.382013e-02		2.040458e-02	-5.698496e-02	-1.426205e-03	6.054475e-02
+	Electronic dipole moment:		1	8.038508e-03	-1.030270e-02	1.805191e-02	2.228530e-02		2.043185e-02	-2.618686e-02	4.588339e-02	5.664360e-02
+	Electronic dipole moment:		2	2.022854e-02	-2.474705e-02	3.527949e-03	3.215675e-02		5.141583e-02	-6.290074e-02	8.967154e-03	8.173433e-02
+	Electronic dipole moment:		3	-4.071815e-02	-2.816010e-02	-6.525319e-03	4.993535e-02		-1.034952e-01	-7.157584e-02	-1.658571e-02	1.269230e-01
+	Electronic dipole moment:		4	7.010237e-02	-4.890759e-02	-2.544221e-02	8.918296e-02		1.781825e-01	-1.243107e-01	-6.466767e-02	2.266805e-01
+
+				| from and to eigenstates |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
+	Transition dipole moment:		0 -> 1	-1.336795e-01	-2.101354e-01	-7.249241e-02	2.593882e-01		-3.397794e-01	-5.341110e-01	-1.842574e-01	6.592991e-01
+	Transition dipole moment:		0 -> 2	-3.073904e-02	-4.927778e-02	-1.306558e+00	1.307848e+00		-7.813086e-02	-1.252516e-01	-3.320939e+00	3.324219e+00
+	Transition dipole moment:		0 -> 3	1.624994e-01	1.296140e+00	-6.162612e-02	1.307740e+00		4.130323e-01	3.294461e+00	-1.566380e-01	3.323944e+00
+	Transition dipole moment:		0 -> 4	-4.556279e-03	-4.980071e-02	-8.575193e-02	9.926865e-02		-1.158091e-02	-1.265808e-01	-2.179597e-01	2.523158e-01
+
+
+	Elapsed time(omp) for the CIS = 0.213826[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
@@ -259,8 +280,8 @@ SCF iter=12: RMS density=0.000000190761143
 
      >>>>>  The MolDS finished normally!  <<<<<
      >>>>>  CPU time: 0.27[s].  <<<<<
-     >>>>>  Elapsed time: 0[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 0.263797[s].  <<<<<
+     >>>>>  Elapsed time: 1[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 0.284364[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

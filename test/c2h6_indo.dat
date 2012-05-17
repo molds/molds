@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/5/14(Mon.) 16:46:24  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/5/17(Thu.) 10:31:42  <<<<<
 
 
 **********  START: Parse input  **********
@@ -139,7 +139,7 @@ SCF iter=7: RMS density=0.000000275934258
 		6	H	1.000000e+00	-2.141181e-02
 		7	H	1.000000e+00	-1.632549e-02
 
-	Elapsed time(omp) for the SCF = 0.043386[s].
+	Elapsed time(omp) for the SCF = 0.030882[s].
 **********  DONE: INDO-SCF  **********
 
 
@@ -151,7 +151,7 @@ SCF iter=7: RMS density=0.000000275934258
      >>>>>  The MolDS finished normally!  <<<<<
      >>>>>  CPU time: 0.03[s].  <<<<<
      >>>>>  Elapsed time: 0[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 0.0469658[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 0.034229[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

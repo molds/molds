@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/5/14(Mon.) 16:50:26  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/5/17(Thu.) 10:35:56  <<<<<
 
 
 **********  START: Parse input  **********
@@ -63,6 +63,7 @@
 		Number of printed coefficients of CIS-eigenvector: 1
 		CIS-Davidson: no
 		Exciton energies: no
+		All transition dipole moments: no
 
 	MD conditions:
 		Electronic eigenstate: 1
@@ -91,9 +92,9 @@ Error in base::MallocFreer::Malloc: Reaches limit of heap. Change the "limit_hea
 
 
      >>>>>  The MolDS finished abnormally..............  <<<<<
-     >>>>>  CPU time: 0[s].  <<<<<
+     >>>>>  CPU time: 0.01[s].  <<<<<
      >>>>>  Elapsed time: 0[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 0.00547385[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 0.00439286[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

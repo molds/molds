@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/5/14(Mon.) 16:46:53  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/5/17(Thu.) 10:32:17  <<<<<
 
 
 **********  START: Parse input  **********
@@ -150,7 +150,7 @@ SCF iter=11: RMS density=0.000000372121777
 		6	H	1.000000e+00	7.029841e-02
 		7	H	1.000000e+00	7.579838e-02
 
-	Elapsed time(omp) for the SCF = 0.060618[s].
+	Elapsed time(omp) for the SCF = 0.059791[s].
 **********  DONE: AM1-SCF  **********
 
 
@@ -290,7 +290,7 @@ SCF iter=3: RMS density=0.000000402147136
 		6	H	1.000000e+00	7.029851e-02
 		7	H	1.000000e+00	7.579821e-02
 
-	Elapsed time(omp) for the SCF = 0.049621[s].
+	Elapsed time(omp) for the SCF = 0.051654[s].
 **********  DONE: AM1-SCF  **********
 
 
@@ -432,7 +432,7 @@ SCF iter=4: RMS density=0.000000508928944
 		6	H	1.000000e+00	7.029888e-02
 		7	H	1.000000e+00	7.579780e-02
 
-	Elapsed time(omp) for the SCF = 0.049866[s].
+	Elapsed time(omp) for the SCF = 0.051927[s].
 **********  DONE: AM1-SCF  **********
 
 
@@ -574,7 +574,7 @@ SCF iter=4: RMS density=0.000000845998915
 		6	H	1.000000e+00	7.029951e-02
 		7	H	1.000000e+00	7.579714e-02
 
-	Elapsed time(omp) for the SCF = 0.050723[s].
+	Elapsed time(omp) for the SCF = 0.050639[s].
 **********  DONE: AM1-SCF  **********
 
 
@@ -717,7 +717,7 @@ SCF iter=5: RMS density=0.000000522797385
 		6	H	1.000000e+00	7.030033e-02
 		7	H	1.000000e+00	7.579602e-02
 
-	Elapsed time(omp) for the SCF = 0.050702[s].
+	Elapsed time(omp) for the SCF = 0.050217[s].
 **********  DONE: AM1-SCF  **********
 
 
@@ -860,7 +860,7 @@ SCF iter=5: RMS density=0.000000666775874
 		6	H	1.000000e+00	7.030143e-02
 		7	H	1.000000e+00	7.579471e-02
 
-	Elapsed time(omp) for the SCF = 0.050481[s].
+	Elapsed time(omp) for the SCF = 0.050356[s].
 **********  DONE: AM1-SCF  **********
 
 
@@ -938,9 +938,9 @@ SCF iter=5: RMS density=0.000000666775874
 
 
      >>>>>  The MolDS finished normally!  <<<<<
-     >>>>>  CPU time: 7.13[s].  <<<<<
-     >>>>>  Elapsed time: 8[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 7.1279[s].  <<<<<
+     >>>>>  CPU time: 7.22[s].  <<<<<
+     >>>>>  Elapsed time: 7[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 7.27362[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

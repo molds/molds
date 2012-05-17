@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/5/14(Mon.) 16:47:20  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/5/17(Thu.) 10:32:44  <<<<<
 
 
 **********  START: Parse input  **********
@@ -125,7 +125,7 @@ SCF iter=9: RMS density=0.000000192432080
 		3	H	1.000000e+00	2.643243e-02
 		4	H	1.000000e+00	2.643243e-02
 
-	Elapsed time(omp) for the SCF = 0.025360[s].
+	Elapsed time(omp) for the SCF = 0.028131[s].
 **********  DONE: PM3-SCF  **********
 
 
@@ -135,9 +135,9 @@ SCF iter=9: RMS density=0.000000192432080
 
 
      >>>>>  The MolDS finished normally!  <<<<<
-     >>>>>  CPU time: 0.03[s].  <<<<<
+     >>>>>  CPU time: 0.02[s].  <<<<<
      >>>>>  Elapsed time: 0[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 0.0296099[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 0.0319541[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

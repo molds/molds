@@ -20,6 +20,8 @@ CIS
    max_iter 200
    max_dim 49
    norm_tol 0.000001
+   exciton_energies yes
+   all_transition_dipole_moments yes
 CIS_END
 
 GEOMETRY

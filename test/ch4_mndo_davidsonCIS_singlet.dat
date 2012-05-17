@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/5/14(Mon.) 16:46:26  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/5/17(Thu.) 10:31:48  <<<<<
 
 
 **********  START: Parse input  **********
@@ -60,6 +60,7 @@
 		Max dimensions for the Davidson: 16
 		Norm tolerance for the residual of the Davidson: 1.000000e-06
 		Exciton energies: no
+		All transition dipole moments: no
 
 Input terms:
 theory | mndo | theory_end | scf | max_iter | 50 | rms_density | 0.000001 | damping_thresh | 1.0 | 
@@ -141,13 +142,13 @@ SCF iter=9: RMS density=0.000000388314827
 		| [a.u.] | [Kcal/mol] | 
 		-1.520346e-02	-9.540316e+00
 
-	Elapsed time(omp) for the SCF = 0.029839[s].
+	Elapsed time(omp) for the SCF = 0.025883[s].
 **********  DONE: MNDO-SCF  **********
 
 
 **********  START: MNDO-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.001957[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.002056[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -196,8 +197,28 @@ SCF iter=9: RMS density=0.000000388314827
 		 3	3.644174e-01	9.916381e+00	4.936964e-01 (3 -> 6)	
 		 4	3.644174e-01	9.916381e+00	5.840630e-01 (2 -> 6)	
 
+				| i-th eigenstate |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
+	Total dipole moment:	0	-1.612647e-05	-1.913546e-05	-1.491862e-16	2.502457e-05		-4.098941e-05	-4.863751e-05	-3.791936e-16	6.360613e-05
+	Total dipole moment:	1	-2.205246e-05	-2.504835e-05	2.018843e-15	3.337260e-05		-5.605177e-05	-6.366656e-05	5.131388e-15	8.482471e-05
+	Total dipole moment:	2	-3.548569e-01	-2.594998e-01	-4.972213e-10	4.396175e-01		-9.019564e-01	-6.595827e-01	-1.263811e-09	1.117396e+00
+	Total dipole moment:	3	-2.796586e-02	8.606176e-02	2.551175e-10	9.049152e-02		-7.108214e-02	2.187472e-01	6.484440e-10	2.300066e-01
+	Total dipole moment:	4	3.827533e-01	1.733582e-01	2.421117e-10	4.201823e-01		9.728620e-01	4.406326e-01	6.153866e-10	1.067997e+00
 
-	Elapsed time(omp) for the CIS = 0.004746[s].
+				| i-th eigenstate |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
+	Electronic dipole moment:		0	-1.612647e-05	-1.819533e-05	-1.491862e-16	2.431323e-05		-4.098941e-05	-4.624792e-05	-3.791936e-16	6.179807e-05
+	Electronic dipole moment:		1	-2.205246e-05	-2.410821e-05	2.018843e-15	3.267287e-05		-5.605177e-05	-6.127696e-05	5.131388e-15	8.304618e-05
+	Electronic dipole moment:		2	-3.548569e-01	-2.594988e-01	-4.972213e-10	4.396169e-01		-9.019564e-01	-6.595803e-01	-1.263811e-09	1.117395e+00
+	Electronic dipole moment:		3	-2.796586e-02	8.606270e-02	2.551175e-10	9.049242e-02		-7.108214e-02	2.187496e-01	6.484440e-10	2.300088e-01
+	Electronic dipole moment:		4	3.827533e-01	1.733591e-01	2.421117e-10	4.201826e-01		9.728620e-01	4.406350e-01	6.153866e-10	1.067998e+00
+
+				| from and to eigenstates |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
+	Transition dipole moment:		0 -> 1	-5.379915e-06	-5.628577e-06	-2.467975e-09	7.786166e-06		-1.367438e-05	-1.430642e-05	-6.272968e-09	1.979046e-05
+	Transition dipole moment:		0 -> 2	3.723888e-04	-5.906309e-04	-1.237738e+00	1.237739e+00		9.465182e-04	-1.501234e-03	-3.146018e+00	3.146018e+00
+	Transition dipole moment:		0 -> 3	8.211800e-02	-1.235010e+00	6.140370e-04	1.237737e+00		2.087232e-01	-3.139082e+00	1.560727e-03	3.146014e+00
+	Transition dipole moment:		0 -> 4	1.235010e+00	8.211892e-02	3.323831e-04	1.237737e+00		3.139083e+00	2.087255e-01	8.448338e-04	3.146015e+00
+
+
+	Elapsed time(omp) for the CIS = 0.006189[s].
 **********  DONE: MNDO-CIS  **********
 
 
@@ -209,7 +230,7 @@ SCF iter=9: RMS density=0.000000388314827
      >>>>>  The MolDS finished normally!  <<<<<
      >>>>>  CPU time: 0.03[s].  <<<<<
      >>>>>  Elapsed time: 0[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 0.03842[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 0.0364869[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

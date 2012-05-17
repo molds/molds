@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/5/14(Mon.) 16:47:10  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/5/17(Thu.) 10:32:34  <<<<<
 
 
 **********  START: Parse input  **********
@@ -66,6 +66,7 @@
 		Max dimensions for the Davidson: 49
 		Norm tolerance for the residual of the Davidson: 1.000000e-06
 		Exciton energies: no
+		All transition dipole moments: no
 
 	MD conditions:
 		Electronic eigenstate: 1
@@ -162,13 +163,13 @@ SCF iter=11: RMS density=0.000000372121777
 		6	H	1.000000e+00	7.029841e-02
 		7	H	1.000000e+00	7.579838e-02
 
-	Elapsed time(omp) for the SCF = 0.057495[s].
+	Elapsed time(omp) for the SCF = 0.066181[s].
 **********  DONE: AM1-SCF  **********
 
 
 **********  START: AM1-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.058360[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.056213[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -259,8 +260,28 @@ SCF iter=11: RMS density=0.000000372121777
 		 3	3.114695e-01	8.475583e+00	5.187700e-01 (5 -> 11)	
 		 4	3.126553e-01	8.507851e+00	6.431089e-01 (6 -> 12)	
 
+				| i-th eigenstate |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
+	Total dipole moment:	0	-1.974246e-02	-3.319339e-02	-1.358351e-02	4.093992e-02		-5.018033e-02	-8.436919e-02	-3.452586e-02	1.040589e-01
+	Total dipole moment:	1	-1.777515e-02	-3.357233e-02	-2.196165e-02	4.387905e-02		-4.517993e-02	-8.533236e-02	-5.582095e-02	1.115294e-01
+	Total dipole moment:	2	-3.231152e-02	-8.477727e-02	5.260615e-02	1.048743e-01		-8.212771e-02	-2.154824e-01	1.337115e-01	2.665640e-01
+	Total dipole moment:	3	-5.273434e-02	-6.056038e-02	2.535617e-02	8.421048e-02		-1.340373e-01	-1.539292e-01	6.444897e-02	2.140417e-01
+	Total dipole moment:	4	9.404645e-02	4.027142e-02	-1.056407e-02	1.028500e-01		2.390423e-01	1.023598e-01	-2.685119e-02	2.614187e-01
 
-	Elapsed time(omp) for the CIS = 0.241544[s].
+				| i-th eigenstate |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
+	Electronic dipole moment:		0	7.944456e-03	-2.185780e-02	5.608872e-04	2.326355e-02		2.019280e-02	-5.555701e-02	1.425633e-03	5.913005e-02
+	Electronic dipole moment:		1	9.911763e-03	-2.223674e-02	-7.817245e-03	2.557001e-02		2.519319e-02	-5.652018e-02	-1.986946e-02	6.499248e-02
+	Electronic dipole moment:		2	-4.624609e-03	-7.344169e-02	6.675055e-02	9.935142e-02		-1.175459e-02	-1.866702e-01	1.696630e-01	2.525262e-01
+	Electronic dipole moment:		3	-2.504743e-02	-4.922480e-02	3.950057e-02	6.790250e-02		-6.366422e-02	-1.251170e-01	1.004005e-01	1.725910e-01
+	Electronic dipole moment:		4	1.217334e-01	5.160701e-02	3.580332e-03	1.322691e-01		3.094154e-01	1.311720e-01	9.100299e-03	3.361946e-01
+
+				| from and to eigenstates |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
+	Transition dipole moment:		0 -> 1	-6.400544e-01	-2.929818e-01	-6.176009e-02	7.066274e-01		-1.626856e+00	-7.446857e-01	-1.569785e-01	1.796068e+00
+	Transition dipole moment:		0 -> 2	-7.721123e-02	-1.176164e-01	-1.418938e+00	1.425896e+00		-1.962514e-01	-2.989512e-01	-3.606580e+00	3.624267e+00
+	Transition dipole moment:		0 -> 3	3.114074e-01	1.276315e+00	-1.735140e-01	1.325165e+00		7.915187e-01	3.244069e+00	-4.410287e-01	3.368233e+00
+	Transition dipole moment:		0 -> 4	9.497513e-02	2.198469e-01	1.478815e-01	2.814639e-01		2.414027e-01	5.587953e-01	3.758775e-01	7.154099e-01
+
+
+	Elapsed time(omp) for the CIS = 0.270203[s].
 **********  DONE: AM1-CIS  **********
 
 
@@ -400,13 +421,13 @@ SCF iter=3: RMS density=0.000000868178033
 		6	H	1.000000e+00	7.029847e-02
 		7	H	1.000000e+00	7.579856e-02
 
-	Elapsed time(omp) for the SCF = 0.049739[s].
+	Elapsed time(omp) for the SCF = 0.050324[s].
 **********  DONE: AM1-SCF  **********
 
 
 **********  START: AM1-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.055955[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.056519[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -497,8 +518,28 @@ SCF iter=3: RMS density=0.000000868178033
 		 3	3.114667e-01	8.475507e+00	5.188089e-01 (5 -> 11)	
 		 4	3.126522e-01	8.507766e+00	6.431651e-01 (6 -> 12)	
 
+				| i-th eigenstate |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
+	Total dipole moment:	0	-1.973267e-02	-3.318419e-02	-1.358031e-02	4.092669e-02		-5.015545e-02	-8.434582e-02	-3.451771e-02	1.040253e-01
+	Total dipole moment:	1	-1.776149e-02	-3.356232e-02	-2.195891e-02	4.386449e-02		-4.514520e-02	-8.530693e-02	-5.581399e-02	1.114924e-01
+	Total dipole moment:	2	-3.230820e-02	-8.476626e-02	5.262368e-02	1.048732e-01		-8.211928e-02	-2.154544e-01	1.337561e-01	2.665612e-01
+	Total dipole moment:	3	-5.272412e-02	-6.055356e-02	2.536344e-02	8.420137e-02		-1.340114e-01	-1.539118e-01	6.446745e-02	2.140186e-01
+	Total dipole moment:	4	9.403454e-02	4.027282e-02	-1.055361e-02	1.028386e-01		2.390120e-01	1.023633e-01	-2.682461e-02	2.613897e-01
 
-	Elapsed time(omp) for the CIS = 0.237981[s].
+				| i-th eigenstate |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
+	Electronic dipole moment:		0	7.951016e-03	-2.185492e-02	5.633711e-04	2.326314e-02		2.020947e-02	-5.554967e-02	1.431947e-03	5.912901e-02
+	Electronic dipole moment:		1	9.922201e-03	-2.223305e-02	-7.815231e-03	2.557022e-02		2.521972e-02	-5.651079e-02	-1.986434e-02	6.499304e-02
+	Electronic dipole moment:		2	-4.624518e-03	-7.343699e-02	6.676736e-02	9.935924e-02		-1.175436e-02	-1.866582e-01	1.697057e-01	2.525460e-01
+	Electronic dipole moment:		3	-2.504044e-02	-4.922429e-02	3.950712e-02	6.790336e-02		-6.364646e-02	-1.251157e-01	1.004171e-01	1.725932e-01
+	Electronic dipole moment:		4	1.217182e-01	5.160209e-02	3.590065e-03	1.322535e-01		3.093769e-01	1.311595e-01	9.125038e-03	3.361550e-01
+
+				| from and to eigenstates |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
+	Transition dipole moment:		0 -> 1	-6.401307e-01	-2.929492e-01	-6.175098e-02	7.066822e-01		-1.627050e+00	-7.446027e-01	-1.569554e-01	1.796207e+00
+	Transition dipole moment:		0 -> 2	-7.716334e-02	-1.176125e-01	-1.419112e+00	1.426066e+00		-1.961297e-01	-2.989412e-01	-3.607023e+00	3.624700e+00
+	Transition dipole moment:		0 -> 3	3.112021e-01	1.276515e+00	-1.735370e-01	1.325312e+00		7.909971e-01	3.244577e+00	-4.410871e-01	3.368607e+00
+	Transition dipole moment:		0 -> 4	9.495280e-02	2.200127e-01	1.480556e-01	2.816772e-01		2.413460e-01	5.592166e-01	3.763198e-01	7.159523e-01
+
+
+	Elapsed time(omp) for the CIS = 0.243440[s].
 **********  DONE: AM1-CIS  **********
 
 
@@ -641,13 +682,13 @@ SCF iter=5: RMS density=0.000000435658339
 		6	H	1.000000e+00	7.029846e-02
 		7	H	1.000000e+00	7.579905e-02
 
-	Elapsed time(omp) for the SCF = 0.050178[s].
+	Elapsed time(omp) for the SCF = 0.051194[s].
 **********  DONE: AM1-SCF  **********
 
 
 **********  START: AM1-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.055848[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.056778[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -738,8 +779,28 @@ SCF iter=5: RMS density=0.000000435658339
 		 3	3.114582e-01	8.475277e+00	5.189231e-01 (5 -> 11)	
 		 4	3.126428e-01	8.507513e+00	6.433338e-01 (6 -> 12)	
 
+				| i-th eigenstate |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
+	Total dipole moment:	0	-1.970330e-02	-3.315724e-02	-1.357097e-02	4.088758e-02		-5.008081e-02	-8.427732e-02	-3.449398e-02	1.039259e-01
+	Total dipole moment:	1	-1.772087e-02	-3.353317e-02	-2.195113e-02	4.382185e-02		-4.504197e-02	-8.523283e-02	-5.579422e-02	1.113841e-01
+	Total dipole moment:	2	-3.229730e-02	-8.473271e-02	5.267531e-02	1.048687e-01		-8.209157e-02	-2.153691e-01	1.338873e-01	2.665496e-01
+	Total dipole moment:	3	-5.269290e-02	-6.053331e-02	2.538443e-02	8.417359e-02		-1.339320e-01	-1.538604e-01	6.452081e-02	2.139480e-01
+	Total dipole moment:	4	9.399839e-02	4.027595e-02	-1.052226e-02	1.028035e-01		2.389201e-01	1.023713e-01	-2.674493e-02	2.613006e-01
 
-	Elapsed time(omp) for the CIS = 0.237577[s].
+				| i-th eigenstate |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
+	Electronic dipole moment:		0	7.970702e-03	-2.184689e-02	5.705369e-04	2.326251e-02		2.025951e-02	-5.552928e-02	1.450160e-03	5.912742e-02
+	Electronic dipole moment:		1	9.953136e-03	-2.222282e-02	-7.809619e-03	2.557164e-02		2.529835e-02	-5.648479e-02	-1.985008e-02	6.499664e-02
+	Electronic dipole moment:		2	-4.623297e-03	-7.342236e-02	6.681683e-02	9.938162e-02		-1.175125e-02	-1.866211e-01	1.698315e-01	2.526029e-01
+	Electronic dipole moment:		3	-2.501889e-02	-4.922296e-02	3.952595e-02	6.790542e-02		-6.359169e-02	-1.251123e-01	1.004650e-01	1.725984e-01
+	Electronic dipole moment:		4	1.216724e-01	5.158629e-02	3.619247e-03	1.322060e-01		3.092605e-01	1.311193e-01	9.199211e-03	3.360341e-01
+
+				| from and to eigenstates |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
+	Transition dipole moment:		0 -> 1	-6.403592e-01	-2.928511e-01	-6.172362e-02	7.068461e-01		-1.627631e+00	-7.443534e-01	-1.568858e-01	1.796624e+00
+	Transition dipole moment:		0 -> 2	-7.701949e-02	-1.176006e-01	-1.419634e+00	1.426577e+00		-1.957641e-01	-2.989110e-01	-3.608350e+00	3.625998e+00
+	Transition dipole moment:		0 -> 3	3.105859e-01	1.277114e+00	-1.736058e-01	1.325754e+00		7.894309e-01	3.246102e+00	-4.412619e-01	3.369731e+00
+	Transition dipole moment:		0 -> 4	9.488479e-02	2.205082e-01	1.485784e-01	2.823163e-01		2.411731e-01	5.604760e-01	3.776486e-01	7.175767e-01
+
+
+	Elapsed time(omp) for the CIS = 0.244178[s].
 **********  DONE: AM1-CIS  **********
 
 
@@ -882,13 +943,13 @@ SCF iter=5: RMS density=0.000000720184858
 		6	H	1.000000e+00	7.029855e-02
 		7	H	1.000000e+00	7.579997e-02
 
-	Elapsed time(omp) for the SCF = 0.050720[s].
+	Elapsed time(omp) for the SCF = 0.050875[s].
 **********  DONE: AM1-SCF  **********
 
 
 **********  START: AM1-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.058830[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.055939[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -979,8 +1040,28 @@ SCF iter=5: RMS density=0.000000720184858
 		 3	3.114441e-01	8.474894e+00	5.191119e-01 (5 -> 11)	
 		 4	3.126273e-01	8.507090e+00	6.436125e-01 (6 -> 12)	
 
+				| i-th eigenstate |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
+	Total dipole moment:	0	-1.965435e-02	-3.311232e-02	-1.355544e-02	4.082241e-02		-4.995639e-02	-8.416315e-02	-3.445449e-02	1.037602e-01
+	Total dipole moment:	1	-1.765323e-02	-3.348457e-02	-2.193813e-02	4.375083e-02		-4.487006e-02	-8.510931e-02	-5.576119e-02	1.112035e-01
+	Total dipole moment:	2	-3.227872e-02	-8.467653e-02	5.276081e-02	1.048605e-01		-8.204434e-02	-2.152263e-01	1.341046e-01	2.665290e-01
+	Total dipole moment:	3	-5.264043e-02	-6.049915e-02	2.541894e-02	8.412660e-02		-1.337987e-01	-1.537735e-01	6.460853e-02	2.138285e-01
+	Total dipole moment:	4	9.393761e-02	4.028063e-02	-1.046971e-02	1.027444e-01		2.387656e-01	1.023832e-01	-2.661136e-02	2.611504e-01
 
-	Elapsed time(omp) for the CIS = 0.241015[s].
+				| i-th eigenstate |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
+	Electronic dipole moment:		0	8.003526e-03	-2.183350e-02	5.824629e-04	2.326150e-02		2.034294e-02	-5.549524e-02	1.480473e-03	5.912485e-02
+	Electronic dipole moment:		1	1.000464e-02	-2.220575e-02	-7.800234e-03	2.557405e-02		2.542927e-02	-5.644140e-02	-1.982622e-02	6.500276e-02
+	Electronic dipole moment:		2	-4.620840e-03	-7.339771e-02	6.689871e-02	9.941838e-02		-1.174501e-02	-1.865584e-01	1.700396e-01	2.526964e-01
+	Electronic dipole moment:		3	-2.498255e-02	-4.922033e-02	3.955685e-02	6.790812e-02		-6.349932e-02	-1.251056e-01	1.005435e-01	1.726053e-01
+	Electronic dipole moment:		4	1.215955e-01	5.155945e-02	3.668188e-03	1.321261e-01		3.090650e-01	1.310511e-01	9.323605e-03	3.358310e-01
+
+				| from and to eigenstates |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
+	Transition dipole moment:		0 -> 1	-6.407397e-01	-2.926877e-01	-6.167807e-02	7.071192e-01		-1.628598e+00	-7.439381e-01	-1.567700e-01	1.797318e+00
+	Transition dipole moment:		0 -> 2	-7.678057e-02	-1.175809e-01	-1.420503e+00	1.427427e+00		-1.951568e-01	-2.988610e-01	-3.610558e+00	3.628159e+00
+	Transition dipole moment:		0 -> 3	3.095622e-01	1.278112e+00	-1.737206e-01	1.326491e+00		7.868288e-01	3.248636e+00	-4.415539e-01	3.371603e+00
+	Transition dipole moment:		0 -> 4	9.477103e-02	2.213328e-01	1.494464e-01	2.833796e-01		2.408840e-01	5.625720e-01	3.798549e-01	7.202792e-01
+
+
+	Elapsed time(omp) for the CIS = 0.246253[s].
 **********  DONE: AM1-CIS  **********
 
 
@@ -1124,13 +1205,13 @@ SCF iter=6: RMS density=0.000000003947661
 		6	H	1.000000e+00	7.029848e-02
 		7	H	1.000000e+00	7.580108e-02
 
-	Elapsed time(omp) for the SCF = 0.050674[s].
+	Elapsed time(omp) for the SCF = 0.051115[s].
 **********  DONE: AM1-SCF  **********
 
 
 **********  START: AM1-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.055664[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.056409[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -1221,8 +1302,28 @@ SCF iter=6: RMS density=0.000000003947661
 		 3	3.114244e-01	8.474357e+00	5.193731e-01 (5 -> 11)	
 		 4	3.126056e-01	8.506499e+00	6.439999e-01 (6 -> 12)	
 
+				| i-th eigenstate |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
+	Total dipole moment:	0	-1.958594e-02	-3.304957e-02	-1.353371e-02	4.073137e-02		-4.978250e-02	-8.400364e-02	-3.439926e-02	1.035288e-01
+	Total dipole moment:	1	-1.755880e-02	-3.341672e-02	-2.191989e-02	4.365169e-02		-4.463002e-02	-8.493686e-02	-5.571480e-02	1.109516e-01
+	Total dipole moment:	2	-3.225040e-02	-8.459623e-02	5.287943e-02	1.048468e-01		-8.197236e-02	-2.150222e-01	1.344061e-01	2.664940e-01
+	Total dipole moment:	3	-5.256616e-02	-6.045065e-02	2.546661e-02	8.405969e-02		-1.336099e-01	-1.536503e-01	6.472968e-02	2.136585e-01
+	Total dipole moment:	4	9.385086e-02	4.028540e-02	-1.039553e-02	1.026595e-01		2.385451e-01	1.023953e-01	-2.642280e-02	2.609344e-01
 
-	Elapsed time(omp) for the CIS = 0.236776[s].
+				| i-th eigenstate |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
+	Electronic dipole moment:		0	8.049369e-03	-2.181484e-02	5.991431e-04	2.326024e-02		2.045946e-02	-5.544781e-02	1.522870e-03	5.912164e-02
+	Electronic dipole moment:		1	1.007651e-02	-2.218200e-02	-7.787036e-03	2.557762e-02		2.561193e-02	-5.638102e-02	-1.979268e-02	6.501185e-02
+	Electronic dipole moment:		2	-4.615096e-03	-7.336150e-02	6.701228e-02	9.946786e-02		-1.173041e-02	-1.864664e-01	1.703283e-01	2.528221e-01
+	Electronic dipole moment:		3	-2.493086e-02	-4.921593e-02	3.959946e-02	6.791077e-02		-6.336793e-02	-1.250944e-01	1.006518e-01	1.726120e-01
+	Electronic dipole moment:		4	1.214862e-01	5.152012e-02	3.737321e-03	1.320120e-01		3.087871e-01	1.309511e-01	9.499324e-03	3.355412e-01
+
+				| from and to eigenstates |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
+	Transition dipole moment:		0 -> 1	-6.412713e-01	-2.924589e-01	-6.161427e-02	7.075008e-01		-1.629949e+00	-7.433564e-01	-1.566079e-01	1.798288e+00
+	Transition dipole moment:		0 -> 2	-7.644739e-02	-1.175532e-01	-1.421716e+00	1.428615e+00		-1.943099e-01	-2.987906e-01	-3.613643e+00	3.631177e+00
+	Transition dipole moment:		0 -> 3	3.081346e-01	1.279504e+00	-1.738808e-01	1.327521e+00		7.832002e-01	3.252176e+00	-4.419609e-01	3.374223e+00
+	Transition dipole moment:		0 -> 4	9.460952e-02	2.224813e-01	1.506543e-01	2.848607e-01		2.404735e-01	5.654913e-01	3.829252e-01	7.240439e-01
+
+
+	Elapsed time(omp) for the CIS = 0.243353[s].
 **********  DONE: AM1-CIS  **********
 
 
@@ -1366,13 +1467,13 @@ SCF iter=6: RMS density=0.000000005033379
 		6	H	1.000000e+00	7.029853e-02
 		7	H	1.000000e+00	7.580263e-02
 
-	Elapsed time(omp) for the SCF = 0.050329[s].
+	Elapsed time(omp) for the SCF = 0.050954[s].
 **********  DONE: AM1-SCF  **********
 
 
 **********  START: AM1-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.055907[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.056170[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -1463,8 +1564,28 @@ SCF iter=6: RMS density=0.000000005033379
 		 3	3.113990e-01	8.473665e+00	5.197036e-01 (5 -> 11)	
 		 4	3.125776e-01	8.505739e+00	6.444909e-01 (6 -> 12)	
 
+				| i-th eigenstate |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
+	Total dipole moment:	0	-1.949800e-02	-3.296887e-02	-1.350578e-02	4.061434e-02		-4.955897e-02	-8.379853e-02	-3.432827e-02	1.032314e-01
+	Total dipole moment:	1	-1.743753e-02	-3.332946e-02	-2.189625e-02	4.352432e-02		-4.432180e-02	-8.471506e-02	-5.565472e-02	1.106278e-01
+	Total dipole moment:	2	-3.221187e-02	-8.449156e-02	5.303013e-02	1.048266e-01		-8.187441e-02	-2.147562e-01	1.347892e-01	2.664428e-01
+	Total dipole moment:	3	-5.246914e-02	-6.038685e-02	2.552640e-02	8.397130e-02		-1.333633e-01	-1.534881e-01	6.488166e-02	2.134338e-01
+	Total dipole moment:	4	9.373730e-02	4.028947e-02	-1.029904e-02	1.025475e-01		2.382565e-01	1.024056e-01	-2.617755e-02	2.606498e-01
 
-	Elapsed time(omp) for the CIS = 0.236655[s].
+				| i-th eigenstate |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
+	Electronic dipole moment:		0	8.108302e-03	-2.179077e-02	6.205838e-04	2.325870e-02		2.060925e-02	-5.538662e-02	1.577367e-03	5.911774e-02
+	Electronic dipole moment:		1	1.016876e-02	-2.215136e-02	-7.769888e-03	2.558237e-02		2.584643e-02	-5.630315e-02	-1.974909e-02	6.502391e-02
+	Electronic dipole moment:		2	-4.605569e-03	-7.331346e-02	6.715649e-02	9.952924e-02		-1.170619e-02	-1.863443e-01	1.706948e-01	2.529781e-01
+	Electronic dipole moment:		3	-2.486285e-02	-4.920875e-02	3.965276e-02	6.791173e-02		-6.319506e-02	-1.250762e-01	1.007873e-01	1.726144e-01
+	Electronic dipole moment:		4	1.213436e-01	5.146757e-02	3.827320e-03	1.318629e-01		3.084247e-01	1.308175e-01	9.728079e-03	3.351622e-01
+
+				| from and to eigenstates |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
+	Transition dipole moment:		0 -> 1	-6.419536e-01	-2.921647e-01	-6.153228e-02	7.079907e-01		-1.631684e+00	-7.426086e-01	-1.563995e-01	1.799533e+00
+	Transition dipole moment:		0 -> 2	-7.602142e-02	-1.175178e-01	-1.423272e+00	1.430138e+00		-1.932272e-01	-2.987005e-01	-3.617598e+00	3.635048e+00
+	Transition dipole moment:		0 -> 3	3.063088e-01	1.281288e+00	-1.740870e-01	1.328846e+00		7.785595e-01	3.256710e+00	-4.424850e-01	3.377589e+00
+	Transition dipole moment:		0 -> 4	9.439963e-02	2.239532e-01	1.521970e-01	2.867582e-01		2.399400e-01	5.692324e-01	3.868463e-01	7.288668e-01
+
+
+	Elapsed time(omp) for the CIS = 0.243522[s].
 **********  DONE: AM1-CIS  **********
 
 
@@ -1542,9 +1663,9 @@ SCF iter=6: RMS density=0.000000005033379
 
 
      >>>>>  The MolDS finished normally!  <<<<<
-     >>>>>  CPU time: 10[s].  <<<<<
+     >>>>>  CPU time: 10.13[s].  <<<<<
      >>>>>  Elapsed time: 10[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 10.0256[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 10.1888[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

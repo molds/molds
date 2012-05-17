@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/5/14(Mon.) 16:46:25  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/5/17(Thu.) 10:31:47  <<<<<
 
 
 **********  START: Parse input  **********
@@ -147,7 +147,7 @@ SCF iter=8: RMS density=0.000000782384958
 		6	H	1.000000e+00	1.599949e-02
 		7	H	1.000000e+00	2.221343e-02
 
-	Elapsed time(omp) for the SCF = 0.034442[s].
+	Elapsed time(omp) for the SCF = 0.026083[s].
 **********  DONE: ZINDO/S-SCF  **********
 
 
@@ -288,7 +288,7 @@ SCF iter=4: RMS density=0.000000916022614
 		6	H	1.000000e+00	1.597875e-02
 		7	H	1.000000e+00	2.219382e-02
 
-	Elapsed time(omp) for the SCF = 0.024839[s].
+	Elapsed time(omp) for the SCF = 0.018370[s].
 **********  DONE: ZINDO/S-SCF  **********
 
 
@@ -431,7 +431,7 @@ SCF iter=5: RMS density=0.000000616040326
 		6	H	1.000000e+00	1.591669e-02
 		7	H	1.000000e+00	2.213515e-02
 
-	Elapsed time(omp) for the SCF = 0.025061[s].
+	Elapsed time(omp) for the SCF = 0.018314[s].
 **********  DONE: ZINDO/S-SCF  **********
 
 
@@ -575,7 +575,7 @@ SCF iter=6: RMS density=0.000000007274086
 		6	H	1.000000e+00	1.581390e-02
 		7	H	1.000000e+00	2.203806e-02
 
-	Elapsed time(omp) for the SCF = 0.025599[s].
+	Elapsed time(omp) for the SCF = 0.018507[s].
 **********  DONE: ZINDO/S-SCF  **********
 
 
@@ -719,7 +719,7 @@ SCF iter=6: RMS density=0.000000010198127
 		6	H	1.000000e+00	1.567135e-02
 		7	H	1.000000e+00	2.190363e-02
 
-	Elapsed time(omp) for the SCF = 0.025307[s].
+	Elapsed time(omp) for the SCF = 0.018547[s].
 **********  DONE: ZINDO/S-SCF  **********
 
 
@@ -863,7 +863,7 @@ SCF iter=6: RMS density=0.000000013139603
 		6	H	1.000000e+00	1.549037e-02
 		7	H	1.000000e+00	2.173328e-02
 
-	Elapsed time(omp) for the SCF = 0.025500[s].
+	Elapsed time(omp) for the SCF = 0.027941[s].
 **********  DONE: ZINDO/S-SCF  **********
 
 
@@ -941,9 +941,9 @@ SCF iter=6: RMS density=0.000000013139603
 
 
      >>>>>  The MolDS finished normally!  <<<<<
-     >>>>>  CPU time: 0.5[s].  <<<<<
+     >>>>>  CPU time: 0.47[s].  <<<<<
      >>>>>  Elapsed time: 0[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 0.498044[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 0.469288[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

@@ -17,6 +17,8 @@ CIS
    active_occ 7
    active_vir 7
    nstates 49
+   exciton_energies yes
+   all_transition_dipole_moments yes
 CIS_END
 
 GEOMETRY
