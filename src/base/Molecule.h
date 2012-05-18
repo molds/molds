@@ -98,19 +98,16 @@ private:
    std::string messageStartPrincipalAxes;
    std::string messageDonePrincipalAxes;
    std::string messagePrincipalAxes;
-   std::string messagePrincipalAxesTitleAU;
-   std::string messagePrincipalAxesTitleAng;
+   std::string messagePrincipalAxesNote;
+   std::string messagePrincipalAxesTitle;
    std::string messageInertiaTensorOrigin;
-   std::string messageInertiaTensorOriginTitleAU;
-   std::string messageInertiaTensorOriginTitleAng;
+   std::string messageInertiaTensorOriginTitle;
    std::string messageStartRotate;
    std::string messageDoneRotate;
    std::string messageRotatingOrigin;
-   std::string messageRotatingOriginTitleAU;
-   std::string messageRotatingOriginTitleAng;
+   std::string messageRotatingOriginTitle;
    std::string messageRotatingAxis;
-   std::string messageRotatingAxisTitleAU;
-   std::string messageRotatingAxisTitleAng;
+   std::string messageRotatingAxisTitle;
    std::string messageRotatingAngle;
    std::string messageRotatingType;
    std::string messageRotatingEularAngles;
@@ -118,8 +115,7 @@ private:
    std::string messageStartTranslate;
    std::string messageDoneTranslate;
    std::string messageTranslatingDifference;
-   std::string messageTranslatingDifferenceTitleAU;
-   std::string messageTranslatingDifferenceTitleAng;
+   std::string messageTranslatingDifferenceTitle;
 };
 }
 #endif

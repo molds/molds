@@ -113,6 +113,7 @@ private:
    std::string messageExcitedStatesEnergies;
    std::string messageExcitedStatesEnergiesTitle;
    std::string messageExcitonEnergiesCIS;
+   std::string messageExcitonEnergiesShortCIS;
    std::string messageExcitonEnergiesCISTitle;
    std::string messageTotalDipoleMomentsTitle;
    std::string messageTotalDipoleMoment;

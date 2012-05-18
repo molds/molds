@@ -131,15 +131,16 @@ void ZindoS::SetMessages(){
    this->messageDavidsonConverge = "\n\n\t\tDavidson for ZINDO/S-CIS met convergence criterion(^^b\n\n\n";
    this->messageDavidsonReachCISMatrix = "\n\t\tDimension of the expansion vectors reaches to the dimension of the CIS-matrix.\n";
    this->messageDavidsonGoToDirect = "\t\tHence, we go to the Direct-CIS.\n\n";
-   this->messageExcitedStatesEnergies = "\tExcitation energies:\n";
-   this->messageExcitedStatesEnergiesTitle = "\t\t| i-th | e[a.u.] | e[eV] | dominant eigenvector coefficients (occ. -> vir.) |\n";
+   this->messageExcitedStatesEnergies = "\tExcitation energies:";
+   this->messageExcitedStatesEnergiesTitle = "\t\t\t\t|   i-th   |   e[a.u.]   |   e[eV]   | dominant eigenvector coefficients (occ. -> vir.) |\n";
    this->messageExcitonEnergiesCIS = "\tFree exciton (Ef) and exciton binding (Eb) energies:\n";
-   this->messageExcitonEnergiesCISTitle = "\t\t| i-th | Ef[a.u.] | Ef[eV] | Eb[a.u.] | Eb[eV] |\n";
+   this->messageExcitonEnergiesShortCIS = "\tEf and Eb:";
+   this->messageExcitonEnergiesCISTitle = "\t\t\t|   i-th   |   Ef[a.u.]   |   Ef[eV]   |   Eb[a.u.]   |   Eb[eV]   |\n";
    this->messageTotalDipoleMomentsTitle = "\t\t\t\t| i-th eigenstate |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |\t\t|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |\n";
    this->messageTotalDipoleMoment = "Total dipole moment:";
-   this->messageElectronicDipoleMomentsTitle = "\t\t\t\t| i-th eigenstate |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |\t\t|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |\n";
+   this->messageElectronicDipoleMomentsTitle = "\t\t\t\t\t| i-th eigenstate |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |\t\t|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |\n";
    this->messageElectronicDipoleMoment = "Electronic dipole moment:";
-   this->messageTransitionDipoleMomentsTitle = "\t\t\t\t| from and to eigenstates |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |\t\t|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |\n";
+   this->messageTransitionDipoleMomentsTitle = "\t\t\t\t\t| from and to eigenstates |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |\t\t|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |\n";
    this->messageTransitionDipoleMoment = "Transition dipole moment:";
 
 }
@@ -1094,13 +1095,14 @@ void ZindoS::OutputCISResults() const{
    int numberActiveVir = Parameters::GetInstance()->GetActiveVirCIS();
 
    // output cis eigen energies
-   this->OutputLog(this->messageExcitedStatesEnergies);
    this->OutputLog(this->messageExcitedStatesEnergiesTitle);
    double eV2AU = Parameters::GetInstance()->GetEV2AU();
    for(int k=0; k<Parameters::GetInstance()->GetNumberExcitedStatesCIS(); k++){
-      this->OutputLog((boost::format("\t\t %d\t%e\t%e\t") % (k+1) 
-                                                          % this->excitedEnergies[k]
-                                                          % (this->excitedEnergies[k]/eV2AU)).str());
+      this->OutputLog((boost::format("%s\t%d\t%e\t%e\t") 
+         % this->messageExcitedStatesEnergies
+         % (k+1) 
+         % this->excitedEnergies[k]
+         % (this->excitedEnergies[k]/eV2AU)).str());
 
       // sort eigen vector coefficeits of CIS and output
       vector<CISEigenVectorCoefficient> cisEigenVectorCoefficients;
@@ -1125,7 +1127,8 @@ void ZindoS::OutputCISResults() const{
       this->OutputLog(this->messageExcitonEnergiesCIS);
       this->OutputLog(this->messageExcitonEnergiesCISTitle);
       for(int k=0; k<Parameters::GetInstance()->GetNumberExcitedStatesCIS(); k++){
-         this->OutputLog((boost::format("\t\t %d\t%e\t%e\t%e\t%e\n") 
+         this->OutputLog((boost::format("%s\t%d\t%e\t%e\t%e\t%e\n") 
+                           % this->messageExcitonEnergiesShortCIS
                            % (k+1) 
                            %  this->freeExcitonEnergiesCIS[k]
                            % (this->freeExcitonEnergiesCIS[k]/eV2AU)
@@ -1194,7 +1197,7 @@ void ZindoS::OutputCISDipole() const{
       temp += pow(this->electronicTransitionDipoleMoments[k][k][YAxis],2.0);
       temp += pow(this->electronicTransitionDipoleMoments[k][k][ZAxis],2.0);
       magnitude = sqrt(temp);
-      this->OutputLog((boost::format("\t%s\t\t%d\t%e\t%e\t%e\t%e\t\t%e\t%e\t%e\t%e\n") 
+      this->OutputLog((boost::format("\t%s\t%d\t%e\t%e\t%e\t%e\t\t%e\t%e\t%e\t%e\n") 
          % this->messageElectronicDipoleMoment
          % k
          % (this->electronicTransitionDipoleMoments[k][k][XAxis])
@@ -1227,7 +1230,7 @@ void ZindoS::OutputCISTransitionDipole() const{
             temp += pow(this->electronicTransitionDipoleMoments[to][from][YAxis],2.0);
             temp += pow(this->electronicTransitionDipoleMoments[to][from][ZAxis],2.0);
             magnitude = sqrt(temp);
-            this->OutputLog((boost::format("\t%s\t\t%d -> %d\t%e\t%e\t%e\t%e\t\t%e\t%e\t%e\t%e\n") 
+            this->OutputLog((boost::format("\t%s\t%d -> %d\t\t%e\t%e\t%e\t%e\t\t%e\t%e\t%e\t%e\n") 
                % this->messageTransitionDipoleMoment
                % from
                % to
