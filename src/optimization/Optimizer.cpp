@@ -195,13 +195,13 @@ bool Optimizer::SatisfiesConvergenceCriterion(double** matrixForce,
    // output logs
    this->OutputLog("\n");
    this->OutputLog(this->messageOptimizationLog);
-   this->OutputLog((boost::format("%s %e%s\n") % this->messageEnergyDifference.c_str() 
+   this->OutputLog((boost::format("%s %e %s\n") % this->messageEnergyDifference.c_str() 
                                                % energyDifference 
                                                % this->messageAu.c_str()).str());
-   this->OutputLog((boost::format("%s %e%s\n") % this->messageMaxGradient.c_str() 
+   this->OutputLog((boost::format("%s %e %s\n") % this->messageMaxGradient.c_str() 
                                                % maxGradient 
                                                % this->messageAu.c_str()).str());
-   this->OutputLog((boost::format("%s %e%s\n") % this->messageRmsGradient.c_str() 
+   this->OutputLog((boost::format("%s %e %s\n") % this->messageRmsGradient.c_str() 
                                                % rmsGradient 
                                                % this->messageAu.c_str()).str());
    this->OutputLog("\n\n");

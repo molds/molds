@@ -135,8 +135,8 @@ void Mndo::SetMessages(){
    this->messageSCFMetConvergence = "\n\n\n\t\tMNDO-SCF met convergence criterion(^^b\n\n\n";
    this->messageStartSCF = "**********  START: MNDO-SCF  **********\n";
    this->messageDoneSCF = "**********  DONE: MNDO-SCF  **********\n\n\n";
-   this->messageHeatsFormation = "\tHeats of formation:\n";
-   this->messageHeatsFormationTitle = "\t\t| [a.u.] | [Kcal/mol] | \n";
+   this->messageHeatsFormation = "\tHeats of formation:";
+   this->messageHeatsFormationTitle = "\t\t\t\t|  [a.u.]  |  [Kcal/mol]  | \n";
    this->messageStartCIS = "**********  START: MNDO-CIS  **********\n";
    this->messageDoneCIS = "**********  DONE: MNDO-CIS  **********\n\n\n";
    this->messageDavidsonConverge = "\n\n\t\tDavidson for MNDO-CIS met convergence criterion(^^b\n\n\n";
@@ -245,9 +245,9 @@ void Mndo::CalcSCFProperties(){
 void Mndo::OutputSCFResults() const{
    MolDS_cndo::Cndo2::OutputSCFResults();
    // output heats of formation
-   this->OutputLog(this->messageHeatsFormation);
    this->OutputLog(this->messageHeatsFormationTitle);
-   this->OutputLog((boost::format("\t\t%e\t%e\n\n") % this->heatsFormation 
+   this->OutputLog((boost::format("%s\t%e\t%e\n\n") % this->messageHeatsFormation
+                                                    % this->heatsFormation 
                                                     % (this->heatsFormation/Parameters::GetInstance()->
                                                                                         GetKcalMolin2AU())).str());
 }

@@ -158,13 +158,13 @@ void MD::SetMessages(){
    this->messageEndStepMD =     "\t========== DONE: MD step ";
    this->messageEnergies = "\tEnergies:\n";
    this->messageEnergiesTitle = "\t\t|\tkind\t\t\t| [a.u.] | [eV] | \n";
-   this->messageCoreKineticEnergy =   "Core kinetic     ";
-   this->messageCoreRepulsionEnergy = "Core repulsion   ";
-   this->messageVdWCorrectionEnergy = "VdW correction   ";
-   this->messageElectronicEnergy = "Electronic\n\t\t(inc. core rep.)";
-   this->messageElectronicEnergyVdW = "Electronic\n\t\t(inc. core rep. and vdW)";
-   this->messageTotalEnergy =         "Total            ";
-   this->messageErrorEnergy =         "Error            ";
+   this->messageCoreKineticEnergy =   "Core kinetic:     ";
+   this->messageCoreRepulsionEnergy = "Core repulsion:   ";
+   this->messageVdWCorrectionEnergy = "VdW correction:   ";
+   this->messageElectronicEnergy = "Electronic\n\t\t(inc. core rep.):";
+   this->messageElectronicEnergyVdW = "Electronic\n\t\t(inc. core rep. and vdW):";
+   this->messageTotalEnergy =         "Total:            ";
+   this->messageErrorEnergy =         "Error:            ";
    this->messageTime = "\tTime in [fs]: ";
 }
 

@@ -199,12 +199,13 @@ private:
    std::string errorMessageSetOverlapElementNullDiaMatrix;
    std::string messageIterSCF;
    std::string messageDensityRMS;
-   std::string messageEnergiesMOs;
-   std::string messageEnergiesMOsTitle;
+   std::string messageEnergyMO;
+   std::string messageEnergyMOTitle;
    std::string messageMullikenAtoms;
    std::string messageMullikenAtomsTitle;
    std::string messageElecEnergy;
-   std::string messageElecEnergyVdW;
+   std::string messageNoteElecEnergy;
+   std::string messageNoteElecEnergyVdW;
    std::string messageElecEnergyTitle;
    std::string messageOcc;
    std::string messageUnOcc;
@@ -212,15 +213,12 @@ private:
    std::string messageCoreRepulsion;
    std::string messageVdWCorrectionTitle;
    std::string messageVdWCorrection;
-   std::string messageElectronicDipoleMomentsTitleAU;
-   std::string messageElectronicDipoleMomentsTitleDebye;
-   std::string messageElectronicDipoleMoments;
-   std::string messageCoreDipoleMomentTitleAU;
-   std::string messageCoreDipoleMomentTitleDebye;
+   std::string messageElectronicDipoleMomentTitle;
+   std::string messageElectronicDipoleMoment;
+   std::string messageCoreDipoleMomentTitle;
    std::string messageCoreDipoleMoment;
-   std::string messageTotalDipoleTitleAU;
-   std::string messageTotalDipoleTitleDebye;
-   std::string messageTotalDipole;
+   std::string messageTotalDipoleMomentTitle;
+   std::string messageTotalDipoleMoment;
    double elecSCFEnergy;
    double** gammaAB;
    double bondingAdjustParameterK[2]; //see (3.79) in J. A. Pople book

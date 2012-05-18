@@ -129,16 +129,13 @@ void Molecule::SetMessages(){
    this->messageTotalNumberAOs = "\tTotal number of valence AOs: ";
    this->messageTotalNumberAtoms = "\tTotal number of atoms: ";
    this->messageTotalNumberValenceElectrons = "\tTotal number of valence electrons: ";
-   this->messageConfiguration = "\tMolecular configuration:\n";
-   this->messageConfigurationTitleAU = "\t\t| i-th | atom type | x[a.u.] | y[a.u.] | z[a.u.] |\n";
-   this->messageConfigurationTitleAng = "\t\t| i-th | atom type | x[angst.] | y[angst.] | z[angst.] |\n";
-   this->messageMomenta = "\tMomenta of each atom:\n";
-   this->messageMomentaTitleAU = "\t\t| i-th | atom type | px[a.u.] | py[a.u.] | pz[a.u.] |\n ";
-   this->messageMomentaTitleGAngMolinFsin = "\t\t| i-th | atom type | px | py | pz | [(g/Mol)*(angst/fs)]\n ";
-   this->messageCOM = "\tCenter of Mass:\n";
-   this->messageCOC = "\tCenter of Core:\n";
-   this->messageCOMTitleAU = "\t\t| x[a.u.] | y[a.u.] | z[a.u.] |\n";
-   this->messageCOMTitleAng = "\t\t| x[angst.] | y[angst.] | z[angst.] |\n";
+   this->messageAtomCoordinatesTitle = "\t\t\t\t| i-th | atom type |   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |\t\t|  x[angst.]  |  y[angst.]  |  z[angst.]  |\n";
+   this->messageAtomCoordinates = "\tAtom coordinates:";
+   this->messageAtomMomenta = "\tAtom momenta:";
+   this->messageAtomMomentaTitle = "\t\t\t| i-th | atom type |   px[a.u.]   |   py[a.u.]   |   pz[a.u.]   |\t\t|   px[u]   |   py[u]   |   pz[u]   | [u] = [(g/Mol)*(angst/fs)]\n";
+   this->messageCOM = "\tCenter of Mass:";
+   this->messageCOC = "\tCenter of Core:";
+   this->messageCOMTitle = "\t\t\t|   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |\t\t|  x[angst.]  |  y[angst.]  |  z[angst.]  |\n";
    this->messageStartPrincipalAxes = "**********  START: Principal Axes of Inertia  **********\n";
    this->messageDonePrincipalAxes =  "**********  DONE: Principal Axes of Inertia  ***********\n\n\n";
    this->messagePrincipalAxes = "\tPrincipal Axes:\n";
@@ -298,29 +295,21 @@ void Molecule::CalcTotalCoreMass(){
 
 void Molecule::OutputConfiguration() const{
    double ang2AU = Parameters::GetInstance()->GetAngstrom2AU();
-   this->OutputLog(this->messageConfiguration);
-   this->OutputLog(this->messageConfigurationTitleAng);
+   this->OutputLog(this->messageAtomCoordinatesTitle);
    for(int a=0; a<this->atomVect->size(); a++){
       const Atom& atom = *(*this->atomVect)[a];
-      this->OutputLog((boost::format("\t\t%d\t%s\t%e\t%e\t%e\n") % a
-                                                                 % AtomTypeStr(atom.GetAtomType()) 
-                                                                 % (atom.GetXyz()[0]/ang2AU)
-                                                                 % (atom.GetXyz()[1]/ang2AU)
-                                                                 % (atom.GetXyz()[2]/ang2AU)).str());
+      this->OutputLog((boost::format("%s\t%d\t%s\t%e\t%e\t%e\t\t%e\t%e\t%e\n") 
+         % this->messageAtomCoordinates
+         % a
+         % AtomTypeStr(atom.GetAtomType()) 
+         % atom.GetXyz()[0]
+         % atom.GetXyz()[1]
+         % atom.GetXyz()[2]
+         % (atom.GetXyz()[0]/ang2AU)
+         % (atom.GetXyz()[1]/ang2AU)
+         % (atom.GetXyz()[2]/ang2AU)).str());
    }
    this->OutputLog("\n");
-
-   this->OutputLog(this->messageConfigurationTitleAU);
-   for(int a=0; a<this->atomVect->size(); a++){
-      const Atom& atom = *(*this->atomVect)[a];
-      this->OutputLog((boost::format("\t\t%d\t%s\t%e\t%e\t%e\n") % a
-                                                                 % AtomTypeStr(atom.GetAtomType())
-                                                                 % atom.GetXyz()[0]
-                                                                 % atom.GetXyz()[1]
-                                                                 % atom.GetXyz()[2]).str());
-   }
-   this->OutputLog("\n");
-
 }
 
 void Molecule::OutputMomenta() const{
@@ -328,59 +317,48 @@ void Molecule::OutputMomenta() const{
    double fs2AU = Parameters::GetInstance()->GetFs2AU();
    double gMolin2AU = Parameters::GetInstance()->GetGMolin2AU();
    double momentumUnit2AU = ang2AU*gMolin2AU/fs2AU;
-   this->OutputLog(this->messageMomenta);
-   this->OutputLog(this->messageMomentaTitleGAngMolinFsin);
+   this->OutputLog(this->messageAtomMomentaTitle);
    for(int a=0; a<this->atomVect->size(); a++){
       const Atom& atom = *(*this->atomVect)[a];
-      this->OutputLog((boost::format("\t\t%d\t%s\t%e\t%e\t%e\n") % a
-                                                                 % AtomTypeStr(atom.GetAtomType())
-                                                                 % (atom.GetPxyz()[0]/momentumUnit2AU)
-                                                                 % (atom.GetPxyz()[1]/momentumUnit2AU)
-                                                                 % (atom.GetPxyz()[2]/momentumUnit2AU)).str());
-   }
-   this->OutputLog("\n");
-
-   this->OutputLog(this->messageMomentaTitleAU);
-   for(int a=0; a<this->atomVect->size(); a++){
-      const Atom& atom = *(*this->atomVect)[a];
-      this->OutputLog((boost::format("\t\t%d\t%s\t%e\t%e\t%e\n") % a
-                                                                 % AtomTypeStr(atom.GetAtomType())
-                                                                 % atom.GetPxyz()[0]
-                                                                 % atom.GetPxyz()[1]
-                                                                 % atom.GetPxyz()[2]).str());
+      this->OutputLog((boost::format("%s\t%d\t%s\t%e\t%e\t%e\t\t%e\t%e\t%e\n") 
+         % this->messageAtomMomenta
+         % a
+         % AtomTypeStr(atom.GetAtomType())
+         % (atom.GetPxyz()[0]/momentumUnit2AU)
+         % (atom.GetPxyz()[1]/momentumUnit2AU)
+         % (atom.GetPxyz()[2]/momentumUnit2AU)
+         % atom.GetPxyz()[0]
+         % atom.GetPxyz()[1]
+         % atom.GetPxyz()[2]).str());
    }
    this->OutputLog("\n");
 }
 
 void Molecule::OutputXyzCOM() const{
    double ang2AU = Parameters::GetInstance()->GetAngstrom2AU();
-   this->OutputLog(this->messageCOM);
-   this->OutputLog(this->messageCOMTitleAng);
-   this->OutputLog((boost::format("\t\t%e\t%e\t%e\n") % (this->xyzCOM[0]/ang2AU)
-                                                      % (this->xyzCOM[1]/ang2AU)
-                                                      % (this->xyzCOM[2]/ang2AU)).str());
-   this->OutputLog("\n");
-
-   this->OutputLog(this->messageCOMTitleAU);
-   this->OutputLog((boost::format("\t\t%e\t%e\t%e\n") % this->xyzCOM[0]
-                                                      % this->xyzCOM[1]
-                                                      % this->xyzCOM[2]).str());
+   this->OutputLog(this->messageCOMTitle);
+   this->OutputLog((boost::format("%s\t%e\t%e\t%e\t\t%e\t%e\t%e\n") 
+      % this->messageCOM
+      % this->xyzCOM[0]
+      % this->xyzCOM[1]
+      % this->xyzCOM[2]
+      % (this->xyzCOM[0]/ang2AU)
+      % (this->xyzCOM[1]/ang2AU)
+      % (this->xyzCOM[2]/ang2AU)).str());
    this->OutputLog("\n");
 }
 
 void Molecule::OutputXyzCOC() const{
    double ang2AU = Parameters::GetInstance()->GetAngstrom2AU();
-   this->OutputLog(this->messageCOC);
-   this->OutputLog(this->messageCOMTitleAng);
-   this->OutputLog((boost::format("\t\t%e\t%e\t%e\n") % (this->xyzCOC[0]/ang2AU)
-                                                      % (this->xyzCOC[1]/ang2AU)
-                                                      % (this->xyzCOC[2]/ang2AU)).str());
-   this->OutputLog("\n");
-
-   this->OutputLog(this->messageCOMTitleAU);
-   this->OutputLog((boost::format("\t\t%e\t%e\t%e\n") % this->xyzCOC[0]
-                                                      % this->xyzCOC[1]
-                                                      % this->xyzCOC[2]).str());
+   this->OutputLog(this->messageCOMTitle);
+   this->OutputLog((boost::format("%s\t%e\t%e\t%e\t\t%e\t%e\t%e\n") 
+      % this->messageCOC
+      % this->xyzCOC[0]
+      % this->xyzCOC[1]
+      % this->xyzCOC[2]
+      % (this->xyzCOC[0]/ang2AU)
+      % (this->xyzCOC[1]/ang2AU)
+      % (this->xyzCOC[2]/ang2AU)).str());
    this->OutputLog("\n");
 }
 

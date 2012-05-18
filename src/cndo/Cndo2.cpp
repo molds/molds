@@ -173,29 +173,27 @@ void Cndo2::SetMessages(){
    this->messageOmpElapsedTimeSCF = "\tElapsed time(omp) for the SCF = ";
    this->messageIterSCF = "SCF iter=";
    this->messageDensityRMS = ": RMS density=";
-   this->messageEnergiesMOs = "\tEnergies of MOs:\n";
-   this->messageEnergiesMOsTitle = "\t\t| i-th | occ/unocc | e[a.u.] | e[eV] | \n";
+   this->messageEnergyMO = "\tEnergy of MO:";
+   this->messageEnergyMOTitle = "\t\t\t| i-th | occ/unocc |  e[a.u.]  |  e[eV]  | \n";
    this->messageOcc = "occ";
    this->messageUnOcc = "unocc";
-   this->messageMullikenAtoms = "\tMulliken charge on each Atom:\n";
-   this->messageMullikenAtomsTitle = "\t\t| i-th | atom type | core charge | Mulliken charge | \n";
-   this->messageElecEnergy = "\tElectronic energy(including core-repulsions):\n";
-   this->messageElecEnergyVdW = "\tElectronic energy(including core-repulsions and vdW correction):\n";
-   this->messageElecEnergyTitle = "\t\t| [a.u.] | [eV] | \n";
+   this->messageMullikenAtoms = "\tMulliken charge:";
+   this->messageMullikenAtomsTitle = "\t\t\t\t| i-th | atom type | core charge[a.u.] | Mulliken charge[a.u.]| \n";
+   this->messageElecEnergy = "\tElectronic energy(SCF):";
+   this->messageNoteElecEnergy = "\tNote that this electronic energy includs core-repulsions.\n\n";
+   this->messageNoteElecEnergyVdW = "\tNote that this electronic energy includs core-repulsions and vdW correction.\n\n";
+   this->messageElecEnergyTitle = "\t\t\t\t|   [a.u.]   |   [eV]   |\n";
    this->messageUnitSec = "[s].";
-   this->messageCoreRepulsionTitle = "\t\t| [a.u.] | [eV] |\n";
-   this->messageCoreRepulsion = "\tTotal core repulsion energy:\n";
-   this->messageVdWCorrectionTitle = "\t\t| [a.u.] | [eV] |\n";
-   this->messageVdWCorrection = "\tEmpirical van der Waals correction:\n";
-   this->messageElectronicDipoleMomentsTitleAU = "\t\t| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |\n";
-   this->messageElectronicDipoleMomentsTitleDebye = "\t\t| x[debye] | y[debye] | z[debye] | magnitude[debye] |\n";
-   this->messageElectronicDipoleMoments = "\tElectronic Dipole moment (ground state):\n";
-   this->messageCoreDipoleMomentTitleAU = "\t\t| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |\n";
-   this->messageCoreDipoleMomentTitleDebye = "\t\t| x[Debye] | y[Debye] | z[Debye] | magnitude[debye] |\n";
-   this->messageCoreDipoleMoment = "\tCore Dipole moment:\n";
-   this->messageTotalDipoleTitleAU = "\t\t| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |\n";
-   this->messageTotalDipoleTitleDebye = "\t\t| x[debye] | y[debye] | z[debye] | magnitude[debye] |\n";
-   this->messageTotalDipole = "\tTotal Dipole moment (ground state):\n";
+   this->messageCoreRepulsionTitle = "\t\t\t\t|   [a.u.]   |   [eV]   |\n";
+   this->messageCoreRepulsion = "\tCore repulsion energy:";
+   this->messageVdWCorrectionTitle = "\t\t\t\t\t\t|   [a.u.]   |   [eV]   |\n";
+   this->messageVdWCorrection = "\tEmpirical van der Waals correction:";
+   this->messageElectronicDipoleMomentTitle = "\t\t\t\t\t|  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |\t\t|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |\n";
+   this->messageElectronicDipoleMoment = "\tElectronic Dipole moment(SCF):";
+   this->messageCoreDipoleMomentTitle = "\t\t\t\t\t|  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |\t\t|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |\n";
+   this->messageCoreDipoleMoment = "\tCore Dipole moment:";
+   this->messageTotalDipoleMomentTitle = "\t\t\t\t\t|   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |  magnitude[a.u.]  |\t\t|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |\n";
+   this->messageTotalDipoleMoment = "\tTotal Dipole moment(SCF):";
 }
 
 void Cndo2::SetEnableAtomTypes(){
@@ -816,49 +814,48 @@ void Cndo2::DoDamp(double rmsDensity,
 }
 
 void Cndo2::OutputMOEnergies() const{
-   this->OutputLog(this->messageEnergiesMOs);
-   this->OutputLog(this->messageEnergiesMOsTitle);
    double eV2AU = Parameters::GetInstance()->GetEV2AU();
+   this->OutputLog(this->messageEnergyMOTitle);
    for(int mo=0; mo<this->molecule->GetTotalNumberAOs(); mo++){
+      string occUnOcc = this->messageUnOcc;
       if(mo < this->molecule->GetTotalNumberValenceElectrons()/2){
-         this->OutputLog((boost::format("\t\t %d\t%s\t%e\t%e \n") % mo
-                                                                  % this->messageOcc.c_str()
-                                                                  % this->energiesMO[mo] 
-                                                                  % (this->energiesMO[mo]/eV2AU) ).str());
+         occUnOcc = this->messageOcc;
       }
-      else{
-         this->OutputLog((boost::format("\t\t %d\t%s\t%e\t%e \n") % mo
-                                                                  % this->messageUnOcc.c_str()
-                                                                  % this->energiesMO[mo] 
-                                                                  % (this->energiesMO[mo]/eV2AU) ).str());
-      }
+      this->OutputLog((boost::format("%s\t%d\t%s\t%e\t%e\n") %this->messageEnergyMO
+                                                              % mo
+                                                              % occUnOcc
+                                                              % this->energiesMO[mo] 
+                                                              % (this->energiesMO[mo]/eV2AU) ).str());
    }
    this->OutputLog("\n");
 }
 
 void Cndo2::OutputSCFEnergies() const{
    double eV2AU = Parameters::GetInstance()->GetEV2AU();
+
+   // electronic energy
+   this->OutputLog(this->messageElecEnergyTitle);
+   this->OutputLog((boost::format("%s\t%e\t%e\n") % this->messageElecEnergy
+                                                  % this->elecSCFEnergy
+                                                  % (this->elecSCFEnergy/eV2AU)).str());
    if(Parameters::GetInstance()->RequiresVdWSCF()){
-      this->OutputLog(this->messageElecEnergyVdW);
+      this->OutputLog(this->messageNoteElecEnergyVdW);
    }
    else{
-      this->OutputLog(this->messageElecEnergy);
+      this->OutputLog(this->messageNoteElecEnergy);
    }
-   this->OutputLog(this->messageElecEnergyTitle);
-   this->OutputLog((boost::format("\t\t%e\t%e\n\n") % this->elecSCFEnergy 
-                                                    % (this->elecSCFEnergy/eV2AU)).str());
 
    // output core repulsion energy
-   this->OutputLog(this->messageCoreRepulsion);
    this->OutputLog(this->messageCoreRepulsionTitle);
-   this->OutputLog((boost::format("\t\t%e\t%e\n\n") % this->coreRepulsionEnergy 
+   this->OutputLog((boost::format("%s\t%e\t%e\n\n") % this->messageCoreRepulsion
+                                                    % this->coreRepulsionEnergy 
                                                     % (this->coreRepulsionEnergy/eV2AU)).str());
 
    // output van der Waals correction 
    if(Parameters::GetInstance()->RequiresVdWSCF()){
-      this->OutputLog(this->messageVdWCorrection);
       this->OutputLog(this->messageVdWCorrectionTitle);
-      this->OutputLog((boost::format("\t\t%e\t%e\n\n") % this->vdWCorrectionEnergy 
+      this->OutputLog((boost::format("%s\t%e\t%e\n\n") % this->messageVdWCorrection
+                                                       % this->vdWCorrectionEnergy 
                                                        % (this->vdWCorrectionEnergy/eV2AU)).str());
    }
 }
@@ -875,15 +872,13 @@ void Cndo2::OutputSCFDipole() const{
    temp += pow(this->electronicTransitionDipoleMoments[groundState][groundState][YAxis]+this->coreDipoleMoment[YAxis],2.0);
    temp += pow(this->electronicTransitionDipoleMoments[groundState][groundState][ZAxis]+this->coreDipoleMoment[ZAxis],2.0);
    magnitude = sqrt(temp);
-   this->OutputLog(this->messageTotalDipole);
-   this->OutputLog(this->messageTotalDipoleTitleAU);
-   this->OutputLog((boost::format("\t\t%e\t%e\t%e\t%e\n\n") 
+   this->OutputLog(this->messageTotalDipoleMomentTitle);
+   this->OutputLog((boost::format("%s\t%e\t%e\t%e\t%e\t\t%e\t%e\t%e\t%e\n\n") 
+      % this->messageTotalDipoleMoment
       % (this->electronicTransitionDipoleMoments[groundState][groundState][XAxis]+this->coreDipoleMoment[XAxis])
       % (this->electronicTransitionDipoleMoments[groundState][groundState][YAxis]+this->coreDipoleMoment[YAxis])
       % (this->electronicTransitionDipoleMoments[groundState][groundState][ZAxis]+this->coreDipoleMoment[ZAxis])
-      % magnitude).str());
-   this->OutputLog(this->messageTotalDipoleTitleDebye);
-   this->OutputLog((boost::format("\t\t%e\t%e\t%e\t%e\n\n") 
+      % magnitude
       % ((this->electronicTransitionDipoleMoments[groundState][groundState][XAxis]+this->coreDipoleMoment[XAxis])/debye2AU)
       % ((this->electronicTransitionDipoleMoments[groundState][groundState][YAxis]+this->coreDipoleMoment[YAxis])/debye2AU)
       % ((this->electronicTransitionDipoleMoments[groundState][groundState][ZAxis]+this->coreDipoleMoment[ZAxis])/debye2AU)
@@ -895,15 +890,13 @@ void Cndo2::OutputSCFDipole() const{
    temp += pow(this->electronicTransitionDipoleMoments[groundState][groundState][YAxis],2.0);
    temp += pow(this->electronicTransitionDipoleMoments[groundState][groundState][ZAxis],2.0);
    magnitude = sqrt(temp);
-   this->OutputLog(this->messageElectronicDipoleMoments);
-   this->OutputLog(this->messageElectronicDipoleMomentsTitleAU);
-   this->OutputLog((boost::format("\t\t%e\t%e\t%e\t%e\n\n") 
+   this->OutputLog(this->messageElectronicDipoleMomentTitle);
+   this->OutputLog((boost::format("%s\t%e\t%e\t%e\t%e\t\t%e\t%e\t%e\t%e\n\n") 
+      % this->messageElectronicDipoleMoment
       % this->electronicTransitionDipoleMoments[groundState][groundState][XAxis]
       % this->electronicTransitionDipoleMoments[groundState][groundState][YAxis]
       % this->electronicTransitionDipoleMoments[groundState][groundState][ZAxis]
-      % magnitude).str());
-   this->OutputLog(this->messageElectronicDipoleMomentsTitleDebye);
-   this->OutputLog((boost::format("\t\t%e\t%e\t%e\t%e\n\n") 
+      % magnitude
       % (this->electronicTransitionDipoleMoments[groundState][groundState][XAxis]/debye2AU)
       % (this->electronicTransitionDipoleMoments[groundState][groundState][YAxis]/debye2AU)
       % (this->electronicTransitionDipoleMoments[groundState][groundState][ZAxis]/debye2AU)
@@ -915,15 +908,13 @@ void Cndo2::OutputSCFDipole() const{
    temp += pow(this->electronicTransitionDipoleMoments[groundState][groundState][YAxis]+this->coreDipoleMoment[YAxis],2.0);
    temp += pow(this->electronicTransitionDipoleMoments[groundState][groundState][ZAxis]+this->coreDipoleMoment[ZAxis],2.0);
    magnitude = sqrt(temp);
-   this->OutputLog(this->messageCoreDipoleMoment);
-   this->OutputLog(this->messageCoreDipoleMomentTitleAU);
-   this->OutputLog((boost::format("\t\t%e\t%e\t%e\t%e\n\n") 
+   this->OutputLog(this->messageCoreDipoleMomentTitle);
+   this->OutputLog((boost::format("%s\t\t%e\t%e\t%e\t%e\t\t%e\t%e\t%e\t%e\n\n") 
+      % this->messageCoreDipoleMoment
       % this->coreDipoleMoment[XAxis]
       % this->coreDipoleMoment[YAxis]
       % this->coreDipoleMoment[ZAxis]
-      % magnitude).str());
-   this->OutputLog(this->messageCoreDipoleMomentTitleDebye);
-   this->OutputLog((boost::format("\t\t%e\t%e\t%e\t%e\n\n") 
+      % magnitude
       % (this->coreDipoleMoment[XAxis]/debye2AU)
       % (this->coreDipoleMoment[YAxis]/debye2AU)
       % (this->coreDipoleMoment[ZAxis]/debye2AU)
@@ -931,14 +922,14 @@ void Cndo2::OutputSCFDipole() const{
 }
 
 void Cndo2::OutputSCFMulliken() const{
-   this->OutputLog(this->messageMullikenAtoms);
    this->OutputLog(this->messageMullikenAtomsTitle);
    for(int a=0; a<this->molecule->GetNumberAtoms(); a++){
       Atom* atom = this->molecule->GetAtom(a);
-      this->OutputLog((boost::format("\t\t%d\t%s\t%e\t%e\n") % a
-                                                             % AtomTypeStr(atom->GetAtomType())
-                                                             % atom->GetCoreCharge()
-                                                             % (atom->GetCoreCharge()-atomicElectronPopulation[a])).str());
+      this->OutputLog((boost::format("%s\t%d\t%s\t%e\t%e\n") % this->messageMullikenAtoms
+                                                               % a
+                                                               % AtomTypeStr(atom->GetAtomType())
+                                                               % atom->GetCoreCharge()
+                                                               % (atom->GetCoreCharge()-atomicElectronPopulation[a])).str());
    }
    this->OutputLog("\n");
 }

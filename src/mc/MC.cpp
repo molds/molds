@@ -66,10 +66,10 @@ void MC::SetMessages(){
    this->messageEndStepMC =     "\t========== DONE: MC step ";
    this->messageEnergies = "\tEnergies:\n";
    this->messageEnergiesTitle = "\t\t|\tkind\t\t\t| [a.u.] | [eV] | \n";
-   this->messageCoreRepulsionEnergy = "Core repulsion   ";
-   this->messageVdWCorrectionEnergy = "VdW correction   ";
-   this->messageElectronicEnergy = "Electronic\n\t\t(inc. core rep.)";
-   this->messageElectronicEnergyVdW = "Electronic\n\t\t(inc. core rep. and vdW)";
+   this->messageCoreRepulsionEnergy = "Core repulsion:   ";
+   this->messageVdWCorrectionEnergy = "VdW correction:   ";
+   this->messageElectronicEnergy = "Electronic\n\t\t(inc. core rep.):";
+   this->messageElectronicEnergyVdW = "Electronic\n\t\t(inc. core rep. and vdW):";
    this->messageTransitionRate = "\tTransition Rate: ";
 }
 
