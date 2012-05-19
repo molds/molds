@@ -65,7 +65,7 @@ void Atom::SetMessages(){
    this->errorMessageMndoCoreIntegral = "Error in base_atoms::Atom::GetMndoCoreINtegral: Invalid orbitalType for MNDO.\n";
    this->errorMessageAm1CoreIntegral = "Error in base_atoms::Atom::GetAm1CoreINtegral: Invalid orbitalType for AM1.\n";
    this->errorMessagePm3CoreIntegral = "Error in base_atoms::Atom::GetPm3CoreINtegral: Invalid orbitalType for PM3.\n";
-   this->errorMessagePm3PddgCoreIntegral = "Error in base_atoms::Atom::GetPm3PddgCoreINtegral: Invalid orbitalType for PM3.\n";
+   this->errorMessagePm3PddgCoreIntegral = "Error in base_atoms::Atom::GetPm3PddgCoreINtegral: Invalid orbitalType for PM3/PDDG.\n";
    this->errorMessageIonPot = "Error in base_atoms::Atom::GetZindoIonPot: Invalid orbitalType.\n";
    this->errorMessageAtomType = "\tatom type = ";
    this->errorMessageOrbitalType = "\torbital type = ";
