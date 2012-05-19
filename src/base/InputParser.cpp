@@ -1106,6 +1106,7 @@ void InputParser::ValidateVdWConditions() const{
    TheoryType theory = Parameters::GetInstance()->GetCurrentTheory();
    // Validate theory
    if(theory == PM3D){
+      Parameters::GetInstance()->SetRequiresVdWSCF(true);
       Parameters::GetInstance()->SetVdWScalingFactorSCF();
       Parameters::GetInstance()->SetVdWDampingFactorSCF();
    }
