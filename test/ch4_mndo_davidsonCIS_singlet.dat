@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/5/17(Thu.) 10:31:48  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/5/19(Sat.) 23:58:57  <<<<<
 
 
 **********  START: Parse input  **********
@@ -8,34 +8,18 @@
 	Total number of valence AOs: 8
 	Total number of valence electrons: 8
 
-	Molecular configuration:
-		| i-th | atom type | x[angst.] | y[angst.] | z[angst.] |
-		0	C	6.473890e-01	8.201310e-01	0.000000e+00
-		1	H	1.004043e+00	-1.886790e-01	0.000000e+00
-		2	H	1.004062e+00	1.324529e+00	8.736520e-01
-		3	H	1.004062e+00	1.324529e+00	-8.736520e-01
-		4	H	-4.226110e-01	8.201440e-01	0.000000e+00
+				| i-th | atom type |   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
+	Atom coordinates:	0	C	1.223388e+00	1.549823e+00	0.000000e+00		6.473890e-01	8.201310e-01	0.000000e+00
+	Atom coordinates:	1	H	1.897366e+00	-3.565516e-01	0.000000e+00		1.004043e+00	-1.886790e-01	0.000000e+00
+	Atom coordinates:	2	H	1.897402e+00	2.502997e+00	1.650963e+00		1.004062e+00	1.324529e+00	8.736520e-01
+	Atom coordinates:	3	H	1.897402e+00	2.502997e+00	-1.650963e+00		1.004062e+00	1.324529e+00	-8.736520e-01
+	Atom coordinates:	4	H	-7.986191e-01	1.549848e+00	0.000000e+00		-4.226110e-01	8.201440e-01	0.000000e+00
 
-		| i-th | atom type | x[a.u.] | y[a.u.] | z[a.u.] |
-		0	C	1.223388e+00	1.549823e+00	0.000000e+00
-		1	H	1.897366e+00	-3.565516e-01	0.000000e+00
-		2	H	1.897402e+00	2.502997e+00	1.650963e+00
-		3	H	1.897402e+00	2.502997e+00	-1.650963e+00
-		4	H	-7.986191e-01	1.549848e+00	0.000000e+00
+			|   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
+	Center of Mass:	1.223388e+00	1.549823e+00	0.000000e+00		6.473890e-01	8.201309e-01	0.000000e+00
 
-	Center of Mass:
-		| x[angst.] | y[angst.] | z[angst.] |
-		6.473890e-01	8.201309e-01	0.000000e+00
-
-		| x[a.u.] | y[a.u.] | z[a.u.] |
-		1.223388e+00	1.549823e+00	0.000000e+00
-
-	Center of Core:
-		| x[angst.] | y[angst.] | z[angst.] |
-		6.473890e-01	8.201309e-01	0.000000e+00
-
-		| x[a.u.] | y[a.u.] | z[a.u.] |
-		1.223388e+00	1.549823e+00	0.000000e+00
+			|   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
+	Center of Core:	1.223388e+00	1.549823e+00	0.000000e+00		6.473890e-01	8.201309e-01	0.000000e+00
 
 	SCF conditions:
 		Max iterations: 50
@@ -74,81 +58,65 @@ h | 1.004043 | -0.188679 | 0.000000 | h | 1.004062 | 1.324529 | 0.873652 | h | 1
 
 
 **********  START: MNDO-SCF  **********
-SCF iter=0: RMS density=4.000000000000004
-SCF iter=1: RMS density=1.791764664635559
-SCF iter=2: RMS density=0.902974688872801
-SCF iter=3: RMS density=0.450316453459356
+SCF iter=0: RMS density=3.999999999999997
+SCF iter=1: RMS density=1.791764664635558
+SCF iter=2: RMS density=0.902974688872800
+SCF iter=3: RMS density=0.450316453459357
 SCF iter=4: RMS density=0.224939537319347
-SCF iter=5: RMS density=0.112410119412689
-SCF iter=6: RMS density=0.000026035855237
-SCF iter=7: RMS density=0.000034473760337
-SCF iter=8: RMS density=0.000007176200199
-SCF iter=9: RMS density=0.000000388314827
+SCF iter=5: RMS density=0.112410119412690
+SCF iter=6: RMS density=0.000026035855122
+SCF iter=7: RMS density=0.000034473761486
+SCF iter=8: RMS density=0.000007176214480
+SCF iter=9: RMS density=0.000000388310899
 
 
 
 		MNDO-SCF met convergence criterion(^^b
 
 
-	Energies of MOs:
-		| i-th | occ/unocc | e[a.u.] | e[eV] | 
-		 0	occ	-1.151525e+00	-3.133485e+01 
-		 1	occ	-5.165207e-01	-1.405536e+01 
-		 2	occ	-5.165207e-01	-1.405536e+01 
-		 3	occ	-5.165206e-01	-1.405535e+01 
-		 4	unocc	1.677779e-01	4.565505e+00 
-		 5	unocc	1.677779e-01	4.565506e+00 
-		 6	unocc	1.677779e-01	4.565506e+00 
-		 7	unocc	2.335181e-01	6.354403e+00 
+			| i-th | occ/unocc |  e[a.u.]  |  e[eV]  | 
+	Energy of MO:	0	occ	-1.151525e+00	-3.133485e+01
+	Energy of MO:	1	occ	-5.165207e-01	-1.405536e+01
+	Energy of MO:	2	occ	-5.165207e-01	-1.405536e+01
+	Energy of MO:	3	occ	-5.165206e-01	-1.405535e+01
+	Energy of MO:	4	unocc	1.677779e-01	4.565505e+00
+	Energy of MO:	5	unocc	1.677779e-01	4.565506e+00
+	Energy of MO:	6	unocc	1.677779e-01	4.565506e+00
+	Energy of MO:	7	unocc	2.335181e-01	6.354403e+00
 
-	Electronic energy(including core-repulsions):
-		| [a.u.] | [eV] | 
-		-6.798110e+00	-1.849875e+02
+				|   [a.u.]   |   [eV]   |
+	Electronic energy(SCF):	-6.798110e+00	-1.849875e+02
+	Note that this electronic energy includs core-repulsions.
 
-	Total core repulsion energy:
-		| [a.u.] | [eV] |
-		7.665854e+00	2.086002e+02
+				|   [a.u.]   |   [eV]   |
+	Core repulsion energy:	7.665854e+00	2.086002e+02
 
-	Total Dipole moment (ground state):
-		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
-		-1.612647e-05	-1.913546e-05	-1.491862e-16	2.502457e-05
+					|   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
+	Total Dipole moment(SCF):	-1.612647e-05	-1.913546e-05	1.217776e-15	2.502457e-05		-4.098941e-05	-4.863751e-05	3.095278e-15	6.360613e-05
 
-		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
-		-4.098941e-05	-4.863751e-05	-3.791936e-16	6.360613e-05
+					|  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
+	Electronic Dipole moment(SCF):	-1.612647e-05	-1.819533e-05	1.217776e-15	2.431323e-05		-4.098941e-05	-4.624792e-05	3.095278e-15	6.179807e-05
 
-	Electronic Dipole moment (ground state):
-		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
-		-1.612647e-05	-1.819533e-05	-1.491862e-16	2.431323e-05
+					|  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
+	Core Dipole moment:		3.552714e-15	-9.401387e-07	0.000000e+00	2.502457e-05		9.030099e-15	-2.389595e-06	0.000000e+00	6.360613e-05
 
-		| x[debye] | y[debye] | z[debye] | magnitude[debye] |
-		-4.098941e-05	-4.624792e-05	-3.791936e-16	6.179807e-05
+				| i-th | atom type | core charge[a.u.] | Mulliken charge[a.u.]| 
+	Mulliken charge:	0	C	4.000000e+00	7.563577e-02
+	Mulliken charge:	1	H	1.000000e+00	-1.890902e-02
+	Mulliken charge:	2	H	1.000000e+00	-1.890890e-02
+	Mulliken charge:	3	H	1.000000e+00	-1.890890e-02
+	Mulliken charge:	4	H	1.000000e+00	-1.890895e-02
 
-	Core Dipole moment:
-		| x[a.u.] | y[a.u.] | z[a.u.] | magnitude[a.u.] |
-		3.552714e-15	-9.401387e-07	0.000000e+00	2.502457e-05
+				|  [a.u.]  |  [Kcal/mol]  | 
+	Heats of formation:	-1.520346e-02	-9.540316e+00
 
-		| x[Debye] | y[Debye] | z[Debye] | magnitude[debye] |
-		9.030099e-15	-2.389595e-06	0.000000e+00	6.360613e-05
-
-	Mulliken charge on each Atom:
-		| i-th | atom type | core charge | Mulliken charge | 
-		0	C	4.000000e+00	7.563577e-02
-		1	H	1.000000e+00	-1.890902e-02
-		2	H	1.000000e+00	-1.890890e-02
-		3	H	1.000000e+00	-1.890890e-02
-		4	H	1.000000e+00	-1.890895e-02
-
-	Heats of formation:
-		| [a.u.] | [Kcal/mol] | 
-		-1.520346e-02	-9.540316e+00
-
-	Elapsed time(omp) for the SCF = 0.025883[s].
+	Elapsed time(omp) for the SCF = 0.016880[s].
 **********  DONE: MNDO-SCF  **********
 
 
 **********  START: MNDO-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.002056[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.001390[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -168,19 +136,19 @@ SCF iter=9: RMS density=0.000000388314827
 	  1-th excited: norm of the residual = 2.863531e-03
 	  2-th excited: norm of the residual = 2.514323e-07
 	  3-th excited: norm of the residual = 1.975442e-02
-	  4-th excited: norm of the residual = 4.736559e-03
+	  4-th excited: norm of the residual = 4.736558e-03
 
 	Davidson iter=3
-	  1-th excited: norm of the residual = 9.584759e-10
-	  2-th excited: norm of the residual = 4.970116e-10
-	  3-th excited: norm of the residual = 5.073278e-10
-	  4-th excited: norm of the residual = 1.121527e-02
+	  1-th excited: norm of the residual = 2.160505e-09
+	  2-th excited: norm of the residual = 1.809374e-09
+	  3-th excited: norm of the residual = 1.665528e-09
+	  4-th excited: norm of the residual = 1.170048e-02
 
 	Davidson iter=4
-	  1-th excited: norm of the residual = 9.580959e-10
-	  2-th excited: norm of the residual = 8.880074e-11
-	  3-th excited: norm of the residual = 1.533683e-10
-	  4-th excited: norm of the residual = 1.565349e-10
+	  1-th excited: norm of the residual = 2.382142e-09
+	  2-th excited: norm of the residual = 1.397974e-10
+	  3-th excited: norm of the residual = 6.937535e-10
+	  4-th excited: norm of the residual = 6.385750e-10
 
 
 
@@ -190,35 +158,34 @@ SCF iter=9: RMS density=0.000000388314827
 	======  DONE: Davidson-CIS  =====
 
 
-	Excitation energies:
-		| i-th | e[a.u.] | e[eV] | dominant eigenvector coefficients (occ. -> vir.) |
-		 1	3.370473e-01	9.171598e+00	5.763875e-01 (1 -> 5)	
-		 2	3.644174e-01	9.916380e+00	6.215209e-01 (1 -> 4)	
-		 3	3.644174e-01	9.916381e+00	4.936964e-01 (3 -> 6)	
-		 4	3.644174e-01	9.916381e+00	5.840630e-01 (2 -> 6)	
+				|   i-th   |   e[a.u.]   |   e[eV]   | dominant eigenvector coefficients (occ. -> vir.) |
+	Excitation energies:	1	3.370473e-01	9.171598e+00	5.763875e-01 (1 -> 5)	
+	Excitation energies:	2	3.644174e-01	9.916380e+00	6.215201e-01 (1 -> 4)	
+	Excitation energies:	3	3.644174e-01	9.916381e+00	4.936968e-01 (3 -> 6)	
+	Excitation energies:	4	3.644174e-01	9.916381e+00	5.840633e-01 (2 -> 6)	
 
 				| i-th eigenstate |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
-	Total dipole moment:	0	-1.612647e-05	-1.913546e-05	-1.491862e-16	2.502457e-05		-4.098941e-05	-4.863751e-05	-3.791936e-16	6.360613e-05
-	Total dipole moment:	1	-2.205246e-05	-2.504835e-05	2.018843e-15	3.337260e-05		-5.605177e-05	-6.366656e-05	5.131388e-15	8.482471e-05
-	Total dipole moment:	2	-3.548569e-01	-2.594998e-01	-4.972213e-10	4.396175e-01		-9.019564e-01	-6.595827e-01	-1.263811e-09	1.117396e+00
-	Total dipole moment:	3	-2.796586e-02	8.606176e-02	2.551175e-10	9.049152e-02		-7.108214e-02	2.187472e-01	6.484440e-10	2.300066e-01
-	Total dipole moment:	4	3.827533e-01	1.733582e-01	2.421117e-10	4.201823e-01		9.728620e-01	4.406326e-01	6.153866e-10	1.067997e+00
+	Total dipole moment:	0	-1.612647e-05	-1.913546e-05	1.217776e-15	2.502457e-05		-4.098941e-05	-4.863751e-05	3.095278e-15	6.360613e-05
+	Total dipole moment:	1	-2.205246e-05	-2.504835e-05	-3.978516e-15	3.337260e-05		-5.605177e-05	-6.366656e-05	-1.011238e-14	8.482471e-05
+	Total dipole moment:	2	-3.548561e-01	-2.594993e-01	4.411516e-11	4.396166e-01		-9.019544e-01	-6.595816e-01	1.121296e-10	1.117394e+00
+	Total dipole moment:	3	-2.796600e-02	8.606199e-02	-3.685349e-10	9.049179e-02		-7.108249e-02	2.187478e-01	-9.367224e-10	2.300072e-01
+	Total dipole moment:	4	3.827527e-01	1.733575e-01	3.244125e-10	4.201814e-01		9.728604e-01	4.406308e-01	8.245744e-10	1.067995e+00
 
-				| i-th eigenstate |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
-	Electronic dipole moment:		0	-1.612647e-05	-1.819533e-05	-1.491862e-16	2.431323e-05		-4.098941e-05	-4.624792e-05	-3.791936e-16	6.179807e-05
-	Electronic dipole moment:		1	-2.205246e-05	-2.410821e-05	2.018843e-15	3.267287e-05		-5.605177e-05	-6.127696e-05	5.131388e-15	8.304618e-05
-	Electronic dipole moment:		2	-3.548569e-01	-2.594988e-01	-4.972213e-10	4.396169e-01		-9.019564e-01	-6.595803e-01	-1.263811e-09	1.117395e+00
-	Electronic dipole moment:		3	-2.796586e-02	8.606270e-02	2.551175e-10	9.049242e-02		-7.108214e-02	2.187496e-01	6.484440e-10	2.300088e-01
-	Electronic dipole moment:		4	3.827533e-01	1.733591e-01	2.421117e-10	4.201826e-01		9.728620e-01	4.406350e-01	6.153866e-10	1.067998e+00
+					| i-th eigenstate |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
+	Electronic dipole moment:	0	-1.612647e-05	-1.819533e-05	1.217776e-15	2.431323e-05		-4.098941e-05	-4.624792e-05	3.095278e-15	6.179807e-05
+	Electronic dipole moment:	1	-2.205246e-05	-2.410821e-05	-3.978516e-15	3.267287e-05		-5.605177e-05	-6.127696e-05	-1.011238e-14	8.304618e-05
+	Electronic dipole moment:	2	-3.548561e-01	-2.594984e-01	4.411516e-11	4.396160e-01		-9.019544e-01	-6.595792e-01	1.121296e-10	1.117393e+00
+	Electronic dipole moment:	3	-2.796600e-02	8.606293e-02	-3.685349e-10	9.049268e-02		-7.108249e-02	2.187502e-01	-9.367224e-10	2.300095e-01
+	Electronic dipole moment:	4	3.827527e-01	1.733584e-01	3.244125e-10	4.201818e-01		9.728604e-01	4.406332e-01	8.245744e-10	1.067996e+00
 
-				| from and to eigenstates |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
-	Transition dipole moment:		0 -> 1	-5.379915e-06	-5.628577e-06	-2.467975e-09	7.786166e-06		-1.367438e-05	-1.430642e-05	-6.272968e-09	1.979046e-05
-	Transition dipole moment:		0 -> 2	3.723888e-04	-5.906309e-04	-1.237738e+00	1.237739e+00		9.465182e-04	-1.501234e-03	-3.146018e+00	3.146018e+00
-	Transition dipole moment:		0 -> 3	8.211800e-02	-1.235010e+00	6.140370e-04	1.237737e+00		2.087232e-01	-3.139082e+00	1.560727e-03	3.146014e+00
-	Transition dipole moment:		0 -> 4	1.235010e+00	8.211892e-02	3.323831e-04	1.237737e+00		3.139083e+00	2.087255e-01	8.448338e-04	3.146015e+00
+					| from and to eigenstates |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
+	Transition dipole moment:	0 -> 1		-5.379915e-06	-5.628577e-06	4.902428e-09	7.786167e-06		-1.367438e-05	-1.430642e-05	1.246073e-08	1.979047e-05
+	Transition dipole moment:	0 -> 2		7.845404e-04	1.920931e-03	-1.237737e+00	1.237739e+00		1.994103e-03	4.882521e-03	-3.146014e+00	3.146018e+00
+	Transition dipole moment:	0 -> 3		8.212116e-02	-1.235008e+00	-1.864648e-03	1.237737e+00		2.087312e-01	-3.139078e+00	-4.739464e-03	3.146014e+00
+	Transition dipole moment:	0 -> 4		1.235010e+00	8.212061e-02	9.102610e-04	1.237737e+00		3.139082e+00	2.087298e-01	2.313653e-03	3.146015e+00
 
 
-	Elapsed time(omp) for the CIS = 0.006189[s].
+	Elapsed time(omp) for the CIS = 0.004178[s].
 **********  DONE: MNDO-CIS  **********
 
 
@@ -228,9 +195,9 @@ SCF iter=9: RMS density=0.000000388314827
 
 
      >>>>>  The MolDS finished normally!  <<<<<
-     >>>>>  CPU time: 0.03[s].  <<<<<
+     >>>>>  CPU time: 0.02[s].  <<<<<
      >>>>>  Elapsed time: 0[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 0.0364869[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 0.0223191[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 
