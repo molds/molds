@@ -49,6 +49,11 @@ const double Parameters::boltzmann = 3.166791*pow(10.0,-6.0);
 const double Parameters::avogadro = 6.0221415*pow(10.0, 23.0);
 const double Parameters::debye2AU = 0.393430191;
 
+// constant
+const double Parameters::vdWScalingFactorSCFPM3DAM1D = 1.40;
+const double Parameters::vdWDampingFactorSCFPM3DAM1D = 23.0;
+
+
 Parameters::Parameters(){
    this->SetDefaultValues();
    this->SetMessages();
@@ -281,12 +286,20 @@ double Parameters::GetVdWScalingFactorSCF() const{
    return this->vdWScalingFactorSCF;
 }
 
+void Parameters::SetVdWScalingFactorSCF(){
+   this->vdWScalingFactorSCF = this->vdWScalingFactorSCFPM3DAM1D;
+}
+
 void Parameters::SetVdWScalingFactorSCF(double vdWScalingFactorSCF){
    this->vdWScalingFactorSCF = vdWScalingFactorSCF;
 }
 
 double Parameters::GetVdWDampingFactorSCF() const{
    return this->vdWDampingFactorSCF;
+}
+
+void Parameters::SetVdWDampingFactorSCF(){
+   this->vdWDampingFactorSCF = this->vdWDampingFactorSCFPM3DAM1D;
 }
 
 void Parameters::SetVdWDampingFactorSCF(double vdWScalingFactorSCF){

@@ -138,6 +138,7 @@ private:
    std::string stringTheoryMNDO;
    std::string stringTheoryAM1;
    std::string stringTheoryPM3;
+   std::string stringTheoryPM3D;
    std::string stringTheoryPM3PDDG;
    // geometry
    std::string stringGeometry;
@@ -247,6 +248,7 @@ private:
    std::string stringOptimizationRmsGradient;
    std::string stringOptimizationTimeWidth;
    void CalcMolecularBasics(Molecule* molecule) const;
+   void ValidateVdWConditions() const;
    void ValidateCisConditions(const Molecule& molecule) const;
    void ValidateMdConditions(const Molecule& molecule) const;
    void ValidateMcConditions(const Molecule& molecule) const;

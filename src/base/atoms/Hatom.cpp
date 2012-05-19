@@ -194,5 +194,10 @@ void Hatom::SetAtomicParameters(){
    this->pm3PddgParameterPa[1] =-0.034823 * Parameters::GetInstance()->GetEV2AU();
    this->pm3PddgParameterDa[0] = 0.663395 * Parameters::GetInstance()->GetAngstrom2AU();
    this->pm3PddgParameterDa[1] = 1.081901 * Parameters::GetInstance()->GetAngstrom2AU();
+   this->pm3DCoreintegralS = -13.054076 * Parameters::GetInstance()->GetEV2AU();         
+   this->pm3DCoreintegralP = 0.0 * Parameters::GetInstance()->GetEV2AU();         
+   this->pm3DBondingParameterS = -5.628901 * Parameters::GetInstance()->GetEV2AU();     
+   this->pm3DBondingParameterP = 0.0 * Parameters::GetInstance()->GetEV2AU();     
+   this->pm3DAlpha = 3.417532 / Parameters::GetInstance()->GetAngstrom2AU();        
 }
 }

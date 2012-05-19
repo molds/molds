@@ -193,6 +193,7 @@ void InputParser::SetMessages(){
    this->stringTheoryMNDO = "mndo";
    this->stringTheoryAM1 = "am1";
    this->stringTheoryPM3 = "pm3";
+   this->stringTheoryPM3D = "pm3-d";
    this->stringTheoryPM3PDDG = "pm3/pddg";
    this->stringTheory = "theory";
    this->stringTheoryEnd = "theory_end";
@@ -929,6 +930,10 @@ int InputParser::ParseTheory(vector<string>* inputTerms, int parseIndex) const{
       else if((*inputTerms)[parseIndex].compare(this->stringTheoryPM3) == 0){
          Parameters::GetInstance()->SetCurrentTheory(PM3);
       }
+      // PM3-D
+      else if((*inputTerms)[parseIndex].compare(this->stringTheoryPM3D) == 0){
+         Parameters::GetInstance()->SetCurrentTheory(PM3D);
+      }
       // PM3/PDG
       else if((*inputTerms)[parseIndex].compare(this->stringTheoryPM3PDDG) == 0){
          Parameters::GetInstance()->SetCurrentTheory(PM3PDDG);
@@ -1041,6 +1046,7 @@ void InputParser::Parse(Molecule* molecule) const{
 
    // calculate basics and validate conditions
    this->CalcMolecularBasics(molecule);
+   this->ValidateVdWConditions();
    if(Parameters::GetInstance()->RequiresCIS()){
       this->ValidateCisConditions(*molecule);
    }
@@ -1094,6 +1100,15 @@ void InputParser::Parse(Molecule* molecule) const{
 
 void InputParser::CalcMolecularBasics(Molecule* molecule) const{
    molecule->CalcBasics();
+}
+
+void InputParser::ValidateVdWConditions() const{
+   TheoryType theory = Parameters::GetInstance()->GetCurrentTheory();
+   // Validate theory
+   if(theory == PM3D){
+      Parameters::GetInstance()->SetVdWScalingFactorSCF();
+      Parameters::GetInstance()->SetVdWDampingFactorSCF();
+   }
 }
 
 void InputParser::ValidateCisConditions(const Molecule& molecule) const{

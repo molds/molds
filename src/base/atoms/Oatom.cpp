@@ -200,5 +200,10 @@ void Oatom::SetAtomicParameters(){
    this->pm3PddgParameterPa[1] =-0.001522 * Parameters::GetInstance()->GetEV2AU();
    this->pm3PddgParameterDa[0] = 1.360685 * Parameters::GetInstance()->GetAngstrom2AU();
    this->pm3PddgParameterDa[1] = 1.366407 * Parameters::GetInstance()->GetAngstrom2AU();
+   this->pm3DCoreintegralS = -86.960302 * Parameters::GetInstance()->GetEV2AU();         
+   this->pm3DCoreintegralP = -71.926845 * Parameters::GetInstance()->GetEV2AU();         
+   this->pm3DBondingParameterS = -45.234302 * Parameters::GetInstance()->GetEV2AU();     
+   this->pm3DBondingParameterP = -24.788037 * Parameters::GetInstance()->GetEV2AU();     
+   this->pm3DAlpha = 3.387806 / Parameters::GetInstance()->GetAngstrom2AU();        
 }
 }

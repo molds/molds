@@ -200,5 +200,10 @@ void Natom::SetAtomicParameters(){
    this->pm3PddgParameterPa[1] = 0.012501 * Parameters::GetInstance()->GetEV2AU();
    this->pm3PddgParameterDa[0] = 1.004172 * Parameters::GetInstance()->GetAngstrom2AU();
    this->pm3PddgParameterDa[1] = 1.516336 * Parameters::GetInstance()->GetAngstrom2AU();
+   this->pm3DCoreintegralS = -49.348460 * Parameters::GetInstance()->GetEV2AU();         
+   this->pm3DCoreintegralP = -47.543768 * Parameters::GetInstance()->GetEV2AU();         
+   this->pm3DBondingParameterS = -14.068411 * Parameters::GetInstance()->GetEV2AU();     
+   this->pm3DBondingParameterP = -20.039292 * Parameters::GetInstance()->GetEV2AU();     
+   this->pm3DAlpha = 3.060404 / Parameters::GetInstance()->GetAngstrom2AU();        
 }
 }

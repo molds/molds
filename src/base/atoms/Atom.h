@@ -212,6 +212,11 @@ protected:
    double pm3PddgParameterM[4];// Table II in ref. [RCJ_2002] for H, C, N, O, and Table II in re. [BGJ_2003] for S.
    double pm3PddgParameterPa[2];// Table II in ref. [RCJ_2002] for H, C, N, O, and Table II in re. [BGJ_2003] for S.
    double pm3PddgParameterDa[2];// Table II in ref. [RCJ_2002] for H, C, N, O, and Table II in re. [BGJ_2003] for S.
+   double pm3DCoreintegralS; // Table II in ref. [MH_2007] for H, C, N, and O and Table IV in ref. [MMHBV_2007] for S.
+   double pm3DCoreintegralP; // Table II in ref. [MH_2007] for H, C, N, and O and Table IV in ref. [MMHBV_2007] for S.
+   double pm3DBondingParameterS; // Table II in ref. [MH_2007] for H, C, N, O, and Table IV in re. [MMHBV_2007] for S.
+   double pm3DBondingParameterP; // Table II in ref. [MH_2007] for H, C, N, O, and Table IV in re. [MMHBV_2007] for S.
+   double pm3DAlpha; // Table II in ref. [MH_2007] for H, C, N, O, and Table IV in re. [MMHBV_2007] for S.
 private:
    std::string errorMessageIonPot;
    std::string errorMessageAtomType;
@@ -227,6 +232,7 @@ private:
    std::string errorMessageMndoCoreIntegral;
    std::string errorMessageAm1CoreIntegral;
    std::string errorMessagePm3CoreIntegral;
+   std::string errorMessagePm3DCoreIntegral;
    std::string errorMessagePm3PddgCoreIntegral;
    std::string errorMessageGetAtomicBasisValueBadValenceIndex;
    std::string errorMessageGetRealAngularPartAOBadValence;
@@ -281,6 +287,7 @@ private:
    double GetMndoCoreIntegral(MolDS_base::OrbitalType orbital) const; 
    double GetAm1CoreIntegral(MolDS_base::OrbitalType orbital) const; 
    double GetPm3CoreIntegral(MolDS_base::OrbitalType orbital) const; 
+   double GetPm3DCoreIntegral(MolDS_base::OrbitalType orbital) const; 
    double GetPm3PddgCoreIntegral(MolDS_base::OrbitalType orbital) const; 
    virtual void SetAtomicParameters() = 0;
 };

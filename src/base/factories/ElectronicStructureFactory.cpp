@@ -40,6 +40,7 @@
 #include"../../mndo/Mndo.h"
 #include"../../am1/Am1.h"
 #include"../../pm3/Pm3.h"
+#include"../../pm3/Pm3D.h"
 #include"../../pm3/Pm3Pddg.h"
 #include"ElectronicStructureFactory.h"
 using namespace std;
@@ -68,6 +69,9 @@ ElectronicStructure* ElectronicStructureFactory::Create(TheoryType theoryType){
    }
    else if(theoryType == PM3 ){
       electronicStructure = new MolDS_pm3::Pm3();
+   }
+   else if(theoryType == PM3D ){
+      electronicStructure = new MolDS_pm3::Pm3D();
    }
    else if(theoryType == PM3PDDG ){
       electronicStructure = new MolDS_pm3::Pm3Pddg();

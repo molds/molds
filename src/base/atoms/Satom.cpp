@@ -222,5 +222,10 @@ void Satom::SetAtomicParameters(){
    this->pm3PddgParameterPa[1] =-0.002663 * Parameters::GetInstance()->GetEV2AU();
    this->pm3PddgParameterDa[0] = 0.672870 * Parameters::GetInstance()->GetAngstrom2AU();
    this->pm3PddgParameterDa[1] = 2.032340 * Parameters::GetInstance()->GetAngstrom2AU();
+   this->pm3DCoreintegralS = -50.249536 * Parameters::GetInstance()->GetEV2AU();         
+   this->pm3DCoreintegralP = -43.968965 * Parameters::GetInstance()->GetEV2AU();         
+   this->pm3DBondingParameterS = -8.397415 * Parameters::GetInstance()->GetEV2AU();     
+   this->pm3DBondingParameterP = -7.594232 * Parameters::GetInstance()->GetEV2AU();     
+   this->pm3DAlpha = 2.234331 / Parameters::GetInstance()->GetAngstrom2AU();        
 }
 }

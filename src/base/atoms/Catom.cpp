@@ -200,5 +200,10 @@ void Catom::SetAtomicParameters(){
    this->pm3PddgParameterPa[1] = 0.000985 * Parameters::GetInstance()->GetEV2AU();
    this->pm3PddgParameterDa[0] = 0.836915 * Parameters::GetInstance()->GetAngstrom2AU();
    this->pm3PddgParameterDa[1] = 1.585236 * Parameters::GetInstance()->GetAngstrom2AU();
+   this->pm3DCoreintegralS = -47.275431 * Parameters::GetInstance()->GetEV2AU();         
+   this->pm3DCoreintegralP = -36.268916 * Parameters::GetInstance()->GetEV2AU();         
+   this->pm3DBondingParameterS = -11.941466 * Parameters::GetInstance()->GetEV2AU();     
+   this->pm3DBondingParameterP = -9.819760 * Parameters::GetInstance()->GetEV2AU();     
+   this->pm3DAlpha = 2.721152 / Parameters::GetInstance()->GetAngstrom2AU();        
 }
 }

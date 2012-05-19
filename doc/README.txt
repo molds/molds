@@ -104,7 +104,7 @@ HOW TO WRITE INPUT:
 
    <SCF>
       Write "cndo/2", "indo", "zindo/s", "mndo", "am1", 
-      "pm3/pddg", or "pm3/pddg" in theory-directive.
+      "pm3", "pm3-D", or "pm3/pddg" in theory-directive.
       This theory-directive indicate a electronic structure theory used in your simulations.
       MNDO only supports (can calculate) Heats of formation.
       SCF module outputs also the dipole moment arrond the center of cores of the molecule.
@@ -137,10 +137,12 @@ HOW TO WRITE INPUT:
        set theory-directive as "PM3-D" or "AM1-D".
 
        "vdW_s6" is a scaling factor in the Grimme's van der Waals correction([G_2004]).
-       The default value of the "vdW_s6" is 1.4.
+       The default value of the "vdW_s6" is 1.4. 
+       For PM3-D and AM1-D, this "vdW_s6" is forced to be set as 1.4.
 
        "vdW_d" is a damping factor in the Grimme's van der Waals correction([G_2004]).
        The default value of the "vdW_d" is 23.0.
+       For PM3-D and AM1-D, this "vdW_s6" is forced to be set as 23.
 
        E.g.
          SCF
