@@ -323,7 +323,8 @@ double Cndo2::GetDiatomVdWCorrectionEnergy(int indexAtomA, int indexAtomB) const
    const Atom& atomB = *this->molecule->GetAtom(indexAtomB);
    double distance = this->molecule->GetDistanceAtoms(indexAtomA, indexAtomB);
    double vdWDistance = atomA.GetVdWRadii() + atomB.GetVdWRadii();
-   double vdWCoefficients = sqrt(atomA.GetVdWCoefficient()*atomB.GetVdWCoefficient());
+   double vdWCoefficients = 2.0*atomA.GetVdWCoefficient()*atomB.GetVdWCoefficient()
+                           /(atomA.GetVdWCoefficient()+atomB.GetVdWCoefficient());
    double dampingFactor = Parameters::GetInstance()->GetVdWDampingFactorSCF();
    double damping = 1.0/(1.0+exp(-1.0*dampingFactor*(distance/vdWDistance - 1.0)));
    double scalingFactor = Parameters::GetInstance()->GetVdWScalingFactorSCF();
@@ -350,6 +351,8 @@ double Cndo2::GetDiatomVdWCorrectionFirstDerivative(int indexAtomA, int indexAto
    const Atom& atomB = *this->molecule->GetAtom(indexAtomB);
    double distance = this->molecule->GetDistanceAtoms(indexAtomA, indexAtomB);
    double vdWDistance = atomA.GetVdWRadii() + atomB.GetVdWRadii();
+   double vdWCoefficients = 2.0*atomA.GetVdWCoefficient()*atomB.GetVdWCoefficient()
+                           /(atomA.GetVdWCoefficient()+atomB.GetVdWCoefficient());
    double dampingFactor = Parameters::GetInstance()->GetVdWDampingFactorSCF();
    double damping = 1.0/(1.0+exp(-1.0*dampingFactor*(distance/vdWDistance - 1.0)));
    double dampingFirstDerivative = (dampingFactor/vdWDistance)
@@ -357,7 +360,7 @@ double Cndo2::GetDiatomVdWCorrectionFirstDerivative(int indexAtomA, int indexAto
                                   *pow(1.0+exp(-1.0*dampingFactor*(distance/vdWDistance - 1.0)),-2.0);
    double value=0.0;
    value += 6.0*pow(distance,-7.0)*damping - pow(distance,-6.0)*dampingFirstDerivative;
-   value *= sqrt(atomA.GetVdWCoefficient()*atomB.GetVdWCoefficient());
+   value *= vdWCoefficients;
    value *= Parameters::GetInstance()->GetVdWScalingFactorSCF();
    value *= (atomA.GetXyz()[axisA] - atomB.GetXyz()[axisA])/distance;
    return value;

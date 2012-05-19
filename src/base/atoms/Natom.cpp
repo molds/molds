@@ -46,10 +46,10 @@ void Natom::SetAtomicParameters(){
    this->valence.push_back(py);
    this->valence.push_back(pz);
    this->valence.push_back(px);
-   this->vdWCoefficient = 1.23*Parameters::GetInstance()->GetJ2AU()
+   this->vdWCoefficient = 1.11*Parameters::GetInstance()->GetJ2AU()
                               *pow(Parameters::GetInstance()->GetNm2AU(),6.0)
                               /Parameters::GetInstance()->GetAvogadro();
-   this->vdWRadii = 1.397*Parameters::GetInstance()->GetAngstrom2AU();
+   this->vdWRadii = 1.550*Parameters::GetInstance()->GetAngstrom2AU();
    this->bondingParameter = -25.0*Parameters::GetInstance()->GetEV2AU();
    this->imuAmuS = 19.316*Parameters::GetInstance()->GetEV2AU();
    this->imuAmuP = 7.275*Parameters::GetInstance()->GetEV2AU();

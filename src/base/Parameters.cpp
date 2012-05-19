@@ -105,8 +105,8 @@ void Parameters::SetDefaultValues(){
    this->diisStartErrorSCF = pow(10.0, -2.0);
    this->diisEndErrorSCF = pow(10.0, -8.0);
    this->requiresVdWSCF = false;
-   this->vdWScalingFactorSCF = 0.90;
-   this->vdWDampingFactorSCF = 20.0;
+   this->vdWScalingFactorSCF = 1.40;
+   this->vdWDampingFactorSCF = 23.0;
    // MOPlot
    this->fileNamePrefixMOPlot = "MO_";
    this->gridNumberMOPlot[XAxis] = 25;

@@ -49,8 +49,11 @@
 [RCJ_2002] M. P. Repasky, J. Chandrasekhar, and W. L. Jorgensen, J. Comp. Chem. 23, 1601 (2002)
 [BGRJ_2003] I. T.-Brohman, C. R. W. Guimar\~{a}es, M. P. Repasky, and W. L. Jorgensen, J. Comp. Chem. 25, 138 (2003)
 [S_2004] J. J. P. Stewart, J. Mol. Model. 10, 155 (2004)
+[G_2004] S. Grimme, J. Comp. Chem. 1463 (2004)
 [BGJ_2003] I. T.-Brohman, C. R. W. Guimar\~{a}es, and, W. L. Jorgensen, J. Comp. Theor. Chem. 1, 817 (2004)
 [G_2006] S. Grimme, J. Comp. Chem. 271787 (2006)
 [S_2007] J. J. P. Stewart, J. Mol. Model. 13, 1173 (2007)
+[MH_2007] J. P. McNamara and I. H. Hillier, Phys. Chem. Chem. Phys. 9, 2362 (2007)
+[MMHBV_2007] C. A. Morgado, J. P. McNamara, I. H. Hillier, N. A. Burton, and M. A. Vincent, J. Chem. Theory Comput. 3, 1656 (2007)
 
 

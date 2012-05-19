@@ -110,8 +110,8 @@ protected:
    MolDS_base::ShellType valenceShellType;
    int firstAOIndex;
    int numberValenceElectrons;
-   double vdWCoefficient;               // Table 1 in [G_2006]
-   double vdWRadii;                     // Table 1 in [G_2006]
+   double vdWCoefficient;               // Table 1 in [G_2004] and [G_2006]
+   double vdWRadii;                     // Table 1 in [G_2004] and [G_2006]
    double imuAmuS;                      // Table 3.4 or 3.5 in J. A. Pople book
    double imuAmuP;                      // Table 3.4 or 3.5 in J. A. Pople book
    double imuAmuD;                      // Table 3.4 or 3.5 in J. A. Pople book

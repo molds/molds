@@ -49,7 +49,7 @@ void Oatom::SetAtomicParameters(){
    this->vdWCoefficient = 0.70*Parameters::GetInstance()->GetJ2AU()
                               *pow(Parameters::GetInstance()->GetNm2AU(),6.0)
                               /Parameters::GetInstance()->GetAvogadro();
-   this->vdWRadii = 1.342*Parameters::GetInstance()->GetAngstrom2AU();
+   this->vdWRadii = 1.490*Parameters::GetInstance()->GetAngstrom2AU();
    this->bondingParameter = -31.0*Parameters::GetInstance()->GetEV2AU();
    this->imuAmuS = 25.390*Parameters::GetInstance()->GetEV2AU();
    this->imuAmuP = 9.111*Parameters::GetInstance()->GetEV2AU();

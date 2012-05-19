@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/5/20(Sun.) 0:2:6  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/5/20(Sun.) 2:25:59  <<<<<
 
 
 **********  START: Parse input  **********
@@ -97,14 +97,14 @@ SCF iter=12: RMS density=0.000000169506348
 	Energy of MO:	13	unocc	1.840269e-01	5.007668e+00
 
 				|   [a.u.]   |   [eV]   |
-	Electronic energy(SCF):	-1.212918e+01	-3.300545e+02
+	Electronic energy(SCF):	-1.212780e+01	-3.300168e+02
 	Note that this electronic energy includs core-repulsions and vdW correction.
 
 				|   [a.u.]   |   [eV]   |
 	Core repulsion energy:	2.185489e+01	5.947066e+02
 
 						|   [a.u.]   |   [eV]   |
-	Empirical van der Waals correction:	-3.223663e-03	-8.772102e-02
+	Empirical van der Waals correction:	-1.839038e-03	-5.004318e-02
 
 					|   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
 	Total Dipole moment(SCF):	-1.756074e-02	-3.270080e-02	-1.363454e-02	3.954266e-02		-4.463495e-02	-8.311715e-02	-3.465556e-02	1.005074e-01
@@ -125,7 +125,7 @@ SCF iter=12: RMS density=0.000000169506348
 	Mulliken charge:	6	H	1.000000e+00	3.744313e-02
 	Mulliken charge:	7	H	1.000000e+00	4.258006e-02
 
-	Elapsed time(omp) for the SCF = 0.044352[s].
+	Elapsed time(omp) for the SCF = 0.060487[s].
 **********  DONE: PM3-SCF  **********
 
 
@@ -134,9 +134,9 @@ SCF iter=12: RMS density=0.000000169506348
 	Energies:
 		|	kind			| [a.u.] | [eV] | 
 		Core repulsion:   	2.185489e+01	5.947066e+02
-		VdW correction:   	-3.223663e-03	-8.772102e-02
+		VdW correction:   	-1.839038e-03	-5.004318e-02
 		Electronic
-		(inc. core rep. and vdW):	-1.212918e+01	-3.300545e+02
+		(inc. core rep. and vdW):	-1.212780e+01	-3.300168e+02
 
 				| i-th | atom type |   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
 	Atom coordinates:	0	C	0.000000e+00	3.779452e-02	0.000000e+00		0.000000e+00	2.000000e-02	0.000000e+00
@@ -191,14 +191,14 @@ SCF iter=12: RMS density=0.000000330165341
 	Energy of MO:	13	unocc	1.839963e-01	5.006833e+00
 
 				|   [a.u.]   |   [eV]   |
-	Electronic energy(SCF):	-1.212892e+01	-3.300474e+02
+	Electronic energy(SCF):	-1.212759e+01	-3.300111e+02
 	Note that this electronic energy includs core-repulsions and vdW correction.
 
 				|   [a.u.]   |   [eV]   |
 	Core repulsion energy:	2.190779e+01	5.961461e+02
 
 						|   [a.u.]   |   [eV]   |
-	Empirical van der Waals correction:	-3.170319e-03	-8.626947e-02
+	Empirical van der Waals correction:	-1.835719e-03	-4.995287e-02
 
 					|   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
 	Total Dipole moment(SCF):	-9.515967e-02	-3.235397e-02	3.185385e-02	1.054363e-01		-2.418718e-01	-8.223562e-02	8.096444e-02	2.679924e-01
@@ -219,16 +219,16 @@ SCF iter=12: RMS density=0.000000330165341
 	Mulliken charge:	6	H	1.000000e+00	3.876166e-02
 	Mulliken charge:	7	H	1.000000e+00	4.011921e-02
 
-	Elapsed time(omp) for the SCF = 0.044606[s].
+	Elapsed time(omp) for the SCF = 0.038753[s].
 **********  DONE: PM3-SCF  **********
 
 
 	Energies:
 		|	kind			| [a.u.] | [eV] | 
 		Core repulsion:   	2.190779e+01	5.961461e+02
-		VdW correction:   	-3.170319e-03	-8.626947e-02
+		VdW correction:   	-1.835719e-03	-4.995287e-02
 		Electronic
-		(inc. core rep. and vdW):	-1.212892e+01	-3.300474e+02
+		(inc. core rep. and vdW):	-1.212759e+01	-3.300111e+02
 
 				| i-th | atom type |   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
 	Atom coordinates:	0	C	1.179654e-04	4.070798e-02	-1.188489e-03		6.242460e-05	2.154173e-02	-6.289213e-04
@@ -280,14 +280,14 @@ SCF iter=7: RMS density=0.000000485534181
 	Energy of MO:	13	unocc	1.839025e-01	5.004282e+00
 
 				|   [a.u.]   |   [eV]   |
-	Electronic energy(SCF):	-1.212815e+01	-3.300264e+02
+	Electronic energy(SCF):	-1.212678e+01	-3.299892e+02
 	Note that this electronic energy includs core-repulsions and vdW correction.
 
 				|   [a.u.]   |   [eV]   |
 	Core repulsion energy:	2.189056e+01	5.956771e+02
 
 						|   [a.u.]   |   [eV]   |
-	Empirical van der Waals correction:	-3.216717e-03	-8.753203e-02
+	Empirical van der Waals correction:	-1.849242e-03	-5.032083e-02
 
 					|   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
 	Total Dipole moment(SCF):	-4.878647e-02	-1.636770e-02	3.994740e-02	6.514458e-02		-1.240029e-01	-4.160255e-02	1.015362e-01	1.655810e-01
@@ -308,16 +308,16 @@ SCF iter=7: RMS density=0.000000485534181
 	Mulliken charge:	6	H	1.000000e+00	3.956646e-02
 	Mulliken charge:	7	H	1.000000e+00	4.000530e-02
 
-	Elapsed time(omp) for the SCF = 0.038812[s].
+	Elapsed time(omp) for the SCF = 0.037593[s].
 **********  DONE: PM3-SCF  **********
 
 
 	Energies:
 		|	kind			| [a.u.] | [eV] | 
 		Core repulsion:   	2.190779e+01	5.961461e+02
-		VdW correction:   	-3.170319e-03	-8.626947e-02
+		VdW correction:   	-1.835719e-03	-4.995287e-02
 		Electronic
-		(inc. core rep. and vdW):	-1.212892e+01	-3.300474e+02
+		(inc. core rep. and vdW):	-1.212759e+01	-3.300111e+02
 
 				| i-th | atom type |   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
 	Atom coordinates:	0	C	1.179654e-04	4.070798e-02	-1.188489e-03		6.242460e-05	2.154173e-02	-6.289213e-04
@@ -370,14 +370,14 @@ SCF iter=8: RMS density=0.000000255221986
 	Energy of MO:	13	unocc	1.842203e-01	5.012930e+00
 
 				|   [a.u.]   |   [eV]   |
-	Electronic energy(SCF):	-1.212639e+01	-3.299786e+02
+	Electronic energy(SCF):	-1.212499e+01	-3.299404e+02
 	Note that this electronic energy includs core-repulsions and vdW correction.
 
 				|   [a.u.]   |   [eV]   |
 	Core repulsion energy:	2.184911e+01	5.945493e+02
 
 						|   [a.u.]   |   [eV]   |
-	Empirical van der Waals correction:	-3.243500e-03	-8.826084e-02
+	Empirical van der Waals correction:	-1.841313e-03	-5.010508e-02
 
 					|   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
 	Total Dipole moment(SCF):	-1.820813e-01	-4.350680e-02	-1.929134e-02	1.881983e-01		-4.628047e-01	-1.105833e-01	-4.903372e-02	4.783525e-01
@@ -398,16 +398,16 @@ SCF iter=8: RMS density=0.000000255221986
 	Mulliken charge:	6	H	1.000000e+00	3.860427e-02
 	Mulliken charge:	7	H	1.000000e+00	4.015956e-02
 
-	Elapsed time(omp) for the SCF = 0.039060[s].
+	Elapsed time(omp) for the SCF = 0.037864[s].
 **********  DONE: PM3-SCF  **********
 
 
 	Energies:
 		|	kind			| [a.u.] | [eV] | 
 		Core repulsion:   	2.190779e+01	5.961461e+02
-		VdW correction:   	-3.170319e-03	-8.626947e-02
+		VdW correction:   	-1.835719e-03	-4.995287e-02
 		Electronic
-		(inc. core rep. and vdW):	-1.212892e+01	-3.300474e+02
+		(inc. core rep. and vdW):	-1.212759e+01	-3.300111e+02
 
 				| i-th | atom type |   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
 	Atom coordinates:	0	C	1.179654e-04	4.070798e-02	-1.188489e-03		6.242460e-05	2.154173e-02	-6.289213e-04
@@ -459,14 +459,14 @@ SCF iter=7: RMS density=0.000000626265065
 	Energy of MO:	13	unocc	1.834912e-01	4.993091e+00
 
 				|   [a.u.]   |   [eV]   |
-	Electronic energy(SCF):	-1.212630e+01	-3.299761e+02
+	Electronic energy(SCF):	-1.212488e+01	-3.299374e+02
 	Note that this electronic energy includs core-repulsions and vdW correction.
 
 				|   [a.u.]   |   [eV]   |
 	Core repulsion energy:	2.182517e+01	5.938980e+02
 
 						|   [a.u.]   |   [eV]   |
-	Empirical van der Waals correction:	-3.250212e-03	-8.844347e-02
+	Empirical van der Waals correction:	-1.830324e-03	-4.980606e-02
 
 					|   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
 	Total Dipole moment(SCF):	-1.988187e-01	-6.746948e-02	8.942232e-02	2.282046e-01		-5.053467e-01	-1.714904e-01	2.272889e-01	5.800384e-01
@@ -487,16 +487,16 @@ SCF iter=7: RMS density=0.000000626265065
 	Mulliken charge:	6	H	1.000000e+00	3.881106e-02
 	Mulliken charge:	7	H	1.000000e+00	4.017300e-02
 
-	Elapsed time(omp) for the SCF = 0.039283[s].
+	Elapsed time(omp) for the SCF = 0.037458[s].
 **********  DONE: PM3-SCF  **********
 
 
 	Energies:
 		|	kind			| [a.u.] | [eV] | 
 		Core repulsion:   	2.190779e+01	5.961461e+02
-		VdW correction:   	-3.170319e-03	-8.626947e-02
+		VdW correction:   	-1.835719e-03	-4.995287e-02
 		Electronic
-		(inc. core rep. and vdW):	-1.212892e+01	-3.300474e+02
+		(inc. core rep. and vdW):	-1.212759e+01	-3.300111e+02
 
 				| i-th | atom type |   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
 	Atom coordinates:	0	C	1.179654e-04	4.070798e-02	-1.188489e-03		6.242460e-05	2.154173e-02	-6.289213e-04
@@ -548,14 +548,14 @@ SCF iter=7: RMS density=0.000000877371491
 	Energy of MO:	13	unocc	1.836537e-01	4.997512e+00
 
 				|   [a.u.]   |   [eV]   |
-	Electronic energy(SCF):	-1.212930e+01	-3.300576e+02
+	Electronic energy(SCF):	-1.212795e+01	-3.300209e+02
 	Note that this electronic energy includs core-repulsions and vdW correction.
 
 				|   [a.u.]   |   [eV]   |
 	Core repulsion energy:	2.188459e+01	5.955148e+02
 
 						|   [a.u.]   |   [eV]   |
-	Empirical van der Waals correction:	-3.182397e-03	-8.659813e-02
+	Empirical van der Waals correction:	-1.831793e-03	-4.984601e-02
 
 					|   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
 	Total Dipole moment(SCF):	-7.120026e-02	-2.112740e-02	1.872330e-02	7.659247e-02		-1.809730e-01	-5.370051e-02	4.758989e-02	1.946787e-01
@@ -576,16 +576,16 @@ SCF iter=7: RMS density=0.000000877371491
 	Mulliken charge:	6	H	1.000000e+00	3.903480e-02
 	Mulliken charge:	7	H	1.000000e+00	3.977403e-02
 
-	Elapsed time(omp) for the SCF = 0.039228[s].
+	Elapsed time(omp) for the SCF = 0.037483[s].
 **********  DONE: PM3-SCF  **********
 
 
 	Energies:
 		|	kind			| [a.u.] | [eV] | 
 		Core repulsion:   	2.188459e+01	5.955148e+02
-		VdW correction:   	-3.182397e-03	-8.659813e-02
+		VdW correction:   	-1.831793e-03	-4.984601e-02
 		Electronic
-		(inc. core rep. and vdW):	-1.212930e+01	-3.300576e+02
+		(inc. core rep. and vdW):	-1.212795e+01	-3.300209e+02
 
 				| i-th | atom type |   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
 	Atom coordinates:	0	C	-4.361129e-04	4.062786e-02	-3.499568e-04		-2.307810e-04	2.149934e-02	-1.851892e-04
@@ -614,7 +614,7 @@ SCF iter=7: RMS density=0.000000877371491
      >>>>>  The MolDS finished normally!  <<<<<
      >>>>>  CPU time: 0.24[s].  <<<<<
      >>>>>  Elapsed time: 0[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 0.249764[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 0.255579[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

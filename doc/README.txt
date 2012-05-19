@@ -129,14 +129,18 @@ HOW TO WRITE INPUT:
        The default value of the "diis_end_error" is 10**(-8.0).
 
        "vdW" should be set as "yes" or "no". 
-       For "yes", Grimmes's empirical van der Waals correction([G_2006]) is applied.
-       The default value of the "vdW" is "no".
+       For "yes", Grimmes's empirical van der Waals correction([G_2004]) is applied.
+       The default value of the "vdW" is "no". 
+       Note that this empirical van der Waals correction is applied to the semiempirical methods 
+       of which semiempirical parameters are not modified.
+       If user wants to use PM3-D or AM1-D of which semiempirical parameters are modified to be suite for vdW, 
+       set theory-directive as "PM3-D" or "AM1-D".
 
-       "vdW_s6" is a scaling factor in the Grimme's van der Waals correction([G_2006]).
-       The default value of the "vdW_s6" is 0.9.
+       "vdW_s6" is a scaling factor in the Grimme's van der Waals correction([G_2004]).
+       The default value of the "vdW_s6" is 1.4.
 
-       "vdW_d" is a damping factor in the Grimme's van der Waals correction([G_2006]).
-       The default value of the "vdW_d" is 20.0.
+       "vdW_d" is a damping factor in the Grimme's van der Waals correction([G_2004]).
+       The default value of the "vdW_d" is 23.0.
 
        E.g.
          SCF
