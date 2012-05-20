@@ -64,6 +64,7 @@ void Atom::SetMessages(){
    this->errorMessageIndoCoreIntegral = "Error in base_atoms::Atom::GetCoreIntegral: Invalid orbitalType for INDO.\n";
    this->errorMessageMndoCoreIntegral = "Error in base_atoms::Atom::GetMndoCoreINtegral: Invalid orbitalType for MNDO.\n";
    this->errorMessageAm1CoreIntegral = "Error in base_atoms::Atom::GetAm1CoreINtegral: Invalid orbitalType for AM1.\n";
+   this->errorMessageAm1DCoreIntegral = "Error in base_atoms::Atom::GetAm1DCoreINtegral: Invalid orbitalType for AM1.\n";
    this->errorMessagePm3CoreIntegral = "Error in base_atoms::Atom::GetPm3CoreINtegral: Invalid orbitalType for PM3.\n";
    this->errorMessagePm3DCoreIntegral = "Error in base_atoms::Atom::GetPm3DCoreINtegral: Invalid orbitalType for PM3-D.\n";
    this->errorMessagePm3PddgCoreIntegral = "Error in base_atoms::Atom::GetPm3PddgCoreINtegral: Invalid orbitalType for PM3/PDDG.\n";
@@ -308,6 +309,14 @@ double Atom::GetBondingParameter(TheoryType theory, OrbitalType orbital) const{
                               orbital == pz ) ){
       value = this->am1BondingParameterP;
    }
+   else if(theory == AM1D && orbital == s){
+      value = this->am1DBondingParameterS;
+   }
+   else if(theory == AM1D && ( orbital == px ||
+                               orbital == py ||
+                               orbital == pz ) ){
+      value = this->am1DBondingParameterP;
+   }
    else if(theory == PM3 && orbital == s){
       value = this->pm3BondingParameterS;
    }
@@ -445,7 +454,7 @@ double Atom::GetOrbitalExponent(ShellType shellType,
          throw MolDSException(ss.str());
       }
    }
-   else if(theory == AM1){
+   else if(theory == AM1 || theory == AM1D){
       if(orbitalType == s){ 
          return this->am1OrbitalExponentS;
       }
@@ -673,6 +682,26 @@ double Atom::GetAm1CoreIntegral(OrbitalType orbital) const{
    return value;
 }
 
+double Atom::GetAm1DCoreIntegral(OrbitalType orbital) const{
+   double value=0.0;
+
+   if(orbital == s){
+      value = this->am1DCoreintegralS;
+   }
+   else if(orbital == px || orbital == py || orbital == pz){
+      value = this->am1DCoreintegralP;
+   }
+   else{
+      stringstream ss;
+      ss << this->errorMessageAm1DCoreIntegral;
+      ss << this->errorMessageAtomType << AtomTypeStr(this->atomType) << endl;
+      ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbital) << endl;
+      throw MolDSException(ss.str());
+   }
+
+   return value;
+}
+
 double Atom::GetPm3CoreIntegral(OrbitalType orbital) const{
    double value=0.0;
 
@@ -749,6 +778,9 @@ double Atom::GetNddoAlpha(TheoryType theory) const{
    else if(theory == AM1){
       value = this->am1Alpha;
    }
+   else if(theory == AM1D){
+      value = this->am1DAlpha;
+   }
    else if(theory == PM3){
       value = this->pm3Alpha;
    }
@@ -772,7 +804,7 @@ double Atom::GetNddoDerivedParameterD(TheoryType theory, int dIndex) const{
       if(theory == MNDO){
          return this->mndoDerivedParameterD[dIndex];
       }
-      else if(theory == AM1){
+      else if(theory == AM1 || theory == AM1D){
          return this->am1DerivedParameterD[dIndex];
       }
       else if(theory == PM3 || theory == PM3D){
@@ -801,7 +833,7 @@ double Atom::GetNddoDerivedParameterRho(TheoryType theory, int rhoIndex) const{
       if(theory == MNDO){
          return this->mndoDerivedParameterRho[rhoIndex];
       }
-      else if(theory == AM1){
+      else if(theory == AM1 || theory == AM1D){
          return this->am1DerivedParameterRho[rhoIndex];
       }
       else if(theory == PM3 || theory == PM3D){
@@ -827,7 +859,7 @@ double Atom::GetNddoDerivedParameterRho(TheoryType theory, int rhoIndex) const{
 
 double Atom::GetNddoParameterK(TheoryType theory, int kIndex) const{
    if(kIndex == 0 || kIndex == 1 || kIndex == 2 || kIndex == 3){
-      if(theory == AM1){
+      if(theory == AM1 || theory == AM1D){
          return this->am1ParameterK[kIndex];
       }
       else if(theory == PM3 || theory == PM3D){
@@ -853,7 +885,7 @@ double Atom::GetNddoParameterK(TheoryType theory, int kIndex) const{
 
 double Atom::GetNddoParameterL(TheoryType theory, int lIndex) const{
    if(lIndex == 0 || lIndex == 1 || lIndex == 2 || lIndex == 3){
-      if(theory == AM1){
+      if(theory == AM1 || theory == AM1D){
          return this->am1ParameterL[lIndex];
       }
       else if(theory == PM3 || theory == PM3D){
@@ -879,7 +911,7 @@ double Atom::GetNddoParameterL(TheoryType theory, int lIndex) const{
 
 double Atom::GetNddoParameterM(TheoryType theory, int mIndex) const{
    if(mIndex == 0 || mIndex == 1 || mIndex == 2 || mIndex == 3){
-      if(theory == AM1){
+      if(theory == AM1 || theory == AM1D){
          return this->am1ParameterM[mIndex];
       }
       else if(theory == PM3 || theory == PM3D){
@@ -939,7 +971,7 @@ double Atom::GetNddoGss(TheoryType theory) const{
    if(theory == MNDO){
       return this->mndoGss;
    }
-   else if(theory == AM1){
+   else if(theory == AM1 || theory == AM1D){
       return this->am1Gss;
    }
    else if(theory == PM3 || theory == PM3D){
@@ -960,7 +992,7 @@ double Atom::GetNddoGpp(TheoryType theory) const{
    if(theory == MNDO){
       return this->mndoGpp;
    }
-   else if(theory == AM1){
+   else if(theory == AM1 || theory == AM1D){
       return this->am1Gpp;
    }
    else if(theory == PM3 || theory == PM3D){
@@ -981,7 +1013,7 @@ double Atom::GetNddoGsp(TheoryType theory) const{
    if(theory == MNDO){
       return this->mndoGsp;
    }
-   else if(theory == AM1){
+   else if(theory == AM1 || theory == AM1D){
       return this->am1Gsp;
    }
    else if(theory == PM3 || theory == PM3D){
@@ -1002,7 +1034,7 @@ double Atom::GetNddoGpp2(TheoryType theory) const{
    if(theory == MNDO){
       return this->mndoGpp2;
    }
-   else if(theory == AM1){
+   else if(theory == AM1 || theory == AM1D){
       return this->am1Gpp2;
    }
    else if(theory == PM3 || theory == PM3D){
@@ -1023,7 +1055,7 @@ double Atom::GetNddoHsp(TheoryType theory) const{
    if(theory == MNDO){
       return this->mndoHsp;
    }
-   else if(theory == AM1){
+   else if(theory == AM1 || theory == AM1D){
       return this->am1Hsp;
    }
    else if(theory == PM3 || theory == PM3D){
@@ -1045,7 +1077,7 @@ double Atom::GetNddoHpp(TheoryType theory) const{
    if(theory == MNDO){
       return 0.5*(this->mndoGpp - this->mndoGpp2);
    }
-   else if(theory == AM1){
+   else if(theory == AM1 || theory == AM1D){
       return 0.5*(this->am1Gpp - this->am1Gpp2);
    }
    else if(theory == PM3 || theory == PM3D){
@@ -1191,6 +1223,9 @@ double Atom::GetCoreIntegral(OrbitalType orbital,
    }
    else if(theory == AM1){
       value = this->GetAm1CoreIntegral(orbital);
+   }
+   else if(theory == AM1D){
+      value = this->GetAm1DCoreIntegral(orbital);
    }
    else if(theory == PM3){
       value = this->GetPm3CoreIntegral(orbital);

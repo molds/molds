@@ -163,6 +163,11 @@ void Satom::SetAtomicParameters(){
    this->am1ParameterM[1] = 1.503313 * Parameters::GetInstance()->GetAngstrom2AU();
    this->am1ParameterM[2] = 2.009173 * Parameters::GetInstance()->GetAngstrom2AU();
    this->am1ParameterM[3] = 0.00 * Parameters::GetInstance()->GetAngstrom2AU();
+   this->am1DCoreintegralS = -57.235044 * Parameters::GetInstance()->GetEV2AU();         
+   this->am1DCoreintegralP = -48.307513 * Parameters::GetInstance()->GetEV2AU();         
+   this->am1DBondingParameterS = -3.311308 * Parameters::GetInstance()->GetEV2AU();     
+   this->am1DBondingParameterP = -7.256468 * Parameters::GetInstance()->GetEV2AU();     
+   this->am1DAlpha = 2.309315 / Parameters::GetInstance()->GetAngstrom2AU();        
    this->pm3CoreintegralS = -49.895371 * Parameters::GetInstance()->GetEV2AU();         
    this->pm3CoreintegralP = -44.392583 * Parameters::GetInstance()->GetEV2AU();         
    this->pm3OrbitalExponentS = 1.891185;      

@@ -135,6 +135,11 @@ void Hatom::SetAtomicParameters(){
    this->am1ParameterM[1] = 1.80 * Parameters::GetInstance()->GetAngstrom2AU();
    this->am1ParameterM[2] = 2.10 * Parameters::GetInstance()->GetAngstrom2AU();
    this->am1ParameterM[3] = 0.00 * Parameters::GetInstance()->GetAngstrom2AU();
+   this->am1DCoreintegralS = -11.223791 * Parameters::GetInstance()->GetEV2AU();         
+   this->am1DCoreintegralP = 0.0 * Parameters::GetInstance()->GetEV2AU();         
+   this->am1DBondingParameterS = -6.376265 * Parameters::GetInstance()->GetEV2AU();     
+   this->am1DBondingParameterP = 0.0 * Parameters::GetInstance()->GetEV2AU();     
+   this->am1DAlpha = 3.577756 / Parameters::GetInstance()->GetAngstrom2AU();        
    this->pm3CoreintegralS = -13.073321 * Parameters::GetInstance()->GetEV2AU();         
    this->pm3CoreintegralP = 0.0;
    this->pm3OrbitalExponentS = 0.967807;      

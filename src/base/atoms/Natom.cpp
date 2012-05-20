@@ -141,6 +141,11 @@ void Natom::SetAtomicParameters(){
    this->am1ParameterM[1] = 2.10 * Parameters::GetInstance()->GetAngstrom2AU();
    this->am1ParameterM[2] = 2.40 * Parameters::GetInstance()->GetAngstrom2AU();
    this->am1ParameterM[3] = 0.00 * Parameters::GetInstance()->GetAngstrom2AU();
+   this->am1DCoreintegralS = -71.997845 * Parameters::GetInstance()->GetEV2AU();         
+   this->am1DCoreintegralP = -57.401718 * Parameters::GetInstance()->GetEV2AU();         
+   this->am1DBondingParameterS = -20.092408 * Parameters::GetInstance()->GetEV2AU();     
+   this->am1DBondingParameterP = -18.470679 * Parameters::GetInstance()->GetEV2AU();     
+   this->am1DAlpha = 2.968737 / Parameters::GetInstance()->GetAngstrom2AU();        
    this->pm3CoreintegralS = -49.335672 * Parameters::GetInstance()->GetEV2AU();         
    this->pm3CoreintegralP = -47.509736 * Parameters::GetInstance()->GetEV2AU();         
    this->pm3OrbitalExponentS = 2.028094;      

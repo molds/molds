@@ -181,6 +181,11 @@ protected:
    double am1ParameterK[4];// Table I in ref. [DZHS_1985] for H, C, N, O, and Table I in re. [DY_1990] for S.
    double am1ParameterL[4];// Table I in ref. [DZHS_1985] for H, C, N, O, and Table I in re. [DY_1990] for S.
    double am1ParameterM[4];// Table I in ref. [DZHS_1985] for H, C, N, O, and Table I in re. [DY_1990] for S.
+   double am1DCoreintegralS; // Table II in ref. [MH_2007] for H, C, N, and O and Table IV in ref. [MMHBV_2007] for S.
+   double am1DCoreintegralP; // Table II in ref. [MH_2007] for H, C, N, and O and Table IV in ref. [MMHBV_2007] for S.
+   double am1DBondingParameterS; // Table II in ref. [MH_2007] for H, C, N, O, and Table IV in re. [MMHBV_2007] for S.
+   double am1DBondingParameterP; // Table II in ref. [MH_2007] for H, C, N, O, and Table IV in re. [MMHBV_2007] for S.
+   double am1DAlpha; // Table II in ref. [MH_2007] for H, C, N, O, and Table IV in re. [MMHBV_2007] for S.
    double pm3CoreintegralS; // Table II in ref. [S_1989].
    double pm3CoreintegralP; // Table II in ref. [S_1989].
    double pm3OrbitalExponentS;// Table II in ref. [S_1989].
@@ -231,6 +236,7 @@ private:
    std::string errorMessageZindoCoreIntegral;
    std::string errorMessageMndoCoreIntegral;
    std::string errorMessageAm1CoreIntegral;
+   std::string errorMessageAm1DCoreIntegral;
    std::string errorMessagePm3CoreIntegral;
    std::string errorMessagePm3DCoreIntegral;
    std::string errorMessagePm3PddgCoreIntegral;
@@ -286,6 +292,7 @@ private:
    double GetZindoCoreIntegral(MolDS_base::OrbitalType orbital) const; // Eq. (13) in [BZ_1979]
    double GetMndoCoreIntegral(MolDS_base::OrbitalType orbital) const; 
    double GetAm1CoreIntegral(MolDS_base::OrbitalType orbital) const; 
+   double GetAm1DCoreIntegral(MolDS_base::OrbitalType orbital) const; 
    double GetPm3CoreIntegral(MolDS_base::OrbitalType orbital) const; 
    double GetPm3DCoreIntegral(MolDS_base::OrbitalType orbital) const; 
    double GetPm3PddgCoreIntegral(MolDS_base::OrbitalType orbital) const; 

@@ -39,6 +39,7 @@
 #include"../../zindo/ZindoS.h"
 #include"../../mndo/Mndo.h"
 #include"../../am1/Am1.h"
+#include"../../am1/Am1D.h"
 #include"../../pm3/Pm3.h"
 #include"../../pm3/Pm3D.h"
 #include"../../pm3/Pm3Pddg.h"
@@ -66,6 +67,9 @@ ElectronicStructure* ElectronicStructureFactory::Create(TheoryType theoryType){
    }
    else if(theoryType == AM1 ){
       electronicStructure = new MolDS_am1::Am1();
+   }
+   else if(theoryType == AM1D ){
+      electronicStructure = new MolDS_am1::Am1D();
    }
    else if(theoryType == PM3 ){
       electronicStructure = new MolDS_pm3::Pm3();

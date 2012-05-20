@@ -192,6 +192,7 @@ void InputParser::SetMessages(){
    this->stringTheoryZINDOS = "zindo/s";
    this->stringTheoryMNDO = "mndo";
    this->stringTheoryAM1 = "am1";
+   this->stringTheoryAM1D = "am1-d";
    this->stringTheoryPM3 = "pm3";
    this->stringTheoryPM3D = "pm3-d";
    this->stringTheoryPM3PDDG = "pm3/pddg";
@@ -926,6 +927,10 @@ int InputParser::ParseTheory(vector<string>* inputTerms, int parseIndex) const{
       else if((*inputTerms)[parseIndex].compare(this->stringTheoryAM1) == 0){
          Parameters::GetInstance()->SetCurrentTheory(AM1);
       }
+      // AM1-D
+      else if((*inputTerms)[parseIndex].compare(this->stringTheoryAM1D) == 0){
+         Parameters::GetInstance()->SetCurrentTheory(AM1D);
+      }
       // PM3
       else if((*inputTerms)[parseIndex].compare(this->stringTheoryPM3) == 0){
          Parameters::GetInstance()->SetCurrentTheory(PM3);
@@ -1105,7 +1110,7 @@ void InputParser::CalcMolecularBasics(Molecule* molecule) const{
 void InputParser::ValidateVdWConditions() const{
    TheoryType theory = Parameters::GetInstance()->GetCurrentTheory();
    // Validate theory
-   if(theory == PM3D){
+   if(theory == PM3D || theory == AM1D){
       Parameters::GetInstance()->SetRequiresVdWSCF(true);
       Parameters::GetInstance()->SetVdWScalingFactorSCF();
       Parameters::GetInstance()->SetVdWDampingFactorSCF();

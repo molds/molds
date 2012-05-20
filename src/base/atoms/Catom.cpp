@@ -141,6 +141,11 @@ void Catom::SetAtomicParameters(){
    this->am1ParameterM[1] = 1.85 * Parameters::GetInstance()->GetAngstrom2AU();
    this->am1ParameterM[2] = 2.05 * Parameters::GetInstance()->GetAngstrom2AU();
    this->am1ParameterM[3] = 2.65 * Parameters::GetInstance()->GetAngstrom2AU();
+   this->am1DCoreintegralS = -52.183798 * Parameters::GetInstance()->GetEV2AU();         
+   this->am1DCoreintegralP = -39.368413 * Parameters::GetInstance()->GetEV2AU();         
+   this->am1DBondingParameterS = -15.682341 * Parameters::GetInstance()->GetEV2AU();     
+   this->am1DBondingParameterP = -7.804762 * Parameters::GetInstance()->GetEV2AU();     
+   this->am1DAlpha = 2.625506 / Parameters::GetInstance()->GetAngstrom2AU();        
    this->pm3CoreintegralS = -47.270320 * Parameters::GetInstance()->GetEV2AU();         
    this->pm3CoreintegralP = -36.266918 * Parameters::GetInstance()->GetEV2AU();         
    this->pm3OrbitalExponentS = 1.565085;      

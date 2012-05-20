@@ -141,6 +141,11 @@ void Oatom::SetAtomicParameters(){
    this->am1ParameterM[1] = 1.445071 * Parameters::GetInstance()->GetAngstrom2AU();
    this->am1ParameterM[2] = 0.00 * Parameters::GetInstance()->GetAngstrom2AU();
    this->am1ParameterM[3] = 0.00 * Parameters::GetInstance()->GetAngstrom2AU();
+   this->am1DCoreintegralS = -97.610588 * Parameters::GetInstance()->GetEV2AU();         
+   this->am1DCoreintegralP = -78.589700 * Parameters::GetInstance()->GetEV2AU();         
+   this->am1DBondingParameterS = -29.502481 * Parameters::GetInstance()->GetEV2AU();     
+   this->am1DBondingParameterP = -29.495380 * Parameters::GetInstance()->GetEV2AU();     
+   this->am1DAlpha = 4.633699 / Parameters::GetInstance()->GetAngstrom2AU();        
    this->pm3CoreintegralS = -86.993002 * Parameters::GetInstance()->GetEV2AU();         
    this->pm3CoreintegralP = -71.879580 * Parameters::GetInstance()->GetEV2AU();         
    this->pm3OrbitalExponentS = 3.796544;      

@@ -80,7 +80,11 @@ CAPABILITIES:
    ---------|-----|-----|--------|--------|--------|--------|----------|----------|--------------|--------------|
    AM1      | OK  | OK  | OK     | OK     | OK     | OK     | OK       | OK       | OK           | OK           |
    ---------|-----|-----|--------|--------|--------|--------|----------|----------|--------------|--------------|
+   AM1-D    | OK  | OK  | OK     | OK     | OK     | OK     | OK       | OK       | OK           | OK           |
+   ---------|-----|-----|--------|--------|--------|--------|----------|----------|--------------|--------------|
    PM3      | OK  | OK  | OK     | OK     | OK     | OK     | OK       | OK       | OK           | OK           |
+   ---------|-----|-----|--------|--------|--------|--------|----------|----------|--------------|--------------|
+   PM3-D    | OK  | OK  | OK     | OK     | OK     | OK     | OK       | OK       | OK           | OK           |
    ---------|-----|-----|--------|--------|--------|--------|----------|----------|--------------|--------------|
    PM3/PDDG | OK  | OK  | OK     | OK     | OK     | OK     | OK       | OK       | OK           | OK           |
 
@@ -93,7 +97,9 @@ CAPABILITIES:
    ZINDO/S  | H, C, N, O, and S
    MNDO     | H, C, N, O, and S 
    AM1      | H, C, N, O, and S 
+   AM1-D    | H, C, N, O, and S 
    PM3      | H, C, N, O, and S 
+   PM3-D    | H, C, N, O, and S 
    PM3/PDDG | H, C, N, O, and S 
 
 ==============================================================================
@@ -103,7 +109,7 @@ HOW TO WRITE INPUT:
       Lines starting with "//" or "#" in input-files are treated as comments.
 
    <SCF>
-      Write "cndo/2", "indo", "zindo/s", "mndo", "am1", 
+      Write "cndo/2", "indo", "zindo/s", "mndo", "am1", "am1-d",
       "pm3", "pm3-D", or "pm3/pddg" in theory-directive.
       This theory-directive indicate a electronic structure theory used in your simulations.
       MNDO only supports (can calculate) Heats of formation.
@@ -143,7 +149,7 @@ HOW TO WRITE INPUT:
 
        "vdW_d" is a damping factor in the Grimme's van der Waals correction([G_2004]).
        The default value of the "vdW_d" is 23.0.
-       For PM3-D and AM1-D, this "vdW_s6" is forced to be set as 23.
+       For PM3-D and AM1-D, this "vdW_s6" is forced to be set as 23.0.
 
        E.g.
          SCF

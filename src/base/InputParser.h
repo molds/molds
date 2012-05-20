@@ -137,6 +137,7 @@ private:
    std::string stringTheoryZINDOS;
    std::string stringTheoryMNDO;
    std::string stringTheoryAM1;
+   std::string stringTheoryAM1D;
    std::string stringTheoryPM3;
    std::string stringTheoryPM3D;
    std::string stringTheoryPM3PDDG;
