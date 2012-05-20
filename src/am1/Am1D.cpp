@@ -99,12 +99,12 @@ void Am1D::SetMessages(){
       = "Error in am1::Am1D::GetElectronicEnergy: Set electronic state is not calculated by CIS.\n";
    this->errorMessageGetElectronicEnergyNULLCISEnergy 
       = "Error in am1::Am1D::GetElectronicEnergy: excitedEnergies is NULL\n";
-   this->messageSCFMetConvergence = "\n\n\n\t\tPM3-D-SCF met convergence criterion(^^b\n\n\n";
-   this->messageStartSCF = "**********  START: PM3-D-SCF  **********\n";
-   this->messageDoneSCF = "**********  DONE: PM3-D-SCF  **********\n\n\n";
-   this->messageStartCIS = "**********  START: PM3-D-CIS  **********\n";
-   this->messageDoneCIS = "**********  DONE: PM3-D-CIS  **********\n\n\n";
-   this->messageDavidsonConverge = "\n\n\t\tDavidson for PM3-D-CIS met convergence criterion(^^b\n\n\n";
+   this->messageSCFMetConvergence = "\n\n\n\t\tAM1-D-SCF met convergence criterion(^^b\n\n\n";
+   this->messageStartSCF = "**********  START: AM1-D-SCF  **********\n";
+   this->messageDoneSCF = "**********  DONE: AM1-D-SCF  **********\n\n\n";
+   this->messageStartCIS = "**********  START: AM1-D-CIS  **********\n";
+   this->messageDoneCIS = "**********  DONE: AM1-D-CIS  **********\n\n\n";
+   this->messageDavidsonConverge = "\n\n\t\tDavidson for AM1-D-CIS met convergence criterion(^^b\n\n\n";
 }
 
 void Am1D::SetEnableAtomTypes(){
