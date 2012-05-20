@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/5/19(Sat.) 23:59:18  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/5/20(Sun.) 11:52:32  <<<<<
 
 
 **********  START: Parse input  **********
@@ -99,7 +99,7 @@ SCF iter=10: RMS density=0.000000031135571
 	Electronic Dipole moment(SCF):	-1.552321e-05	-1.752453e-05	1.647120e-15	2.341109e-05		-3.945607e-05	-4.454293e-05	4.186562e-15	5.950507e-05
 
 					|  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
-	Core Dipole moment:		3.552714e-15	-9.401387e-07	0.000000e+00	2.412290e-05		9.030099e-15	-2.389595e-06	0.000000e+00	6.131430e-05
+	Core Dipole moment:		3.552714e-15	-9.401387e-07	0.000000e+00	9.401387e-07		9.030099e-15	-2.389595e-06	0.000000e+00	2.389595e-06
 
 				| i-th | atom type | core charge[a.u.] | Mulliken charge[a.u.]| 
 	Mulliken charge:	0	C	4.000000e+00	-2.582278e-01
@@ -108,13 +108,13 @@ SCF iter=10: RMS density=0.000000031135571
 	Mulliken charge:	3	H	1.000000e+00	6.455701e-02
 	Mulliken charge:	4	H	1.000000e+00	6.455694e-02
 
-	Elapsed time(omp) for the SCF = 0.017847[s].
+	Elapsed time(omp) for the SCF = 0.021028[s].
 **********  DONE: AM1-SCF  **********
 
 
 **********  START: AM1-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.001602[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.001318[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -138,14 +138,14 @@ SCF iter=10: RMS density=0.000000031135571
 
 	Davidson iter=3
 	  1-th excited: norm of the residual = 1.420954e-10
-	  2-th excited: norm of the residual = 1.218568e-09
-	  3-th excited: norm of the residual = 1.617520e-09
+	  2-th excited: norm of the residual = 1.218575e-09
+	  3-th excited: norm of the residual = 1.617525e-09
 	  4-th excited: norm of the residual = 1.593912e-03
 
 	Davidson iter=4
 	  1-th excited: norm of the residual = 1.359262e-10
 	  2-th excited: norm of the residual = 5.592510e-10
-	  3-th excited: norm of the residual = 4.495188e-11
+	  3-th excited: norm of the residual = 4.495192e-11
 	  4-th excited: norm of the residual = 7.403011e-10
 
 
@@ -165,25 +165,25 @@ SCF iter=10: RMS density=0.000000031135571
 				| i-th eigenstate |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
 	Total dipole moment:	0	-1.552321e-05	-1.846467e-05	1.647120e-15	2.412290e-05		-3.945607e-05	-4.693252e-05	4.186562e-15	6.131430e-05
 	Total dipole moment:	1	-2.668882e-05	-3.077121e-05	1.329092e-15	4.073279e-05		-6.783622e-05	-7.821263e-05	3.378216e-15	1.035324e-04
-	Total dipole moment:	2	-1.397646e-01	9.150543e-02	-2.854957e-10	1.670551e-01		-3.552464e-01	2.325836e-01	-7.256578e-10	4.246117e-01
+	Total dipole moment:	2	-1.397646e-01	9.150543e-02	-2.854957e-10	1.670551e-01		-3.552464e-01	2.325837e-01	-7.256578e-10	4.246117e-01
 	Total dipole moment:	3	-3.516617e-01	-3.399203e-01	2.504209e-10	4.890928e-01		-8.938352e-01	-8.639914e-01	6.365065e-10	1.243150e+00
-	Total dipole moment:	4	4.913788e-01	2.483591e-01	3.507767e-11	5.505773e-01		1.248961e+00	6.312661e-01	8.915856e-11	1.399428e+00
+	Total dipole moment:	4	4.913788e-01	2.483591e-01	3.507767e-11	5.505773e-01		1.248961e+00	6.312661e-01	8.915857e-11	1.399428e+00
 
 					| i-th eigenstate |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
 	Electronic dipole moment:	0	-1.552321e-05	-1.752453e-05	1.647120e-15	2.341109e-05		-3.945607e-05	-4.454293e-05	4.186562e-15	5.950507e-05
 	Electronic dipole moment:	1	-2.668882e-05	-2.983107e-05	1.329092e-15	4.002731e-05		-6.783622e-05	-7.582303e-05	3.378216e-15	1.017393e-04
 	Electronic dipole moment:	2	-1.397646e-01	9.150637e-02	-2.854957e-10	1.670556e-01		-3.552464e-01	2.325860e-01	-7.256578e-10	4.246130e-01
 	Electronic dipole moment:	3	-3.516617e-01	-3.399193e-01	2.504209e-10	4.890922e-01		-8.938352e-01	-8.639890e-01	6.365065e-10	1.243149e+00
-	Electronic dipole moment:	4	4.913788e-01	2.483601e-01	3.507767e-11	5.505777e-01		1.248961e+00	6.312685e-01	8.915856e-11	1.399429e+00
+	Electronic dipole moment:	4	4.913788e-01	2.483601e-01	3.507767e-11	5.505777e-01		1.248961e+00	6.312685e-01	8.915857e-11	1.399429e+00
 
 					| from and to eigenstates |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
-	Transition dipole moment:	0 -> 1		4.876757e-06	8.898544e-06	-3.453140e-10	1.014726e-05		1.239548e-05	2.261785e-05	-8.777007e-10	2.579176e-05
-	Transition dipole moment:	0 -> 2		-3.585881e-01	-1.360506e+00	4.873047e-04	1.406969e+00		-9.114403e-01	-3.458061e+00	1.238605e-03	3.576159e+00
-	Transition dipole moment:	0 -> 3		2.133120e-03	-1.066170e-03	-1.406968e+00	1.406970e+00		5.421851e-03	-2.709935e-03	-3.576158e+00	3.576163e+00
-	Transition dipole moment:	0 -> 4		1.360504e+00	-3.585862e-01	2.334409e-03	1.406969e+00		3.458058e+00	-9.114355e-01	5.933478e-03	3.576159e+00
+	Transition dipole moment:	0 -> 1		4.876757e-06	8.898544e-06	-3.453136e-10	1.014726e-05		1.239548e-05	2.261785e-05	-8.776999e-10	2.579176e-05
+	Transition dipole moment:	0 -> 2		-3.585881e-01	-1.360506e+00	4.873048e-04	1.406969e+00		-9.114402e-01	-3.458061e+00	1.238605e-03	3.576159e+00
+	Transition dipole moment:	0 -> 3		2.133120e-03	-1.066170e-03	-1.406968e+00	1.406970e+00		5.421852e-03	-2.709935e-03	-3.576158e+00	3.576163e+00
+	Transition dipole moment:	0 -> 4		1.360504e+00	-3.585862e-01	2.334409e-03	1.406969e+00		3.458058e+00	-9.114354e-01	5.933478e-03	3.576159e+00
 
 
-	Elapsed time(omp) for the CIS = 0.005321[s].
+	Elapsed time(omp) for the CIS = 0.003929[s].
 **********  DONE: AM1-CIS  **********
 
 
@@ -195,7 +195,7 @@ SCF iter=10: RMS density=0.000000031135571
      >>>>>  The MolDS finished normally!  <<<<<
      >>>>>  CPU time: 0.02[s].  <<<<<
      >>>>>  Elapsed time: 0[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 0.0244441[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 0.0261931[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

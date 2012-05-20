@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/5/19(Sat.) 23:59:40  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/5/20(Sun.) 11:52:53  <<<<<
 
 
 **********  START: Parse input  **********
@@ -62,19 +62,19 @@ h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 | -1.0401 | 0.0000 | geometry_end |
 
 
 **********  START: PM3-SCF  **********
-SCF iter=0: RMS density=5.291502622129181
-SCF iter=1: RMS density=1.910456125626946
-SCF iter=2: RMS density=1.044203238495392
-SCF iter=3: RMS density=0.569275110921828
-SCF iter=4: RMS density=0.308641545774631
+SCF iter=0: RMS density=5.291502622129180
+SCF iter=1: RMS density=1.910456125626943
+SCF iter=2: RMS density=1.044203238495390
+SCF iter=3: RMS density=0.569275110921830
+SCF iter=4: RMS density=0.308641545774630
 SCF iter=5: RMS density=0.166813060251973
-SCF iter=6: RMS density=0.000657312351884
-SCF iter=7: RMS density=0.000224796079740
-SCF iter=8: RMS density=0.000083564976808
-SCF iter=9: RMS density=0.000026986732830
-SCF iter=10: RMS density=0.000004938275856
-SCF iter=11: RMS density=0.000002003884715
-SCF iter=12: RMS density=0.000000169506348
+SCF iter=6: RMS density=0.000657312351886
+SCF iter=7: RMS density=0.000224796079705
+SCF iter=8: RMS density=0.000083564977040
+SCF iter=9: RMS density=0.000026986732818
+SCF iter=10: RMS density=0.000004938275857
+SCF iter=11: RMS density=0.000002003884717
+SCF iter=12: RMS density=0.000000169506349
 
 
 
@@ -111,7 +111,7 @@ SCF iter=12: RMS density=0.000000169506348
 	Electronic Dipole moment(SCF):	1.012618e-02	-2.136521e-02	5.098589e-04	2.364893e-02		2.573818e-02	-5.430496e-02	1.295932e-03	6.010958e-02
 
 					|  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
-	Core Dipole moment:		-2.768691e-02	-1.133558e-02	-1.414440e-02	3.954266e-02		-7.037313e-02	-2.881219e-02	-3.595149e-02	1.005074e-01
+	Core Dipole moment:		-2.768691e-02	-1.133558e-02	-1.414440e-02	3.309267e-02		-7.037313e-02	-2.881219e-02	-3.595149e-02	8.411319e-02
 
 				| i-th | atom type | core charge[a.u.] | Mulliken charge[a.u.]| 
 	Mulliken charge:	0	C	4.000000e+00	-1.174103e-01
@@ -123,13 +123,13 @@ SCF iter=12: RMS density=0.000000169506348
 	Mulliken charge:	6	H	1.000000e+00	3.744313e-02
 	Mulliken charge:	7	H	1.000000e+00	4.258006e-02
 
-	Elapsed time(omp) for the SCF = 0.056224[s].
+	Elapsed time(omp) for the SCF = 0.043323[s].
 **********  DONE: PM3-SCF  **********
 
 
 **********  START: PM3-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.040264[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.038706[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -240,7 +240,7 @@ SCF iter=12: RMS density=0.000000169506348
 	Transition dipole moment:	0 -> 4		1.748246e-03	9.050517e-02	1.317124e-01	1.598199e-01		4.443600e-03	2.300413e-01	3.347796e-01	4.062217e-01
 
 
-	Elapsed time(omp) for the CIS = 0.171649[s].
+	Elapsed time(omp) for the CIS = 0.169273[s].
 **********  DONE: PM3-CIS  **********
 
 
@@ -250,9 +250,9 @@ SCF iter=12: RMS density=0.000000169506348
 
 
      >>>>>  The MolDS finished normally!  <<<<<
-     >>>>>  CPU time: 0.22[s].  <<<<<
+     >>>>>  CPU time: 0.21[s].  <<<<<
      >>>>>  Elapsed time: 0[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 0.229722[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 0.214701[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

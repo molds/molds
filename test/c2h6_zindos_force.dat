@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/5/19(Sat.) 23:58:56  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/5/20(Sun.) 11:52:11  <<<<<
 
 
 **********  START: Parse input  **********
@@ -57,14 +57,14 @@ geometry_end |
 **********  START: Molecular dynamics  **********
 **********  START: ZINDO/S-SCF  **********
 SCF iter=0: RMS density=5.291502622129184
-SCF iter=1: RMS density=3.838492151665709
-SCF iter=2: RMS density=0.639670447585092
-SCF iter=3: RMS density=0.104551025859929
-SCF iter=4: RMS density=0.017838263308201
-SCF iter=5: RMS density=0.002973046733475
-SCF iter=6: RMS density=0.000074147072849
+SCF iter=1: RMS density=3.838492151665712
+SCF iter=2: RMS density=0.639670447585090
+SCF iter=3: RMS density=0.104551025859926
+SCF iter=4: RMS density=0.017838263308202
+SCF iter=5: RMS density=0.002973046733476
+SCF iter=6: RMS density=0.000074147072850
 SCF iter=7: RMS density=0.000011993148173
-SCF iter=8: RMS density=0.000000782384955
+SCF iter=8: RMS density=0.000000782384952
 
 
 
@@ -101,7 +101,7 @@ SCF iter=8: RMS density=0.000000782384955
 	Electronic Dipole moment(SCF):	1.574631e-01	-1.556661e-02	4.973247e-03	1.583088e-01		4.002314e-01	-3.956639e-02	1.264074e-02	4.023810e-01
 
 					|  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
-	Core Dipole moment:		-2.768691e-02	-1.133558e-02	-1.414440e-02	1.328522e-01		-7.037313e-02	-2.881219e-02	-3.595149e-02	3.376767e-01
+	Core Dipole moment:		-2.768691e-02	-1.133558e-02	-1.414440e-02	3.309267e-02		-7.037313e-02	-2.881219e-02	-3.595149e-02	8.411319e-02
 
 				| i-th | atom type | core charge[a.u.] | Mulliken charge[a.u.]| 
 	Mulliken charge:	0	C	4.000000e+00	-5.161364e-02
@@ -113,7 +113,7 @@ SCF iter=8: RMS density=0.000000782384955
 	Mulliken charge:	6	H	1.000000e+00	1.599949e-02
 	Mulliken charge:	7	H	1.000000e+00	2.221343e-02
 
-	Elapsed time(omp) for the SCF = 0.019077[s].
+	Elapsed time(omp) for the SCF = 0.018338[s].
 **********  DONE: ZINDO/S-SCF  **********
 
 
@@ -156,10 +156,10 @@ SCF iter=8: RMS density=0.000000782384955
 
 	========== START: MD step 1
 **********  START: ZINDO/S-SCF  **********
-SCF iter=0: RMS density=0.000399629201405
+SCF iter=0: RMS density=0.000399629201406
 SCF iter=1: RMS density=0.000081736877335
 SCF iter=2: RMS density=0.000018350514824
-SCF iter=3: RMS density=0.000004027773906
+SCF iter=3: RMS density=0.000004027773905
 SCF iter=4: RMS density=0.000000916022614
 
 
@@ -197,7 +197,7 @@ SCF iter=4: RMS density=0.000000916022614
 	Electronic Dipole moment(SCF):	1.574695e-01	-1.558855e-02	4.963638e-03	1.583171e-01		4.002477e-01	-3.962215e-02	1.261631e-02	4.024019e-01
 
 					|  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
-	Core Dipole moment:		-2.768169e-02	-1.130373e-02	-1.412951e-02	1.328612e-01		-7.035985e-02	-2.873122e-02	-3.591364e-02	3.376995e-01
+	Core Dipole moment:		-2.768169e-02	-1.130373e-02	-1.412951e-02	3.307103e-02		-7.035985e-02	-2.873122e-02	-3.591364e-02	8.405820e-02
 
 				| i-th | atom type | core charge[a.u.] | Mulliken charge[a.u.]| 
 	Mulliken charge:	0	C	4.000000e+00	-5.155536e-02
@@ -209,7 +209,7 @@ SCF iter=4: RMS density=0.000000916022614
 	Mulliken charge:	6	H	1.000000e+00	1.597875e-02
 	Mulliken charge:	7	H	1.000000e+00	2.219382e-02
 
-	Elapsed time(omp) for the SCF = 0.013595[s].
+	Elapsed time(omp) for the SCF = 0.012840[s].
 **********  DONE: ZINDO/S-SCF  **********
 
 
@@ -253,12 +253,12 @@ SCF iter=4: RMS density=0.000000916022614
 
 	========== START: MD step 2
 **********  START: ZINDO/S-SCF  **********
-SCF iter=0: RMS density=0.001197576731379
-SCF iter=1: RMS density=0.000245066261714
+SCF iter=0: RMS density=0.001197576731378
+SCF iter=1: RMS density=0.000245066261715
 SCF iter=2: RMS density=0.000055047292895
-SCF iter=3: RMS density=0.000012086530016
-SCF iter=4: RMS density=0.000002750216150
-SCF iter=5: RMS density=0.000000616040325
+SCF iter=3: RMS density=0.000012086530015
+SCF iter=4: RMS density=0.000002750216152
+SCF iter=5: RMS density=0.000000616040323
 
 
 
@@ -295,7 +295,7 @@ SCF iter=5: RMS density=0.000000616040325
 	Electronic Dipole moment(SCF):	1.574887e-01	-1.565412e-02	4.934909e-03	1.583417e-01		4.002965e-01	-3.978882e-02	1.254329e-02	4.024646e-01
 
 					|  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
-	Core Dipole moment:		-2.766603e-02	-1.120831e-02	-1.408490e-02	1.328881e-01		-7.032004e-02	-2.848868e-02	-3.580024e-02	3.377679e-01
+	Core Dipole moment:		-2.766603e-02	-1.120831e-02	-1.408490e-02	3.300636e-02		-7.032004e-02	-2.848868e-02	-3.580024e-02	8.389381e-02
 
 				| i-th | atom type | core charge[a.u.] | Mulliken charge[a.u.]| 
 	Mulliken charge:	0	C	4.000000e+00	-5.138118e-02
@@ -307,7 +307,7 @@ SCF iter=5: RMS density=0.000000616040325
 	Mulliken charge:	6	H	1.000000e+00	1.591669e-02
 	Mulliken charge:	7	H	1.000000e+00	2.213515e-02
 
-	Elapsed time(omp) for the SCF = 0.013448[s].
+	Elapsed time(omp) for the SCF = 0.014021[s].
 **********  DONE: ZINDO/S-SCF  **********
 
 
@@ -351,13 +351,13 @@ SCF iter=5: RMS density=0.000000616040325
 
 	========== START: MD step 3
 **********  START: ZINDO/S-SCF  **********
-SCF iter=0: RMS density=0.001991668552524
-SCF iter=1: RMS density=0.000407959046499
+SCF iter=0: RMS density=0.001991668552526
+SCF iter=1: RMS density=0.000407959046498
 SCF iter=2: RMS density=0.000091713202377
 SCF iter=3: RMS density=0.000020149483814
-SCF iter=4: RMS density=0.000004588760799
-SCF iter=5: RMS density=0.000001028351503
-SCF iter=6: RMS density=0.000000007274087
+SCF iter=4: RMS density=0.000004588760801
+SCF iter=5: RMS density=0.000001028351501
+SCF iter=6: RMS density=0.000000007274086
 
 
 
@@ -394,7 +394,7 @@ SCF iter=6: RMS density=0.000000007274087
 	Electronic Dipole moment(SCF):	1.575211e-01	-1.576216e-02	4.887594e-03	1.583832e-01		4.003788e-01	-4.006343e-02	1.242303e-02	4.025700e-01
 
 					|  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
-	Core Dipole moment:		-2.763998e-02	-1.104974e-02	-1.401075e-02	1.329331e-01		-7.025385e-02	-2.808564e-02	-3.561178e-02	3.378824e-01
+	Core Dipole moment:		-2.763998e-02	-1.104974e-02	-1.401075e-02	3.289934e-02		-7.025385e-02	-2.808564e-02	-3.561178e-02	8.362180e-02
 
 				| i-th | atom type | core charge[a.u.] | Mulliken charge[a.u.]| 
 	Mulliken charge:	0	C	4.000000e+00	-5.109280e-02
@@ -406,7 +406,7 @@ SCF iter=6: RMS density=0.000000007274087
 	Mulliken charge:	6	H	1.000000e+00	1.581390e-02
 	Mulliken charge:	7	H	1.000000e+00	2.203806e-02
 
-	Elapsed time(omp) for the SCF = 0.014128[s].
+	Elapsed time(omp) for the SCF = 0.013829[s].
 **********  DONE: ZINDO/S-SCF  **********
 
 
@@ -450,13 +450,13 @@ SCF iter=6: RMS density=0.000000007274087
 
 	========== START: MD step 4
 **********  START: ZINDO/S-SCF  **********
-SCF iter=0: RMS density=0.002779628410980
-SCF iter=1: RMS density=0.000570162606598
+SCF iter=0: RMS density=0.002779628410982
+SCF iter=1: RMS density=0.000570162606599
 SCF iter=2: RMS density=0.000128325918762
-SCF iter=3: RMS density=0.000028218388926
-SCF iter=4: RMS density=0.000006433878292
-SCF iter=5: RMS density=0.000001442816919
-SCF iter=6: RMS density=0.000000010198124
+SCF iter=3: RMS density=0.000028218388925
+SCF iter=4: RMS density=0.000006433878290
+SCF iter=5: RMS density=0.000001442816921
+SCF iter=6: RMS density=0.000000010198125
 
 
 
@@ -493,7 +493,7 @@ SCF iter=6: RMS density=0.000000010198124
 	Electronic Dipole moment(SCF):	1.575673e-01	-1.591081e-02	4.822536e-03	1.584420e-01		4.004961e-01	-4.044124e-02	1.225767e-02	4.027194e-01
 
 					|  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
-	Core Dipole moment:		-2.760364e-02	-1.082872e-02	-1.390739e-02	1.329966e-01		-7.016146e-02	-2.752387e-02	-3.534906e-02	3.380436e-01
+	Core Dipole moment:		-2.760364e-02	-1.082872e-02	-1.390739e-02	3.275114e-02		-7.016146e-02	-2.752387e-02	-3.534906e-02	8.324512e-02
 
 				| i-th | atom type | core charge[a.u.] | Mulliken charge[a.u.]| 
 	Mulliken charge:	0	C	4.000000e+00	-5.069309e-02
@@ -505,7 +505,7 @@ SCF iter=6: RMS density=0.000000010198124
 	Mulliken charge:	6	H	1.000000e+00	1.567135e-02
 	Mulliken charge:	7	H	1.000000e+00	2.190363e-02
 
-	Elapsed time(omp) for the SCF = 0.013950[s].
+	Elapsed time(omp) for the SCF = 0.013722[s].
 **********  DONE: ZINDO/S-SCF  **********
 
 
@@ -549,13 +549,13 @@ SCF iter=6: RMS density=0.000000010198124
 
 	========== START: MD step 5
 **********  START: ZINDO/S-SCF  **********
-SCF iter=0: RMS density=0.003559360272666
-SCF iter=1: RMS density=0.000731462985486
+SCF iter=0: RMS density=0.003559360272668
+SCF iter=1: RMS density=0.000731462985485
 SCF iter=2: RMS density=0.000164872389223
 SCF iter=3: RMS density=0.000036297384029
-SCF iter=4: RMS density=0.000008288430738
-SCF iter=5: RMS density=0.000001860366235
-SCF iter=6: RMS density=0.000000013139599
+SCF iter=4: RMS density=0.000008288430740
+SCF iter=5: RMS density=0.000001860366233
+SCF iter=6: RMS density=0.000000013139601
 
 
 
@@ -592,7 +592,7 @@ SCF iter=6: RMS density=0.000000013139599
 	Electronic Dipole moment(SCF):	1.576280e-01	-1.609754e-02	4.740878e-03	1.585188e-01		4.006505e-01	-4.091588e-02	1.205011e-02	4.029146e-01
 
 					|  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
-	Core Dipole moment:		-2.755710e-02	-1.054621e-02	-1.377523e-02	1.330787e-01		-7.004317e-02	-2.680581e-02	-3.501315e-02	3.382525e-01
+	Core Dipole moment:		-2.755710e-02	-1.054621e-02	-1.377523e-02	3.256337e-02		-7.004317e-02	-2.680581e-02	-3.501315e-02	8.276785e-02
 
 				| i-th | atom type | core charge[a.u.] | Mulliken charge[a.u.]| 
 	Mulliken charge:	0	C	4.000000e+00	-5.018595e-02
@@ -604,7 +604,7 @@ SCF iter=6: RMS density=0.000000013139599
 	Mulliken charge:	6	H	1.000000e+00	1.549037e-02
 	Mulliken charge:	7	H	1.000000e+00	2.173328e-02
 
-	Elapsed time(omp) for the SCF = 0.014013[s].
+	Elapsed time(omp) for the SCF = 0.013263[s].
 **********  DONE: ZINDO/S-SCF  **********
 
 
@@ -654,7 +654,7 @@ SCF iter=6: RMS density=0.000000013139599
      >>>>>  The MolDS finished normally!  <<<<<
      >>>>>  CPU time: 0.3[s].  <<<<<
      >>>>>  Elapsed time: 0[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 0.311523[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 0.307827[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

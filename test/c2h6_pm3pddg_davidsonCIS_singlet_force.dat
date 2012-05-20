@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/5/20(Sun.) 0:0:14  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/5/20(Sun.) 11:53:26  <<<<<
 
 
 **********  START: Parse input  **********
@@ -69,19 +69,19 @@ h | -0.3700 | -0.5208 | 0.9016 | h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 |
 
 **********  START: Molecular dynamics  **********
 **********  START: PM3/PDDG-SCF  **********
-SCF iter=0: RMS density=5.291502622129178
-SCF iter=1: RMS density=1.862872189503769
-SCF iter=2: RMS density=0.993239189796955
-SCF iter=3: RMS density=0.533349207055901
-SCF iter=4: RMS density=0.285488533225344
-SCF iter=5: RMS density=0.152407528472137
-SCF iter=6: RMS density=0.000620521117906
-SCF iter=7: RMS density=0.000181786594217
-SCF iter=8: RMS density=0.000057887199751
-SCF iter=9: RMS density=0.000021427661581
-SCF iter=10: RMS density=0.000003665762884
-SCF iter=11: RMS density=0.000001692271513
-SCF iter=12: RMS density=0.000000190761140
+SCF iter=0: RMS density=5.291502622129180
+SCF iter=1: RMS density=1.862872189503767
+SCF iter=2: RMS density=0.993239189796953
+SCF iter=3: RMS density=0.533349207055902
+SCF iter=4: RMS density=0.285488533225345
+SCF iter=5: RMS density=0.152407528472138
+SCF iter=6: RMS density=0.000620521117899
+SCF iter=7: RMS density=0.000181786594206
+SCF iter=8: RMS density=0.000057887199666
+SCF iter=9: RMS density=0.000021427661569
+SCF iter=10: RMS density=0.000003665762871
+SCF iter=11: RMS density=0.000001692271511
+SCF iter=12: RMS density=0.000000190761141
 
 
 
@@ -118,7 +118,7 @@ SCF iter=12: RMS density=0.000000190761140
 	Electronic Dipole moment(SCF):	8.027778e-03	-2.241960e-02	-5.611121e-04	2.382013e-02		2.040458e-02	-5.698496e-02	-1.426205e-03	6.054475e-02
 
 					|  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
-	Core Dipole moment:		-2.768691e-02	-1.133558e-02	-1.414440e-02	4.173903e-02		-7.037313e-02	-2.881219e-02	-3.595149e-02	1.060900e-01
+	Core Dipole moment:		-2.768691e-02	-1.133558e-02	-1.414440e-02	3.309267e-02		-7.037313e-02	-2.881219e-02	-3.595149e-02	8.411319e-02
 
 				| i-th | atom type | core charge[a.u.] | Mulliken charge[a.u.]| 
 	Mulliken charge:	0	C	4.000000e+00	-2.698941e-01
@@ -130,13 +130,13 @@ SCF iter=12: RMS density=0.000000190761140
 	Mulliken charge:	6	H	1.000000e+00	8.849413e-02
 	Mulliken charge:	7	H	1.000000e+00	9.338598e-02
 
-	Elapsed time(omp) for the SCF = 0.041782[s].
+	Elapsed time(omp) for the SCF = 0.043288[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.040368[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.039852[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -241,7 +241,7 @@ SCF iter=12: RMS density=0.000000190761140
 	Transition dipole moment:	0 -> 4		-4.556279e-03	-4.980071e-02	-8.575193e-02	9.926865e-02		-1.158091e-02	-1.265808e-01	-2.179597e-01	2.523158e-01
 
 
-	Elapsed time(omp) for the CIS = 0.150646[s].
+	Elapsed time(omp) for the CIS = 0.146240[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
@@ -284,10 +284,10 @@ SCF iter=12: RMS density=0.000000190761140
 
 	========== START: MD step 1
 **********  START: PM3/PDDG-SCF  **********
-SCF iter=0: RMS density=0.000010227520481
+SCF iter=0: RMS density=0.000010227520480
 SCF iter=1: RMS density=0.000003506977134
 SCF iter=2: RMS density=0.000001319693810
-SCF iter=3: RMS density=0.000000535987498
+SCF iter=3: RMS density=0.000000535987497
 
 
 
@@ -324,7 +324,7 @@ SCF iter=3: RMS density=0.000000535987498
 	Electronic Dipole moment(SCF):	8.031878e-03	-2.241808e-02	-5.596763e-04	2.382005e-02		2.041500e-02	-5.698109e-02	-1.422556e-03	6.054453e-02
 
 					|  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
-	Core Dipole moment:		-2.768418e-02	-1.132885e-02	-1.414277e-02	4.172805e-02		-7.036618e-02	-2.879506e-02	-3.594734e-02	1.060621e-01
+	Core Dipole moment:		-2.768418e-02	-1.132885e-02	-1.414277e-02	3.308738e-02		-7.036618e-02	-2.879506e-02	-3.594734e-02	8.409974e-02
 
 				| i-th | atom type | core charge[a.u.] | Mulliken charge[a.u.]| 
 	Mulliken charge:	0	C	4.000000e+00	-2.698929e-01
@@ -336,13 +336,13 @@ SCF iter=3: RMS density=0.000000535987498
 	Mulliken charge:	6	H	1.000000e+00	8.849370e-02
 	Mulliken charge:	7	H	1.000000e+00	9.338540e-02
 
-	Elapsed time(omp) for the SCF = 0.037794[s].
+	Elapsed time(omp) for the SCF = 0.037762[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.039213[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.039000[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -447,7 +447,7 @@ SCF iter=3: RMS density=0.000000535987498
 	Transition dipole moment:	0 -> 4		-4.555340e-03	-4.979167e-02	-8.573721e-02	9.925135e-02		-1.157852e-02	-1.265578e-01	-2.179223e-01	2.522718e-01
 
 
-	Elapsed time(omp) for the CIS = 0.148491[s].
+	Elapsed time(omp) for the CIS = 0.143687[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
@@ -458,7 +458,7 @@ SCF iter=3: RMS density=0.000000535987498
 		Electronic
 		(inc. core rep.):	-1.201756e+01	-3.270171e+02
 		Total:            	-1.201756e+01	-3.270170e+02
-		Error:            	-2.954494e-09	-8.039650e-08
+		Error:            	-2.954501e-09	-8.039670e-08
 
 				| i-th | atom type |   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
 	Atom coordinates:	0	C	4.450199e-06	3.779229e-02	-2.701325e-07		2.354944e-06	1.999882e-02	-1.429480e-07
@@ -493,9 +493,9 @@ SCF iter=3: RMS density=0.000000535987498
 **********  START: PM3/PDDG-SCF  **********
 SCF iter=0: RMS density=0.000030772491049
 SCF iter=1: RMS density=0.000010578204406
-SCF iter=2: RMS density=0.000003995003328
+SCF iter=2: RMS density=0.000003995003329
 SCF iter=3: RMS density=0.000001629980388
-SCF iter=4: RMS density=0.000000718202392
+SCF iter=4: RMS density=0.000000718202390
 
 
 
@@ -532,7 +532,7 @@ SCF iter=4: RMS density=0.000000718202392
 	Electronic Dipole moment(SCF):	8.044025e-03	-2.241388e-02	-5.555405e-04	2.382009e-02		2.044588e-02	-5.697040e-02	-1.412043e-03	6.054465e-02
 
 					|  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
-	Core Dipole moment:		-2.767599e-02	-1.130864e-02	-1.413787e-02	4.169554e-02		-7.034535e-02	-2.874369e-02	-3.593489e-02	1.059795e-01
+	Core Dipole moment:		-2.767599e-02	-1.130864e-02	-1.413787e-02	3.307151e-02		-7.034535e-02	-2.874369e-02	-3.593489e-02	8.405941e-02
 
 				| i-th | atom type | core charge[a.u.] | Mulliken charge[a.u.]| 
 	Mulliken charge:	0	C	4.000000e+00	-2.698885e-01
@@ -544,13 +544,13 @@ SCF iter=4: RMS density=0.000000718202392
 	Mulliken charge:	6	H	1.000000e+00	8.849226e-02
 	Mulliken charge:	7	H	1.000000e+00	9.338348e-02
 
-	Elapsed time(omp) for the SCF = 0.039697[s].
+	Elapsed time(omp) for the SCF = 0.038648[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.039299[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.038568[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -655,7 +655,7 @@ SCF iter=4: RMS density=0.000000718202392
 	Transition dipole moment:	0 -> 4		-4.552459e-03	-4.976439e-02	-8.569308e-02	9.919941e-02		-1.157120e-02	-1.264885e-01	-2.178101e-01	2.521398e-01
 
 
-	Elapsed time(omp) for the CIS = 0.149016[s].
+	Elapsed time(omp) for the CIS = 0.145518[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
@@ -666,7 +666,7 @@ SCF iter=4: RMS density=0.000000718202392
 		Electronic
 		(inc. core rep.):	-1.201756e+01	-3.270172e+02
 		Total:            	-1.201756e+01	-3.270170e+02
-		Error:            	-3.190772e-09	-8.682602e-08
+		Error:            	-3.190777e-09	-8.682617e-08
 
 				| i-th | atom type |   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
 	Atom coordinates:	0	C	1.779990e-05	3.778559e-02	-1.080714e-06		9.419301e-06	1.999527e-02	-5.718892e-07
@@ -699,12 +699,12 @@ SCF iter=4: RMS density=0.000000718202392
 
 	========== START: MD step 3
 **********  START: PM3/PDDG-SCF  **********
-SCF iter=0: RMS density=0.000051204068843
-SCF iter=1: RMS density=0.000017599713516
+SCF iter=0: RMS density=0.000051204068844
+SCF iter=1: RMS density=0.000017599713515
 SCF iter=2: RMS density=0.000006647279544
-SCF iter=3: RMS density=0.000002712620893
-SCF iter=4: RMS density=0.000001195494238
-SCF iter=5: RMS density=0.000000563962506
+SCF iter=3: RMS density=0.000002712620894
+SCF iter=4: RMS density=0.000001195494240
+SCF iter=5: RMS density=0.000000563962508
 
 
 
@@ -741,7 +741,7 @@ SCF iter=5: RMS density=0.000000563962506
 	Electronic Dipole moment(SCF):	8.064227e-03	-2.240693e-02	-5.486676e-04	2.382023e-02		2.049723e-02	-5.695274e-02	-1.394574e-03	6.054499e-02
 
 					|  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
-	Core Dipole moment:		-2.766233e-02	-1.127497e-02	-1.412970e-02	4.164145e-02		-7.031063e-02	-2.865811e-02	-3.591413e-02	1.058420e-01
+	Core Dipole moment:		-2.766233e-02	-1.127497e-02	-1.412970e-02	3.304508e-02		-7.031063e-02	-2.865811e-02	-3.591413e-02	8.399224e-02
 
 				| i-th | atom type | core charge[a.u.] | Mulliken charge[a.u.]| 
 	Mulliken charge:	0	C	4.000000e+00	-2.698807e-01
@@ -753,13 +753,13 @@ SCF iter=5: RMS density=0.000000563962506
 	Mulliken charge:	6	H	1.000000e+00	8.848977e-02
 	Mulliken charge:	7	H	1.000000e+00	9.338014e-02
 
-	Elapsed time(omp) for the SCF = 0.038608[s].
+	Elapsed time(omp) for the SCF = 0.038076[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.039345[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.038266[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -864,7 +864,7 @@ SCF iter=5: RMS density=0.000000563962506
 	Transition dipole moment:	0 -> 4		-4.547650e-03	-4.971890e-02	-8.561947e-02	9.911278e-02		-1.155898e-02	-1.263729e-01	-2.176230e-01	2.519196e-01
 
 
-	Elapsed time(omp) for the CIS = 0.148949[s].
+	Elapsed time(omp) for the CIS = 0.143110[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
@@ -875,7 +875,7 @@ SCF iter=5: RMS density=0.000000563962506
 		Electronic
 		(inc. core rep.):	-1.201757e+01	-3.270174e+02
 		Total:            	-1.201756e+01	-3.270170e+02
-		Error:            	-1.177940e-09	-3.205362e-08
+		Error:            	-1.177945e-09	-3.205377e-08
 
 				| i-th | atom type |   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
 	Atom coordinates:	0	C	4.004644e-05	3.777443e-02	-2.432294e-06		2.119166e-05	1.998937e-02	-1.287114e-06
@@ -910,7 +910,7 @@ SCF iter=5: RMS density=0.000000563962506
 **********  START: PM3/PDDG-SCF  **********
 SCF iter=0: RMS density=0.000071519615800
 SCF iter=1: RMS density=0.000024561726602
-SCF iter=2: RMS density=0.000009267155713
+SCF iter=2: RMS density=0.000009267155712
 SCF iter=3: RMS density=0.000003776850824
 SCF iter=4: RMS density=0.000001662270152
 SCF iter=5: RMS density=0.000000783281371
@@ -950,7 +950,7 @@ SCF iter=5: RMS density=0.000000783281371
 	Electronic Dipole moment(SCF):	8.092530e-03	-2.239718e-02	-5.390503e-04	2.382044e-02		2.056916e-02	-5.692796e-02	-1.370129e-03	6.054552e-02
 
 					|  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
-	Core Dipole moment:		-2.764320e-02	-1.122785e-02	-1.411826e-02	4.156571e-02		-7.026203e-02	-2.853836e-02	-3.588505e-02	1.056495e-01
+	Core Dipole moment:		-2.764320e-02	-1.122785e-02	-1.411826e-02	3.300813e-02		-7.026203e-02	-2.853836e-02	-3.588505e-02	8.389831e-02
 
 				| i-th | atom type | core charge[a.u.] | Mulliken charge[a.u.]| 
 	Mulliken charge:	0	C	4.000000e+00	-2.698700e-01
@@ -962,13 +962,13 @@ SCF iter=5: RMS density=0.000000783281371
 	Mulliken charge:	6	H	1.000000e+00	8.848635e-02
 	Mulliken charge:	7	H	1.000000e+00	9.337555e-02
 
-	Elapsed time(omp) for the SCF = 0.038484[s].
+	Elapsed time(omp) for the SCF = 0.038334[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.039456[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.040040[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -1073,7 +1073,7 @@ SCF iter=5: RMS density=0.000000783281371
 	Transition dipole moment:	0 -> 4		-4.540952e-03	-4.965535e-02	-8.551655e-02	9.899169e-02		-1.154195e-02	-1.262113e-01	-2.173614e-01	2.516118e-01
 
 
-	Elapsed time(omp) for the CIS = 0.149227[s].
+	Elapsed time(omp) for the CIS = 0.145140[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
@@ -1084,7 +1084,7 @@ SCF iter=5: RMS density=0.000000783281371
 		Electronic
 		(inc. core rep.):	-1.201758e+01	-3.270177e+02
 		Total:            	-1.201756e+01	-3.270170e+02
-		Error:            	-1.499798e-09	-4.081190e-08
+		Error:            	-1.499810e-09	-4.081224e-08
 
 				| i-th | atom type |   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
 	Atom coordinates:	0	C	7.118537e-05	3.775881e-02	-4.325786e-06		3.766967e-05	1.998110e-02	-2.289107e-06
@@ -1117,13 +1117,13 @@ SCF iter=5: RMS density=0.000000783281371
 
 	========== START: MD step 5
 **********  START: PM3/PDDG-SCF  **********
-SCF iter=0: RMS density=0.000091936840788
-SCF iter=1: RMS density=0.000031577938330
-SCF iter=2: RMS density=0.000011916080456
+SCF iter=0: RMS density=0.000091936840787
+SCF iter=1: RMS density=0.000031577938331
+SCF iter=2: RMS density=0.000011916080457
 SCF iter=3: RMS density=0.000004857252706
-SCF iter=4: RMS density=0.000002138149017
+SCF iter=4: RMS density=0.000002138149016
 SCF iter=5: RMS density=0.000001007658317
-SCF iter=6: RMS density=0.000000006183159
+SCF iter=6: RMS density=0.000000006183152
 
 
 
@@ -1160,7 +1160,7 @@ SCF iter=6: RMS density=0.000000006183159
 	Electronic Dipole moment(SCF):	8.128838e-03	-2.238475e-02	-5.267236e-04	2.382084e-02		2.066145e-02	-5.689637e-02	-1.338798e-03	6.054655e-02
 
 					|  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
-	Core Dipole moment:		-2.761862e-02	-1.116733e-02	-1.410354e-02	4.146852e-02		-7.019954e-02	-2.838452e-02	-3.584762e-02	1.054025e-01
+	Core Dipole moment:		-2.761862e-02	-1.116733e-02	-1.410354e-02	3.296069e-02		-7.019954e-02	-2.838452e-02	-3.584762e-02	8.377773e-02
 
 				| i-th | atom type | core charge[a.u.] | Mulliken charge[a.u.]| 
 	Mulliken charge:	0	C	4.000000e+00	-2.698556e-01
@@ -1172,13 +1172,13 @@ SCF iter=6: RMS density=0.000000006183159
 	Mulliken charge:	6	H	1.000000e+00	8.848172e-02
 	Mulliken charge:	7	H	1.000000e+00	9.336932e-02
 
-	Elapsed time(omp) for the SCF = 0.038403[s].
+	Elapsed time(omp) for the SCF = 0.038164[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.039281[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.039354[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -1283,7 +1283,7 @@ SCF iter=6: RMS density=0.000000006183159
 	Transition dipole moment:	0 -> 4		-4.532344e-03	-4.957366e-02	-8.538414e-02	9.883593e-02		-1.152007e-02	-1.260037e-01	-2.170249e-01	2.512159e-01
 
 
-	Elapsed time(omp) for the CIS = 0.149200[s].
+	Elapsed time(omp) for the CIS = 0.143556[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
@@ -1294,7 +1294,7 @@ SCF iter=6: RMS density=0.000000006183159
 		Electronic
 		(inc. core rep.):	-1.201760e+01	-3.270180e+02
 		Total:            	-1.201756e+01	-3.270170e+02
-		Error:            	3.476645e-09	9.460508e-08
+		Error:            	3.476643e-09	9.460503e-08
 
 				| i-th | atom type |   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
 	Atom coordinates:	0	C	1.112105e-04	3.773874e-02	-6.762469e-06		5.885005e-05	1.997048e-02	-3.578544e-06
@@ -1331,9 +1331,9 @@ SCF iter=6: RMS density=0.000000006183159
 
 
      >>>>>  The MolDS finished normally!  <<<<<
-     >>>>>  CPU time: 7.45[s].  <<<<<
-     >>>>>  Elapsed time: 8[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 7.46724[s].  <<<<<
+     >>>>>  CPU time: 7.27[s].  <<<<<
+     >>>>>  Elapsed time: 7[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 7.2964[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

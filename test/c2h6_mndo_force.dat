@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/5/19(Sat.) 23:58:57  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/5/20(Sun.) 11:52:12  <<<<<
 
 
 **********  START: Parse input  **********
@@ -56,18 +56,18 @@ geometry_end |
 
 **********  START: Molecular dynamics  **********
 **********  START: MNDO-SCF  **********
-SCF iter=0: RMS density=5.291502622129183
-SCF iter=1: RMS density=2.406832383581160
-SCF iter=2: RMS density=1.097693927705066
+SCF iter=0: RMS density=5.291502622129178
+SCF iter=1: RMS density=2.406832383581157
+SCF iter=2: RMS density=1.097693927705068
 SCF iter=3: RMS density=0.485996526273500
-SCF iter=4: RMS density=0.217393982341883
-SCF iter=5: RMS density=0.097852276195716
-SCF iter=6: RMS density=0.000404257453006
-SCF iter=7: RMS density=0.000094990567957
-SCF iter=8: RMS density=0.000036084327903
-SCF iter=9: RMS density=0.000007701726070
-SCF iter=10: RMS density=0.000002052101675
-SCF iter=11: RMS density=0.000000358204690
+SCF iter=4: RMS density=0.217393982341887
+SCF iter=5: RMS density=0.097852276195717
+SCF iter=6: RMS density=0.000404257452994
+SCF iter=7: RMS density=0.000094990567956
+SCF iter=8: RMS density=0.000036084327885
+SCF iter=9: RMS density=0.000007701726076
+SCF iter=10: RMS density=0.000002052101684
+SCF iter=11: RMS density=0.000000358204689
 
 
 
@@ -104,7 +104,7 @@ SCF iter=11: RMS density=0.000000358204690
 	Electronic Dipole moment(SCF):	7.727997e-03	-2.059175e-02	1.916286e-03	2.207746e-02		1.964261e-02	-5.233902e-02	4.870714e-03	5.611532e-02
 
 					|  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
-	Core Dipole moment:		-2.768691e-02	-1.133558e-02	-1.414440e-02	3.958838e-02		-7.037313e-02	-2.881219e-02	-3.595149e-02	1.006236e-01
+	Core Dipole moment:		-2.768691e-02	-1.133558e-02	-1.414440e-02	3.309267e-02		-7.037313e-02	-2.881219e-02	-3.595149e-02	8.411319e-02
 
 				| i-th | atom type | core charge[a.u.] | Mulliken charge[a.u.]| 
 	Mulliken charge:	0	C	4.000000e+00	1.051263e-02
@@ -119,7 +119,7 @@ SCF iter=11: RMS density=0.000000358204690
 				|  [a.u.]  |  [Kcal/mol]  | 
 	Heats of formation:	-2.736798e-02	-1.717367e+01
 
-	Elapsed time(omp) for the SCF = 0.044243[s].
+	Elapsed time(omp) for the SCF = 0.042890[s].
 **********  DONE: MNDO-SCF  **********
 
 
@@ -162,9 +162,9 @@ SCF iter=11: RMS density=0.000000358204690
 
 	========== START: MD step 1
 **********  START: MNDO-SCF  **********
-SCF iter=0: RMS density=0.000009924289643
-SCF iter=1: RMS density=0.000002901935968
-SCF iter=2: RMS density=0.000000979764641
+SCF iter=0: RMS density=0.000009924289644
+SCF iter=1: RMS density=0.000002901935967
+SCF iter=2: RMS density=0.000000979764640
 
 
 
@@ -201,7 +201,7 @@ SCF iter=2: RMS density=0.000000979764641
 	Electronic Dipole moment(SCF):	7.737569e-03	-2.059190e-02	1.915708e-03	2.208090e-02		1.966694e-02	-5.233940e-02	4.869244e-03	5.612407e-02
 
 					|  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
-	Core Dipole moment:		-2.768185e-02	-1.132371e-02	-1.413787e-02	3.956971e-02		-7.036027e-02	-2.878202e-02	-3.593489e-02	1.005762e-01
+	Core Dipole moment:		-2.768185e-02	-1.132371e-02	-1.413787e-02	3.308158e-02		-7.036027e-02	-2.878202e-02	-3.593489e-02	8.408500e-02
 
 				| i-th | atom type | core charge[a.u.] | Mulliken charge[a.u.]| 
 	Mulliken charge:	0	C	4.000000e+00	1.051278e-02
@@ -216,7 +216,7 @@ SCF iter=2: RMS density=0.000000979764641
 				|  [a.u.]  |  [Kcal/mol]  | 
 	Heats of formation:	-2.736950e-02	-1.717462e+01
 
-	Elapsed time(omp) for the SCF = 0.038353[s].
+	Elapsed time(omp) for the SCF = 0.036975[s].
 **********  DONE: MNDO-SCF  **********
 
 
@@ -227,7 +227,7 @@ SCF iter=2: RMS density=0.000000979764641
 		Electronic
 		(inc. core rep.):	-1.255204e+01	-3.415610e+02
 		Total:            	-1.255203e+01	-3.415609e+02
-		Error:            	2.902745e-10	7.898834e-09
+		Error:            	2.902674e-10	7.898640e-09
 
 				| i-th | atom type |   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
 	Atom coordinates:	0	C	-1.346471e-06	3.779129e-02	-7.994195e-07		-7.125219e-07	1.999829e-02	-4.230346e-07
@@ -260,10 +260,10 @@ SCF iter=2: RMS density=0.000000979764641
 
 	========== START: MD step 2
 **********  START: MNDO-SCF  **********
-SCF iter=0: RMS density=0.000030012836303
+SCF iter=0: RMS density=0.000030012836304
 SCF iter=1: RMS density=0.000008815637316
-SCF iter=2: RMS density=0.000002989897476
-SCF iter=3: RMS density=0.000001129680542
+SCF iter=2: RMS density=0.000002989897475
+SCF iter=3: RMS density=0.000001129680543
 SCF iter=4: RMS density=0.000000458886004
 
 
@@ -301,7 +301,7 @@ SCF iter=4: RMS density=0.000000458886004
 	Electronic Dipole moment(SCF):	7.765924e-03	-2.059338e-02	1.913319e-03	2.209203e-02		1.973901e-02	-5.234316e-02	4.863174e-03	5.615235e-02
 
 					|  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
-	Core Dipole moment:		-2.766668e-02	-1.128812e-02	-1.411828e-02	3.951495e-02		-7.032171e-02	-2.869154e-02	-3.588509e-02	1.004370e-01
+	Core Dipole moment:		-2.766668e-02	-1.128812e-02	-1.411828e-02	3.304834e-02		-7.032171e-02	-2.869154e-02	-3.588509e-02	8.400051e-02
 
 				| i-th | atom type | core charge[a.u.] | Mulliken charge[a.u.]| 
 	Mulliken charge:	0	C	4.000000e+00	1.051379e-02
@@ -316,7 +316,7 @@ SCF iter=4: RMS density=0.000000458886004
 				|  [a.u.]  |  [Kcal/mol]  | 
 	Heats of formation:	-2.737405e-02	-1.717747e+01
 
-	Elapsed time(omp) for the SCF = 0.038564[s].
+	Elapsed time(omp) for the SCF = 0.037829[s].
 **********  DONE: MNDO-SCF  **********
 
 
@@ -360,10 +360,10 @@ SCF iter=4: RMS density=0.000000458886004
 
 	========== START: MD step 3
 **********  START: MNDO-SCF  **********
-SCF iter=0: RMS density=0.000049637780702
+SCF iter=0: RMS density=0.000049637780703
 SCF iter=1: RMS density=0.000014538371811
 SCF iter=2: RMS density=0.000004917373274
-SCF iter=3: RMS density=0.000001853917143
+SCF iter=3: RMS density=0.000001853917144
 SCF iter=4: RMS density=0.000000751870880
 
 
@@ -401,7 +401,7 @@ SCF iter=4: RMS density=0.000000751870880
 	Electronic Dipole moment(SCF):	7.813201e-03	-2.059569e-02	1.909433e-03	2.211051e-02		1.985918e-02	-5.234904e-02	4.853295e-03	5.619932e-02
 
 					|  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
-	Core Dipole moment:		-2.764140e-02	-1.122883e-02	-1.408564e-02	3.942357e-02		-7.025745e-02	-2.854084e-02	-3.580214e-02	1.002047e-01
+	Core Dipole moment:		-2.764140e-02	-1.122883e-02	-1.408564e-02	3.299302e-02		-7.025745e-02	-2.854084e-02	-3.580214e-02	8.385990e-02
 
 				| i-th | atom type | core charge[a.u.] | Mulliken charge[a.u.]| 
 	Mulliken charge:	0	C	4.000000e+00	1.051542e-02
@@ -416,7 +416,7 @@ SCF iter=4: RMS density=0.000000751870880
 				|  [a.u.]  |  [Kcal/mol]  | 
 	Heats of formation:	-2.738162e-02	-1.718222e+01
 
-	Elapsed time(omp) for the SCF = 0.038974[s].
+	Elapsed time(omp) for the SCF = 0.036783[s].
 **********  DONE: MNDO-SCF  **********
 
 
@@ -460,8 +460,8 @@ SCF iter=4: RMS density=0.000000751870880
 
 	========== START: MD step 4
 **********  START: MNDO-SCF  **********
-SCF iter=0: RMS density=0.000069459236424
-SCF iter=1: RMS density=0.000020351739766
+SCF iter=0: RMS density=0.000069459236423
+SCF iter=1: RMS density=0.000020351739767
 SCF iter=2: RMS density=0.000006886520202
 SCF iter=3: RMS density=0.000002597229748
 SCF iter=4: RMS density=0.000001053607060
@@ -502,7 +502,7 @@ SCF iter=5: RMS density=0.000000448103295
 	Electronic Dipole moment(SCF):	7.879260e-03	-2.059907e-02	1.903892e-03	2.213661e-02		2.002709e-02	-5.235763e-02	4.839212e-03	5.626565e-02
 
 					|  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
-	Core Dipole moment:		-2.760603e-02	-1.114591e-02	-1.403999e-02	3.929598e-02		-7.016755e-02	-2.833008e-02	-3.568610e-02	9.988044e-02
+	Core Dipole moment:		-2.760603e-02	-1.114591e-02	-1.403999e-02	3.291573e-02		-7.016755e-02	-2.833008e-02	-3.568610e-02	8.366347e-02
 
 				| i-th | atom type | core charge[a.u.] | Mulliken charge[a.u.]| 
 	Mulliken charge:	0	C	4.000000e+00	1.051777e-02
@@ -517,7 +517,7 @@ SCF iter=5: RMS density=0.000000448103295
 				|  [a.u.]  |  [Kcal/mol]  | 
 	Heats of formation:	-2.739219e-02	-1.718885e+01
 
-	Elapsed time(omp) for the SCF = 0.038765[s].
+	Elapsed time(omp) for the SCF = 0.038580[s].
 **********  DONE: MNDO-SCF  **********
 
 
@@ -528,7 +528,7 @@ SCF iter=5: RMS density=0.000000448103295
 		Electronic
 		(inc. core rep.):	-1.255206e+01	-3.415616e+02
 		Total:            	-1.255203e+01	-3.415609e+02
-		Error:            	4.606688e-09	1.253554e-07
+		Error:            	4.606681e-09	1.253552e-07
 
 				| i-th | atom type |   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
 	Atom coordinates:	0	C	-2.154535e-05	3.774283e-02	-1.277883e-05		-1.140131e-05	1.997264e-02	-6.762264e-06
@@ -562,11 +562,11 @@ SCF iter=5: RMS density=0.000000448103295
 	========== START: MD step 5
 **********  START: MNDO-SCF  **********
 SCF iter=0: RMS density=0.000089060775403
-SCF iter=1: RMS density=0.000026069366510
-SCF iter=2: RMS density=0.000008811634666
-SCF iter=3: RMS density=0.000003320008024
-SCF iter=4: RMS density=0.000001345731442
-SCF iter=5: RMS density=0.000000571981870
+SCF iter=1: RMS density=0.000026069366509
+SCF iter=2: RMS density=0.000008811634668
+SCF iter=3: RMS density=0.000003320008023
+SCF iter=4: RMS density=0.000001345731441
+SCF iter=5: RMS density=0.000000571981872
 
 
 
@@ -603,7 +603,7 @@ SCF iter=5: RMS density=0.000000571981870
 	Electronic Dipole moment(SCF):	7.964130e-03	-2.060330e-02	1.896834e-03	2.217028e-02		2.024280e-02	-5.236838e-02	4.821273e-03	5.635124e-02
 
 					|  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
-	Core Dipole moment:		-2.756059e-02	-1.103944e-02	-1.398136e-02	3.913208e-02		-7.005204e-02	-2.805947e-02	-3.553707e-02	9.946386e-02
+	Core Dipole moment:		-2.756059e-02	-1.103944e-02	-1.398136e-02	3.281667e-02		-7.005204e-02	-2.805947e-02	-3.553707e-02	8.341166e-02
 
 				| i-th | atom type | core charge[a.u.] | Mulliken charge[a.u.]| 
 	Mulliken charge:	0	C	4.000000e+00	1.052076e-02
@@ -618,7 +618,7 @@ SCF iter=5: RMS density=0.000000571981870
 				|  [a.u.]  |  [Kcal/mol]  | 
 	Heats of formation:	-2.740571e-02	-1.719734e+01
 
-	Elapsed time(omp) for the SCF = 0.038215[s].
+	Elapsed time(omp) for the SCF = 0.039115[s].
 **********  DONE: MNDO-SCF  **********
 
 
@@ -629,7 +629,7 @@ SCF iter=5: RMS density=0.000000571981870
 		Electronic
 		(inc. core rep.):	-1.255207e+01	-3.415620e+02
 		Total:            	-1.255203e+01	-3.415609e+02
-		Error:            	7.172689e-09	1.951804e-07
+		Error:            	7.172682e-09	1.951802e-07
 
 				| i-th | atom type |   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
 	Atom coordinates:	0	C	-3.366630e-05	3.771379e-02	-1.995579e-05		-1.781544e-05	1.995728e-02	-1.056015e-05
@@ -666,9 +666,9 @@ SCF iter=5: RMS density=0.000000571981870
 
 
      >>>>>  The MolDS finished normally!  <<<<<
-     >>>>>  CPU time: 5.57[s].  <<<<<
-     >>>>>  Elapsed time: 6[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 5.60607[s].  <<<<<
+     >>>>>  CPU time: 5.44[s].  <<<<<
+     >>>>>  Elapsed time: 5[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 5.46369[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/5/19(Sat.) 23:58:56  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/5/20(Sun.) 11:52:11  <<<<<
 
 
 **********  START: Parse input  **********
@@ -96,7 +96,7 @@ SCF iter=7: RMS density=0.000000025983611
 	Electronic Dipole moment(SCF):	-2.671237e-05	-3.163328e-05	1.799776e-16	4.140308e-05		-6.789610e-05	-8.040379e-05	4.574574e-16	1.052362e-04
 
 					|  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
-	Core Dipole moment:		3.552714e-15	-9.401387e-07	0.000000e+00	4.212575e-05		9.030099e-15	-2.389595e-06	0.000000e+00	1.070730e-04
+	Core Dipole moment:		3.552714e-15	-9.401387e-07	0.000000e+00	9.401387e-07		9.030099e-15	-2.389595e-06	0.000000e+00	2.389595e-06
 
 				| i-th | atom type | core charge[a.u.] | Mulliken charge[a.u.]| 
 	Mulliken charge:	0	C	4.000000e+00	-8.894141e-02
@@ -105,13 +105,13 @@ SCF iter=7: RMS density=0.000000025983611
 	Mulliken charge:	3	H	1.000000e+00	2.223536e-02
 	Mulliken charge:	4	H	1.000000e+00	2.223536e-02
 
-	Elapsed time(omp) for the SCF = 0.007928[s].
+	Elapsed time(omp) for the SCF = 0.008551[s].
 **********  DONE: ZINDO/S-SCF  **********
 
 
 **********  START: ZINDO/S-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.001119[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.001247[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -174,7 +174,7 @@ SCF iter=7: RMS density=0.000000025983611
 	Transition dipole moment:	0 -> 4		-6.345427e-07	-1.768601e-07	-1.469721e-08	6.588930e-07		-1.612847e-06	-4.495336e-07	-3.735658e-08	1.674739e-06
 
 
-	Elapsed time(omp) for the CIS = 0.003458[s].
+	Elapsed time(omp) for the CIS = 0.003585[s].
 **********  DONE: ZINDO/S-CIS  **********
 
 
@@ -186,7 +186,7 @@ SCF iter=7: RMS density=0.000000025983611
      >>>>>  The MolDS finished normally!  <<<<<
      >>>>>  CPU time: 0.01[s].  <<<<<
      >>>>>  Elapsed time: 0[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 0.0123918[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 0.0134132[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

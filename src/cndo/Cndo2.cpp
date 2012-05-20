@@ -908,9 +908,9 @@ void Cndo2::OutputSCFDipole() const{
 
    // output core dipole moment 
    temp = 0.0;
-   temp += pow(this->electronicTransitionDipoleMoments[groundState][groundState][XAxis]+this->coreDipoleMoment[XAxis],2.0);
-   temp += pow(this->electronicTransitionDipoleMoments[groundState][groundState][YAxis]+this->coreDipoleMoment[YAxis],2.0);
-   temp += pow(this->electronicTransitionDipoleMoments[groundState][groundState][ZAxis]+this->coreDipoleMoment[ZAxis],2.0);
+   temp += pow(this->coreDipoleMoment[XAxis],2.0);
+   temp += pow(this->coreDipoleMoment[YAxis],2.0);
+   temp += pow(this->coreDipoleMoment[ZAxis],2.0);
    magnitude = sqrt(temp);
    this->OutputLog(this->messageCoreDipoleMomentTitle);
    this->OutputLog((boost::format("%s\t\t%e\t%e\t%e\t%e\t\t%e\t%e\t%e\t%e\n\n") 
