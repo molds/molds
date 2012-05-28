@@ -2314,7 +2314,7 @@ void Mndo::CalcTwoElecTwoCore(double****** twoElecTwoCore,
 // taht is, Eq. (9) in ref. [DT_1977-2].
 // Note that atomA != atomB.
 // Note taht d-orbital cannot be treated, 
-// that is, matrix[dxy][dxy][dxy][dxy] can be treatable.
+// that is, matrix[dxy][dxy][dxy][dxy] cannot be treatable.
 void Mndo::CalcTwoElecTwoCoreDiatomic(double**** matrix, int atomAIndex, int atomBIndex) const{
    const Atom& atomA = *this->molecule->GetAtom(atomAIndex);
    const Atom& atomB = *this->molecule->GetAtom(atomBIndex);
@@ -2392,7 +2392,7 @@ void Mndo::CalcTwoElecTwoCoreDiatomic(double**** matrix, int atomAIndex, int ato
 // This derivative is related to the coordinates of atomA.
 // Note that atomA != atomB.
 // Note taht d-orbital cannot be treated, 
-// that is, matrix[dxy][dxy][dxy][dxy][CartesianType_end] can be treatable.
+// that is, matrix[dxy][dxy][dxy][dxy][CartesianType_end] cannot be treatable.
 void Mndo::CalcTwoElecTwoCoreDiatomicFirstDerivatives(double***** matrix, 
                                                       int atomAIndex, 
                                                       int atomBIndex) const{
