@@ -241,13 +241,13 @@ private:
                                           int atomBIndex,
                                           double const* const* const* const* const* twoElecTwoCoreFirstDeriv) const;
    void CalcForceSCFOverlapPart(double* force, 
-                               int atomAIndex,
-                               int atomBIndex,
-                               double const* const* const* overlapDer) const;
+                                int atomAIndex,
+                                int atomBIndex,
+                                double const* const* const* overlapDer) const;
    void CalcForceSCFTwoElecPart(double* force, 
-                               int atomAIndex,
-                               int atomBIndex,
-                               double const* const* const* const* const* twoElecTwoCoreFirstDeriv) const;
+                                int atomAIndex,
+                                int atomBIndex,
+                                double const* const* const* const* const* twoElecTwoCoreFirstDeriv) const;
    void CalcForceExcitedStaticPart(double* force, 
                                    int elecStateIndex,
                                    int atomAIndex,
