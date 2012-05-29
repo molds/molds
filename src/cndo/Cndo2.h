@@ -117,6 +117,12 @@ protected:
                                                 int nb, int lb, double alpha, double beta) const;
    double GetReducedOverlapFirstDerivativeBeta(int na, int la, int m, 
                                                int nb, int lb, double alpha, double beta) const;
+   double GetReducedOverlapSecondDerivativeAlpha(int na, int la, int m, 
+                                                 int nb, int lb, double alpha, double beta) const;
+   double GetReducedOverlapSecondDerivativeBeta(int na, int la, int m, 
+                                                int nb, int lb, double alpha, double beta) const;
+   double GetReducedOverlapSecondDerivativeAlphaBeta(int na, int la, int m, 
+                                                     int nb, int lb, double alpha, double beta) const;
    double GetOverlapElementFirstDerivativeByGTOExpansion(const MolDS_base_atoms::Atom& atomA, 
                                                          int valenceIndexA, 
                                                          const MolDS_base_atoms::Atom& atomB, 
@@ -154,6 +160,9 @@ protected:
    virtual void CalcDiatomicOverlapFirstDerivativeInDiatomicFrame(double** diatomicOverlapDeri, 
                                                                   const MolDS_base_atoms::Atom& atomA, 
                                                                   const MolDS_base_atoms::Atom& atomB) const;
+   virtual void CalcDiatomicOverlapSecondDerivativeInDiatomicFrame(double** diatomicOverlapSecondDeri, 
+                                                                   const MolDS_base_atoms::Atom& atomA, 
+                                                                   const MolDS_base_atoms::Atom& atomB) const;
    void CalcDiatomicOverlapFirstDerivative(double*** overlapFirstDeri, 
                                            const MolDS_base_atoms::Atom& atomA, 
                                            const MolDS_base_atoms::Atom& atomB) const;
@@ -333,7 +342,9 @@ private:
    double GetAuxiliaryB(int k, double rho) const;
    double GetAuxiliaryD(int la, int lb, int m) const;
    double GetAuxiliaryAFirstDerivative(int k, double rho) const;
+   double GetAuxiliaryASecondDerivative(int k, double rho) const;
    double GetAuxiliaryBFirstDerivative(int k, double rho) const;
+   double GetAuxiliaryBSecondDerivative(int k, double rho) const;
    void DoDamp(double rmsDensity, 
                double** orbitalElectronPopulation, 
                double const* const* oldOrbitalElectronPopulation, 

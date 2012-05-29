@@ -461,11 +461,20 @@ void Mndo::CalcDiatomicOverlapInDiatomicFrame(double** diatomicOverlap,
    MolDS_cndo::Cndo2::CalcDiatomicOverlapInDiatomicFrame(diatomicOverlap, atomA, atomB);
 }
 
+// First derivative of (B.40) in J. A. Pople book without bond corrections.
 void Mndo::CalcDiatomicOverlapFirstDerivativeInDiatomicFrame(double** diatomicOverlapDeri, 
                                                              const Atom& atomA, 
                                                              const Atom& atomB) const{
    MolDS_cndo::Cndo2::CalcDiatomicOverlapFirstDerivativeInDiatomicFrame(
                       diatomicOverlapDeri,atomA, atomB);
+}
+
+// Second derivative of (B.40) in J. A. Pople book without bond corrections.
+void Mndo::CalcDiatomicOverlapSecondDerivativeInDiatomicFrame(double** diatomicOverlapSecondDeri, 
+                                                              const Atom& atomA, 
+                                                              const Atom& atomB) const{
+   MolDS_cndo::Cndo2::CalcDiatomicOverlapSecondDerivativeInDiatomicFrame(
+                      diatomicOverlapSecondDeri,atomA, atomB);
 }
 
 // The order of mol, moJ, moK, moL is consistent with Eq. (9) in [RZ_1973]

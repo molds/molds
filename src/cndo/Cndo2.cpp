@@ -4795,6 +4795,132 @@ void Cndo2::CalcDiatomicOverlapFirstDerivativeInDiatomicFrame(double** diatomicO
    }
    */
 
+}
+
+// Second derivative of (B.40) in J. A. Pople book.
+void Cndo2::CalcDiatomicOverlapSecondDerivativeInDiatomicFrame(double** diatomicOverlapSecondDeri, 
+                                                               const Atom& atomA, 
+                                                               const Atom& atomB) const{
+
+   int na = atomA.GetValenceShellType() + 1;
+   int nb = atomB.GetValenceShellType() + 1;
+   int m = 0;
+   double alpha = 0.0;
+   double beta = 0.0;
+   double pre = 0.0;
+   double reducedOverlap = 0.0;
+   double reducedOverlapFirstDerivAlpha = 0.0;
+   double reducedOverlapFirstDerivBeta = 0.0;
+   double reducedOverlapSecondDerivAlpha = 0.0;
+   double reducedOverlapSecondDerivBeta = 0.0;
+   double reducedOverlapSecondDerivAlphaBeta = 0.0;
+   double orbitalExponentA = 0.0;
+   double orbitalExponentB = 0.0;
+   double temp1=0.0;
+   double temp2=0.0;
+   double temp3=0.0;
+
+   MallocerFreer::GetInstance()->Initialize<double>(diatomicOverlapSecondDeri, 
+                                                    OrbitalType_end, 
+                                                    OrbitalType_end);
+   double R = this->molecule->GetDistanceAtoms(atomA, atomB);
+
+   for(int a=0; a<atomA.GetValenceSize(); a++){
+      OrbitalType valenceOrbitalA = atomA.GetValence(a);
+      RealSphericalHarmonicsIndex realShpericalHarmonicsA(valenceOrbitalA);
+      orbitalExponentA = atomA.GetOrbitalExponent(
+                               atomA.GetValenceShellType(), 
+                               valenceOrbitalA,
+                               this->theory);
+
+      for(int b=0; b<atomB.GetValenceSize(); b++){
+         OrbitalType valenceOrbitalB = atomB.GetValence(b);
+         RealSphericalHarmonicsIndex realShpericalHarmonicsB(valenceOrbitalB);
+         orbitalExponentB = atomB.GetOrbitalExponent(
+                                  atomB.GetValenceShellType(), 
+                                  valenceOrbitalB,
+                                  this->theory);
+
+         if(realShpericalHarmonicsA.GetM() == realShpericalHarmonicsB.GetM()){
+            m = abs(realShpericalHarmonicsA.GetM());
+            alpha = orbitalExponentA * R;
+            beta =  orbitalExponentB * R;
+
+            reducedOverlap = this->GetReducedOverlap
+                                   (na, realShpericalHarmonicsA.GetL(), m,
+                                    nb, realShpericalHarmonicsB.GetL(), alpha, beta);
+            reducedOverlapFirstDerivAlpha = this->GetReducedOverlapFirstDerivativeAlpha(
+                                                  na, 
+                                                  realShpericalHarmonicsA.GetL(), 
+                                                  m,
+                                                  nb, 
+                                                  realShpericalHarmonicsB.GetL(), 
+                                                  alpha, 
+                                                  beta);
+            reducedOverlapFirstDerivBeta  = this->GetReducedOverlapFirstDerivativeBeta(
+                                                  na, 
+                                                  realShpericalHarmonicsA.GetL(), 
+                                                  m,
+                                                  nb, 
+                                                  realShpericalHarmonicsB.GetL(), 
+                                                  alpha, 
+                                                  beta);
+            reducedOverlapSecondDerivAlpha = this->GetReducedOverlapSecondDerivativeAlpha(
+                                                   na, 
+                                                   realShpericalHarmonicsA.GetL(), 
+                                                   m,
+                                                   nb, 
+                                                   realShpericalHarmonicsB.GetL(), 
+                                                   alpha, 
+                                                   beta);
+            reducedOverlapSecondDerivBeta = this->GetReducedOverlapSecondDerivativeBeta(
+                                                  na, 
+                                                  realShpericalHarmonicsA.GetL(), 
+                                                  m,
+                                                  nb, 
+                                                  realShpericalHarmonicsB.GetL(), 
+                                                  alpha, 
+                                                  beta);
+            reducedOverlapSecondDerivAlphaBeta = this->GetReducedOverlapSecondDerivativeAlphaBeta(
+                                                       na, 
+                                                       realShpericalHarmonicsA.GetL(), 
+                                                       m,
+                                                       nb, 
+                                                       realShpericalHarmonicsB.GetL(), 
+                                                       alpha, 
+                                                       beta);
+
+            temp1 = static_cast<double>(na+nb+1)
+                   *static_cast<double>(na+nb)
+                   *pow(R,na+nb-1)*reducedOverlap;
+            temp2 = 2.0*static_cast<double>(na+nb+1)*pow(R,na+nb)
+                       *(orbitalExponentA*reducedOverlapFirstDerivAlpha
+                        +orbitalExponentB*reducedOverlapFirstDerivBeta);
+            temp3 = pow(R,na+nb+1)
+                   *(pow(orbitalExponentA,2.0)*reducedOverlapSecondDerivAlpha
+                    +pow(orbitalExponentB,2.0)*reducedOverlapSecondDerivBeta
+                    +2.0*orbitalExponentA*orbitalExponentB*reducedOverlapSecondDerivAlphaBeta);
+
+            pre =  pow(2.0*orbitalExponentA, na+0.5);
+            pre *= pow(2.0*orbitalExponentB, nb+0.5);
+            double factorials = Factorial(2*na)*Factorial(2*nb);
+            pre /= sqrt(factorials);
+            pre /= pow(2.0, na+nb+1.0);
+
+            diatomicOverlapSecondDeri[valenceOrbitalA][valenceOrbitalB] = pre*(temp1+temp2+temp3);
+         }
+         
+      }
+   }
+
+   /*
+   for(int i=0;i<OrbitalType_end;i++){
+      for(int j=0;j<OrbitalType_end;j++){
+         this->OutputLog((boost::format("diatomicOverlap[%d][%d]=%lf\n") % i % j % diatomicOverlap[i][j]).str());
+      }
+   }
+   */
+
 
 }
 
@@ -4917,8 +5043,13 @@ double Cndo2::GetReducedOverlap(int na, int nb, double alpha, double beta) const
 
 // First derivative of (B.24) in J. A. Pople book.
 // This derivative is carried out by alpha.
-double Cndo2::GetReducedOverlapFirstDerivativeAlpha
-              (int na, int la, int m, int nb, int lb, double alpha, double beta) const{
+double Cndo2::GetReducedOverlapFirstDerivativeAlpha(int na, 
+                                                    int la, 
+                                                    int m, 
+                                                    int nb, 
+                                                    int lb, 
+                                                    double alpha, 
+                                                    double beta) const{
    double value = 0.0;
    double temp1 = 0.0;
    double temp2 = 0.0;
@@ -4941,8 +5072,13 @@ double Cndo2::GetReducedOverlapFirstDerivativeAlpha
 
 // First derivative of (B.24) in J. A. Pople book.
 // This derivative is carried out by Beta.
-double Cndo2::GetReducedOverlapFirstDerivativeBeta
-              (int na, int la, int m, int nb, int lb, double alpha, double beta) const{
+double Cndo2::GetReducedOverlapFirstDerivativeBeta(int na, 
+                                                   int la, 
+                                                   int m, 
+                                                   int nb, 
+                                                   int lb, 
+                                                   double alpha, 
+                                                   double beta) const{
    double value = 0.0;
    double temp1 = 0.0;
    double temp2 = 0.0;
@@ -4959,6 +5095,99 @@ double Cndo2::GetReducedOverlapFirstDerivativeBeta
       }
    }
    value *= 0.5*this->GetAuxiliaryD(la, lb, m);
+
+   return value;
+}
+
+// Second derivative of (B.24) in J. A. Pople book.
+// This derivative is carried out by alpha twice.
+double Cndo2::GetReducedOverlapSecondDerivativeAlpha(int na, 
+                                                     int la, 
+                                                     int m, 
+                                                     int nb, 
+                                                     int lb, 
+                                                     double alpha, 
+                                                     double beta) const{
+   double value = 0.0;
+   double temp1 = 0.0;
+   double temp2 = 0.0;
+   double temp3 = 0.0;
+   int I = 2*ShellType_end+1;
+   int J = 2*ShellType_end+1;
+
+   for(int i=0; i<I; i++){
+      for(int j=0; j<J; j++){
+         temp1 = this->GetAuxiliaryASecondDerivative(i, 0.5*(alpha+beta))
+                *this->GetAuxiliaryB(j, 0.5*(alpha-beta));
+         temp2 = this->GetAuxiliaryA(i, 0.5*(alpha+beta))
+                *this->GetAuxiliaryBSecondDerivative(j, 0.5*(alpha-beta));
+         temp3 = this->GetAuxiliaryAFirstDerivative(i, 0.5*(alpha+beta))
+                *this->GetAuxiliaryBFirstDerivative(j, 0.5*(alpha-beta));
+         value += this->Y[na][nb][la][lb][m][i][j]*(temp1 + temp2 + 2.0*temp3);
+      }
+   }
+   value *= 0.25*this->GetAuxiliaryD(la, lb, m);
+
+   return value;
+}
+
+// Second derivative of (B.24) in J. A. Pople book.
+// This derivative is carried out by beta twice.
+double Cndo2::GetReducedOverlapSecondDerivativeBeta(int na, 
+                                                    int la, 
+                                                    int m, 
+                                                    int nb, 
+                                                    int lb, 
+                                                    double alpha, 
+                                                    double beta) const{
+   double value = 0.0;
+   double temp1 = 0.0;
+   double temp2 = 0.0;
+   double temp3 = 0.0;
+   int I = 2*ShellType_end+1;
+   int J = 2*ShellType_end+1;
+
+   for(int i=0; i<I; i++){
+      for(int j=0; j<J; j++){
+         temp1 = this->GetAuxiliaryASecondDerivative(i, 0.5*(alpha+beta))
+                *this->GetAuxiliaryB(j, 0.5*(alpha-beta));
+         temp2 = this->GetAuxiliaryA(i, 0.5*(alpha+beta))
+                *this->GetAuxiliaryBSecondDerivative(j, 0.5*(alpha-beta));
+         temp3 = this->GetAuxiliaryAFirstDerivative(i, 0.5*(alpha+beta))
+                *this->GetAuxiliaryBFirstDerivative(j, 0.5*(alpha-beta));
+         value += this->Y[na][nb][la][lb][m][i][j]*(temp1 + temp2 - 2.0*temp3);
+      }
+   }
+   value *= 0.25*this->GetAuxiliaryD(la, lb, m);
+
+   return value;
+}
+
+// Second derivative of (B.24) in J. A. Pople book.
+// This derivative is carried out by alpha and beta.
+double Cndo2::GetReducedOverlapSecondDerivativeAlphaBeta(int na, 
+                                                         int la, 
+                                                         int m, 
+                                                         int nb, 
+                                                         int lb, 
+                                                         double alpha, 
+                                                         double beta) const{
+   double value = 0.0;
+   double temp1 = 0.0;
+   double temp2 = 0.0;
+   int I = 2*ShellType_end+1;
+   int J = 2*ShellType_end+1;
+
+   for(int i=0; i<I; i++){
+      for(int j=0; j<J; j++){
+         temp1 = this->GetAuxiliaryASecondDerivative(i, 0.5*(alpha+beta))
+                *this->GetAuxiliaryB(j, 0.5*(alpha-beta));
+         temp2 = this->GetAuxiliaryA(i, 0.5*(alpha+beta))
+                *this->GetAuxiliaryBSecondDerivative(j, 0.5*(alpha-beta));
+         value += this->Y[na][nb][la][lb][m][i][j]*(temp1 - temp2);
+      }
+   }
+   value *= 0.25*this->GetAuxiliaryD(la, lb, m);
 
    return value;
 }
@@ -4980,6 +5209,11 @@ double Cndo2::GetAuxiliaryA(int k, double rho) const{
 // First derivative of (B.22) in J. A. Pople book.
 double Cndo2::GetAuxiliaryAFirstDerivative(int k, double rho) const{
    return -1.0*this->GetAuxiliaryA(k+1, rho);
+}
+
+// Second derivative of (B.22) in J. A. Pople book.
+double Cndo2::GetAuxiliaryASecondDerivative(int k, double rho) const{
+   return this->GetAuxiliaryA(k+2, rho);
 }
 
 // see (B.23) in J. A. Pople book.
@@ -5015,6 +5249,11 @@ double Cndo2::GetAuxiliaryB(int k, double rho) const{
 // First derivative of (B.23) in J. A. Pople book.
 double Cndo2::GetAuxiliaryBFirstDerivative(int k, double rho) const{
    return -1.0*this->GetAuxiliaryB(k+1, rho);
+}
+
+// Second derivative of (B.23) in J. A. Pople book.
+double Cndo2::GetAuxiliaryBSecondDerivative(int k, double rho) const{
+   return this->GetAuxiliaryB(k+2, rho);
 }
 
 // see (B.16) in J. A. Pople book.

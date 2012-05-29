@@ -662,10 +662,10 @@ void ZindoS::CalcDiatomicOverlapInDiatomicFrame(double** diatomicOverlap,
    
 }
 
-void ZindoS::CalcDiatomicOverlapFirstDerivativeInDiatomicFrame(
-                                                double** diatomicOverlapDeri, 
-                                                const Atom& atomA, 
-                                                const Atom& atomB) const{
+// First derivative of (B.40) in J. A. Pople book with bond correction.
+void ZindoS::CalcDiatomicOverlapFirstDerivativeInDiatomicFrame(double** diatomicOverlapDeri, 
+                                                               const Atom& atomA, 
+                                                               const Atom& atomB) const{
 
    MolDS_cndo::Cndo2::CalcDiatomicOverlapFirstDerivativeInDiatomicFrame(
                       diatomicOverlapDeri,atomA, atomB);
@@ -674,8 +674,22 @@ void ZindoS::CalcDiatomicOverlapFirstDerivativeInDiatomicFrame(
    diatomicOverlapDeri[pz][pz] *= this->overlapCorrectionSigma;
    diatomicOverlapDeri[py][py] *= this->overlapCorrectionPi;
    diatomicOverlapDeri[px][px] *= this->overlapCorrectionPi;
-
 }
+
+// Second derivative of (B.40) in J. A. Pople book with bond correction.
+void ZindoS::CalcDiatomicOverlapSecondDerivativeInDiatomicFrame(double** diatomicOverlapSecondDeri, 
+                                                                const Atom& atomA, 
+                                                                const Atom& atomB) const{
+
+   MolDS_cndo::Cndo2::CalcDiatomicOverlapSecondDerivativeInDiatomicFrame(
+                      diatomicOverlapSecondDeri,atomA, atomB);
+
+   // see (4f) in [AEZ_1986] like as overlap integlral
+   diatomicOverlapSecondDeri[pz][pz] *= this->overlapCorrectionSigma;
+   diatomicOverlapSecondDeri[py][py] *= this->overlapCorrectionPi;
+   diatomicOverlapSecondDeri[px][px] *= this->overlapCorrectionPi;
+}
+
 // The order of mol, moJ, moK, moL is consistent with Eq. (9) in [RZ_1973]
 double ZindoS::GetMolecularIntegralElement(int moI, int moJ, int moK, int moL, 
                                            const Molecule& molecule, 
