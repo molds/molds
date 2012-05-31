@@ -19,7 +19,8 @@ AC_CHECK_LIB([pthread], [main])
 #Check for OpenMP
 AX_OPENMP(,[AC_MSG_FAILURE([Cannot use OpenMP!])])
 export CXXFLAGS="$CXXFLAGS $OPENMP_CXXFLAGS"
-AC_CHECK_LIB([iomp5], [main],,[AC_MSG_FAILURE([Cannot find omp5!])])
+AC_CHECK_HEADERS([omp.h],,[AC_MSG_FAILURE([Cannot find omp.h!])])
+AC_CHECK_LIB([iomp5], [omp_set_num_threads],,[AC_MSG_FAILURE([Cannot find omp5!])])
 
 # Check for mkl
 export LIBS="-lmkl_intel_thread -lmkl_core $LIBS"
