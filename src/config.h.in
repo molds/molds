@@ -1,5 +1,11 @@
 /* config.h.in.  Generated from configure.ac by autoheader.  */
 
+/* define if the Boost library is available */
+#undef HAVE_BOOST
+
+/* Define to 1 if you have the <boost/random.hpp> header file. */
+#undef HAVE_BOOST_RANDOM_HPP
+
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
 
@@ -9,18 +15,11 @@
 /* Define to 1 if you have the `iomp5' library (-liomp5). */
 #undef HAVE_LIBIOMP5
 
-/* Define to 1 if you have the `mkl_core' library (-lmkl_core). */
-#undef HAVE_LIBMKL_CORE
-
 /* Define to 1 if you have the `mkl_intel' library (-lmkl_intel). */
 #undef HAVE_LIBMKL_INTEL
 
 /* Define to 1 if you have the `mkl_intel_lp64' library (-lmkl_intel_lp64). */
 #undef HAVE_LIBMKL_INTEL_LP64
-
-/* Define to 1 if you have the `mkl_intel_thread' library
-   (-lmkl_intel_thread). */
-#undef HAVE_LIBMKL_INTEL_THREAD
 
 /* Define to 1 if you have the `pthread' library (-lpthread). */
 #undef HAVE_LIBPTHREAD
@@ -30,6 +29,12 @@
 
 /* Define to 1 if you have the `memset' function. */
 #undef HAVE_MEMSET
+
+/* Define to 1 if you have the <omp.h> header file. */
+#undef HAVE_OMP_H
+
+/* Define if OpenMP is enabled */
+#undef HAVE_OPENMP
 
 /* Define to 1 if you have the `pow' function. */
 #undef HAVE_POW
@@ -78,9 +83,6 @@
 
 /* Define to the one symbol short name of this package. */
 #undef PACKAGE_TARNAME
-
-/* Define to the home page for this package. */
-#undef PACKAGE_URL
 
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
