@@ -14,7 +14,7 @@ AC_PROG_CXX([icpc g++])
 AC_LANG_PUSH([C++])
 
 # Boost
-AX_BOOST_BASE([1.48])
+AX_BOOST_BASE([1.48],,[AC_MSG_FAILURE([boost library is too old!])])
 
 export CPPFLAGS="$CPPFLAGS $BOOST_CPPFLAGS"
 export LDFLAGS="$LDFLAGS -Wl,-rpath=$BOOST_LIBDIR $BOOST_LDFLAGS"
