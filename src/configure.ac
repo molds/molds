@@ -10,6 +10,9 @@ AC_CONFIG_HEADERS([config.h])
 # Checks for programs.
 AC_PROG_CXX([icpc g++])
 
+# Boost
+AX_BOOST_BASE([1.48])
+
 # Checks for libraries.
 # FIXME: Replace `main' with a function in `-lboost_random':
 AC_CHECK_LIB([boost_random], [main])
