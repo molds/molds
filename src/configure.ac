@@ -21,6 +21,15 @@ AX_OPENMP(,[AC_MSG_FAILURE([Cannot use OpenMP!])])
 export CXXFLAGS="$CXXFLAGS $OPENMP_CXXFLAGS"
 AC_CHECK_LIB([iomp5], [main],,[AC_MSG_FAILURE([Cannot find omp5!])])
 
+# Check for mkl
+export LIBS="-lmkl_intel_thread -lmkl_core $LIBS"
+AC_CHECK_LIB([mkl_intel_lp64], [main],,
+						 [
+							AC_CHECK_LIB([mkl_intel], [main],,
+													 [AC_MSG_FAILURE([Cannot find mkl!])
+													 ])
+							])
+
 # Boost
 AX_BOOST_BASE([1.48],,[AC_MSG_FAILURE([boost library is too old!])])
 
@@ -32,14 +41,6 @@ AX_CXX_CHECK_LIB([boost_random], [boost::random::random_device],,[AC_MSG_ERROR(C
 
 # Checks for libraries.
 # FIXME: Replace `main' with a function in `-lmkl_core':
-AC_CHECK_LIB([mkl_core], [main])
-# FIXME: Replace `main' with a function in `-lmkl_intel':
-AC_CHECK_LIB([mkl_intel], [main])
-# FIXME: Replace `main' with a function in `-lmkl_intel_lp64':
-AC_CHECK_LIB([mkl_intel_lp64], [main])
-# FIXME: Replace `main' with a function in `-lmkl_intel_thread':
-AC_CHECK_LIB([mkl_intel_thread], [main])
-
 # Checks for header files.
 AC_CHECK_HEADERS([stdlib.h string.h])
 
