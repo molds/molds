@@ -1,7 +1,7 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_PREREQ([2.67])
+AC_PREREQ([2.59])
 AC_INIT([MolDS], [0.1], [molds-dev@lists.sourceforge.jp])
 AM_INIT_AUTOMAKE([MolDS], [0.1])
 AC_CONFIG_SRCDIR([Main.cpp])
