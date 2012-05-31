@@ -103,6 +103,7 @@ if test "x$want_boost" = "xyes"; then
         for ac_boost_path_tmp in $libsubdirs; do
                 if test -d "$ac_boost_path"/"$ac_boost_path_tmp" ; then
                         BOOST_LDFLAGS="-L$ac_boost_path/$ac_boost_path_tmp"
+                        BOOST_LIBDIR="$ac_boost_path/$ac_boost_path_tmp"
                         break
                 fi
         done
@@ -113,6 +114,7 @@ if test "x$want_boost" = "xyes"; then
                     if ls "$ac_boost_path_tmp/$libsubdir/libboost_"* >/dev/null 2>&1 ; then break; fi
                 done
                 BOOST_LDFLAGS="-L$ac_boost_path_tmp/$libsubdir"
+                BOOST_LIBDIR="$ac_boost_path_tmp/$libsubdir"
                 BOOST_CPPFLAGS="-I$ac_boost_path_tmp/include"
                 break;
             fi
@@ -123,6 +125,7 @@ if test "x$want_boost" = "xyes"; then
     dnl --with-boost-libdir parameter
     if test "$ac_boost_lib_path" != ""; then
        BOOST_LDFLAGS="-L$ac_boost_lib_path"
+       BOOST_LIBDIR="$ac_boost_lib_path"
     fi
 
     CPPFLAGS_SAVED="$CPPFLAGS"
@@ -191,6 +194,7 @@ if test "x$want_boost" = "xyes"; then
                         if ls "$best_path/$libsubdir/libboost_"* >/dev/null 2>&1 ; then break; fi
                     done
                     BOOST_LDFLAGS="-L$best_path/$libsubdir"
+                    BOOST_LIBDIR="$best_path/$libsubdir"
                 fi
             fi
 
@@ -207,6 +211,7 @@ if test "x$want_boost" = "xyes"; then
                         AC_MSG_NOTICE(We will use a staged boost library from $BOOST_ROOT)
                         BOOST_CPPFLAGS="-I$BOOST_ROOT"
                         BOOST_LDFLAGS="-L$BOOST_ROOT/stage/$libsubdir"
+                        BOOST_LIBDIR="$BOOST_ROOT/stage/$libsubdir"
                     fi
                 fi
             fi

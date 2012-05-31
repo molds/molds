@@ -17,10 +17,10 @@ AC_LANG_PUSH([C++])
 AX_BOOST_BASE([1.48])
 
 export CPPFLAGS="$CPPFLAGS $BOOST_CPPFLAGS"
-export LDFLAGS="$LDFLAGS $BOOST_LDFLAGS"
+export LDFLAGS="$LDFLAGS -Wl,-rpath=$BOOST_LIBDIR $BOOST_LDFLAGS"
 
 AC_CHECK_HEADERS([boost/random.hpp])
-AC_CHECK_LIB([boost_random], [main],,[AC_MSG_ERROR(Cannot find -lboost_random!)])
+AX_CXX_CHECK_LIB([boost_random], [boost::random::random_device],,[AC_MSG_ERROR(Cannot find -lboost_random!)])
 
 # Checks for libraries.
 # FIXME: Replace `main' with a function in `-liomp5':
