@@ -10,12 +10,19 @@ AC_CONFIG_HEADERS([config.h])
 # Checks for programs.
 AC_PROG_CXX([icpc g++])
 
+# Use C++
+AC_LANG_PUSH([C++])
+
 # Boost
 AX_BOOST_BASE([1.48])
 
+export CPPFLAGS="$CPPFLAGS $BOOST_CPPFLAGS"
+export LDFLAGS="$LDFLAGS $BOOST_LDFLAGS"
+
+AC_CHECK_HEADERS([boost/random.hpp])
+AC_CHECK_LIB([boost_random], [main],,[AC_MSG_ERROR(Cannot find -lboost_random!)])
+
 # Checks for libraries.
-# FIXME: Replace `main' with a function in `-lboost_random':
-AC_CHECK_LIB([boost_random], [main])
 # FIXME: Replace `main' with a function in `-liomp5':
 AC_CHECK_LIB([iomp5], [main])
 # FIXME: Replace `main' with a function in `-lmkl_core':
