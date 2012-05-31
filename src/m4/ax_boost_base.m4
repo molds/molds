@@ -15,6 +15,9 @@
 #   $BOOST_ROOT environment variable. Further documentation is available at
 #   <http://randspringer.de/boost/index.html>.
 #
+#   If boost library found, the this macro sets BOOST_LIBDIR as found
+#   library directory.
+#
 #   This macro calls:
 #
 #     AC_SUBST(BOOST_CPPFLAGS) / AC_SUBST(BOOST_LDFLAGS)
@@ -27,6 +30,7 @@
 #
 #   Copyright (c) 2008 Thomas Porschberg <thomas@randspringer.de>
 #   Copyright (c) 2009 Peter Adolphs
+#   Copyright (c) 2012 Katsuhiko Nishimra
 #
 #   Copying and distribution of this file, with or without modification, are
 #   permitted in any medium without royalty provided the copyright notice
