@@ -13,6 +13,9 @@ AC_PROG_CXX([icpc g++])
 # Use C++
 AC_LANG_PUSH([C++])
 
+#Check for pthread
+AC_CHECK_LIB([pthread], [main])
+
 #Check for OpenMP
 AX_OPENMP(,[AC_MSG_FAILURE([Cannot use OpenMP!])])
 export CXXFLAGS="$CXXFLAGS $OPENMP_CXXFLAGS"
@@ -36,8 +39,6 @@ AC_CHECK_LIB([mkl_intel], [main])
 AC_CHECK_LIB([mkl_intel_lp64], [main])
 # FIXME: Replace `main' with a function in `-lmkl_intel_thread':
 AC_CHECK_LIB([mkl_intel_thread], [main])
-# FIXME: Replace `main' with a function in `-lpthread':
-AC_CHECK_LIB([pthread], [main])
 
 # Checks for header files.
 AC_CHECK_HEADERS([stdlib.h string.h])
