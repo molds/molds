@@ -47,8 +47,6 @@ export LDFLAGS="$LDFLAGS -Wl,-rpath=$BOOST_LIBDIR $BOOST_LDFLAGS"
 AC_CHECK_HEADERS([boost/random.hpp])
 AX_CXX_CHECK_LIB([boost_random], [boost::random::random_device],,[AC_MSG_FAILURE(Cannot find -lboost_random!)])
 
-# Checks for libraries.
-# FIXME: Replace `main' with a function in `-lmkl_core':
 # Checks for header files.
 AC_CHECK_HEADERS([stdlib.h string.h])
 
