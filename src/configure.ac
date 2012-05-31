@@ -31,6 +31,7 @@ AC_CHECK_FUNC([omp_get_wtime],,
 
 # Check for mkl
 export LIBS="-lmkl_intel_thread -lmkl_core $LIBS"
+AC_CHECK_HEADERS([mkl.h])
 AC_CHECK_LIB([mkl_intel_lp64], [main],,
 						 [
 							AC_CHECK_LIB([mkl_intel], [main],,
