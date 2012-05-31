@@ -13,6 +13,11 @@ AC_PROG_CXX([icpc g++])
 # Use C++
 AC_LANG_PUSH([C++])
 
+#Check for OpenMP
+AX_OPENMP(,[AC_MSG_FAILURE([Cannot use OpenMP!])])
+export CXXFLAGS="$CXXFLAGS $OPENMP_CXXFLAGS"
+AC_CHECK_LIB([iomp5], [main],,[AC_MSG_FAILURE([Cannot find omp5!])])
+
 # Boost
 AX_BOOST_BASE([1.48],,[AC_MSG_FAILURE([boost library is too old!])])
 
@@ -23,8 +28,6 @@ AC_CHECK_HEADERS([boost/random.hpp])
 AX_CXX_CHECK_LIB([boost_random], [boost::random::random_device],,[AC_MSG_ERROR(Cannot find -lboost_random!)])
 
 # Checks for libraries.
-# FIXME: Replace `main' with a function in `-liomp5':
-AC_CHECK_LIB([iomp5], [main])
 # FIXME: Replace `main' with a function in `-lmkl_core':
 AC_CHECK_LIB([mkl_core], [main])
 # FIXME: Replace `main' with a function in `-lmkl_intel':
