@@ -20,7 +20,14 @@ AC_CHECK_LIB([pthread], [main])
 AX_OPENMP(,[AC_MSG_FAILURE([Cannot use OpenMP!])])
 export CXXFLAGS="$CXXFLAGS $OPENMP_CXXFLAGS"
 AC_CHECK_HEADERS([omp.h],,[AC_MSG_FAILURE([Cannot find omp.h!])])
-AC_CHECK_LIB([iomp5], [omp_set_num_threads],,[AC_MSG_FAILURE([Cannot find libiomp5!])])
+AC_CHECK_LIB([iomp5], [omp_set_num_threads],,[
+							AC_CHECK_FUNC([omp_set_num_threads],,
+														[AC_MSG_FAILURE([Cannot find omp_set_num_threads!])
+														])
+							])
+AC_CHECK_FUNC([omp_get_wtime],,
+							[AC_MSG_FAILURE([Cannot find omp_get_wtime!])
+							])
 
 # Check for mkl
 export LIBS="-lmkl_intel_thread -lmkl_core $LIBS"
