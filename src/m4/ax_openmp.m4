@@ -38,6 +38,7 @@
 # LICENSE
 #
 #   Copyright (c) 2008 Steven G. Johnson <stevenj@alum.mit.edu>
+#   Copyright (c) 2012 Katsuhiko Nishimra <nishimra@tcl.t.u-tokyo.ac.jp>
 #
 #   This program is free software: you can redistribute it and/or modify it
 #   under the terms of the GNU General Public License as published by the
