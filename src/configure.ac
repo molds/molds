@@ -35,6 +35,15 @@ AC_CHECK_LIB([iomp5], [omp_set_num_threads],,[
 AC_CHECK_FUNC([omp_get_wtime],,
 							[AC_MSG_FAILURE([Cannot find omp_get_wtime!])
 							])
+# OpenMP debug options
+export CXXFLAGS_SAVED="$CXXFLAGS_SAVED"
+export CXXFLAGS="$CXXFLAGS -openmp-report2"
+AC_MSG_CHECKING([for openmp diagnosis option])
+AC_COMPILE_IFELSE(
+									[int main(){return 0;}],
+									[AC_MSG_RESULT([-openmp-report2])],
+									[AC_MSG_RESULT([no])
+									export CXXFLAGS="$CXXFLAGS_SAVED"])
 
 # Check for mkl
 export LIBS="-lmkl_intel_thread -lmkl_core $LIBS"
