@@ -7,6 +7,13 @@ AM_INIT_AUTOMAKE([MolDS], [0.1])
 AC_CONFIG_SRCDIR([Main.cpp])
 AC_CONFIG_HEADERS([config.h])
 
+# Setup CXXFLAGS
+[
+ if [ -z "$CXXFLAGS" ]; then
+	 export CXXFLAGS="-g -O0"
+ fi
+ ]
+
 # Checks for programs.
 AC_PROG_CXX([icpc g++])
 
