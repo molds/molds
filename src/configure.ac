@@ -3,6 +3,12 @@
 
 AC_PREREQ([2.59])
 AC_INIT([MolDS], [0.1], [molds-dev@lists.sourceforge.jp])
+
+# Check if pwd is source directory
+[ if [ -x ./configure ]; then ]
+AC_MSG_FAILURE([Don't execute configure script in source directory!])
+[ fi ]
+
 AM_INIT_AUTOMAKE([MolDS], [0.1])
 AC_CONFIG_SRCDIR([Main.cpp])
 AC_CONFIG_HEADERS([config.h])
