@@ -81,10 +81,14 @@ void Am1D::SetMessages(){
       = "Error in am1::Am1D::GetSemiEmpiricalMultipoleInteraction: Bad multipole combintaion is set\n";
    this->errorMessageGetSemiEmpiricalMultipoleInteractionFirstDeriBadMultipoles
       = "Error in am1::Am1D::GetSemiEmpiricalMultipoleInteractionFirstDerivative: Bad multipole combintaion is set\n";
+   this->errorMessageGetSemiEmpiricalMultipoleInteractionSecondDeriBadMultipoles
+      = "Error in am1::Am1D::GetSemiEmpiricalMultipoleInteractionSecondDerivative: Bad multipole combintaion is set\n";
    this->errorMessageGetNddoRepulsionIntegral 
       = "Error in am1::Am1D::GetNddoRepulsionIntegral: Bad orbital is set.\n";
    this->errorMessageGetNddoRepulsionIntegralFirstDerivative 
       = "Error in am1::Am1D::GetNddoRepulsionIntegralFirstDerivative: Bad orbital is set.\n";
+   this->errorMessageGetNddoRepulsionIntegralSecondDerivative 
+      = "Error in am1::Am1D::GetNddoRepulsionIntegralSecondDerivative: Bad orbital is set.\n";
    this->errorMessageCalcTwoElecTwoCoreNullMatrix 
       = "Error in am1::Am1D::CalcTwoElecTwoCore: The two elec two core matrix is NULL.\n"; 
    this->errorMessageCalcTwoElecTwoCoreDiatomicNullMatrix 

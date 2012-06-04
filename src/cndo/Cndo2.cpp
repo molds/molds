@@ -3360,39 +3360,32 @@ void Cndo2::CalcOverlap(double** overlap, const Molecule& molecule) const{
 
 // First derivative of diatomic overlap integrals between AOs in space fixed flame.
 // The Overlap matrix is S_{\mu\nu} in (3.74) in J. A. Pople book.
-// Note that this methoc can not treat d-obitals 
+// Note that this method can not treat d-obitals 
 // because CalcRotatingMatrixFirstDerivatives can not treat d-orbitals.
 void Cndo2::CalcDiatomicOverlapFirstDerivative(double*** overlapFirstDeri, 
                                                const Atom& atomA, 
                                                const Atom& atomB) const{
-   double Cartesian[CartesianType_end] = {atomA.GetXyz()[XAxis] - atomB.GetXyz()[XAxis], 
+   double cartesian[CartesianType_end] = {atomA.GetXyz()[XAxis] - atomB.GetXyz()[XAxis], 
                                           atomA.GetXyz()[YAxis] - atomB.GetXyz()[YAxis],
                                           atomA.GetXyz()[ZAxis] - atomB.GetXyz()[ZAxis]};
-   double R = sqrt( pow(Cartesian[XAxis],2.0) + 
-                    pow(Cartesian[YAxis],2.0) + 
-                    pow(Cartesian[ZAxis],2.0) );
+   double R = sqrt( pow(cartesian[XAxis],2.0) + 
+                    pow(cartesian[YAxis],2.0) + 
+                    pow(cartesian[ZAxis],2.0) );
    
    double** diatomicOverlap = NULL;
+   double** diaOverlapFirstDeri = NULL;
    double** rotatingMatrix = NULL;
-   double** diaOverlapDeriR = NULL;
-   double*** rMatDeri = NULL;
+   double*** rotMatFirstDerivatives = NULL;
 
    try{
-      MallocerFreer::GetInstance()->Malloc<double>(&diatomicOverlap, 
-                                                   OrbitalType_end, 
-                                                   OrbitalType_end);
-      MallocerFreer::GetInstance()->Malloc<double>(&rotatingMatrix, 
-                                                   OrbitalType_end, 
-                                                   OrbitalType_end);
-      MallocerFreer::GetInstance()->Malloc<double>(&diaOverlapDeriR, OrbitalType_end, OrbitalType_end);
-      MallocerFreer::GetInstance()->Malloc<double>(&rMatDeri, 
-                                                   OrbitalType_end, 
-                                                   OrbitalType_end, 
-                                                   CartesianType_end);
+      this->MallocDiatomicOverlapFirstDeriTemps(&diatomicOverlap,
+                                                &diaOverlapFirstDeri,
+                                                &rotatingMatrix,
+                                                &rotMatFirstDerivatives);
       this->CalcDiatomicOverlapInDiatomicFrame(diatomicOverlap, atomA, atomB);
+      this->CalcDiatomicOverlapFirstDerivativeInDiatomicFrame(diaOverlapFirstDeri, atomA, atomB);
       this->CalcRotatingMatrix(rotatingMatrix, atomA, atomB);
-      this->CalcDiatomicOverlapFirstDerivativeInDiatomicFrame(diaOverlapDeriR, atomA, atomB);
-      this->CalcRotatingMatrixFirstDerivatives(rMatDeri, atomA, atomB);
+      this->CalcRotatingMatrixFirstDerivatives(rotMatFirstDerivatives, atomA, atomB);
 
       // rotate
       for(int i=0; i<OrbitalType_end; i++){
@@ -3407,13 +3400,13 @@ void Cndo2::CalcDiatomicOverlapFirstDerivative(double*** overlapFirstDeri,
                   for(int l=0; l<OrbitalType_end; l++){
                      temp1 += rotatingMatrix[i][k] 
                              *rotatingMatrix[j][l]
-                             *(Cartesian[c]/R)
-                             *diaOverlapDeriR[k][l];
-                     temp2 += rMatDeri[i][k][c] 
+                             *(cartesian[c]/R)
+                             *diaOverlapFirstDeri[k][l];
+                     temp2 += rotMatFirstDerivatives[i][k][c] 
                              *rotatingMatrix[j][l]
                              *diatomicOverlap[k][l];
                      temp3 += rotatingMatrix[i][k] 
-                             *rMatDeri[j][l][c]
+                             *rotMatFirstDerivatives[j][l][c]
                              *diatomicOverlap[k][l];
                   }
                }
@@ -3423,27 +3416,246 @@ void Cndo2::CalcDiatomicOverlapFirstDerivative(double*** overlapFirstDeri,
       }
    }
    catch(MolDSException ex){
-      this->FreeDiatomicOverlapDeriTemps(&diatomicOverlap,
-                                         &rotatingMatrix,
-                                         &diaOverlapDeriR,
-                                         &rMatDeri);
+      this->FreeDiatomicOverlapFirstDeriTemps(&diatomicOverlap,
+                                              &diaOverlapFirstDeri,
+                                              &rotatingMatrix,
+                                              &rotMatFirstDerivatives);
       throw ex;
    }
    // free
-   this->FreeDiatomicOverlapDeriTemps(&diatomicOverlap,
-                                      &rotatingMatrix,
-                                      &diaOverlapDeriR,
-                                      &rMatDeri);
+   this->FreeDiatomicOverlapFirstDeriTemps(&diatomicOverlap,
+                                           &diaOverlapFirstDeri,
+                                           &rotatingMatrix,
+                                           &rotMatFirstDerivatives);
 }
 
-void Cndo2::FreeDiatomicOverlapDeriTemps(double*** diatomicOverlap, 
-                                         double*** rotatingMatrix,
-                                         double*** diaOverlapDeriR,
-                                         double**** rMatDeri) const{
+// First derivative of diatomic overlap integrals between AOs in space fixed flame.
+// The Overlap matrix is S_{\mu\nu} in (3.74) in J. A. Pople book.
+// Note that this method can not treat d-obitals 
+// because CalcRotatingMatrixFirstDerivatives can not treat d-orbitals.
+void Cndo2::CalcDiatomicOverlapSecondDerivative(double**** overlapSecondDeri, 
+                                                const Atom& atomA, 
+                                                const Atom& atomB) const{
+   double cartesian[CartesianType_end] = {atomA.GetXyz()[XAxis] - atomB.GetXyz()[XAxis], 
+                                          atomA.GetXyz()[YAxis] - atomB.GetXyz()[YAxis],
+                                          atomA.GetXyz()[ZAxis] - atomB.GetXyz()[ZAxis]};
+   double R = sqrt( pow(cartesian[XAxis],2.0) + 
+                    pow(cartesian[YAxis],2.0) + 
+                    pow(cartesian[ZAxis],2.0) );
+   
+   double** diatomicOverlap = NULL;
+   double** diaOverlapFirstDeri = NULL;
+   double** diaOverlapSecondDeri = NULL;
+   double** rotatingMatrix = NULL;
+   double*** rotMatFirstDerivatives = NULL;
+   double**** rotMatSecondDerivatives = NULL;
+   double*** tempOverlapFirstDeri = NULL;
+   double**** tempOverlapSecondDeri = NULL;
+
+   try{
+      this->MallocDiatomicOverlapSecondDeriTemps(&diatomicOverlap,
+                                                 &diaOverlapFirstDeri,
+                                                 &diaOverlapSecondDeri,
+                                                 &rotatingMatrix,
+                                                 &rotMatFirstDerivatives,
+                                                 &rotMatSecondDerivatives,
+                                                 &tempOverlapFirstDeri,
+                                                 &tempOverlapSecondDeri);
+      this->CalcDiatomicOverlapInDiatomicFrame(diatomicOverlap, atomA, atomB);
+      this->CalcDiatomicOverlapFirstDerivativeInDiatomicFrame(diaOverlapFirstDeri, atomA, atomB);
+      this->CalcDiatomicOverlapSecondDerivativeInDiatomicFrame(diaOverlapSecondDeri, atomA, atomB);
+      this->CalcRotatingMatrix(rotatingMatrix, atomA, atomB);
+      this->CalcRotatingMatrixFirstDerivatives(rotMatFirstDerivatives, atomA, atomB);
+      this->CalcRotatingMatrixSecondDerivatives(rotMatSecondDerivatives, atomA, atomB);
+
+      // calculate each element of first derivatives
+      for(int i=0; i<OrbitalType_end; i++){
+         for(int j=0; j<OrbitalType_end; j++){
+            for(int dimA1=0; dimA1<CartesianType_end; dimA1++){
+               tempOverlapFirstDeri[i][j][dimA1] = (cartesian[dimA1]/R)*diaOverlapFirstDeri[i][j];
+            }
+         }
+      }
+
+      // calculate each element of second derivatives
+      for(int i=0; i<OrbitalType_end; i++){
+         for(int j=0; j<OrbitalType_end; j++){
+            for(int dimA1=0; dimA1<CartesianType_end; dimA1++){
+               for(int dimA2=dimA1; dimA2<CartesianType_end; dimA2++){
+                  tempOverlapSecondDeri[i][j][dimA1][dimA2] 
+                     = this->GetSecondDerivativeElementFromDistanceDerivatives(diaOverlapFirstDeri[i][j],
+                                                                               diaOverlapSecondDeri[i][j],
+                                                                               static_cast<CartesianType>(dimA1),
+                                                                               static_cast<CartesianType>(dimA2),
+                                                                               cartesian,
+                                                                               R);
+                  if(dimA1!=dimA2){
+                     tempOverlapSecondDeri[i][j][dimA2][dimA1] = tempOverlapSecondDeri[i][j][dimA1][dimA2];
+                  }
+
+               }
+            }
+         }
+      }
+
+      // rotate
+      for(int i=0; i<OrbitalType_end; i++){
+         for(int j=0; j<OrbitalType_end; j++){
+            for(int dimA1=0; dimA1<CartesianType_end; dimA1++){
+               for(int dimA2=dimA1; dimA2<CartesianType_end; dimA2++){
+                  overlapSecondDeri[i][j][dimA1][dimA2] = 0.0;
+               
+                  double temp1 = 0.0, temp2=0.0, temp3 = 0.0;
+                  double temp4 = 0.0, temp5=0.0, temp6 = 0.0;
+                  double temp7 = 0.0, temp8=0.0, temp9 = 0.0;
+                  for(int k=0; k<OrbitalType_end; k++){
+                     for(int l=0; l<OrbitalType_end; l++){
+              
+                        temp1 += rotMatSecondDerivatives[i][k][dimA1][dimA2]
+                                *rotatingMatrix[j][l]
+                                *diatomicOverlap[k][l];
+                        temp2 += rotatingMatrix[i][k]
+                                *rotMatSecondDerivatives[j][l][dimA1][dimA2]
+                                *diatomicOverlap[k][l];
+                        temp3 += rotatingMatrix[i][k]
+                                *rotatingMatrix[j][l]
+                                *tempOverlapSecondDeri[k][l][dimA1][dimA2];
+                        temp4 += rotMatFirstDerivatives[i][k][dimA1] 
+                                *rotMatFirstDerivatives[j][l][dimA2]
+                                *diatomicOverlap[k][l];
+                        temp5 += rotMatFirstDerivatives[i][k][dimA1] 
+                                *rotatingMatrix[j][l]
+                                *tempOverlapFirstDeri[k][l][dimA2];
+                        temp6 += rotMatFirstDerivatives[i][k][dimA2] 
+                                *rotMatFirstDerivatives[j][l][dimA1]
+                                *diatomicOverlap[k][l];
+                        temp7 += rotatingMatrix[i][k] 
+                                *rotMatFirstDerivatives[j][l][dimA1]
+                                *tempOverlapFirstDeri[k][l][dimA2];
+                        temp8 += rotMatFirstDerivatives[i][k][dimA2] 
+                                *rotatingMatrix[j][l]
+                                *tempOverlapFirstDeri[k][l][dimA1];
+                        temp9 += rotatingMatrix[i][k] 
+                                *rotMatFirstDerivatives[j][l][dimA2]
+                                *tempOverlapFirstDeri[k][l][dimA1];
+                     }
+                  }
+
+                  overlapSecondDeri[i][j][dimA1][dimA2] = temp1+temp2+temp3 
+                                                       +temp4+temp5+temp6 
+                                                       +temp7+temp8+temp9;
+                  overlapSecondDeri[i][j][dimA2][dimA1] = overlapSecondDeri[i][j][dimA1][dimA2];
+               }
+            }
+         }
+      }
+      
+   }
+   catch(MolDSException ex){
+      this->FreeDiatomicOverlapSecondDeriTemps(&diatomicOverlap,
+                                               &diaOverlapFirstDeri,
+                                               &diaOverlapSecondDeri,
+                                               &rotatingMatrix,
+                                               &rotMatFirstDerivatives,
+                                               &rotMatSecondDerivatives,
+                                               &tempOverlapFirstDeri,
+                                               &tempOverlapSecondDeri);
+      throw ex;
+   }
+   // free
+   this->FreeDiatomicOverlapSecondDeriTemps(&diatomicOverlap,
+                                            &diaOverlapFirstDeri,
+                                            &diaOverlapSecondDeri,
+                                            &rotatingMatrix,
+                                            &rotMatFirstDerivatives,
+                                            &rotMatSecondDerivatives,
+                                            &tempOverlapFirstDeri,
+                                            &tempOverlapSecondDeri);
+
+   for(int i=0; i<OrbitalType_end; i++){
+      for(int j=0; j<OrbitalType_end; j++){
+         for(int dimA1=0; dimA1<CartesianType_end; dimA1++){
+            for(int dimA2=0; dimA2<CartesianType_end; dimA2++){
+               printf("i=%d j=%d dimA1=%d dimA2=%d: %e\n",i,j,dimA1,dimA2,overlapSecondDeri[i][j][dimA1][dimA2]);
+            }
+         }
+      }
+   }
+}
+
+double Cndo2::GetSecondDerivativeElementFromDistanceDerivatives(double firstDistanceDeri,
+                                                                double secondDistanceDeri,
+                                                                CartesianType axisA1,
+                                                                CartesianType axisA2,
+                                                                double* cartesian,
+                                                                double Rab) const{
+   double value=0.0;               
+   if(axisA1 != axisA2){
+      value = -1.0*pow(Rab, -3.0)*firstDistanceDeri;
+      value += pow(Rab, -2.0)*secondDistanceDeri;
+      value *= cartesian[axisA1]*cartesian[axisA2];
+   }
+   else{
+      value = (pow(Rab,2.0) - pow(cartesian[axisA1],2.0))*pow(Rab, -3.0)*firstDistanceDeri;
+      value += pow(cartesian[axisA1]/Rab, 2.0)*secondDistanceDeri;
+   }
+   return value;
+}
+
+void Cndo2::MallocDiatomicOverlapFirstDeriTemps(double*** diatomicOverlap, 
+                                                double*** diaOverlapFirstDeri,
+                                                double*** rotatingMatrix,
+                                                double**** rotMatFirstDerivatives) const{
+   MallocerFreer::GetInstance()->Malloc<double>(diatomicOverlap, OrbitalType_end, OrbitalType_end);
+   MallocerFreer::GetInstance()->Malloc<double>(diaOverlapFirstDeri, OrbitalType_end, OrbitalType_end);
+   MallocerFreer::GetInstance()->Malloc<double>(rotatingMatrix, OrbitalType_end, OrbitalType_end);
+   MallocerFreer::GetInstance()->Malloc<double>(rotMatFirstDerivatives, OrbitalType_end, OrbitalType_end, CartesianType_end);
+}
+
+void Cndo2::MallocDiatomicOverlapSecondDeriTemps(double*** diatomicOverlap, 
+                                                 double*** diaOverlapFirstDeri,
+                                                 double*** diaOverlapSecondDeri,
+                                                 double*** rotatingMatrix,
+                                                 double**** rotMatFirstDerivatives,
+                                                 double***** rotMatSecondDerivatives,
+                                                 double**** tempOverlapFirstDeri,
+                                                 double***** tempOverlapSecondDeri) const{
+   MallocerFreer::GetInstance()->Malloc<double>(diatomicOverlap, OrbitalType_end, OrbitalType_end);
+   MallocerFreer::GetInstance()->Malloc<double>(diaOverlapFirstDeri, OrbitalType_end, OrbitalType_end);
+   MallocerFreer::GetInstance()->Malloc<double>(diaOverlapSecondDeri, OrbitalType_end, OrbitalType_end);
+   MallocerFreer::GetInstance()->Malloc<double>(rotatingMatrix, OrbitalType_end, OrbitalType_end);
+   MallocerFreer::GetInstance()->Malloc<double>(rotMatFirstDerivatives, OrbitalType_end, OrbitalType_end, CartesianType_end);
+   MallocerFreer::GetInstance()->Malloc<double>(rotMatSecondDerivatives, OrbitalType_end, OrbitalType_end, CartesianType_end, CartesianType_end);
+   MallocerFreer::GetInstance()->Malloc<double>(tempOverlapFirstDeri, OrbitalType_end, OrbitalType_end, CartesianType_end);
+   MallocerFreer::GetInstance()->Malloc<double>(tempOverlapSecondDeri, OrbitalType_end, OrbitalType_end, CartesianType_end, CartesianType_end);
+}
+
+void Cndo2::FreeDiatomicOverlapFirstDeriTemps(double*** diatomicOverlap, 
+                                              double*** diaOverlapFirstDeri,
+                                              double*** rotatingMatrix,
+                                              double**** rotMatFirstDerivatives) const{
    MallocerFreer::GetInstance()->Free<double>(diatomicOverlap, OrbitalType_end, OrbitalType_end);
+   MallocerFreer::GetInstance()->Free<double>(diaOverlapFirstDeri, OrbitalType_end, OrbitalType_end);
    MallocerFreer::GetInstance()->Free<double>(rotatingMatrix, OrbitalType_end, OrbitalType_end);
-   MallocerFreer::GetInstance()->Free<double>(diaOverlapDeriR, OrbitalType_end, OrbitalType_end);
-   MallocerFreer::GetInstance()->Free<double>(rMatDeri, OrbitalType_end, OrbitalType_end, CartesianType_end);
+   MallocerFreer::GetInstance()->Free<double>(rotMatFirstDerivatives, OrbitalType_end, OrbitalType_end, CartesianType_end);
+}
+
+void Cndo2::FreeDiatomicOverlapSecondDeriTemps(double*** diatomicOverlap, 
+                                               double*** diaOverlapFirstDeri,
+                                               double*** diaOverlapSecondDeri,
+                                               double*** rotatingMatrix,
+                                               double**** rotMatFirstDerivatives,
+                                               double***** rotMatSecondDerivatives,
+                                               double**** tempOverlapFirstDeri,
+                                               double***** tempOverlapSecondDeri) const{
+   MallocerFreer::GetInstance()->Free<double>(diatomicOverlap, OrbitalType_end, OrbitalType_end);
+   MallocerFreer::GetInstance()->Free<double>(diaOverlapFirstDeri, OrbitalType_end, OrbitalType_end);
+   MallocerFreer::GetInstance()->Free<double>(diaOverlapSecondDeri, OrbitalType_end, OrbitalType_end);
+   MallocerFreer::GetInstance()->Free<double>(rotatingMatrix, OrbitalType_end, OrbitalType_end);
+   MallocerFreer::GetInstance()->Free<double>(rotMatFirstDerivatives, OrbitalType_end, OrbitalType_end, CartesianType_end);
+   MallocerFreer::GetInstance()->Free<double>(rotMatSecondDerivatives, OrbitalType_end, OrbitalType_end, CartesianType_end, CartesianType_end);
+   MallocerFreer::GetInstance()->Free<double>(tempOverlapFirstDeri, OrbitalType_end, OrbitalType_end, CartesianType_end);
+   MallocerFreer::GetInstance()->Free<double>(tempOverlapSecondDeri, OrbitalType_end, OrbitalType_end, CartesianType_end, CartesianType_end);
 }
 
 // calculate Overlap matrix. E.g. S_{\mu\nu} in (3.74) in J. A. Pople book by GTO expansion.
@@ -4567,12 +4779,12 @@ void Cndo2::CalcRotatingMatrix(double** rotatingMatrix,
 // This method can not calculate d-orbital yet.
 // For rotating matirxi, see J. Mol. Struc. (Theochem), 419, 19 (1997) (ref. [BFB_1997])
 // we set gamma=0 always.
-void Cndo2::CalcRotatingMatrixFirstDerivatives(double*** rMatFirstDeri, 
+void Cndo2::CalcRotatingMatrixFirstDerivatives(double*** rotMatFirstDerivatives, 
                                                const Atom& atomA, 
                                                const Atom& atomB) const{
 
    MallocerFreer::GetInstance()->Initialize<double>(
-                                 rMatFirstDeri,  
+                                 rotMatFirstDerivatives,  
                                  OrbitalType_end, 
                                  OrbitalType_end,
                                  CartesianType_end);
@@ -4584,52 +4796,203 @@ void Cndo2::CalcRotatingMatrixFirstDerivatives(double*** rMatFirstDeri,
    double R = sqrt( pow(x,2.0) + pow(y,2.0) + pow(z,2.0) );
 
    // for s-function
-   rMatFirstDeri[s][s][XAxis] = 0.0;
-   rMatFirstDeri[s][s][YAxis] = 0.0;
-   rMatFirstDeri[s][s][ZAxis] = 0.0;
+   rotMatFirstDerivatives[s][s][XAxis] = 0.0;
+   rotMatFirstDerivatives[s][s][YAxis] = 0.0;
+   rotMatFirstDerivatives[s][s][ZAxis] = 0.0;
 
    // for p-function
-   rMatFirstDeri[py][py][XAxis] = -1.0/r + pow(x,2.0)/pow(r,3.0);
-   rMatFirstDeri[py][pz][XAxis] = x*y/pow(R,3.0);
-   rMatFirstDeri[py][px][XAxis] = (1.0/(pow(r,3.0)*R) + 1.0/(pow(R,3.0)*r))*x*y*z;
+   rotMatFirstDerivatives[py][py][XAxis] = -1.0/r + pow(x,2.0)/pow(r,3.0);
+   rotMatFirstDerivatives[py][pz][XAxis] = x*y/pow(R,3.0);
+   rotMatFirstDerivatives[py][px][XAxis] = (1.0/(pow(r,3.0)*R) + 1.0/(pow(R,3.0)*r))*x*y*z;
 
-   rMatFirstDeri[pz][py][XAxis] = 0.0;
-   rMatFirstDeri[pz][pz][XAxis] = x*z/pow(R,3.0);
-   rMatFirstDeri[pz][px][XAxis] = x/(r*R) - x*r/pow(R,3.0);
+   rotMatFirstDerivatives[pz][py][XAxis] = 0.0;
+   rotMatFirstDerivatives[pz][pz][XAxis] = x*z/pow(R,3.0);
+   rotMatFirstDerivatives[pz][px][XAxis] = x/(r*R) - x*r/pow(R,3.0);
 
-   rMatFirstDeri[px][py][XAxis] = -1.0*x*y/pow(r,3.0);
-   rMatFirstDeri[px][pz][XAxis] = -1.0/R + x*x/pow(R,3.0); 
-   rMatFirstDeri[px][px][XAxis] = -1.0*z/(r*R) + 
+   rotMatFirstDerivatives[px][py][XAxis] = -1.0*x*y/pow(r,3.0);
+   rotMatFirstDerivatives[px][pz][XAxis] = -1.0/R + x*x/pow(R,3.0); 
+   rotMatFirstDerivatives[px][px][XAxis] = -1.0*z/(r*R) + 
                                   (1.0/(pow(r,3.0)*R) + 1.0/(pow(R,3.0)*r))*x*x*z;
 
-   rMatFirstDeri[py][py][YAxis] = x*y/pow(r,3.0);
-   rMatFirstDeri[py][pz][YAxis] = -1.0/R + y*y/pow(R,3.0);
-   rMatFirstDeri[py][px][YAxis] = -1.0*z/(r*R) +
+   rotMatFirstDerivatives[py][py][YAxis] = x*y/pow(r,3.0);
+   rotMatFirstDerivatives[py][pz][YAxis] = -1.0/R + y*y/pow(R,3.0);
+   rotMatFirstDerivatives[py][px][YAxis] = -1.0*z/(r*R) +
                                   (1.0/(pow(r,3.0)*R) + 1.0/(pow(R,3.0)*r))*y*y*z;
 
-   rMatFirstDeri[pz][py][YAxis] = 0.0;
-   rMatFirstDeri[pz][pz][YAxis] = y*z/pow(R,3.0); 
-   rMatFirstDeri[pz][px][YAxis] = y/(r*R) - y*r/pow(R,3.0);
+   rotMatFirstDerivatives[pz][py][YAxis] = 0.0;
+   rotMatFirstDerivatives[pz][pz][YAxis] = y*z/pow(R,3.0); 
+   rotMatFirstDerivatives[pz][px][YAxis] = y/(r*R) - y*r/pow(R,3.0);
 
-   rMatFirstDeri[px][py][YAxis] = 1.0/r - y*y/pow(r,3.0);
-   rMatFirstDeri[px][pz][YAxis] = x*y/pow(R,3.0);
-   rMatFirstDeri[px][px][YAxis] = (1.0/(pow(r,3.0)*R) + 1.0/(pow(R,3.0)*r))*x*y*z;
+   rotMatFirstDerivatives[px][py][YAxis] = 1.0/r - y*y/pow(r,3.0);
+   rotMatFirstDerivatives[px][pz][YAxis] = x*y/pow(R,3.0);
+   rotMatFirstDerivatives[px][px][YAxis] = (1.0/(pow(r,3.0)*R) + 1.0/(pow(R,3.0)*r))*x*y*z;
 
-   rMatFirstDeri[py][py][ZAxis] = 0.0;
-   rMatFirstDeri[py][pz][ZAxis] = y*z/pow(R,3.0);
-   rMatFirstDeri[py][px][ZAxis] = -1.0*y/(r*R) + y*z*z/(r*pow(R,3.0));
+   rotMatFirstDerivatives[py][py][ZAxis] = 0.0;
+   rotMatFirstDerivatives[py][pz][ZAxis] = y*z/pow(R,3.0);
+   rotMatFirstDerivatives[py][px][ZAxis] = -1.0*y/(r*R) + y*z*z/(r*pow(R,3.0));
 
-   rMatFirstDeri[pz][py][ZAxis] = 0.0;
-   rMatFirstDeri[pz][pz][ZAxis] = -1.0/R + z*z/pow(R,3.0); 
-   rMatFirstDeri[pz][px][ZAxis] = -1.0*z*r/pow(R,3.0);
+   rotMatFirstDerivatives[pz][py][ZAxis] = 0.0;
+   rotMatFirstDerivatives[pz][pz][ZAxis] = -1.0/R + z*z/pow(R,3.0); 
+   rotMatFirstDerivatives[pz][px][ZAxis] = -1.0*z*r/pow(R,3.0);
 
-   rMatFirstDeri[px][py][ZAxis] = 0.0;
-   rMatFirstDeri[px][pz][ZAxis] = x*z/pow(R,3.0);
-   rMatFirstDeri[px][px][ZAxis] = -1.0*x/(r*R) + x*z*z/(r*pow(R,3.0));
+   rotMatFirstDerivatives[px][py][ZAxis] = 0.0;
+   rotMatFirstDerivatives[px][pz][ZAxis] = x*z/pow(R,3.0);
+   rotMatFirstDerivatives[px][px][ZAxis] = -1.0*x/(r*R) + x*z*z/(r*pow(R,3.0));
 
    // for d-function
    // ToDo: First derivative of rotating matrix for d-orbital...
 
+}
+
+// Second derivative of rotating matirx. 
+// Both derivatives are related to a coordinate of atom A.
+// This method can not calculate d-orbital yet.
+// For rotating matirxi, see J. Mol. Struc. (Theochem), 419, 19 (1997) (ref. [BFB_1997])
+// we set gamma=0 always.
+void Cndo2::CalcRotatingMatrixSecondDerivatives(double**** rotMatSecondDerivatives, 
+                                                const Atom& atomA, 
+                                                const Atom& atomB) const{
+
+   MallocerFreer::GetInstance()->Initialize<double>(
+                                 rotMatSecondDerivatives,  
+                                 OrbitalType_end, 
+                                 OrbitalType_end,
+                                 CartesianType_end,
+                                 CartesianType_end);
+
+   double x = atomB.GetXyz()[0] - atomA.GetXyz()[0];
+   double y = atomB.GetXyz()[1] - atomA.GetXyz()[1];
+   double z = atomB.GetXyz()[2] - atomA.GetXyz()[2];
+   double r = sqrt( pow(x,2.0) + pow(y,2.0) );
+   double R = sqrt( pow(x,2.0) + pow(y,2.0) + pow(z,2.0) );
+
+   // for s-function
+   rotMatSecondDerivatives[s][s][XAxis][XAxis] = 0.0;
+   rotMatSecondDerivatives[s][s][XAxis][YAxis] = 0.0;
+   rotMatSecondDerivatives[s][s][XAxis][ZAxis] = 0.0;
+   rotMatSecondDerivatives[s][s][YAxis][XAxis] = 0.0;
+   rotMatSecondDerivatives[s][s][YAxis][YAxis] = 0.0;
+   rotMatSecondDerivatives[s][s][YAxis][ZAxis] = 0.0;
+   rotMatSecondDerivatives[s][s][ZAxis][XAxis] = 0.0;
+   rotMatSecondDerivatives[s][s][ZAxis][YAxis] = 0.0;
+   rotMatSecondDerivatives[s][s][ZAxis][ZAxis] = 0.0;
+
+   // for p-function, xx-derivatives
+   rotMatSecondDerivatives[py][py][XAxis][XAxis] = -3.0*x*pow(r,-3.0) + 3.0*pow(x,3.0)*pow(r,-5.0);
+   rotMatSecondDerivatives[py][pz][XAxis][XAxis] = -1.0*y*pow(R,-3.0) + 3.0*pow(x,2.0)*y*pow(R,-5.0);
+   rotMatSecondDerivatives[py][px][XAxis][XAxis] = -1.0*(1.0/(pow(r,3.0)*R) + 1.0/(r*pow(R,3.0)))*y*z
+                                                   +(2.0*pow(r*R,-3.0) + 3.0/(pow(r,5.0)*R) + 3.0/(r*pow(R,5.0)))*pow(x,2.0)*y*z;
+                                                
+   rotMatSecondDerivatives[pz][py][XAxis][XAxis] = 0.0;
+   rotMatSecondDerivatives[pz][pz][XAxis][XAxis] = -1.0*z*pow(R,-3.0) + 3.0*pow(x,2.0)*z*pow(R,-5.0);
+   rotMatSecondDerivatives[pz][px][XAxis][XAxis] = -1.0*pow(r*R,-1.0) + (1.0/(pow(r,3.0)*R) + 1.0/(r*pow(R,3.0)))*pow(x,2.0)
+                                                   +r*pow(R,-3.0) - 3.0*pow(x,2.0)*r*pow(R,-5.0) + pow(x,2.0)*pow(r,-1.0)*pow(R,-3.0);
+                                                
+   rotMatSecondDerivatives[px][py][XAxis][XAxis] = y*pow(r,-3.0) - 3.0*pow(x,2.0)*y*pow(r,-5.0);
+   rotMatSecondDerivatives[px][pz][XAxis][XAxis] = -3.0*x*pow(R,-3.0) + 3.0*pow(x,3.0)*pow(R,-5.0);
+   rotMatSecondDerivatives[px][px][XAxis][XAxis] = -3.0*(1.0/(pow(r,3.0)*R) + 1.0/(r*pow(R,3.0)))*x*z
+                                                   +(2.0*pow(r*R,-3.0) + 3.0/(pow(r,5.0)*R) + 3.0/(r*pow(R,5.0)))*pow(x,3.0)*z;
+
+   // for p-function, xy-derivatives
+   rotMatSecondDerivatives[py][py][XAxis][YAxis] = -1.0*y*pow(r,-3.0) + 3.0*pow(x,2.0)*y*pow(r,-5.0);
+   rotMatSecondDerivatives[py][pz][XAxis][YAxis] = -1.0*x*pow(R,-3.0) + 3.0*x*pow(y,2.0)*pow(R,-5.0);  
+   rotMatSecondDerivatives[py][px][XAxis][YAxis] = -1.0*(1.0/(pow(r,3.0)*R) + 1.0/(r*pow(R,3.0)))*x*z
+                                                   +(2.0*pow(r*R,-3.0) + 3.0/(pow(r,5.0)*R) + 3.0/(r*pow(R,5.0)))*x*pow(y,2.0)*z;
+                                                
+   rotMatSecondDerivatives[pz][py][XAxis][YAxis] = 0.0;
+   rotMatSecondDerivatives[pz][pz][XAxis][YAxis] = 3.0*x*y*z*pow(R,-5.0);
+   rotMatSecondDerivatives[pz][px][XAxis][YAxis] = (1.0/(pow(r,3.0)*R) + 1.0/(r*pow(R,3.0)))*x*y + x*y*pow(r,-1.0)*pow(R,-3.0) - 3.0*x*y*r*pow(R,-5.0);
+                                                
+   rotMatSecondDerivatives[px][py][XAxis][YAxis] = x*pow(r,-3.0) - 3.0*x*pow(y,2.0)*pow(R,-5.0);
+   rotMatSecondDerivatives[px][pz][XAxis][YAxis] = rotMatSecondDerivatives[py][pz][XAxis][XAxis];
+   rotMatSecondDerivatives[px][px][XAxis][YAxis] = rotMatSecondDerivatives[py][px][XAxis][XAxis];
+
+   // for p-function, yx-derivatives
+   for(int i=py; i<=px; i++){
+      for(int j=py; j<=px; j++){
+         rotMatSecondDerivatives[i][j][YAxis][XAxis] = rotMatSecondDerivatives[i][j][XAxis][YAxis];
+      }
+   }
+
+   // for p-function, xz-derivatives
+   rotMatSecondDerivatives[py][py][XAxis][ZAxis] = 0.0;
+   rotMatSecondDerivatives[py][pz][XAxis][ZAxis] = rotMatSecondDerivatives[pz][pz][XAxis][YAxis];
+   rotMatSecondDerivatives[py][px][XAxis][ZAxis] = -1.0*(1.0/(pow(r,3.0)*R) + 1.0/(r*pow(R,3.0)))*x*y 
+                                                   +(pow(r*R,-3.0) + 3.0/(r*pow(R,5.0)))*x*y*pow(z,2.0);
+                                                
+   rotMatSecondDerivatives[pz][py][XAxis][ZAxis] = 0.0;
+   rotMatSecondDerivatives[pz][pz][XAxis][ZAxis] = -1.0*x*pow(R,-3.0) + 3.0*x*pow(z,2.0)*pow(R,-5.0); 
+   rotMatSecondDerivatives[pz][px][XAxis][ZAxis] = x*z*pow(r,-1.0)*pow(R,-3.0) - 3.0*x*z*r*pow(R,-5.0);
+                                                
+   rotMatSecondDerivatives[px][py][XAxis][ZAxis] = 0.0;
+   rotMatSecondDerivatives[px][pz][XAxis][ZAxis] = rotMatSecondDerivatives[pz][pz][XAxis][XAxis];
+   rotMatSecondDerivatives[px][px][XAxis][ZAxis] = pow(r*R,-1.0) - pow(z,2.0)*pow(r,-1.0)*pow(R,-3.0)
+                                                   -1.0*(1.0/(pow(r,3.0)*R) + 1.0/(r*pow(R,3.0)))*pow(x,2.0)
+                                                   +(pow(r*R,-3.0) + 3.0/(r*pow(R,5.0)))*pow(x*z,2.0);
+
+
+   // for p-function, zx-derivatives
+   for(int i=py; i<=px; i++){
+      for(int j=py; j<=px; j++){
+         rotMatSecondDerivatives[i][j][ZAxis][XAxis] = rotMatSecondDerivatives[i][j][XAxis][ZAxis];
+      }
+   }
+
+   // for p-function, yy-derivatives
+   rotMatSecondDerivatives[py][py][YAxis][YAxis] = -1.0*x*pow(r,-3.0) + 3.0*x*pow(y,2.0)*pow(r,-5.0); 
+   rotMatSecondDerivatives[py][pz][YAxis][YAxis] = -3.0*y*pow(R,-3.0) + 3.0*pow(y,3.0)*pow(R,-5.0);
+   rotMatSecondDerivatives[py][px][YAxis][YAxis] = -3.0*(1.0/(pow(r,3.0)*R) + 1.0/(r*pow(R,3.0)))*y*z
+                                                   +(2.0*pow(r*R,-3.0) + 3.0/(pow(r,5.0)*R) + 3.0/(r*pow(R,5.0)))*pow(y,3.0)*z;
+                                                
+   rotMatSecondDerivatives[pz][py][YAxis][YAxis] = 0.0;
+   rotMatSecondDerivatives[pz][pz][YAxis][YAxis] = -1.0*z*pow(R,-3.0) + 3.0*pow(y,2.0)*z*pow(R,-5.0);
+   rotMatSecondDerivatives[pz][px][YAxis][YAxis] = -1.0*pow(r*R,-1.0) + (1.0/(pow(r,3.0)*R) + 1.0/(r*pow(R,3.0)))*pow(y,2.0)
+                                                   +r*pow(R,-3.0) - 3.0*pow(y,2.0)*r*pow(R,-5.0) + pow(y,2.0)*pow(r,-1.0)*pow(R,-3.0);
+                                                
+   rotMatSecondDerivatives[px][py][YAxis][YAxis] = 3.0*y*pow(r,-3.0) - 3.0*pow(y,3.0)*pow(r,-5.0);
+   rotMatSecondDerivatives[px][pz][YAxis][YAxis] = rotMatSecondDerivatives[py][pz][XAxis][YAxis];
+   rotMatSecondDerivatives[px][px][YAxis][YAxis] = -1.0*(1.0/(pow(r,3.0)*R) + 1.0/(r*pow(R,3.0)))*x*z
+                                                   +(2.0*pow(r*R,-3.0) + 3.0/(pow(r,5.0)*R) + 3.0/(r*pow(R,5.0)))*x*pow(y,2.0)*z;
+               
+   // for p-function, yz-derivatives
+   rotMatSecondDerivatives[py][py][YAxis][ZAxis] = 0.0;
+   rotMatSecondDerivatives[py][pz][YAxis][ZAxis] = rotMatSecondDerivatives[pz][pz][YAxis][YAxis];
+   rotMatSecondDerivatives[py][px][YAxis][ZAxis] = pow(r*R,-1.0) - pow(z,2.0)*pow(r,-1.0)*pow(R,-3.0)
+                                                   -1.0*(1.0/(pow(r,3.0)*R) + 1.0/(r*pow(R,3.0)))*pow(y,2.0)
+                                                   +(pow(r*R,-3.0) + 3.0/(r*pow(R,5.0)))*pow(y*z,2.0);
+                                                
+   rotMatSecondDerivatives[pz][py][YAxis][ZAxis] = 0.0;
+   rotMatSecondDerivatives[pz][pz][YAxis][ZAxis] = -1.0*y*pow(R,-3.0) + 3.0*y*pow(z,2.0)*pow(R,-5.0);
+   rotMatSecondDerivatives[pz][px][YAxis][ZAxis] = y*z*pow(r,-1.0)*pow(R,-3.0) - 3.0*y*z*r*pow(R,-5.0);
+                                                
+   rotMatSecondDerivatives[px][py][YAxis][ZAxis] = 0.0;
+   rotMatSecondDerivatives[px][pz][YAxis][ZAxis] = rotMatSecondDerivatives[pz][pz][XAxis][YAxis];
+   rotMatSecondDerivatives[px][px][YAxis][ZAxis] = -1.0*(1.0/(pow(r,3.0)*R) + 1.0/(r*pow(R,3.0)))*x*y
+                                                   +(pow(r*R,-3.0) + 3.0/(r*pow(R,5.0)))*x*y*pow(z,2.0);
+                                          
+               
+   // for p-function, zy-derivatives
+   for(int i=py; i<=px; i++){
+      for(int j=py; j<=px; j++){
+         rotMatSecondDerivatives[i][j][ZAxis][YAxis] = rotMatSecondDerivatives[i][j][YAxis][ZAxis];
+      }
+   }
+
+   // for p-function, zz-derivatives
+   rotMatSecondDerivatives[py][py][ZAxis][ZAxis] = 0.0;
+   rotMatSecondDerivatives[py][pz][ZAxis][ZAxis] = rotMatSecondDerivatives[pz][pz][YAxis][ZAxis];
+   rotMatSecondDerivatives[py][px][ZAxis][ZAxis] = -3.0*y*z*pow(r,-1.0)*pow(R,-3.0) + 3.0*y*pow(z,3.0)*pow(r,-1.0)*pow(R,-5.0);
+                                                
+   rotMatSecondDerivatives[pz][py][ZAxis][ZAxis] = 0.0;
+   rotMatSecondDerivatives[pz][pz][ZAxis][ZAxis] = -3.0*z*pow(R,-3.0) + 3.0*pow(z,3.0)*pow(R,-5.0); 
+   rotMatSecondDerivatives[pz][px][ZAxis][ZAxis] = -3.0*pow(z,2.0)*r*pow(R,-5.0) + r*pow(R,-3.0);
+                                                
+   rotMatSecondDerivatives[px][py][ZAxis][ZAxis] = 0.0;
+   rotMatSecondDerivatives[px][pz][ZAxis][ZAxis] = rotMatSecondDerivatives[pz][pz][XAxis][ZAxis];
+   rotMatSecondDerivatives[px][px][ZAxis][ZAxis] = -3.0*x*z*pow(r,-1.0)*pow(R,-3.0) + 3.0*x*pow(z,3.0)*pow(r,-1.0)*pow(R,-5.0);
+
+   // for d-function
+   // ToDo: Second derivative of rotating matrix for d-orbital...
 }
 
 // see (B.40) in J. A. Pople book.

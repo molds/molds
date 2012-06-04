@@ -81,10 +81,14 @@ void Pm3::SetMessages(){
       = "Error in pm3:: Pm3::GetSemiEmpiricalMultipoleInteraction: Bad multipole combintaion is set\n";
    this->errorMessageGetSemiEmpiricalMultipoleInteractionFirstDeriBadMultipoles
       = "Error in pm3:: Pm3::GetSemiEmpiricalMultipoleInteractionFirstDerivative: Bad multipole combintaion is set\n";
+   this->errorMessageGetSemiEmpiricalMultipoleInteractionSecondDeriBadMultipoles
+      = "Error in pm3:: Pm3::GetSemiEmpiricalMultipoleInteractionSecondDerivative: Bad multipole combintaion is set\n";
    this->errorMessageGetNddoRepulsionIntegral 
       = "Error in pm3::Pm3::GetNddoRepulsionIntegral: Bad orbital is set.\n";
    this->errorMessageGetNddoRepulsionIntegralFirstDerivative 
       = "Error in pm3::Pm3::GetNddoRepulsionIntegralFirstDerivative: Bad orbital is set.\n";
+   this->errorMessageGetNddoRepulsionIntegralSecondDerivative 
+      = "Error in pm3::Pm3::GetNddoRepulsionIntegralSecondDerivative: Bad orbital is set.\n";
    this->errorMessageCalcTwoElecTwoCoreNullMatrix 
       = "Error in pm3::Pm3::CalcTwoElecTwoCore: The two elec two core matrix is NULL.\n"; 
    this->errorMessageCalcTwoElecTwoCoreDiatomicNullMatrix 
