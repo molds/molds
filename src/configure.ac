@@ -12,12 +12,6 @@ AM_INIT_AUTOMAKE([MolDS], [0.1])
 AC_CONFIG_SRCDIR([Main.cpp])
 AC_CONFIG_HEADERS([config.h])
 
-# Checks for programs.
-AC_PROG_CXX([icpc g++])
-
-# Use C++
-AC_LANG_PUSH([C++])
-
 # Setup CXXFLAGS
 AC_MSG_CHECKING([release mode])
 AC_ARG_ENABLE([release],
@@ -32,6 +26,12 @@ AS_IF([test -z "$CXXFLAGS"],
 			[AS_IF([test "$release_enabled" = "yes"],
 						 [export CXXFLAGS="-O2"],
 						 [export CXXFLAGS="-g -O0"])])
+
+# Checks for programs.
+AC_PROG_CXX([icpc g++])
+
+# Use C++
+AC_LANG_PUSH([C++])
 
 #Check for pthread
 AC_CHECK_LIB([pthread], [main])
