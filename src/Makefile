@@ -21,10 +21,9 @@
 
 all: MolDS.out
 
-build:
-	mkdir build
 
-build/Makefile: build
+build/Makefile:
+	mkdir -p build
 	cd build; \
 	../configure $(CONFIGURE_OPTIONS)
 
