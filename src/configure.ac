@@ -5,20 +5,36 @@ AC_PREREQ([2.59])
 AC_INIT([MolDS], [0.1], [molds-dev@lists.sourceforge.jp])
 
 # Check if pwd is source directory
-[ if [ -x ./configure ]; then ]
-AC_MSG_FAILURE([Don't execute configure script in source directory!])
-[ fi ]
+AS_IF([test -x ./configure],
+			AC_MSG_FAILURE([Don't execute configure script in source directory!]))
 
 AM_INIT_AUTOMAKE([MolDS], [0.1])
 AC_CONFIG_SRCDIR([Main.cpp])
 AC_CONFIG_HEADERS([config.h])
 
 # Setup CXXFLAGS
-[
- if [ -z "$CXXFLAGS" ]; then
-	 export CXXFLAGS="-g -O0"
- fi
- ]
+AC_MSG_CHECKING([release mode])
+AC_ARG_ENABLE([release],
+							AS_HELP_STRING([--enable-release],
+														 [Enable optimize option and disable debug option])
+							,[AS_IF([test "$enableval" = "no"],
+											[export release_enabled=no],
+											[export release_enabled=yes])]
+							,[export release_enabled=no])
+AC_MSG_RESULT([$release_enabled])
+AS_IF([test -z "$CXXFLAGS"],
+			[AS_IF([test "$release_enabled" = "yes"],
+						 [export CXXFLAGS="-O2"],
+						 [export CXXFLAGS="-g -O0"
+							AS_IF([test 
+							# OpenMP debug options
+							export CXXFLAGS_SAVED="$CXXFLAGS_SAVED"
+							export CXXFLAGS="$CXXFLAGS -openmp-report2"
+							AC_MSG_CHECKING([for openmp diagnosis option])
+							AC_COMPILE_IFELSE([int main(){return 0;}],
+																[AC_MSG_RESULT([-openmp-report2])],
+																[AC_MSG_RESULT([no])
+																export CXXFLAGS="$CXXFLAGS_SAVED"])])])
 
 # Checks for programs.
 AC_PROG_CXX([icpc g++])
@@ -39,17 +55,7 @@ AC_CHECK_LIB([iomp5], [omp_set_num_threads],,[
 														])
 							])
 AC_CHECK_FUNC([omp_get_wtime],,
-							[AC_MSG_FAILURE([Cannot find omp_get_wtime!])
-							])
-# OpenMP debug options
-export CXXFLAGS_SAVED="$CXXFLAGS_SAVED"
-export CXXFLAGS="$CXXFLAGS -openmp-report2"
-AC_MSG_CHECKING([for openmp diagnosis option])
-AC_COMPILE_IFELSE(
-									[int main(){return 0;}],
-									[AC_MSG_RESULT([-openmp-report2])],
-									[AC_MSG_RESULT([no])
-									export CXXFLAGS="$CXXFLAGS_SAVED"])
+							[AC_MSG_FAILURE([Cannot find omp_get_wtime!])])
 
 # Check for mkl
 export LIBS="-lmkl_intel_thread -lmkl_core $LIBS"
