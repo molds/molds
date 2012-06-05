@@ -29,7 +29,7 @@ build/Makefile: build
 	../configure $(CONFIGURE_OPTIONS)
 
 build/MolDS: build/Makefile
-	make -C build
+	+make -C build
 
 MolDS.out: build/MolDS
 	cp $< $@
