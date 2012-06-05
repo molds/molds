@@ -34,7 +34,7 @@ AS_IF([test -z "$CXXFLAGS"],
 							AC_COMPILE_IFELSE([int main(){return 0;}],
 																[AC_MSG_RESULT([-openmp-report2])],
 																[AC_MSG_RESULT([no])
-																export CXXFLAGS="$CXXFLAGS_SAVED"])])])
+																export CXXFLAGS="$CXXFLAGS_SAVED"])])])])
 
 # Checks for programs.
 AC_PROG_CXX([icpc g++])
