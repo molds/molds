@@ -31,7 +31,7 @@ AS_IF([test -z "$CXXFLAGS"],
 							export CXXFLAGS_SAVED="$CXXFLAGS_SAVED"
 							export CXXFLAGS="$CXXFLAGS -openmp-report2"
 							AC_MSG_CHECKING([for openmp diagnosis option])
-							AC_COMPILE_IFELSE([int main(){return 0;}],
+							AC_COMPILE_IFELSE([AC_LANG_SOURCE([int main(){return 0;}])],
 																[AC_MSG_RESULT([-openmp-report2])],
 																[AC_MSG_RESULT([no])
 																export CXXFLAGS="$CXXFLAGS_SAVED"])])])])
