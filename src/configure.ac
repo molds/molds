@@ -54,7 +54,7 @@ AC_COMPILE_IFELSE(
 # Check for mkl
 export LIBS="-lmkl_intel_thread -lmkl_core $LIBS"
 AC_CHECK_HEADERS([mkl.h])
-AC_CHECK_LIB([mkl_intel_lp64], [main],,
+AC_CHECK_LIB([mkl_intel_lp64], [dsyevd],,
 						 [
 							AC_CHECK_LIB([mkl_intel], [main],,
 													 [AC_MSG_FAILURE([Cannot find mkl!])
