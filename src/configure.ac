@@ -12,6 +12,12 @@ AM_INIT_AUTOMAKE([MolDS], [0.1])
 AC_CONFIG_SRCDIR([Main.cpp])
 AC_CONFIG_HEADERS([config.h])
 
+# Checks for programs.
+AC_PROG_CXX([icpc g++])
+
+# Use C++
+AC_LANG_PUSH([C++])
+
 # Setup CXXFLAGS
 AC_MSG_CHECKING([release mode])
 AC_ARG_ENABLE([release],
@@ -25,22 +31,7 @@ AC_MSG_RESULT([$release_enabled])
 AS_IF([test -z "$CXXFLAGS"],
 			[AS_IF([test "$release_enabled" = "yes"],
 						 [export CXXFLAGS="-O2"],
-						 [export CXXFLAGS="-g -O0"
-							AS_IF([test 
-							# OpenMP debug options
-							export CXXFLAGS_SAVED="$CXXFLAGS_SAVED"
-							export CXXFLAGS="$CXXFLAGS -openmp-report2"
-							AC_MSG_CHECKING([for openmp diagnosis option])
-							AC_COMPILE_IFELSE([AC_LANG_SOURCE([int main(){return 0;}])],
-																[AC_MSG_RESULT([-openmp-report2])],
-																[AC_MSG_RESULT([no])
-																export CXXFLAGS="$CXXFLAGS_SAVED"])])])])
-
-# Checks for programs.
-AC_PROG_CXX([icpc g++])
-
-# Use C++
-AC_LANG_PUSH([C++])
+						 [export CXXFLAGS="-g -O0"])])
 
 #Check for pthread
 AC_CHECK_LIB([pthread], [main])
@@ -56,6 +47,20 @@ AC_CHECK_LIB([iomp5], [omp_set_num_threads],,[
 							])
 AC_CHECK_FUNC([omp_get_wtime],,
 							[AC_MSG_FAILURE([Cannot find omp_get_wtime!])])
+
+# OpenMP debug options
+AS_IF([test "$release_enabled" = "no" ],
+			[export CXXFLAGS_SAVED="$CXXFLAGS_SAVED"
+			 export CXXFLAGS="$CXXFLAGS -openmp-report2"
+			 AC_MSG_CHECKING([for openmp diagnosis option])
+			 AC_COMPILE_IFELSE([AC_LANG_SOURCE([int main(){return 0;}])],
+			 [AS_IF([test -f penmp-report2],
+							[rm penmp-report2
+							 AC_MSG_RESULT([no])
+							 export CXXFLAGS="$CXXFLAGS_SAVED"],
+							 [AC_MSG_RESULT([-openmp-report2])])]
+			 ,[AC_MSG_RESULT([no])
+			 export CXXFLAGS="$CXXFLAGS_SAVED"])])
 
 # Check for mkl
 export LIBS="-lmkl_intel_thread -lmkl_core $LIBS"
