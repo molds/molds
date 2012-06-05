@@ -27,7 +27,7 @@ build/Makefile:
 	cd build; \
 	../configure $(CONFIGURE_OPTIONS)
 
-build/MolDS: build/Makefile
+build/MolDS: build/Makefile $(wildcard *.cpp) $(wildcard */*.cpp) $(wildcard */*.h)
 	+make -C build
 
 MolDS.out: build/MolDS
