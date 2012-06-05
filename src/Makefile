@@ -17,10 +17,9 @@
 #// along with MolDS.  If not, see <http://www.gnu.org/licenses/>.         // 
 #//************************************************************************//
 
-.PHONY: all 
+.PHONY: all clean
 
 all: MolDS.out
-
 
 build/Makefile:
 	mkdir -p build
@@ -32,3 +31,6 @@ build/MolDS: build/Makefile $(wildcard *.cpp) $(wildcard */*.cpp) $(wildcard */*
 
 MolDS.out: build/MolDS
 	cp $< $@
+
+clean:
+	rm -rf build
