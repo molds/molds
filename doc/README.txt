@@ -20,34 +20,43 @@
 
 ==============================================================================
 REQUIREMENTS:
-   MolDS requires intel-c++-compliler(icpc), mkl, and boost-libraries.
-   GNU c++-compiler is not supported for MolDS.
-   To get the boost-libraries, see the HP of the boost: http://www.boost.org/
+   MolDS requires c/c++ compiler of Intel (icpc) or GNU (g++) and boost-libraries. 
+   Valid versions of these compiler are icpc 11.0, g++ 4.4, or later because the
+   MolDS is implemented with openMP 3.0. To compile MolDS with g++, furthermore, 
+   openBLAS is also required. The default compiler is set as icpc. 
+
+   To get the boost-libraries, see the HP: http://www.boost.org/
+   To get the openBLAS-libraries, see the HP: http://xianyi.github.com/OpenBLAS/
 
 ==============================================================================
 COMPILE(using GNUmake): 
    In the "src" directory in the MolDS package.
-   Change the "BOOST_TOP_DIR" to the top directory of the boost-libraries 
-   in your systems.
 
-   To compile MolDS on 32 bit archtecture,
-   $ make depend INTEL=32
-   $ make INTEL=32
+   Case i) Use Intel c/c++ compiler (icpc)
+      Change the "BOOST_TOP_DIR" in Makefile to the top directory of the 
+      boost-libraries in your systems.
 
-   To compile MolDS on 64 bit archtecture,
-   $ make depend INTEL=64
-   $ make INTEL=64
+      To compile MolDS on 32 bit archtecture,
+      $ make depend INTEL=32
+      $ make INTEL=32
 
-   The compile succeeded if you could fine "MolDS.out" in the "src" directory. 
-   Use "$ make clean" when you wanna clean the compilation.
+      To compile MolDS on 64 bit archtecture,
+      $ make depend INTEL=64
+      $ make INTEL=64
 
-COMPILE(primitive method): 
-   In the "src" directory in the MolDS package.
-   for 32 bit
-   $ icc <MolDS.cpp and all cpp-files> -lmkl_intel -lmkl_intel_thread -lmkl_core -liomp5 -lpthread -O3 -openmp -openmp-report2
+   Case ii) Use GNU c/c++ compiler (g++)
+      Rename "Makefile_GNU" to "Makefile".
+      Change the "BOOST_TOP_DIR" in Makefile to the top directory of the 
+      boost-libraries in your systems.
+      Change the "OPENBLAS_TOP_DIR" in Makefile to the top directory of the 
+      boost-libraries in your systems.
+      
+      Then, just type: 
+      $ make depend
+      $ make 
 
-   for 64 bit
-   $ icc <MolDS.cpp and all cpp-files> -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread -O3 -openmp -openmp-report2
+   For both case, the compile succeeded if you could fine "MolDS.out" in the "src" directory. 
+   Type "$ make clean" when you wanna clean the compilation.
 
 ==============================================================================
 CARRY OUT MolDS:
@@ -110,7 +119,7 @@ HOW TO WRITE INPUT:
 
    <SCF>
       Write "cndo/2", "indo", "zindo/s", "mndo", "am1", "am1-d",
-      "pm3", "pm3-D", or "pm3/pddg" in theory-directive.
+      "pm3", "pm3-d", or "pm3/pddg" in theory-directive.
       This theory-directive indicate a electronic structure theory used in your simulations.
       MNDO only supports (can calculate) Heats of formation.
       SCF module outputs also the dipole moment arrond the center of cores of the molecule.
@@ -319,8 +328,8 @@ HOW TO WRITE INPUT:
          HOLEPLOT_END
 
    <Particle Plot>
-      Write particle plot directive for the output of the density of i
-      the particle which lives avobe Fermi's see.
+      Write particle plot directive for the output of the density of 
+      the particle which lives avobe Fermi's sea.
       Note that this plot is valid only when CIS is required.
 
       E.g.
@@ -368,7 +377,7 @@ HOW TO WRITE INPUT:
        "method", "total_steps", "electronic_state", "max_gradient", "rms_gradient", 
        and "dt" are prepared as options.
 
-       "method" should be set as "conjugate_gradient" or "steepest_descent". 
+       "method" should be set as "conjugate_gradient", "steepest_descent", or "bfgs". 
        The default of the "method" is conjugate gradient.
 
        "electronic_state" means the electronic eigenstate 
@@ -378,6 +387,7 @@ HOW TO WRITE INPUT:
 
       "line_search_times" means the times of line-search trials.
       The default value of the "line_search_times" is 50.
+      This parameter have no effect if method is "bfgs".
 
       "steep_step" means the number of steps of the steepest descent.
       The default value of the "steep_step" is 50.
@@ -388,7 +398,8 @@ HOW TO WRITE INPUT:
       The default value of the "rms_gradient" is 0.00030.
 
       "dt" is initial fictious time steps for the steepest descent algorythms.
-      The defaul value of the "dt" is 50[fs]
+      The default value of the "dt" is 50[fs].
+      This parameter have no effect if method is "bfgs".
 
       E.g.
          OPTIMIZE

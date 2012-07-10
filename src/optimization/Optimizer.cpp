@@ -1,5 +1,6 @@
 //************************************************************************//
 // Copyright (C) 2011-2012 Mikiya Fujii                                   // 
+// Copyright (C) 2012-2012 Katsuhiko Nishimra                             // 
 //                                                                        // 
 // This file is part of MolDS.                                            // 
 //                                                                        // 
@@ -67,7 +68,7 @@ void Optimizer::Optimize(Molecule& molecule){
    // Search Minimum
    double lineSearchedEnergy = 0.0;
    bool obtainesOptimizedStructure = false;
-   this->LineSearch(electronicStructure, molecule, &lineSearchedEnergy, &obtainesOptimizedStructure);
+   this->SearchMinimum(electronicStructure, molecule, &lineSearchedEnergy, &obtainesOptimizedStructure);
   
    // Not converged
    if(!obtainesOptimizedStructure){
@@ -101,7 +102,9 @@ void Optimizer::SetEnableTheoryTypes(){
    this->enableTheoryTypes.push_back(ZINDOS);
    this->enableTheoryTypes.push_back(MNDO);
    this->enableTheoryTypes.push_back(AM1);
+   this->enableTheoryTypes.push_back(AM1D);
    this->enableTheoryTypes.push_back(PM3);
+   this->enableTheoryTypes.push_back(PM3D);
    this->enableTheoryTypes.push_back(PM3PDDG);
 }
 
@@ -129,13 +132,25 @@ void Optimizer::ClearMolecularMomenta(Molecule& molecule) const{
    }
 }
 
-void Optimizer::UpdateMolecularCoordinates(Molecule& molecule, double** matrixForce, double dt) const{
+void Optimizer::UpdateMolecularCoordinates(Molecule& molecule, double const* const* matrixForce, double dt) const{
    #pragma omp parallel for schedule(auto) 
    for(int a=0; a<molecule.GetNumberAtoms(); a++){
       const Atom* atom = molecule.GetAtom(a);
       double coreMass = atom->GetAtomicMass() - static_cast<double>(atom->GetNumberValenceElectrons());
       for(int i=0; i<CartesianType_end; i++){
          atom->GetXyz()[i] += dt*matrixForce[a][i]/coreMass;
+      }
+   }
+   molecule.CalcXyzCOM();
+   molecule.CalcXyzCOC();
+}
+
+void Optimizer::UpdateMolecularCoordinates(Molecule& molecule, double const* const* matrixForce) const{
+   #pragma omp parallel for schedule(auto)
+   for(int a=0; a<molecule.GetNumberAtoms(); a++){
+      const Atom* atom = molecule.GetAtom(a);
+      for(int i=0; i<CartesianType_end; i++){
+         atom->GetXyz()[i] += matrixForce[a][i];
       }
    }
    molecule.CalcXyzCOM();
@@ -169,6 +184,33 @@ void Optimizer::OutputMoleculeElectronicStructure(boost::shared_ptr<ElectronicSt
    if(Parameters::GetInstance()->RequiresCIS()){
       electronicStructure->OutputCISResults();
    }
+}
+
+void Optimizer::LineSearch(boost::shared_ptr<ElectronicStructure> electronicStructure,
+                           MolDS_base::Molecule& molecule,
+                           double& lineSearchCurrentEnergy,
+                           double const* const* matrixForce,
+                           int elecState,
+                           double dt) const{
+   bool tempCanOutputLogs = false;
+   int lineSearchSteps = 0;
+   double lineSearchOldEnergy = lineSearchCurrentEnergy;
+
+   while(lineSearchCurrentEnergy <= lineSearchOldEnergy){
+      this->UpdateMolecularCoordinates(molecule, matrixForce, dt);
+      this->UpdateElectronicStructure(electronicStructure, molecule, false, tempCanOutputLogs);
+      lineSearchOldEnergy = lineSearchCurrentEnergy;
+      lineSearchCurrentEnergy = electronicStructure->GetElectronicEnergy(elecState);
+      lineSearchSteps++;
+   }
+
+   // final state of line search
+   this->OutputLog((boost::format("%s%d\n\n") % this->messageLineSearchSteps.c_str() % lineSearchSteps).str());
+   this->UpdateMolecularCoordinates(molecule, matrixForce, -0.5*dt);
+   this->UpdateElectronicStructure(electronicStructure, molecule, false, tempCanOutputLogs);
+   this->OutputMoleculeElectronicStructure(electronicStructure, molecule, this->CanOutputLogs());
+
+   lineSearchCurrentEnergy = electronicStructure->GetElectronicEnergy(elecState);
 }
 
 bool Optimizer::SatisfiesConvergenceCriterion(double** matrixForce, 

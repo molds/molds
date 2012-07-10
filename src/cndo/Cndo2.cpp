@@ -306,31 +306,6 @@ double Cndo2::GetDiatomCoreRepulsionEnergy(int indexAtomA, int indexAtomB) const
    return atomA.GetCoreCharge()*atomB.GetCoreCharge()/distance; 
 }
 
-// See (2) in [G_2004] ((11) in [G_2006])
-void Cndo2::CalcVdWCorrectionEnergy(){
-   double value = 0.0;
-   for(int i=0; i<this->molecule->GetNumberAtoms(); i++){
-      for(int j=i+1; j<this->molecule->GetNumberAtoms(); j++){
-         value += this->GetDiatomVdWCorrectionEnergy(i, j);
-      }
-   }
-   this->vdWCorrectionEnergy = value;
-}
-
-// See (2) in [G_2004] ((11) in [G_2006])
-double Cndo2::GetDiatomVdWCorrectionEnergy(int indexAtomA, int indexAtomB) const{
-   const Atom& atomA = *this->molecule->GetAtom(indexAtomA);
-   const Atom& atomB = *this->molecule->GetAtom(indexAtomB);
-   double distance = this->molecule->GetDistanceAtoms(indexAtomA, indexAtomB);
-   double vdWDistance = atomA.GetVdWRadii() + atomB.GetVdWRadii();
-   double vdWCoefficients = 2.0*atomA.GetVdWCoefficient()*atomB.GetVdWCoefficient()
-                           /(atomA.GetVdWCoefficient()+atomB.GetVdWCoefficient());
-   double dampingFactor = Parameters::GetInstance()->GetVdWDampingFactorSCF();
-   double damping = 1.0/(1.0+exp(-1.0*dampingFactor*(distance/vdWDistance - 1.0)));
-   double scalingFactor = Parameters::GetInstance()->GetVdWScalingFactorSCF();
-   return -1.0*scalingFactor*vdWCoefficients*pow(distance,-6.0)*damping;
-}
-
 // First derivative of the core repulsion related to the coordinate of atom A.
 double Cndo2::GetDiatomCoreRepulsionFirstDerivative(int indexAtomA, int indexAtomB, 
                                                     CartesianType axisA) const{
@@ -344,6 +319,55 @@ double Cndo2::GetDiatomCoreRepulsionFirstDerivative(int indexAtomA, int indexAto
    return value;
 }
 
+// See (2) in [G_2004] ((11) in [G_2006])
+void Cndo2::CalcVdWCorrectionEnergy(){
+   double value = 0.0;
+   for(int i=0; i<this->molecule->GetNumberAtoms(); i++){
+      for(int j=i+1; j<this->molecule->GetNumberAtoms(); j++){
+         value += this->GetDiatomVdWCorrectionEnergy(i, j);
+      }
+   }
+   this->vdWCorrectionEnergy = value;
+}
+
+// See damping function in (2) in [G_2004] ((11) in [G_2006])
+double Cndo2::GetVdwDampingValue(double vdWDistance, double distance) const{
+   double dampingFactor = Parameters::GetInstance()->GetVdWDampingFactorSCF();
+   return 1.0/(1.0+exp(-1.0*dampingFactor*(distance/vdWDistance - 1.0)));
+}
+
+// See damping function in (2) in [G_2004] ((11) in [G_2006])
+double Cndo2::GetVdwDampingValueFirstDerivative(double vdWDistance, double distance) const{
+   double dampingFactor = Parameters::GetInstance()->GetVdWDampingFactorSCF();
+   return (dampingFactor/vdWDistance)
+         *exp(-1.0*dampingFactor*(distance/vdWDistance - 1.0))
+         *pow(1.0+exp(-1.0*dampingFactor*(distance/vdWDistance - 1.0)),-2.0);
+}
+
+// See damping function in (2) in [G_2004] ((11) in [G_2006])
+double Cndo2::GetVdwDampingValueSecondDerivative(double vdWDistance, double distance) const{
+   double dampingFactor = Parameters::GetInstance()->GetVdWDampingFactorSCF();
+   double exponent = -1.0*dampingFactor*(distance/vdWDistance - 1.0);
+   double pre = dampingFactor/vdWDistance;
+   double dominator = 1.0+exp(exponent);
+
+   return 2.0*pow(dominator,-3.0)*pre*pre*exp(2.0*exponent) 
+         -    pow(dominator,-2.0)*pre*pre*exp(    exponent);
+}
+
+// See (2) in [G_2004] ((11) in [G_2006])
+double Cndo2::GetDiatomVdWCorrectionEnergy(int indexAtomA, int indexAtomB) const{
+   const Atom& atomA = *this->molecule->GetAtom(indexAtomA);
+   const Atom& atomB = *this->molecule->GetAtom(indexAtomB);
+   double distance = this->molecule->GetDistanceAtoms(indexAtomA, indexAtomB);
+   double vdWDistance = atomA.GetVdWRadii() + atomB.GetVdWRadii();
+   double vdWCoefficients = 2.0*atomA.GetVdWCoefficient()*atomB.GetVdWCoefficient()
+                           /(atomA.GetVdWCoefficient()+atomB.GetVdWCoefficient());
+   double damping = this->GetVdwDampingValue(vdWDistance, distance);
+   double scalingFactor = Parameters::GetInstance()->GetVdWScalingFactorSCF();
+   return -1.0*scalingFactor*vdWCoefficients*pow(distance,-6.0)*damping;
+}
+
 // First derivative of the vdW correction related to the coordinate of atom A.
 // See (2) in [G_2004] ((11) in [G_2006]).
 double Cndo2::GetDiatomVdWCorrectionFirstDerivative(int indexAtomA, int indexAtomB, 
@@ -355,15 +379,56 @@ double Cndo2::GetDiatomVdWCorrectionFirstDerivative(int indexAtomA, int indexAto
    double vdWCoefficients = 2.0*atomA.GetVdWCoefficient()*atomB.GetVdWCoefficient()
                            /(atomA.GetVdWCoefficient()+atomB.GetVdWCoefficient());
    double dampingFactor = Parameters::GetInstance()->GetVdWDampingFactorSCF();
-   double damping = 1.0/(1.0+exp(-1.0*dampingFactor*(distance/vdWDistance - 1.0)));
-   double dampingFirstDerivative = (dampingFactor/vdWDistance)
-                                  *exp(-1.0*dampingFactor*(distance/vdWDistance - 1.0))
-                                  *pow(1.0+exp(-1.0*dampingFactor*(distance/vdWDistance - 1.0)),-2.0);
+   double damping = this->GetVdwDampingValue(vdWDistance, distance);
+   double dampingFirstDerivative = this->GetVdwDampingValueFirstDerivative(vdWDistance, distance);
    double value=0.0;
    value += 6.0*pow(distance,-7.0)*damping - pow(distance,-6.0)*dampingFirstDerivative;
    value *= vdWCoefficients;
    value *= Parameters::GetInstance()->GetVdWScalingFactorSCF();
    value *= (atomA.GetXyz()[axisA] - atomB.GetXyz()[axisA])/distance;
+   return value;
+}
+
+// Second derivative of the vdW correction.
+// Both derivative sare related to the coordinate of atom A.
+// See (2) in [G_2004] ((11) in [G_2006]).
+double Cndo2::GetDiatomVdWCorrectionSecondDerivative(int indexAtomA, 
+                                                     int indexAtomB, 
+                                                     CartesianType axisA1,
+                                                     CartesianType axisA2) const{
+   const Atom& atomA = *this->molecule->GetAtom(indexAtomA);
+   const Atom& atomB = *this->molecule->GetAtom(indexAtomB);
+   double distance = this->molecule->GetDistanceAtoms(indexAtomA, indexAtomB);
+   double dCartesian1 = atomA.GetXyz()[axisA1] - atomB.GetXyz()[axisA1];
+   double dCartesian2 = atomA.GetXyz()[axisA2] - atomB.GetXyz()[axisA2];
+   double vdWDistance = atomA.GetVdWRadii() + atomB.GetVdWRadii();
+   double vdWScalingFacotor = Parameters::GetInstance()->GetVdWScalingFactorSCF();
+   double vdWCoefficients = 2.0*atomA.GetVdWCoefficient()*atomB.GetVdWCoefficient()
+                           /(atomA.GetVdWCoefficient()+atomB.GetVdWCoefficient());
+   double dampingFactor = Parameters::GetInstance()->GetVdWDampingFactorSCF();
+   double damping = this->GetVdwDampingValue(vdWDistance, distance);
+   double dampingFirstDerivative = this->GetVdwDampingValueFirstDerivative(vdWDistance, distance);
+   double dampingSecondDerivative = this->GetVdwDampingValueSecondDerivative(vdWDistance, distance);
+
+   double temp1 = -6.0*pow(distance,-7.0)*damping 
+                  +    pow(distance,-6.0)*dampingFirstDerivative;
+   double temp2 = 42.0*pow(distance,-8.0)*damping 
+                 -12.0*pow(distance,-7.0)*dampingFirstDerivative
+                 +     pow(distance,-6.0)*dampingSecondDerivative;
+
+   double pre1=0.0;
+   double pre2=0.0;
+   if(axisA1 != axisA2){
+      pre1 = -dCartesian1*dCartesian2/pow(distance,3.0);
+      pre2 =  dCartesian1*dCartesian2/pow(distance,2.0);
+   }
+   else{
+      pre1 = 1.0/distance - dCartesian1*dCartesian1/pow(distance,3.0);
+      pre2 = pow(dCartesian1/distance,2.0);
+   }
+
+   double value= pre1*temp1 + pre2*temp2;
+   value *= -1.0*vdWScalingFacotor*vdWCoefficients;
    return value;
 }
 
@@ -3362,78 +3427,7 @@ void Cndo2::CalcOverlap(double** overlap, const Molecule& molecule) const{
 // The Overlap matrix is S_{\mu\nu} in (3.74) in J. A. Pople book.
 // Note that this method can not treat d-obitals 
 // because CalcRotatingMatrixFirstDerivatives can not treat d-orbitals.
-void Cndo2::CalcDiatomicOverlapFirstDerivative(double*** overlapFirstDeri, 
-                                               const Atom& atomA, 
-                                               const Atom& atomB) const{
-   double cartesian[CartesianType_end] = {atomA.GetXyz()[XAxis] - atomB.GetXyz()[XAxis], 
-                                          atomA.GetXyz()[YAxis] - atomB.GetXyz()[YAxis],
-                                          atomA.GetXyz()[ZAxis] - atomB.GetXyz()[ZAxis]};
-   double R = sqrt( pow(cartesian[XAxis],2.0) + 
-                    pow(cartesian[YAxis],2.0) + 
-                    pow(cartesian[ZAxis],2.0) );
-   
-   double** diatomicOverlap = NULL;
-   double** diaOverlapFirstDeri = NULL;
-   double** rotatingMatrix = NULL;
-   double*** rotMatFirstDerivatives = NULL;
-
-   try{
-      this->MallocDiatomicOverlapFirstDeriTemps(&diatomicOverlap,
-                                                &diaOverlapFirstDeri,
-                                                &rotatingMatrix,
-                                                &rotMatFirstDerivatives);
-      this->CalcDiatomicOverlapInDiatomicFrame(diatomicOverlap, atomA, atomB);
-      this->CalcDiatomicOverlapFirstDerivativeInDiatomicFrame(diaOverlapFirstDeri, atomA, atomB);
-      this->CalcRotatingMatrix(rotatingMatrix, atomA, atomB);
-      this->CalcRotatingMatrixFirstDerivatives(rotMatFirstDerivatives, atomA, atomB);
-
-      // rotate
-      for(int i=0; i<OrbitalType_end; i++){
-         for(int j=0; j<OrbitalType_end; j++){
-            for(int c=0; c<CartesianType_end; c++){
-               overlapFirstDeri[i][j][c] = 0.0;
-
-               double temp1 = 0.0;
-               double temp2 = 0.0;
-               double temp3 = 0.0;
-               for(int k=0; k<OrbitalType_end; k++){
-                  for(int l=0; l<OrbitalType_end; l++){
-                     temp1 += rotatingMatrix[i][k] 
-                             *rotatingMatrix[j][l]
-                             *(cartesian[c]/R)
-                             *diaOverlapFirstDeri[k][l];
-                     temp2 += rotMatFirstDerivatives[i][k][c] 
-                             *rotatingMatrix[j][l]
-                             *diatomicOverlap[k][l];
-                     temp3 += rotatingMatrix[i][k] 
-                             *rotMatFirstDerivatives[j][l][c]
-                             *diatomicOverlap[k][l];
-                  }
-               }
-               overlapFirstDeri[i][j][c] = temp1 + temp2 + temp3;
-            }
-         }
-      }
-   }
-   catch(MolDSException ex){
-      this->FreeDiatomicOverlapFirstDeriTemps(&diatomicOverlap,
-                                              &diaOverlapFirstDeri,
-                                              &rotatingMatrix,
-                                              &rotMatFirstDerivatives);
-      throw ex;
-   }
-   // free
-   this->FreeDiatomicOverlapFirstDeriTemps(&diatomicOverlap,
-                                           &diaOverlapFirstDeri,
-                                           &rotatingMatrix,
-                                           &rotMatFirstDerivatives);
-}
-
-// First derivative of diatomic overlap integrals between AOs in space fixed flame.
-// The Overlap matrix is S_{\mu\nu} in (3.74) in J. A. Pople book.
-// Note that this method can not treat d-obitals 
-// because CalcRotatingMatrixFirstDerivatives can not treat d-orbitals.
-void Cndo2::CalcDiatomicOverlapSecondDerivative(double**** overlapSecondDeri, 
+void Cndo2::CalcDiatomicOverlapFirstDerivatives(double*** diatomicOverlapFirstDerivs, 
                                                 const Atom& atomA, 
                                                 const Atom& atomB) const{
    double cartesian[CartesianType_end] = {atomA.GetXyz()[XAxis] - atomB.GetXyz()[XAxis], 
@@ -3443,28 +3437,107 @@ void Cndo2::CalcDiatomicOverlapSecondDerivative(double**** overlapSecondDeri,
                     pow(cartesian[YAxis],2.0) + 
                     pow(cartesian[ZAxis],2.0) );
    
-   double** diatomicOverlap = NULL;
-   double** diaOverlapFirstDeri = NULL;
-   double** diaOverlapSecondDeri = NULL;
-   double** rotatingMatrix = NULL;
-   double*** rotMatFirstDerivatives = NULL;
-   double**** rotMatSecondDerivatives = NULL;
-   double*** tempOverlapFirstDeri = NULL;
-   double**** tempOverlapSecondDeri = NULL;
+   double** diaOverlapInDiaFrame = NULL;  // diatomic overlap in diatomic frame
+   double** diaOverlapFirstDerivInDiaFrame = NULL; // first derivative of the diaOverlap. This derivative is related to the distance between two atoms.
+   double**  rotMat = NULL; // rotating Matrix from the diatomic frame to space fixed frame.
+   double*** rotMatFirstDerivs = NULL; // first derivatives of the rotMat.
 
    try{
-      this->MallocDiatomicOverlapSecondDeriTemps(&diatomicOverlap,
-                                                 &diaOverlapFirstDeri,
-                                                 &diaOverlapSecondDeri,
-                                                 &rotatingMatrix,
+      this->MallocDiatomicOverlapFirstDeriTemps(&diaOverlapInDiaFrame,
+                                                &diaOverlapFirstDerivInDiaFrame,
+                                                &rotMat,
+                                                &rotMatFirstDerivs);
+      this->CalcDiatomicOverlapInDiatomicFrame(diaOverlapInDiaFrame, atomA, atomB);
+      this->CalcDiatomicOverlapFirstDerivativeInDiatomicFrame(diaOverlapFirstDerivInDiaFrame, atomA, atomB);
+      this->CalcRotatingMatrix(rotMat, atomA, atomB);
+      this->CalcRotatingMatrixFirstDerivatives(rotMatFirstDerivs, atomA, atomB);
+
+      // rotate
+      for(int i=0; i<OrbitalType_end; i++){
+         for(int j=0; j<OrbitalType_end; j++){
+            for(int c=0; c<CartesianType_end; c++){
+               diatomicOverlapFirstDerivs[i][j][c] = 0.0;
+
+               double temp1 = 0.0;
+               double temp2 = 0.0;
+               double temp3 = 0.0;
+               for(int k=0; k<OrbitalType_end; k++){
+                  for(int l=0; l<OrbitalType_end; l++){
+                     temp1 += rotMat[i][k] 
+                             *rotMat[j][l]
+                             *(cartesian[c]/R)
+                             *diaOverlapFirstDerivInDiaFrame[k][l];
+                     temp2 += rotMatFirstDerivs[i][k][c] 
+                             *rotMat[j][l]
+                             *diaOverlapInDiaFrame[k][l];
+                     temp3 += rotMat[i][k] 
+                             *rotMatFirstDerivs[j][l][c]
+                             *diaOverlapInDiaFrame[k][l];
+                  }
+               }
+               diatomicOverlapFirstDerivs[i][j][c] = temp1 + temp2 + temp3;
+            }
+         }
+      }
+   }
+   catch(MolDSException ex){
+      this->FreeDiatomicOverlapFirstDeriTemps(&diaOverlapInDiaFrame,
+                                              &diaOverlapFirstDerivInDiaFrame,
+                                              &rotMat,
+                                              &rotMatFirstDerivs);
+      throw ex;
+   }
+   // free
+   this->FreeDiatomicOverlapFirstDeriTemps(&diaOverlapInDiaFrame,
+                                           &diaOverlapFirstDerivInDiaFrame,
+                                           &rotMat,
+                                           &rotMatFirstDerivs);
+}
+
+void Cndo2::CalcDiatomicOverlapFirstDerivatives(double*** diatomicOverlapFirstDerivs, 
+                                                int atomAIndex, 
+                                                int atomBIndex) const{
+   this->CalcDiatomicOverlapFirstDerivatives(diatomicOverlapFirstDerivs,
+                                             *this->molecule->GetAtom(atomAIndex),
+                                             *this->molecule->GetAtom(atomBIndex));
+}
+
+// Second derivative of diatomic overlap integrals between AOs in space fixed flame.
+// The Overlap matrix is S_{\mu\nu} in (3.74) in J. A. Pople book.
+// Note that this method can not treat d-obitals 
+// because CalcRotatingMatrixFirstDerivatives can not treat d-orbitals.
+void Cndo2::CalcDiatomicOverlapSecondDerivatives(double**** diatomicOverlapSecondDerivs, 
+                                                 const Atom& atomA, 
+                                                 const Atom& atomB) const{
+   double cartesian[CartesianType_end] = {atomA.GetXyz()[XAxis] - atomB.GetXyz()[XAxis], 
+                                          atomA.GetXyz()[YAxis] - atomB.GetXyz()[YAxis],
+                                          atomA.GetXyz()[ZAxis] - atomB.GetXyz()[ZAxis]};
+   double R = sqrt( pow(cartesian[XAxis],2.0) + 
+                    pow(cartesian[YAxis],2.0) + 
+                    pow(cartesian[ZAxis],2.0) );
+   
+   double** diaOverlapInDiaFrame = NULL;  // diatomic overlap in diatomic frame
+   double** diaOverlapFirstDerivInDiaFrame = NULL; // first derivative of the diaOverlap. This derivative is related to the distance between two atoms.
+   double** diaOverlapSecondDerivInDiaFrame = NULL; // second derivative of the diaOverlap. This derivative is related to the distance between two atoms.
+   double**  rotMat = NULL; // rotating Matrix from the diatomic frame to space fixed frame.
+   double*** rotMatFirstDerivatives = NULL; //first derivatives of the rotMat
+   double**** rotMatSecondDerivatives = NULL; //second derivatives of the rotMat
+   double*** tempDiaOverlapFirstDerivs = NULL; // first derivatives of the diaOverlap. This derivatives are related to the all Cartesian coordinates.
+   double**** tempDiaOverlapSecondDerivs = NULL; //sedond derivatives of the diaOverlap. This derivatives are related to the all Cartesian coordinates.
+
+   try{
+      this->MallocDiatomicOverlapSecondDeriTemps(&diaOverlapInDiaFrame,
+                                                 &diaOverlapFirstDerivInDiaFrame,
+                                                 &diaOverlapSecondDerivInDiaFrame,
+                                                 &rotMat,
                                                  &rotMatFirstDerivatives,
                                                  &rotMatSecondDerivatives,
-                                                 &tempOverlapFirstDeri,
-                                                 &tempOverlapSecondDeri);
-      this->CalcDiatomicOverlapInDiatomicFrame(diatomicOverlap, atomA, atomB);
-      this->CalcDiatomicOverlapFirstDerivativeInDiatomicFrame(diaOverlapFirstDeri, atomA, atomB);
-      this->CalcDiatomicOverlapSecondDerivativeInDiatomicFrame(diaOverlapSecondDeri, atomA, atomB);
-      this->CalcRotatingMatrix(rotatingMatrix, atomA, atomB);
+                                                 &tempDiaOverlapFirstDerivs,
+                                                 &tempDiaOverlapSecondDerivs);
+      this->CalcDiatomicOverlapInDiatomicFrame(diaOverlapInDiaFrame, atomA, atomB);
+      this->CalcDiatomicOverlapFirstDerivativeInDiatomicFrame(diaOverlapFirstDerivInDiaFrame, atomA, atomB);
+      this->CalcDiatomicOverlapSecondDerivativeInDiatomicFrame(diaOverlapSecondDerivInDiaFrame, atomA, atomB);
+      this->CalcRotatingMatrix(rotMat, atomA, atomB);
       this->CalcRotatingMatrixFirstDerivatives(rotMatFirstDerivatives, atomA, atomB);
       this->CalcRotatingMatrixSecondDerivatives(rotMatSecondDerivatives, atomA, atomB);
 
@@ -3472,7 +3545,7 @@ void Cndo2::CalcDiatomicOverlapSecondDerivative(double**** overlapSecondDeri,
       for(int i=0; i<OrbitalType_end; i++){
          for(int j=0; j<OrbitalType_end; j++){
             for(int dimA1=0; dimA1<CartesianType_end; dimA1++){
-               tempOverlapFirstDeri[i][j][dimA1] = (cartesian[dimA1]/R)*diaOverlapFirstDeri[i][j];
+               tempDiaOverlapFirstDerivs[i][j][dimA1] = (cartesian[dimA1]/R)*diaOverlapFirstDerivInDiaFrame[i][j];
             }
          }
       }
@@ -3482,15 +3555,15 @@ void Cndo2::CalcDiatomicOverlapSecondDerivative(double**** overlapSecondDeri,
          for(int j=0; j<OrbitalType_end; j++){
             for(int dimA1=0; dimA1<CartesianType_end; dimA1++){
                for(int dimA2=dimA1; dimA2<CartesianType_end; dimA2++){
-                  tempOverlapSecondDeri[i][j][dimA1][dimA2] 
-                     = this->GetSecondDerivativeElementFromDistanceDerivatives(diaOverlapFirstDeri[i][j],
-                                                                               diaOverlapSecondDeri[i][j],
+                  tempDiaOverlapSecondDerivs[i][j][dimA1][dimA2] 
+                     = this->GetSecondDerivativeElementFromDistanceDerivatives(diaOverlapFirstDerivInDiaFrame[i][j],
+                                                                               diaOverlapSecondDerivInDiaFrame[i][j],
                                                                                static_cast<CartesianType>(dimA1),
                                                                                static_cast<CartesianType>(dimA2),
                                                                                cartesian,
                                                                                R);
                   if(dimA1!=dimA2){
-                     tempOverlapSecondDeri[i][j][dimA2][dimA1] = tempOverlapSecondDeri[i][j][dimA1][dimA2];
+                     tempDiaOverlapSecondDerivs[i][j][dimA2][dimA1] = tempDiaOverlapSecondDerivs[i][j][dimA1][dimA2];
                   }
 
                }
@@ -3503,7 +3576,7 @@ void Cndo2::CalcDiatomicOverlapSecondDerivative(double**** overlapSecondDeri,
          for(int j=0; j<OrbitalType_end; j++){
             for(int dimA1=0; dimA1<CartesianType_end; dimA1++){
                for(int dimA2=dimA1; dimA2<CartesianType_end; dimA2++){
-                  overlapSecondDeri[i][j][dimA1][dimA2] = 0.0;
+                  diatomicOverlapSecondDerivs[i][j][dimA1][dimA2] = 0.0;
                
                   double temp1 = 0.0, temp2=0.0, temp3 = 0.0;
                   double temp4 = 0.0, temp5=0.0, temp6 = 0.0;
@@ -3512,39 +3585,39 @@ void Cndo2::CalcDiatomicOverlapSecondDerivative(double**** overlapSecondDeri,
                      for(int l=0; l<OrbitalType_end; l++){
               
                         temp1 += rotMatSecondDerivatives[i][k][dimA1][dimA2]
-                                *rotatingMatrix[j][l]
-                                *diatomicOverlap[k][l];
-                        temp2 += rotatingMatrix[i][k]
+                                *rotMat[j][l]
+                                *diaOverlapInDiaFrame[k][l];
+                        temp2 += rotMat[i][k]
                                 *rotMatSecondDerivatives[j][l][dimA1][dimA2]
-                                *diatomicOverlap[k][l];
-                        temp3 += rotatingMatrix[i][k]
-                                *rotatingMatrix[j][l]
-                                *tempOverlapSecondDeri[k][l][dimA1][dimA2];
+                                *diaOverlapInDiaFrame[k][l];
+                        temp3 += rotMat[i][k]
+                                *rotMat[j][l]
+                                *tempDiaOverlapSecondDerivs[k][l][dimA1][dimA2];
                         temp4 += rotMatFirstDerivatives[i][k][dimA1] 
                                 *rotMatFirstDerivatives[j][l][dimA2]
-                                *diatomicOverlap[k][l];
+                                *diaOverlapInDiaFrame[k][l];
                         temp5 += rotMatFirstDerivatives[i][k][dimA1] 
-                                *rotatingMatrix[j][l]
-                                *tempOverlapFirstDeri[k][l][dimA2];
+                                *rotMat[j][l]
+                                *tempDiaOverlapFirstDerivs[k][l][dimA2];
                         temp6 += rotMatFirstDerivatives[i][k][dimA2] 
                                 *rotMatFirstDerivatives[j][l][dimA1]
-                                *diatomicOverlap[k][l];
-                        temp7 += rotatingMatrix[i][k] 
+                                *diaOverlapInDiaFrame[k][l];
+                        temp7 += rotMat[i][k] 
                                 *rotMatFirstDerivatives[j][l][dimA1]
-                                *tempOverlapFirstDeri[k][l][dimA2];
+                                *tempDiaOverlapFirstDerivs[k][l][dimA2];
                         temp8 += rotMatFirstDerivatives[i][k][dimA2] 
-                                *rotatingMatrix[j][l]
-                                *tempOverlapFirstDeri[k][l][dimA1];
-                        temp9 += rotatingMatrix[i][k] 
+                                *rotMat[j][l]
+                                *tempDiaOverlapFirstDerivs[k][l][dimA1];
+                        temp9 += rotMat[i][k] 
                                 *rotMatFirstDerivatives[j][l][dimA2]
-                                *tempOverlapFirstDeri[k][l][dimA1];
+                                *tempDiaOverlapFirstDerivs[k][l][dimA1];
                      }
                   }
 
-                  overlapSecondDeri[i][j][dimA1][dimA2] = temp1+temp2+temp3 
-                                                       +temp4+temp5+temp6 
-                                                       +temp7+temp8+temp9;
-                  overlapSecondDeri[i][j][dimA2][dimA1] = overlapSecondDeri[i][j][dimA1][dimA2];
+                  diatomicOverlapSecondDerivs[i][j][dimA1][dimA2] = temp1+temp2+temp3 
+                                                                   +temp4+temp5+temp6 
+                                                                   +temp7+temp8+temp9;
+                  diatomicOverlapSecondDerivs[i][j][dimA2][dimA1] = diatomicOverlapSecondDerivs[i][j][dimA1][dimA2];
                }
             }
          }
@@ -3552,26 +3625,26 @@ void Cndo2::CalcDiatomicOverlapSecondDerivative(double**** overlapSecondDeri,
       
    }
    catch(MolDSException ex){
-      this->FreeDiatomicOverlapSecondDeriTemps(&diatomicOverlap,
-                                               &diaOverlapFirstDeri,
-                                               &diaOverlapSecondDeri,
-                                               &rotatingMatrix,
+      this->FreeDiatomicOverlapSecondDeriTemps(&diaOverlapInDiaFrame,
+                                               &diaOverlapFirstDerivInDiaFrame,
+                                               &diaOverlapSecondDerivInDiaFrame,
+                                               &rotMat,
                                                &rotMatFirstDerivatives,
                                                &rotMatSecondDerivatives,
-                                               &tempOverlapFirstDeri,
-                                               &tempOverlapSecondDeri);
+                                               &tempDiaOverlapFirstDerivs,
+                                               &tempDiaOverlapSecondDerivs);
       throw ex;
    }
    // free
-   this->FreeDiatomicOverlapSecondDeriTemps(&diatomicOverlap,
-                                            &diaOverlapFirstDeri,
-                                            &diaOverlapSecondDeri,
-                                            &rotatingMatrix,
+   this->FreeDiatomicOverlapSecondDeriTemps(&diaOverlapInDiaFrame,
+                                            &diaOverlapFirstDerivInDiaFrame,
+                                            &diaOverlapSecondDerivInDiaFrame,
+                                            &rotMat,
                                             &rotMatFirstDerivatives,
                                             &rotMatSecondDerivatives,
-                                            &tempOverlapFirstDeri,
-                                            &tempOverlapSecondDeri);
-
+                                            &tempDiaOverlapFirstDerivs,
+                                            &tempDiaOverlapSecondDerivs);
+   /*
    for(int i=0; i<OrbitalType_end; i++){
       for(int j=0; j<OrbitalType_end; j++){
          for(int dimA1=0; dimA1<CartesianType_end; dimA1++){
@@ -3581,6 +3654,15 @@ void Cndo2::CalcDiatomicOverlapSecondDerivative(double**** overlapSecondDeri,
          }
       }
    }
+   */
+}
+
+void Cndo2::CalcDiatomicOverlapSecondDerivatives(double**** diatomicOverlapSecondDerivs, 
+                                                 int atomAIndex, 
+                                                 int atomBIndex) const{
+   this->CalcDiatomicOverlapSecondDerivatives(diatomicOverlapSecondDerivs,
+                                              *this->molecule->GetAtom(atomAIndex),
+                                              *this->molecule->GetAtom(atomBIndex));
 }
 
 double Cndo2::GetSecondDerivativeElementFromDistanceDerivatives(double firstDistanceDeri,
@@ -3602,60 +3684,60 @@ double Cndo2::GetSecondDerivativeElementFromDistanceDerivatives(double firstDist
    return value;
 }
 
-void Cndo2::MallocDiatomicOverlapFirstDeriTemps(double*** diatomicOverlap, 
-                                                double*** diaOverlapFirstDeri,
-                                                double*** rotatingMatrix,
-                                                double**** rotMatFirstDerivatives) const{
-   MallocerFreer::GetInstance()->Malloc<double>(diatomicOverlap, OrbitalType_end, OrbitalType_end);
-   MallocerFreer::GetInstance()->Malloc<double>(diaOverlapFirstDeri, OrbitalType_end, OrbitalType_end);
-   MallocerFreer::GetInstance()->Malloc<double>(rotatingMatrix, OrbitalType_end, OrbitalType_end);
-   MallocerFreer::GetInstance()->Malloc<double>(rotMatFirstDerivatives, OrbitalType_end, OrbitalType_end, CartesianType_end);
+void Cndo2::MallocDiatomicOverlapFirstDeriTemps(double*** diaOverlapInDiaFrame, 
+                                                double*** diaOverlapFirstDerivInDiaFrame,
+                                                double*** rotMat,
+                                                double**** rotMatFirstDerivs) const{
+   MallocerFreer::GetInstance()->Malloc<double>(diaOverlapInDiaFrame, OrbitalType_end, OrbitalType_end);
+   MallocerFreer::GetInstance()->Malloc<double>(diaOverlapFirstDerivInDiaFrame, OrbitalType_end, OrbitalType_end);
+   MallocerFreer::GetInstance()->Malloc<double>(rotMat, OrbitalType_end, OrbitalType_end);
+   MallocerFreer::GetInstance()->Malloc<double>(rotMatFirstDerivs, OrbitalType_end, OrbitalType_end, CartesianType_end);
 }
 
-void Cndo2::MallocDiatomicOverlapSecondDeriTemps(double*** diatomicOverlap, 
-                                                 double*** diaOverlapFirstDeri,
-                                                 double*** diaOverlapSecondDeri,
-                                                 double*** rotatingMatrix,
-                                                 double**** rotMatFirstDerivatives,
-                                                 double***** rotMatSecondDerivatives,
-                                                 double**** tempOverlapFirstDeri,
-                                                 double***** tempOverlapSecondDeri) const{
-   MallocerFreer::GetInstance()->Malloc<double>(diatomicOverlap, OrbitalType_end, OrbitalType_end);
-   MallocerFreer::GetInstance()->Malloc<double>(diaOverlapFirstDeri, OrbitalType_end, OrbitalType_end);
-   MallocerFreer::GetInstance()->Malloc<double>(diaOverlapSecondDeri, OrbitalType_end, OrbitalType_end);
-   MallocerFreer::GetInstance()->Malloc<double>(rotatingMatrix, OrbitalType_end, OrbitalType_end);
-   MallocerFreer::GetInstance()->Malloc<double>(rotMatFirstDerivatives, OrbitalType_end, OrbitalType_end, CartesianType_end);
-   MallocerFreer::GetInstance()->Malloc<double>(rotMatSecondDerivatives, OrbitalType_end, OrbitalType_end, CartesianType_end, CartesianType_end);
-   MallocerFreer::GetInstance()->Malloc<double>(tempOverlapFirstDeri, OrbitalType_end, OrbitalType_end, CartesianType_end);
-   MallocerFreer::GetInstance()->Malloc<double>(tempOverlapSecondDeri, OrbitalType_end, OrbitalType_end, CartesianType_end, CartesianType_end);
+void Cndo2::MallocDiatomicOverlapSecondDeriTemps(double*** diaOverlapInDiaFrame, 
+                                                 double*** diaOverlapFirstDerivInDiaFrame,
+                                                 double*** diaOverlapSecondDerivInDiaFrame,
+                                                 double*** rotMat,
+                                                 double**** rotMatFirstDerivs,
+                                                 double***** rotMatSecondDerivs,
+                                                 double**** tempDiaOverlapFirstDerivs,
+                                                 double***** tempDiaOverlapSecondDerivs) const{
+   MallocerFreer::GetInstance()->Malloc<double>(diaOverlapInDiaFrame, OrbitalType_end, OrbitalType_end);
+   MallocerFreer::GetInstance()->Malloc<double>(diaOverlapFirstDerivInDiaFrame, OrbitalType_end, OrbitalType_end);
+   MallocerFreer::GetInstance()->Malloc<double>(diaOverlapSecondDerivInDiaFrame, OrbitalType_end, OrbitalType_end);
+   MallocerFreer::GetInstance()->Malloc<double>(rotMat, OrbitalType_end, OrbitalType_end);
+   MallocerFreer::GetInstance()->Malloc<double>(rotMatFirstDerivs, OrbitalType_end, OrbitalType_end, CartesianType_end);
+   MallocerFreer::GetInstance()->Malloc<double>(rotMatSecondDerivs, OrbitalType_end, OrbitalType_end, CartesianType_end, CartesianType_end);
+   MallocerFreer::GetInstance()->Malloc<double>(tempDiaOverlapFirstDerivs, OrbitalType_end, OrbitalType_end, CartesianType_end);
+   MallocerFreer::GetInstance()->Malloc<double>(tempDiaOverlapSecondDerivs, OrbitalType_end, OrbitalType_end, CartesianType_end, CartesianType_end);
 }
 
-void Cndo2::FreeDiatomicOverlapFirstDeriTemps(double*** diatomicOverlap, 
-                                              double*** diaOverlapFirstDeri,
-                                              double*** rotatingMatrix,
-                                              double**** rotMatFirstDerivatives) const{
-   MallocerFreer::GetInstance()->Free<double>(diatomicOverlap, OrbitalType_end, OrbitalType_end);
-   MallocerFreer::GetInstance()->Free<double>(diaOverlapFirstDeri, OrbitalType_end, OrbitalType_end);
-   MallocerFreer::GetInstance()->Free<double>(rotatingMatrix, OrbitalType_end, OrbitalType_end);
-   MallocerFreer::GetInstance()->Free<double>(rotMatFirstDerivatives, OrbitalType_end, OrbitalType_end, CartesianType_end);
+void Cndo2::FreeDiatomicOverlapFirstDeriTemps(double*** diaOverlapInDiaFrame, 
+                                              double*** diaOverlapFirstDerivInDiaFrame,
+                                              double*** rotMat,
+                                              double**** rotMatFirstDerivs) const{
+   MallocerFreer::GetInstance()->Free<double>(diaOverlapInDiaFrame, OrbitalType_end, OrbitalType_end);
+   MallocerFreer::GetInstance()->Free<double>(diaOverlapFirstDerivInDiaFrame, OrbitalType_end, OrbitalType_end);
+   MallocerFreer::GetInstance()->Free<double>(rotMat, OrbitalType_end, OrbitalType_end);
+   MallocerFreer::GetInstance()->Free<double>(rotMatFirstDerivs, OrbitalType_end, OrbitalType_end, CartesianType_end);
 }
 
-void Cndo2::FreeDiatomicOverlapSecondDeriTemps(double*** diatomicOverlap, 
-                                               double*** diaOverlapFirstDeri,
-                                               double*** diaOverlapSecondDeri,
-                                               double*** rotatingMatrix,
-                                               double**** rotMatFirstDerivatives,
-                                               double***** rotMatSecondDerivatives,
-                                               double**** tempOverlapFirstDeri,
-                                               double***** tempOverlapSecondDeri) const{
-   MallocerFreer::GetInstance()->Free<double>(diatomicOverlap, OrbitalType_end, OrbitalType_end);
-   MallocerFreer::GetInstance()->Free<double>(diaOverlapFirstDeri, OrbitalType_end, OrbitalType_end);
-   MallocerFreer::GetInstance()->Free<double>(diaOverlapSecondDeri, OrbitalType_end, OrbitalType_end);
-   MallocerFreer::GetInstance()->Free<double>(rotatingMatrix, OrbitalType_end, OrbitalType_end);
-   MallocerFreer::GetInstance()->Free<double>(rotMatFirstDerivatives, OrbitalType_end, OrbitalType_end, CartesianType_end);
-   MallocerFreer::GetInstance()->Free<double>(rotMatSecondDerivatives, OrbitalType_end, OrbitalType_end, CartesianType_end, CartesianType_end);
-   MallocerFreer::GetInstance()->Free<double>(tempOverlapFirstDeri, OrbitalType_end, OrbitalType_end, CartesianType_end);
-   MallocerFreer::GetInstance()->Free<double>(tempOverlapSecondDeri, OrbitalType_end, OrbitalType_end, CartesianType_end, CartesianType_end);
+void Cndo2::FreeDiatomicOverlapSecondDeriTemps(double*** diaOverlapInDiaFrame, 
+                                               double*** diaOverlapFirstDerivInDiaFrame,
+                                               double*** diaOverlapSecondDerivInDiaFrame,
+                                               double*** rotMat,
+                                               double**** rotMatFirstDerivs,
+                                               double***** rotMatSecondDerivs,
+                                               double**** tempDiaOverlapFirstDerivs,
+                                               double***** tempDiaOverlapSecondDerivs) const{
+   MallocerFreer::GetInstance()->Free<double>(diaOverlapInDiaFrame, OrbitalType_end, OrbitalType_end);
+   MallocerFreer::GetInstance()->Free<double>(diaOverlapFirstDerivInDiaFrame, OrbitalType_end, OrbitalType_end);
+   MallocerFreer::GetInstance()->Free<double>(diaOverlapSecondDerivInDiaFrame, OrbitalType_end, OrbitalType_end);
+   MallocerFreer::GetInstance()->Free<double>(rotMat, OrbitalType_end, OrbitalType_end);
+   MallocerFreer::GetInstance()->Free<double>(rotMatFirstDerivs, OrbitalType_end, OrbitalType_end, CartesianType_end);
+   MallocerFreer::GetInstance()->Free<double>(rotMatSecondDerivs, OrbitalType_end, OrbitalType_end, CartesianType_end, CartesianType_end);
+   MallocerFreer::GetInstance()->Free<double>(tempDiaOverlapFirstDerivs, OrbitalType_end, OrbitalType_end, CartesianType_end);
+   MallocerFreer::GetInstance()->Free<double>(tempDiaOverlapSecondDerivs, OrbitalType_end, OrbitalType_end, CartesianType_end, CartesianType_end);
 }
 
 // calculate Overlap matrix. E.g. S_{\mu\nu} in (3.74) in J. A. Pople book by GTO expansion.

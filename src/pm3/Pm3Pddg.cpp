@@ -92,14 +92,18 @@ void Pm3Pddg::SetMessages(){
       = "Error in pm3::Pm3Pddg::GetNddoRepulsionIntegralSecondDerivative: Bad orbital is set.\n";
    this->errorMessageCalcTwoElecTwoCoreNullMatrix 
       = "Error in pm3::Pm3Pddg::CalcTwoElecTwoCore: The two elec two core matrix is NULL.\n"; 
-   this->errorMessageCalcTwoElecTwoCoreDiatomicNullMatrix 
-      = "Error in pm3::Pm3Pddg::CalcTwoElecTwoCoreDiatomic: The two elec two core diatomic matrix is NULL.\n"; 
-   this->errorMessageCalcTwoElecTwoCoreDiatomicSameAtoms
-      = "Error in pm3::Pm3Pddg::CalcTwoElecTwoCoreDiatomic: Atom A and B is same.\n"; 
-   this->errorMessageCalcTwoElecTwoCoreDiatomicFirstDerivativesNullMatrix
-      = "Error in pm3::Pm3Pddg::CalcTwoElecTwoCoreDiatomicFirstDerivatives: The two elec two core diatomic matrix is NULL.\n"; 
-   this->errorMessageCalcTwoElecTwoCoreDiatomicFirstDerivativesSameAtoms
-      = "Error in pm3::Pm3Pddg::CalcTwoElecTwoCoreDiatomicFirstDerivatives: Atom A and B is same.\n"; 
+   this->errorMessageCalcDiatomicTwoElecTwoCoreSameAtoms
+      = "Error in pm3::Pm3Pddg::CalcDiatomicTwoElecTwoCore: Atom A and B is same.\n"; 
+   this->errorMessageCalcDiatomicTwoElecTwoCoreFirstDerivativesSameAtoms
+      = "Error in pm3::Pm3Pddg::CalcDiatomicTwoElecTwoCoreFirstDerivatives: Atom A and B is same.\n"; 
+   this->errorMessageCalcDiatomicTwoElecTwoCoreSecondDerivativesSameAtoms
+      = "Error in pm3::Pm3Pddg::CalcDiatomicTwoElecTwoCoreSecondDerivatives: Atom A and B is same.\n"; 
+   this->errorMessageCalcDiatomicTwoElecTwoCoreNullMatrix 
+      = "Error in pm3::Pm3Pddg::CalcDiatomicTwoElecTwoCore: The two elec two core diatomic matrix is NULL.\n"; 
+   this->errorMessageCalcDiatomicTwoElecTwoCoreFirstDerivativesNullMatrix
+      = "Error in pm3::Pm3Pddg::CalcDiatomicTwoElecTwoCoreFirstDerivatives: The two elec two core diatomic matrix is NULL.\n"; 
+   this->errorMessageCalcDiatomicTwoElecTwoCoreSecondDerivativesNullMatrix
+      = "Error in pm3::Pm3Pddg::CalcDiatomicTwoElecTwoCoreSecondDerivatives: The two elec two core diatomic matrix is NULL.\n"; 
    this->errorMessageGetElectronicEnergyEnergyNotCalculated
       = "Error in pm3::Pm3Pddg::GetElectronicEnergy: Set electronic state is not calculated by CIS.\n";
    this->errorMessageGetElectronicEnergyNULLCISEnergy 
@@ -122,11 +126,14 @@ void Pm3Pddg::SetEnableAtomTypes(){
 }
 
 double Pm3Pddg::GetDiatomCoreRepulsionEnergy(int indexAtomA, int indexAtomB) const{
-   double energy = Pm3::GetDiatomCoreRepulsionEnergy(indexAtomA, indexAtomB);
+   // PM3 term
+   double pm3Term = Pm3::GetDiatomCoreRepulsionEnergy(indexAtomA, indexAtomB);
+
+   // pddg additional term, eq. (4) in [RCJ_2002]
    const Atom& atomA = *this->molecule->GetAtom(indexAtomA);
    const Atom& atomB = *this->molecule->GetAtom(indexAtomB);
-   double na = static_cast<double>(atomA.GetNumberValenceElectrons());
-   double nb = static_cast<double>(atomB.GetNumberValenceElectrons());
+   int na = atomA.GetNumberValenceElectrons();
+   int nb = atomB.GetNumberValenceElectrons();
    double distance = this->molecule->GetDistanceAtoms(indexAtomA, indexAtomB);
    double temp = 0.0;
    for(int i=0; i<2; i++){
@@ -135,11 +142,12 @@ double Pm3Pddg::GetDiatomCoreRepulsionEnergy(int indexAtomA, int indexAtomB) con
       for(int j=0; j<2; j++){
          double pb = atomB.GetPm3PddgParameterPa(j);
          double db = atomB.GetPm3PddgParameterDa(j);
-         temp += (na*pa +nb*pb)*exp(-10.0*pow((distance-da-db),2.0));
+         temp += this->GetPddgAdditonalDiatomCoreRepulsionTerm(na, pa, da, nb, pb, db, distance);
       }
    }
-   energy += temp/(na+nb);
-   return energy;
+   double additionalTerm = temp/(na+nb);
+   
+   return pm3Term + additionalTerm;
 }
 
 // First derivative of diatomic core repulsion energy.
@@ -147,15 +155,17 @@ double Pm3Pddg::GetDiatomCoreRepulsionEnergy(int indexAtomA, int indexAtomB) con
 double Pm3Pddg::GetDiatomCoreRepulsionFirstDerivative(int atomAIndex,
                                                       int atomBIndex, 
                                                       CartesianType axisA) const{
-   double value = Pm3::GetDiatomCoreRepulsionFirstDerivative(atomAIndex,
-                                                             atomBIndex,
-                                                             axisA);
+   // PM3 term
+   double pm3Term = Pm3::GetDiatomCoreRepulsionFirstDerivative(atomAIndex, atomBIndex, axisA);
+
+   // pddg additional term, first derivative of eq. (4) in [RCJ_2002]
    const Atom& atomA = *this->molecule->GetAtom(atomAIndex);
    const Atom& atomB = *this->molecule->GetAtom(atomBIndex);
-   double Rab = this->molecule->GetDistanceAtoms(atomAIndex, atomBIndex);
-   double dRabDa = (atomA.GetXyz()[axisA] - atomB.GetXyz()[axisA])/Rab;
-   double na = static_cast<double>(atomA.GetNumberValenceElectrons());
-   double nb = static_cast<double>(atomB.GetNumberValenceElectrons());
+   double distance = this->molecule->GetDistanceAtoms(atomAIndex, atomBIndex);
+   double dCartesian = (atomA.GetXyz()[axisA] - atomB.GetXyz()[axisA]);
+   int na = atomA.GetNumberValenceElectrons();
+   int nb = atomB.GetNumberValenceElectrons();
+   double pddgExponent = -10.0;
    double temp = 0.0;
    for(int i=0; i<2; i++){
       double pa = atomA.GetPm3PddgParameterPa(i);
@@ -163,14 +173,87 @@ double Pm3Pddg::GetDiatomCoreRepulsionFirstDerivative(int atomAIndex,
       for(int j=0; j<2; j++){
          double pb = atomB.GetPm3PddgParameterPa(j);
          double db = atomB.GetPm3PddgParameterDa(j);
-         temp += (na*pa +nb*pb)*exp(-10.0*pow((Rab-da-db),2.0))
-                *(-20.0*(Rab-da-db));
+         temp += this->GetPddgAdditonalDiatomCoreRepulsionTermFirstDerivative(na, pa, da, nb, pb, db, distance);
       }
    }
-   value += temp*dRabDa/(na+nb);
-   return value;
+   double additionalTerm = temp*dCartesian/(distance*(na+nb));
+
+   return pm3Term + additionalTerm;
 }
 
+// Second derivative of diatomic core repulsion energy.
+// Both derivative are related to the coordinate of atomA.
+double Pm3Pddg::GetDiatomCoreRepulsionSecondDerivative(int atomAIndex,
+                                                       int atomBIndex, 
+                                                       CartesianType axisA1,
+                                                       CartesianType axisA2) const{
+   // PM3 term
+   double pm3Term = Pm3::GetDiatomCoreRepulsionSecondDerivative(atomAIndex, atomBIndex, axisA1, axisA2);
+
+   // pddg additional term, first derivative of eq. (4) in [RCJ_2002]
+   const Atom& atomA = *this->molecule->GetAtom(atomAIndex);
+   const Atom& atomB = *this->molecule->GetAtom(atomBIndex);
+   double distance = this->molecule->GetDistanceAtoms(atomAIndex, atomBIndex);
+   double dCartesian1 = (atomA.GetXyz()[axisA1] - atomB.GetXyz()[axisA1]);
+   double dCartesian2 = (atomA.GetXyz()[axisA2] - atomB.GetXyz()[axisA2]);
+   int na = atomA.GetNumberValenceElectrons();
+   int nb = atomB.GetNumberValenceElectrons();
+   double pddgExponent = -10.0;
+   double tempFirstDeriv = 0.0;
+   double tempSecondDeriv = 0.0;
+   for(int i=0; i<2; i++){
+      double pa = atomA.GetPm3PddgParameterPa(i);
+      double da = atomA.GetPm3PddgParameterDa(i);
+      for(int j=0; j<2; j++){
+         double pb = atomB.GetPm3PddgParameterPa(j);
+         double db = atomB.GetPm3PddgParameterDa(j);
+         tempFirstDeriv +=  this->GetPddgAdditonalDiatomCoreRepulsionTermFirstDerivative(na, pa, da, nb, pb, db, distance);
+         tempSecondDeriv += this->GetPddgAdditonalDiatomCoreRepulsionTermSecondDerivative(na, pa, da, nb, pb, db, distance);
+      }
+   }
+   double preFirstDeriv = 0.0;
+   double preSecondDeriv = 0.0;
+   if(axisA1 != axisA2){
+      preFirstDeriv = -dCartesian1*dCartesian2/pow(distance,3.0);
+      preSecondDeriv = dCartesian1*dCartesian2/pow(distance,2.0);
+   }
+   else{
+      preFirstDeriv = 1.0/distance - dCartesian1*dCartesian1/pow(distance,3.0);
+      preSecondDeriv = pow(dCartesian1/distance,2.0);
+   }
+   preFirstDeriv  /= static_cast<double>(na+nb);
+   preSecondDeriv /= static_cast<double>(na+nb);
+   double additionalTerm = preFirstDeriv*tempFirstDeriv + preSecondDeriv*tempSecondDeriv;
+
+   return pm3Term + additionalTerm;
+}
+
+// see eq. (4) in [RCJ_2002]
+double Pm3Pddg::GetPddgAdditonalDiatomCoreRepulsionTerm(int na, double pa, double da,
+                                                        int nb, double pb, double db,
+                                                        double distance) const{
+   double pddgExponent = -10.0;
+   return (static_cast<double>(na)*pa +static_cast<double>(nb)*pb)*exp(pddgExponent*pow((distance-da-db),2.0));
+}
+
+// see eq. (4) in [RCJ_2002]
+double Pm3Pddg::GetPddgAdditonalDiatomCoreRepulsionTermFirstDerivative(int na, double pa, double da,
+                                                                       int nb, double pb, double db,
+                                                                       double distance) const{
+   double pddgExponent = -10.0;
+   return (static_cast<double>(na)*pa +static_cast<double>(nb)*pb)*exp(pddgExponent*pow((distance-da-db),2.0))
+         *(2.0*pddgExponent*(distance-da-db));
+}
+
+// see eq. (4) in [RCJ_2002]
+double Pm3Pddg::GetPddgAdditonalDiatomCoreRepulsionTermSecondDerivative(int na, double pa, double da,
+                                                                        int nb, double pb, double db,
+                                                                        double distance) const{
+   double pddgExponent = -10.0;
+   return (static_cast<double>(na)*pa +static_cast<double>(nb)*pb)
+         *(2.0*pddgExponent + pow(2.0*pddgExponent*(distance-da-db),2.0))
+         *exp(pddgExponent*pow((distance-da-db),2.0));
+}
 
 }
 

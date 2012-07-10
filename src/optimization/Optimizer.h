@@ -1,5 +1,6 @@
 //************************************************************************//
 // Copyright (C) 2011-2012 Mikiya Fujii                                   // 
+// Copyright (C) 2012-2012 Katsuhiko Nishimra                             // 
 //                                                                        // 
 // This file is part of MolDS.                                            // 
 //                                                                        // 
@@ -30,7 +31,8 @@ protected:
    std::string errorMessageGeometyrOptimizationNotConverged;
    std::string messageLineSearchSteps;
    virtual void SetMessages();
-   void UpdateMolecularCoordinates(MolDS_base::Molecule& molecule, double** matrixForce, double dt) const;
+   void UpdateMolecularCoordinates(MolDS_base::Molecule& molecule, double const* const* matrixForce, double dt) const;
+   void UpdateMolecularCoordinates(MolDS_base::Molecule& molecule, double const* const* matrixForce) const;
    void UpdateElectronicStructure(boost::shared_ptr<MolDS_base::ElectronicStructure> electronicStructure, 
                                   MolDS_base::Molecule& molecule,
                                   bool requireGuess, 
@@ -44,6 +46,12 @@ protected:
    void OutputMoleculeElectronicStructure(boost::shared_ptr<MolDS_base::ElectronicStructure> electronicStructure, 
                                           MolDS_base::Molecule& molecule,
                                           bool printsLogs) const;
+   void LineSearch(boost::shared_ptr<MolDS_base::ElectronicStructure> electronicStructure,
+                   MolDS_base::Molecule& molecule,
+                   double &lineSearchCurrentEnergy,
+                   double const* const* matrixForce,
+                   int elecState,
+                   double dt) const;
 private:
    std::string errorMessageTheoryType;
    std::string errorMessageTotalSteps;
@@ -60,10 +68,10 @@ private:
    void SetEnableTheoryTypes();
    void CheckEnableTheoryType(MolDS_base::TheoryType theoryType) const;
    void ClearMolecularMomenta(MolDS_base::Molecule& molecule) const;
-   virtual void LineSearch(boost::shared_ptr<MolDS_base::ElectronicStructure> electronicStructure, 
-                   MolDS_base::Molecule& molecule,
-                   double* lineSearchedEnergy,
-                   bool* obainesOptimizedStructure) const = 0;
+   virtual void SearchMinimum(boost::shared_ptr<MolDS_base::ElectronicStructure> electronicStructure,
+                              MolDS_base::Molecule& molecule,
+                              double* lineSearchedEnergy,
+                              bool* obainesOptimizedStructure) const = 0;
 };
 
 }

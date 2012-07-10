@@ -1,5 +1,6 @@
 //************************************************************************//
 // Copyright (C) 2011-2012 Mikiya Fujii                                   // 
+// Copyright (C) 2012-2012 Katsuhiko Nishimra                             // 
 //                                                                        // 
 // This file is part of MolDS.                                            // 
 //                                                                        // 
@@ -37,7 +38,23 @@ public:
    }
 protected:
    void OutputLog(std::string log) const{
-      if(this->canOutputLogs){std::cout << log;}
+      if(this->canOutputLogs){
+         bool endl = false;
+         std::string::reverse_iterator iter;
+         for(iter = log.rbegin(); iter != log.rend(); iter++){
+            if(*iter == '\n'){
+               std::string::iterator fwditer = iter.base();
+               log.erase(--fwditer);
+               endl = true;
+               break;
+            }
+            else if(*iter != '\0'){
+               break;
+            }
+         }
+         std::cout << log;
+         if(endl){std::cout << std::endl;}
+      }
    }
 private:
    bool canOutputLogs;

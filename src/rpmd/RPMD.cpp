@@ -177,7 +177,7 @@ void RPMD::DoRPMD(const Molecule& refferenceMolecule){
                                                temperature);
    this->OutputLog(this->messageEndInitialRPMD);
 
-   // time step roop
+   // time step loop
    for(int s=0; s<totalSteps; s++){
       this->OutputLog((boost::format("%s%d\n") % this->messageStartStepRPMD.c_str() % (s+1)).str());
       // update momenta
@@ -308,14 +308,18 @@ void RPMD::SetEnableTheoryTypes(){
    this->enableGroundStateTheoryTypes.push_back(ZINDOS);
    this->enableGroundStateTheoryTypes.push_back(MNDO);
    this->enableGroundStateTheoryTypes.push_back(AM1);
+   this->enableGroundStateTheoryTypes.push_back(AM1D);
    this->enableGroundStateTheoryTypes.push_back(PM3);
+   this->enableGroundStateTheoryTypes.push_back(PM3D);
    this->enableGroundStateTheoryTypes.push_back(PM3PDDG);
 
    // excited state
    this->enableExcitedStateTheoryTypes.clear();
    this->enableExcitedStateTheoryTypes.push_back(MNDO);
    this->enableExcitedStateTheoryTypes.push_back(AM1);
+   this->enableExcitedStateTheoryTypes.push_back(AM1D);
    this->enableExcitedStateTheoryTypes.push_back(PM3);
+   this->enableExcitedStateTheoryTypes.push_back(PM3D);
    this->enableExcitedStateTheoryTypes.push_back(PM3PDDG);
 }
 

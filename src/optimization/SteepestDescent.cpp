@@ -1,5 +1,6 @@
 //************************************************************************//
 // Copyright (C) 2011-2012 Mikiya Fujii                                   // 
+// Copyright (C) 2012-2012 Katsuhiko Nishimra                             // 
 //                                                                        // 
 // This file is part of MolDS.                                            // 
 //                                                                        // 
@@ -60,10 +61,10 @@ void SteepestDescent::SetMessages(){
    this->messageStartSteepestDescentStep = "\n==========  START: Steepest Descent step ";
 }
 
-void SteepestDescent::LineSearch(boost::shared_ptr<ElectronicStructure> electronicStructure, 
-                                 Molecule& molecule,
-                                 double* lineSearchedEnergy,
-                                 bool* obtainesOptimizedStructure) const{
+void SteepestDescent::SearchMinimum(boost::shared_ptr<ElectronicStructure> electronicStructure,
+                                    Molecule& molecule,
+                                    double* lineSearchedEnergy,
+                                    bool* obtainesOptimizedStructure) const{
    int elecState = Parameters::GetInstance()->GetElectronicStateIndexOptimization();
    double dt = Parameters::GetInstance()->GetTimeWidthOptimization();
    int totalSteps = Parameters::GetInstance()->GetTotalStepsOptimization();
@@ -76,33 +77,17 @@ void SteepestDescent::LineSearch(boost::shared_ptr<ElectronicStructure> electron
    // initial calculation
    bool requireGuess = true;
    this->UpdateElectronicStructure(electronicStructure, molecule, requireGuess, this->CanOutputLogs());
-   lineSearchCurrentEnergy = electronicStructure->GetElectronicEnergy(elecState);
 
    requireGuess = false;
    matrixForce = electronicStructure->GetForce(elecState);
+   lineSearchCurrentEnergy = electronicStructure->GetElectronicEnergy(elecState);
    for(int s=0; s<totalSteps; s++){
       this->OutputLog((boost::format("%s%d\n\n") % this->messageStartSteepestDescentStep.c_str() % (s+1)).str());
       lineSearchInitialEnergy = lineSearchCurrentEnergy;
 
-      // line search roop
-      bool tempCanOutputLogs = false;
-      int lineSearchSteps = 0;
-      double lineSearchOldEnergy = lineSearchCurrentEnergy;
-      while(lineSearchCurrentEnergy <= lineSearchOldEnergy){
-         this->UpdateMolecularCoordinates(molecule, matrixForce, dt);
-         this->UpdateElectronicStructure(electronicStructure, molecule, requireGuess, tempCanOutputLogs);
-         lineSearchOldEnergy = lineSearchCurrentEnergy;
-         lineSearchCurrentEnergy = electronicStructure->GetElectronicEnergy(elecState);
-         lineSearchSteps++;
-      }
-
-      // final state of line search
-      this->OutputLog((boost::format("%s%d\n\n") % this->messageLineSearchSteps.c_str() % lineSearchSteps).str());
-      this->UpdateMolecularCoordinates(molecule, matrixForce, -0.5*dt);
-      this->UpdateElectronicStructure(electronicStructure, molecule, requireGuess, tempCanOutputLogs);
-      this->OutputMoleculeElectronicStructure(electronicStructure, molecule, this->CanOutputLogs());
+      // do line search
+      this->LineSearch(electronicStructure, molecule, lineSearchCurrentEnergy, matrixForce, elecState, dt);
       matrixForce = electronicStructure->GetForce(elecState);
-      lineSearchCurrentEnergy = electronicStructure->GetElectronicEnergy(elecState);
 
       // check convergence
       if(this->SatisfiesConvergenceCriterion(matrixForce, 

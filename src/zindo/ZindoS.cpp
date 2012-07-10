@@ -102,7 +102,7 @@ void ZindoS::SetMessages(){
    this->errorMessageCalcCISMatrix
       = "Error in zindo::ZindoS::CalcCISMatrix: Non available orbital is contained.\n";
    this->errorMessageDavidsonNotConverged =  "Error in zindo::ZindoS::DoCISDavidson: Davidson did not met convergence criterion. \n";
-   this->errorMessageDavidsonMaxIter = "Davidson roop reaches max_iter=";
+   this->errorMessageDavidsonMaxIter = "Davidson loop reaches max_iter=";
    this->errorMessageDavidsonMaxDim = "Dimension of the expansion vectors reaches max_dim=";
    this->errorMessageCalcForceNotGroundState 
       = "Error in zindo::ZindoS::CalcForce: Only ground state is enable in ZindoS.";
@@ -1430,7 +1430,7 @@ void ZindoS::DoCISDavidson(){
       interactionMatrixDimension = 0;
       reachMaxDim = false;
       goToDirectCIS = false;
-      // Davidson roop
+      // Davidson loop
       for(int k=0; k<maxIter; k++){
          this->OutputLog((boost::format("%s%d\n") % this->messageNumIterCIS.c_str() % k ).str());
          // calculate dimension of the interaction matrix 
@@ -1540,7 +1540,7 @@ void ZindoS::DoCISDavidson(){
                                                    interactionMatrixDimension, 
                                                    &interactionEigenEnergies);
 
-         // stop the Davidson roop
+         // stop the Davidson loop
          if(allConverged){
             this->OutputLog(this->messageDavidsonConverge);
             break;
@@ -1564,7 +1564,7 @@ void ZindoS::DoCISDavidson(){
             throw MolDSException(ss.str());
          }
 
-      }// end Davidson roop
+      }// end Davidson loop
    }
    catch(MolDSException ex){
       this->FreeDavidsonCISTemporaryMtrices(&expansionVectors, 
@@ -1733,7 +1733,8 @@ void ZindoS::CalcCISMatrix(double** matrixCIS) const{
                            ss << this->errorMessageAtomType << AtomTypeStr(atomA.GetAtomType()) << "\n";
                            ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbitalMu) << "\n";
                            ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbitalNu) << "\n";
-                           throw MolDSException(ss.str());
+                           #pragma omp critical
+                           ompErrors << ss.str() << endl ;
                         }   
 
                         value += 2.0*(coulomb-gamma)*fockMatrix[moA][mu]
@@ -1840,7 +1841,8 @@ void ZindoS::CalcCISMatrix(double** matrixCIS) const{
                            ss << this->errorMessageAtomType << AtomTypeStr(atomA.GetAtomType()) << "\n";
                            ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbitalMu) << "\n";
                            ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbitalNu) << "\n";
-                           throw MolDSException(ss.str());
+                           #pragma omp critical
+                           ompErrors << ss.str() << endl ;
                         }   
 
                         value += 2.0*(coulomb-gamma)*fockMatrix[moI][mu]
@@ -1945,9 +1947,9 @@ void ZindoS::CalcForce(const vector<int>& elecStates){
    stringstream ompErrors;
    #pragma omp parallel 
    {
-      double*** overlapDer=NULL;
+      double*** diatomicOverlapFirstDerivs=NULL;
       try{
-         MallocerFreer::GetInstance()->Malloc<double>(&overlapDer,
+         MallocerFreer::GetInstance()->Malloc<double>(&diatomicOverlapFirstDerivs,
                                                       OrbitalType_end, 
                                                       OrbitalType_end, 
                                                       CartesianType_end);
@@ -1968,7 +1970,7 @@ void ZindoS::CalcForce(const vector<int>& elecStates){
                   int numberAOsB = atomB.GetValenceSize();
 
                   // calc. first derivative of overlap.
-                  this->CalcDiatomicOverlapFirstDerivative(overlapDer, atomA, atomB);
+                  this->CalcDiatomicOverlapFirstDerivatives(diatomicOverlapFirstDerivs, atomA, atomB);
 
                   for(int i=0; i<CartesianType_end; i++){
                      coreRepulsion[i] += this->GetDiatomCoreRepulsionFirstDerivative(
@@ -1996,7 +1998,7 @@ void ZindoS::CalcForce(const vector<int>& elecStates){
                         for(int i=0; i<CartesianType_end; i++){
                            electronicForce2[i] += 2.0*this->orbitalElectronPopulation[mu][nu]
                                                  *bondParameter
-                                                 *overlapDer[mu-firstAOIndexA][nu-firstAOIndexB][i];
+                                                 *diatomicOverlapFirstDerivs[mu-firstAOIndexA][nu-firstAOIndexB][i];
                            electronicForce3[i] += (this->orbitalElectronPopulation[mu][mu]
                                                   *this->orbitalElectronPopulation[nu][nu]
                                                   -0.5*pow(this->orbitalElectronPopulation[mu][nu],2.0))
@@ -2020,7 +2022,7 @@ void ZindoS::CalcForce(const vector<int>& elecStates){
          #pragma omp critical
          ompErrors << ex.what() << endl ;
       }
-      MallocerFreer::GetInstance()->Free<double>(&overlapDer, 
+      MallocerFreer::GetInstance()->Free<double>(&diatomicOverlapFirstDerivs, 
                                                  OrbitalType_end,
                                                  OrbitalType_end,
                                                  CartesianType_end);

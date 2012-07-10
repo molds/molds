@@ -18,7 +18,6 @@
 //************************************************************************//
 #ifndef INCLUDED_LAPACK
 #define INCLUDED_LAPACK
-#include"mkl.h"
 namespace MolDS_wrappers{
 // Lapacke is singleton
 class Lapack: public MolDS_base::PrintController, private MolDS_base::Uncopyable{
@@ -27,6 +26,8 @@ public:
    static void DeleteInstance();
    int Dsyevd(double** matrix, double* eigenValues, int size, bool calcEigenVectors);
    int Dsysv(double const* const* matrix, double* b, int size);
+   int Dgetrs(double const* const* matrix, double** b, int size, int nrhs) const;
+   int Dgetrf(double* matrix, int* ipiv, int sizeM, int sizeN) const;
 private:
    Lapack();
    ~Lapack();
@@ -36,8 +37,10 @@ private:
    std::string errorMessageDsyevdInfo;
    std::string errorMessageDsyevdSize;
    std::string errorMessageDsysvInfo;
-   std::string errorMessageInfo;
    std::string errorMessageDsysvSize;
+   std::string errorMessageDgetrsInfo;
+   std::string errorMessageDgetrsSize;
+   std::string errorMessageDgetrfInfo;
 };
 }
 #endif
