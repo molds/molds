@@ -37,8 +37,9 @@ AC_LANG_PUSH([C++])
 AC_CHECK_LIB([pthread], [main])
 
 #Check for OpenMP
+CXXFLAGS_SAVED="$CXXFLAGS"
 AX_OPENMP(,[AC_MSG_FAILURE([Cannot use OpenMP!])])
-export CXXFLAGS="$CXXFLAGS $OPENMP_CXXFLAGS"
+CXXFLAGS="$CXXFLAGS $OPENMP_CXXFLAGS"
 AC_CHECK_HEADERS([omp.h],,[AC_MSG_FAILURE([Cannot find omp.h!])])
 AC_CHECK_LIB([iomp5], [omp_set_num_threads],,[
 							AC_CHECK_FUNC([omp_set_num_threads],,
@@ -50,17 +51,18 @@ AC_CHECK_FUNC([omp_get_wtime],,
 
 # OpenMP debug options
 AS_IF([test "$release_enabled" = "no" ],
-			[export CXXFLAGS_SAVED="$CXXFLAGS_SAVED"
-			 export CXXFLAGS="$CXXFLAGS -openmp-report2"
-			 AC_MSG_CHECKING([for openmp diagnosis option])
-			 AC_COMPILE_IFELSE([AC_LANG_SOURCE([int main(){return 0;}])],
-			 [AS_IF([test -f penmp-report2],
-							[rm penmp-report2
-							 AC_MSG_RESULT([no])
-							 export CXXFLAGS="$CXXFLAGS_SAVED"],
-							 [AC_MSG_RESULT([-openmp-report2])])]
-			 ,[AC_MSG_RESULT([no])
-			 export CXXFLAGS="$CXXFLAGS_SAVED"])])
+      [CXXFLAGS="$CXXFLAGS -openmp-report2"
+       AC_MSG_CHECKING([for openmp diagnosis option])
+       AC_COMPILE_IFELSE([AC_LANG_SOURCE([int main(){return 0;}])],
+      [AS_IF([test -f penmp-report2],
+             [rm penmp-report2
+              AC_MSG_RESULT([no])],
+             [OPENMP_CXXFLAGS="$OPENMP_CXXFLAGS -openmp-report2"
+              AC_MSG_RESULT([-openmp-report2])])],
+      [AC_MSG_RESULT([no])
+       ])])
+CXXFLAGS="$CXXFLAGS_SAVED"
+AC_SUBST([OPENMP_CXXFLAGS])
 
 # Check for LAPACK
 AX_BLAS(,[AC_MSG_FAILURE([Cannot find BLAS library!])])
