@@ -36,6 +36,7 @@
 # LICENSE
 #
 #   Copyright (c) 2008 Steven G. Johnson <stevenj@alum.mit.edu>
+#   Copyright (c) 2012 Katsuhiko Nishimra <ktns.87@gmail.com>
 #
 #   This program is free software: you can redistribute it and/or modify it
 #   under the terms of the GNU General Public License as published by the
@@ -131,6 +132,14 @@ fi
 # BLAS in Intel MKL library?
 if test $ax_blas_ok = no; then
 	AC_CHECK_LIB(mkl, $sgemm, [ax_blas_ok=yes;BLAS_LIBS="-lmkl -lguide -lpthread"],,[-lguide -lpthread])
+fi
+
+if test $ax_blas_ok = no; then
+	AC_CHECK_LIB(mkl_intel_lp64, $sgemm, [ax_blas_ok=yes;BLAS_LIBS="-lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core"],,[-lmkl_intel_thread -lmkl_core])
+fi
+
+if test $ax_blas_ok = no; then
+	AC_CHECK_LIB(mkl_intel, $sgemm, [ax_blas_ok=yes;BLAS_LIBS="-lmkl_intel -lmkl_intel_thread -lmkl_core"],,[-lmkl_intel_thread -lmkl_core])
 fi
 
 # BLAS in Apple vecLib library?
