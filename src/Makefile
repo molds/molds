@@ -29,6 +29,11 @@ else
    LDFLAGS+= -L$(OPENBLASDIR)/lib
 endif
 
+ifeq ($(BOOSTDIR),)
+else
+   CONFIGURE_OPTIONS+=--with-boost=$(BOOSTDIR)
+endif
+
 all: MolDS.out
 
 build/Makefile:
