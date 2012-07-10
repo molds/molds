@@ -19,12 +19,22 @@
 
 .PHONY: all clean
 
+ifeq ($(OPENBLASDIR),)
+   ifeq ($(BLASLIB),openblas)
+      CONFIGURE_OPTIONS+=--with-blas=openblas
+   endif
+else
+   CONFIGURE_OPTIONS+=--with-blas=openblas
+   CFLAGS+= -I$(OPENBLASDIR)/include
+   LDFLAGS+= -L$(OPENBLASDIR)/lib
+endif
+
 all: MolDS.out
 
 build/Makefile:
 	mkdir -p build
 	cd build; \
-	../configure $(CONFIGURE_OPTIONS)
+	CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)" ../configure $(CONFIGURE_OPTIONS)
 
 build/MolDS: build/Makefile $(wildcard *.cpp) $(wildcard */*.cpp) $(wildcard */*.h)
 	+make -C build
