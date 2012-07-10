@@ -43,9 +43,10 @@ DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(top_srcdir)/configure AUTHORS COPYING ChangeLog INSTALL NEWS \
 	depcomp install-sh missing
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/m4/ax_boost_base.m4 \
-	$(top_srcdir)/m4/ax_cxx_check_lib.m4 \
-	$(top_srcdir)/m4/ax_openmp.m4 $(top_srcdir)/configure.ac
+am__aclocal_m4_deps = $(top_srcdir)/m4/ax_blas.m4 \
+	$(top_srcdir)/m4/ax_boost_base.m4 \
+	$(top_srcdir)/m4/ax_lapack.m4 $(top_srcdir)/m4/ax_openmp.m4 \
+	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
@@ -71,8 +72,8 @@ am_MolDS_OBJECTS = Main.$(OBJEXT) MolDSException.$(OBJEXT) \
 	Pm3.$(OBJEXT) Pm3D.$(OBJEXT) Pm3Pddg.$(OBJEXT) \
 	ElectronicStructureFactory.$(OBJEXT) MD.$(OBJEXT) MC.$(OBJEXT) \
 	RPMD.$(OBJEXT) Optimizer.$(OBJEXT) ConjugateGradient.$(OBJEXT) \
-	SteepestDescent.$(OBJEXT) OptimizerFactory.$(OBJEXT) \
-	MolDS.$(OBJEXT)
+	SteepestDescent.$(OBJEXT) BFGS.$(OBJEXT) \
+	OptimizerFactory.$(OBJEXT) MolDS.$(OBJEXT)
 MolDS_OBJECTS = $(am_MolDS_OBJECTS)
 MolDS_LDADD = $(LDADD)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I.
@@ -110,8 +111,12 @@ AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
+BLAS_LIBS = @BLAS_LIBS@
 BOOST_CPPFLAGS = @BOOST_CPPFLAGS@
 BOOST_LDFLAGS = @BOOST_LDFLAGS@
+CC = @CC@
+CCDEPMODE = @CCDEPMODE@
+CFLAGS = @CFLAGS@
 CPPFLAGS = @CPPFLAGS@
 CXX = @CXX@
 CXXCPP = @CXXCPP@
@@ -125,16 +130,21 @@ ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
+F77 = @F77@
+FFLAGS = @FFLAGS@
+FLIBS = @FLIBS@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
+LAPACK_LIBS = @LAPACK_LIBS@
 LDFLAGS = @LDFLAGS@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LTLIBOBJS = @LTLIBOBJS@
 MAKEINFO = @MAKEINFO@
 OBJEXT = @OBJEXT@
+OPENMP_CXXFLAGS = @OPENMP_CXXFLAGS@
 PACKAGE = @PACKAGE@
 PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
@@ -146,8 +156,12 @@ SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
 VERSION = @VERSION@
+ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
+ac_ct_F77 = @ac_ct_F77@
 ac_ct_STRIP = @ac_ct_STRIP@
+am__fastdepCC_FALSE = @am__fastdepCC_FALSE@
+am__fastdepCC_TRUE = @am__fastdepCC_TRUE@
 am__fastdepCXX_FALSE = @am__fastdepCXX_FALSE@
 am__fastdepCXX_TRUE = @am__fastdepCXX_TRUE@
 am__include = @am__include@
@@ -175,8 +189,9 @@ sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
-MolDS_SOURCES = Main.cpp base/MolDSException.cpp wrappers/Lapack.cpp base/Utilities.cpp base/Enums.cpp base/MathUtilities.cpp base/MallocerFreer.cpp base/EularAngle.cpp base/Parameters.cpp base/atoms/Atom.cpp base/atoms/Hatom.cpp base/atoms/Liatom.cpp base/atoms/Catom.cpp base/atoms/Natom.cpp base/atoms/Oatom.cpp base/atoms/Satom.cpp base/factories/AtomFactory.cpp base/Molecule.cpp base/InputParser.cpp base/GTOExpansionSTO.cpp base/RealSphericalHarmonicsIndex.cpp base/loggers/MOLogger.cpp base/loggers/DensityLogger.cpp base/loggers/HoleDensityLogger.cpp base/loggers/ParticleDensityLogger.cpp cndo/Cndo2.cpp indo/Indo.cpp zindo/ZindoS.cpp mndo/Mndo.cpp am1/Am1.cpp am1/Am1D.cpp pm3/Pm3.cpp pm3/Pm3D.cpp pm3/Pm3Pddg.cpp base/factories/ElectronicStructureFactory.cpp md/MD.cpp mc/MC.cpp rpmd/RPMD.cpp optimization/Optimizer.cpp optimization/ConjugateGradient.cpp optimization/SteepestDescent.cpp base/factories/OptimizerFactory.cpp  base/MolDS.cpp base/PrintController.h base/MolDSException.h base/Uncopyable.h wrappers/Lapack.h base/Utilities.h base/Enums.h base/MathUtilities.h base/MallocerFreer.h base/EularAngle.h base/Parameters.h base/atoms/Atom.h base/atoms/Hatom.h base/atoms/Liatom.h base/atoms/Catom.h base/atoms/Natom.h base/atoms/Oatom.h base/atoms/Satom.h base/factories/AtomFactory.h base/Molecule.h base/InputParser.h base/GTOExpansionSTO.h base/RealSphericalHarmonicsIndex.h base/loggers/MOLogger.h base/loggers/DensityLogger.h base/loggers/HoleDensityLogger.h base/loggers/ParticleDensityLogger.h base/ElectronicStructure.h cndo/Cndo2.h indo/Indo.h zindo/ZindoS.h mndo/Mndo.h am1/Am1.h am1/Am1D.h pm3/Pm3.h pm3/Pm3D.h pm3/Pm3Pddg.h base/factories/ElectronicStructureFactory.h md/MD.h mc/MC.h rpmd/RPMD.h optimization/Optimizer.h optimization/ConjugateGradient.h optimization/SteepestDescent.h base/factories/OptimizerFactory.h base/MolDS.h
+MolDS_SOURCES = Main.cpp base/MolDSException.cpp wrappers/Lapack.cpp base/Utilities.cpp base/Enums.cpp base/MathUtilities.cpp base/MallocerFreer.cpp base/EularAngle.cpp base/Parameters.cpp base/atoms/Atom.cpp base/atoms/Hatom.cpp base/atoms/Liatom.cpp base/atoms/Catom.cpp base/atoms/Natom.cpp base/atoms/Oatom.cpp base/atoms/Satom.cpp base/factories/AtomFactory.cpp base/Molecule.cpp base/InputParser.cpp base/GTOExpansionSTO.cpp base/RealSphericalHarmonicsIndex.cpp base/loggers/MOLogger.cpp base/loggers/DensityLogger.cpp base/loggers/HoleDensityLogger.cpp base/loggers/ParticleDensityLogger.cpp cndo/Cndo2.cpp indo/Indo.cpp zindo/ZindoS.cpp mndo/Mndo.cpp am1/Am1.cpp am1/Am1D.cpp pm3/Pm3.cpp pm3/Pm3D.cpp pm3/Pm3Pddg.cpp base/factories/ElectronicStructureFactory.cpp md/MD.cpp mc/MC.cpp rpmd/RPMD.cpp optimization/Optimizer.cpp optimization/ConjugateGradient.cpp optimization/SteepestDescent.cpp optimization/BFGS.cpp base/factories/OptimizerFactory.cpp  base/MolDS.cpp base/PrintController.h base/MolDSException.h base/Uncopyable.h wrappers/Lapack.h base/Utilities.h base/Enums.h base/MathUtilities.h base/MallocerFreer.h base/EularAngle.h base/Parameters.h base/atoms/Atom.h base/atoms/Hatom.h base/atoms/Liatom.h base/atoms/Catom.h base/atoms/Natom.h base/atoms/Oatom.h base/atoms/Satom.h base/factories/AtomFactory.h base/Molecule.h base/InputParser.h base/GTOExpansionSTO.h base/RealSphericalHarmonicsIndex.h base/loggers/MOLogger.h base/loggers/DensityLogger.h base/loggers/HoleDensityLogger.h base/loggers/ParticleDensityLogger.h base/ElectronicStructure.h cndo/Cndo2.h indo/Indo.h zindo/ZindoS.h mndo/Mndo.h am1/Am1.h am1/Am1D.h pm3/Pm3.h pm3/Pm3D.h pm3/Pm3Pddg.h base/factories/ElectronicStructureFactory.h md/MD.h mc/MC.h rpmd/RPMD.h optimization/Optimizer.h optimization/ConjugateGradient.h optimization/SteepestDescent.h optimization/BFGS.h base/factories/OptimizerFactory.h base/MolDS.h
 ACLOCAL_AMFLAGS = -I m4
+AM_CXXFLAGS = $(OPENMP_CXXFLAGS)
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
@@ -269,6 +284,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Am1D.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Atom.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AtomFactory.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BFGS.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Catom.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Cndo2.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ConjugateGradient.Po@am__quote@
@@ -882,6 +898,20 @@ SteepestDescent.obj: optimization/SteepestDescent.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='optimization/SteepestDescent.cpp' object='SteepestDescent.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o SteepestDescent.obj `if test -f 'optimization/SteepestDescent.cpp'; then $(CYGPATH_W) 'optimization/SteepestDescent.cpp'; else $(CYGPATH_W) '$(srcdir)/optimization/SteepestDescent.cpp'; fi`
+
+BFGS.o: optimization/BFGS.cpp
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT BFGS.o -MD -MP -MF "$(DEPDIR)/BFGS.Tpo" -c -o BFGS.o `test -f 'optimization/BFGS.cpp' || echo '$(srcdir)/'`optimization/BFGS.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/BFGS.Tpo" "$(DEPDIR)/BFGS.Po"; else rm -f "$(DEPDIR)/BFGS.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='optimization/BFGS.cpp' object='BFGS.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o BFGS.o `test -f 'optimization/BFGS.cpp' || echo '$(srcdir)/'`optimization/BFGS.cpp
+
+BFGS.obj: optimization/BFGS.cpp
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT BFGS.obj -MD -MP -MF "$(DEPDIR)/BFGS.Tpo" -c -o BFGS.obj `if test -f 'optimization/BFGS.cpp'; then $(CYGPATH_W) 'optimization/BFGS.cpp'; else $(CYGPATH_W) '$(srcdir)/optimization/BFGS.cpp'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/BFGS.Tpo" "$(DEPDIR)/BFGS.Po"; else rm -f "$(DEPDIR)/BFGS.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='optimization/BFGS.cpp' object='BFGS.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o BFGS.obj `if test -f 'optimization/BFGS.cpp'; then $(CYGPATH_W) 'optimization/BFGS.cpp'; else $(CYGPATH_W) '$(srcdir)/optimization/BFGS.cpp'; fi`
 
 OptimizerFactory.o: base/factories/OptimizerFactory.cpp
 @am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT OptimizerFactory.o -MD -MP -MF "$(DEPDIR)/OptimizerFactory.Tpo" -c -o OptimizerFactory.o `test -f 'base/factories/OptimizerFactory.cpp' || echo '$(srcdir)/'`base/factories/OptimizerFactory.cpp; \

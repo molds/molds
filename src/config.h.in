@@ -1,5 +1,15 @@
 /* config.h.in.  Generated from configure.ac by autoheader.  */
 
+/* Define to dummy `main' function (if any) required to link to the Fortran
+   libraries. */
+#undef F77_DUMMY_MAIN
+
+/* Define if F77 and FC dummy `main' functions are identical. */
+#undef FC_DUMMY_MAIN_EQ_F77
+
+/* Define if you have a BLAS library. */
+#undef HAVE_BLAS
+
 /* define if the Boost library is available */
 #undef HAVE_BOOST
 
@@ -9,17 +19,14 @@
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
 
-/* Define to 1 if you have the `boost_random' library (-lboost_random). */
-#undef HAVE_LIBBOOST_RANDOM
+/* Define if you have LAPACK library. */
+#undef HAVE_LAPACK
+
+/* Define to 1 if you have the <lapacke.h> header file. */
+#undef HAVE_LAPACKE_H
 
 /* Define to 1 if you have the `iomp5' library (-liomp5). */
 #undef HAVE_LIBIOMP5
-
-/* Define to 1 if you have the `mkl_intel' library (-lmkl_intel). */
-#undef HAVE_LIBMKL_INTEL
-
-/* Define to 1 if you have the `mkl_intel_lp64' library (-lmkl_intel_lp64). */
-#undef HAVE_LIBMKL_INTEL_LP64
 
 /* Define to 1 if you have the `pthread' library (-lpthread). */
 #undef HAVE_LIBPTHREAD
