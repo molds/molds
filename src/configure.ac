@@ -6,7 +6,7 @@ AC_INIT([MolDS], [0.1], [molds-dev@lists.sourceforge.jp])
 
 # Check if pwd is source directory
 AS_IF([test -x ./configure],
-			AC_MSG_FAILURE([Don't execute configure script in source directory!]))
+      AC_MSG_FAILURE([Don't execute configure script in source directory!]))
 
 AM_INIT_AUTOMAKE([MolDS], [0.1])
 AC_CONFIG_SRCDIR([Main.cpp])
@@ -62,15 +62,13 @@ AS_IF([test "$release_enabled" = "no" ],
 			 ,[AC_MSG_RESULT([no])
 			 export CXXFLAGS="$CXXFLAGS_SAVED"])])
 
-# Check for mkl
-export LIBS="-lmkl_intel_thread -lmkl_core $LIBS"
-AC_CHECK_HEADERS([mkl.h])
-AC_CHECK_LIB([mkl_intel_lp64], [dsyevd],,
-						 [
-							AC_CHECK_LIB([mkl_intel], [main],,
-													 [AC_MSG_FAILURE([Cannot find mkl!])
-													 ])
-							])
+# Check for LAPACK
+AX_BLAS(,[AC_MSG_FAILURE([Cannot find BLAS library!])])
+AX_LAPACK(,[AC_MSG_FAILURE([Cannot find LAPACK library!])])
+LIBS="$LAPACK_LIBS $BLAS_LIBS $LIBS"
+AC_CHECK_HEADERS([mkl.h lapacke.h],[molds_lapack_header_found=yes],)
+AS_IF([test "x$molds_lapack_header_found" != "xyes"],
+      [AC_MSG_FAILURE([Cannot find mkl.h or lapacke.h!])])
 
 # Boost
 AX_BOOST_BASE([1.48],,[AC_MSG_FAILURE([boost library is too old!])])
