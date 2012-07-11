@@ -1807,22 +1807,22 @@ echo $ECHO_N "checking release mode... $ECHO_C" >&6
 if test "${enable_release+set}" = set; then
   enableval="$enable_release"
   if test "$enableval" = "no"; then
-  export release_enabled=no
+  release_enabled=no
 else
-  export release_enabled=yes
+  release_enabled=yes
 fi
 
 
 else
-  export release_enabled=no
+  release_enabled=no
 fi;
 echo "$as_me:$LINENO: result: $release_enabled" >&5
 echo "${ECHO_T}$release_enabled" >&6
 if test -z "$CXXFLAGS"; then
   if test "$release_enabled" = "yes"; then
-  export CXXFLAGS="-O2"
+  CXXFLAGS="-O2"
 else
-  export CXXFLAGS="-g -O0"
+  CXXFLAGS="-g -O0"
 fi
 
 fi
@@ -3451,7 +3451,7 @@ _ACEOF
 
 else
 
-							echo "$as_me:$LINENO: checking for omp_set_num_threads" >&5
+              echo "$as_me:$LINENO: checking for omp_set_num_threads" >&5
 echo $ECHO_N "checking for omp_set_num_threads... $ECHO_C" >&6
 if test "${ac_cv_func_omp_set_num_threads+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
@@ -8128,8 +8128,8 @@ fi
 
 
 
-export CPPFLAGS="$CPPFLAGS $BOOST_CPPFLAGS"
-export LDFLAGS="$LDFLAGS -Wl,-rpath=$BOOST_LIBDIR $BOOST_LDFLAGS"
+CPPFLAGS="$CPPFLAGS $BOOST_CPPFLAGS"
+LDFLAGS="$LDFLAGS -Wl,-rpath=$BOOST_LIBDIR $BOOST_LDFLAGS"
 
 
 for ac_header in boost/random.hpp
