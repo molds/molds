@@ -18,14 +18,14 @@ AC_ARG_ENABLE([release],
 							AS_HELP_STRING([--enable-release],
 														 [Enable optimize option and disable debug option])
 							,[AS_IF([test "$enableval" = "no"],
-											[export release_enabled=no],
-											[export release_enabled=yes])]
-							,[export release_enabled=no])
+											[release_enabled=no],
+											[release_enabled=yes])]
+							,[release_enabled=no])
 AC_MSG_RESULT([$release_enabled])
 AS_IF([test -z "$CXXFLAGS"],
 			[AS_IF([test "$release_enabled" = "yes"],
-						 [export CXXFLAGS="-O2"],
-						 [export CXXFLAGS="-g -O0"])])
+						 [CXXFLAGS="-O2"],
+						 [CXXFLAGS="-g -O0"])])
 
 # Checks for programs.
 AC_PROG_CXX([icpc g++])
@@ -75,8 +75,8 @@ AS_IF([test "x$molds_lapack_header_found" != "xyes"],
 # Boost
 AX_BOOST_BASE([1.48],,[AC_MSG_FAILURE([boost library is too old!])])
 
-export CPPFLAGS="$CPPFLAGS $BOOST_CPPFLAGS"
-export LDFLAGS="$LDFLAGS -Wl,-rpath=$BOOST_LIBDIR $BOOST_LDFLAGS"
+CPPFLAGS="$CPPFLAGS $BOOST_CPPFLAGS"
+LDFLAGS="$LDFLAGS -Wl,-rpath=$BOOST_LIBDIR $BOOST_LDFLAGS"
 
 AC_CHECK_HEADERS([boost/random.hpp])
 
