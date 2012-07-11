@@ -15,17 +15,17 @@ AC_CONFIG_HEADERS([config.h])
 # Setup CXXFLAGS
 AC_MSG_CHECKING([release mode])
 AC_ARG_ENABLE([release],
-							AS_HELP_STRING([--enable-release],
-														 [Enable optimize option and disable debug option])
-							,[AS_IF([test "$enableval" = "no"],
-											[release_enabled=no],
-											[release_enabled=yes])]
-							,[release_enabled=no])
+              AS_HELP_STRING([--enable-release],
+                             [Enable optimize option and disable debug option])
+              ,[AS_IF([test "$enableval" = "no"],
+                      [release_enabled=no],
+                      [release_enabled=yes])]
+              ,[release_enabled=no])
 AC_MSG_RESULT([$release_enabled])
 AS_IF([test -z "$CXXFLAGS"],
-			[AS_IF([test "$release_enabled" = "yes"],
-						 [CXXFLAGS="-O2"],
-						 [CXXFLAGS="-g -O0"])])
+      [AS_IF([test "$release_enabled" = "yes"],
+             [CXXFLAGS="-O2"],
+             [CXXFLAGS="-g -O0"])])
 
 # Checks for programs.
 AC_PROG_CXX([icpc g++])
@@ -42,12 +42,12 @@ AX_OPENMP(,[AC_MSG_FAILURE([Cannot use OpenMP!])])
 CXXFLAGS="$CXXFLAGS $OPENMP_CXXFLAGS"
 AC_CHECK_HEADERS([omp.h],,[AC_MSG_FAILURE([Cannot find omp.h!])])
 AC_CHECK_LIB([iomp5], [omp_set_num_threads],,[
-							AC_CHECK_FUNC([omp_set_num_threads],,
-														[AC_MSG_FAILURE([Cannot find omp_set_num_threads!])
-														])
-							])
+              AC_CHECK_FUNC([omp_set_num_threads],,
+                            [AC_MSG_FAILURE([Cannot find omp_set_num_threads!])
+                            ])
+              ])
 AC_CHECK_FUNC([omp_get_wtime],,
-							[AC_MSG_FAILURE([Cannot find omp_get_wtime!])])
+              [AC_MSG_FAILURE([Cannot find omp_get_wtime!])])
 
 # OpenMP debug options
 AS_IF([test "$release_enabled" = "no" ],
