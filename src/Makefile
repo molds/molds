@@ -18,20 +18,22 @@
 #//************************************************************************//
 
 .PHONY: all clean
-
+CONFIGURE_OPTIONS_INT=
+CFLAGS_INT=
+LDFLAGS_INT=
 ifeq ($(OPENBLASDIR),)
    ifeq ($(BLASLIB),openblas)
-      CONFIGURE_OPTIONS+=--with-blas=openblas
+      CONFIGURE_OPTIONS_INT+= --with-blas=openblas
    endif
 else
-   CONFIGURE_OPTIONS+=--with-blas=openblas
-   CFLAGS+= -I$(OPENBLASDIR)/include
-   LDFLAGS+= -L$(OPENBLASDIR)/lib
+   CONFIGURE_OPTIONS_INT+= --with-blas=openblas
+   CFLAGS_INT+= -I$(OPENBLASDIR)/include
+   LDFLAGS_INT+= -L$(OPENBLASDIR)/lib
 endif
 
 ifeq ($(BOOSTDIR),)
 else
-   CONFIGURE_OPTIONS+=--with-boost=$(BOOSTDIR)
+   CONFIGURE_OPTIONS_INT+= --with-boost=$(BOOSTDIR)
 endif
 
 all: MolDS.out
@@ -39,7 +41,7 @@ all: MolDS.out
 build/Makefile:
 	mkdir -p build
 	cd build; \
-	CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)" ../configure $(CONFIGURE_OPTIONS)
+	CFLAGS="$(CFLAGS)$(CFLAGS_INT)" LDFLAGS="$(LDFLAGS)$(LDFLAGS_INT)" ../configure $(CONFIGURE_OPTIONS)$(CONFIGURE_OPTIONS_INT)
 
 build/MolDS: build/Makefile $(wildcard *.cpp) $(wildcard */*.cpp) $(wildcard */*.h)
 	+make -C build
