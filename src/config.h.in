@@ -16,17 +16,44 @@
 /* Define to 1 if you have the <boost/random.hpp> header file. */
 #undef HAVE_BOOST_RANDOM_HPP
 
+/* Define to 1 if you have the `dgetrf' function. */
+#undef HAVE_DGETRF
+
+/* Define to 1 if you have the `dgetrs' function. */
+#undef HAVE_DGETRS
+
+/* Define to 1 if you have the `dsyevd' function. */
+#undef HAVE_DSYEVD
+
+/* Define to 1 if you have the `dsysv' function. */
+#undef HAVE_DSYSV
+
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
 
 /* Define if you have LAPACK library. */
 #undef HAVE_LAPACK
 
+/* Define to 1 if you have the `LAPACKE_dgetrf_work' function. */
+#undef HAVE_LAPACKE_DGETRF_WORK
+
+/* Define to 1 if you have the `LAPACKE_dgetrs_work' function. */
+#undef HAVE_LAPACKE_DGETRS_WORK
+
+/* Define to 1 if you have the `LAPACKE_dsyevd_work' function. */
+#undef HAVE_LAPACKE_DSYEVD_WORK
+
+/* Define to 1 if you have the `LAPACKE_dsysv_work' function. */
+#undef HAVE_LAPACKE_DSYSV_WORK
+
 /* Define to 1 if you have the <lapacke.h> header file. */
 #undef HAVE_LAPACKE_H
 
 /* Define to 1 if you have the `iomp5' library (-liomp5). */
 #undef HAVE_LIBIOMP5
+
+/* Define to 1 if you have the `lapacke' library (-llapacke). */
+#undef HAVE_LIBLAPACKE
 
 /* Define to 1 if you have the `pthread' library (-lpthread). */
 #undef HAVE_LIBPTHREAD
