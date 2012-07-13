@@ -86,6 +86,26 @@ AC_CHECK_HEADERS([mkl.h lapacke.h],[molds_lapack_header_found=yes],)
 AS_IF([test "x$molds_lapack_header_found" != "xyes"],
       [AC_MSG_FAILURE([Cannot find mkl.h or lapacke.h!])])
 
+dnl Check for LAPACK C interface
+AC_CHECK_FUNCS([dgetrf dgetrs dsyevd dsysv],
+               [molds_lapack_cinterface_found=yes],
+               [molds_lapack_cinterface_found=no;break])
+
+AS_IF([test x$molds_lapack_cinterface_found != xyes],
+      [AC_CHECK_FUNCS([LAPACKE_dgetrf_work LAPACKE_dgetrs_work LAPACKE_dsyevd_work LAPACKE_dsysv_work],
+                      [molds_lapack_cinterface_found=yes],
+                      [molds_lapack_cinterface_found=no;break])])
+AS_IF([test x$molds_lapack_cinterface_found != xyes],
+      [AC_CHECK_LIB([lapacke], [LAPACKE_dgetrf_work])])
+
+AS_IF([test x$molds_lapack_cinterface_found != xyes],
+      [AC_CHECK_FUNCS([LAPACKE_dgetrf_work LAPACKE_dgetrs_work LAPACKE_dsyevd_work LAPACKE_dsysv_work],
+                      [molds_lapack_cinterface_found=yes]
+                      [molds_lapack_cinterface_found=no;break])])
+
+AS_IF([test x$molds_lapack_cinterface_found != xyes],
+      [AC_MSG_FAILURE([Cannot find C interface functions of LAPACK!])])
+
 dnl Boost
 AX_BOOST_BASE([1.48],,[AC_MSG_FAILURE([boost library is too old!])])
 
