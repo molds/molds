@@ -155,10 +155,12 @@ int Lapack::Dsyevd(double** matrix, double* eigenValues, int size, bool calcEige
    }
 
    // call Lapack
-#if defined(HAVE_MKL_H)
+#if defined(HAVE_DSYEVD)
    dsyevd(&job, &uplo, &size, convertedMatrix, &lda, tempEigenValues, work, &lwork, iwork, &liwork, &info);
-#elif defined(HAVE_LAPACKE_H)
+#elif defined(HAVE_LAPACKE_DSYEVD_WORK)
    info = LAPACKE_dsyevd_work(LAPACK_COL_MAJOR, job, uplo, size, convertedMatrix, lda, tempEigenValues, work, lwork, iwork, liwork);
+#else
+#error Cannot find dsyevd!
 #endif
 
    for(int i = 0; i < size; i++){
@@ -244,10 +246,12 @@ int Lapack::Dsysv(double const* const* matrix, double* b, int size){
       if(!this->calculatedDsysvBlockSize){
          lwork = -1;
          double tempWork[3]={0.0, 0.0, 0.0};
-#if defined(HAVE_MKL_H)
+#if defined(HAVE_DSYSV)
          dsysv(&uplo, &size, &nrhs, convertedMatrix, &lda, ipiv, tempB, &ldb, tempWork, &lwork, &info);
-#elif defined(HAVE_LAPACKE_H)
+#elif defined(HAVE_LAPACKE_DSYSV_WORK)
          info = LAPACKE_dsysv_work(LAPACK_COL_MAJOR, uplo, size, nrhs, convertedMatrix, lda, ipiv, tempB, ldb, tempWork, lwork);
+#else
+#error Cannot find dsysv!
 #endif
          this->calculatedDsysvBlockSize = true;
          this->dsysvBlockSize = tempWork[0]/size;
@@ -258,10 +262,12 @@ int Lapack::Dsysv(double const* const* matrix, double* b, int size){
    work = (double*)LAPACK_malloc( sizeof(double)*lwork, 16 );
 
    // call Lapack
-#if defined(HAVE_MKL_H)
+#if defined(HAVE_DSYSV)
    dsysv(&uplo, &size, &nrhs, convertedMatrix, &lda, ipiv, tempB, &ldb, work, &lwork, &info);
-#elif defined(HAVE_LAPACKE_H)
+#elif defined(HAVE_LAPACKE_DSYSV_WORK)
    info = LAPACKE_dsysv_work(LAPACK_COL_MAJOR, uplo, size, nrhs, convertedMatrix, lda, ipiv, tempB, ldb, work, lwork);
+#else
+#error Cannot find dsysv!
 #endif
    for(int i = 0; i < size; i++){
       b[i] = tempB[i];
@@ -320,10 +326,12 @@ int Lapack::Dgetrs(double const* const* matrix, double** b, int size, int nrhs) 
          }
       }
       this->Dgetrf(convertedMatrix, ipiv, size, size);
-#if defined(HAVE_MKL_H)
+#if defined(HAVE_DGETRS)
       dgetrs(&trans, &size, &nrhs, convertedMatrix, &lda, ipiv, convertedB, &ldb, &info);
-#elif defined(HAVE_LAPACKE_H)
+#elif defined(HAVE_LAPACKE_DGETRS_WORK)
       info = LAPACKE_dgetrs_work(LAPACK_COL_MAJOR, trans, size, nrhs, convertedMatrix, lda, ipiv, convertedB, ldb);
+#else
+#error Cannot find dgetrs!
 #endif
       for(int i = 0; i < nrhs; i++){
          for(int j = 0; j < size; j++){
@@ -357,10 +365,12 @@ int Lapack::Dgetrs(double const* const* matrix, double** b, int size, int nrhs) 
 int Lapack::Dgetrf(double* matrix, int* ipiv, int sizeM, int sizeN) const{
    int info = 0;
    int lda = sizeM;
-#if defined(HAVE_MKL_H)
+#if defined(HAVE_DGETRF)
    dgetrf(&sizeM, &sizeN, matrix, &lda, ipiv, &info);
-#elif defined(HAVE_LAPACKE_H)
+#elif defined(HAVE_LAPACKE_DGETRF_WORK)
    info = LAPACKE_dgetrf_work(LAPACK_COL_MAJOR, sizeM, sizeN, matrix, lda, ipiv);
+#else
+#error Cannot find dgetrf!
 #endif
    if(info != 0){
       stringstream ss;
