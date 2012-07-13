@@ -2112,7 +2112,7 @@ double Mndo::GetAuxiliaryHessianElement8(int mu,
                  *orbitalElectronPopulation           [nu][sigma];
    double temp4 = orbitalElectronPopulation           [mu][lambda]
                  *orbitalElectronPopulationFirstDerivs[nu][sigma]    [atomBIndex][axisB];
-   double value = (0.5*(temp1 + temp2) - 0.25*(temp3 + temp4))
+   double value = ((temp1 + temp2) - 0.5*(temp3 + temp4))
                  *diatomicTwoElecTwoCoreFirstDerivs[mu-firstAOIndexA]
                                                    [nu-firstAOIndexA]
                                                    [lambda-firstAOIndexC]
@@ -2696,19 +2696,19 @@ void Mndo::CalcStaticFirstOrderFock(double* staticFirstOrderFock,
                               moI = redundantQIndeces[i-nonRedundantQIndeces.size()].moI;
                               moJ = redundantQIndeces[i-nonRedundantQIndeces.size()].moJ;
                            }
-                           double temp1 = this->fockMatrix[mu][moI]
-                                         *this->fockMatrix[nu][moJ]
+                           double temp1 = this->fockMatrix[moI][mu]
+                                         *this->fockMatrix[moJ][nu]
                                          *this->orbitalElectronPopulation[lambda][sigma]
-                                         +this->fockMatrix[lambda][moI]
-                                         *this->fockMatrix[sigma][moJ]
+                                         +this->fockMatrix[moI][lambda]
+                                         *this->fockMatrix[moJ][sigma]
                                          *this->orbitalElectronPopulation[mu][nu]
                                          -0.5
-                                         *this->fockMatrix[mu][moI]
-                                         *this->fockMatrix[lambda][moJ]
+                                         *this->fockMatrix[moI][mu]
+                                         *this->fockMatrix[moJ][lambda]
                                          *this->orbitalElectronPopulation[nu][sigma]
                                          -0.5
-                                         *this->fockMatrix[lambda][moI]
-                                         *this->fockMatrix[mu][moJ]
+                                         *this->fockMatrix[moI][lambda]
+                                         *this->fockMatrix[moJ][mu]
                                          *this->orbitalElectronPopulation[nu][sigma];
                            staticFirstOrderFock[i] += temp1*diatomicTwoElecTwoCoreFirstDerivs[mu-firstAOIndexA]
                                                                                              [nu-firstAOIndexA]
@@ -2731,8 +2731,8 @@ void Mndo::CalcStaticFirstOrderFock(double* staticFirstOrderFock,
                         moI = redundantQIndeces[i-nonRedundantQIndeces.size()].moI;
                         moJ = redundantQIndeces[i-nonRedundantQIndeces.size()].moJ;
                      }
-                     double temp2 = this->fockMatrix[mu][moI]
-                                   *this->fockMatrix[nu][moJ]
+                     double temp2 = this->fockMatrix[moI][mu]
+                                   *this->fockMatrix[moJ][nu]
                                    *coreChargeB
                                    *diatomicTwoElecTwoCoreFirstDerivs[mu-firstAOIndexA]
                                                                      [nu-firstAOIndexA]
@@ -2759,8 +2759,8 @@ void Mndo::CalcStaticFirstOrderFock(double* staticFirstOrderFock,
                         moI = redundantQIndeces[i-nonRedundantQIndeces.size()].moI;
                         moJ = redundantQIndeces[i-nonRedundantQIndeces.size()].moJ;
                      }
-                     double temp3 = this->fockMatrix[lambda][moI]
-                                   *this->fockMatrix[sigma][moJ]
+                     double temp3 = this->fockMatrix[moI][lambda]
+                                   *this->fockMatrix[moJ][sigma]
                                    *coreChargeA
                                    *diatomicTwoElecTwoCoreFirstDerivs[s]
                                                                      [s]
@@ -2790,10 +2790,10 @@ void Mndo::CalcStaticFirstOrderFock(double* staticFirstOrderFock,
                         moI = redundantQIndeces[i-nonRedundantQIndeces.size()].moI;
                         moJ = redundantQIndeces[i-nonRedundantQIndeces.size()].moJ;
                      }
-                     double temp4 = ( this->fockMatrix[mu][moI]
-                                     *this->fockMatrix[lambda][moJ]
-                                     +this->fockMatrix[lambda][moI]
-                                     *this->fockMatrix[mu][moJ]
+                     double temp4 = ( this->fockMatrix[moI][mu]
+                                     *this->fockMatrix[moJ][lambda]
+                                     +this->fockMatrix[moI][lambda]
+                                     *this->fockMatrix[moJ][mu]
                                     )
                                     *bondParameter
                                     *diatomicOverlapFirstDerivs[mu-firstAOIndexA][lambda-firstAOIndexB][axisA];
