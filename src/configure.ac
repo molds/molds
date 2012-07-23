@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with MolDS.  If not, see <http://www.gnu.org/licenses/>.
 
-AC_PREREQ([2.59])
+AC_PREREQ([2.60])
 AC_INIT([MolDS], [0.1], [molds-dev@lists.sourceforge.jp])
 
 dnl Check if pwd is source directory
@@ -76,6 +76,25 @@ AS_IF([test "$release_enabled" = "no" ],
                          [AC_MSG_RESULT([no])])])
 CXXFLAGS="$CXXFLAGS_SAVED"
 AC_SUBST([OPENMP_CXXFLAGS])
+
+dnl --with-openblas option
+AC_ARG_WITH([openblas],
+            [AC_HELP_STRING([--with-openblas[=DIR]],
+                           [Use OpenBLAS library.])],
+            [AS_CASE([$withval],
+                     [yes],[BLAS_LIBS=-lopenblas
+                            OPENBLAS_ROOT=],
+                     [no],[OPENBLAS_ROOT=],
+                     [AS_IF([test -d $withval],
+                            [AC_MSG_NOTICE([Using OpenBLAS under `$withval'.])
+                             BLAS_LIBS=-lopenblas
+                             OPENBLAS_ROOT=$withval
+                             CPPFLAGS="$CPPFLAGS -I$OPENBLAS_ROOT/lib"
+                             LDFLAGS="$LDFLAGS -L$OPENBLAS_ROOT/lib"],
+                            [AC_MSG_FAILURE([Cannot find directory `$withval'!])])])],
+            [OPENBLAS_ROOT=])
+AM_CONDITIONAL([USE_OPENBLAS_DIR], [test x != x$OPENBLAS_ROOT])
+AC_SUBST([OPENBLAS_ROOT])
 
 dnl Check for LAPACK
 AX_BLAS(,[AC_MSG_FAILURE([Cannot find BLAS library!])])
