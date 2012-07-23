@@ -68,13 +68,12 @@ AS_IF([test "$release_enabled" = "no" ],
       [CXXFLAGS="$CXXFLAGS -openmp-report2"
        AC_MSG_CHECKING([for openmp diagnosis option])
        AC_COMPILE_IFELSE([AC_LANG_SOURCE([int main(){return 0;}])],
-      [AS_IF([test -f penmp-report2],
-             [rm penmp-report2
-              AC_MSG_RESULT([no])],
-             [OPENMP_CXXFLAGS="$OPENMP_CXXFLAGS -openmp-report2"
-              AC_MSG_RESULT([-openmp-report2])])],
-      [AC_MSG_RESULT([no])
-       ])])
+                         [AS_IF([test -f penmp-report2],
+                                [rm penmp-report2
+                                 AC_MSG_RESULT([no])],
+                         [OPENMP_CXXFLAGS="$OPENMP_CXXFLAGS -openmp-report2"
+                          AC_MSG_RESULT([-openmp-report2])])],
+                         [AC_MSG_RESULT([no])])])
 CXXFLAGS="$CXXFLAGS_SAVED"
 AC_SUBST([OPENMP_CXXFLAGS])
 
