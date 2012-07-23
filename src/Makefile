@@ -26,9 +26,7 @@ ifeq ($(OPENBLASDIR),)
       CONFIGURE_OPTIONS_INT+= --with-blas=openblas
    endif
 else
-   CONFIGURE_OPTIONS_INT+= --with-blas=openblas
-   CFLAGS_INT+= -I$(OPENBLASDIR)/include
-   LDFLAGS_INT+= -L$(OPENBLASDIR)/lib
+   CONFIGURE_OPTIONS_INT+= --with-openblas=$(OPENBLASDIR)
 endif
 
 ifeq ($(BOOSTDIR),)
