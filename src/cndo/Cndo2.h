@@ -51,9 +51,10 @@ protected:
    std::string errorMessageCoulombInt;
    std::string errorMessageExchangeInt;
    std::string errorMessageMolecularIntegralElement;
+   std::string errorMessageGetDiatomCoreRepulsion2ndDerivativeNotImplemented;
    std::string errorMessageGetGaussianCartesianMatrixBadOrbital;
    std::string errorMessageGetGaussianOverlapBadOrbital;
-   std::string errorMessageGetGaussianOverlapFirstDerivativeOrbitalD;
+   std::string errorMessageGetGaussianOverlap1stDerivativeOrbitalD;
    std::string errorMessageCISNotImplemented;
    std::string errorMessageCalcForceNotImplemented;
    std::string errorMessageGetElectronicEnergyNULLCISEnergy;
@@ -102,31 +103,35 @@ protected:
    double GetBondingAdjustParameterK(MolDS_base::ShellType shellA, 
                                      MolDS_base::ShellType shellB) const;
    virtual double GetDiatomCoreRepulsionEnergy(int indexAtomA, int indexAtomB) const;
-   virtual double GetDiatomCoreRepulsionFirstDerivative(int indexAtomA, 
+   virtual double GetDiatomCoreRepulsion1stDerivative(int indexAtomA, 
                                                         int indexAtomB, 
                                                         MolDS_base::CartesianType axisA) const;
+   virtual double GetDiatomCoreRepulsion2ndDerivative(int indexAtomA,
+                                                         int indexAtomB, 
+                                                         MolDS_base::CartesianType axisA1,
+                                                         MolDS_base::CartesianType axisA2) const;
    virtual double GetDiatomVdWCorrectionEnergy(int indexAtomA, int indexAtomB) const;
-   virtual double GetDiatomVdWCorrectionFirstDerivative(int indexAtomA, 
+   virtual double GetDiatomVdWCorrection1stDerivative(int indexAtomA, 
                                                         int indexAtomB, 
                                                         MolDS_base::CartesianType axisA) const;
-   virtual double GetDiatomVdWCorrectionSecondDerivative(int indexAtomA, 
+   virtual double GetDiatomVdWCorrection2ndDerivative(int indexAtomA, 
                                                          int indexAtomB, 
                                                          MolDS_base::CartesianType axisA1,
                                                          MolDS_base::CartesianType axisA2) const;
    double GetReducedOverlap(int na, int la, int m, 
                             int nb, int lb, double alpha, double beta) const;
    double GetReducedOverlap(int na, int nb, double alpha, double beta) const;
-   double GetReducedOverlapFirstDerivativeAlpha(int na, int la, int m, 
+   double GetReducedOverlap1stDerivativeAlpha(int na, int la, int m, 
                                                 int nb, int lb, double alpha, double beta) const;
-   double GetReducedOverlapFirstDerivativeBeta(int na, int la, int m, 
+   double GetReducedOverlap1stDerivativeBeta(int na, int la, int m, 
                                                int nb, int lb, double alpha, double beta) const;
-   double GetReducedOverlapSecondDerivativeAlpha(int na, int la, int m, 
+   double GetReducedOverlap2ndDerivativeAlpha(int na, int la, int m, 
                                                  int nb, int lb, double alpha, double beta) const;
-   double GetReducedOverlapSecondDerivativeBeta(int na, int la, int m, 
+   double GetReducedOverlap2ndDerivativeBeta(int na, int la, int m, 
                                                 int nb, int lb, double alpha, double beta) const;
-   double GetReducedOverlapSecondDerivativeAlphaBeta(int na, int la, int m, 
+   double GetReducedOverlap2ndDerivativeAlphaBeta(int na, int la, int m, 
                                                      int nb, int lb, double alpha, double beta) const;
-   double GetOverlapElementFirstDerivativeByGTOExpansion(const MolDS_base_atoms::Atom& atomA, 
+   double GetOverlapElement1stDerivativeByGTOExpansion(const MolDS_base_atoms::Atom& atomA, 
                                                          int valenceIndexA, 
                                                          const MolDS_base_atoms::Atom& atomB, 
                                                          int valenceIndexB,
@@ -137,7 +142,7 @@ protected:
                            const MolDS_base_atoms::Atom& atomB) const;
    virtual void CalcGammaAB(double** gammaAB, const MolDS_base::Molecule& molecule) const;
    virtual double GetFockDiagElement(const MolDS_base_atoms::Atom& atomA, 
-                                     int atomAIndex, 
+                                     int indexAtomA, 
                                      int mu, 
                                      const MolDS_base::Molecule& molecule, 
                                      double const* const* gammaAB,
@@ -147,8 +152,8 @@ protected:
                                      bool isGuess) const;
    virtual double GetFockOffDiagElement(const MolDS_base_atoms::Atom& atomA, 
                                         const MolDS_base_atoms::Atom& atomB, 
-                                        int atomAIndex, 
-                                        int atomBIndex, 
+                                        int indexAtomA, 
+                                        int indexAtomB, 
                                         int mu, 
                                         int nu, 
                                         const MolDS_base::Molecule& molecule, 
@@ -160,25 +165,25 @@ protected:
    virtual void CalcDiatomicOverlapInDiatomicFrame(double** diatomicOverlap, 
                                                    const MolDS_base_atoms::Atom& atomA, 
                                                    const MolDS_base_atoms::Atom& atomB) const;
-   virtual void CalcDiatomicOverlapFirstDerivativeInDiatomicFrame(double** diatomicOverlapDeri, 
+   virtual void CalcDiatomicOverlap1stDerivativeInDiatomicFrame(double** diatomicOverlapDeri, 
                                                                   const MolDS_base_atoms::Atom& atomA, 
                                                                   const MolDS_base_atoms::Atom& atomB) const;
-   virtual void CalcDiatomicOverlapSecondDerivativeInDiatomicFrame(double** diatomicOverlapSecondDeri, 
+   virtual void CalcDiatomicOverlap2ndDerivativeInDiatomicFrame(double** diatomicOverlap2ndDeri, 
                                                                    const MolDS_base_atoms::Atom& atomA, 
                                                                    const MolDS_base_atoms::Atom& atomB) const;
-   void CalcDiatomicOverlapFirstDerivatives(double*** diatomicOverlapFirstDerivs, 
+   void CalcDiatomicOverlap1stDerivatives(double*** diatomicOverlap1stDerivs, 
                                             const MolDS_base_atoms::Atom& atomA, 
                                             const MolDS_base_atoms::Atom& atomB) const;
-   void CalcDiatomicOverlapFirstDerivatives(double*** diatomicOverlapFirstDerivs, 
-                                            int atomAIndex, 
-                                            int atomBIndex) const;
-   void CalcDiatomicOverlapSecondDerivatives(double**** overlapSecondDeri, 
+   void CalcDiatomicOverlap1stDerivatives(double*** diatomicOverlap1stDerivs, 
+                                            int indexAtomA, 
+                                            int indexAtomB) const;
+   void CalcDiatomicOverlap2ndDerivatives(double**** overlap2ndDeri, 
                                              const MolDS_base_atoms::Atom& atomA, 
                                              const MolDS_base_atoms::Atom& atomB) const;
-   void CalcDiatomicOverlapSecondDerivatives(double**** overlapSecondDeri, 
-                                             int atomAIndex, 
-                                             int atomBIndex) const;
-   double GetSecondDerivativeElementFromDistanceDerivatives(double firstDistanceDeri,
+   void CalcDiatomicOverlap2ndDerivatives(double**** overlap2ndDeri, 
+                                             int indexAtomA, 
+                                             int indexAtomB) const;
+   double Get2ndDerivativeElementFromDistanceDerivatives(double firstDistanceDeri,
                                                             double secondDistanceDeri,
                                                             MolDS_base::CartesianType axisA1,
                                                             MolDS_base::CartesianType axisA2,
@@ -191,10 +196,10 @@ protected:
    virtual void CalcTwoElecTwoCore(double****** twoElecTwoCore, 
                                    const MolDS_base::Molecule& molecule) const;
    virtual void CalcForce(const std::vector<int>& elecStates);
-   void CalcRotatingMatrixFirstDerivatives(double*** rotMatFirstDerivatives, 
+   void CalcRotatingMatrix1stDerivatives(double*** rotMat1stDerivatives, 
                                            const MolDS_base_atoms::Atom& atomA,
                                            const MolDS_base_atoms::Atom& atomB) const;
-   void CalcRotatingMatrixSecondDerivatives(double**** rotMatSecondDerivatives, 
+   void CalcRotatingMatrix2ndDerivatives(double**** rotMat2ndDerivatives, 
                                             const MolDS_base_atoms::Atom& atomA,
                                             const MolDS_base_atoms::Atom& atomB) const;
    struct MoEnergyGap{
@@ -274,8 +279,8 @@ private:
    void CalcCoreRepulsionEnergy();
    void CalcVdWCorrectionEnergy();
    double GetVdwDampingValue(double vdWDistance, double distance) const;
-   double GetVdwDampingValueFirstDerivative(double vdWDistance, double distance) const;
-   double GetVdwDampingValueSecondDerivative(double vdWDistance, double distance) const;
+   double GetVdwDampingValue1stDerivative(double vdWDistance, double distance) const;
+   double GetVdwDampingValue2ndDerivative(double vdWDistance, double distance) const;
    void CalcElectronicDipoleMomentGroundState(double*** electronicTransitionDipoleMoments,
                                               double const* const* const* cartesianMatrix,
                                               const MolDS_base::Molecule& molecule, 
@@ -325,6 +330,9 @@ private:
                                           const MolDS_base_atoms::Atom& atomB, 
                                           int valenceIndexB,
                                           MolDS_base::STOnGType stonG) const; // see [DY_1977]
+   double GetGaussianOverlapSaSb(double gaussianExponentA, 
+                                 double gaussianExponentB, 
+                                 double Rab) const; // see [DY_1977]
    double GetGaussianOverlap(MolDS_base::AtomType atomTypeA, 
                              MolDS_base::OrbitalType valenceOrbitalA, 
                              double gaussianExponentA, 
@@ -335,20 +343,17 @@ private:
                              double dy, 
                              double dz, 
                              double Rab) const; // see [DY_1977]
-   double GetGaussianOverlapSaSb(double gaussianExponentA, 
-                                 double gaussianExponentB, 
-                                 double Rab) const; // see [DY_1977]
-   double GetGaussianOverlapFirstDerivative(MolDS_base::AtomType atomTypeA, 
-                                            MolDS_base::OrbitalType valenceOrbitalA, 
-                                            double gaussianExponentA, 
-                                            MolDS_base::AtomType atomTypeB, 
-                                            MolDS_base::OrbitalType valenceOrbitalB, 
-                                            double gaussianExponentB, 
-                                            double dx, 
-                                            double dy, 
-                                            double dz, 
-                                            double Rab, 
-                                            MolDS_base::CartesianType axisA) const;// see [DY_1977]
+   double GetGaussianOverlap1stDerivative(MolDS_base::AtomType atomTypeA, 
+                                          MolDS_base::OrbitalType valenceOrbitalA, 
+                                          double gaussianExponentA, 
+                                          MolDS_base::AtomType atomTypeB, 
+                                          MolDS_base::OrbitalType valenceOrbitalB, 
+                                          double gaussianExponentB, 
+                                          double dx, 
+                                          double dy, 
+                                          double dz, 
+                                          double Rab, 
+                                          MolDS_base::CartesianType axisA) const;// see [DY_1977]
    void CalcFockMatrix(double** fockMatrix, 
                        const MolDS_base::Molecule& molecule, 
                        double const* const* overlap, 
@@ -366,10 +371,10 @@ private:
    double GetAuxiliaryA(int k, double rho) const;
    double GetAuxiliaryB(int k, double rho) const;
    double GetAuxiliaryD(int la, int lb, int m) const;
-   double GetAuxiliaryAFirstDerivative(int k, double rho) const;
-   double GetAuxiliaryASecondDerivative(int k, double rho) const;
-   double GetAuxiliaryBFirstDerivative(int k, double rho) const;
-   double GetAuxiliaryBSecondDerivative(int k, double rho) const;
+   double GetAuxiliaryA1stDerivative(int k, double rho) const;
+   double GetAuxiliaryA2ndDerivative(int k, double rho) const;
+   double GetAuxiliaryB1stDerivative(int k, double rho) const;
+   double GetAuxiliaryB2ndDerivative(int k, double rho) const;
    void DoDamp(double rmsDensity, 
                double** orbitalElectronPopulation, 
                double const* const* oldOrbitalElectronPopulation, 
@@ -388,12 +393,12 @@ private:
    void FreeDiatomicOverlapAndRotatingMatrix(double*** diatomicOverlap, 
                                              double*** rotatingMatrix) const;
    void CalcElecSCFEnergy(double* elecSCFEnergy, 
-                         const MolDS_base::Molecule& molecule, 
-                         double const* energiesMO, 
-                         double const* const* fockMatrix, 
-                         double const* const* gammaAB, 
-                         double coreRepulsionEnergy,
-                         double vdWCorrectionEnergy) const;
+                          const MolDS_base::Molecule& molecule, 
+                          double const* energiesMO, 
+                          double const* const* fockMatrix, 
+                          double const* const* gammaAB, 
+                          double coreRepulsionEnergy,
+                          double vdWCorrectionEnergy) const;
    void FreeElecEnergyMatrices(double*** fMatrix, 
                                double*** hMatrix, 
                                double*** dammyOrbitalElectronPopulation, 
@@ -408,30 +413,30 @@ private:
                                    double**** diisStoredErrorVect,
                                    double*** diisErrorProducts,
                                    double** diisErrorCoefficients);
-   void MallocDiatomicOverlapFirstDeriTemps(double*** diaOverlapInDiaFrame, 
-                                            double*** diaOverlapFirstDerivInDiaFrame,
-                                            double*** rotMat,
-                                            double**** rotMatFirstDerivs) const;
-   void MallocDiatomicOverlapSecondDeriTemps(double*** diaOverlapInDiaFrame, 
-                                             double*** diaOverlapFirstDerivInDiaFrame,
-                                             double*** diaOverlapSecondDerivInDiaFrame,
-                                             double*** rotMat,
-                                             double**** rotMatFirstDerivs,
-                                             double***** rotMatSecondDerivs,
-                                             double**** tempDiaOverlapFirstDerivs,
-                                             double***** tempDiaOverlapSecondDerivs) const;
-   void FreeDiatomicOverlapFirstDeriTemps(double*** diaOverlapInDiaFrame, 
-                                          double*** diaOverlapFirstDerivInDiaFrame,
+   void MallocDiatomicOverlap1stDeriTemps(double*** diaOverlapInDiaFrame, 
+                                          double*** diaOverlap1stDerivInDiaFrame,
                                           double*** rotMat,
-                                          double**** rotMatFirstDerivs) const;
-   void FreeDiatomicOverlapSecondDeriTemps(double*** diaOverlapInDiaFrame, 
-                                           double*** diaOverlapFirstDerivInDiaFrame,
-                                           double*** diaOverlapSecondDerivInDiaFrame,
-                                           double*** rotMat,
-                                           double**** rotMatFirstDerivs,
-                                           double***** rotMatSecondDerivs,
-                                           double**** tempDiaOverlapFirstDerivs,
-                                           double***** tempDiaOverlapSecondDerivs) const;
+                                          double**** rotMat1stDerivs) const;
+   void MallocDiatomicOverlap2ndDeriTemps(double*** diaOverlapInDiaFrame, 
+                                          double*** diaOverlap1stDerivInDiaFrame,
+                                          double*** diaOverlap2ndDerivInDiaFrame,
+                                          double*** rotMat,
+                                          double**** rotMat1stDerivs,
+                                          double***** rotMat2ndDerivs,
+                                          double**** tempDiaOverlap1stDerivs,
+                                          double***** tempDiaOverlap2ndDerivs) const;
+   void FreeDiatomicOverlap1stDeriTemps(double*** diaOverlapInDiaFrame, 
+                                        double*** diaOverlap1stDerivInDiaFrame,
+                                        double***  rotMat,
+                                        double**** rotMat1stDerivs) const;
+   void FreeDiatomicOverlap2ndDeriTemps(double*** diaOverlapInDiaFrame, 
+                                        double*** diaOverlap1stDerivInDiaFrame,
+                                        double*** diaOverlap2ndDerivInDiaFrame,
+                                        double***   rotMat,
+                                        double****  rotMat1stDerivs,
+                                        double***** rotMat2ndDerivs,
+                                        double****  tempDiaOverlap1stDerivs,
+                                        double***** tempDiaOverlap2ndDerivs) const;
 };
 
 

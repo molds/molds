@@ -52,7 +52,7 @@ protected:
                                                       double const* groundStateDipole) const;
    virtual void CalcGammaAB(double** gammaAB, const MolDS_base::Molecule& molecule) const;
    virtual double GetFockDiagElement(const MolDS_base_atoms::Atom& atomA, 
-                                     int atomAIndex, 
+                                     int indexAtomA, 
                                      int mu, 
                                      const MolDS_base::Molecule& molecule, 
                                      double const* const* gammaAB,
@@ -62,8 +62,8 @@ protected:
                                      bool isGuess) const;
    virtual double GetFockOffDiagElement(const MolDS_base_atoms::Atom& atomA, 
                                         const MolDS_base_atoms::Atom& atomB, 
-                                        int atomAIndex, 
-                                        int atomBIndex, 
+                                        int indexAtomA, 
+                                        int indexAtomB, 
                                         int mu, int nu, 
                                         const MolDS_base::Molecule& molecule, 
                                         double const* const* gammaAB, 
@@ -74,12 +74,12 @@ protected:
    virtual void CalcDiatomicOverlapInDiatomicFrame(double** diatomicOverlap, 
                                                    const MolDS_base_atoms::Atom& atomA, 
                                                    const MolDS_base_atoms::Atom& atomB) const;
-   virtual void CalcDiatomicOverlapFirstDerivativeInDiatomicFrame(double** diatomicOverlapDeri, 
-                                                                  const MolDS_base_atoms::Atom& atomA, 
-                                                                  const MolDS_base_atoms::Atom& atomB) const;
-   virtual void CalcDiatomicOverlapSecondDerivativeInDiatomicFrame(double** diatomicOverlapSecondDeri, 
-                                                                   const MolDS_base_atoms::Atom& atomA, 
-                                                                   const MolDS_base_atoms::Atom& atomB) const;
+   virtual void CalcDiatomicOverlap1stDerivativeInDiatomicFrame(double** diatomicOverlapDeri, 
+                                                                const MolDS_base_atoms::Atom& atomA, 
+                                                                const MolDS_base_atoms::Atom& atomB) const;
+   virtual void CalcDiatomicOverlap2ndDerivativeInDiatomicFrame(double** diatomicOverlap2ndDeri, 
+                                                                const MolDS_base_atoms::Atom& atomA, 
+                                                                const MolDS_base_atoms::Atom& atomB) const;
    virtual double GetCoulombInt(MolDS_base::OrbitalType orbital1, 
                                 MolDS_base::OrbitalType orbital2, 
                                 const MolDS_base_atoms::Atom& atom) const; // Apendix in [BZ_1979]
@@ -156,11 +156,11 @@ private:
                                       MolDS_base::OrbitalType orbitalA, 
                                       const MolDS_base_atoms::Atom& atomB, 
                                       MolDS_base::OrbitalType orbitalB) const; // ref. [MN_1957] and (5a) in [AEZ_1986]
-   double GetNishimotoMatagaTwoEleIntFirstDerivative(const MolDS_base_atoms::Atom& atomA, 
-                                                     MolDS_base::OrbitalType orbitalA, 
-                                                     const MolDS_base_atoms::Atom& atomB, 
-                                                     MolDS_base::OrbitalType orbitalB,
-                                                     MolDS_base::CartesianType axisA) const;// ref. [MN_1957] and (5a) in [AEZ_1986]
+   double GetNishimotoMatagaTwoEleInt1stDerivative(const MolDS_base_atoms::Atom& atomA, 
+                                                   MolDS_base::OrbitalType orbitalA, 
+                                                   const MolDS_base_atoms::Atom& atomB, 
+                                                   MolDS_base::OrbitalType orbitalB,
+                                                   MolDS_base::CartesianType axisA) const;// ref. [MN_1957] and (5a) in [AEZ_1986]
    void CalcRitzVector(double* ritzVector, 
                        double const* const* expansionVectors, 
                        double const* const* interactionMatrix, 
