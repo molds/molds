@@ -59,36 +59,50 @@ namespace MolDS_cndo{
  *  Refferences for Cndo2 are [PB_1970], [PSS_1965], and [PS_1965].
  */
 Cndo2::Cndo2(){
+   //protected variables
+   this->molecule = NULL;
    this->theory = CNDO2;
-   this->SetMessages();
-   this->SetEnableAtomTypes();
-   this->gammaAB = NULL;
+   this->coreRepulsionEnergy = 0.0;
+   this->vdWCorrectionEnergy = 0.0;
+   this->matrixCISdimension = 0;
+   this->fockMatrix = NULL;
+   this->energiesMO = NULL;
+   this->orbitalElectronPopulation = NULL;
+   this->atomicElectronPopulation = NULL;
    this->overlap = NULL;
+   this->twoElecTwoCore = NULL;
    this->cartesianMatrix = NULL;
    this->electronicTransitionDipoleMoments = NULL;
    this->coreDipoleMoment = NULL;
-   this->twoElecTwoCore = NULL;
-   this->orbitalElectronPopulation = NULL;
-   this->atomicElectronPopulation = NULL;
-   this->fockMatrix = NULL;
-   this->energiesMO = NULL;
-   this->molecule = NULL;
-   this->matrixForce = NULL;
-   this->bondingAdjustParameterK[0] = 1.000; //see (3.79) in J. A. Pople book
-   this->bondingAdjustParameterK[1] = 0.750; //see (3.79) in J. A. Pople book
-   this->elecSCFEnergy = 0.0;
-   this->coreRepulsionEnergy = 0.0;
-   this->vdWCorrectionEnergy = 0.0;
+   this->normalForceConstants = NULL;
+   this->normalModes = NULL;
    this->matrixCIS = NULL;
    this->excitedEnergies = NULL;
    this->freeExcitonEnergiesCIS = NULL;
-   this->matrixCISdimension = 0;
+   this->matrixForce = NULL;
+
+   //protected methods
+   this->SetMessages();
+   this->SetEnableAtomTypes();
+
+   //private variables
+   this->elecSCFEnergy = 0.0;
+   this->bondingAdjustParameterK[0] = 1.000; //see (3.79) in J. A. Pople book
+   this->bondingAdjustParameterK[1] = 0.750; //see (3.79) in J. A. Pople book
+   this->gammaAB = NULL;
    //this->OutputLog("Cndo created\n");
 }
 
 Cndo2::~Cndo2(){
-   MallocerFreer::GetInstance()->Free<double>(&this->gammaAB, 
-                                              this->molecule->GetNumberAtoms(),
+   MallocerFreer::GetInstance()->Free<double>(&this->fockMatrix, 
+                                              this->molecule->GetTotalNumberAOs(),
+                                              this->molecule->GetTotalNumberAOs());
+   MallocerFreer::GetInstance()->Free<double>(&this->energiesMO, 
+                                              this->molecule->GetTotalNumberAOs());
+   MallocerFreer::GetInstance()->Free<double>(&this->orbitalElectronPopulation, 
+                                              this->molecule->GetTotalNumberAOs(),
+                                              this->molecule->GetTotalNumberAOs());
+   MallocerFreer::GetInstance()->Free<double>(&this->atomicElectronPopulation, 
                                               this->molecule->GetNumberAtoms());
    MallocerFreer::GetInstance()->Free<double>(&this->overlap, 
                                               this->molecule->GetTotalNumberAOs(),
@@ -107,16 +121,9 @@ Cndo2::~Cndo2(){
                                               CartesianType_end);
    MallocerFreer::GetInstance()->Free<double>(&this->coreDipoleMoment, 
                                               CartesianType_end);
-   MallocerFreer::GetInstance()->Free<double>(&this->orbitalElectronPopulation, 
-                                              this->molecule->GetTotalNumberAOs(),
-                                              this->molecule->GetTotalNumberAOs());
-   MallocerFreer::GetInstance()->Free<double>(&this->atomicElectronPopulation, 
+   MallocerFreer::GetInstance()->Free<double>(&this->gammaAB, 
+                                              this->molecule->GetNumberAtoms(),
                                               this->molecule->GetNumberAtoms());
-   MallocerFreer::GetInstance()->Free<double>(&this->fockMatrix, 
-                                              this->molecule->GetTotalNumberAOs(),
-                                              this->molecule->GetTotalNumberAOs());
-   MallocerFreer::GetInstance()->Free<double>(&this->energiesMO, 
-                                              this->molecule->GetTotalNumberAOs());
    //this->OutputLog("cndo deleted\n");
 }
 
@@ -168,6 +175,8 @@ void Cndo2::SetMessages(){
       = "Error in cndo::Cndo2::SetOverlapElement: diatomicOverlap is NULL.\n";
    this->errorMessageGetElectronicTransitionDipoleMomentBadState
       = "Error in cndo::Cndo2::GetElectronicTransitionDipoleMoment: Bad eigen state is set. In SCF module, the transition dipole moment of only between ground states can be calculated. Note taht state=0 means the ground state and other state = i means the i-th excited state in below.\n";
+   this->errorMessageCalcFrequenciesNormalModesBadTheory
+      = "Error in cndo::Cndo2::CalcFrequenciesNormalModesBadTheory: CNDO2 is not supported for frequency (normal mode) analysis.\n";
    this->errorMessageFromState = "\tfrom state = ";
    this->errorMessageToState = "\tto state = ";
    this->messageSCFMetConvergence = "\n\n\n\t\tCNDO/2-SCF met convergence criterion(^^b\n\n\n";
@@ -183,8 +192,8 @@ void Cndo2::SetMessages(){
    this->messageMullikenAtoms = "\tMulliken charge:";
    this->messageMullikenAtomsTitle = "\t\t\t\t| i-th | atom type | core charge[a.u.] | Mulliken charge[a.u.]| \n";
    this->messageElecEnergy = "\tElectronic energy(SCF):";
-   this->messageNoteElecEnergy = "\tNote that this electronic energy includs core-repulsions.\n\n";
-   this->messageNoteElecEnergyVdW = "\tNote that this electronic energy includs core-repulsions and vdW correction.\n\n";
+   this->messageNoteElecEnergy = "\tNote that this electronic energy includes core-repulsions.\n\n";
+   this->messageNoteElecEnergyVdW = "\tNote that this electronic energy includes core-repulsions and vdW correction.\n\n";
    this->messageElecEnergyTitle = "\t\t\t\t|   [a.u.]   |   [eV]   |\n";
    this->messageUnitSec = "[s].";
    this->messageCoreRepulsionTitle = "\t\t\t\t|   [a.u.]   |   [eV]   |\n";
@@ -197,6 +206,12 @@ void Cndo2::SetMessages(){
    this->messageCoreDipoleMoment = "\tCore Dipole moment:";
    this->messageTotalDipoleMomentTitle = "\t\t\t\t\t|   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |  magnitude[a.u.]  |\t\t|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |\n";
    this->messageTotalDipoleMoment = "\tTotal Dipole moment(SCF):";
+   this->messageNormalModesTitle = "\t\t\t\t       |    normal frequencies          |   normalized normal mode ...\n";
+   this->messageNormalModesUnitsNonMassWeighted = "\t\t\t\t| i-th |    [a.u.]    |    [cm-1]       |   [angst.] in non-mass-weighted coordinates ...\n";
+   this->messageNormalModesUnitsMassWeighted = "\t\t\t\t| i-th |    [a.u.]    |    [cm-1]       |   [a.u.] in mass-weighted coordinates ...\n";
+   this->messageNormalModesMassWeighted = "Normal mode(mw):";
+   this->messageNormalModesNonMassWeighted = "Normal mode(nmw):";
+   this->messageNormalModesImaginaryFrequencies = "\t\t\t\t\t'i' following the frequency means the imaginary frequency.\n";
 }
 
 void Cndo2::SetEnableAtomTypes(){
@@ -231,11 +246,16 @@ void Cndo2::SetMolecule(Molecule* molecule){
 
    // set molecule and malloc
    this->molecule = molecule;
-   if(this->theory == CNDO2 || this->theory == INDO){
-      MallocerFreer::GetInstance()->Malloc<double>(&this->gammaAB,
-                                                   this->molecule->GetNumberAtoms(), 
-                                                   this->molecule->GetNumberAtoms());
-   }
+   MallocerFreer::GetInstance()->Malloc<double>(&this->fockMatrix,
+                                                this->molecule->GetTotalNumberAOs(), 
+                                                this->molecule->GetTotalNumberAOs());
+   MallocerFreer::GetInstance()->Malloc<double>(&this->energiesMO,
+                                                this->molecule->GetTotalNumberAOs());
+   MallocerFreer::GetInstance()->Malloc<double>(&this->orbitalElectronPopulation,
+                                                this->molecule->GetTotalNumberAOs(), 
+                                                this->molecule->GetTotalNumberAOs());
+   MallocerFreer::GetInstance()->Malloc<double>(&this->atomicElectronPopulation,
+                                                this->molecule->GetNumberAtoms());
    MallocerFreer::GetInstance()->Malloc<double>(&this->overlap, 
                                                 this->molecule->GetTotalNumberAOs(), 
                                                 this->molecule->GetTotalNumberAOs());
@@ -253,16 +273,11 @@ void Cndo2::SetMolecule(Molecule* molecule){
                                                 CartesianType_end);
    MallocerFreer::GetInstance()->Malloc<double>(&this->coreDipoleMoment, 
                                                 CartesianType_end);
-   MallocerFreer::GetInstance()->Malloc<double>(&this->orbitalElectronPopulation,
-                                                this->molecule->GetTotalNumberAOs(), 
-                                                this->molecule->GetTotalNumberAOs());
-   MallocerFreer::GetInstance()->Malloc<double>(&this->atomicElectronPopulation,
-                                                this->molecule->GetNumberAtoms());
-   MallocerFreer::GetInstance()->Malloc<double>(&this->fockMatrix,
-                                                this->molecule->GetTotalNumberAOs(), 
-                                                this->molecule->GetTotalNumberAOs());
-   MallocerFreer::GetInstance()->Malloc<double>(&this->energiesMO,
-                                                this->molecule->GetTotalNumberAOs());
+   if(this->theory == CNDO2 || this->theory == INDO){
+      MallocerFreer::GetInstance()->Malloc<double>(&this->gammaAB,
+                                                   this->molecule->GetNumberAtoms(), 
+                                                   this->molecule->GetNumberAtoms());
+   }
 }
 
 void Cndo2::CheckNumberValenceElectrons(const Molecule& molecule) const{
@@ -595,6 +610,17 @@ void Cndo2::CalcSCFProperties(){
                                                *this->molecule, 
                                                this->orbitalElectronPopulation,
                                                this->overlap);
+   const int groundState = 0;
+   if(Parameters::GetInstance()->RequiresFrequencies() && 
+      Parameters::GetInstance()->GetElectronicStateIndexFrequencies() == groundState){
+      this->CalcNormalModes(this->normalModes, this->normalForceConstants, *this->molecule);
+   }
+}
+
+void Cndo2::CalcNormalModes(double** normalModes, double* normalForceConstants, const Molecule& molecule) const{
+   stringstream ss;
+   ss << this->errorMessageCalcFrequenciesNormalModesBadTheory;
+   throw MolDSException(ss.str());
 }
 
 double Cndo2::GetBondingAdjustParameterK(ShellType shellA, ShellType shellB) const{
@@ -997,12 +1023,95 @@ void Cndo2::OutputSCFMulliken() const{
    this->OutputLog("\n");
 }
 
+void Cndo2::OutputNormalModes(double const* const* normalModes, 
+                              double const* normalForceConstants, 
+                              const Molecule& molecule) const{
+
+   int hessianDim = CartesianType_end*molecule.GetNumberAtoms();
+   double ang2AU = Parameters::GetInstance()->GetAngstrom2AU();
+   double kayser2AU = Parameters::GetInstance()->GetKayser2AU();
+
+   // output in mass-weighted coordinates
+   this->OutputLog(this->messageNormalModesTitle);
+   this->OutputLog(this->messageNormalModesUnitsMassWeighted);
+   for(int i=0; i<hessianDim; i++){
+      // normal frequencies
+      if(normalForceConstants[i]>0)
+         this->OutputLog(boost::format("\t%s\t%d\t%e\t%e\t") % this->messageNormalModesMassWeighted
+                                                             % i
+                                                             % sqrt(normalForceConstants[i])
+                                                             % (sqrt(normalForceConstants[i])/kayser2AU));
+      else
+         this->OutputLog(boost::format("\t%s\t%d\t%ei\t%ei\t") % this->messageNormalModesMassWeighted
+                                                               % i
+                                                               % sqrt(fabs(normalForceConstants[i]))
+                                                               % (sqrt(fabs(normalForceConstants[i]))/kayser2AU));
+      // normal modes
+      for(int a=0; a<molecule.GetNumberAtoms(); a++){
+         const double sqrtCoreMass = sqrt(molecule.GetAtom(a)->GetCoreMass());
+         for(int j=XAxis; j<CartesianType_end; j++){
+            int hessianIndex = CartesianType_end*a+j;
+            this->OutputLog(boost::format("\t%e") % normalModes[i][hessianIndex]);
+         }
+      }
+      this->OutputLog("\n");
+   }
+   this->OutputLog(this->messageNormalModesImaginaryFrequencies);
+   this->OutputLog("\n");
+
+   // output in non-mass-weighted coordinates
+   this->OutputLog(this->messageNormalModesTitle);
+   this->OutputLog(this->messageNormalModesUnitsNonMassWeighted);
+   for(int i=0; i<hessianDim; i++){
+      // normal frequencies
+      if(normalForceConstants[i]>0)
+         this->OutputLog(boost::format("\t%s\t%d\t%e\t%e\t") % this->messageNormalModesNonMassWeighted
+                                                             % i
+                                                             % sqrt(normalForceConstants[i])
+                                                             % (sqrt(normalForceConstants[i])/kayser2AU));
+      else
+         this->OutputLog(boost::format("\t%s\t%d\t%ei\t%ei\t") % this->messageNormalModesNonMassWeighted
+                                                               % i
+                                                               % sqrt(fabs(normalForceConstants[i]))
+                                                               % (sqrt(fabs(normalForceConstants[i]))/kayser2AU));
+
+      double normSquare=0.0;
+      for(int a=0; a<molecule.GetNumberAtoms(); a++){
+         const double sqrtCoreMass = sqrt(molecule.GetAtom(a)->GetCoreMass());
+         for(int j=XAxis; j<CartesianType_end; j++){
+            int hessianIndex = CartesianType_end*a+j;
+            normSquare += pow(normalModes[i][hessianIndex]/(sqrtCoreMass*ang2AU),2.0);
+         }
+      }
+      double norm = sqrt(normSquare);
+
+      // normal modes
+      for(int a=0; a<molecule.GetNumberAtoms(); a++){
+         const double sqrtCoreMass = sqrt(molecule.GetAtom(a)->GetCoreMass());
+         for(int j=XAxis; j<CartesianType_end; j++){
+            int hessianIndex = CartesianType_end*a+j;
+            this->OutputLog(boost::format("\t%e") % (normalModes[i][hessianIndex]/(sqrtCoreMass*ang2AU*norm)));
+         }
+      }
+      this->OutputLog("\n");
+   }
+   this->OutputLog(this->messageNormalModesImaginaryFrequencies);
+   this->OutputLog("\n");
+}
+
 void Cndo2::OutputSCFResults() const{
    this->OutputMOEnergies();
    this->OutputSCFEnergies();
    this->OutputSCFDipole();
    this->OutputSCFMulliken();
    // ToDo: output eigen-vectors of the Hartree Fock matrix
+
+   // Normal modes and frequencies  
+   const int groundState = 0;
+   if(Parameters::GetInstance()->RequiresFrequencies() && 
+      Parameters::GetInstance()->GetElectronicStateIndexFrequencies() == groundState){
+      this->OutputNormalModes(this->normalModes, this->normalForceConstants, *this->molecule);
+   }
 
    // output MOs
    if(Parameters::GetInstance()->RequiresMOPlot()){
@@ -4932,6 +5041,9 @@ void Cndo2::CalcRotatingMatrix2ndDerivatives(double**** rotMat2ndDerivatives,
    double z = atomB.GetXyz()[2] - atomA.GetXyz()[2];
    double r = sqrt( pow(x,2.0) + pow(y,2.0) );
    double R = sqrt( pow(x,2.0) + pow(y,2.0) + pow(z,2.0) );
+   double temp1 = 1.0/(pow(r,3.0)*R) + 1.0/(r*pow(R,3.0));
+   double temp2 = 2.0*pow(r*R,-3.0) + 3.0/(pow(r,5.0)*R) + 3.0/(r*pow(R,5.0));
+   double temp3 = pow(r*R,-3.0) + 3.0/(r*pow(R,5.0));
 
    // for s-function
    rotMat2ndDerivatives[s][s][XAxis][XAxis] = 0.0;
@@ -4947,30 +5059,27 @@ void Cndo2::CalcRotatingMatrix2ndDerivatives(double**** rotMat2ndDerivatives,
    // for p-function, xx-derivatives
    rotMat2ndDerivatives[py][py][XAxis][XAxis] = -3.0*x*pow(r,-3.0) + 3.0*pow(x,3.0)*pow(r,-5.0);
    rotMat2ndDerivatives[py][pz][XAxis][XAxis] = -1.0*y*pow(R,-3.0) + 3.0*pow(x,2.0)*y*pow(R,-5.0);
-   rotMat2ndDerivatives[py][px][XAxis][XAxis] = -1.0*(1.0/(pow(r,3.0)*R) + 1.0/(r*pow(R,3.0)))*y*z
-                                                   +(2.0*pow(r*R,-3.0) + 3.0/(pow(r,5.0)*R) + 3.0/(r*pow(R,5.0)))*pow(x,2.0)*y*z;
-                                                
+   rotMat2ndDerivatives[py][px][XAxis][XAxis] = -1.0*temp1*y*z+temp2*pow(x,2.0)*y*z;
+                                              
    rotMat2ndDerivatives[pz][py][XAxis][XAxis] = 0.0;
    rotMat2ndDerivatives[pz][pz][XAxis][XAxis] = -1.0*z*pow(R,-3.0) + 3.0*pow(x,2.0)*z*pow(R,-5.0);
-   rotMat2ndDerivatives[pz][px][XAxis][XAxis] = -1.0*pow(r*R,-1.0) + (1.0/(pow(r,3.0)*R) + 1.0/(r*pow(R,3.0)))*pow(x,2.0)
+   rotMat2ndDerivatives[pz][px][XAxis][XAxis] = -1.0*pow(r*R,-1.0) + temp1*pow(x,2.0)
                                                    +r*pow(R,-3.0) - 3.0*pow(x,2.0)*r*pow(R,-5.0) + pow(x,2.0)*pow(r,-1.0)*pow(R,-3.0);
-                                                
+                                              
    rotMat2ndDerivatives[px][py][XAxis][XAxis] = y*pow(r,-3.0) - 3.0*pow(x,2.0)*y*pow(r,-5.0);
    rotMat2ndDerivatives[px][pz][XAxis][XAxis] = -3.0*x*pow(R,-3.0) + 3.0*pow(x,3.0)*pow(R,-5.0);
-   rotMat2ndDerivatives[px][px][XAxis][XAxis] = -3.0*(1.0/(pow(r,3.0)*R) + 1.0/(r*pow(R,3.0)))*x*z
-                                                   +(2.0*pow(r*R,-3.0) + 3.0/(pow(r,5.0)*R) + 3.0/(r*pow(R,5.0)))*pow(x,3.0)*z;
+   rotMat2ndDerivatives[px][px][XAxis][XAxis] = -3.0*temp1*x*z+temp2*pow(x,3.0)*z;
 
    // for p-function, xy-derivatives
    rotMat2ndDerivatives[py][py][XAxis][YAxis] = -1.0*y*pow(r,-3.0) + 3.0*pow(x,2.0)*y*pow(r,-5.0);
    rotMat2ndDerivatives[py][pz][XAxis][YAxis] = -1.0*x*pow(R,-3.0) + 3.0*x*pow(y,2.0)*pow(R,-5.0);  
-   rotMat2ndDerivatives[py][px][XAxis][YAxis] = -1.0*(1.0/(pow(r,3.0)*R) + 1.0/(r*pow(R,3.0)))*x*z
-                                                   +(2.0*pow(r*R,-3.0) + 3.0/(pow(r,5.0)*R) + 3.0/(r*pow(R,5.0)))*x*pow(y,2.0)*z;
-                                                
+   rotMat2ndDerivatives[py][px][XAxis][YAxis] = -1.0*temp1*x*z+temp2*x*pow(y,2.0)*z;
+                                              
    rotMat2ndDerivatives[pz][py][XAxis][YAxis] = 0.0;
    rotMat2ndDerivatives[pz][pz][XAxis][YAxis] = 3.0*x*y*z*pow(R,-5.0);
-   rotMat2ndDerivatives[pz][px][XAxis][YAxis] = (1.0/(pow(r,3.0)*R) + 1.0/(r*pow(R,3.0)))*x*y + x*y*pow(r,-1.0)*pow(R,-3.0) - 3.0*x*y*r*pow(R,-5.0);
-                                                
-   rotMat2ndDerivatives[px][py][XAxis][YAxis] = x*pow(r,-3.0) - 3.0*x*pow(y,2.0)*pow(R,-5.0);
+   rotMat2ndDerivatives[pz][px][XAxis][YAxis] = temp1*x*y + x*y*pow(r,-1.0)*pow(R,-3.0) - 3.0*x*y*r*pow(R,-5.0);
+                                              
+   rotMat2ndDerivatives[px][py][XAxis][YAxis] = x*pow(r,-3.0) - 3.0*x*pow(y,2.0)*pow(r,-5.0);
    rotMat2ndDerivatives[px][pz][XAxis][YAxis] = rotMat2ndDerivatives[py][pz][XAxis][XAxis];
    rotMat2ndDerivatives[px][px][XAxis][YAxis] = rotMat2ndDerivatives[py][px][XAxis][XAxis];
 
@@ -4980,22 +5089,19 @@ void Cndo2::CalcRotatingMatrix2ndDerivatives(double**** rotMat2ndDerivatives,
          rotMat2ndDerivatives[i][j][YAxis][XAxis] = rotMat2ndDerivatives[i][j][XAxis][YAxis];
       }
    }
-
    // for p-function, xz-derivatives
    rotMat2ndDerivatives[py][py][XAxis][ZAxis] = 0.0;
    rotMat2ndDerivatives[py][pz][XAxis][ZAxis] = rotMat2ndDerivatives[pz][pz][XAxis][YAxis];
-   rotMat2ndDerivatives[py][px][XAxis][ZAxis] = -1.0*(1.0/(pow(r,3.0)*R) + 1.0/(r*pow(R,3.0)))*x*y 
-                                                   +(pow(r*R,-3.0) + 3.0/(r*pow(R,5.0)))*x*y*pow(z,2.0);
-                                                
+   rotMat2ndDerivatives[py][px][XAxis][ZAxis] = -1.0*temp1*x*y +temp3*x*y*pow(z,2.0);
+                                              
    rotMat2ndDerivatives[pz][py][XAxis][ZAxis] = 0.0;
    rotMat2ndDerivatives[pz][pz][XAxis][ZAxis] = -1.0*x*pow(R,-3.0) + 3.0*x*pow(z,2.0)*pow(R,-5.0); 
    rotMat2ndDerivatives[pz][px][XAxis][ZAxis] = x*z*pow(r,-1.0)*pow(R,-3.0) - 3.0*x*z*r*pow(R,-5.0);
-                                                
+                                              
    rotMat2ndDerivatives[px][py][XAxis][ZAxis] = 0.0;
    rotMat2ndDerivatives[px][pz][XAxis][ZAxis] = rotMat2ndDerivatives[pz][pz][XAxis][XAxis];
    rotMat2ndDerivatives[px][px][XAxis][ZAxis] = pow(r*R,-1.0) - pow(z,2.0)*pow(r,-1.0)*pow(R,-3.0)
-                                                   -1.0*(1.0/(pow(r,3.0)*R) + 1.0/(r*pow(R,3.0)))*pow(x,2.0)
-                                                   +(pow(r*R,-3.0) + 3.0/(r*pow(R,5.0)))*pow(x*z,2.0);
+                                                   -1.0*temp1*pow(x,2.0)+temp3*pow(x*z,2.0);
 
 
    // for p-function, zx-derivatives
@@ -5008,34 +5114,30 @@ void Cndo2::CalcRotatingMatrix2ndDerivatives(double**** rotMat2ndDerivatives,
    // for p-function, yy-derivatives
    rotMat2ndDerivatives[py][py][YAxis][YAxis] = -1.0*x*pow(r,-3.0) + 3.0*x*pow(y,2.0)*pow(r,-5.0); 
    rotMat2ndDerivatives[py][pz][YAxis][YAxis] = -3.0*y*pow(R,-3.0) + 3.0*pow(y,3.0)*pow(R,-5.0);
-   rotMat2ndDerivatives[py][px][YAxis][YAxis] = -3.0*(1.0/(pow(r,3.0)*R) + 1.0/(r*pow(R,3.0)))*y*z
-                                                   +(2.0*pow(r*R,-3.0) + 3.0/(pow(r,5.0)*R) + 3.0/(r*pow(R,5.0)))*pow(y,3.0)*z;
-                                                
+   rotMat2ndDerivatives[py][px][YAxis][YAxis] = -3.0*temp1*y*z+temp2*pow(y,3.0)*z;
+                                              
    rotMat2ndDerivatives[pz][py][YAxis][YAxis] = 0.0;
    rotMat2ndDerivatives[pz][pz][YAxis][YAxis] = -1.0*z*pow(R,-3.0) + 3.0*pow(y,2.0)*z*pow(R,-5.0);
-   rotMat2ndDerivatives[pz][px][YAxis][YAxis] = -1.0*pow(r*R,-1.0) + (1.0/(pow(r,3.0)*R) + 1.0/(r*pow(R,3.0)))*pow(y,2.0)
+   rotMat2ndDerivatives[pz][px][YAxis][YAxis] = -1.0*pow(r*R,-1.0) + temp1*pow(y,2.0)
                                                    +r*pow(R,-3.0) - 3.0*pow(y,2.0)*r*pow(R,-5.0) + pow(y,2.0)*pow(r,-1.0)*pow(R,-3.0);
-                                                
+                                              
    rotMat2ndDerivatives[px][py][YAxis][YAxis] = 3.0*y*pow(r,-3.0) - 3.0*pow(y,3.0)*pow(r,-5.0);
    rotMat2ndDerivatives[px][pz][YAxis][YAxis] = rotMat2ndDerivatives[py][pz][XAxis][YAxis];
-   rotMat2ndDerivatives[px][px][YAxis][YAxis] = -1.0*(1.0/(pow(r,3.0)*R) + 1.0/(r*pow(R,3.0)))*x*z
-                                                   +(2.0*pow(r*R,-3.0) + 3.0/(pow(r,5.0)*R) + 3.0/(r*pow(R,5.0)))*x*pow(y,2.0)*z;
+   rotMat2ndDerivatives[px][px][YAxis][YAxis] = -1.0*temp1*x*z+temp2*x*pow(y,2.0)*z;
                
    // for p-function, yz-derivatives
    rotMat2ndDerivatives[py][py][YAxis][ZAxis] = 0.0;
    rotMat2ndDerivatives[py][pz][YAxis][ZAxis] = rotMat2ndDerivatives[pz][pz][YAxis][YAxis];
    rotMat2ndDerivatives[py][px][YAxis][ZAxis] = pow(r*R,-1.0) - pow(z,2.0)*pow(r,-1.0)*pow(R,-3.0)
-                                                   -1.0*(1.0/(pow(r,3.0)*R) + 1.0/(r*pow(R,3.0)))*pow(y,2.0)
-                                                   +(pow(r*R,-3.0) + 3.0/(r*pow(R,5.0)))*pow(y*z,2.0);
-                                                
+                                                   -1.0*temp1*pow(y,2.0)+temp3*pow(y*z,2.0);
+                                              
    rotMat2ndDerivatives[pz][py][YAxis][ZAxis] = 0.0;
    rotMat2ndDerivatives[pz][pz][YAxis][ZAxis] = -1.0*y*pow(R,-3.0) + 3.0*y*pow(z,2.0)*pow(R,-5.0);
    rotMat2ndDerivatives[pz][px][YAxis][ZAxis] = y*z*pow(r,-1.0)*pow(R,-3.0) - 3.0*y*z*r*pow(R,-5.0);
-                                                
+                                              
    rotMat2ndDerivatives[px][py][YAxis][ZAxis] = 0.0;
    rotMat2ndDerivatives[px][pz][YAxis][ZAxis] = rotMat2ndDerivatives[pz][pz][XAxis][YAxis];
-   rotMat2ndDerivatives[px][px][YAxis][ZAxis] = -1.0*(1.0/(pow(r,3.0)*R) + 1.0/(r*pow(R,3.0)))*x*y
-                                                   +(pow(r*R,-3.0) + 3.0/(r*pow(R,5.0)))*x*y*pow(z,2.0);
+   rotMat2ndDerivatives[px][px][YAxis][ZAxis] = -1.0*temp1*x*y+temp3*x*y*pow(z,2.0);
                                           
                
    // for p-function, zy-derivatives
@@ -5049,11 +5151,11 @@ void Cndo2::CalcRotatingMatrix2ndDerivatives(double**** rotMat2ndDerivatives,
    rotMat2ndDerivatives[py][py][ZAxis][ZAxis] = 0.0;
    rotMat2ndDerivatives[py][pz][ZAxis][ZAxis] = rotMat2ndDerivatives[pz][pz][YAxis][ZAxis];
    rotMat2ndDerivatives[py][px][ZAxis][ZAxis] = -3.0*y*z*pow(r,-1.0)*pow(R,-3.0) + 3.0*y*pow(z,3.0)*pow(r,-1.0)*pow(R,-5.0);
-                                                
+                                              
    rotMat2ndDerivatives[pz][py][ZAxis][ZAxis] = 0.0;
    rotMat2ndDerivatives[pz][pz][ZAxis][ZAxis] = -3.0*z*pow(R,-3.0) + 3.0*pow(z,3.0)*pow(R,-5.0); 
    rotMat2ndDerivatives[pz][px][ZAxis][ZAxis] = -3.0*pow(z,2.0)*r*pow(R,-5.0) + r*pow(R,-3.0);
-                                                
+                                              
    rotMat2ndDerivatives[px][py][ZAxis][ZAxis] = 0.0;
    rotMat2ndDerivatives[px][pz][ZAxis][ZAxis] = rotMat2ndDerivatives[pz][pz][XAxis][ZAxis];
    rotMat2ndDerivatives[px][px][ZAxis][ZAxis] = -3.0*x*z*pow(r,-1.0)*pow(R,-3.0) + 3.0*x*pow(z,3.0)*pow(r,-1.0)*pow(R,-5.0);
@@ -5080,14 +5182,10 @@ void Cndo2::CalcDiatomicOverlapInDiatomicFrame(double** diatomicOverlap,
    double reducedOverlap = 0.0;
    double orbitalExponentA = 0.0;
    double orbitalExponentB = 0.0;
-   double R = 0.0; // Inter nuclear distance between aton A and B.
+   double rAB = 0.0; // Inter nuclear distance between aton A and B.
 
    MallocerFreer::GetInstance()->Initialize<double>(diatomicOverlap, OrbitalType_end, OrbitalType_end);
-   R = sqrt( 
-            pow( atomA.GetXyz()[0] - atomB.GetXyz()[0], 2.0)
-           +pow( atomA.GetXyz()[1] - atomB.GetXyz()[1], 2.0)
-           +pow( atomA.GetXyz()[2] - atomB.GetXyz()[2], 2.0)
-           );
+   rAB = this->molecule->GetDistanceAtoms(atomA, atomB);
 
    for(int a=0; a<atomA.GetValenceSize(); a++){
       OrbitalType valenceOrbitalA = atomA.GetValence(a);
@@ -5107,8 +5205,8 @@ void Cndo2::CalcDiatomicOverlapInDiatomicFrame(double** diatomicOverlap,
 
          if(realShpericalHarmonicsA.GetM() == realShpericalHarmonicsB.GetM()){
             m = abs(realShpericalHarmonicsA.GetM());
-            alpha = orbitalExponentA * R;
-            beta =  orbitalExponentB * R;
+            alpha = orbitalExponentA * rAB;
+            beta =  orbitalExponentB * rAB;
 
             reducedOverlap = this->GetReducedOverlap
                                    (na, realShpericalHarmonicsA.GetL(), m,
@@ -5119,7 +5217,7 @@ void Cndo2::CalcDiatomicOverlapInDiatomicFrame(double** diatomicOverlap,
             pre *= pow(2.0*orbitalExponentB, nb+0.5);
             double factorials = Factorial(2*na)*Factorial(2*nb);
             pre /= sqrt(factorials);
-            pre *= pow(R/2.0, na+nb+1.0);
+            pre *= pow(rAB/2.0, na+nb+1.0);
 
             diatomicOverlap[valenceOrbitalA][valenceOrbitalB] = pre*reducedOverlap;
          }

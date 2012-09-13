@@ -59,9 +59,12 @@ namespace MolDS_zindo{
  */
 
 ZindoS::ZindoS() : MolDS_cndo::Cndo2(){
+   //protected variables and methods
    this->theory = ZINDOS;
    this->SetMessages();
    this->SetEnableAtomTypes();
+
+   //private variables
    this->matrixForceElecStatesNum = 0;
    this->nishimotoMatagaParamA = 1.2;
    this->nishimotoMatagaParamB = 2.4;
@@ -115,6 +118,8 @@ void ZindoS::SetMessages(){
       = "Error in zindo::ZindoS::GetElectronicEnergy: excitedEnergies is NULL\n";
    this->errorMessageGetElectronicTransitionDipoleMomentBadState
       = "Error in zindo::ZindoS::GetElectronicTransitionDipoleMoment: Bad eigen state is set to calculate the transition dipole moment. Note taht state=0 means the ground state and other state = i means the i-th excited state in below.\n";
+   this->errorMessageCalcFrequenciesNormalModesBadTheory
+      = "Error in zindo::ZindoS::CalcFrequenciesNormalModesBadTheory: ZINDO/S is not supported for frequency (normal mode) analysis.\n";
    this->messageSCFMetConvergence = "\n\n\n\t\tZINDO/S-SCF met convergence criterion(^^b\n\n\n";
    this->messageStartSCF = "**********  START: ZINDO/S-SCF  **********\n";
    this->messageDoneSCF = "**********  DONE: ZINDO/S-SCF  **********\n\n\n";

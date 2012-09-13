@@ -32,7 +32,7 @@ REQUIREMENTS:
 COMPILE(using GNUmake): 
    In the "src" directory in the MolDS package.
 
-   Case i) Use Intel c/c++ compiler (icpc)
+   Case i) Using Intel c/c++ compiler (icpc)
       Change the "BOOST_TOP_DIR" in Makefile to the top directory of the 
       boost-libraries in your systems.
 
@@ -44,16 +44,15 @@ COMPILE(using GNUmake):
       $ make depend INTEL=64
       $ make INTEL=64
 
-   Case ii) Use GNU c/c++ compiler (g++)
-      Rename "Makefile_GNU" to "Makefile".
-      Change the "BOOST_TOP_DIR" in Makefile to the top directory of the 
+   Case ii) Using GNU c/c++ compiler (g++)
+      Change the "BOOST_TOP_DIR" in "Makefile_GNU" to the top directory of the 
       boost-libraries in your systems.
-      Change the "OPENBLAS_TOP_DIR" in Makefile to the top directory of the 
+      Change the "OPENBLAS_TOP_DIR" in "Makefile_GNU" to the top directory of the 
       boost-libraries in your systems.
       
       Then, just type: 
-      $ make depend
-      $ make 
+      $ make -f Makefile_GNU depend
+      $ make -f Makefile_GNU 
 
    For both case, the compile succeeded if you could fine "MolDS.out" in the "src" directory. 
    Type "$ make clean" when you wanna clean the compilation.
@@ -84,28 +83,29 @@ SAMPLE and TEST
 CAPABILITIES:
 
    Electronic state and molecular dynamics:
-            | HF  | CIS | MD(gs) | MD(es) | MC(gs) | MC(es) | RPMD(gs) | RPMD(es) | Optimize(gs) | Optimize(es) |
-   ---------|-----|-----|--------|--------|--------|--------|----------|----------|--------------|--------------|
-   CNDO2    | OK  | --  | --     | --     | OK     | --     | --       | --       | --           | --           |
-   ---------|-----|-----|--------|--------|--------|--------|----------|----------|--------------|--------------|
-   INDO     | OK  | --  | --     | --     | OK     | --     | --       | --       | --           | --           |
-   ---------|-----|-----|--------|--------|--------|--------|----------|----------|--------------|--------------|
-   ZINDO/S  | OK  | OK  | OK     | --     | OK     | OK     | OK       | --       | OK           | --           |
-   ---------|-----|-----|--------|--------|--------|--------|----------|----------|--------------|--------------|
-   MNDO     | OK  | OK  | OK     | OK     | OK     | OK     | OK       | OK       | OK           | OK           |
-   ---------|-----|-----|--------|--------|--------|--------|----------|----------|--------------|--------------|
-   AM1      | OK  | OK  | OK     | OK     | OK     | OK     | OK       | OK       | OK           | OK           |
-   ---------|-----|-----|--------|--------|--------|--------|----------|----------|--------------|--------------|
-   AM1-D    | OK  | OK  | OK     | OK     | OK     | OK     | OK       | OK       | OK           | OK           |
-   ---------|-----|-----|--------|--------|--------|--------|----------|----------|--------------|--------------|
-   PM3      | OK  | OK  | OK     | OK     | OK     | OK     | OK       | OK       | OK           | OK           |
-   ---------|-----|-----|--------|--------|--------|--------|----------|----------|--------------|--------------|
-   PM3-D    | OK  | OK  | OK     | OK     | OK     | OK     | OK       | OK       | OK           | OK           |
-   ---------|-----|-----|--------|--------|--------|--------|----------|----------|--------------|--------------|
-   PM3/PDDG | OK  | OK  | OK     | OK     | OK     | OK     | OK       | OK       | OK           | OK           |
+            | HF  | CIS | MD(gs) | MD(es) | MC(gs) | MC(es) | RPMD(gs) | RPMD(es) | Optimize(gs) | Optimize(es) | Frequencies(gs) |
+   ---------|-----|-----|--------|--------|--------|--------|----------|----------|--------------|--------------|-----------------|
+   CNDO2    | OK  | --  | --     | --     | OK     | --     | --       | --       | --           | --           | --              |
+   ---------|-----|-----|--------|--------|--------|--------|----------|----------|--------------|--------------|-----------------|
+   INDO     | OK  | --  | --     | --     | OK     | --     | --       | --       | --           | --           | --              |
+   ---------|-----|-----|--------|--------|--------|--------|----------|----------|--------------|--------------|-----------------|
+   ZINDO/S  | OK  | OK  | OK     | --     | OK     | OK     | OK       | --       | OK           | --           | --              |
+   ---------|-----|-----|--------|--------|--------|--------|----------|----------|--------------|--------------|-----------------|
+   MNDO     | OK  | OK  | OK     | OK     | OK     | OK     | OK       | OK       | OK           | OK           | OK              |
+   ---------|-----|-----|--------|--------|--------|--------|----------|----------|--------------|--------------|-----------------|
+   AM1      | OK  | OK  | OK     | OK     | OK     | OK     | OK       | OK       | OK           | OK           | OK              |
+   ---------|-----|-----|--------|--------|--------|--------|----------|----------|--------------|--------------|-----------------|
+   AM1-D    | OK  | OK  | OK     | OK     | OK     | OK     | OK       | OK       | OK           | OK           | OK              |
+   ---------|-----|-----|--------|--------|--------|--------|----------|----------|--------------|--------------|-----------------|
+   PM3      | OK  | OK  | OK     | OK     | OK     | OK     | OK       | OK       | OK           | OK           | OK              |
+   ---------|-----|-----|--------|--------|--------|--------|----------|----------|--------------|--------------|-----------------|
+   PM3-D    | OK  | OK  | OK     | OK     | OK     | OK     | OK       | OK       | OK           | OK           | OK              |
+   ---------|-----|-----|--------|--------|--------|--------|----------|----------|--------------|--------------|-----------------|
+   PM3/PDDG | OK  | OK  | OK     | OK     | OK     | OK     | OK       | OK       | OK           | OK           | OK              |
 
       "OK", "Sch", and "--" mean available, shceduled, and non-scheduled methods, respectively.
-      MD(gs) and MD(es) mean Born-Oppenheimer Molecular Dynamics on ground and excited states, respectively. 
+      "gs" and "es" mean ground and excited states, respectively.
+      i.e., MD(gs) and MD(es) mean Born-Oppenheimer Molecular Dynamics on ground and excited states, respectively. 
 
    Elements:
    CNDO2    | H, Li, C, N, O, and S
@@ -203,8 +203,28 @@ HOW TO WRITE INPUT:
             limit_heap 512
          MEMORY_END
 
+   <Frequencies (Normal modes analysis)>
+      write frequencies-directive. Note taht not only the frequencies but also the normal modes are calculated.
+
+      E.g.
+         FREQUENCIES
+            (options)
+         FREQUENCIES_END
+
+      -options
+       "electronic_state" is only prepared.
+       "electronic_state" is index of the electronic state used for calculating the normal modes. 
+       electronic_state=0 means the electronic ground state.
+       electronic_state=1 means, then, first electornic excited state.
+       The default value of the "electronic_state" is 0.
+
+       E.g. 
+         FREQUENCIES
+            electronic_state 0
+         FREQUENCIES_END
+
    <MO Plot>
-      writ MO plot directive
+      write MO plot directive.
 
       E.g.
          MOPLOT 

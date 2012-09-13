@@ -47,6 +47,7 @@ protected:
    virtual void SetMessages();
    virtual void SetEnableAtomTypes();
    virtual void CalcSCFProperties();
+   virtual void CalcNormalModes(double** normalModes, double* normalForceConstants, const MolDS_base::Molecule& molecule) const;
    virtual void CalcForce(const std::vector<int>& elecStates);
    virtual double GetDiatomCoreRepulsionEnergy(int indexAtomA, int indexAtomB) const;
    virtual double GetDiatomCoreRepulsion1stDerivative(int indexAtomA,
@@ -107,11 +108,11 @@ private:
    std::string messageHeatsFormation;
    std::string messageHeatsFormationTitle;
    struct MoIndexPair{int moI; int moJ; bool isMoICIMO; bool isMoJCIMO;};
+   double    heatsFormation;
+   int       zMatrixForceElecStatesNum;
+   int       etaMatrixForceElecStatesNum;
    double*** zMatrixForce;
    double*** etaMatrixForce;
-   int zMatrixForceElecStatesNum;
-   int etaMatrixForceElecStatesNum;
-   double heatsFormation;
    double GetAuxiliaryDiatomCoreRepulsionEnergy(const MolDS_base_atoms::Atom& atomA,
                                                 const MolDS_base_atoms::Atom& atomB,
                                                 double distanceAB) const;

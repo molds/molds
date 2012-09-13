@@ -161,11 +161,9 @@ double Pm3Pddg::GetDiatomCoreRepulsion1stDerivative(int indexAtomA,
    // pddg additional term, first derivative of eq. (4) in [RCJ_2002]
    const Atom& atomA = *this->molecule->GetAtom(indexAtomA);
    const Atom& atomB = *this->molecule->GetAtom(indexAtomB);
-   double distance = this->molecule->GetDistanceAtoms(indexAtomA, indexAtomB);
-   double dCartesian = (atomA.GetXyz()[axisA] - atomB.GetXyz()[axisA]);
    int na = atomA.GetNumberValenceElectrons();
    int nb = atomB.GetNumberValenceElectrons();
-   double pddgExponent = -10.0;
+   double distance = this->molecule->GetDistanceAtoms(indexAtomA, indexAtomB);
    double temp = 0.0;
    for(int i=0; i<2; i++){
       double pa = atomA.GetPm3PddgParameterPa(i);
@@ -176,6 +174,7 @@ double Pm3Pddg::GetDiatomCoreRepulsion1stDerivative(int indexAtomA,
          temp += this->GetPddgAdditonalDiatomCoreRepulsionTerm1stDerivative(na, pa, da, nb, pb, db, distance);
       }
    }
+   double dCartesian = (atomA.GetXyz()[axisA] - atomB.GetXyz()[axisA]);
    double additionalTerm = temp*dCartesian/(distance*(na+nb));
 
    return pm3Term + additionalTerm;
@@ -232,7 +231,8 @@ double Pm3Pddg::GetDiatomCoreRepulsion2ndDerivative(int indexAtomA,
 double Pm3Pddg::GetPddgAdditonalDiatomCoreRepulsionTerm(int na, double pa, double da,
                                                         int nb, double pb, double db,
                                                         double distance) const{
-   double pddgExponent = -10.0;
+   double ang2AU = Parameters::GetInstance()->GetAngstrom2AU();
+   double pddgExponent = -10.0/(ang2AU*ang2AU);
    return (static_cast<double>(na)*pa +static_cast<double>(nb)*pb)*exp(pddgExponent*pow((distance-da-db),2.0));
 }
 
@@ -240,7 +240,8 @@ double Pm3Pddg::GetPddgAdditonalDiatomCoreRepulsionTerm(int na, double pa, doubl
 double Pm3Pddg::GetPddgAdditonalDiatomCoreRepulsionTerm1stDerivative(int na, double pa, double da,
                                                                        int nb, double pb, double db,
                                                                        double distance) const{
-   double pddgExponent = -10.0;
+   double ang2AU = Parameters::GetInstance()->GetAngstrom2AU();
+   double pddgExponent = -10.0/(ang2AU*ang2AU);
    return (static_cast<double>(na)*pa +static_cast<double>(nb)*pb)*exp(pddgExponent*pow((distance-da-db),2.0))
          *(2.0*pddgExponent*(distance-da-db));
 }
@@ -249,7 +250,8 @@ double Pm3Pddg::GetPddgAdditonalDiatomCoreRepulsionTerm1stDerivative(int na, dou
 double Pm3Pddg::GetPddgAdditonalDiatomCoreRepulsionTerm2ndDerivative(int na, double pa, double da,
                                                                         int nb, double pb, double db,
                                                                         double distance) const{
-   double pddgExponent = -10.0;
+   double ang2AU = Parameters::GetInstance()->GetAngstrom2AU();
+   double pddgExponent = -10.0/(ang2AU*ang2AU);
    return (static_cast<double>(na)*pa +static_cast<double>(nb)*pb)
          *(2.0*pddgExponent + pow(2.0*pddgExponent*(distance-da-db),2.0))
          *exp(pddgExponent*pow((distance-da-db),2.0));

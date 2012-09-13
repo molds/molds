@@ -62,6 +62,7 @@ protected:
    std::string errorMessageGetElectronicEnergyNumberCISStates;
    std::string errorMessageGetElectronicEnergySetElecState;
    std::string errorMessageGetElectronicTransitionDipoleMomentBadState;
+   std::string errorMessageCalcFrequenciesNormalModesBadTheory;
    std::string errorMessageFromState;
    std::string errorMessageToState;
    std::string messageSCFMetConvergence;
@@ -70,28 +71,31 @@ protected:
    std::string messageOmpElapsedTimeSCF;
    std::string messageUnitSec; 
    std::vector<MolDS_base::AtomType> enableAtomTypes;
-   MolDS_base::TheoryType theory;
    MolDS_base::Molecule* molecule;
-   double coreRepulsionEnergy;
-   double vdWCorrectionEnergy;
-   double** fockMatrix;
-   double* energiesMO;
-   double*** matrixForce;
+   MolDS_base::TheoryType theory;
+   double       coreRepulsionEnergy;
+   double       vdWCorrectionEnergy;
+   int          matrixCISdimension;
+   double**     fockMatrix;
+   double*      energiesMO;
+   double**     orbitalElectronPopulation; //P_{\mu\nu} of (2.50) in J. A. Pople book.
+   double*      atomicElectronPopulation; //P_{AB} of (3.21) in J. A. Pople book.
+   double**     overlap; // overlap integral between AOs
    double****** twoElecTwoCore;
-   double** orbitalElectronPopulation; //P_{\mu\nu} of (2.50) in J. A. Pople book.
-   double*   atomicElectronPopulation; //P_{AB} of (3.21) in J. A. Pople book.
-   double** matrixCIS;
-   double* excitedEnergies;
-   double* freeExcitonEnergiesCIS;
-   double** overlap; // overlap integral between AOs
-   double*** cartesianMatrix; // cartesian matrix represented by AOs
-   double*** electronicTransitionDipoleMoments; // Diagnonal terms are electronic dipole moments of each eigenstates (i.e. electronicDipole[0][0][XAxis] is the x-component of the electronic dipole moment of the ground state. electronicDipole[10][10][XAxis] is the x-component of the electronic dipole moment of the 10-th excited state). Off-diagonal terms are transition dipole moments between eigenstates (i.e. electronicDipole[10][0][XAxis] is the x-component of the transition dipole moment from the ground state to 10-th excited state.).
-   double* coreDipoleMoment; // dipole moment of configuration.
-   int matrixCISdimension;
+   double***    cartesianMatrix; // cartesian matrix represented by AOs
+   double***    electronicTransitionDipoleMoments; // Diagnonal terms are electronic dipole moments of each eigenstates (i.e. electronicDipole[0][0][XAxis] is the x-component of the electronic dipole moment of the ground state. electronicDipole[10][10][XAxis] is the x-component of the electronic dipole moment of the 10-th excited state). Off-diagonal terms are transition dipole moments between eigenstates (i.e. electronicDipole[10][0][XAxis] is the x-component of the transition dipole moment from the ground state to 10-th excited state.).
+   double*      coreDipoleMoment; // dipole moment of configuration.
+   double*      normalForceConstants; // force constants of normal modes
+   double**     normalModes; // in mass-weighted coordinates
+   double**     matrixCIS;
+   double*      excitedEnergies;
+   double*      freeExcitonEnergiesCIS;
+   double***    matrixForce;
    virtual void SetMessages();
    virtual void SetEnableAtomTypes();
    virtual void CalcSCFProperties();
    virtual void CalcCISProperties();
+   virtual void CalcNormalModes(double** normalModes, double* normalForceConstants, const MolDS_base::Molecule& molecule) const;
    virtual double GetElectronicTransitionDipoleMoment(int to, int from, MolDS_base::CartesianType axis,
                                                       double const* const* fockMatrix,
                                                       double const* const* matrixCIS,
@@ -244,9 +248,15 @@ private:
    std::string messageCoreDipoleMoment;
    std::string messageTotalDipoleMomentTitle;
    std::string messageTotalDipoleMoment;
+   std::string messageNormalModesTitle;
+   std::string messageNormalModesUnitsMassWeighted;
+   std::string messageNormalModesUnitsNonMassWeighted;
+   std::string messageNormalModesMassWeighted;
+   std::string messageNormalModesNonMassWeighted;
+   std::string messageNormalModesImaginaryFrequencies;
    double elecSCFEnergy;
-   double** gammaAB;
    double bondingAdjustParameterK[2]; //see (3.79) in J. A. Pople book
+   double** gammaAB;
    class ReducedOverlapParameters : private MolDS_base::Uncopyable{
    public:
       // use Y[na][nb][la][lb][m][i][j] 
@@ -270,6 +280,9 @@ private:
    void OutputSCFEnergies() const;
    void OutputSCFDipole() const;
    void OutputSCFMulliken() const;
+   void OutputNormalModes(double const* const* normalModes, 
+                          double const* normalForceConstants, 
+                          const MolDS_base::Molecule& molecule) const;
    void CalcCoreRepulsionEnergy();
    void CalcVdWCorrectionEnergy();
    double GetVdwDampingValue(double vdWDistance, double distance) const;

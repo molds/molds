@@ -55,9 +55,11 @@ namespace MolDS_mndo{
  *  Main Refferences for MNDO are [DT_1977, DT_1977-2, DT_1977-3]
  */
 Mndo::Mndo() : MolDS_zindo::ZindoS(){
+   // protedted variables and methods
    this->theory = MNDO;
    this->SetMessages();
    this->SetEnableAtomTypes();
+   // private variables
    this->heatsFormation = 0.0;
    this->zMatrixForceElecStatesNum = 0;
    this->etaMatrixForceElecStatesNum = 0;
@@ -83,6 +85,11 @@ Mndo::~Mndo(){
                                               this->etaMatrixForceElecStatesNum,
                                               this->molecule->GetTotalNumberAOs(),
                                               this->molecule->GetTotalNumberAOs());
+   MallocerFreer::GetInstance()->Free<double>(&this->normalForceConstants,
+                                              CartesianType_end*molecule->GetNumberAtoms());
+   MallocerFreer::GetInstance()->Free<double>(&this->normalModes,
+                                              CartesianType_end*molecule->GetNumberAtoms(),
+                                              CartesianType_end*molecule->GetNumberAtoms());
 }
 
 void Mndo::SetMolecule(Molecule* molecule){
@@ -91,6 +98,11 @@ void Mndo::SetMolecule(Molecule* molecule){
                                                 molecule->GetNumberAtoms(),
                                                 molecule->GetNumberAtoms(),
                                                 dxy, dxy, dxy, dxy);
+   MallocerFreer::GetInstance()->Malloc<double>(&this->normalForceConstants,
+                                                CartesianType_end*molecule->GetNumberAtoms());
+   MallocerFreer::GetInstance()->Malloc<double>(&this->normalModes,
+                                                CartesianType_end*molecule->GetNumberAtoms(),
+                                                CartesianType_end*molecule->GetNumberAtoms());
 }
 void Mndo::SetMessages(){
    this->errorMessageSCFNotConverged 
@@ -235,17 +247,17 @@ double Mndo::GetAuxiliaryDiatomCoreRepulsionEnergy2ndDerivative(const Atom& atom
    double fact2=0.0;
    if(atomA.GetAtomType() == H && (atomB.GetAtomType() == N || 
                                    atomB.GetAtomType() == O)  ){
-      fact1 = -alphaA*exp(-alphaA*distanceAB);
+      fact1 = -alphaA*exp(-alphaA*distanceAB)
              +((1.0/ang2AU) - alphaB*(distanceAB/ang2AU))*exp(-alphaB*distanceAB);
-      fact2 = alphaA*alphaA*exp(-alphaA*distanceAB);
-             +(-2.0*alphaA/ang2AU + (distanceAB/ang2AU)*alphaA*alphaA)*exp(-alphaB*distanceAB);
+      fact2 = alphaA*alphaA*exp(-alphaA*distanceAB)
+             +(-2.0*alphaB/ang2AU + (distanceAB/ang2AU)*alphaB*alphaB)*exp(-alphaB*distanceAB);
    }
    else if(atomB.GetAtomType() == H && (atomA.GetAtomType() == N || 
                                         atomA.GetAtomType() == O)  ){
-      fact1 = -alphaB*exp(-alphaB*distanceAB);
+      fact1 = -alphaB*exp(-alphaB*distanceAB)
              +((1.0/ang2AU) - alphaA*(distanceAB/ang2AU))*exp(-alphaA*distanceAB);
-      fact2 = alphaB*alphaB*exp(-alphaB*distanceAB);
-             +(-2.0*alphaB/ang2AU + (distanceAB/ang2AU)*alphaB*alphaB)*exp(-alphaA*distanceAB);
+      fact2 = alphaB*alphaB*exp(-alphaB*distanceAB)
+             +(-2.0*alphaA/ang2AU + (distanceAB/ang2AU)*alphaA*alphaA)*exp(-alphaA*distanceAB);
    }
    else{
       fact1 = -alphaA*exp(-alphaA*distanceAB) - alphaB*exp(-alphaB*distanceAB);
@@ -347,27 +359,17 @@ void Mndo::CalcSCFProperties(){
    MolDS_cndo::Cndo2::CalcSCFProperties();
    this->CalcHeatsFormation(&this->heatsFormation, *this->molecule);
  
-   /*
-   // test code for hessian
-   int hessianDim = this->molecule->GetNumberAtoms()*3;
-   double** hessian = NULL;
-   double* forceCons = NULL;
+}
+
+void Mndo::CalcNormalModes(double** normalModes, double* normalForceConstants, const Molecule& molecule) const{
    bool isMassWeighted = true;
-   MallocerFreer::GetInstance()->Malloc<double>(&hessian, hessianDim, hessianDim);
-   MallocerFreer::GetInstance()->Malloc<double>(&forceCons, hessianDim);
-   this->CalcHessianSCF(hessian, isMassWeighted);
+   this->CalcHessianSCF(normalModes, isMassWeighted);
    bool calcEigenVectors = true;
-   MolDS_wrappers::Lapack::GetInstance()->Dsyevd(hessian,
-                                                 forceCons,
+   int hessianDim = CartesianType_end*molecule.GetNumberAtoms();
+   MolDS_wrappers::Lapack::GetInstance()->Dsyevd(normalModes,
+                                                 normalForceConstants,
                                                  hessianDim,
                                                  calcEigenVectors);
-   for(int i=0; i<hessianDim; i++){
-      printf("force cons: %d %e\n",i,forceCons[i]);
-   }
-   cout << endl << endl;
-   MallocerFreer::GetInstance()->Free<double>(&hessian, hessianDim, hessianDim);
-   MallocerFreer::GetInstance()->Free<double>(&forceCons, hessianDim);
-   */
 }
 
 void Mndo::OutputSCFResults() const{
@@ -2430,26 +2432,6 @@ void Mndo::CalcHessianSCF(double** hessianSCF, bool isMassWeighted) const{
                                                    CartesianType_end);
       this->CalcOrbitalElectronPopulation1stDerivatives(orbitalElectronPopulation1stDerivs);
 
-//debug
-{
-   printf("orbitalpop\n");
-   for(int mu=0; mu<totalNumberAOs; mu++){
-      //for(int nu=0; nu<totalNumberAOs; nu++){
-         printf("%.14e\n",this->orbitalElectronPopulation[mu][mu]);
-      //}
-   }
-   printf("\n\n");
-
-   int indexDerivAtom=0;
-   CartesianType derivAxis=XAxis;
-   printf("orbitalpop 1st deriv atom:%d axis:%s\n",indexDerivAtom,CartesianTypeStr(static_cast<CartesianType>(derivAxis)));
-   for(int mu=0; mu<totalNumberAOs; mu++){
-      //for(int nu=0; nu<totalNumberAOs; nu++){
-         printf("%.14e\n",orbitalElectronPopulation1stDerivs[mu][mu][indexDerivAtom][derivAxis]);
-      //}
-   }
-   printf("\n\n");
-}
 			//#pragma omp parallel
 //{
       double****    diatomicOverlap1stDerivs = NULL;
@@ -2551,16 +2533,17 @@ void Mndo::CalcHessianSCF(double** hessianSCF, bool isMassWeighted) const{
                                               totalNumberAOs,
                                               this->molecule->GetNumberAtoms(),
                                               CartesianType_end);
-
+   /*
    int hessianDim = this->molecule->GetNumberAtoms()*3;
    for(int i=0; i<hessianDim; i++){
       for(int j=0; j<hessianDim; j++){
-         //printf("hess elem: %d %d %e\n",i,j,hessianSCF[i][j]);
+         printf("hess elem: %d %d %e\n",i,j,hessianSCF[i][j]);
          printf("%e ",hessianSCF[i][j]);
       }
       cout << endl;
    }
    cout << endl << endl;
+   */
 }
 
 void Mndo::CalcOrbitalElectronPopulation1stDerivatives(double**** orbitalElectronPopulation1stDerivs) const{
@@ -2853,17 +2836,13 @@ void Mndo::CalcMatrixCPHF(double** matrixCPHF,
       for(int i=0; i<nonRedundantQIndeces.size(); i++){
          int moI = nonRedundantQIndeces[i].moI;
          int moJ = nonRedundantQIndeces[i].moJ;
-         for(int j=i; j<nonRedundantQIndeces.size(); j++){
+         for(int j=0; j<nonRedundantQIndeces.size(); j++){
             int moK = nonRedundantQIndeces[j].moI;
             int moL = nonRedundantQIndeces[j].moJ;
             matrixCPHF[i][j] = (this->GetGammaNRElement(moI, moJ, moK, moL)-0.5*this->GetKNRElement(moI, moJ, moK, moL))
                               *occupations[j];
-
-         }
-         for(int j=0; j<i; j++){
-            matrixCPHF[i][j] = matrixCPHF[j][i];
-         }
-      }
+         }    
+      }  
 
       for(int i=nonRedundantQIndeces.size(); i<nonRedundantQIndeces.size()+redundantQIndeces.size(); i++){
          int moI = redundantQIndeces[i-nonRedundantQIndeces.size()].moI;
@@ -3644,18 +3623,18 @@ void Mndo::CalcDiatomicTwoElecTwoCore1stDerivatives(double***** matrix,
                                                        CartesianType_end);
    } 
 
-   double** rotatingMatrix = NULL;
-   double*** rotMat1stDerivatives = NULL;
+   double**   rotatingMatrix = NULL;
+   double***  rotMat1stDerivatives = NULL;
    double**** diatomicTwoElecTwoCore = NULL;
    try{
       this->MallocDiatomicTwoElecTwoCore1stDeriTemps(&rotatingMatrix,
-                                                       &rotMat1stDerivatives,
-                                                       &diatomicTwoElecTwoCore);
+                                                     &rotMat1stDerivatives,
+                                                     &diatomicTwoElecTwoCore);
       // calclation in diatomic frame
       for(int mu=0; mu<atomA.GetValenceSize(); mu++){
-         for(int nu=0; nu<atomA.GetValenceSize(); nu++){
+         for(int nu=mu; nu<atomA.GetValenceSize(); nu++){
             for(int lambda=0; lambda<atomB.GetValenceSize(); lambda++){
-               for(int sigma=0; sigma<atomB.GetValenceSize(); sigma++){
+               for(int sigma=lambda; sigma<atomB.GetValenceSize(); sigma++){
                   for(int dimA=0; dimA<CartesianType_end; dimA++){
                      matrix[mu][nu][lambda][sigma][dimA] 
                         = this->GetNddoRepulsionIntegral1stDerivative(
@@ -3666,6 +3645,9 @@ void Mndo::CalcDiatomicTwoElecTwoCore1stDerivatives(double***** matrix,
                                 atomB.GetValence(lambda),
                                 atomB.GetValence(sigma),
                                 static_cast<CartesianType>(dimA));
+                     matrix[nu][mu][lambda][sigma][dimA] = matrix[mu][nu][lambda][sigma][dimA];
+                     matrix[nu][mu][sigma][lambda][dimA] = matrix[mu][nu][lambda][sigma][dimA];
+                     matrix[mu][nu][sigma][lambda][dimA] = matrix[mu][nu][lambda][sigma][dimA];
                   }  
                   diatomicTwoElecTwoCore[mu][nu][lambda][sigma] 
                      = this->GetNddoRepulsionIntegral(
@@ -3675,6 +3657,9 @@ void Mndo::CalcDiatomicTwoElecTwoCore1stDerivatives(double***** matrix,
                              atomB, 
                              atomB.GetValence(lambda),
                              atomB.GetValence(sigma));
+                  diatomicTwoElecTwoCore[nu][mu][lambda][sigma] = diatomicTwoElecTwoCore[mu][nu][lambda][sigma];
+                  diatomicTwoElecTwoCore[nu][mu][sigma][lambda] = diatomicTwoElecTwoCore[mu][nu][lambda][sigma];
+                  diatomicTwoElecTwoCore[mu][nu][sigma][lambda] = diatomicTwoElecTwoCore[mu][nu][lambda][sigma];
                }
             }
          }

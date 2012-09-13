@@ -35,6 +35,8 @@ private:
    std::string errorMessageNonValidExcitedStatesMC;
    std::string errorMessageNonValidExcitedStatesRPMD;
    std::string errorMessageNonValidExcitedStatesOptimization;
+   std::string errorMessageNonValidElectronicStateFrequencies;
+   std::string errorMessageNonValidTheoryFrequencies;
    std::string errorMessageElecState;
    std::string errorMessageTheory;
    std::string errorMessageNumberExcitedStateCIS;
@@ -100,6 +102,9 @@ private:
    std::string messageOptimizationTimeWidth;
    std::string messageOptimizationRmsGradient;
    std::string messageOptimizationMaxGradient;
+   // Frequencies (Normal modes)
+   std::string messageFrequenciesConditions;
+   std::string messageFrequenciesElecState;
    // MOPlot
    std::string messageMOPlotConditions;
    std::string messageMOPlotIndex;
@@ -123,6 +128,7 @@ private:
    std::string messageK;
    std::string messageAngst;
    std::string messageMB;
+
    // others
    std::string stringYES;
    std::string stringNO;
@@ -249,6 +255,10 @@ private:
    std::string stringOptimizationMaxGradient;
    std::string stringOptimizationRmsGradient;
    std::string stringOptimizationTimeWidth;
+   // Frequencies (Normal modes)
+   std::string stringFrequencies;
+   std::string stringFrequenciesEnd;
+   std::string stringFrequenciesElecState;
    void CalcMolecularBasics(Molecule* molecule) const;
    void ValidateVdWConditions() const;
    void ValidateCisConditions(const Molecule& molecule) const;
@@ -256,6 +266,7 @@ private:
    void ValidateMcConditions(const Molecule& molecule) const;
    void ValidateRpmdConditions(const Molecule& molecule) const;
    void ValidateOptimizationConditions(const Molecule& molecule) const;
+   void ValidateFrequenciesConditions() const;
    void OutputMolecularBasics(Molecule* molecule) const;
    void OutputScfConditions() const;
    void OutputMemoryConditions() const;
@@ -264,6 +275,7 @@ private:
    void OutputMcConditions() const;
    void OutputRpmdConditions() const;
    void OutputOptimizationConditions() const;
+   void OutputFrequenciesConditions() const;
    void OutputMOPlotConditions() const;
    void OutputHolePlotConditions() const;
    void OutputParticlePlotConditions() const;
@@ -287,6 +299,7 @@ private:
    int ParseConditionsMD(std::vector<std::string>* inputTerms, int parseIndex) const;
    int ParseConditionsRPMD(std::vector<std::string>* inputTerms, int parseIndex) const;
    int ParseConditionsOptimization(std::vector<std::string>* inputTerms, int parseIndex) const;
+   int ParseConditionsFrequencies(std::vector<std::string>* inputTerms, int parseIndex) const;
    int ParseConditionsMemory(std::vector<std::string>* inputTerms, int parseIndex) const;
 };
 
