@@ -365,7 +365,6 @@ double Cndo2::GetVdwDampingValue2ndDerivative(double vdWDistance, double distanc
    double exponent = -1.0*dampingFactor*(distance/vdWDistance - 1.0);
    double pre = dampingFactor/vdWDistance;
    double dominator = 1.0+exp(exponent);
-
    return 2.0*pow(dominator,-3.0)*pre*pre*exp(2.0*exponent) 
          -    pow(dominator,-2.0)*pre*pre*exp(    exponent);
 }
@@ -1123,25 +1122,19 @@ double Cndo2::GetMolecularIntegralElement(int moI, int moJ, int moK, int moL,
                                           double const* const* fockMatrix, 
                                           double const* const* gammaAB) const{
    double value = 0.0;
-   int firstAOIndexA;
-   int firstAOIndexB;
-   int numberAOsA;
-   int numberAOsB;
-   double gamma;
-
    for(int A=0; A<molecule.GetNumberAtoms(); A++){
       const Atom& atomA = *molecule.GetAtom(A);
-      firstAOIndexA = atomA.GetFirstAOIndex();
-      numberAOsA = atomA.GetValenceSize();
+      int firstAOIndexA = atomA.GetFirstAOIndex();
+      int lastAOIndexA  = atomA.GetLastAOIndex();
 
       for(int B=0; B<molecule.GetNumberAtoms(); B++){
          const Atom& atomB = *molecule.GetAtom(B);
-         firstAOIndexB = atomB.GetFirstAOIndex();
-         numberAOsB = atomB.GetValenceSize();
-         gamma = gammaAB[A][B];
+         int firstAOIndexB = atomB.GetFirstAOIndex();
+         int lastAOIndexB  = atomB.GetLastAOIndex();
+         double gamma = gammaAB[A][B];
 
-         for(int mu=firstAOIndexA; mu<firstAOIndexA+numberAOsA; mu++){
-            for(int nu=firstAOIndexB; nu<firstAOIndexB+numberAOsB; nu++){
+         for(int mu=firstAOIndexA; mu<=lastAOIndexA; mu++){
+            for(int nu=firstAOIndexB; nu<=lastAOIndexB; nu++){
 
                value += gamma*fockMatrix[moI][mu]*fockMatrix[moJ][mu]*fockMatrix[moK][nu]*fockMatrix[moL][nu];
             }
@@ -1162,9 +1155,11 @@ void Cndo2::UpdateOldOrbitalElectronPopulation(double** oldOrbitalElectronPopula
    }
 }
 
-bool Cndo2::SatisfyConvergenceCriterion(double const* const* oldOrbitalElectronPopulation, 
-                                        double const* const* orbitalElectronPopulation,
-                                        int numberAOs, double* rmsDensity, int times) const{
+bool Cndo2::SatisfyConvergenceCriterion(double const* const * oldOrbitalElectronPopulation,
+                                        double const* const * orbitalElectronPopulation,
+                                        int numberAOs,
+                                        double* rmsDensity,
+                                        int times) const{
    bool satisfy = false;
    double change = 0.0;
    stringstream ompErrors;
@@ -1222,13 +1217,13 @@ void Cndo2::CalcFockMatrix(double** fockMatrix,
       try{
         const Atom& atomA = *molecule.GetAtom(A);
          int firstAOIndexA = atomA.GetFirstAOIndex();
-         int numberAOsA = atomA.GetValenceSize();
+         int lastAOIndexA  = atomA.GetLastAOIndex();
          for(int B=A; B<molecule.GetNumberAtoms(); B++){
             const Atom& atomB = *molecule.GetAtom(B);
             int firstAOIndexB = atomB.GetFirstAOIndex();
-            int numberAOsB = atomB.GetValenceSize();
-            for(int mu=firstAOIndexA; mu<firstAOIndexA+numberAOsA; mu++){
-               for(int nu=firstAOIndexB; nu<firstAOIndexB+numberAOsB; nu++){
+            int lastAOIndexB  = atomB.GetLastAOIndex();
+            for(int mu=firstAOIndexA; mu<=lastAOIndexA; mu++){
+               for(int nu=firstAOIndexB; nu<=lastAOIndexB; nu++){
                   if(mu == nu){
                      // diagonal part
                      fockMatrix[mu][mu] = this->GetFockDiagElement(atomA, 
@@ -3355,10 +3350,11 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
    return value;
 }
 
-void Cndo2::FreeDiatomicOverlapAndRotatingMatrix(double*** diatomicOverlap, double*** rotatingMatrix) const{
+void Cndo2::FreeDiatomicOverlapAndRotatingMatrix(double*** diatomicOverlap, 
+                                                 double*** rotatingMatrix) const{
    // free
    MallocerFreer::GetInstance()->Free<double>(diatomicOverlap, OrbitalType_end, OrbitalType_end);
-   MallocerFreer::GetInstance()->Free<double>(rotatingMatrix, OrbitalType_end, OrbitalType_end);
+   MallocerFreer::GetInstance()->Free<double>(rotatingMatrix,  OrbitalType_end, OrbitalType_end);
 }
 
 // calculate Overlap matrix. E.g. S_{\mu\nu} in (3.74) in J. A. Pople book.
@@ -3514,10 +3510,10 @@ void Cndo2::CalcDiatomicOverlap2ndDerivatives(double**** diatomicOverlap2ndDeriv
    double** diaOverlapInDiaFrame = NULL;  // diatomic overlap in diatomic frame
    double** diaOverlap1stDerivInDiaFrame = NULL; // first derivative of the diaOverlap. This derivative is related to the distance between two atoms.
    double** diaOverlap2ndDerivInDiaFrame = NULL; // second derivative of the diaOverlap. This derivative is related to the distance between two atoms.
-   double**  rotMat = NULL; // rotating Matrix from the diatomic frame to space fixed frame.
-   double*** rotMat1stDerivatives = NULL; //first derivatives of the rotMat
+   double**   rotMat = NULL; // rotating Matrix from the diatomic frame to space fixed frame.
+   double***  rotMat1stDerivatives = NULL; //first derivatives of the rotMat
    double**** rotMat2ndDerivatives = NULL; //second derivatives of the rotMat
-   double*** tempDiaOverlap1stDerivs = NULL; // first derivatives of the diaOverlap. This derivatives are related to the all Cartesian coordinates.
+   double***  tempDiaOverlap1stDerivs = NULL; // first derivatives of the diaOverlap. This derivatives are related to the all Cartesian coordinates.
    double**** tempDiaOverlap2ndDerivs = NULL; //sedond derivatives of the diaOverlap. This derivatives are related to the all Cartesian coordinates.
 
    try{
@@ -3575,32 +3571,32 @@ void Cndo2::CalcDiatomicOverlap2ndDerivatives(double**** diatomicOverlap2ndDeriv
                   for(int k=0; k<OrbitalType_end; k++){
                      for(int l=0; l<OrbitalType_end; l++){
               
-                        temp1 += rotMat2ndDerivatives[i][k][dimA1][dimA2]
-                                *rotMat[j][l]
-                                *diaOverlapInDiaFrame[k][l];
-                        temp2 += rotMat[i][k]
-                                *rotMat2ndDerivatives[j][l][dimA1][dimA2]
-                                *diaOverlapInDiaFrame[k][l];
-                        temp3 += rotMat[i][k]
-                                *rotMat[j][l]
+                        temp1 += rotMat2ndDerivatives   [i][k][dimA1][dimA2]
+                                *rotMat                 [j][l]
+                                *diaOverlapInDiaFrame   [k][l];
+                        temp2 += rotMat                 [i][k]
+                                *rotMat2ndDerivatives   [j][l][dimA1][dimA2]
+                                *diaOverlapInDiaFrame   [k][l];
+                        temp3 += rotMat                 [i][k]
+                                *rotMat                 [j][l]
                                 *tempDiaOverlap2ndDerivs[k][l][dimA1][dimA2];
-                        temp4 += rotMat1stDerivatives[i][k][dimA1] 
-                                *rotMat1stDerivatives[j][l][dimA2]
-                                *diaOverlapInDiaFrame[k][l];
-                        temp5 += rotMat1stDerivatives[i][k][dimA1] 
-                                *rotMat[j][l]
+                        temp4 += rotMat1stDerivatives   [i][k][dimA1] 
+                                *rotMat1stDerivatives   [j][l][dimA2]
+                                *diaOverlapInDiaFrame   [k][l];
+                        temp5 += rotMat1stDerivatives   [i][k][dimA1] 
+                                *rotMat                 [j][l]
                                 *tempDiaOverlap1stDerivs[k][l][dimA2];
-                        temp6 += rotMat1stDerivatives[i][k][dimA2] 
-                                *rotMat1stDerivatives[j][l][dimA1]
-                                *diaOverlapInDiaFrame[k][l];
-                        temp7 += rotMat[i][k] 
-                                *rotMat1stDerivatives[j][l][dimA1]
+                        temp6 += rotMat1stDerivatives   [i][k][dimA2] 
+                                *rotMat1stDerivatives   [j][l][dimA1]
+                                *diaOverlapInDiaFrame   [k][l];
+                        temp7 += rotMat                 [i][k] 
+                                *rotMat1stDerivatives   [j][l][dimA1]
                                 *tempDiaOverlap1stDerivs[k][l][dimA2];
-                        temp8 += rotMat1stDerivatives[i][k][dimA2] 
-                                *rotMat[j][l]
+                        temp8 += rotMat1stDerivatives   [i][k][dimA2] 
+                                *rotMat                 [j][l]
                                 *tempDiaOverlap1stDerivs[k][l][dimA1];
-                        temp9 += rotMat[i][k] 
-                                *rotMat1stDerivatives[j][l][dimA2]
+                        temp9 += rotMat                 [i][k] 
+                                *rotMat1stDerivatives   [j][l][dimA2]
                                 *tempDiaOverlap1stDerivs[k][l][dimA1];
                      }
                   }
@@ -3678,38 +3674,38 @@ void Cndo2::MallocDiatomicOverlap1stDeriTemps(double*** diaOverlapInDiaFrame,
                                               double*** diaOverlap1stDerivInDiaFrame,
                                               double*** rotMat,
                                               double**** rotMat1stDerivs) const{
-   MallocerFreer::GetInstance()->Malloc<double>(diaOverlapInDiaFrame, OrbitalType_end, OrbitalType_end);
+   MallocerFreer::GetInstance()->Malloc<double>(diaOverlapInDiaFrame,         OrbitalType_end, OrbitalType_end);
    MallocerFreer::GetInstance()->Malloc<double>(diaOverlap1stDerivInDiaFrame, OrbitalType_end, OrbitalType_end);
-   MallocerFreer::GetInstance()->Malloc<double>(rotMat, OrbitalType_end, OrbitalType_end);
-   MallocerFreer::GetInstance()->Malloc<double>(rotMat1stDerivs, OrbitalType_end, OrbitalType_end, CartesianType_end);
+   MallocerFreer::GetInstance()->Malloc<double>(rotMat,                       OrbitalType_end, OrbitalType_end);
+   MallocerFreer::GetInstance()->Malloc<double>(rotMat1stDerivs,              OrbitalType_end, OrbitalType_end, CartesianType_end);
 }
 
 void Cndo2::MallocDiatomicOverlap2ndDeriTemps(double*** diaOverlapInDiaFrame, 
                                               double*** diaOverlap1stDerivInDiaFrame,
                                               double*** diaOverlap2ndDerivInDiaFrame,
-                                              double*** rotMat,
-                                              double**** rotMat1stDerivs,
+                                              double***   rotMat,
+                                              double****  rotMat1stDerivs,
                                               double***** rotMat2ndDerivs,
-                                              double**** tempDiaOverlap1stDerivs,
+                                              double****  tempDiaOverlap1stDerivs,
                                               double***** tempDiaOverlap2ndDerivs) const{
-   MallocerFreer::GetInstance()->Malloc<double>(diaOverlapInDiaFrame, OrbitalType_end, OrbitalType_end);
+   MallocerFreer::GetInstance()->Malloc<double>(diaOverlapInDiaFrame,         OrbitalType_end, OrbitalType_end);
    MallocerFreer::GetInstance()->Malloc<double>(diaOverlap1stDerivInDiaFrame, OrbitalType_end, OrbitalType_end);
    MallocerFreer::GetInstance()->Malloc<double>(diaOverlap2ndDerivInDiaFrame, OrbitalType_end, OrbitalType_end);
-   MallocerFreer::GetInstance()->Malloc<double>(rotMat, OrbitalType_end, OrbitalType_end);
-   MallocerFreer::GetInstance()->Malloc<double>(rotMat1stDerivs, OrbitalType_end, OrbitalType_end, CartesianType_end);
-   MallocerFreer::GetInstance()->Malloc<double>(rotMat2ndDerivs, OrbitalType_end, OrbitalType_end, CartesianType_end, CartesianType_end);
-   MallocerFreer::GetInstance()->Malloc<double>(tempDiaOverlap1stDerivs, OrbitalType_end, OrbitalType_end, CartesianType_end);
-   MallocerFreer::GetInstance()->Malloc<double>(tempDiaOverlap2ndDerivs, OrbitalType_end, OrbitalType_end, CartesianType_end, CartesianType_end);
+   MallocerFreer::GetInstance()->Malloc<double>(rotMat,                       OrbitalType_end, OrbitalType_end);
+   MallocerFreer::GetInstance()->Malloc<double>(rotMat1stDerivs,              OrbitalType_end, OrbitalType_end, CartesianType_end);
+   MallocerFreer::GetInstance()->Malloc<double>(rotMat2ndDerivs,              OrbitalType_end, OrbitalType_end, CartesianType_end, CartesianType_end);
+   MallocerFreer::GetInstance()->Malloc<double>(tempDiaOverlap1stDerivs,      OrbitalType_end, OrbitalType_end, CartesianType_end);
+   MallocerFreer::GetInstance()->Malloc<double>(tempDiaOverlap2ndDerivs,      OrbitalType_end, OrbitalType_end, CartesianType_end, CartesianType_end);
 }
 
 void Cndo2::FreeDiatomicOverlap1stDeriTemps(double*** diaOverlapInDiaFrame, 
                                             double*** diaOverlap1stDerivInDiaFrame,
                                             double*** rotMat,
                                             double**** rotMat1stDerivs) const{
-   MallocerFreer::GetInstance()->Free<double>(diaOverlapInDiaFrame, OrbitalType_end, OrbitalType_end);
+   MallocerFreer::GetInstance()->Free<double>(diaOverlapInDiaFrame,         OrbitalType_end, OrbitalType_end);
    MallocerFreer::GetInstance()->Free<double>(diaOverlap1stDerivInDiaFrame, OrbitalType_end, OrbitalType_end);
-   MallocerFreer::GetInstance()->Free<double>(rotMat, OrbitalType_end, OrbitalType_end);
-   MallocerFreer::GetInstance()->Free<double>(rotMat1stDerivs, OrbitalType_end, OrbitalType_end, CartesianType_end);
+   MallocerFreer::GetInstance()->Free<double>(rotMat,                       OrbitalType_end, OrbitalType_end);
+   MallocerFreer::GetInstance()->Free<double>(rotMat1stDerivs,              OrbitalType_end, OrbitalType_end, CartesianType_end);
 }
 
 void Cndo2::FreeDiatomicOverlap2ndDeriTemps(double*** diaOverlapInDiaFrame, 
@@ -3720,14 +3716,14 @@ void Cndo2::FreeDiatomicOverlap2ndDeriTemps(double*** diaOverlapInDiaFrame,
                                             double***** rotMat2ndDerivs,
                                             double****  tempDiaOverlap1stDerivs,
                                             double***** tempDiaOverlap2ndDerivs) const{
-   MallocerFreer::GetInstance()->Free<double>(diaOverlapInDiaFrame, OrbitalType_end, OrbitalType_end);
+   MallocerFreer::GetInstance()->Free<double>(diaOverlapInDiaFrame,         OrbitalType_end, OrbitalType_end);
    MallocerFreer::GetInstance()->Free<double>(diaOverlap1stDerivInDiaFrame, OrbitalType_end, OrbitalType_end);
    MallocerFreer::GetInstance()->Free<double>(diaOverlap2ndDerivInDiaFrame, OrbitalType_end, OrbitalType_end);
-   MallocerFreer::GetInstance()->Free<double>(rotMat, OrbitalType_end, OrbitalType_end);
-   MallocerFreer::GetInstance()->Free<double>(rotMat1stDerivs, OrbitalType_end, OrbitalType_end, CartesianType_end);
-   MallocerFreer::GetInstance()->Free<double>(rotMat2ndDerivs, OrbitalType_end, OrbitalType_end, CartesianType_end, CartesianType_end);
-   MallocerFreer::GetInstance()->Free<double>(tempDiaOverlap1stDerivs, OrbitalType_end, OrbitalType_end, CartesianType_end);
-   MallocerFreer::GetInstance()->Free<double>(tempDiaOverlap2ndDerivs, OrbitalType_end, OrbitalType_end, CartesianType_end, CartesianType_end);
+   MallocerFreer::GetInstance()->Free<double>(rotMat,                       OrbitalType_end, OrbitalType_end);
+   MallocerFreer::GetInstance()->Free<double>(rotMat1stDerivs,              OrbitalType_end, OrbitalType_end, CartesianType_end);
+   MallocerFreer::GetInstance()->Free<double>(rotMat2ndDerivs,              OrbitalType_end, OrbitalType_end, CartesianType_end, CartesianType_end);
+   MallocerFreer::GetInstance()->Free<double>(tempDiaOverlap1stDerivs,      OrbitalType_end, OrbitalType_end, CartesianType_end);
+   MallocerFreer::GetInstance()->Free<double>(tempDiaOverlap2ndDerivs,      OrbitalType_end, OrbitalType_end, CartesianType_end, CartesianType_end);
 }
 
 // calculate Overlap matrix. E.g. S_{\mu\nu} in (3.74) in J. A. Pople book by GTO expansion.
@@ -5262,67 +5258,69 @@ void Cndo2::CalcDiatomicOverlap2ndDerivativeInDiatomicFrame(double** diatomicOve
    for(int a=0; a<atomA.GetValenceSize(); a++){
       OrbitalType valenceOrbitalA = atomA.GetValence(a);
       RealSphericalHarmonicsIndex realShpericalHarmonicsA(valenceOrbitalA);
-      orbitalExponentA = atomA.GetOrbitalExponent(
-                               atomA.GetValenceShellType(), 
-                               valenceOrbitalA,
-                               this->theory);
+      orbitalExponentA = atomA.GetOrbitalExponent(atomA.GetValenceShellType(),
+                                                  valenceOrbitalA,
+                                                  this->theory);
 
       for(int b=0; b<atomB.GetValenceSize(); b++){
          OrbitalType valenceOrbitalB = atomB.GetValence(b);
          RealSphericalHarmonicsIndex realShpericalHarmonicsB(valenceOrbitalB);
-         orbitalExponentB = atomB.GetOrbitalExponent(
-                                  atomB.GetValenceShellType(), 
-                                  valenceOrbitalB,
-                                  this->theory);
+         orbitalExponentB = atomB.GetOrbitalExponent(atomB.GetValenceShellType(),
+                                                     valenceOrbitalB,
+                                                     this->theory);
 
          if(realShpericalHarmonicsA.GetM() == realShpericalHarmonicsB.GetM()){
             m = abs(realShpericalHarmonicsA.GetM());
             alpha = orbitalExponentA * R;
             beta =  orbitalExponentB * R;
 
-            reducedOverlap = this->GetReducedOverlap
-                                   (na, realShpericalHarmonicsA.GetL(), m,
-                                    nb, realShpericalHarmonicsB.GetL(), alpha, beta);
-            reducedOverlap1stDerivAlpha = this->GetReducedOverlap1stDerivativeAlpha(
-                                                  na, 
-                                                  realShpericalHarmonicsA.GetL(), 
-                                                  m,
-                                                  nb, 
-                                                  realShpericalHarmonicsB.GetL(), 
-                                                  alpha, 
-                                                  beta);
-            reducedOverlap1stDerivBeta  = this->GetReducedOverlap1stDerivativeBeta(
-                                                  na, 
-                                                  realShpericalHarmonicsA.GetL(), 
-                                                  m,
-                                                  nb, 
-                                                  realShpericalHarmonicsB.GetL(), 
-                                                  alpha, 
-                                                  beta);
-            reducedOverlap2ndDerivAlpha = this->GetReducedOverlap2ndDerivativeAlpha(
-                                                   na, 
-                                                   realShpericalHarmonicsA.GetL(), 
-                                                   m,
-                                                   nb, 
-                                                   realShpericalHarmonicsB.GetL(), 
-                                                   alpha, 
-                                                   beta);
-            reducedOverlap2ndDerivBeta = this->GetReducedOverlap2ndDerivativeBeta(
-                                                  na, 
-                                                  realShpericalHarmonicsA.GetL(), 
-                                                  m,
-                                                  nb, 
-                                                  realShpericalHarmonicsB.GetL(), 
-                                                  alpha, 
-                                                  beta);
-            reducedOverlap2ndDerivAlphaBeta = this->GetReducedOverlap2ndDerivativeAlphaBeta(
-                                                       na, 
-                                                       realShpericalHarmonicsA.GetL(), 
-                                                       m,
-                                                       nb, 
-                                                       realShpericalHarmonicsB.GetL(), 
-                                                       alpha, 
-                                                       beta);
+            reducedOverlap = this->GetReducedOverlap(na,
+                                                     realShpericalHarmonicsA.GetL(),
+                                                     m,
+                                                     nb,
+                                                     realShpericalHarmonicsB.GetL(),
+                                                     alpha,
+                                                     beta);
+            reducedOverlap1stDerivAlpha
+               = this->GetReducedOverlap1stDerivativeAlpha(na,
+                                                           realShpericalHarmonicsA.GetL(),
+                                                           m,
+                                                           nb,
+                                                           realShpericalHarmonicsB.GetL(),
+                                                           alpha,
+                                                           beta);
+            reducedOverlap1stDerivBeta
+               = this->GetReducedOverlap1stDerivativeBeta(na,
+                                                          realShpericalHarmonicsA.GetL(),
+                                                          m,
+                                                          nb,
+                                                          realShpericalHarmonicsB.GetL(),
+                                                          alpha,
+                                                          beta);
+            reducedOverlap2ndDerivAlpha
+               = this->GetReducedOverlap2ndDerivativeAlpha(na,
+                                                           realShpericalHarmonicsA.GetL(),
+                                                           m,
+                                                           nb,
+                                                           realShpericalHarmonicsB.GetL(),
+                                                           alpha,
+                                                           beta);
+            reducedOverlap2ndDerivBeta
+               = this->GetReducedOverlap2ndDerivativeBeta(na,
+                                                          realShpericalHarmonicsA.GetL(),
+                                                          m,
+                                                          nb,
+                                                          realShpericalHarmonicsB.GetL(),
+                                                          alpha,
+                                                          beta);
+            reducedOverlap2ndDerivAlphaBeta
+               = this->GetReducedOverlap2ndDerivativeAlphaBeta(na,
+                                                               realShpericalHarmonicsA.GetL(),
+                                                               m,
+                                                               nb,
+                                                               realShpericalHarmonicsB.GetL(),
+                                                               alpha,
+                                                               beta);
 
             temp1 = static_cast<double>(na+nb+1)
                    *static_cast<double>(na+nb)

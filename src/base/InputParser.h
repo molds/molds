@@ -25,7 +25,7 @@ class InputParser: public PrintController, private Uncopyable{
 public:
    static InputParser* GetInstance();
    static void DeleteInstance();
-   void Parse(Molecule* molecule) const;
+   void Parse(Molecule* molecule, int argc, char *argv[]) const;
 private:
    static InputParser* inputParser;
    InputParser();
@@ -71,7 +71,6 @@ private:
    // Memory
    std::string messageMemoryConditions;
    std::string messageMemoryLimitHeap;
-   std::string messageMemoryMB;
    // MD
    std::string messageMdConditions;
    std::string messageMdTotalSteps;
@@ -123,6 +122,7 @@ private:
    std::string messageFs;
    std::string messageK;
    std::string messageAngst;
+   std::string messageMB;
    // others
    std::string stringYES;
    std::string stringNO;
@@ -269,7 +269,10 @@ private:
    void OutputParticlePlotConditions() const;
    void OutputInputTerms(std::vector<std::string> inputTerms) const;
    bool IsCommentOut(std::string str) const;
-   std::vector<std::string> GetInputTerms() const;
+   std::vector<std::string> GetInputTerms(int argc, char *argv[]) const;
+   void AddInputTermsFromStdRedirect(std::vector<std::string>& inputTerms) const;
+   void AddInputTermsFromFile(std::vector<std::string>& inputTerms, char* fileName) const;
+   void AddInputTermsFromString(std::vector<std::string>& inputTerms, std::string str) const;
    int ParseMolecularGeometry(Molecule* molecule, std::vector<std::string>* inputTerms, int parseIndex) const;
    int ParseTheory(std::vector<std::string>* inputTerms, int parseIndex) const;
    int ParseConditionsSCF(std::vector<std::string>* inputTerms, int parseIndex) const;
