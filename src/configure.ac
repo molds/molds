@@ -96,10 +96,29 @@ AC_ARG_WITH([openblas],
 AM_CONDITIONAL([USE_OPENBLAS_DIR], [test x != x$OPENBLAS_ROOT])
 AC_SUBST([OPENBLAS_ROOT])
 
-dnl Check for LAPACK
+dnl Check for BLAS
 AX_BLAS(,[AC_MSG_FAILURE([Cannot find BLAS library!])])
+LIBS="$BLAS_LIBS $LIBS"
+AC_CHECK_HEADERS([mkl.h cblas.h],[molds_blas_header_found=yes],)
+AS_IF([test "x$molds_blas_header_found" != "xyes"],
+      [AC_MSG_FAILURE([Cannot find mkl.h or blas.h!])])
+
+dnl Check for BLAS C interface
+AC_CHECK_FUNCS([dgemv dgemm],
+               [molds_blas_cinterface_found=yes],
+               [molds_blas_cinterface_found=no;break])
+
+AS_IF([test x$molds_lapack_cinterface_found != xyes],
+      [AC_CHECK_FUNCS([cblas_dgemv cblas_dgemm],
+                      [molds_lapack_cinterface_found=yes],
+                      [molds_lapack_cinterface_found=no;break])])
+
+AS_IF([test x$molds_lapack_cinterface_found != xyes],
+      [AC_MSG_FAILURE([Cannot find C interface functions of BLAS!])])
+
+dnl Check for LAPACK
 AX_LAPACK(,[AC_MSG_FAILURE([Cannot find LAPACK library!])])
-LIBS="$LAPACK_LIBS $BLAS_LIBS $LIBS"
+LIBS="$LAPACK_LIBS $LIBS"
 AC_CHECK_HEADERS([mkl.h lapacke.h],[molds_lapack_header_found=yes],)
 AS_IF([test "x$molds_lapack_header_found" != "xyes"],
       [AC_MSG_FAILURE([Cannot find mkl.h or lapacke.h!])])
