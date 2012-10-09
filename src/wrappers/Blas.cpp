@@ -24,7 +24,14 @@
 #include<string>
 #include<stdexcept>
 #include<boost/format.hpp>
+#include"config.h"
+#ifdef HAVE_MKL_H
 #include"mkl.h"
+#elif HAVE_CBLAS_H
+#include"cblas.h"
+#else
+#error Cannot find mkl.h or cblas.h!
+#endif
 #include"../base/PrintController.h"
 #include"../base/MolDSException.h"
 #include"../base/Uncopyable.h"
@@ -81,11 +88,12 @@ void Blas::Dgemv(bool isColumnMajorMatrixA,
                  int m, int n,
                  double alpha,
                  double const* const* matrixA,
-                 double const* vectorX ,
+                 double const* vectorX,
                  int incrementX,
                  double beta,
                  double* vectorY,
                  int incrementY) const{
+#ifdef HAVE_DGEMV
    double const* a = &matrixA[0][0];
    char transA;
    if(isColumnMajorMatrixA){
@@ -97,6 +105,22 @@ void Blas::Dgemv(bool isColumnMajorMatrixA,
    }
    int lda = m;
    dgemv(&transA, &m, &n, &alpha, a, &lda, vectorX, &incrementX, &beta, vectorY, &incrementY);
+#elif defined(HAVE_CBLAS_DGEMV)
+   double* a = const_cast<double*>(&matrixA[0][0]);
+   double* x = const_cast<double*>(&vectorX[0]);
+   CBLAS_TRANSPOSE transA;
+   if(isColumnMajorMatrixA){
+      transA = CblasNoTrans;
+   }
+   else{
+      transA = CblasTrans;
+      swap(m,n);
+   }
+   int lda = m;
+   cblas_dgemv(CblasColMajor, transA, m, n, alpha, a, lda, x, incrementX, beta, vectorY, incrementY);
+#else
+#error Cannot find dgemv or cblas_dgemv!
+#endif
 }
 
 // matrixC = matrixA*matrixB
@@ -126,6 +150,7 @@ void Blas::Dgemm(bool isColumnMajorMatrixA,
                  double const* const* matrixB,
                  double beta,
                  double** matrixC) const{
+#ifdef HAVE_DGEMM
    double const* a = &matrixA[0][0];
    double const* b = &matrixB[0][0];
    double*       c = &matrixC[0][0];
@@ -151,9 +176,42 @@ void Blas::Dgemm(bool isColumnMajorMatrixA,
       transB = 'T'; //kb=k
       ldb = n;
    }
+#elif defined(HAVE_CBLAS_DGEMM)
+   double* a = const_cast<double*>(&matrixA[0][0]);
+   double* b = const_cast<double*>(&matrixB[0][0]);
+   double*       c = &matrixC[0][0];
+
+   int lda;
+   CBLAS_TRANSPOSE transA;
+   if(isColumnMajorMatrixA){
+      transA = CblasNoTrans;
+      lda = m;
+   }
+   else{
+      transA = CblasTrans;
+      lda = k;
+   }
+
+   int ldb;
+   CBLAS_TRANSPOSE transB;
+   if(isColumnMajorMatrixB){
+      transB = CblasNoTrans;
+      ldb = k;
+   }
+   else{
+      transB = CblasTrans;
+      ldb = n;
+   }
+#else
+#error Cannot find dgemm or cblas_dgemm
+#endif
 
    double* tmpC;
+#ifdef HAVE_MKL_MALLOC
    tmpC = (double*)mkl_malloc( sizeof(double)*m*n, 16 );
+#else
+   tmpC = (double*)malloc( sizeof(double)*m*n);
+#endif
    for(int i=0; i<m; i++){
       for(int j=0; j<n; j++){
          tmpC[i+j*m] = matrixC[i][j];
@@ -161,13 +219,21 @@ void Blas::Dgemm(bool isColumnMajorMatrixA,
    }
    int ldc = m;
    //call blas
+#ifdef HAVE_DGEMM
    dgemm(&transA, &transB, &m, &n, &k, &alpha, a, &lda, b, &ldb, &beta, tmpC, &ldc);
+#elif defined(HAVE_CBLAS_DGEMM)
+   cblas_dgemm(CblasColMajor, transA, transB, m, n, k, alpha, a, lda, b, ldb, beta, tmpC, ldc);
+#endif
    for(int i=0; i<m; i++){
       for(int j=0; j<n; j++){
          matrixC[i][j] = tmpC[i+j*m];
       }
    }
+#ifdef HAVE_MKL_FREE
    mkl_free(tmpC);
+#else
+   free(tmpC);
+#endif
 }
 
 }
