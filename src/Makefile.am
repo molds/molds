@@ -37,3 +37,14 @@ MolDS_SOURCES = Main.cpp base/MolDSException.cpp wrappers/Blas.cpp \
 	optimization/Optimizer.h optimization/ConjugateGradient.h \
 	optimization/SteepestDescent.h optimization/BFGS.h \
 	base/factories/OptimizerFactory.h base/MolDS.h
+
+ACLOCAL_AMFLAGS = -I m4
+AM_CXXFLAGS=$(OPENMP_CXXFLAGS)
+AM_CPPFLAGS=
+AM_LDFLAGS=
+if USE_OPENBLAS_DIR
+OPENBLAS_INCLUDE_DIR=$(OPENBLAS_ROOT)/include
+OPENBLAS_LIB_DIR=$(OPENBLAS_ROOT)/lib
+AM_CPPFLAGS+= -I$(OPENBLAS_INCLUDE_DIR)
+AM_LDFLAGS+= -L$(OPENBLAS_LIB_DIR)
+endif
