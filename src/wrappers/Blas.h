@@ -16,25 +16,43 @@
 // You should have received a copy of the GNU General Public License      // 
 // along with MolDS.  If not, see <http://www.gnu.org/licenses/>.         // 
 //************************************************************************//
-#ifndef INCLUDED_MOLDS
-#define INCLUDED_MOLDS
-namespace MolDS_base{
-class MolDS: public PrintController{
+#ifndef INCLUDED_BLAS
+#define INCLUDED_BLAS
+namespace MolDS_wrappers{
+// Blas is singleton
+class Blas: public MolDS_base::PrintController, private MolDS_base::Uncopyable{
 public:
-   void Run(int argc, char *argv[]) const;
+   static Blas* GetInstance();
+   static void DeleteInstance();
+   void Dgemv(int m, int n,
+              double const* const* matrixA,
+              double const* vectorX,
+              double* vectorY) const;
+   void Dgemv(bool isColumnMajorMatrixA,
+              int m, int n,
+              double alpha,
+              double const* const* matrixA,
+              double const* vectorX,
+              int incrementX,
+              double beta,
+              double* vectorY,
+              int incrementY) const;
+   void Dgemm(int m, int n, int k, 
+              double const* const* matrixA, 
+              double const* const* matrixB, 
+              double**             matrixC) const;
+   void Dgemm(bool isColumnMajorMatrixA, 
+              bool isColumnMajorMatrixB, 
+              int m, int n, int k, 
+              double alpha,
+              double const* const* matrixA,
+              double const* const* matrixB,
+              double beta,
+              double**             matrixC) const;
 private:
-   void CalculateElectronicStructureOnce(Molecule* molecule, bool* runningNormally) const;
-   void DoMC(Molecule* molecule, bool* runningNormally) const;
-   void DoMD(Molecule* molecule, bool* runningNormally) const;
-   void DoRPMD(Molecule* molecule, bool* runningNormally) const;
-   void DoNASCO(Molecule* molecule, bool* runningNormally) const;
-   void OptimizeGeometry(Molecule* molecule, bool* runningNormally) const;
-   void DiagonalizePrincipalAxes(Molecule* molecule, bool* runningNormally) const;
-   void TranslateMolecule(Molecule* molecule, bool* runningNormally) const;
-   void RotateMolecule(Molecule* molecule, bool* runningNormally) const;
+   Blas();
+   ~Blas();
+   static Blas* blas;
 };
 }
 #endif
-
-
-

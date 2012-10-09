@@ -31,15 +31,20 @@ private:
    InputParser();
    ~InputParser();
    void SetMessages();
+   std::string errorMessageNotFoundInputFile; 
    std::string errorMessageNonValidExcitedStatesMD;
    std::string errorMessageNonValidExcitedStatesMC;
    std::string errorMessageNonValidExcitedStatesRPMD;
+   std::string errorMessageNonValidTheoriesNASCO;
+   std::string errorMessageNonValidNumberExcitedStatesNASCO;
    std::string errorMessageNonValidExcitedStatesOptimization;
    std::string errorMessageNonValidElectronicStateFrequencies;
    std::string errorMessageNonValidTheoryFrequencies;
    std::string errorMessageElecState;
+   std::string errorMessageInputFile; 
    std::string errorMessageTheory;
    std::string errorMessageNumberExcitedStateCIS;
+   std::string errorMessageNumberElectronicStatesNASCO;
    std::string messageStartParseInput;
    std::string messageDoneParseInput;
    std::string messageTotalNumberAOs;
@@ -94,6 +99,12 @@ private:
    std::string messageRpmdTemperature;
    std::string messageRpmdNumBeads;
    std::string messageRpmdSeed;
+   // NASCO
+   std::string messageNascoConditions;
+   std::string messageNascoTotalSteps;
+   std::string messageNascoNumElecStates;
+   std::string messageNascoTimeWidth;
+   std::string messageNascoSeed;
    // Optimization
    std::string messageOptimizationConditions;
    std::string messageOptimizationMethod;
@@ -243,6 +254,13 @@ private:
    std::string stringRPMDTemperature;
    std::string stringRPMDNumBeads;
    std::string stringRPMDSeed;
+   // NASCO
+   std::string stringNASCO;
+   std::string stringNASCOEnd;
+   std::string stringNASCOTotalSteps;
+   std::string stringNASCONumElecStates;
+   std::string stringNASCOTimeWidth;
+   std::string stringNASCOSeed;
    // Optimization
    std::string stringOptimization;
    std::string stringOptimizationEnd;
@@ -265,6 +283,7 @@ private:
    void ValidateMdConditions(const Molecule& molecule) const;
    void ValidateMcConditions(const Molecule& molecule) const;
    void ValidateRpmdConditions(const Molecule& molecule) const;
+   void ValidateNascoConditions(const Molecule& molecule) const;
    void ValidateOptimizationConditions(const Molecule& molecule) const;
    void ValidateFrequenciesConditions() const;
    void OutputMolecularBasics(Molecule* molecule) const;
@@ -274,6 +293,7 @@ private:
    void OutputMdConditions() const;
    void OutputMcConditions() const;
    void OutputRpmdConditions() const;
+   void OutputNascoConditions() const;
    void OutputOptimizationConditions() const;
    void OutputFrequenciesConditions() const;
    void OutputMOPlotConditions() const;
@@ -282,8 +302,8 @@ private:
    void OutputInputTerms(std::vector<std::string> inputTerms) const;
    bool IsCommentOut(std::string str) const;
    std::vector<std::string> GetInputTerms(int argc, char *argv[]) const;
-   void AddInputTermsFromStdRedirect(std::vector<std::string>& inputTerms) const;
-   void AddInputTermsFromFile(std::vector<std::string>& inputTerms, char* fileName) const;
+   void StoreInputTermsFromRedirect(std::vector<std::string>& inputTerms) const;
+   void StoreInputTermsFromFile(std::vector<std::string>& inputTerms, char* fileName) const;
    void AddInputTermsFromString(std::vector<std::string>& inputTerms, std::string str) const;
    int ParseMolecularGeometry(Molecule* molecule, std::vector<std::string>* inputTerms, int parseIndex) const;
    int ParseTheory(std::vector<std::string>* inputTerms, int parseIndex) const;
@@ -298,6 +318,7 @@ private:
    int ParseConditionsMC(std::vector<std::string>* inputTerms, int parseIndex) const;
    int ParseConditionsMD(std::vector<std::string>* inputTerms, int parseIndex) const;
    int ParseConditionsRPMD(std::vector<std::string>* inputTerms, int parseIndex) const;
+   int ParseConditionsNASCO(std::vector<std::string>* inputTerms, int parseIndex) const;
    int ParseConditionsOptimization(std::vector<std::string>* inputTerms, int parseIndex) const;
    int ParseConditionsFrequencies(std::vector<std::string>* inputTerms, int parseIndex) const;
    int ParseConditionsMemory(std::vector<std::string>* inputTerms, int parseIndex) const;

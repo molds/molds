@@ -32,6 +32,7 @@
 #include"PrintController.h"
 #include"MolDSException.h"
 #include"Uncopyable.h"
+#include"../wrappers/Blas.h"
 #include"../wrappers/Lapack.h"
 #include"Utilities.h"
 #include"Enums.h"
@@ -48,6 +49,7 @@
 #include"../md/MD.h"
 #include"../mc/MC.h"
 #include"../rpmd/RPMD.h"
+#include"../nasco/NASCO.h"
 #include"../optimization/Optimizer.h"
 #include"factories/OptimizerFactory.h"
 #include"MolDS.h"
@@ -72,6 +74,7 @@ void MolDS::Run(int argc, char *argv[]) const{
       InputParser::GetInstance();
       molecule = new Molecule();
       Parameters::GetInstance();
+      MolDS_wrappers::Blas::GetInstance();
       MolDS_wrappers::Lapack::GetInstance();
       GTOExpansionSTO::GetInstance();
       // Parse input
@@ -102,6 +105,11 @@ void MolDS::Run(int argc, char *argv[]) const{
       this->DoRPMD(molecule, &runningNormally);
    }
 
+   // NASCO
+   else if(runningNormally && Parameters::GetInstance()->GetCurrentSimulation() == NASCO){
+      this->DoNASCO(molecule, &runningNormally);
+   }
+
    // Optimization
    else if(runningNormally && Parameters::GetInstance()->GetCurrentSimulation() == Optimization){
       this->OptimizeGeometry(molecule, &runningNormally);
@@ -125,6 +133,7 @@ void MolDS::Run(int argc, char *argv[]) const{
    //Free 
    GTOExpansionSTO::DeleteInstance();
    MolDS_wrappers::Lapack::DeleteInstance(); 
+   MolDS_wrappers::Blas::DeleteInstance(); 
    Parameters::DeleteInstance();
    delete molecule;
    InputParser::DeleteInstance();
@@ -177,6 +186,17 @@ void MolDS::DoRPMD(Molecule* molecule, bool* runningNormally) const{
    try{
       boost::shared_ptr<MolDS_rpmd::RPMD> rpmd(new MolDS_rpmd::RPMD());
       rpmd->DoRPMD(*molecule);
+   }
+   catch(MolDSException ex){
+      this->OutputLog(boost::format("%s\n") % ex.what());
+      *runningNormally = false;
+   }
+}
+
+void MolDS::DoNASCO(Molecule* molecule, bool* runningNormally) const{
+   try{
+      boost::shared_ptr<MolDS_nasco::NASCO> nasco(new MolDS_nasco::NASCO());
+      nasco->DoNASCO(*molecule);
    }
    catch(MolDSException ex){
       this->OutputLog(boost::format("%s\n") % ex.what());
