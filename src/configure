@@ -6942,6 +6942,66 @@ as_fn_error $? "Cannot find BLAS library!
 See \`config.log' for more details" "$LINENO" 5; }
 fi
 
+LIBS="$BLAS_LIBS $LIBS"
+for ac_header in mkl.h cblas.h
+do :
+  as_ac_Header=`$as_echo "ac_cv_header_$ac_header" | $as_tr_sh`
+ac_fn_cxx_check_header_mongrel "$LINENO" "$ac_header" "$as_ac_Header" "$ac_includes_default"
+if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
+  cat >>confdefs.h <<_ACEOF
+#define `$as_echo "HAVE_$ac_header" | $as_tr_cpp` 1
+_ACEOF
+ molds_blas_header_found=yes
+fi
+
+done
+
+if test "x$molds_blas_header_found" != "xyes"; then :
+  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+as_fn_error $? "Cannot find mkl.h or blas.h!
+See \`config.log' for more details" "$LINENO" 5; }
+fi
+
+for ac_func in dgemv dgemm
+do :
+  as_ac_var=`$as_echo "ac_cv_func_$ac_func" | $as_tr_sh`
+ac_fn_cxx_check_func "$LINENO" "$ac_func" "$as_ac_var"
+if eval test \"x\$"$as_ac_var"\" = x"yes"; then :
+  cat >>confdefs.h <<_ACEOF
+#define `$as_echo "HAVE_$ac_func" | $as_tr_cpp` 1
+_ACEOF
+ molds_blas_cinterface_found=yes
+else
+  molds_blas_cinterface_found=no;break
+fi
+done
+
+
+if test x$molds_lapack_cinterface_found != xyes; then :
+  for ac_func in cblas_dgemv cblas_dgemm
+do :
+  as_ac_var=`$as_echo "ac_cv_func_$ac_func" | $as_tr_sh`
+ac_fn_cxx_check_func "$LINENO" "$ac_func" "$as_ac_var"
+if eval test \"x\$"$as_ac_var"\" = x"yes"; then :
+  cat >>confdefs.h <<_ACEOF
+#define `$as_echo "HAVE_$ac_func" | $as_tr_cpp` 1
+_ACEOF
+ molds_lapack_cinterface_found=yes
+else
+  molds_lapack_cinterface_found=no;break
+fi
+done
+
+fi
+
+if test x$molds_lapack_cinterface_found != xyes; then :
+  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+as_fn_error $? "Cannot find C interface functions of BLAS!
+See \`config.log' for more details" "$LINENO" 5; }
+fi
+
 
 
 ax_lapack_ok=no
@@ -7118,7 +7178,7 @@ as_fn_error $? "Cannot find LAPACK library!
 See \`config.log' for more details" "$LINENO" 5; }
 fi
 
-LIBS="$LAPACK_LIBS $BLAS_LIBS $LIBS"
+LIBS="$LAPACK_LIBS $LIBS"
 for ac_header in mkl.h lapacke.h
 do :
   as_ac_Header=`$as_echo "ac_cv_header_$ac_header" | $as_tr_sh`

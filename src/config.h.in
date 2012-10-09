@@ -16,6 +16,21 @@
 /* Define to 1 if you have the <boost/random.hpp> header file. */
 #undef HAVE_BOOST_RANDOM_HPP
 
+/* Define to 1 if you have the `cblas_dgemm' function. */
+#undef HAVE_CBLAS_DGEMM
+
+/* Define to 1 if you have the `cblas_dgemv' function. */
+#undef HAVE_CBLAS_DGEMV
+
+/* Define to 1 if you have the <cblas.h> header file. */
+#undef HAVE_CBLAS_H
+
+/* Define to 1 if you have the `dgemm' function. */
+#undef HAVE_DGEMM
+
+/* Define to 1 if you have the `dgemv' function. */
+#undef HAVE_DGEMV
+
 /* Define to 1 if you have the `dgetrf' function. */
 #undef HAVE_DGETRF
 
