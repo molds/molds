@@ -3688,7 +3688,7 @@ else
 ax_cv_cxx_openmp=unknown
 # Flags to try:  -fopenmp (gcc), -openmp (icc), -mp (SGI & PGI),
 #                -xopenmp (Sun), -omp (Tru64), -qsmp=omp (AIX), none
-ax_openmp_flags="-fopenmp -openmp -mp -xopenmp -omp -qsmp=omp none"
+ax_openmp_flags="-openmp -fopenmp -mp -xopenmp -omp -qsmp=omp none"
 if test "x$OPENMP_CXXFLAGS" != x; then
   ax_openmp_flags="$OPENMP_CXXFLAGS $ax_openmp_flags"
 fi
@@ -6354,14 +6354,14 @@ fi
 
 # BLAS in Intel MKL library?
 if test $ax_blas_ok = no; then
-	as_ac_Lib=`$as_echo "ac_cv_lib_mkl_$sgemm" | $as_tr_sh`
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $sgemm in -lmkl" >&5
-$as_echo_n "checking for $sgemm in -lmkl... " >&6; }
+	as_ac_Lib=`$as_echo "ac_cv_lib_mkl_intel_lp64_$sgemm" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $sgemm in -lmkl_intel_lp64" >&5
+$as_echo_n "checking for $sgemm in -lmkl_intel_lp64... " >&6; }
 if eval \${$as_ac_Lib+:} false; then :
   $as_echo_n "(cached) " >&6
 else
   ac_check_lib_save_LIBS=$LIBS
-LIBS="-lmkl  $LIBS"
+LIBS="-lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core $LIBS"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -6401,7 +6401,113 @@ eval ac_res=\$$as_ac_Lib
 	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
 $as_echo "$ac_res" >&6; }
 if eval test \"x\$"$as_ac_Lib"\" = x"yes"; then :
-  ax_blas_ok=yes;BLAS_LIBS="-lmkl"
+  ax_blas_ok=yes;BLAS_LIBS="-lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core"
+fi
+
+fi
+
+if test $ax_blas_ok = no; then
+	as_ac_Lib=`$as_echo "ac_cv_lib_mkl_intel_$sgemm" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $sgemm in -lmkl_intel" >&5
+$as_echo_n "checking for $sgemm in -lmkl_intel... " >&6; }
+if eval \${$as_ac_Lib+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lmkl_intel -lmkl_intel_thread -lmkl_core $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char $sgemm ();
+#ifdef F77_DUMMY_MAIN
+
+#  ifdef __cplusplus
+     extern "C"
+#  endif
+   int F77_DUMMY_MAIN() { return 1; }
+
+#endif
+int
+main ()
+{
+return $sgemm ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  eval "$as_ac_Lib=yes"
+else
+  eval "$as_ac_Lib=no"
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+eval ac_res=\$$as_ac_Lib
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_Lib"\" = x"yes"; then :
+  ax_blas_ok=yes;BLAS_LIBS="-lmkl_intel -lmkl_intel_thread -lmkl_core"
+fi
+
+fi
+
+if test $ax_blas_ok = no; then
+	as_ac_Lib=`$as_echo "ac_cv_lib_mkl_$sgemm" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $sgemm in -lmkl" >&5
+$as_echo_n "checking for $sgemm in -lmkl... " >&6; }
+if eval \${$as_ac_Lib+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lmkl -lguide -lpthread $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char $sgemm ();
+#ifdef F77_DUMMY_MAIN
+
+#  ifdef __cplusplus
+     extern "C"
+#  endif
+   int F77_DUMMY_MAIN() { return 1; }
+
+#endif
+int
+main ()
+{
+return $sgemm ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  eval "$as_ac_Lib=yes"
+else
+  eval "$as_ac_Lib=no"
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+eval ac_res=\$$as_ac_Lib
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_Lib"\" = x"yes"; then :
+  ax_blas_ok=yes;BLAS_LIBS="-lmkl -lguide -lpthread"
 fi
 
 fi
@@ -7372,6 +7478,7 @@ $as_echo_n "checking for boostlib >= $boost_lib_version_req... " >&6; }
         for ac_boost_path_tmp in $libsubdirs; do
                 if test -d "$ac_boost_path"/"$ac_boost_path_tmp" ; then
                         BOOST_LDFLAGS="-L$ac_boost_path/$ac_boost_path_tmp"
+                        BOOST_LIBDIR="$ac_boost_path/$ac_boost_path_tmp"
                         break
                 fi
         done
@@ -7382,6 +7489,7 @@ $as_echo_n "checking for boostlib >= $boost_lib_version_req... " >&6; }
                     if ls "$ac_boost_path_tmp/$libsubdir/libboost_"* >/dev/null 2>&1 ; then break; fi
                 done
                 BOOST_LDFLAGS="-L$ac_boost_path_tmp/$libsubdir"
+                BOOST_LIBDIR="$ac_boost_path_tmp/$libsubdir"
                 BOOST_CPPFLAGS="-I$ac_boost_path_tmp/include"
                 break;
             fi
@@ -7390,6 +7498,7 @@ $as_echo_n "checking for boostlib >= $boost_lib_version_req... " >&6; }
 
             if test "$ac_boost_lib_path" != ""; then
        BOOST_LDFLAGS="-L$ac_boost_lib_path"
+       BOOST_LIBDIR="$ac_boost_lib_path"
     fi
 
     CPPFLAGS_SAVED="$CPPFLAGS"
@@ -7488,6 +7597,7 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
                         if ls "$best_path/$libsubdir/libboost_"* >/dev/null 2>&1 ; then break; fi
                     done
                     BOOST_LDFLAGS="-L$best_path/$libsubdir"
+                    BOOST_LIBDIR="$best_path/$libsubdir"
                 fi
             fi
 
@@ -7505,6 +7615,7 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 $as_echo "$as_me: We will use a staged boost library from $BOOST_ROOT" >&6;}
                         BOOST_CPPFLAGS="-I$BOOST_ROOT"
                         BOOST_LDFLAGS="-L$BOOST_ROOT/stage/$libsubdir"
+                        BOOST_LIBDIR="$BOOST_ROOT/stage/$libsubdir"
                     fi
                 fi
             fi

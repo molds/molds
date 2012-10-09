@@ -52,13 +52,18 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = MolDS$(EXEEXT)
+@USE_OPENBLAS_DIR_TRUE@am__append_1 = -I$(OPENBLAS_INCLUDE_DIR)
+@USE_OPENBLAS_DIR_TRUE@am__append_2 = -L$(OPENBLAS_LIB_DIR)
 subdir = .
 DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/config.h.in \
 	$(top_srcdir)/configure AUTHORS COPYING ChangeLog INSTALL NEWS \
 	config.guess config.sub depcomp install-sh missing
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/configure.ac
+am__aclocal_m4_deps = $(top_srcdir)/m4/ax_blas.m4 \
+	$(top_srcdir)/m4/ax_boost_base.m4 \
+	$(top_srcdir)/m4/ax_lapack.m4 $(top_srcdir)/m4/ax_openmp.m4 \
+	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
@@ -273,6 +278,12 @@ MolDS_SOURCES = Main.cpp base/MolDSException.cpp wrappers/Blas.cpp \
 	optimization/SteepestDescent.h optimization/BFGS.h \
 	base/factories/OptimizerFactory.h base/MolDS.h
 
+ACLOCAL_AMFLAGS = -I m4
+AM_CXXFLAGS = $(OPENMP_CXXFLAGS)
+AM_CPPFLAGS = $(am__append_1)
+AM_LDFLAGS = $(am__append_2)
+@USE_OPENBLAS_DIR_TRUE@OPENBLAS_INCLUDE_DIR = $(OPENBLAS_ROOT)/include
+@USE_OPENBLAS_DIR_TRUE@OPENBLAS_LIB_DIR = $(OPENBLAS_ROOT)/lib
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
