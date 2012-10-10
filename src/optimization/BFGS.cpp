@@ -138,15 +138,19 @@ void BFGS::SearchMinimum(boost::shared_ptr<ElectronicStructure> electronicStruct
          static const double inifinity = 1.0/0.0;
          this->CalcRFOStep(vectorStep, matrixHessian, vectorForce, trustRadius, dimension);
 
+         // Store reference energy for calculating actual/expected ratio
+         double referenceEnergy = lineSearchCurrentEnergy;
+
          //Do GDIIS
-         gdiis.DoGDIIS(vectorForce, molecule, vectorStep);
+         if(gdiis.DoGDIIS(vectorForce, molecule, vectorStep)){
+            // If GDIIS step is taken
+            // Recalculate reference energy
+            this->UpdateElectronicStructure(electronicStructure, molecule, requireGuess, false);
+            referenceEnergy = electronicStructure->GetElectronicEnergy(elecState);
 
-         // Calculate reference energy
-         this->UpdateElectronicStructure(electronicStructure, molecule, requireGuess, false);
-         double referenceEnergy = electronicStructure->GetElectronicEnergy(elecState);
-
-         // Calculate RFO step
-         this->CalcRFOStep(vectorStep, matrixHessian, vectorForce, trustRadius, dimension);
+            // Recalculate RFO step
+            this->CalcRFOStep(vectorStep, matrixHessian, vectorForce, trustRadius, dimension);
+         }
 
          // Calculate approximate change of energy using
          // [2/2] Pade approximant

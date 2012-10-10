@@ -60,7 +60,7 @@ GDIIS::~GDIIS(){
    MallocerFreer::GetInstance()->Free(&this->matrixPositions, maxnumErrors,   sizeErrorVector);
 }
 
-void GDIIS::DoGDIIS(double* vectorError,
+bool GDIIS::DoGDIIS(double* vectorError,
                     double* vectorPosition,
                     double const* vectorRefStep){
    // Prepare GDIIS parameters
@@ -105,19 +105,19 @@ void GDIIS::DoGDIIS(double* vectorError,
          // Remove the newest data to eliminate singularity.
          this->DiscardPrevious();
          MallocerFreer::GetInstance()->Free(&vectorCoefs, numErrors+1);
-         return;
+         return false;
       }
 
       // If only one error vector is given, following routine is meaningless.
       if(numErrors <= 1){
          MallocerFreer::GetInstance()->Free(&vectorCoefs, numErrors+1);
-         return;
+         return false;
       }
 
       // If Lagrange multiplier is too small, don't take GDIIS step.
       if(-vectorCoefs[numErrors] < 1e-8){
          MallocerFreer::GetInstance()->Free(&vectorCoefs, numErrors+1);
-         return;
+         return false;
       }
 
       // Interpolate error vectors and positions
@@ -147,7 +147,7 @@ void GDIIS::DoGDIIS(double* vectorError,
             vectorPosition[i] = matrixPositions[current][i];
          }
          MallocerFreer::GetInstance()->Free(&vectorCoefs, numErrors+1);
-         return;
+         return false;
       }
 
       // If the calculated cosine value is below the minimum tolerant value
@@ -158,7 +158,7 @@ void GDIIS::DoGDIIS(double* vectorError,
             vectorPosition[i] = matrixPositions[current][i];
          }
          MallocerFreer::GetInstance()->Free(&vectorCoefs, numErrors+1);
-         return;
+         return false;
       }
    }
    catch(MolDSException ex){
@@ -166,9 +166,10 @@ void GDIIS::DoGDIIS(double* vectorError,
       throw ex;
    }
    MallocerFreer::GetInstance()->Free(&vectorCoefs, numErrors+1);
+   return true;
 }
 
-void GDIIS::DoGDIIS(double *vectorError, Molecule& molecule, double const* vectorRefStep){
+bool GDIIS::DoGDIIS(double *vectorError, Molecule& molecule, double const* vectorRefStep){
    double** matrixPosition = NULL;
    try{
       MallocerFreer::GetInstance()->Malloc(&matrixPosition, molecule.GetNumberAtoms(), CartesianType_end);
@@ -178,12 +179,17 @@ void GDIIS::DoGDIIS(double *vectorError, Molecule& molecule, double const* vecto
             matrixPosition[i][j] = atom->GetXyz()[j];
          }
       }
-      this->DoGDIIS(vectorError,&matrixPosition[0][0],vectorRefStep);
-      for(int i=0;i<molecule.GetNumberAtoms();i++){
-         Atom* atom = molecule.GetAtom(i);
-         for(int j=0;j<CartesianType_end;j++){
-            atom->GetXyz()[j] = matrixPosition[i][j];
+      if(this->DoGDIIS(vectorError,&matrixPosition[0][0],vectorRefStep)){
+         for(int i=0;i<molecule.GetNumberAtoms();i++){
+            Atom* atom = molecule.GetAtom(i);
+            for(int j=0;j<CartesianType_end;j++){
+               atom->GetXyz()[j] = matrixPosition[i][j];
+            }
          }
+      }
+      else{
+         MallocerFreer::GetInstance()->Free(&matrixPosition, molecule.GetNumberAtoms(), CartesianType_end);
+         return false;
       }
    }
    catch(MolDSException ex){
@@ -191,6 +197,7 @@ void GDIIS::DoGDIIS(double *vectorError, Molecule& molecule, double const* vecto
       throw ex;
    }
    MallocerFreer::GetInstance()->Free(&matrixPosition, molecule.GetNumberAtoms(), CartesianType_end);
+   return true;
 }
 
 double GDIIS::MinCosine(){

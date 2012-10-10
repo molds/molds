@@ -25,10 +25,10 @@ class GDIIS{
 public:
    GDIIS(int sizeErrorVector);
 	 ~GDIIS();
-   void DoGDIIS(double* vectorError,
+   bool DoGDIIS(double* vectorError,
                 double* vectorPosition,
                 double const* vectorRefStep);
-   void DoGDIIS(double* vectorError,
+   bool DoGDIIS(double* vectorError,
                 MolDS_base::Molecule& molecule,
                 double const* vectorRefStep);
 
