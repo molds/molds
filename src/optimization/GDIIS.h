@@ -33,6 +33,7 @@ public:
                 double const* vectorRefStep);
 
    void DiscardPrevious();
+   void DiscardOldest();
    typedef std::list<double*> list;
    typedef std::list<double*>::iterator iterator;
 private:

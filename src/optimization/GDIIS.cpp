@@ -97,12 +97,7 @@ bool GDIIS::DoGDIIS(double* vectorError,
 
    // Discard the oldest data if the size of the list exceeds the maximum
    if(listErrors.size() > maxnumErrors){
-      tmp = listErrors.front();
-      MallocerFreer::GetInstance()->Free(&tmp, sizeErrorVector);
-      listErrors.pop_front();
-      tmp = listPositions.front();
-      MallocerFreer::GetInstance()->Free(&tmp, sizeErrorVector);
-      listPositions.pop_front();
+      this->DiscardOldest();
    }
 
    // Prepare GDIIS matrix
@@ -256,4 +251,14 @@ void GDIIS::DiscardPrevious(){
    tmp = listPositions.back();
    MallocerFreer::GetInstance()->Free(&tmp, this->sizeErrorVector);
    listPositions.pop_back();
+}
+
+
+void GDIIS::DiscardOldest(){
+   double *tmp = listErrors.front();
+   MallocerFreer::GetInstance()->Free(&tmp, sizeErrorVector);
+   listErrors.pop_front();
+   tmp = listPositions.front();
+   MallocerFreer::GetInstance()->Free(&tmp, sizeErrorVector);
+   listPositions.pop_front();
 }
