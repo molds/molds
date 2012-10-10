@@ -828,6 +828,21 @@ mklNumThreads = "2"
 ompNumThreads = "2"
 testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
 
+prefix = "ch4_pm3_opt_bfgs"
+testerOmp = TesterOmp.new(prefix, <<"SECTION", <<"TITLE")
+------------------------------------------------
+------  Test of PM3/BFGS ----------------------
+------------------------------------------------
+SECTION
+\t\t\t>>> CH4 <<<
+TITLE
+mklNumThreads = "1"
+ompNumThreads = "1"
+testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+mklNumThreads = "2"
+ompNumThreads = "2"
+testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+
 prefix = "c2h6_pm3_MC"
 testerOmp = TesterOmp.new(prefix, <<"SECTION", <<"TITLE")
 ---------------------------------------------------
