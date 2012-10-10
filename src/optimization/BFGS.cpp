@@ -26,6 +26,7 @@
 #include<string>
 #include<vector>
 #include<stdexcept>
+#include<list>
 #include<boost/shared_ptr.hpp>
 #include<boost/format.hpp>
 #include"../base/PrintController.h"

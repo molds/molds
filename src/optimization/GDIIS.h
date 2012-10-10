@@ -32,15 +32,15 @@ public:
                 MolDS_base::Molecule& molecule,
                 double const* vectorRefStep);
 
-   void DiscardPrevious(){numErrors--;nextError=(nextError-1+maxnumErrors)%maxnumErrors;};
+   void DiscardPrevious();
+   typedef std::list<double*> list;
+   typedef std::list<double*>::iterator iterator;
 private:
    const int sizeErrorVector;
    const int maxnumErrors;
-   int numErrors;
-   int nextError;
    double** matrixGDIIS;
-   double** matrixErrors;
-   double** matrixPositions;
+   list listErrors;
+   list listPositions;
    double MinCosine();
    std::string messageTakingGDIISStep;
    std::string messageSingularGDIISMatrix;

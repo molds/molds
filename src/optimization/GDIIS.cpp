@@ -22,6 +22,7 @@
 #include<math.h>
 #include<vector>
 #include<stdexcept>
+#include<list>
 #include<boost/format.hpp>
 #include"../base/PrintController.h"
 #include"../base/MolDSException.h"
@@ -43,11 +44,9 @@ using namespace MolDS_optimization;
 GDIIS::GDIIS(int sizeErrorVector):
    sizeErrorVector(sizeErrorVector),
    maxnumErrors(MAXNUMERRORS),
-   numErrors(0),
-   nextError(0),
    matrixGDIIS(NULL),
-   matrixErrors(NULL),
-   matrixPositions(NULL),
+   listErrors(),
+   listPositions(),
    messageTakingGDIISStep("Taking GDIIS step.\n"),
    messageSingularGDIISMatrix("Error while solving GDIIS equation. Discarding current data.\n"),
    formatTooSmallLagrangeMultiplier("GDIIS: Lagrange Multiplier is too small. (%e)\n"),
@@ -55,40 +54,71 @@ GDIIS::GDIIS(int sizeErrorVector):
    formatWrongDirection("GDIIS: GDIIS step direction is too far from reference step. (cosine: %+f)\n")
 {
    MallocerFreer::GetInstance()->Malloc(&this->matrixGDIIS,     maxnumErrors+1, maxnumErrors+1);
-   MallocerFreer::GetInstance()->Malloc(&this->matrixErrors,    maxnumErrors,   sizeErrorVector);
-   MallocerFreer::GetInstance()->Malloc(&this->matrixPositions, maxnumErrors,   sizeErrorVector);
-   double *tmp = this->matrixErrors[0];
 }
 
 GDIIS::~GDIIS(){
    MallocerFreer::GetInstance()->Free(&this->matrixGDIIS,     maxnumErrors+1, maxnumErrors+1);
-   MallocerFreer::GetInstance()->Free(&this->matrixErrors,    maxnumErrors,   sizeErrorVector);
-   MallocerFreer::GetInstance()->Free(&this->matrixPositions, maxnumErrors,   sizeErrorVector);
+   for(GDIIS::iterator it = listErrors.begin(); it != listErrors.end(); it++){
+      MallocerFreer::GetInstance()->Free(&*it, sizeErrorVector);
+   }
+   for(GDIIS::iterator it = listPositions.begin(); it != listPositions.end(); it++){
+      MallocerFreer::GetInstance()->Free(&*it, sizeErrorVector);
+   }
 }
 
 bool GDIIS::DoGDIIS(double* vectorError,
                     double* vectorPosition,
                     double const* vectorRefStep){
    // Prepare GDIIS parameters
-   const int current = this->nextError++;
-   this->nextError %= this->maxnumErrors;
-   if(this->numErrors < this->maxnumErrors){
-      this->numErrors++;
+   double *tmp = NULL;
+   try{
+      MallocerFreer::GetInstance()->Malloc(&tmp, sizeErrorVector);
+      for(int i=0;i<sizeErrorVector;i++){
+         tmp[i]=vectorError[i];
+      }
+      listErrors.push_back(tmp);
+      tmp = NULL;
+   }catch(MolDSException ex){
+      MallocerFreer::GetInstance()->Free(&tmp, sizeErrorVector);
+      throw ex;
    }
-   for(int i=0;i<this->sizeErrorVector;i++){
-      this->matrixErrors[current][i]    = vectorError[i];
-      this->matrixPositions[current][i] = vectorPosition[i];
+
+   try{
+      MallocerFreer::GetInstance()->Malloc(&tmp, sizeErrorVector);
+      for(int i=0;i<sizeErrorVector;i++){
+         tmp[i]=vectorPosition[i];
+      }
+      listPositions.push_back(tmp);
+      tmp = NULL;
+   }catch(MolDSException ex){
+      MallocerFreer::GetInstance()->Free(&tmp, sizeErrorVector);
+      throw ex;
+   }
+
+   // Discard the oldest data if the size of the list exceeds the maximum
+   if(listErrors.size() > maxnumErrors){
+      tmp = listErrors.front();
+      MallocerFreer::GetInstance()->Free(&tmp, sizeErrorVector);
+      listErrors.pop_front();
+      tmp = listPositions.front();
+      MallocerFreer::GetInstance()->Free(&tmp, sizeErrorVector);
+      listPositions.pop_front();
    }
 
    // Prepare GDIIS matrix
-   for(int i=0;i<this->numErrors;i++){
-      matrixGDIIS[i][current] = 0.0;
-      for(int j=0;j<this->sizeErrorVector;j++){
-         matrixGDIIS[i][current] += vectorError[j] * matrixErrors[i][j];
+   GDIIS::iterator it=listErrors.begin();
+   for(int i=0; it!=listErrors.end();i++,it++){
+      GDIIS::iterator it2=it;
+      for(int j=i;it2!=listErrors.end();j++,it2++){
+         matrixGDIIS[i][j] = 0.0;
+         for(int k=0;k<this->sizeErrorVector;k++){
+            matrixGDIIS[i][j] += (*it)[k] * (*it2)[k];
+         }
+         matrixGDIIS[j][i] = matrixGDIIS[i][j];
       }
-      matrixGDIIS[current][i] = matrixGDIIS[i][current];
    }
-   for(int i=0;i<this->numErrors;i++){
+   const int numErrors = this->listErrors.size();
+   for(int i=0;i<numErrors;i++){
       matrixGDIIS[i][numErrors] = matrixGDIIS[numErrors][i] = 1.0;
    }
    matrixGDIIS[numErrors][numErrors] = 0;
@@ -96,8 +126,8 @@ bool GDIIS::DoGDIIS(double* vectorError,
    double*  vectorCoefs = NULL;
    try{
       // Solve DIIS equation
-      MallocerFreer::GetInstance()->Malloc(&vectorCoefs, this->numErrors+1);
-      for(int i=0;i<this->numErrors;i++){
+      MallocerFreer::GetInstance()->Malloc(&vectorCoefs, numErrors+1);
+      for(int i=0;i<numErrors;i++){
          vectorCoefs[i]=0.0;
       }
       vectorCoefs[numErrors]=1.0;
@@ -131,9 +161,10 @@ bool GDIIS::DoGDIIS(double* vectorError,
       // Interpolate error vectors and positions
       for(int i=0;i<sizeErrorVector;i++){
          vectorError[i] = vectorPosition[i] = 0;
-         for(int j=0;j<numErrors;j++){
-            vectorError[i]    += vectorCoefs[j] * this->matrixErrors[j][i];
-            vectorPosition[i] += vectorCoefs[j] * this->matrixPositions[j][i];
+         GDIIS::iterator it=listErrors.begin(),it2=listPositions.begin();
+         for(int j=0; it!=listErrors.end();it++,it2++,j++){
+            vectorError[i]    += vectorCoefs[j] * (*it)[i];
+            vectorPosition[i] += vectorCoefs[j] * (*it2)[i];
          }
       }
 
@@ -141,7 +172,7 @@ bool GDIIS::DoGDIIS(double* vectorError,
       // and lengths of the vectors.
       double innerprod = 0, norm2gdiis = 0, norm2ref = 0;
       for(int i=0;i<this->sizeErrorVector;i++){
-         double diff = vectorPosition[i] - matrixPositions[current][i];
+         double diff = vectorPosition[i] - listPositions.back()[i];
          innerprod  += diff * vectorRefStep[i];
          norm2gdiis += diff * diff;
          norm2ref   += vectorRefStep[i] * vectorRefStep[i];
@@ -151,8 +182,8 @@ bool GDIIS::DoGDIIS(double* vectorError,
       // If length of the GDIIS step is larger than reference step * 10
       if(norm2gdiis >= norm2ref * 100){
          for(int i=0; i<this->sizeErrorVector; i++){
-            vectorError[i]    = matrixErrors[current][i];
-            vectorPosition[i] = matrixPositions[current][i];
+            vectorError[i]    = listErrors.back()[i];
+            vectorPosition[i] = listPositions.back()[i];
          }
          this->OutputLog((formatTooLargeGDIISStep % sqrt(norm2gdiis) % sqrt(norm2ref)).str());
          MallocerFreer::GetInstance()->Free(&vectorCoefs, numErrors+1);
@@ -163,8 +194,8 @@ bool GDIIS::DoGDIIS(double* vectorError,
       if(cosine < this->MinCosine()){
          // Rollback vectorPosition and vectorError to original value
          for(int i=0; i<this->sizeErrorVector; i++){
-            vectorError[i]    = matrixErrors[current][i];
-            vectorPosition[i] = matrixPositions[current][i];
+            vectorError[i]    = listErrors.back()[i];
+            vectorPosition[i] = listPositions.back()[i];
          }
          this->OutputLog((formatWrongDirection % cosine).str());
          MallocerFreer::GetInstance()->Free(&vectorCoefs, numErrors+1);
@@ -213,5 +244,16 @@ bool GDIIS::DoGDIIS(double *vectorError, Molecule& molecule, double const* vecto
 
 double GDIIS::MinCosine(){
    static const double mincos[] = {1.0/0.0, 1.0/0.0, 0.97, 0.84, 0.71, 0.67, 0.62, 0.56, 0.49, 0.41};
-   return this->numErrors >= sizeof(mincos)/sizeof(mincos[0]) ? 0.0 : mincos[this->numErrors];
+   static const int nummincos = sizeof(mincos)/sizeof(mincos[0]);
+   int numErrors = listErrors.size();
+   return numErrors >= nummincos ? 0.0 : mincos[numErrors];
+}
+
+void GDIIS::DiscardPrevious(){
+   double* tmp = listErrors.back();
+   MallocerFreer::GetInstance()->Free(&tmp, this->sizeErrorVector);
+   listErrors.pop_back();
+   tmp = listPositions.back();
+   MallocerFreer::GetInstance()->Free(&tmp, this->sizeErrorVector);
+   listPositions.pop_back();
 }
