@@ -141,6 +141,10 @@ void BFGS::SearchMinimum(boost::shared_ptr<ElectronicStructure> electronicStruct
          //Do GDIIS
          gdiis.DoGDIIS(vectorForce, molecule, vectorStep);
 
+         // Calculate reference energy
+         this->UpdateElectronicStructure(electronicStructure, molecule, requireGuess, false);
+         double referenceEnergy = electronicStructure->GetElectronicEnergy(elecState);
+
          // Calculate RFO step
          this->CalcRFOStep(vectorStep, matrixHessian, vectorForce, trustRadius, dimension);
 
@@ -173,17 +177,17 @@ void BFGS::SearchMinimum(boost::shared_ptr<ElectronicStructure> electronicStruct
          this->OutputMoleculeElectronicStructure(electronicStructure, molecule, this->CanOutputLogs());
 
          // Calculate the correctness of the approximation
-         double r = (lineSearchCurrentEnergy - lineSearchInitialEnergy)
+         double r = (lineSearchCurrentEnergy - referenceEnergy)
                   / approximateChange; // correctness of the step
          bool aproxcheckCanOutputLogs = true;
          tempCanOutputLogs = molecule.CanOutputLogs();
          molecule.SetCanOutputLogs(aproxcheckCanOutputLogs);
-         this->OutputLog(boost::format("\n"
-                                       "actual energy change          = %e\n"
-                                       "expected energy change        = %e\n"
-                                       "actual/expected energy change = %f\n")
-                                       % (lineSearchCurrentEnergy-lineSearchInitialEnergy)
-                                       % approximateChange % r);
+         this->OutputLog((boost::format("\n"
+                                        "actual energy change          = %e\n"
+                                        "expected energy change        = %e\n"
+                                        "actual/expected energy change = %f\n")
+                                        % (lineSearchCurrentEnergy-referenceEnergy)
+                                        % approximateChange % r));
          molecule.SetCanOutputLogs(tempCanOutputLogs);
 
          // check convergence
