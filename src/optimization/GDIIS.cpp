@@ -69,6 +69,12 @@ GDIIS::~GDIIS(){
 bool GDIIS::DoGDIIS(double* vectorError,
                     double* vectorPosition,
                     double const* vectorRefStep){
+   this->Update(vectorError, vectorPosition);
+   return this->CalcGDIIS(vectorError, vectorPosition, vectorRefStep);
+}
+
+void GDIIS::Update(double const* vectorError,
+                   double const* vectorPosition){
    // Prepare GDIIS parameters
    double *tmp = NULL;
    try{
@@ -99,7 +105,11 @@ bool GDIIS::DoGDIIS(double* vectorError,
    if(listErrors.size() > maxnumErrors){
       this->DiscardOldest();
    }
+}
 
+bool GDIIS::CalcGDIIS(double* vectorError,
+                      double* vectorPosition,
+                      double const* vectorRefStep){
    // Prepare GDIIS matrix
    GDIIS::iterator it=listErrors.begin();
    for(int i=0; it!=listErrors.end();i++,it++){

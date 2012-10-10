@@ -37,6 +37,11 @@ public:
    typedef std::list<double*> list;
    typedef std::list<double*>::iterator iterator;
 private:
+   void Update(double const* vectorError,
+               double const* vectorPosition);
+   bool CalcGDIIS(double*       vectorError,
+                  double*       vectorPosition,
+                  double const* vectorRefStep);
    const int sizeErrorVector;
    const int maxnumErrors;
    double** matrixGDIIS;
