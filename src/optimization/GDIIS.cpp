@@ -95,9 +95,18 @@ void GDIIS::DoGDIIS(double* vectorError,
          vectorCoefs[i]=0.0;
       }
       vectorCoefs[numErrors]=1.0;
-      MolDS_wrappers::Lapack::GetInstance()->Dsysv(matrixGDIIS,
-                                                   vectorCoefs,
-                                                   numErrors+1);
+      try{
+         MolDS_wrappers::Lapack::GetInstance()->Dsysv(matrixGDIIS,
+                                                      vectorCoefs,
+                                                      numErrors+1);
+      }
+      catch(MolDSException ex){
+         // Assume all errors to be due to singular GDIIS matrix.
+         // Remove the newest data to eliminate singularity.
+         this->DiscardPrevious();
+         MallocerFreer::GetInstance()->Free(&vectorCoefs, numErrors+1);
+         return;
+      }
 
       // If only one error vector is given, following routine is meaningless.
       if(numErrors <= 1){
