@@ -132,13 +132,17 @@ void BFGS::SearchMinimum(boost::shared_ptr<ElectronicStructure> electronicStruct
          // Limit the trustRadius to maxNormStep
          trustRadius=min(trustRadius,maxNormStep);
 
-         //Calculate RFO step
+         //Calculate reference RFO step
          MallocerFreer::GetInstance()->Malloc(&matrixStep, molecule.GetNumberAtoms(), CartesianType_end);
          vectorStep = &matrixStep[0][0];
+         static const double inifinity = 1.0/0.0;
          this->CalcRFOStep(vectorStep, matrixHessian, vectorForce, trustRadius, dimension);
 
          //Do GDIIS
-         gdiis.DoGDIIS(vectorStep, molecule);
+         gdiis.DoGDIIS(vectorForce, molecule, vectorStep);
+
+         // Calculate RFO step
+         this->CalcRFOStep(vectorStep, matrixHessian, vectorForce, trustRadius, dimension);
 
          // Calculate approximate change of energy using
          // [2/2] Pade approximant

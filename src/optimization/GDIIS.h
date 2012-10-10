@@ -26,9 +26,11 @@ public:
    GDIIS(int sizeErrorVector);
 	 ~GDIIS();
    void DoGDIIS(double* vectorError,
-                double* vectorPosition);
+                double* vectorPosition,
+                double const* vectorRefStep);
    void DoGDIIS(double* vectorError,
-                MolDS_base::Molecule& molecule);
+                MolDS_base::Molecule& molecule,
+                double const* vectorRefStep);
 
    void DiscardPrevious(){numErrors--;nextError=(nextError-1+maxnumErrors)%maxnumErrors;};
 private:
@@ -39,6 +41,7 @@ private:
    double** matrixGDIIS;
    double** matrixErrors;
    double** matrixPositions;
+   double MinCosine();
 };
 
 }

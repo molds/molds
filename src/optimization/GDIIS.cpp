@@ -19,6 +19,7 @@
 
 #include<string>
 #include<iostream>
+#include<math.h>
 #include<vector>
 #include<stdexcept>
 #include"../base/PrintController.h"
@@ -60,7 +61,8 @@ GDIIS::~GDIIS(){
 }
 
 void GDIIS::DoGDIIS(double* vectorError,
-                    double* vectorPosition){
+                    double* vectorPosition,
+                    double const* vectorRefStep){
    // Prepare GDIIS parameters
    const int current = this->nextError++;
    this->nextError %= this->maxnumErrors;
@@ -97,6 +99,18 @@ void GDIIS::DoGDIIS(double* vectorError,
                                                    vectorCoefs,
                                                    numErrors+1);
 
+      // If only one error vector is given, following routine is meaningless.
+      if(numErrors <= 1){
+         MallocerFreer::GetInstance()->Free(&vectorCoefs, numErrors+1);
+         return;
+      }
+
+      // If Lagrange multiplier is too small, don't take GDIIS step.
+      if(-vectorCoefs[numErrors] < 1e-8){
+         MallocerFreer::GetInstance()->Free(&vectorCoefs, numErrors+1);
+         return;
+      }
+
       // Interpolate error vectors and positions
       for(int i=0;i<sizeErrorVector;i++){
          vectorError[i] = vectorPosition[i] = 0;
@@ -104,6 +118,38 @@ void GDIIS::DoGDIIS(double* vectorError,
             vectorError[i]    += vectorCoefs[j] * this->matrixErrors[j][i];
             vectorPosition[i] += vectorCoefs[j] * this->matrixPositions[j][i];
          }
+      }
+
+      // Calculate cosine of the angle between GDIIS step and vectorRefStep
+      // and lengths of the vectors.
+      double innerprod = 0, norm2gdiis = 0, norm2ref = 0;
+      for(int i=0;i<this->sizeErrorVector;i++){
+         double diff = vectorPosition[i] - matrixPositions[current][i];
+         innerprod  += diff * vectorRefStep[i];
+         norm2gdiis += diff * diff;
+         norm2ref   += vectorRefStep[i] * vectorRefStep[i];
+      }
+      double cosine = innerprod/sqrt(norm2gdiis*norm2ref);
+
+      // If length of the GDIIS step is larger than reference step * 10
+      if(norm2gdiis >= norm2ref * 100){
+         for(int i=0; i<this->sizeErrorVector; i++){
+            vectorError[i]    = matrixErrors[current][i];
+            vectorPosition[i] = matrixPositions[current][i];
+         }
+         MallocerFreer::GetInstance()->Free(&vectorCoefs, numErrors+1);
+         return;
+      }
+
+      // If the calculated cosine value is below the minimum tolerant value
+      if(cosine < this->MinCosine()){
+         // Rollback vectorPosition and vectorError to original value
+         for(int i=0; i<this->sizeErrorVector; i++){
+            vectorError[i]    = matrixErrors[current][i];
+            vectorPosition[i] = matrixPositions[current][i];
+         }
+         MallocerFreer::GetInstance()->Free(&vectorCoefs, numErrors+1);
+         return;
       }
    }
    catch(MolDSException ex){
@@ -113,7 +159,7 @@ void GDIIS::DoGDIIS(double* vectorError,
    MallocerFreer::GetInstance()->Free(&vectorCoefs, numErrors+1);
 }
 
-void GDIIS::DoGDIIS(double *vectorError, Molecule& molecule){
+void GDIIS::DoGDIIS(double *vectorError, Molecule& molecule, double const* vectorRefStep){
    double** matrixPosition = NULL;
    try{
       MallocerFreer::GetInstance()->Malloc(&matrixPosition, molecule.GetNumberAtoms(), CartesianType_end);
@@ -123,7 +169,7 @@ void GDIIS::DoGDIIS(double *vectorError, Molecule& molecule){
             matrixPosition[i][j] = atom->GetXyz()[j];
          }
       }
-      this->DoGDIIS(vectorError,&matrixPosition[0][0]);
+      this->DoGDIIS(vectorError,&matrixPosition[0][0],vectorRefStep);
       for(int i=0;i<molecule.GetNumberAtoms();i++){
          Atom* atom = molecule.GetAtom(i);
          for(int j=0;j<CartesianType_end;j++){
@@ -136,4 +182,9 @@ void GDIIS::DoGDIIS(double *vectorError, Molecule& molecule){
       throw ex;
    }
    MallocerFreer::GetInstance()->Free(&matrixPosition, molecule.GetNumberAtoms(), CartesianType_end);
+}
+
+double GDIIS::MinCosine(){
+   static const double mincos[] = {1.0/0.0, 1.0/0.0, 0.97, 0.84, 0.71, 0.67, 0.62, 0.56, 0.49, 0.41};
+   return this->numErrors >= sizeof(mincos)/sizeof(mincos[0]) ? 0.0 : mincos[this->numErrors];
 }
