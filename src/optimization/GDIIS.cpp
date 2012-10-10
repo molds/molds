@@ -245,6 +245,7 @@ double GDIIS::MinCosine(){
 }
 
 void GDIIS::DiscardPrevious(){
+   if(listErrors.size()==0) return;
    double* tmp = listErrors.back();
    MallocerFreer::GetInstance()->Free(&tmp, this->sizeErrorVector);
    listErrors.pop_back();
@@ -255,6 +256,7 @@ void GDIIS::DiscardPrevious(){
 
 
 void GDIIS::DiscardOldest(){
+   if(listErrors.size()==0) return;
    double *tmp = listErrors.front();
    MallocerFreer::GetInstance()->Free(&tmp, sizeErrorVector);
    listErrors.pop_front();
