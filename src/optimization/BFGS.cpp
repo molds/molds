@@ -41,6 +41,7 @@
 #include"../base/ElectronicStructure.h"
 #include"Optimizer.h"
 #include"BFGS.h"
+#include"GDIIS.h"
 using namespace std;
 using namespace MolDS_base;
 using namespace MolDS_base_atoms;
@@ -87,6 +88,7 @@ void BFGS::SearchMinimum(boost::shared_ptr<ElectronicStructure> electronicStruct
    double** matrixDisplacement   = NULL;
    double       trustRadius     = 0.3;
    const double maxNormStep     = 0.3;
+   GDIIS gdiis(molecule.GetNumberAtoms()*CartesianType_end);
 
    try{
       // initialize Hessian with unit matrix
@@ -134,6 +136,9 @@ void BFGS::SearchMinimum(boost::shared_ptr<ElectronicStructure> electronicStruct
          MallocerFreer::GetInstance()->Malloc(&matrixStep, molecule.GetNumberAtoms(), CartesianType_end);
          vectorStep = &matrixStep[0][0];
          this->CalcRFOStep(vectorStep, matrixHessian, vectorForce, trustRadius, dimension);
+
+         //Do GDIIS
+         gdiis.DoGDIIS(vectorStep, molecule);
 
          // Calculate approximate change of energy using
          // [2/2] Pade approximant
