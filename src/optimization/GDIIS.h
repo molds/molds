@@ -21,7 +21,7 @@
 #define INCLUDED_GDIIS
 namespace MolDS_optimization{
 
-class GDIIS{
+class GDIIS : public MolDS_base::PrintController{
 public:
    GDIIS(int sizeErrorVector);
 	 ~GDIIS();
@@ -42,6 +42,11 @@ private:
    double** matrixErrors;
    double** matrixPositions;
    double MinCosine();
+   std::string messageTakingGDIISStep;
+   std::string messageSingularGDIISMatrix;
+   boost::format formatTooSmallLagrangeMultiplier;
+   boost::format formatTooLargeGDIISStep;
+   boost::format formatWrongDirection;
 };
 
 }

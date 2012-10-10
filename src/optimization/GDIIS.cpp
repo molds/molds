@@ -22,6 +22,7 @@
 #include<math.h>
 #include<vector>
 #include<stdexcept>
+#include<boost/format.hpp>
 #include"../base/PrintController.h"
 #include"../base/MolDSException.h"
 #include"../base/Uncopyable.h"
@@ -46,7 +47,12 @@ GDIIS::GDIIS(int sizeErrorVector):
    nextError(0),
    matrixGDIIS(NULL),
    matrixErrors(NULL),
-   matrixPositions(NULL)
+   matrixPositions(NULL),
+   messageTakingGDIISStep("Taking GDIIS step.\n"),
+   messageSingularGDIISMatrix("Error while solving GDIIS equation. Discarding current data.\n"),
+   formatTooSmallLagrangeMultiplier("GDIIS: Lagrange Multiplier is too small. (%e)\n"),
+   formatTooLargeGDIISStep("GDIIS: GDIIS step is too large. (gdiis:%e, reference:%e)\n"),
+   formatWrongDirection("GDIIS: GDIIS step direction is too far from reference step. (cosine: %+f)\n")
 {
    MallocerFreer::GetInstance()->Malloc(&this->matrixGDIIS,     maxnumErrors+1, maxnumErrors+1);
    MallocerFreer::GetInstance()->Malloc(&this->matrixErrors,    maxnumErrors,   sizeErrorVector);
@@ -104,6 +110,7 @@ bool GDIIS::DoGDIIS(double* vectorError,
          // Assume all errors to be due to singular GDIIS matrix.
          // Remove the newest data to eliminate singularity.
          this->DiscardPrevious();
+         this->OutputLog(messageSingularGDIISMatrix);
          MallocerFreer::GetInstance()->Free(&vectorCoefs, numErrors+1);
          return false;
       }
@@ -116,6 +123,7 @@ bool GDIIS::DoGDIIS(double* vectorError,
 
       // If Lagrange multiplier is too small, don't take GDIIS step.
       if(-vectorCoefs[numErrors] < 1e-8){
+         this->OutputLog((formatTooSmallLagrangeMultiplier % -vectorCoefs[numErrors]).str());
          MallocerFreer::GetInstance()->Free(&vectorCoefs, numErrors+1);
          return false;
       }
@@ -146,6 +154,7 @@ bool GDIIS::DoGDIIS(double* vectorError,
             vectorError[i]    = matrixErrors[current][i];
             vectorPosition[i] = matrixPositions[current][i];
          }
+         this->OutputLog((formatTooLargeGDIISStep % sqrt(norm2gdiis) % sqrt(norm2ref)).str());
          MallocerFreer::GetInstance()->Free(&vectorCoefs, numErrors+1);
          return false;
       }
@@ -157,6 +166,7 @@ bool GDIIS::DoGDIIS(double* vectorError,
             vectorError[i]    = matrixErrors[current][i];
             vectorPosition[i] = matrixPositions[current][i];
          }
+         this->OutputLog((formatWrongDirection % cosine).str());
          MallocerFreer::GetInstance()->Free(&vectorCoefs, numErrors+1);
          return false;
       }
@@ -166,6 +176,7 @@ bool GDIIS::DoGDIIS(double* vectorError,
       throw ex;
    }
    MallocerFreer::GetInstance()->Free(&vectorCoefs, numErrors+1);
+   this->OutputLog(messageTakingGDIISStep);
    return true;
 }
 
