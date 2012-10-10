@@ -156,11 +156,13 @@ bool GDIIS::CalcGDIIS(double* vectorError,
          return false;
       }
 
-      // If Lagrange multiplier is too small, don't take GDIIS step.
+      // If Lagrange multiplier is too small;
       if(-vectorCoefs[numErrors] < 1e-8){
          this->OutputLog((formatTooSmallLagrangeMultiplier % -vectorCoefs[numErrors]).str());
          MallocerFreer::GetInstance()->Free(&vectorCoefs, numErrors+1);
-         return false;
+         // Recalculate GDIIS step without the oldest data.
+         this->DiscardOldest();
+         return CalcGDIIS(vectorError,vectorPosition,vectorRefStep);
       }
 
       // Interpolate error vectors and positions
@@ -186,13 +188,16 @@ bool GDIIS::CalcGDIIS(double* vectorError,
 
       // If length of the GDIIS step is larger than reference step * 10
       if(norm2gdiis >= norm2ref * 100){
+         // Rollback vectorPosition and vectorError to original value
          for(int i=0; i<this->sizeErrorVector; i++){
             vectorError[i]    = listErrors.back()[i];
             vectorPosition[i] = listPositions.back()[i];
          }
          this->OutputLog((formatTooLargeGDIISStep % sqrt(norm2gdiis) % sqrt(norm2ref)).str());
          MallocerFreer::GetInstance()->Free(&vectorCoefs, numErrors+1);
-         return false;
+         // and recalculate GDIIS step without the oldest data
+         this->DiscardOldest();
+         return CalcGDIIS(vectorError,vectorPosition,vectorRefStep);
       }
 
       // If the calculated cosine value is below the minimum tolerant value
@@ -204,7 +209,9 @@ bool GDIIS::CalcGDIIS(double* vectorError,
          }
          this->OutputLog((formatWrongDirection % cosine).str());
          MallocerFreer::GetInstance()->Free(&vectorCoefs, numErrors+1);
-         return false;
+         // and recalculate GDIIS step without the oldest data
+         this->DiscardOldest();
+         return CalcGDIIS(vectorError,vectorPosition,vectorRefStep);
       }
    }
    catch(MolDSException ex){
