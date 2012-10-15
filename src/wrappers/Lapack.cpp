@@ -69,9 +69,9 @@ void Lapack::DeleteInstance(){
 
 /***
  *
- * return notice
- *    i-th eigen value is eigenValues[i].
- *    i-th eigen vector is (matirx[i][0], matirx[i][1], matirx[i][2], ....).
+ * Eigenvalue and eigenvector of a real symmetirc matrix are calculated:
+ *   - i-th eigenvalue will be stored in eigenValues[i].
+ *   - i-th eigenvector will be stored as (matirx[i][0], matirx[i][1], matirx[i][2], ....).
  *
  * ***/
 int Lapack::Dsyevd(double** matrix, double* eigenValues, int size, bool calcEigenVectors){
@@ -178,8 +178,8 @@ int Lapack::Dsyevd(double** matrix, double* eigenValues, int size, bool calcEige
 
 /***
  *
- * Solve matrix*X=b, then we get X by this method.
- * The X is stored in b.
+ * "matrix*X=b" is solved, then we get X by this method.
+ * The X will be stored in b.
  *
  */
 int Lapack::Dsysv(double const* const* matrix, double* b, int size){
@@ -252,8 +252,8 @@ int Lapack::Dsysv(double const* const* matrix, double* b, int size){
 
 /***
  *
- * Solve matrix*X[i]=b[i] (i=0, 1, ... , nrhs-1), then we get X[i] by this method.
- * The X[i] is stored in b[i].
+ * "matrix*X[i]=b[i] (i=0, 1, ... , nrhs-1) is solved, then we get X[i] by this method.
+ * The X[i] will be stored in b[i].
  * b[i][j] is j-th element of i-th solution, b[i].
  *
  */
@@ -317,7 +317,29 @@ int Lapack::Dgetrs(double const* const* matrix, double** b, int size, int nrhs) 
    return info;
 }
 
-// Argument "matrix" means sizeM * sizeN matrix.
+// Argument "matrix" is sizeM*sizeN matrix.
+// Argument "matrix" will be LU-decomposed.
+int Lapack::Dgetrf(double** matrix, int sizeM, int sizeN) const{
+   int*    ipiv            = (int*)   mkl_malloc( sizeof(int)*2*sizeM,        16 );
+   double* convertedMatrix = (double*)mkl_malloc( sizeof(double)*sizeM*sizeN, 16 );
+   for(int i=0; i<sizeM; i++){
+      for(int j=0; j<sizeN; j++){
+         convertedMatrix[i+j*sizeM] = matrix[i][j];
+      }
+   }
+   this->Dgetrf(convertedMatrix, ipiv, sizeM, sizeN);
+   for(int i=0; i<sizeM; i++){
+      for(int j=0; j<sizeN; j++){
+         matrix[i][j] = convertedMatrix[i+j*sizeM];
+      }
+   }
+   mkl_free(convertedMatrix);
+   mkl_free(ipiv);
+   int info = 0;
+   return info;
+}
+
+// Argument "matrix" is sizeM*sizeN matrix.
 // The each element of "matrix" should be stored in 1-dimensional vecotre with column major (Fortran type).
 int Lapack::Dgetrf(double* matrix, int* ipiv, int sizeM, int sizeN) const{
    int info = 0;
