@@ -24,6 +24,24 @@ class Blas: public MolDS_base::PrintController, private MolDS_base::Uncopyable{
 public:
    static Blas* GetInstance();
    static void DeleteInstance();
+   void Dcopy(int n,
+              double const* vectorX,
+              double*       vectorY) const;
+   void Dcopy(int n,
+              double const* vectorX, int incrementX,
+              double*       vectorY, int incrementY) const;
+   void Daxpy(int n, double alpha,
+              double const* vectorX,
+              double*       vectorY) const;
+   void Daxpy(int n, double alpha,
+              double const* vectorX, int incrementX,
+              double*       vectorY, int incrementY) const;
+   double Ddot(int n,
+               double const* vectorX,
+               double const* vectorY) const;
+   double Ddot(int n,
+               double const* vectorX, int incrementX,
+               double const* vectorY, int incrementY)const;
    void Dgemv(int m, int n,
               double const* const* matrixA,
               double const* vectorX,
@@ -37,6 +55,21 @@ public:
               double beta,
               double* vectorY,
               int incrementY) const;
+   void Dsymv(int n,
+              double const* const* matrixA,
+              double const* vectorX,
+              double* vectorY) const;
+   void Dsymv(int n, double alpha,
+              double const* const* matrixA,
+              double const* vectorX, int incrementX,
+              double beta,
+              double*       vectorY, int incrementY) const;
+   void Dsyr(int n, double alpha,
+             double const* vectorX,
+             double ** matrixA)const;
+   void Dsyr(int n, double alpha,
+             double const* vectorX, int incrementX,
+             double ** matrixA)const;
    void Dgemm(int m, int n, int k, 
               double const* const* matrixA, 
               double const* const* matrixB, 

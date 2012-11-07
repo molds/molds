@@ -43,6 +43,12 @@ public:
    virtual void CalcOverlapMOsWithAnotherElectronicStructure(double** overlapMOs, 
                                                              double const* const* overlapAOs,
                                                              const MolDS_base::ElectronicStructure& lhsElectronicStructure) const = 0;
+   virtual void CalcOverlapSingletSDsWithAnotherElectronicStructure(double** overlapSingletSDs, 
+                                                                    double const* const* overlapMOs) const = 0;
+   virtual void CalcOverlapESsWithAnotherElectronicStructure(double** overlapESs, 
+                                                             double const* const* overlapSingletSDs,
+                                                             const MolDS_base::ElectronicStructure& lhsElectronicStructure) const = 0;
+
 };
 
 }
