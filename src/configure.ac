@@ -104,12 +104,12 @@ AS_IF([test "x$molds_blas_header_found" != "xyes"],
       [AC_MSG_FAILURE([Cannot find mkl.h or blas.h!])])
 
 dnl Check for BLAS C interface
-AC_CHECK_FUNCS([dgemv dgemm],
+AC_CHECK_FUNCS([dcopy daxpy ddot dgemv dgemm dsymv dsyr],
                [molds_blas_cinterface_found=yes],
                [molds_blas_cinterface_found=no;break])
 
 AS_IF([test x$molds_lapack_cinterface_found != xyes],
-      [AC_CHECK_FUNCS([cblas_dgemv cblas_dgemm],
+      [AC_CHECK_FUNCS([cblas_dcopy cblas_daxpy cblas_ddot cblas_dgemv cblas_dgemm cblas_dsymv cblas_dsyr],
                       [molds_lapack_cinterface_found=yes],
                       [molds_lapack_cinterface_found=no;break])])
 
