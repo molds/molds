@@ -184,6 +184,8 @@ void Cndo2::SetMessages(){
       = "Error in cndo::Cndo2::CalcOverlapAOsDifferentConfigurations: Number Atoms in lhs and rhs are different.\n";
    this->errorMessageCalcOverlapAOsDifferentConfigurationsOverlapAOsNULL
       = "Error in cndo::Cndo2::CalcOverlapAOsDifferentConfigurations: ovelrapAOs is NULL.\n";
+   this->errorMessageNonExcitedStates 
+      = "Error in cndo::CNDO2::Excited states can not be calculated with CNDO2.\n";
    this->errorMessageLhs = "lhs: ";
    this->errorMessageRhs = "rhs: ";
    this->errorMessageFromState = "\tfrom state = ";
@@ -1542,7 +1544,6 @@ void Cndo2::CalcAtomicElectronPopulation(double* atomicElectronPopulation,
    for(int A=0; A<totalNumberAtoms; A++){
       firstAOIndex = molecule.GetAtom(A)->GetFirstAOIndex();
       numberAOs = molecule.GetAtom(A)->GetValenceSize();
-      atomicElectronPopulation[A] = 0.0;
       for(int i=firstAOIndex; i<firstAOIndex+numberAOs; i++){
          atomicElectronPopulation[A] += orbitalElectronPopulation[i][i];
       }
@@ -1659,30 +1660,18 @@ void Cndo2::CalcElectronicDipoleMomentGroundState(double*** electronicTransition
                                                   double const* const* orbitalElectronPopulation,
                                                   double const* const* overlapAOs) const{
    int groundState = 0;
-   stringstream ompErrors;
-#pragma omp parallel for schedule(auto) 
    for(int axis=0; axis<CartesianType_end; axis++){
-      try{
-         electronicTransitionDipoleMoments[groundState][groundState][axis] = this->GetElectronicTransitionDipoleMoment(
-                                                                                   groundState,
-                                                                                   groundState,
-                                                                                   static_cast<CartesianType>(axis),
-                                                                                   NULL,
-                                                                                   NULL,
-                                                                                   cartesianMatrix,
-                                                                                   molecule,
-                                                                                   orbitalElectronPopulation,
-                                                                                   overlapAOs,
-                                                                                   NULL);
-      }
-      catch(MolDSException ex){
-#pragma omp critical
-         ompErrors << ex.what() << endl ;
-      }
-   }
-   // Exception throwing for omp-region
-   if(!ompErrors.str().empty()){
-      throw MolDSException(ompErrors.str());
+      electronicTransitionDipoleMoments[groundState][groundState][axis] = this->GetElectronicTransitionDipoleMoment(
+                                                                                groundState,
+                                                                                groundState,
+                                                                                static_cast<CartesianType>(axis),
+                                                                                NULL,
+                                                                                NULL,
+                                                                                cartesianMatrix,
+                                                                                molecule,
+                                                                                orbitalElectronPopulation,
+                                                                                overlapAOs,
+                                                                                NULL);
    }
 }
 
@@ -1694,16 +1683,31 @@ double Cndo2::GetElectronicTransitionDipoleMoment(int to, int from, CartesianTyp
                                                   double const* const* orbitalElectronPopulation,
                                                   double const* const* overlapAOs,
                                                   double const* groundStateDipole) const{
-   double value = 0.0;
    int groundState = 0;
    if(from == groundState && to == groundState){
+      double value = 0.0;
       int totalAONumber = molecule.GetTotalNumberAOs();
+      stringstream ompErrors;
+#pragma omp parallel for reduction(+:value) schedule(auto) 
       for(int mu=0; mu<totalAONumber; mu++){
-         for(int nu=0; nu<totalAONumber; nu++){
-            value -= orbitalElectronPopulation[mu][nu]
-                    *(cartesianMatrix[mu][nu][axis]-molecule.GetXyzCOC()[axis]*overlapAOs[mu][nu]);
+         try{
+            double threadValue = 0.0;
+            for(int nu=0; nu<totalAONumber; nu++){
+               threadValue -= orbitalElectronPopulation[mu][nu]
+                             *(cartesianMatrix[mu][nu][axis]-molecule.GetXyzCOC()[axis]*overlapAOs[mu][nu]);
+            }
+            value += threadValue;
+         }
+         catch(MolDSException ex){
+#pragma omp critical
+            ompErrors << ex.what() << endl ;
          }
       }
+      // Exception throwing for omp-region
+      if(!ompErrors.str().empty()){
+         throw MolDSException(ompErrors.str());
+      }
+      return value;
    }
    else{
       stringstream ss;
@@ -1713,7 +1717,6 @@ double Cndo2::GetElectronicTransitionDipoleMoment(int to, int from, CartesianTyp
       ss << this->errorMessageCartesianType << CartesianTypeStr(axis) << endl;
       throw MolDSException(ss.str());
    }
-   return value;
 }
 
 // calculate Cartesian matrix between atomic orbitals. 
@@ -3580,6 +3583,9 @@ void Cndo2::CalcOverlapMOsWithAnotherElectronicStructure(double** overlapMOs,
    double const* const* rhsFockMatrix = this->fockMatrix;
    double const* const* lhsFockMatrix = lhsElectronicStructure.GetFockMatrix();
    int totalAONumber = this->molecule->GetTotalNumberAOs();
+   int usedMONumber = this->molecule->GetTotalNumberValenceElectrons()/2
+                     +Parameters::GetInstance()->GetActiveVirCIS();
+   MallocerFreer::GetInstance()->Initialize<double>(overlapMOs, totalAONumber, totalAONumber);
    double** tmpMatrix=NULL;
    try{
       MallocerFreer::GetInstance()->Malloc<double>(&tmpMatrix,totalAONumber,totalAONumber);
@@ -3589,13 +3595,13 @@ void Cndo2::CalcOverlapMOsWithAnotherElectronicStructure(double** overlapMOs,
       double beta=0.0;
       MolDS_wrappers::Blas::GetInstance()->Dgemm(isColumnMajorOverlapAOs,
                                                  isColumnMajorRhsFock,
-                                                 totalAONumber,totalAONumber,totalAONumber,
+                                                 totalAONumber,usedMONumber,totalAONumber,
                                                  alpha,
                                                  overlapAOs,
                                                  rhsFockMatrix,
                                                  beta,
                                                  tmpMatrix);
-      MolDS_wrappers::Blas::GetInstance()->Dgemm(totalAONumber,totalAONumber,totalAONumber,
+      MolDS_wrappers::Blas::GetInstance()->Dgemm(usedMONumber,totalAONumber,totalAONumber,
                                                  lhsFockMatrix,
                                                  tmpMatrix,
                                                  overlapMOs);
@@ -3606,6 +3612,33 @@ void Cndo2::CalcOverlapMOsWithAnotherElectronicStructure(double** overlapMOs,
       throw ex;
    }
    MallocerFreer::GetInstance()->Free<double>(&tmpMatrix,totalAONumber,totalAONumber);
+}
+
+// calculate OverlapSingletSDs matrix between different electronic-structure, S^{SSD}_{ij}.
+// i and j are singlet SDs belonging to left and right hand side electronic-structures, respectively.
+// The index i=0 means the Hartree-Fock state.
+// This overlapsingletSDs are calculated from overlapMOs.
+// Note that rhs-electronic-structure is this electronic-structure  
+// and lhs-electronic-structure is another electronic-structure.
+void Cndo2::CalcOverlapSingletSDsWithAnotherElectronicStructure(double** overlapSingletSDs, 
+                                                                double const* const* overlapMOs) const{
+      stringstream ss;
+      ss << this->errorMessageNonExcitedStates;
+      throw MolDSException(ss.str());
+}
+
+// calculate overlapESs (ES means eigenstate) matrix between different electronic-structure, S^{ES}_{ij}.
+// i and j are singlet SDs belonging to left and right hand side electronic-structures, respectively.
+// The index i=0 means the ground state.
+// This overlapESs is calculated from the overlapsingletSDs.
+// Note that rhs-electronic-structure is this electronic-structure  
+// and lhs-electronic-structure is another electronic-structure.
+void Cndo2::CalcOverlapESsWithAnotherElectronicStructure(double** overlapESs, 
+                                                         double const* const* overlapSingletSDs,
+                                                         const MolDS_base::ElectronicStructure& lhsElectronicStructure) const{
+      stringstream ss;
+      ss << this->errorMessageNonExcitedStates;
+      throw MolDSException(ss.str());
 }
 
 // calculate OverlapAOs matrix. E.g. S_{\mu\nu} in (3.74) in J. A. Pople book.

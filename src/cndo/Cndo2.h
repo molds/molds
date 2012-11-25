@@ -46,6 +46,11 @@ public:
    void CalcOverlapMOsWithAnotherElectronicStructure(double** overlapMOs,
                                                      double const* const* overlapAOs,
                                                      const MolDS_base::ElectronicStructure& lhsElectronicStructure) const;
+   virtual void CalcOverlapSingletSDsWithAnotherElectronicStructure(double** overlapSingletSDs, 
+                                                                    double const* const* overlapMOs) const;
+   virtual void CalcOverlapESsWithAnotherElectronicStructure(double** overlapESs, 
+                                                             double const* const* overlapSingletSDs,
+                                                             const MolDS_base::ElectronicStructure& lhsElectronicStructure) const;
    MolDS_base::TheoryType GetTheoryType() const;
 protected:
    std::string errorMessageAtomA;
@@ -74,6 +79,7 @@ protected:
    std::string errorMessageCalcFrequenciesNormalModesBadTheory;
    std::string errorMessageFromState;
    std::string errorMessageToState;
+   std::string errorMessageNonExcitedStates;
    std::string messageSCFMetConvergence;
    std::string messageStartSCF;
    std::string messageDoneSCF;
