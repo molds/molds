@@ -16,14 +16,38 @@
 /* Define to 1 if you have the <boost/random.hpp> header file. */
 #undef HAVE_BOOST_RANDOM_HPP
 
+/* Define to 1 if you have the `cblas_daxpy' function. */
+#undef HAVE_CBLAS_DAXPY
+
+/* Define to 1 if you have the `cblas_dcopy' function. */
+#undef HAVE_CBLAS_DCOPY
+
+/* Define to 1 if you have the `cblas_ddot' function. */
+#undef HAVE_CBLAS_DDOT
+
 /* Define to 1 if you have the `cblas_dgemm' function. */
 #undef HAVE_CBLAS_DGEMM
 
 /* Define to 1 if you have the `cblas_dgemv' function. */
 #undef HAVE_CBLAS_DGEMV
 
+/* Define to 1 if you have the `cblas_dsymv' function. */
+#undef HAVE_CBLAS_DSYMV
+
+/* Define to 1 if you have the `cblas_dsyr' function. */
+#undef HAVE_CBLAS_DSYR
+
 /* Define to 1 if you have the <cblas.h> header file. */
 #undef HAVE_CBLAS_H
+
+/* Define to 1 if you have the `daxpy' function. */
+#undef HAVE_DAXPY
+
+/* Define to 1 if you have the `dcopy' function. */
+#undef HAVE_DCOPY
+
+/* Define to 1 if you have the `ddot' function. */
+#undef HAVE_DDOT
 
 /* Define to 1 if you have the `dgemm' function. */
 #undef HAVE_DGEMM
@@ -39,6 +63,12 @@
 
 /* Define to 1 if you have the `dsyevd' function. */
 #undef HAVE_DSYEVD
+
+/* Define to 1 if you have the `dsymv' function. */
+#undef HAVE_DSYMV
+
+/* Define to 1 if you have the `dsyr' function. */
+#undef HAVE_DSYR
 
 /* Define to 1 if you have the `dsysv' function. */
 #undef HAVE_DSYSV

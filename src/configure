@@ -7069,7 +7069,7 @@ as_fn_error $? "Cannot find mkl.h or blas.h!
 See \`config.log' for more details" "$LINENO" 5; }
 fi
 
-for ac_func in dgemv dgemm
+for ac_func in dcopy daxpy ddot dgemv dgemm dsymv dsyr
 do :
   as_ac_var=`$as_echo "ac_cv_func_$ac_func" | $as_tr_sh`
 ac_fn_cxx_check_func "$LINENO" "$ac_func" "$as_ac_var"
@@ -7085,7 +7085,7 @@ done
 
 
 if test x$molds_lapack_cinterface_found != xyes; then :
-  for ac_func in cblas_dgemv cblas_dgemm
+  for ac_func in cblas_dcopy cblas_daxpy cblas_ddot cblas_dgemv cblas_dgemm cblas_dsymv cblas_dsyr
 do :
   as_ac_var=`$as_echo "ac_cv_func_$ac_func" | $as_tr_sh`
 ac_fn_cxx_check_func "$LINENO" "$ac_func" "$as_ac_var"
