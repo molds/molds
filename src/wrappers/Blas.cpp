@@ -259,7 +259,7 @@ void Blas::Dsyr(int n, double alpha,
           double ** matrixA)const{
    double* a = &matrixA[0][0];
 #ifdef HAVE_DSYR
-   char uploA='U';
+   char uploA='L';
    int lda = n;
    dsyr(&uploA, &n, &alpha, vectorX, &incrementX, a, &lda);
 #elif defined(HAVE_CBLAS_DSYR)
