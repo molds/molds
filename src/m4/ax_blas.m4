@@ -108,6 +108,19 @@ if test $ax_blas_ok = no; then
 	LIBS="$save_LIBS"
 fi
 
+# BLAS in Intel MKL library?
+if test $ax_blas_ok = no; then
+	AC_CHECK_LIB(mkl_intel_lp64, $sgemm, [ax_blas_ok=yes;BLAS_LIBS="-lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core"],,[-lmkl_intel_thread -lmkl_core])
+fi
+
+if test $ax_blas_ok = no; then
+	AC_CHECK_LIB(mkl_intel, $sgemm, [ax_blas_ok=yes;BLAS_LIBS="-lmkl_intel -lmkl_intel_thread -lmkl_core"],,[-lmkl_intel_thread -lmkl_core])
+fi
+
+if test $ax_blas_ok = no; then
+	AC_CHECK_LIB(mkl, $sgemm, [ax_blas_ok=yes;BLAS_LIBS="-lmkl -lguide -lpthread"],,[-lguide -lpthread])
+fi
+
 # BLAS in ATLAS library? (http://math-atlas.sourceforge.net/)
 if test $ax_blas_ok = no; then
 	AC_CHECK_LIB(atlas, ATL_xerbla,
@@ -127,19 +140,6 @@ if test $ax_blas_ok = no; then
 			[ax_blas_ok=yes; BLAS_LIBS="-lsgemm -ldgemm -lblas"],
 			[], [-lblas])],
 			[], [-lblas])])
-fi
-
-# BLAS in Intel MKL library?
-if test $ax_blas_ok = no; then
-	AC_CHECK_LIB(mkl_intel_lp64, $sgemm, [ax_blas_ok=yes;BLAS_LIBS="-lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core"],,[-lmkl_intel_thread -lmkl_core])
-fi
-
-if test $ax_blas_ok = no; then
-	AC_CHECK_LIB(mkl_intel, $sgemm, [ax_blas_ok=yes;BLAS_LIBS="-lmkl_intel -lmkl_intel_thread -lmkl_core"],,[-lmkl_intel_thread -lmkl_core])
-fi
-
-if test $ax_blas_ok = no; then
-	AC_CHECK_LIB(mkl, $sgemm, [ax_blas_ok=yes;BLAS_LIBS="-lmkl -lguide -lpthread"],,[-lguide -lpthread])
 fi
 
 # BLAS in Apple vecLib library?
