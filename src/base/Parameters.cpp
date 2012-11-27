@@ -186,6 +186,7 @@ void Parameters::SetDefaultValues(){
    this->seedRPMD                   = static_cast<unsigned long>(time(0));
    // NASCO
    this->numberElectronicStatesNASCO = 3;
+   this->initialElectronicStateNASCO = 0;
    this->totalStepsNASCO             = 10;
    this->timeWidthNASCO              = 0.1*this->fs2AU;
    this->seedNASCO                   = static_cast<unsigned long>(time(0));
@@ -196,6 +197,8 @@ void Parameters::SetDefaultValues(){
    this->maxGradientOptimization          = 0.00045;
    this->rmsGradientOptimization          = 0.00030;
    this->timeWidthOptimization            = 50.0*this->fs2AU;
+   this->initialTrustRadiusOptimization   = 0.3;
+   this->maxNormStepOptimization          = 0.3;
    // Frequencies
    this->requiresFrequencies             = false;
    this->electronicStateIndexFrequencies = 0;
@@ -821,6 +824,14 @@ void Parameters::SetNumberElectronicStatesNASCO(int numberElectronicStates){
    this->numberElectronicStatesNASCO = numberElectronicStates;
 }
 
+int Parameters::GetInitialElectronicStateNASCO() const{
+   return this->initialElectronicStateNASCO;
+}
+
+void Parameters::SetInitialElectronicStateNASCO(int initialElectronicState){
+   this->initialElectronicStateNASCO = initialElectronicState;
+}
+
 double Parameters::GetTimeWidthNASCO() const{
    return this->timeWidthNASCO;
 }
@@ -876,6 +887,22 @@ double Parameters::GetRmsGradientOptimization() const{
 
 void Parameters::SetRmsGradientOptimization(double rmsGradient){
    this->rmsGradientOptimization = rmsGradient;
+}
+
+double Parameters::GetInitialTrustRadiusOptimization() const{
+   return this->initialTrustRadiusOptimization;
+}
+
+void Parameters::SetInitialTrustRadiusOptimization(double initialTrustRadius){
+   this->initialTrustRadiusOptimization = initialTrustRadius;
+}
+
+double Parameters::GetMaxNormStepOptimization() const{
+   return this->maxNormStepOptimization;
+}
+
+void Parameters::SetMaxNormStepOptimization(double maxNormStep){
+   this->maxNormStepOptimization = maxNormStep;
 }
 
 double Parameters::GetTimeWidthOptimization() const{

@@ -1544,7 +1544,6 @@ void Cndo2::CalcAtomicElectronPopulation(double* atomicElectronPopulation,
    for(int A=0; A<totalNumberAtoms; A++){
       firstAOIndex = molecule.GetAtom(A)->GetFirstAOIndex();
       numberAOs = molecule.GetAtom(A)->GetValenceSize();
-      atomicElectronPopulation[A] = 0.0;
       for(int i=firstAOIndex; i<firstAOIndex+numberAOs; i++){
          atomicElectronPopulation[A] += orbitalElectronPopulation[i][i];
       }
@@ -1661,30 +1660,18 @@ void Cndo2::CalcElectronicDipoleMomentGroundState(double*** electronicTransition
                                                   double const* const* orbitalElectronPopulation,
                                                   double const* const* overlapAOs) const{
    int groundState = 0;
-   stringstream ompErrors;
-#pragma omp parallel for schedule(auto) 
    for(int axis=0; axis<CartesianType_end; axis++){
-      try{
-         electronicTransitionDipoleMoments[groundState][groundState][axis] = this->GetElectronicTransitionDipoleMoment(
-                                                                                   groundState,
-                                                                                   groundState,
-                                                                                   static_cast<CartesianType>(axis),
-                                                                                   NULL,
-                                                                                   NULL,
-                                                                                   cartesianMatrix,
-                                                                                   molecule,
-                                                                                   orbitalElectronPopulation,
-                                                                                   overlapAOs,
-                                                                                   NULL);
-      }
-      catch(MolDSException ex){
-#pragma omp critical
-         ompErrors << ex.what() << endl ;
-      }
-   }
-   // Exception throwing for omp-region
-   if(!ompErrors.str().empty()){
-      throw MolDSException(ompErrors.str());
+      electronicTransitionDipoleMoments[groundState][groundState][axis] = this->GetElectronicTransitionDipoleMoment(
+                                                                                groundState,
+                                                                                groundState,
+                                                                                static_cast<CartesianType>(axis),
+                                                                                NULL,
+                                                                                NULL,
+                                                                                cartesianMatrix,
+                                                                                molecule,
+                                                                                orbitalElectronPopulation,
+                                                                                overlapAOs,
+                                                                                NULL);
    }
 }
 
@@ -1696,16 +1683,31 @@ double Cndo2::GetElectronicTransitionDipoleMoment(int to, int from, CartesianTyp
                                                   double const* const* orbitalElectronPopulation,
                                                   double const* const* overlapAOs,
                                                   double const* groundStateDipole) const{
-   double value = 0.0;
    int groundState = 0;
    if(from == groundState && to == groundState){
+      double value = 0.0;
       int totalAONumber = molecule.GetTotalNumberAOs();
+      stringstream ompErrors;
+#pragma omp parallel for reduction(+:value) schedule(auto) 
       for(int mu=0; mu<totalAONumber; mu++){
-         for(int nu=0; nu<totalAONumber; nu++){
-            value -= orbitalElectronPopulation[mu][nu]
-                    *(cartesianMatrix[mu][nu][axis]-molecule.GetXyzCOC()[axis]*overlapAOs[mu][nu]);
+         try{
+            double threadValue = 0.0;
+            for(int nu=0; nu<totalAONumber; nu++){
+               threadValue -= orbitalElectronPopulation[mu][nu]
+                             *(cartesianMatrix[mu][nu][axis]-molecule.GetXyzCOC()[axis]*overlapAOs[mu][nu]);
+            }
+            value += threadValue;
+         }
+         catch(MolDSException ex){
+#pragma omp critical
+            ompErrors << ex.what() << endl ;
          }
       }
+      // Exception throwing for omp-region
+      if(!ompErrors.str().empty()){
+         throw MolDSException(ompErrors.str());
+      }
+      return value;
    }
    else{
       stringstream ss;
@@ -1715,7 +1717,6 @@ double Cndo2::GetElectronicTransitionDipoleMoment(int to, int from, CartesianTyp
       ss << this->errorMessageCartesianType << CartesianTypeStr(axis) << endl;
       throw MolDSException(ss.str());
    }
-   return value;
 }
 
 // calculate Cartesian matrix between atomic orbitals. 
@@ -3584,6 +3585,7 @@ void Cndo2::CalcOverlapMOsWithAnotherElectronicStructure(double** overlapMOs,
    int totalAONumber = this->molecule->GetTotalNumberAOs();
    int usedMONumber = this->molecule->GetTotalNumberValenceElectrons()/2
                      +Parameters::GetInstance()->GetActiveVirCIS();
+   MallocerFreer::GetInstance()->Initialize<double>(overlapMOs, totalAONumber, totalAONumber);
    double** tmpMatrix=NULL;
    try{
       MallocerFreer::GetInstance()->Malloc<double>(&tmpMatrix,totalAONumber,totalAONumber);

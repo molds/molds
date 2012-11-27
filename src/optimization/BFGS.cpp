@@ -64,6 +64,8 @@ void BFGS::SetMessages(){
       = "Error in optimization::BFGS::CheckEnableTheoryType: Non available theory is set.\n";
    this->errorMessageGeometyrOptimizationNotConverged
       = "Error in optimization::BFGS::Optimize: Optimization did not met convergence criterion.\n";
+   this->errorMessageNaNInRFOStep
+      = "Error in optimization::BFGS::Optimize: RFO step has gone NaN. (lambda * s[%d] = %e, lambda = %e, alpha = %e)\n";
    this->messageStartBFGSStep = "\n==========  START: BFGS step ";
 }
 
@@ -88,8 +90,8 @@ void BFGS::SearchMinimum(boost::shared_ptr<ElectronicStructure> electronicStruct
    double** matrixOldCoordinates = NULL;
    double*  vectorOldCoordinates = NULL;
    double** matrixDisplacement   = NULL;
-   double       trustRadius     = 0.3;
-   const double maxNormStep     = 0.3;
+   double       trustRadius      = Parameters::GetInstance()->GetInitialTrustRadiusOptimization();
+   const double maxNormStep      = Parameters::GetInstance()->GetMaxNormStepOptimization();
    GDIIS gdiis(molecule.GetNumberAtoms()*CartesianType_end);
 
    try{
@@ -318,8 +320,12 @@ void BFGS::CalcRFOStep(double* vectorStep,
          for(int i=0;i<dimension;i++){
             // Scale last element of eigenvector to 1/alpha because
             // [vectorStep, 1] is the eigenvector of augmented Hessian.
-            // See Eq. (4) in [EPW_1997].
+            // See Eq. (7) in [EPW_1997].
             vectorStep[i] = matrixAugmentedHessian[0][i] / matrixAugmentedHessian[0][dimension] / alpha;
+            if(isnan(vectorStep[i])){
+               throw MolDSException(boost::format(this->errorMessageNaNInRFOStep)
+                     % i % matrixAugmentedHessian[0][i] % matrixAugmentedHessian[0][dimension] % alpha);
+            }
          }
          //
          // Calculate size of the RFO step

@@ -183,7 +183,7 @@ void Blas::Dsymv(int n, double alpha,
            double beta,
            double*       vectorY, int incrementY) const{
    double const* a = &matrixA[0][0];
-   char uploA='U';
+   char uploA='L';
    int lda = n;
    dsymv(&uploA, &n, &alpha, a, &lda, vectorX, &incrementX, &beta, vectorY, &incrementY);
 }
@@ -202,7 +202,7 @@ void Blas::Dsyr(int n, double alpha,
           double const* vectorX, int incrementX,
           double ** matrixA)const{
    double* a = &matrixA[0][0];
-   char uploA='U';
+   char uploA='L';
    int lda = n;
    dsyr(&uploA, &n, &alpha, vectorX, &incrementX, a, &lda);
 #pragma omp parallel for schedule(auto)
