@@ -255,7 +255,8 @@ bool GDIIS::DoGDIIS(double *vectorError, Molecule& molecule, double const* vecto
 }
 
 double GDIIS::MinCosine(){
-   static const double mincos[] = {1.0/0.0, 1.0/0.0, 0.97, 0.84, 0.71, 0.67, 0.62, 0.56, 0.49, 0.41};
+   static const double inf = std::numeric_limits<double>::infinity();
+   static const double mincos[] = {inf, inf, 0.97, 0.84, 0.71, 0.67, 0.62, 0.56, 0.49, 0.41};
    static const int nummincos = sizeof(mincos)/sizeof(mincos[0]);
    int numErrors = listErrors.size();
    return numErrors >= nummincos ? 0.0 : mincos[numErrors];
