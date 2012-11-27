@@ -43,6 +43,7 @@ AS_IF([test -z "$CXXFLAGS"],
 
 dnl Checks for programs.
 AC_PROG_CXX([icpc g++])
+AC_PROG_F77([ifort gfortran])
 
 dnl Use C++
 AC_LANG_PUSH([C++])
