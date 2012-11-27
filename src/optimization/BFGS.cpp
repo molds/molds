@@ -168,7 +168,7 @@ void BFGS::SearchMinimum(boost::shared_ptr<ElectronicStructure> electronicStruct
          //Calculate reference RFO step
          MallocerFreer::GetInstance()->Malloc(&matrixStep, molecule.GetNumberAtoms(), CartesianType_end);
          vectorStep = &matrixStep[0][0];
-         static const double inifinity = 1.0/0.0;
+         static const double inifinity = std::numeric_limits<double>::infinity();
          this->CalcRFOStep(vectorStep, matrixHessian, vectorForce, trustRadius, dimension);
 
          // Store reference energy for calculating actual/expected ratio
