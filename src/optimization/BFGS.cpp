@@ -175,7 +175,8 @@ void BFGS::SearchMinimum(boost::shared_ptr<ElectronicStructure> electronicStruct
          double referenceEnergy = lineSearchCurrentEnergy;
 
          //Do GDIIS
-         if(gdiis.DoGDIIS(vectorForce, molecule, vectorStep)){
+         try{
+            gdiis.DoGDIIS(vectorForce, molecule, vectorStep);
             // If GDIIS step is taken
             // Recalculate reference energy
             this->UpdateElectronicStructure(electronicStructure, molecule, requireGuess, false);
@@ -183,6 +184,9 @@ void BFGS::SearchMinimum(boost::shared_ptr<ElectronicStructure> electronicStruct
 
             // Recalculate RFO step
             this->CalcRFOStep(vectorStep, matrixHessian, vectorForce, trustRadius, dimension);
+         }
+         catch(GDIISException ex){
+            //if GDIIS step is not taken, do nothing
          }
 
          // Calculate approximate change of energy using
@@ -285,6 +289,14 @@ void BFGS::SearchMinimum(boost::shared_ptr<ElectronicStructure> electronicStruct
 
       }
       *lineSearchedEnergy = lineSearchCurrentEnergy;
+   }
+   catch(GDIISException ex){
+      MallocerFreer::GetInstance()->Free(&matrixHessian, dimension, dimension);
+      MallocerFreer::GetInstance()->Free(&vectorOldForce, dimension);
+      MallocerFreer::GetInstance()->Free(&matrixStep, molecule.GetNumberAtoms(), CartesianType_end);
+      MallocerFreer::GetInstance()->Free(&matrixDisplacement, molecule.GetNumberAtoms(), CartesianType_end);
+      MallocerFreer::GetInstance()->Free(&matrixOldCoordinates, molecule.GetNumberAtoms(), CartesianType_end);
+      throw ex;
    }
    catch(MolDSException ex){
       MallocerFreer::GetInstance()->Free(&matrixHessian, dimension, dimension);

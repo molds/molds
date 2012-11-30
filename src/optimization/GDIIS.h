@@ -21,16 +21,23 @@
 #define INCLUDED_GDIIS
 namespace MolDS_optimization{
 
+class GDIISException : public MolDS_base::MolDSException {
+   public:
+   GDIISException(std::string cause)
+      : MolDS_base::MolDSException(boost::format("GDIISException: %s") % cause){
+   }
+};
+
 class GDIIS : public MolDS_base::PrintController{
 public:
    GDIIS(int sizeErrorVector);
 	 ~GDIIS();
-   bool DoGDIIS(double* vectorError,
+   void DoGDIIS(double* vectorError,
                 double* vectorPosition,
-                double const* vectorRefStep);
-   bool DoGDIIS(double* vectorError,
+                double const* vectorRefStep) throw(GDIISException, MolDS_base::MolDSException);
+   void DoGDIIS(double* vectorError,
                 MolDS_base::Molecule& molecule,
-                double const* vectorRefStep);
+                double const* vectorRefStep) throw(GDIISException, MolDS_base::MolDSException);
 
    void DiscardPrevious();
    void DiscardOldest();
@@ -39,9 +46,9 @@ public:
 private:
    void Update(double const* vectorError,
                double const* vectorPosition);
-   bool CalcGDIIS(double*       vectorError,
+   void CalcGDIIS(double*       vectorError,
                   double*       vectorPosition,
-                  double const* vectorRefStep);
+                  double const* vectorRefStep) throw(GDIISException, MolDS_base::MolDSException);
    const int sizeErrorVector;
    const int maxnumErrors;
    double** matrixGDIIS;
@@ -50,6 +57,7 @@ private:
    double MinCosine();
    std::string messageTakingGDIISStep;
    std::string messageSingularGDIISMatrix;
+   std::string messageOnlyOneErrorVector;
    boost::format formatTooSmallLagrangeMultiplier;
    boost::format formatTooLargeGDIISStep;
    boost::format formatWrongDirection;

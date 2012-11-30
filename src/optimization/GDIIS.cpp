@@ -49,6 +49,7 @@ GDIIS::GDIIS(int sizeErrorVector):
    listPositions(),
    messageTakingGDIISStep("Taking GDIIS step.\n"),
    messageSingularGDIISMatrix("Error while solving GDIIS equation. Discarding current data.\n"),
+   messageOnlyOneErrorVector("There is only one error vector.\n"),
    formatTooSmallLagrangeMultiplier("GDIIS: Lagrange Multiplier is too small. (%e)\n"),
    formatTooLargeGDIISStep("GDIIS: GDIIS step is too large. (gdiis:%e, reference:%e)\n"),
    formatWrongDirection("GDIIS: GDIIS step direction is too far from reference step. (cosine: %+f)\n")
@@ -66,11 +67,11 @@ GDIIS::~GDIIS(){
    }
 }
 
-bool GDIIS::DoGDIIS(double* vectorError,
+void GDIIS::DoGDIIS(double* vectorError,
                     double* vectorPosition,
-                    double const* vectorRefStep){
+                    double const* vectorRefStep) throw(GDIISException, MolDS_base::MolDSException){
    this->Update(vectorError, vectorPosition);
-   return this->CalcGDIIS(vectorError, vectorPosition, vectorRefStep);
+   this->CalcGDIIS(vectorError, vectorPosition, vectorRefStep);
 }
 
 void GDIIS::Update(double const* vectorError,
@@ -107,9 +108,9 @@ void GDIIS::Update(double const* vectorError,
    }
 }
 
-bool GDIIS::CalcGDIIS(double* vectorError,
+void GDIIS::CalcGDIIS(double* vectorError,
                       double* vectorPosition,
-                      double const* vectorRefStep){
+                      double const* vectorRefStep) throw(GDIISException, MolDS_base::MolDSException){
    // Prepare GDIIS matrix
    GDIIS::iterator it=listErrors.begin();
    for(int i=0; it!=listErrors.end();i++,it++){
@@ -130,7 +131,7 @@ bool GDIIS::CalcGDIIS(double* vectorError,
 
    // If only one error vector is given, following routine is meaningless.
    if(numErrors <= 1){
-     return false;
+      throw GDIISException(this->messageOnlyOneErrorVector);
    }
 
    double*  vectorCoefs = NULL;
@@ -147,14 +148,14 @@ bool GDIIS::CalcGDIIS(double* vectorError,
          // Assume all errors to be due to singular GDIIS matrix.
          // Remove the newest data to eliminate singularity.
          this->DiscardPrevious();
-         this->OutputLog(messageSingularGDIISMatrix);
+         this->OutputLog(this->messageSingularGDIISMatrix);
          MallocerFreer::GetInstance()->Free(&vectorCoefs, numErrors+1);
-         return false;
+         throw GDIISException(this->messageSingularGDIISMatrix);
       }
 
       // If Lagrange multiplier is too small;
       if(-vectorCoefs[numErrors] < 1e-8){
-         this->OutputLog((formatTooSmallLagrangeMultiplier % -vectorCoefs[numErrors]).str());
+         this->OutputLog((this->formatTooSmallLagrangeMultiplier % -vectorCoefs[numErrors]).str());
          MallocerFreer::GetInstance()->Free(&vectorCoefs, numErrors+1);
          // Recalculate GDIIS step without the oldest data.
          this->DiscardOldest();
@@ -189,7 +190,7 @@ bool GDIIS::CalcGDIIS(double* vectorError,
             vectorError[i]    = listErrors.back()[i];
             vectorPosition[i] = listPositions.back()[i];
          }
-         this->OutputLog((formatTooLargeGDIISStep % sqrt(normSquaregdiis) % sqrt(normSquareref)).str());
+         this->OutputLog((this->formatTooLargeGDIISStep % sqrt(normSquaregdiis) % sqrt(normSquareref)).str());
          MallocerFreer::GetInstance()->Free(&vectorCoefs, numErrors+1);
          // and recalculate GDIIS step without the oldest data
          this->DiscardOldest();
@@ -210,16 +211,19 @@ bool GDIIS::CalcGDIIS(double* vectorError,
          return CalcGDIIS(vectorError,vectorPosition,vectorRefStep);
       }
    }
+   catch(GDIISException ex){
+      MallocerFreer::GetInstance()->Free(&vectorCoefs, numErrors+1);
+      throw ex;
+   }
    catch(MolDSException ex){
       MallocerFreer::GetInstance()->Free(&vectorCoefs, numErrors+1);
       throw ex;
    }
    MallocerFreer::GetInstance()->Free(&vectorCoefs, numErrors+1);
    this->OutputLog(messageTakingGDIISStep);
-   return true;
 }
 
-bool GDIIS::DoGDIIS(double *vectorError, Molecule& molecule, double const* vectorRefStep){
+void GDIIS::DoGDIIS(double *vectorError, Molecule& molecule, double const* vectorRefStep) throw(GDIISException, MolDS_base::MolDSException){
    double** matrixPosition = NULL;
    try{
       MallocerFreer::GetInstance()->Malloc(&matrixPosition, molecule.GetNumberAtoms(), CartesianType_end);
@@ -229,7 +233,8 @@ bool GDIIS::DoGDIIS(double *vectorError, Molecule& molecule, double const* vecto
             matrixPosition[i][j] = atom->GetXyz()[j];
          }
       }
-      if(this->DoGDIIS(vectorError,&matrixPosition[0][0],vectorRefStep)){
+      try{
+         this->DoGDIIS(vectorError,&matrixPosition[0][0],vectorRefStep);
          for(int i=0;i<molecule.GetNumberAtoms();i++){
             Atom* atom = molecule.GetAtom(i);
             for(int j=0;j<CartesianType_end;j++){
@@ -237,17 +242,20 @@ bool GDIIS::DoGDIIS(double *vectorError, Molecule& molecule, double const* vecto
             }
          }
       }
-      else{
+      catch(GDIISException ex){
          MallocerFreer::GetInstance()->Free(&matrixPosition, molecule.GetNumberAtoms(), CartesianType_end);
-         return false;
+         throw ex;
       }
+   }
+   catch(GDIISException ex){
+      MallocerFreer::GetInstance()->Free(&matrixPosition, molecule.GetNumberAtoms(), CartesianType_end);
+      throw ex;
    }
    catch(MolDSException ex){
       MallocerFreer::GetInstance()->Free(&matrixPosition, molecule.GetNumberAtoms(), CartesianType_end);
       throw ex;
    }
    MallocerFreer::GetInstance()->Free(&matrixPosition, molecule.GetNumberAtoms(), CartesianType_end);
-   return true;
 }
 
 double GDIIS::MinCosine(){
