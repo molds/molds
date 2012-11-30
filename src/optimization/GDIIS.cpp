@@ -128,13 +128,15 @@ bool GDIIS::CalcGDIIS(double* vectorError,
    }
    matrixGDIIS[numErrors][numErrors] = 0;
 
+   // If only one error vector is given, following routine is meaningless.
+   if(numErrors <= 1){
+     return false;
+   }
+
    double*  vectorCoefs = NULL;
    try{
       // Solve DIIS equation
       MallocerFreer::GetInstance()->Malloc(&vectorCoefs, numErrors+1);
-      for(int i=0;i<numErrors;i++){
-         vectorCoefs[i]=0.0;
-      }
       vectorCoefs[numErrors]=1.0;
       try{
          MolDS_wrappers::Lapack::GetInstance()->Dsysv(matrixGDIIS,
@@ -146,12 +148,6 @@ bool GDIIS::CalcGDIIS(double* vectorError,
          // Remove the newest data to eliminate singularity.
          this->DiscardPrevious();
          this->OutputLog(messageSingularGDIISMatrix);
-         MallocerFreer::GetInstance()->Free(&vectorCoefs, numErrors+1);
-         return false;
-      }
-
-      // If only one error vector is given, following routine is meaningless.
-      if(numErrors <= 1){
          MallocerFreer::GetInstance()->Free(&vectorCoefs, numErrors+1);
          return false;
       }
@@ -177,30 +173,30 @@ bool GDIIS::CalcGDIIS(double* vectorError,
 
       // Calculate cosine of the angle between GDIIS step and vectorRefStep
       // and lengths of the vectors.
-      double innerprod = 0, norm2gdiis = 0, norm2ref = 0;
+      double innerprod = 0, normSquaregdiis = 0, normSquareref = 0;
       for(int i=0;i<this->sizeErrorVector;i++){
          double diff = vectorPosition[i] - listPositions.back()[i];
          innerprod  += diff * vectorRefStep[i];
-         norm2gdiis += diff * diff;
-         norm2ref   += vectorRefStep[i] * vectorRefStep[i];
+         normSquaregdiis += diff * diff;
+         normSquareref   += vectorRefStep[i] * vectorRefStep[i];
       }
-      double cosine = innerprod/sqrt(norm2gdiis*norm2ref);
+      double cosine = innerprod/sqrt(normSquaregdiis*normSquareref);
 
       // If length of the GDIIS step is larger than reference step * 10
-      if(norm2gdiis >= norm2ref * 100){
+      if(normSquaregdiis >= normSquareref * 100){
          // Rollback vectorPosition and vectorError to original value
          for(int i=0; i<this->sizeErrorVector; i++){
             vectorError[i]    = listErrors.back()[i];
             vectorPosition[i] = listPositions.back()[i];
          }
-         this->OutputLog((formatTooLargeGDIISStep % sqrt(norm2gdiis) % sqrt(norm2ref)).str());
+         this->OutputLog((formatTooLargeGDIISStep % sqrt(normSquaregdiis) % sqrt(normSquareref)).str());
          MallocerFreer::GetInstance()->Free(&vectorCoefs, numErrors+1);
          // and recalculate GDIIS step without the oldest data
          this->DiscardOldest();
          return CalcGDIIS(vectorError,vectorPosition,vectorRefStep);
       }
 
-      // If the calculated cosine value is below the minimum tolerant value
+      // If the calculated cos(theta) on Eq. 8 of [FS_2002] is below the minimum tolerant value
       if(cosine < this->MinCosine()){
          // Rollback vectorPosition and vectorError to original value
          for(int i=0; i<this->sizeErrorVector; i++){
@@ -256,6 +252,7 @@ bool GDIIS::DoGDIIS(double *vectorError, Molecule& molecule, double const* vecto
 
 double GDIIS::MinCosine(){
    static const double inf = std::numeric_limits<double>::infinity();
+   // Taken from [FS_2002], p 12.
    static const double mincos[] = {inf, inf, 0.97, 0.84, 0.71, 0.67, 0.62, 0.56, 0.49, 0.41};
    static const int nummincos = sizeof(mincos)/sizeof(mincos[0]);
    int numErrors = listErrors.size();
