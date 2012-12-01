@@ -26,6 +26,10 @@ class GDIISException : public MolDS_base::MolDSException {
    GDIISException(const std::string& cause)
       : MolDS_base::MolDSException(boost::format("GDIISException: %s") % cause){
    }
+
+   GDIISException(const boost::format& cause)
+      : MolDS_base::MolDSException(boost::format("GDIISException: %s") % cause.str()){
+   }
 };
 
 class GDIIS : public MolDS_base::PrintController{
