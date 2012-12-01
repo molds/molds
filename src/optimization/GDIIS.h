@@ -23,7 +23,7 @@ namespace MolDS_optimization{
 
 class GDIISException : public MolDS_base::MolDSException {
    public:
-   GDIISException(std::string cause)
+   GDIISException(const std::string& cause)
       : MolDS_base::MolDSException(boost::format("GDIISException: %s") % cause){
    }
 };
