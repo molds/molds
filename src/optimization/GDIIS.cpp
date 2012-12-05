@@ -50,6 +50,7 @@ GDIIS::GDIIS(int sizeErrorVector):
    messageTakingGDIISStep("Taking GDIIS step.\n"),
    messageSingularGDIISMatrix("Error while solving GDIIS equation. Discarding current data.\n"),
    messageOnlyOneErrorVector("There is only one error vector.\n"),
+   messageRecalcGDIISStep("Recalculate GDIIS step without the oldest error vector.\n"),
    formatTooSmallLagrangeMultiplier("GDIIS: Lagrange Multiplier is too small. (%e)\n"),
    formatTooLargeGDIISStep("GDIIS: GDIIS step is too large. (gdiis:%e, reference:%e)\n"),
    formatWrongDirection("GDIIS: GDIIS step direction is too far from reference step. (cosine: %+f)\n")
@@ -131,6 +132,7 @@ void GDIIS::CalcGDIIS(double* vectorError,
 
    // If only one error vector is given, following routine is meaningless.
    if(numErrors <= 1){
+      this->OutputLog(messageOnlyOneErrorVector);
       throw GDIISException(this->messageOnlyOneErrorVector);
    }
 
@@ -158,8 +160,7 @@ void GDIIS::CalcGDIIS(double* vectorError,
          this->OutputLog((this->formatTooSmallLagrangeMultiplier % -vectorCoefs[numErrors]).str());
          MallocerFreer::GetInstance()->Free(&vectorCoefs, numErrors+1);
          // Recalculate GDIIS step without the oldest data.
-         this->DiscardOldest();
-         return CalcGDIIS(vectorError,vectorPosition,vectorRefStep);
+         return this->RecalcGDIIS(vectorError,vectorPosition,vectorRefStep);
       }
 
       // Interpolate error vectors and positions
@@ -193,8 +194,7 @@ void GDIIS::CalcGDIIS(double* vectorError,
          this->OutputLog((this->formatTooLargeGDIISStep % sqrt(normSquaregdiis) % sqrt(normSquareref)).str());
          MallocerFreer::GetInstance()->Free(&vectorCoefs, numErrors+1);
          // and recalculate GDIIS step without the oldest data
-         this->DiscardOldest();
-         return CalcGDIIS(vectorError,vectorPosition,vectorRefStep);
+         return this->RecalcGDIIS(vectorError,vectorPosition,vectorRefStep);
       }
 
       // If the calculated cos(theta) on Eq. 8 of [FS_2002] is below the minimum tolerant value
@@ -207,8 +207,7 @@ void GDIIS::CalcGDIIS(double* vectorError,
          this->OutputLog((formatWrongDirection % cosine).str());
          MallocerFreer::GetInstance()->Free(&vectorCoefs, numErrors+1);
          // and recalculate GDIIS step without the oldest data
-         this->DiscardOldest();
-         return CalcGDIIS(vectorError,vectorPosition,vectorRefStep);
+         return this->RecalcGDIIS(vectorError,vectorPosition,vectorRefStep);
       }
    }
    catch(GDIISException ex){
@@ -221,6 +220,30 @@ void GDIIS::CalcGDIIS(double* vectorError,
    }
    MallocerFreer::GetInstance()->Free(&vectorCoefs, numErrors+1);
    this->OutputLog(messageTakingGDIISStep);
+}
+
+void GDIIS::RecalcGDIIS(double* vectorError,
+                        double* vectorPosition,
+                        double const* vectorRefStep) throw(GDIISException, MolDS_base::MolDSException){
+   double *vectorErrorOldest    = NULL;
+   double *vectorPositionOldest = NULL;
+
+   this->PopOldest(&vectorErrorOldest, &vectorPositionOldest);
+
+   this->OutputLog(messageRecalcGDIISStep);
+
+   try{
+      this->CalcGDIIS(vectorError, vectorPosition, vectorRefStep);
+   }
+   catch(GDIISException ex){
+      this->PushOldest(vectorErrorOldest, vectorPositionOldest);
+      throw ex;
+   }
+   catch(MolDSException ex){
+      MallocerFreer::GetInstance()->Free(&vectorErrorOldest,   this->sizeErrorVector);
+      MallocerFreer::GetInstance()->Free(&vectorPositionOldest, this->sizeErrorVector);
+      throw ex;
+   }
 }
 
 void GDIIS::DoGDIIS(double *vectorError, Molecule& molecule, double const* vectorRefStep) throw(GDIISException, MolDS_base::MolDSException){

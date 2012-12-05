@@ -53,6 +53,9 @@ private:
    void CalcGDIIS(double*       vectorError,
                   double*       vectorPosition,
                   double const* vectorRefStep) throw(GDIISException, MolDS_base::MolDSException);
+   void RecalcGDIIS(double*       vectorError,
+                    double*       vectorPosition,
+                    double const* vectorRefStep) throw(GDIISException, MolDS_base::MolDSException);
    void PopOldest(double** vectorError, double** vectorPosition);
    void PushOldest(double* vectorError, double* vectorPosition);
    const int sizeErrorVector;
@@ -64,6 +67,7 @@ private:
    std::string messageTakingGDIISStep;
    std::string messageSingularGDIISMatrix;
    std::string messageOnlyOneErrorVector;
+   std::string messageRecalcGDIISStep;
    boost::format formatTooSmallLagrangeMultiplier;
    boost::format formatTooLargeGDIISStep;
    boost::format formatWrongDirection;
