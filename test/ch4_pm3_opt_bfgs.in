@@ -5,7 +5,7 @@ THEORY_END
 
 SCF
  max_iter 50
- rms_density 0.000001
+ rms_density 0.00000001
  damping_thresh 1.0
  damping_weight 0.0
  diis_num_error_vect 5
@@ -17,16 +17,16 @@ OPTIMIZATION
    method bfgs
    total_steps 50
    electronic_state 0
-   max_gradient 0.00045
-   rms_gradient 0.00030
+   max_gradient 0.000045
+   rms_gradient 0.000030
 OPTIMIZATION_END
 
 // methane
 GEOMETRY
 C 0 0 0
-H 1 1 1.1
-H -1 -1 1
-H -1 1 -1
-H 1 -1 -1
+H 0.63 0.64 0.0.65
+H -0.66 -0.67 0.68
+H -0.69 0.70 -0.71
+H 0.72 -0.73 -0.74
 GEOMETRY_END
 
