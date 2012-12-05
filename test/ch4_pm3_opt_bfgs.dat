@@ -1,6 +1,6 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2012/12/5(Wed.) 1:49:10  <<<<<
+     >>>>>  Welcome to the MolDS world at 2012/12/5(Wed.) 1:54:43  <<<<<
 
 
 **********  START: Parse input  **********
@@ -56,23 +56,23 @@ h | -0.66 | -0.67 | 0.68 | h | -0.69 | 0.70 | -0.71 | h | 0.72 |
 
 **********  START: Geometry optimization  **********
 **********  START: PM3/PDDG-SCF  **********
-SCF iter=0: RMS density=3.999999999999998
+SCF iter=0: RMS density=3.999999999999997
 SCF iter=1: RMS density=1.443193608401312
 SCF iter=2: RMS density=0.804378753116487
 SCF iter=3: RMS density=0.448595669320450
 SCF iter=4: RMS density=0.249793279327450
 SCF iter=5: RMS density=0.138960929276626
-SCF iter=6: RMS density=0.002285750769430
-SCF iter=7: RMS density=0.000681104732383
-SCF iter=8: RMS density=0.000228471017536
-SCF iter=9: RMS density=0.000045524678946
-SCF iter=10: RMS density=0.000009539390616
+SCF iter=6: RMS density=0.002285750769436
+SCF iter=7: RMS density=0.000681104732446
+SCF iter=8: RMS density=0.000228471017495
+SCF iter=9: RMS density=0.000045524678950
+SCF iter=10: RMS density=0.000009539390614
 SCF iter=11: RMS density=0.000001044195142
-SCF iter=12: RMS density=0.000000315868469
-SCF iter=13: RMS density=0.000000065306052
-SCF iter=14: RMS density=0.000000025695806
-SCF iter=15: RMS density=0.000000013427363
-SCF iter=16: RMS density=0.000000007099385
+SCF iter=12: RMS density=0.000000315868468
+SCF iter=13: RMS density=0.000000065306051
+SCF iter=14: RMS density=0.000000025695805
+SCF iter=15: RMS density=0.000000013427362
+SCF iter=16: RMS density=0.000000007099384
 
 
 
@@ -112,7 +112,7 @@ SCF iter=16: RMS density=0.000000007099385
 	Mulliken charge:	3	H	1.000000e+00	6.297593e-02
 	Mulliken charge:	4	H	1.000000e+00	6.114413e-02
 
-	Elapsed time(omp) for the SCF = 0.011665[s].
+	Elapsed time(omp) for the SCF = 0.032612[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
@@ -200,7 +200,7 @@ actual/expected energy change = 1.073409
 ==========  START: BFGS step 2
 
 Eigenvalues of the raw Hessian:
--2.123562e-13,	4.029997e-01,	5.808629e-01,	8.677897e-01,	9.006654e-01,	1.180007e+00
+2.827599e-16,	4.029997e-01,	5.808629e-01,	8.677897e-01,	9.006654e-01,	1.180007e+00
 1.374632e+00,	1.624752e+00,	1.853612e+00,	1.000000e+03,	1.000000e+03,	1.000000e+03
 1.000000e+03,	1.000000e+03,	1.000000e+03
 Eigenvalues of the level shifted hessian:
@@ -2723,12 +2723,12 @@ GDIIS: GDIIS step direction is too far from reference step. (cosine: +0.892801)
 	Mulliken charge:	4	H	1.000000e+00	8.646027e-02
 
 
-actual energy change          = -8.591234e-08
+actual energy change          = -8.591233e-08
 expected energy change        = -5.578913e-08
 actual/expected energy change = 1.539947
 
 	====== Optimization Logs ======
-	Energy difference:  -8.591234e-08 [a.u.]
+	Energy difference:  -8.591233e-08 [a.u.]
 	Max gradient:  3.186763e-04 [a.u.]
 	Rms gradient:  1.464965e-04 [a.u.]
 
@@ -3172,12 +3172,12 @@ Trust radius is 0.300000
 	Mulliken charge:	4	H	1.000000e+00	8.656247e-02
 
 
-actual energy change          = -1.498222e-08
+actual energy change          = -1.498223e-08
 expected energy change        = -5.400968e-08
 actual/expected energy change = 1.098312
 
 	====== Optimization Logs ======
-	Energy difference:  -1.498222e-08 [a.u.]
+	Energy difference:  -1.498223e-08 [a.u.]
 	Max gradient:  1.483236e-04 [a.u.]
 	Rms gradient:  6.056152e-05 [a.u.]
 
@@ -3247,12 +3247,12 @@ GDIIS: GDIIS step direction is too far from reference step. (cosine: +0.891449)
 	Mulliken charge:	4	H	1.000000e+00	8.657095e-02
 
 
-actual energy change          = -2.288786e-08
+actual energy change          = -2.288785e-08
 expected energy change        = -1.563831e-08
-actual/expected energy change = 1.463577
+actual/expected energy change = 1.463576
 
 	====== Optimization Logs ======
-	Energy difference:  -2.288786e-08 [a.u.]
+	Energy difference:  -2.288785e-08 [a.u.]
 	Max gradient:  1.536038e-04 [a.u.]
 	Rms gradient:  5.748803e-05 [a.u.]
 
@@ -3321,12 +3321,12 @@ GDIIS: GDIIS step direction is too far from reference step. (cosine: +0.552904)
 	Mulliken charge:	4	H	1.000000e+00	8.659365e-02
 
 
-actual energy change          = -2.056645e-08
+actual energy change          = -2.056646e-08
 expected energy change        = -1.491303e-08
-actual/expected energy change = 1.379093
+actual/expected energy change = 1.379094
 
 	====== Optimization Logs ======
-	Energy difference:  -2.056645e-08 [a.u.]
+	Energy difference:  -2.056646e-08 [a.u.]
 	Max gradient:  8.815750e-05 [a.u.]
 	Rms gradient:  3.868072e-05 [a.u.]
 
@@ -3395,12 +3395,12 @@ GDIIS: GDIIS step direction is too far from reference step. (cosine: -0.754735)
 	Mulliken charge:	4	H	1.000000e+00	8.661629e-02
 
 
-actual energy change          = -9.918311e-09
+actual energy change          = -9.918300e-09
 expected energy change        = -7.711781e-09
-actual/expected energy change = 1.286125
+actual/expected energy change = 1.286123
 
 	====== Optimization Logs ======
-	Energy difference:  -9.918311e-09 [a.u.]
+	Energy difference:  -9.918300e-09 [a.u.]
 	Max gradient:  4.864059e-05 [a.u.]
 	Rms gradient:  2.862999e-05 [a.u.]
 
@@ -3469,12 +3469,12 @@ GDIIS: GDIIS step direction is too far from reference step. (cosine: -0.927979)
 	Mulliken charge:	4	H	1.000000e+00	8.662615e-02
 
 
-actual energy change          = -3.154518e-09
+actual energy change          = -3.154526e-09
 expected energy change        = -2.254034e-09
-actual/expected energy change = 1.399499
+actual/expected energy change = 1.399502
 
 	====== Optimization Logs ======
-	Energy difference:  -3.154518e-09 [a.u.]
+	Energy difference:  -3.154526e-09 [a.u.]
 	Max gradient:  5.264624e-05 [a.u.]
 	Rms gradient:  2.918493e-05 [a.u.]
 
@@ -3550,7 +3550,7 @@ Trust radius is 0.300000
 
 actual energy change          = -2.758878e-09
 expected energy change        = -1.648616e-09
-actual/expected energy change = 1.627999
+actual/expected energy change = 1.628000
 
 	====== Optimization Logs ======
 	Energy difference:  -2.758878e-09 [a.u.]
@@ -3623,12 +3623,12 @@ GDIIS: Lagrange Multiplier is too small. (8.054538e-09)
 	Mulliken charge:	4	H	1.000000e+00	8.664236e-02
 
 
-actual energy change          = -6.089578e-09
+actual energy change          = -6.089567e-09
 expected energy change        = -3.905671e-09
-actual/expected energy change = 1.559163
+actual/expected energy change = 1.559160
 
 	====== Optimization Logs ======
-	Energy difference:  -6.089578e-09 [a.u.]
+	Energy difference:  -6.089567e-09 [a.u.]
 	Max gradient:  4.747890e-05 [a.u.]
 	Rms gradient:  2.544596e-05 [a.u.]
 
@@ -3697,12 +3697,12 @@ GDIIS: Lagrange Multiplier is too small. (6.324825e-09)
 	Mulliken charge:	4	H	1.000000e+00	8.665632e-02
 
 
-actual energy change          = -1.055158e-08
+actual energy change          = -1.055159e-08
 expected energy change        = -6.975067e-09
-actual/expected energy change = 1.512757
+actual/expected energy change = 1.512758
 
 	====== Optimization Logs ======
-	Energy difference:  -1.055158e-08 [a.u.]
+	Energy difference:  -1.055159e-08 [a.u.]
 	Max gradient:  4.365823e-05 [a.u.]
 	Rms gradient:  2.170897e-05 [a.u.]
 
@@ -3712,14 +3712,14 @@ actual/expected energy change = 1.512757
 
 **********  DONE: Geometry optimization  **********
 	Summary for memory usage:
-		Max Heap: 0.179208[MB].
+		Max Heap: 0.178968[MB].
 		Current Heap(Leaked): 0.000000[MB].
 
 
      >>>>>  The MolDS finished normally!  <<<<<
      >>>>>  CPU time: 5.4[s].  <<<<<
      >>>>>  Elapsed time: 1[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 1.09496[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 1.08518[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

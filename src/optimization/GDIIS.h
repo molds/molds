@@ -53,6 +53,8 @@ private:
    void CalcGDIIS(double*       vectorError,
                   double*       vectorPosition,
                   double const* vectorRefStep) throw(GDIISException, MolDS_base::MolDSException);
+   void PopOldest(double** vectorError, double** vectorPosition);
+   void PushOldest(double* vectorError, double* vectorPosition);
    const int sizeErrorVector;
    const int maxnumErrors;
    double** matrixGDIIS;

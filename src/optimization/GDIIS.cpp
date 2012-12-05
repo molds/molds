@@ -268,22 +268,33 @@ double GDIIS::MinCosine(){
 }
 
 void GDIIS::DiscardPrevious(){
-   if(listErrors.size()==0) return;
+   if(this->listErrors.size()==0) return;
    double* tmp = listErrors.back();
    MallocerFreer::GetInstance()->Free(&tmp, this->sizeErrorVector);
-   listErrors.pop_back();
+   this->listErrors.pop_back();
    tmp = listPositions.back();
    MallocerFreer::GetInstance()->Free(&tmp, this->sizeErrorVector);
-   listPositions.pop_back();
+   this->listPositions.pop_back();
 }
 
+void GDIIS::PopOldest(double** vectorError, double** vectorPosition){
+   if(this->listErrors.size()==0) return;
+   *vectorError    = listErrors.front();
+   *vectorPosition = listPositions.front();
+   this->listErrors.pop_front();
+   this->listPositions.pop_front();
+}
+
+void GDIIS::PushOldest(double* vectorError, double* vectorPosition){
+   this->listErrors.push_front(vectorError);
+   this->listPositions.push_front(vectorPosition);
+}
 
 void GDIIS::DiscardOldest(){
-   if(listErrors.size()==0) return;
-   double *tmp = listErrors.front();
-   MallocerFreer::GetInstance()->Free(&tmp, sizeErrorVector);
-   listErrors.pop_front();
-   tmp = listPositions.front();
-   MallocerFreer::GetInstance()->Free(&tmp, sizeErrorVector);
-   listPositions.pop_front();
+   if(this->listErrors.size()==0) return;
+   double *vectorErrorOldest    = NULL;
+   double *vectorPositionOldest = NULL;
+   this->PopOldest(&vectorErrorOldest, &vectorPositionOldest);
+   MallocerFreer::GetInstance()->Free(&vectorErrorOldest,    sizeErrorVector);
+   MallocerFreer::GetInstance()->Free(&vectorPositionOldest, sizeErrorVector);
 }
