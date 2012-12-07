@@ -16,13 +16,13 @@
 # along with MolDS.  If not, see <http://www.gnu.org/licenses/>.
 
 AC_PREREQ([2.60])
-AC_INIT([MolDS], [0.1], [molds-dev@lists.sourceforge.jp])
+AC_INIT([MolDS], [0.2], [molds-dev@lists.sourceforge.jp])
 
 dnl Check if pwd is source directory
 AS_IF([test -x ./configure],
       AC_MSG_FAILURE([Don't execute configure script in source directory!]))
 
-AM_INIT_AUTOMAKE([MolDS], [0.1])
+AM_INIT_AUTOMAKE([MolDS], [0.2])
 AC_CONFIG_SRCDIR([Main.cpp])
 AC_CONFIG_HEADERS([config.h])
 
