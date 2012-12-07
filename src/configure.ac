@@ -22,7 +22,7 @@ dnl Check if pwd is source directory
 AS_IF([test -x ./configure],
       AC_MSG_FAILURE([Don't execute configure script in source directory!]))
 
-AM_INIT_AUTOMAKE([MolDS], [0.2])
+AM_INIT_AUTOMAKE([MolDS], [0.2], [no-define])
 AC_CONFIG_SRCDIR([Main.cpp])
 AC_CONFIG_HEADERS([config.h])
 
