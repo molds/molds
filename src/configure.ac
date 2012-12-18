@@ -138,7 +138,7 @@ AS_IF([test x$molds_lapack_cinterface_found != xyes],
 
 AS_IF([test x$molds_lapack_cinterface_found != xyes],
       [AC_CHECK_FUNCS([LAPACKE_dgetrf_work LAPACKE_dgetrs_work LAPACKE_dsyevd_work LAPACKE_dsysv_work],
-                      [molds_lapack_cinterface_found=yes]
+                      [molds_lapack_cinterface_found=yes],
                       [molds_lapack_cinterface_found=no;break])])
 
 AS_IF([test x$molds_lapack_cinterface_found != xyes],
