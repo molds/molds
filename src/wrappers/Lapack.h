@@ -19,8 +19,13 @@
 #ifndef INCLUDED_LAPACK
 #define INCLUDED_LAPACK
 namespace MolDS_wrappers{
-//typedef intptr_t molds_lapack_int;
-typedef intptr_t molds_lapack_int;
+#if SIZEOF_LAPACKINT==64
+typedef int64_t molds_lapack_int;
+#elif SIZEOF_LAPACKINT==32
+typedef int32_t molds_lapack_int;
+#else
+#error SIZEOF_BLASINT is undefined or invalid!
+#endif
 // Lapacke is singleton
 class Lapack: public MolDS_base::PrintController, private MolDS_base::Uncopyable{
 public:
