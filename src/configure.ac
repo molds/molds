@@ -90,7 +90,7 @@ AC_ARG_WITH([openblas],
                             [AC_MSG_NOTICE([Using OpenBLAS under `$withval'.])
                              BLAS_LIBS=-lopenblas
                              OPENBLAS_ROOT=$withval
-                             CPPFLAGS="$CPPFLAGS -I$OPENBLAS_ROOT/lib"
+                             CPPFLAGS="$CPPFLAGS -I$OPENBLAS_ROOT/include"
                              LDFLAGS="$LDFLAGS -L$OPENBLAS_ROOT/lib"],
                             [AC_MSG_FAILURE([Cannot find directory `$withval'!])])])],
             [OPENBLAS_ROOT=])
