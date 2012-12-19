@@ -29,6 +29,7 @@
 #include<omp.h>
 #include<boost/shared_ptr.hpp>
 #include<boost/random.hpp>
+#include"config.h"
 #include"PrintController.h"
 #include"MolDSException.h"
 #include"Uncopyable.h"

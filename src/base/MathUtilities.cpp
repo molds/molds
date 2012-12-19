@@ -26,6 +26,7 @@
 #include"PrintController.h"
 #include"MolDSException.h"
 #include"Uncopyable.h"
+#include"config.h"
 #include"../wrappers/Lapack.h"
 #include"Enums.h"
 #include"MathUtilities.h"
