@@ -143,7 +143,7 @@ AS_IF([test x$molds_lapack_cinterface_found != xyes],
 
 dnl Check size of BLAS int
 AC_LANG_PUSH([C])
-AC_CACHE_CHECK([whether BLAS accepts 64bit integer],[molds_cv_blas_accepts_int64],
+AC_CACHE_CHECK([size of integer variable used in BLAS library],[molds_cv_sizeof_blasint],
                [AC_RUN_IFELSE([AC_LANG_PROGRAM([
                                                 #include <stdint.h>
                                                 #ifdef HAVE_DAXPY
@@ -167,9 +167,10 @@ AC_CACHE_CHECK([whether BLAS accepts 64bit integer],[molds_cv_blas_accepts_int64
                                                 #endif
                                                 return (int64_t)y == 0x80000000 ? 0 : 1;
                                                ])
-                              ],[molds_cv_blas_accepts_int64=yes], [molds_cv_blas_accepts_int64=no])
+                              ],[molds_cv_sizeof_blasint=64], [molds_cv_sizeof_blasint=32])
                ])
 AC_LANG_POP([C])
+AC_DEFINE_UNQUOTED([SIZEOF_BLASINT], [($molds_cv_sizeof_blasint)], [The size of integer variables used by BLAS library])
 
 dnl Boost
 AX_BOOST_BASE([1.48],,[AC_MSG_FAILURE([boost library is too old!])])
