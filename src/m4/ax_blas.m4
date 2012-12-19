@@ -36,6 +36,7 @@
 # LICENSE
 #
 #   Copyright (c) 2008 Steven G. Johnson <stevenj@alum.mit.edu>
+#   Copyright (c) 2012 Katsuhiko Nishimra <ktns.87@gmail.com>
 #
 #   This program is free software: you can redistribute it and/or modify it
 #   under the terms of the GNU General Public License as published by the
@@ -141,9 +142,9 @@ if test $ax_blas_ok = no; then
 	if test x"$ac_cv_fc_compiler_gnu" = xyes; then
 		# 64 bit
 		if test $host_cpu = x86_64; then
-			AC_CHECK_LIB(mkl_gf_lp64, $sgemm,
-			[ax_blas_ok=yes;BLAS_LIBS="-lmkl_gf_lp64 -lmkl_sequential -lmkl_core -lpthread"],,
-			[-lmkl_gf_lp64 -lmkl_sequential -lmkl_core -lpthread])
+			AC_CHECK_LIB(mkl_gf_ilp64, $sgemm,
+			[ax_blas_ok=yes;BLAS_LIBS="-lmkl_gf_ilp64 -lmkl_sequential -lmkl_core -lpthread"],,
+			[-lmkl_gf_ilp64 -lmkl_sequential -lmkl_core -lpthread])
 		# 32 bit
 		elif test $host_cpu = i686; then
 			AC_CHECK_LIB(mkl_gf, $sgemm,
@@ -154,9 +155,9 @@ if test $ax_blas_ok = no; then
 	else
 		# 64-bit
 		if test $host_cpu = x86_64; then
-			AC_CHECK_LIB(mkl_intel_lp64, $sgemm,
-				[ax_blas_ok=yes;BLAS_LIBS="-lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread"],,
-				[-lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread])
+			AC_CHECK_LIB(mkl_intel_ilp64, $sgemm,
+				[ax_blas_ok=yes;BLAS_LIBS="-lmkl_intel_ilp64 -lmkl_sequential -lmkl_core -lpthread"],,
+				[-lmkl_intel_ilp64 -lmkl_sequential -lmkl_core -lpthread])
 		# 32-bit
 		elif test $host_cpu = i686; then
 			AC_CHECK_LIB(mkl_intel, $sgemm,
