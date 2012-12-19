@@ -97,9 +97,6 @@
 /* Define to 1 if you have the `iomp5' library (-liomp5). */
 #undef HAVE_LIBIOMP5
 
-/* Define to 1 if you have the `lapacke' library (-llapacke). */
-#undef HAVE_LIBLAPACKE
-
 /* Define to 1 if you have the `pthread' library (-lpthread). */
 #undef HAVE_LIBPTHREAD
 
@@ -151,6 +148,9 @@
 /* Define to 1 if the system has the type `_Bool'. */
 #undef HAVE__BOOL
 
+/* Define this macro if you use 64bit int in mkl libarary */
+#undef MKL_INT
+
 /* Define to the address where bug reports for this package should be sent. */
 #undef PACKAGE_BUGREPORT
 
@@ -168,6 +168,12 @@
 
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
+
+/* The size of integer variables used by BLAS library */
+#undef SIZEOF_BLASINT
+
+/* The size of integer variables used by LAPACK library */
+#undef SIZEOF_LAPACKINT
 
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS

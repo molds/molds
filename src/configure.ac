@@ -173,7 +173,7 @@ AC_LANG_POP([C])
 AC_DEFINE_UNQUOTED([SIZEOF_BLASINT], [($molds_cv_sizeof_blasint)], [The size of integer variables used by BLAS library])
 
 dnl Size of BLAS int
-AC_DEFINE([SIZEOF_LAPACKINT], [SIZEOF_BLASINT], [The size of integer variables used by LAPACK library]);
+AC_DEFINE([SIZEOF_LAPACKINT], [SIZEOF_BLASINT], [The size of integer variables used by LAPACK library])
 
 dnl Boost
 AX_BOOST_BASE([1.48],,[AC_MSG_FAILURE([boost library is too old!])])
