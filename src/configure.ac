@@ -42,6 +42,7 @@ AS_IF([test -z "$CXXFLAGS"],
              [CXXFLAGS="-g -O0"])])
 
 dnl Checks for programs.
+AC_PROG_CC([icc gcc])
 AC_PROG_CXX([icpc g++])
 AC_PROG_F77([ifort gfortran])
 
@@ -139,6 +140,36 @@ AS_IF([test x$molds_lapack_cinterface_found != xyes],
 
 AS_IF([test x$molds_lapack_cinterface_found != xyes],
       [AC_MSG_FAILURE([Cannot find C interface functions of LAPACK!])])
+
+dnl Check size of BLAS int
+AC_LANG_PUSH([C])
+AC_CACHE_CHECK([whether BLAS accepts 64bit integer],[molds_cv_blas_accepts_int64],
+               [AC_RUN_IFELSE([AC_LANG_PROGRAM([
+                                                #include <stdint.h>
+                                                #ifdef HAVE_DAXPY
+                                                void daxpy(      int64_t*, double*, double*, int64_t*, double*, int64_t*);
+                                                #elif defined(HAVE_CBLAS_DAXPY)
+                                                void cblas_daxpy(int64_t , double , double*, int64_t , double*, int64_t);
+                                                #endif
+                                               ],[
+                                                double alpha = 1,
+                                                       x     = 1,
+                                                       y     = 0;
+                                                int64_t N    = 0x80000000,
+                                                        incx = 0,
+                                                        incy = 0;
+                                                #ifdef HAVE_DAXPY
+                                                daxpy(&N, &alpha, &x, &incx, &y, &incy);
+                                                #elif defined(HAVE_CBLAS_DAXPY)
+                                                cblas_daxpy(N, alpha, &x, incx, &y, incy);
+                                                #else
+                                                #error Cannot find either daxpy or cblas_daxpy!
+                                                #endif
+                                                return (int64_t)y == 0x80000000 ? 0 : 1;
+                                               ])
+                              ],[molds_cv_blas_accepts_int64=yes], [molds_cv_blas_accepts_int64=no])
+               ])
+AC_LANG_POP([C])
 
 dnl Boost
 AX_BOOST_BASE([1.48],,[AC_MSG_FAILURE([boost library is too old!])])
