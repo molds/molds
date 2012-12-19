@@ -19,8 +19,13 @@
 #ifndef INCLUDED_BLAS
 #define INCLUDED_BLAS
 namespace MolDS_wrappers{
-//typedef intptr_t molds_blas_int;
-typedef intptr_t molds_blas_int;
+#if SIZEOF_BLASINT==64
+typedef int64_t molds_blas_int;
+#elif SIZEOF_BLASINT==32
+typedef int32_t molds_blas_int;
+#else
+#error SIZEOF_BLASINT is undefined or invalid!
+#endif
 // Blas is singleton
 class Blas: public MolDS_base::PrintController, private MolDS_base::Uncopyable{
 public:
