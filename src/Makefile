@@ -48,4 +48,4 @@ MolDS.out: build/MolDS
 	cp $< $@
 
 clean:
-	rm -rf build
+	rm -rf build MolDS.out
