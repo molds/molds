@@ -143,8 +143,8 @@ void CalcRotatingMatrix(double matrix[][3], double sita, CartesianType cartesian
 // calculate determinant of the matrix
 double GetDeterminant(double** matrix, int dim){
    double determinant=1.0;
-   intptr_t* ipiv=NULL;
-   MallocerFreer::GetInstance()->Malloc<intptr_t>(&ipiv, dim);
+   MolDS_wrappers::molds_lapack_int* ipiv=NULL;
+   MallocerFreer::GetInstance()->Malloc<MolDS_wrappers::molds_lapack_int>(&ipiv, dim);
    MolDS_wrappers::Lapack::GetInstance()->Dgetrf(matrix, ipiv, dim, dim);
    for(int i=0; i<dim; i++){
       determinant*=matrix[i][i];
@@ -152,7 +152,7 @@ double GetDeterminant(double** matrix, int dim){
          determinant *= -1.0;
       }
    }
-   MallocerFreer::GetInstance()->Free<intptr_t>(&ipiv, dim);
+   MallocerFreer::GetInstance()->Free<MolDS_wrappers::molds_lapack_int>(&ipiv, dim);
    return determinant;
 }
 }
