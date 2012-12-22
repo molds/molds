@@ -1,5 +1,6 @@
 //************************************************************************//
 // Copyright (C) 2011-2012 Mikiya Fujii                                   // 
+// Copyright (C) 2012-2012 Katsuhiko Nishimra                             // 
 //                                                                        // 
 // This file is part of MolDS.                                            // 
 //                                                                        // 
@@ -61,6 +62,7 @@ Parameters::Parameters(){
    this->indecesMOPlot           = NULL;
    this->elecIndecesHolePlot     = NULL;
    this->elecIndecesParticlePlot = NULL;
+   this->electronicStateIndecesMullikenCIS = NULL;
 }
 
 Parameters::~Parameters(){
@@ -82,6 +84,11 @@ Parameters::~Parameters(){
       delete this->elecIndecesParticlePlot;
       this->elecIndecesParticlePlot = NULL;
       //this->OutputLog("elecIndecesParticlePlot deleted\n");
+   }
+   if(this->electronicStateIndecesMullikenCIS != NULL){
+      delete this->electronicStateIndecesMullikenCIS;
+      this->electronicStateIndecesMullikenCIS= NULL;
+      //this->OutputLog("electronicStateIndecesMullikenCIS deleted\n");
    }
 }
 
@@ -211,6 +218,8 @@ void Parameters::SetMessages(){
       = "Error in base::Parameters::GetIndecesHolePlot: elecIndecesHolePlot is NULL.\n";
    this->errorMessageGetIndecesParticlePlotNull
       = "Error in base::Parameters::GetIndecesParticlePlot: elecIndecesParticlePlot is NULL.\n";
+   this->errorMessageGetElectronicStateIndecesMullikenCISNull
+      = "Error in base::Parameters::GetElectronicStateIndecesMullikenCIS: electronicStateIndecesMullikenCIS is NULL.\n";
 }
 
 SimulationType Parameters::GetCurrentSimulation() const{
@@ -673,6 +682,27 @@ bool Parameters::RequiresAllTransitionDipoleMomentsCIS() const{
 
 void Parameters::SetRequiresAllTransitionDipoleMomentsCIS(bool requiresAllTransitionDipoleMomentsCIS){
    this->requiresAllTransitionDipoleMomentsCIS = requiresAllTransitionDipoleMomentsCIS;
+}
+
+vector<int>* Parameters::GetElectronicStateIndecesMullikenCIS() const{
+   if(this->electronicStateIndecesMullikenCIS==NULL){
+      stringstream ss;
+      ss << this->errorMessageGetElectronicStateIndecesMullikenCISNull; 
+      throw MolDSException(ss.str());
+   }
+   return this->electronicStateIndecesMullikenCIS;
+}
+
+void Parameters::AddElectronicStateIndexMullikenCIS(int electronicStateIndex){
+   if(this->electronicStateIndecesMullikenCIS==NULL){
+      this->electronicStateIndecesMullikenCIS = new vector<int>;
+   }
+   this->electronicStateIndecesMullikenCIS->push_back(electronicStateIndex);
+}
+
+bool Parameters::RequiresMullikenCIS() const{
+   return (this->electronicStateIndecesMullikenCIS!=NULL && 
+           0<this->electronicStateIndecesMullikenCIS->size());
 }
 
 // methods for Memory
