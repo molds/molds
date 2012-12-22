@@ -28,10 +28,17 @@
 #if defined(HAVE_MKL_H)
 #include"mkl.h"
 #elif defined(HAVE_LAPACKE_H)
-#if ( __WORDSIZE == 32 )
-#else
+#if SIZEOF_LAPACKINT==64
 #define HAVE_LAPACK_CONFIG_H
 #define LAPACK_ILP64
+#define lapack_int int64_t
+#elif SIZEOF_LAPACKINT==32
+#define lapack_int int32_t
+#ifdef LAPACK_ILP64
+#undef LAPACK_ILP64
+#endif
+#else
+#error SIZEOF_LAPACKINT is undefined or invalid!
 #endif
 #include"lapacke.h"
 #else
