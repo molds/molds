@@ -181,7 +181,7 @@ AX_BOOST_BASE([1.48],,[AC_MSG_FAILURE([boost library is too old!])])
 CPPFLAGS="$CPPFLAGS $BOOST_CPPFLAGS"
 LDFLAGS="$LDFLAGS -Wl,-rpath=$BOOST_LIBDIR $BOOST_LDFLAGS"
 
-AC_CHECK_HEADERS([boost/random.hpp])
+AC_CHECK_HEADERS([boost/random.hpp],,[AC_MSG_FAILURE([Cannot find boost/random.hpp!])])
 
 dnl Checks for header files.
 AC_CHECK_HEADERS([stdlib.h string.h])
