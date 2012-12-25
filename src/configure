@@ -7775,6 +7775,11 @@ if test "x$ac_cv_header_boost_random_hpp" = xyes; then :
 #define HAVE_BOOST_RANDOM_HPP 1
 _ACEOF
 
+else
+  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+as_fn_error $? "Cannot find boost/random.hpp!
+See \`config.log' for more details" "$LINENO" 5; }
 fi
 
 done
