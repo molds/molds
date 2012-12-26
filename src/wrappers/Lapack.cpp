@@ -28,6 +28,7 @@
 #if defined(HAVE_MKL_H)
 #if SIZEOF_LAPACKINT == 64
 #define MKL_ILP64
+#define MKL_INT int64_t
 #endif
 #include"mkl.h"
 #elif defined(HAVE_LAPACKE_H)
