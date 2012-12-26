@@ -27,6 +27,9 @@
 #include<boost/format.hpp>
 #include"config.h"
 #ifdef HAVE_MKL_H
+#if SIZEOF_BLASINT == 64
+#define MKL_ILP64
+#endif
 #include"mkl.h"
 #elif HAVE_CBLAS_H
 #include"cblas.h"
