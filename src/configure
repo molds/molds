@@ -5907,9 +5907,6 @@ eval ac_res=\$$as_ac_Lib
 $as_echo "$ac_res" >&6; }
 if eval test \"x\$"$as_ac_Lib"\" = x"yes"; then :
   ax_blas_ok=yes;BLAS_LIBS="-lmkl_gf_ilp64 -lmkl_sequential -lmkl_core -lpthread"
-
-$as_echo "#define MKL_INT int64_t" >>confdefs.h
-
 fi
 
 		# 32 bit
@@ -6017,9 +6014,6 @@ eval ac_res=\$$as_ac_Lib
 $as_echo "$ac_res" >&6; }
 if eval test \"x\$"$as_ac_Lib"\" = x"yes"; then :
   ax_blas_ok=yes;BLAS_LIBS="-lmkl_intel_ilp64 -lmkl_sequential -lmkl_core -lpthread"
-
-$as_echo "#define MKL_INT int64_t" >>confdefs.h
-
 fi
 
 		# 32-bit
@@ -6181,7 +6175,7 @@ eval ac_res=\$$as_ac_Lib
 $as_echo "$ac_res" >&6; }
 if eval test \"x\$"$as_ac_Lib"\" = x"yes"; then :
   ax_blas_ok=yes
-											BLAS_LIBS="-lopenblas"
+			                BLAS_LIBS="-lopenblas"
 fi
 
 fi
@@ -6732,7 +6726,7 @@ eval ac_res=\$$as_ac_Lib
 $as_echo "$ac_res" >&6; }
 if eval test \"x\$"$as_ac_Lib"\" = x"yes"; then :
   BLAS_LIBS="-xlic_lib=sunperf -lsunmath"
-																 ax_blas_ok=yes
+                                 ax_blas_ok=yes
 fi
 
 fi
@@ -7014,10 +7008,10 @@ if test x"$ax_blas_ok" = xyes; then
 
 $as_echo "#define HAVE_BLAS 1" >>confdefs.h
 
-				:
+        :
 else
-				ax_blas_ok=no
-				{ { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+        ax_blas_ok=no
+        { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
 $as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
 as_fn_error $? "Cannot find BLAS library!
 See \`config.log' for more details" "$LINENO" 5; }

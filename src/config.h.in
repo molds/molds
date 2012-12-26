@@ -148,9 +148,6 @@
 /* Define to 1 if the system has the type `_Bool'. */
 #undef HAVE__BOOL
 
-/* Define this macro if you use 64bit int in mkl libarary */
-#undef MKL_INT
-
 /* Define to the address where bug reports for this package should be sent. */
 #undef PACKAGE_BUGREPORT
 
