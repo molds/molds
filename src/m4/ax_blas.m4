@@ -116,13 +116,12 @@ if test $ax_blas_ok = no; then
 		# 64 bit
 		if test $host_cpu = x86_64; then
 			AC_CHECK_LIB(mkl_gf_ilp64, $sgemm,
-			[ax_blas_ok=yes;BLAS_LIBS="-lmkl_gf_ilp64 -lmkl_sequential -lmkl_core -lpthread"]
-			[AC_DEFINE([MKL_INT], [int64_t], [Define this macro if you use 64bit int in mkl libarary])],,
+			[ax_blas_ok=yes;BLAS_LIBS="-lmkl_gf_ilp64 -lmkl_sequential -lmkl_core -lpthread"],,
 			[-lmkl_gf_ilp64 -lmkl_sequential -lmkl_core -lpthread])
 		# 32 bit
 		elif test $host_cpu = i686; then
 			AC_CHECK_LIB(mkl_gf, $sgemm,
-				[ax_blas_ok=yes;BLAS_LIBS="-lmkl_gf -lmkl_sequential -lmkl_core -lpthread" ],,
+				[ax_blas_ok=yes;BLAS_LIBS="-lmkl_gf -lmkl_sequential -lmkl_core -lpthread"],,
 				[-lmkl_gf -lmkl_sequential -lmkl_core -lpthread])
 		fi
 	# MKL for other compilers (Intel, PGI, ...?)
@@ -130,8 +129,7 @@ if test $ax_blas_ok = no; then
 		# 64-bit
 		if test $host_cpu = x86_64; then
 			AC_CHECK_LIB(mkl_intel_ilp64, $sgemm,
-				[ax_blas_ok=yes;BLAS_LIBS="-lmkl_intel_ilp64 -lmkl_sequential -lmkl_core -lpthread"]
-				[AC_DEFINE([MKL_INT], [int64_t], [Define this macro if you use 64bit int in mkl libarary])],,
+				[ax_blas_ok=yes;BLAS_LIBS="-lmkl_intel_ilp64 -lmkl_sequential -lmkl_core -lpthread"],,
 				[-lmkl_intel_ilp64 -lmkl_sequential -lmkl_core -lpthread])
 		# 32-bit
 		elif test $host_cpu = i686; then
@@ -149,7 +147,7 @@ fi
 # BLAS in OpenBLAS library? (http://xianyi.github.com/OpenBLAS/)
 if test $ax_blas_ok = no; then
 	AC_CHECK_LIB(openblas, $sgemm, [ax_blas_ok=yes
-											BLAS_LIBS="-lopenblas"])
+			                BLAS_LIBS="-lopenblas"])
 fi
 
 # BLAS in ATLAS library? (http://math-atlas.sourceforge.net/)
@@ -198,7 +196,7 @@ if test $ax_blas_ok = no; then
 		AC_CHECK_LIB(sunmath, acosp,
 			[AC_CHECK_LIB(sunperf, $sgemm,
 				[BLAS_LIBS="-xlic_lib=sunperf -lsunmath"
-																 ax_blas_ok=yes],[],[-lsunmath])])
+                                 ax_blas_ok=yes],[],[-lsunmath])])
 	fi
 fi
 
@@ -210,7 +208,7 @@ fi
 # BLAS in SGIMATH library?
 if test $ax_blas_ok = no; then
 	AC_CHECK_LIB(complib.sgimath, $sgemm,
-				 [ax_blas_ok=yes; BLAS_LIBS="-lcomplib.sgimath"])
+		     [ax_blas_ok=yes; BLAS_LIBS="-lcomplib.sgimath"])
 fi
 
 # BLAS in IBM ESSL library? (requires generic BLAS lib, too)
@@ -232,10 +230,10 @@ LIBS="$ax_blas_save_LIBS"
 
 # Finally, execute ACTION-IF-FOUND/ACTION-IF-NOT-FOUND:
 if test x"$ax_blas_ok" = xyes; then
-				ifelse([$1],,AC_DEFINE(HAVE_BLAS,1,[Define if you have a BLAS library.]),[$1])
-				:
+        ifelse([$1],,AC_DEFINE(HAVE_BLAS,1,[Define if you have a BLAS library.]),[$1])
+        :
 else
-				ax_blas_ok=no
-				$2
+        ax_blas_ok=no
+        $2
 fi
 ])dnl AX_BLAS
