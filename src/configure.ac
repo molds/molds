@@ -64,18 +64,6 @@ AC_CHECK_LIB([iomp5], [omp_set_num_threads],,[
               ])
 AC_CHECK_FUNC([omp_get_wtime],,
               [AC_MSG_FAILURE([Cannot find omp_get_wtime!])])
-
-dnl OpenMP debug options
-AS_IF([test "$release_enabled" = "no" ],
-      [CXXFLAGS="$CXXFLAGS -openmp-report2"
-       AC_MSG_CHECKING([for openmp diagnosis option])
-       AC_COMPILE_IFELSE([AC_LANG_SOURCE([int main(){return 0;}])],
-                         [AS_IF([test -f penmp-report2],
-                                [rm penmp-report2
-                                 AC_MSG_RESULT([no])],
-                         [OPENMP_CXXFLAGS="$OPENMP_CXXFLAGS -openmp-report2"
-                          AC_MSG_RESULT([-openmp-report2])])],
-                         [AC_MSG_RESULT([no])])])
 CXXFLAGS="$CXXFLAGS_SAVED"
 AC_SUBST([OPENMP_CXXFLAGS])
 
