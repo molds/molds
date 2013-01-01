@@ -83,8 +83,6 @@ AC_ARG_WITH([openblas],
                              LDFLAGS="$LDFLAGS -L$OPENBLAS_ROOT/lib"],
                             [AC_MSG_FAILURE([Cannot find directory `$withval'!])])])],
             [OPENBLAS_ROOT=])
-AM_CONDITIONAL([USE_OPENBLAS_DIR], [test x != x$OPENBLAS_ROOT])
-AC_SUBST([OPENBLAS_ROOT])
 
 dnl Check for BLAS
 AX_BLAS(,[AC_MSG_FAILURE([Cannot find BLAS library!])])
