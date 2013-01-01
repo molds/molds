@@ -7727,10 +7727,27 @@ if ${molds_cv_ld_accepts_rpath+:} false; then :
   $as_echo_n "(cached) " >&6
 else
   LDFLAGS_save=$LDFLAGS
+               LIBS_save=$LIBS
                LDFLAGS="-Wl,-rpath=$BOOST_LIBDIR"
+               LIBS=""
                cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
+
+#ifdef F77_DUMMY_MAIN
+
+#  ifdef __cplusplus
+     extern "C"
+#  endif
+   int F77_DUMMY_MAIN() { return 1; }
+
+#endif
+int
+main ()
+{
 return 0;
+  ;
+  return 0;
+}
 _ACEOF
 if ac_fn_cxx_try_link "$LINENO"; then :
   molds_cv_ld_accepts_rpath=yes
@@ -7740,6 +7757,7 @@ fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
                LDFLAGS=$LDFLAGS_save
+               LIBS=$LIBS_save
 fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $molds_cv_ld_accepts_rpath" >&5
 $as_echo "$molds_cv_ld_accepts_rpath" >&6; }
