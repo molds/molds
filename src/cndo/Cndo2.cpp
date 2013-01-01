@@ -545,6 +545,27 @@ void Cndo2::DoSCF(bool requiresGuess){
                               this->twoElecTwoCore,
                               isGuess);
 
+         // Level Shift
+         if(!isGuess){
+            const int totalAONumber = this->molecule->GetTotalNumberAOs();
+            stringstream ompErrors;
+#pragma omp parallel for schedule(auto)
+            for(int i = 0; i < totalAONumber; i++){
+               try{
+                  for(int j = 0; j < totalAONumber; j++){
+                     this->fockMatrix[i][j] -= 0.1 * oldOrbitalElectronPopulation[i][j] / 2.0;
+                  }
+               }
+               catch(MolDSException ex){
+#pragma omp critical
+                  ompErrors << ex.what() << endl;
+               }
+            }
+            if(!ompErrors.str().empty()){
+               throw MolDSException(ompErrors.str());
+            }
+         }
+
          // diagonalization of the Fock matrix
          bool calcEigenVectors = true;
          MolDS_wrappers::Lapack::GetInstance()->Dsyevd(this->fockMatrix, 
