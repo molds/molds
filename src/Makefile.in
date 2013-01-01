@@ -52,8 +52,10 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = MolDS$(EXEEXT)
-@USE_OPENBLAS_DIR_TRUE@am__append_1 = -I$(OPENBLAS_INCLUDE_DIR)
-@USE_OPENBLAS_DIR_TRUE@am__append_2 = -L$(OPENBLAS_LIB_DIR)
+@USE_OPENBLAS_DIR_TRUE@am__append_1 = -I$(OPENBLAS_INCLUDE_DIR) \
+@USE_OPENBLAS_DIR_TRUE@	$(BOOST_CPPLAGS)
+@USE_OPENBLAS_DIR_TRUE@am__append_2 = -L$(OPENBLAS_LIB_DIR) \
+@USE_OPENBLAS_DIR_TRUE@	$(BOOST_LDFLAGS)
 subdir = .
 DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/config.h.in \

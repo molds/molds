@@ -4955,10 +4955,8 @@ if test "${with_openblas+set}" = set; then :
     if test -d $withval; then :
   { $as_echo "$as_me:${as_lineno-$LINENO}: Using OpenBLAS under \`$withval'." >&5
 $as_echo "$as_me: Using OpenBLAS under \`$withval'." >&6;}
-                             BLAS_LIBS=-lopenblas
-                             OPENBLAS_ROOT=$withval
-                             CPPFLAGS="$CPPFLAGS -I$OPENBLAS_ROOT/include"
-                             LDFLAGS="$LDFLAGS -L$OPENBLAS_ROOT/lib"
+                            BLAS_LIBS=-lopenblas
+                            OPENBLAS_ROOT=$withval
 else
   { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
 $as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
@@ -7028,7 +7026,7 @@ fi
 done
 
 
-if test x$molds_lapack_cinterface_found != xyes; then :
+if test x$molds_blas_cinterface_found != xyes; then :
   for ac_func in cblas_dcopy cblas_daxpy cblas_ddot cblas_dgemv cblas_dgemm cblas_dsymv cblas_dsyr
 do :
   as_ac_var=`$as_echo "ac_cv_func_$ac_func" | $as_tr_sh`
@@ -7037,15 +7035,15 @@ if eval test \"x\$"$as_ac_var"\" = x"yes"; then :
   cat >>confdefs.h <<_ACEOF
 #define `$as_echo "HAVE_$ac_func" | $as_tr_cpp` 1
 _ACEOF
- molds_lapack_cinterface_found=yes
+ molds_blas_cinterface_found=yes
 else
-  molds_lapack_cinterface_found=no;break
+  molds_blas_cinterface_found=no;break
 fi
 done
 
 fi
 
-if test x$molds_lapack_cinterface_found != xyes; then :
+if test x$molds_blas_cinterface_found != xyes; then :
   { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
 $as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
 as_fn_error $? "Cannot find C interface functions of BLAS!
@@ -7733,8 +7731,32 @@ fi
 
 
 
-CPPFLAGS="$CPPFLAGS $BOOST_CPPFLAGS"
-LDFLAGS="$LDFLAGS -Wl,-rpath=$BOOST_LIBDIR $BOOST_LDFLAGS"
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether ld accepts -rpath option" >&5
+$as_echo_n "checking whether ld accepts -rpath option... " >&6; }
+if ${molds_cv_ld_accepts_rpath+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  LDFLAGS_save=$LDFLAGS
+               LDFLAGS="-Wl,-rpath=$BOOST_LIBDIR"
+               cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+return 0;
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  molds_cv_ld_accepts_rpath=yes
+else
+  molds_cv_ld_accepts_rpath=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+               LDFLAGS=$LDFLAGS_save
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $molds_cv_ld_accepts_rpath" >&5
+$as_echo "$molds_cv_ld_accepts_rpath" >&6; }
+
+if test x$molds_cv_ld_accepts_rpath == xyes; then :
+  BOOST_LDFLAGS="$BOOST_LDFLAGS -Wl,-rpath=$BOOST_LIBDIR"
+fi
 
 for ac_header in boost/random.hpp
 do :
