@@ -76,11 +76,9 @@ AC_ARG_WITH([openblas],
                             OPENBLAS_ROOT=],
                      [no],[OPENBLAS_ROOT=],
                      [AS_IF([test -d $withval],
-                            [AC_MSG_NOTICE([Using OpenBLAS under `$withval'.])
-                             BLAS_LIBS=-lopenblas
-                             OPENBLAS_ROOT=$withval
-                             CPPFLAGS="$CPPFLAGS -I$OPENBLAS_ROOT/include"
-                             LDFLAGS="$LDFLAGS -L$OPENBLAS_ROOT/lib"],
+                            [AC_MSG_NOTICE([Using OpenBLAS under `$withval'.])]
+                            [BLAS_LIBS=-lopenblas]
+                            [OPENBLAS_ROOT=$withval],
                             [AC_MSG_FAILURE([Cannot find directory `$withval'!])])])],
             [OPENBLAS_ROOT=])
 AM_CONDITIONAL([USE_OPENBLAS_DIR], [test x != x$OPENBLAS_ROOT])
