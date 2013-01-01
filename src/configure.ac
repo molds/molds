@@ -167,11 +167,14 @@ AX_BOOST_BASE([1.48],,[AC_MSG_FAILURE([boost library is too old!])])
 dnl Check whether ld accepts -rpath option
 AC_CACHE_CHECK([whether ld accepts -rpath option],[molds_cv_ld_accepts_rpath],
                [LDFLAGS_save=$LDFLAGS]
+               [LIBS_save=$LIBS]
                [LDFLAGS="-Wl,-rpath=$BOOST_LIBDIR"]
-               [AC_LINK_IFELSE([AC_LANG_SOURCE([return 0;])],
+               [LIBS=""]
+               [AC_LINK_IFELSE([AC_LANG_PROGRAM(,[return 0;])],
                                [molds_cv_ld_accepts_rpath=yes],
                                [molds_cv_ld_accepts_rpath=no])]
-               [LDFLAGS=$LDFLAGS_save])
+               [LDFLAGS=$LDFLAGS_save]
+               [LIBS=$LIBS_save])
 
 AS_IF([test x$molds_cv_ld_accepts_rpath == xyes],
       [BOOST_LDFLAGS="$BOOST_LDFLAGS -Wl,-rpath=$BOOST_LIBDIR"])
