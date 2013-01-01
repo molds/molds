@@ -639,9 +639,6 @@ build_os
 build_vendor
 build_cpu
 build
-OPENBLAS_ROOT
-USE_OPENBLAS_DIR_FALSE
-USE_OPENBLAS_DIR_TRUE
 OPENMP_CXXFLAGS
 EGREP
 GREP
@@ -4955,8 +4952,10 @@ if test "${with_openblas+set}" = set; then :
     if test -d $withval; then :
   { $as_echo "$as_me:${as_lineno-$LINENO}: Using OpenBLAS under \`$withval'." >&5
 $as_echo "$as_me: Using OpenBLAS under \`$withval'." >&6;}
-                            BLAS_LIBS=-lopenblas
-                            OPENBLAS_ROOT=$withval
+                             BLAS_LIBS=-lopenblas
+                             OPENBLAS_ROOT=$withval
+                             CPPFLAGS="$CPPFLAGS -I$OPENBLAS_ROOT/include"
+                             LDFLAGS="$LDFLAGS -L$OPENBLAS_ROOT/lib"
 else
   { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
 $as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
@@ -4967,15 +4966,6 @@ esac
 else
   OPENBLAS_ROOT=
 fi
-
- if test x != x$OPENBLAS_ROOT; then
-  USE_OPENBLAS_DIR_TRUE=
-  USE_OPENBLAS_DIR_FALSE='#'
-else
-  USE_OPENBLAS_DIR_TRUE='#'
-  USE_OPENBLAS_DIR_FALSE=
-fi
-
 
 
 # Make sure we can run config.sub.
@@ -8034,10 +8024,6 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${am__fastdepCXX_TRUE}" && test -z "${am__fastdepCXX_FALSE}"; then
   as_fn_error $? "conditional \"am__fastdepCXX\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
-if test -z "${USE_OPENBLAS_DIR_TRUE}" && test -z "${USE_OPENBLAS_DIR_FALSE}"; then
-  as_fn_error $? "conditional \"USE_OPENBLAS_DIR\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 
