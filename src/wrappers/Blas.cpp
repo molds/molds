@@ -203,7 +203,7 @@ void Blas::Dgemv(bool isColumnMajorMatrixA,
       transA = CblasTrans;
       swap(m,n);
    }
-   int lda = m;
+   molds_blas_int lda = m;
    cblas_dgemv(CblasColMajor, transA, m, n, alpha, a, lda, x, incrementX, beta, vectorY, incrementY);
 #else
 #error Cannot find dgemv or cblas_dgemv!
@@ -242,7 +242,7 @@ void Blas::Dsymv(molds_blas_int n, double alpha,
    double* a = const_cast<double*>(&matrixA[0][0]);
    double* x = const_cast<double*>(&vectorX[0]);
    CBLAS_UPLO uploA=CblasUpper;
-   int lda = n;
+   molds_blas_int lda = n;
    cblas_dsymv(CblasRowMajor, uploA, n, alpha, a, lda, x, incrementX, beta, vectorY, incrementY);
 #else
 #error Cannot find dsymv or cblas_dsymv!
@@ -270,7 +270,7 @@ void Blas::Dsyr(molds_blas_int n, double alpha,
 #elif defined(HAVE_CBLAS_DSYR)
    double* x = const_cast<double*>(&vectorX[0]);
    CBLAS_UPLO uploA=CblasUpper;
-   int lda = n;
+   molds_blas_int lda = n;
    cblas_dsyr(CblasRowMajor, uploA, n, alpha, x, incrementX, a, lda);
 #else
 #error Cannot find dsyr or cblas_dsyr!
@@ -341,7 +341,7 @@ void Blas::Dgemm(bool isColumnMajorMatrixA,
    double* b = const_cast<double*>(&matrixB[0][0]);
    double*       c = &matrixC[0][0];
 
-   int lda;
+   molds_blas_int lda;
    CBLAS_TRANSPOSE transA;
    if(isColumnMajorMatrixA){
       transA = CblasNoTrans;
@@ -352,7 +352,7 @@ void Blas::Dgemm(bool isColumnMajorMatrixA,
       lda = k;
    }
 
-   int ldb;
+   molds_blas_int ldb;
    CBLAS_TRANSPOSE transB;
    if(isColumnMajorMatrixB){
       transB = CblasNoTrans;
