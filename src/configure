@@ -7783,6 +7783,18 @@ fi
 
 done
 
+for ac_header in boost/math/special_functions/factorials.hpp
+do :
+  ac_fn_cxx_check_header_mongrel "$LINENO" "boost/math/special_functions/factorials.hpp" "ac_cv_header_boost_math_special_functions_factorials_hpp" "$ac_includes_default"
+if test "x$ac_cv_header_boost_math_special_functions_factorials_hpp" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_BOOST_MATH_SPECIAL_FUNCTIONS_FACTORIALS_HPP 1
+_ACEOF
+
+fi
+
+done
+
 
 for ac_header in stdlib.h string.h
 do :

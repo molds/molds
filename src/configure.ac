@@ -180,6 +180,7 @@ AS_IF([test x$molds_cv_ld_accepts_rpath == xyes],
       [BOOST_LDFLAGS="$BOOST_LDFLAGS -Wl,-rpath=$BOOST_LIBDIR"])
 
 AC_CHECK_HEADERS([boost/random.hpp],,[AC_MSG_FAILURE([Cannot find boost/random.hpp!])])
+AC_CHECK_HEADERS([boost/math/special_functions/factorials.hpp])
 
 dnl Checks for header files.
 AC_CHECK_HEADERS([stdlib.h string.h])
