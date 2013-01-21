@@ -23,10 +23,13 @@
 #include<math.h>
 #include<stdexcept>
 #include<boost/format.hpp>
+#include"config.h"
+#ifdef HAVE_BOOST_MATH_SPECIAL_FUNCTIONS_FACTORIALS_HPP
+#include<boost/math/special_functions/factorials.hpp>
+#endif
 #include"PrintController.h"
 #include"MolDSException.h"
 #include"Uncopyable.h"
-#include"config.h"
 #include"../wrappers/Lapack.h"
 #include"Enums.h"
 #include"MathUtilities.h"
@@ -42,12 +45,16 @@ int Factorial(int n){
       ss << "Error in base::MathUtility::Factorial: n<0 \n";
       throw MolDSException(ss.str());
    }
+#ifdef HAVE_BOOST_MATH_SPECIAL_FUNCTIONS_FACTORIALS_HPP
+   return static_cast<int>(boost::math::factorial<double>(n));
+#else
    else if (n>1){
       return n*Factorial(n-1);
    }
    else{
       return 1;
    }
+#endif
 }
 
 // nCk
