@@ -885,6 +885,7 @@ void Cndo2::DoDIIS(double** orbitalElectronPopulation,
       }
 
       if(diisNumErrorVect <= step && diisEndError<eMax && eMax<diisStartError){
+         cout << "Using DIIS" << endl;
          MolDS_wrappers::Lapack::GetInstance()->Dsysv(diisErrorProducts, 
                                                       diisErrorCoefficients, 
                                                       diisNumErrorVect+1);
@@ -907,6 +908,7 @@ void Cndo2::DoDamp(double rmsDensity,
    double dampingThresh = Parameters::GetInstance()->GetDampingThreshSCF();
    double dampingWeight = Parameters::GetInstance()->GetDampingWeightSCF();
    if(0.0 < dampingWeight && dampingThresh < rmsDensity){
+      cout << "Using Damp" << endl;
       stringstream ompErrors;
 #pragma omp parallel for schedule(auto)
       for(int j=0; j<molecule.GetTotalNumberAOs(); j++){
