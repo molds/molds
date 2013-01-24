@@ -1,5 +1,6 @@
 #//************************************************************************//
 #// Copyright (C) 2011-2012 Mikiya Fujii                                   // 
+#// Copyright (C) 2012-2013 Katsuhiko Nishimra                             // 
 #//                                                                        // 
 #// This file is part of MolDS.                                            // 
 #//                                                                        // 
@@ -42,9 +43,10 @@ endif
 -include $(DEPFILE)
 
 .PHONY: depend
-depend: $(DEPFILE)
+depend:
+	+make -B $(DEPFILE)
 
-$(DEPFILE): $(ALL_HEAD_FILES) $(ALL_CPP_FILES)
+$(DEPFILE): Makefile
 ifeq ($(INTEL), 64)
 	$(CC) -MM $(ALL_CPP_FILES) -I$(BOOST_INC_DIR) | sed 's/^\([^ ]\)/obj\/\1/g' | sed 's/\($$*\)\.o[ :]*/\1.o : /g' | sed 's/h$$/h\n\t$$(CC) -I$$(BOOST_INC_DIR) -o $$@ $$< $$(CFLAGS64) -c /g' > $(DEPFILE)
 else
