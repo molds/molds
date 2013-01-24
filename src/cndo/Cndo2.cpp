@@ -1,6 +1,7 @@
 //************************************************************************//
 // Copyright (C) 2011-2012 Mikiya Fujii                                   // 
-// Copyright (C) 2012-2013 Michihiro Okuyama
+// Copyright (C) 2012-2013 Michihiro Okuyama                              //
+// Copyright (C) 2013-2013 Katsuhiko Nishimra                             //
 //                                                                        // 
 // This file is part of MolDS.                                            // 
 //                                                                        // 
@@ -199,9 +200,11 @@ void Cndo2::SetMessages(){
    this->messageStartSCF = "**********  START: CNDO/2-SCF  **********\n";
    this->messageDoneSCF = "**********  DONE: CNDO/2-SCF  **********\n\n\n";
    this->messageOmpElapsedTimeSCF = "\tElapsed time(omp) for the SCF = ";
-   this->messageIterSCF = "SCF iter=";
-   this->messageDensityRMS = ": RMS density=";
-   this->messageEnergyMO = "\tEnergy of MO:";
+   this->messageIterSCF =     "\tSCF iter ";
+   this->messageDensityRMS =  ":\tRMS density = ";
+   this->messageDiisError =   "\tDIIS error = ";
+   this->messageDiisApplied = " (DIIS was applied)";
+   this->messageEnergyMO =    "\tEnergy of MO:";
    this->messageEnergyMOTitle = "\t\t\t| i-th | occ/unocc |  e[a.u.]  |  e[eV]  | \n";
    this->messageOcc = "occ";
    this->messageUnOcc = "unocc";
@@ -529,9 +532,11 @@ void Cndo2::DoSCF(bool requiresGuess){
       this->CalcTwoElecTwoCore(this->twoElecTwoCore, *this->molecule);
 
       // SCF
-      double rmsDensity;
+      double rmsDensity=0.0;
       int maxIterationsSCF = Parameters::GetInstance()->GetMaxIterationsSCF();
       bool isGuess=true;
+      bool hasAppliedDIIS=false;
+      double diisError=0.0;
       for(int iterationStep=0; iterationStep<maxIterationsSCF; iterationStep++){
          this->CalcAtomicElectronPopulation(this->atomicElectronPopulation, 
                                             this->orbitalElectronPopulation, 
@@ -565,7 +570,9 @@ void Cndo2::DoSCF(bool requiresGuess){
                                                                this->orbitalElectronPopulation,
                                                                this->molecule->GetTotalNumberAOs(), 
                                                                &rmsDensity, 
-                                                               iterationStep);
+                                                               iterationStep,
+                                                               diisError,
+                                                               hasAppliedDIIS);
          if(hasConverged){
             this->OutputLog(this->messageSCFMetConvergence);
             this->CalcSCFProperties();
@@ -584,6 +591,8 @@ void Cndo2::DoSCF(bool requiresGuess){
                             diisStoredErrorVect,
                             diisErrorProducts,
                             diisErrorCoefficients,
+                            diisError,
+                            hasAppliedDIIS,
                             Parameters::GetInstance()->GetDiisNumErrorVectSCF(),
                             *this->molecule,
                             iterationStep);
@@ -795,11 +804,13 @@ void Cndo2::DoDIIS(double** orbitalElectronPopulation,
                    double const* const* oldOrbitalElectronPopulation,
                    double*** diisStoredDensityMatrix,
                    double*** diisStoredErrorVect,
-                   double** diisErrorProducts,
-                   double* diisErrorCoefficients,
-                   int diisNumErrorVect,
-                   const Molecule& molecule,
-                   int step) const{
+                   double**  diisErrorProducts,
+                   double*   diisErrorCoefficients,
+                   double&   diisError,
+                   bool&     hasAppliedDIIS,
+                   int       diisNumErrorVect,
+                   const     Molecule& molecule,
+                   int       step) const{
    int totalNumberAOs = molecule.GetTotalNumberAOs();
    double diisStartError = Parameters::GetInstance()->GetDiisStartErrorSCF();
    double diisEndError = Parameters::GetInstance()->GetDiisEndErrorSCF();
@@ -882,14 +893,16 @@ void Cndo2::DoDIIS(double** orbitalElectronPopulation,
       diisErrorProducts[diisNumErrorVect][diisNumErrorVect] = 0.0;
       diisErrorCoefficients[diisNumErrorVect] = -1.0;
 
-      double eMax = 0;
+      diisError = 0.0;
       for(int j=0; j<totalNumberAOs; j++){
          for(int k=0; k<totalNumberAOs; k++){
-            eMax = max(eMax, fabs(diisStoredErrorVect[diisNumErrorVect-1][j][k]));
+            diisError = max(diisError, fabs(diisStoredErrorVect[diisNumErrorVect-1][j][k]));
          }
       }
 
-      if(diisNumErrorVect <= step && diisEndError<eMax && eMax<diisStartError){
+      hasAppliedDIIS = false;
+      if(diisNumErrorVect <= step && diisEndError<diisError && diisError<diisStartError){
+         hasAppliedDIIS = true;
          MolDS_wrappers::Lapack::GetInstance()->Dsysv(diisErrorProducts, 
                                                       diisErrorCoefficients, 
                                                       diisNumErrorVect+1);
@@ -1300,9 +1313,11 @@ void Cndo2::UpdateOldOrbitalElectronPopulation(double** oldOrbitalElectronPopula
 
 bool Cndo2::SatisfyConvergenceCriterion(double const* const * oldOrbitalElectronPopulation,
                                         double const* const * orbitalElectronPopulation,
-                                        int numberAOs,
+                                        int     numberAOs,
                                         double* rmsDensity,
-                                        int times) const{
+                                        int     times,
+                                        double  diisError,
+                                        bool    hasAppliedDIIS) const{
    bool satisfy = false;
    double change = 0.0;
    stringstream ompErrors;
@@ -1323,11 +1338,15 @@ bool Cndo2::SatisfyConvergenceCriterion(double const* const * oldOrbitalElectron
       throw MolDSException(ompErrors.str());
    }
    *rmsDensity = sqrt(change);
-  
-   this->OutputLog(boost::format("%s%d%s%.15lf\n") % this->messageIterSCF.c_str()
-                                                   % times
-                                                   % this->messageDensityRMS.c_str()
-                                                   % *rmsDensity);
+ 
+   string diisOnOff = hasAppliedDIIS ? this->messageDiisApplied : "";
+   this->OutputLog(boost::format("%s%d%s%.15lf%s%e%s\n") % this->messageIterSCF.c_str()
+                                                       % times
+                                                       % this->messageDensityRMS.c_str()
+                                                       % *rmsDensity
+                                                       % this->messageDiisError.c_str()
+                                                       % diisError
+                                                       % diisOnOff);
 
    if(*rmsDensity < Parameters::GetInstance()->GetThresholdSCF()){
       satisfy = true;
@@ -1481,52 +1500,21 @@ double Cndo2::GetFockOffDiagElement(const Atom& atomA,
 void Cndo2::CalcOrbitalElectronPopulation(double** orbitalElectronPopulation, 
                                           const Molecule& molecule, 
                                           double const* const* fockMatrix) const{
-   int totalNumberAOs = molecule.GetTotalNumberAOs();
+   const int totalNumberAOs = molecule.GetTotalNumberAOs();
+   const int numberTotalValenceElectrons = molecule.GetTotalNumberValenceElectrons();
+
    MallocerFreer::GetInstance()->Initialize<double>(orbitalElectronPopulation, totalNumberAOs, totalNumberAOs);
 
-   double** transposedFockMatrix = NULL;
-   try{
-      MallocerFreer::GetInstance()->Malloc<double>(&transposedFockMatrix, totalNumberAOs, totalNumberAOs);
-      for(int mu=0; mu<totalNumberAOs; mu++){
-         for(int nu=0; nu<totalNumberAOs; nu++){
-            transposedFockMatrix[mu][nu] = fockMatrix[nu][mu];
-         }
-      }
-   
-      int numberTotalValenceElectrons = molecule.GetTotalNumberValenceElectrons();
-      stringstream ompErrors;
-#pragma omp parallel for schedule(auto) 
-      for(int mu=0; mu<totalNumberAOs; mu++){
-         try{
-            for(int nu=mu; nu<totalNumberAOs; nu++){
-               double value = 0.0;
-               for(int mo=0; mo<numberTotalValenceElectrons/2; mo++){
-                  value += transposedFockMatrix[mu][mo]*transposedFockMatrix[nu][mo];
-               }
-               orbitalElectronPopulation[mu][nu] = 2.0*value;
-            }
-         }
-         catch(MolDSException ex){
-#pragma omp critical
-            ompErrors << ex.what() << endl ;
-         }
-      }
-      // Exception throwing for omp-region
-      if(!ompErrors.str().empty()){
-         throw MolDSException(ompErrors.str());
-      }
-   }
-   catch(MolDSException ex){
-      MallocerFreer::GetInstance()->Free<double>(&transposedFockMatrix, totalNumberAOs, totalNumberAOs);
-      throw ex;
-   }
-   MallocerFreer::GetInstance()->Free<double>(&transposedFockMatrix, totalNumberAOs, totalNumberAOs);
-   
-   for(int mu=0; mu<totalNumberAOs; mu++){
-      for(int nu=mu+1; nu<totalNumberAOs; nu++){
-         orbitalElectronPopulation[nu][mu] = orbitalElectronPopulation[mu][nu];
-      }
-   }
+   bool isMatrixAColumnMajor = false;
+   bool isMatrixATransposed = true;
+   bool isLowerTriangularPartMatrixCUsed = false;
+   double alpha = 2.0, beta = 0.0;
+   MolDS_wrappers::Blas::GetInstance()->Dsyrk(totalNumberAOs, numberTotalValenceElectrons/2,
+                                              isMatrixAColumnMajor,
+                                              isMatrixATransposed,
+                                              isLowerTriangularPartMatrixCUsed,
+                                              alpha, fockMatrix,
+                                              beta, orbitalElectronPopulation);
 
    /* 
    this->OutputLog("orbital population\n");
