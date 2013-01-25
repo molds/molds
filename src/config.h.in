@@ -44,21 +44,6 @@
 /* Define to 1 if you have the <cblas.h> header file. */
 #undef HAVE_CBLAS_H
 
-/* Define to 1 if you have the `daxpy' function. */
-#undef HAVE_DAXPY
-
-/* Define to 1 if you have the `dcopy' function. */
-#undef HAVE_DCOPY
-
-/* Define to 1 if you have the `ddot' function. */
-#undef HAVE_DDOT
-
-/* Define to 1 if you have the `dgemm' function. */
-#undef HAVE_DGEMM
-
-/* Define to 1 if you have the `dgemv' function. */
-#undef HAVE_DGEMV
-
 /* Define to 1 if you have the `dgetrf' function. */
 #undef HAVE_DGETRF
 
@@ -67,12 +52,6 @@
 
 /* Define to 1 if you have the `dsyevd' function. */
 #undef HAVE_DSYEVD
-
-/* Define to 1 if you have the `dsymv' function. */
-#undef HAVE_DSYMV
-
-/* Define to 1 if you have the `dsyr' function. */
-#undef HAVE_DSYR
 
 /* Define to 1 if you have the `dsysv' function. */
 #undef HAVE_DSYSV

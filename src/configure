@@ -7001,7 +7001,7 @@ as_fn_error $? "Cannot find mkl.h or blas.h!
 See \`config.log' for more details" "$LINENO" 5; }
 fi
 
-for ac_func in dcopy daxpy ddot dgemv dgemm dsymv dsyr
+for ac_func in cblas_dcopy cblas_daxpy cblas_ddot cblas_dgemv cblas_dgemm cblas_dsymv cblas_dsyr
 do :
   as_ac_var=`$as_echo "ac_cv_func_$ac_func" | $as_tr_sh`
 ac_fn_cxx_check_func "$LINENO" "$ac_func" "$as_ac_var"
@@ -7015,23 +7015,6 @@ else
 fi
 done
 
-
-if test x$molds_blas_cinterface_found != xyes; then :
-  for ac_func in cblas_dcopy cblas_daxpy cblas_ddot cblas_dgemv cblas_dgemm cblas_dsymv cblas_dsyr
-do :
-  as_ac_var=`$as_echo "ac_cv_func_$ac_func" | $as_tr_sh`
-ac_fn_cxx_check_func "$LINENO" "$ac_func" "$as_ac_var"
-if eval test \"x\$"$as_ac_var"\" = x"yes"; then :
-  cat >>confdefs.h <<_ACEOF
-#define `$as_echo "HAVE_$ac_func" | $as_tr_cpp` 1
-_ACEOF
- molds_blas_cinterface_found=yes
-else
-  molds_blas_cinterface_found=no;break
-fi
-done
-
-fi
 
 if test x$molds_blas_cinterface_found != xyes; then :
   { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
