@@ -114,9 +114,9 @@ Cndo2::~Cndo2(){
                                               this->molecule->GetTotalNumberAOs(),
                                               this->molecule->GetTotalNumberAOs());
    MallocerFreer::GetInstance()->Free<double>(&this->cartesianMatrix, 
+                                              CartesianType_end,
                                               this->molecule->GetTotalNumberAOs(),
-                                              this->molecule->GetTotalNumberAOs(),
-                                              CartesianType_end);
+                                              this->molecule->GetTotalNumberAOs());
    int electronicTransitionDipoleMomentsDim = 1;
    if(Parameters::GetInstance()->RequiresCIS()){
       electronicTransitionDipoleMomentsDim += Parameters::GetInstance()->GetNumberExcitedStatesCIS();
@@ -179,8 +179,8 @@ void Cndo2::SetMessages(){
       = "Error in cndo::Cndo2::RotateDiatmicOverlapAOsToSpaceFrame: rotatingMatrix is NULL.\n";
    this->errorMessageSetOverlapAOsElementNullDiaMatrix 
       = "Error in cndo::Cndo2::SetOverlapAOsElement: diatomicOverlapAOs is NULL.\n";
-   this->errorMessageGetElectronicTransitionDipoleMomentBadState
-      = "Error in cndo::Cndo2::GetElectronicTransitionDipoleMoment: Bad eigen state is set. In SCF module, the transition dipole moment of only between ground states can be calculated. Note taht state=0 means the ground state and other state = i means the i-th excited state in below.\n";
+   this->errorMessageCalcElectronicTransitionDipoleMomentBadState
+      = "Error in cndo::Cndo2::CalcElectronicTransitionDipoleMoment: Bad eigen state is set. In SCF module, the transition dipole moment of only between ground states can be calculated. Note taht state=0 means the ground state and other state = i means the i-th excited state in below.\n";
    this->errorMessageCalcFrequenciesNormalModesBadTheory
       = "Error in cndo::Cndo2::CalcFrequenciesNormalModesBadTheory: CNDO2 is not supported for frequency (normal mode) analysis.\n";
    this->errorMessageCalcOverlapAOsDifferentConfigurationsDiffAOs
@@ -278,9 +278,9 @@ void Cndo2::SetMolecule(Molecule* molecule){
                                                 this->molecule->GetTotalNumberAOs(), 
                                                 this->molecule->GetTotalNumberAOs());
    MallocerFreer::GetInstance()->Malloc<double>(&this->cartesianMatrix, 
+                                                CartesianType_end,
                                                 this->molecule->GetTotalNumberAOs(), 
-                                                this->molecule->GetTotalNumberAOs(),
-                                                CartesianType_end);
+                                                this->molecule->GetTotalNumberAOs());
    int electronicTransitionDipoleMomentsDim = 1;
    if(Parameters::GetInstance()->RequiresCIS()){
       electronicTransitionDipoleMomentsDim += Parameters::GetInstance()->GetNumberExcitedStatesCIS();
@@ -504,12 +504,11 @@ double Cndo2::GetDiatomVdWCorrection2ndDerivative(int indexAtomA,
 void Cndo2::DoSCF(bool requiresGuess){
    this->OutputLog(this->messageStartSCF);
    double ompStartTime = omp_get_wtime();
-
+#ifdef MOLDS_DBG
    if(this->molecule == NULL){
-      stringstream ss;
-      ss << this->errorMessageMoleculeNotSet;
-      throw MolDSException(ss.str());
+      throw MolDSException(this->errorMessageMoleculeNotSet);
    }
+#endif
 
    // temporary matrices for scf
    double**  oldOrbitalElectronPopulation = NULL;
@@ -696,11 +695,11 @@ double Cndo2::GetElectronicEnergy(int elecState) const{
       return this->elecSCFEnergy;
    }
    else{
+#ifdef MOLDS_DBG
       if(this->excitedEnergies == NULL){
-         stringstream ss;
-         ss << this->errorMessageGetElectronicEnergyNULLCISEnergy;
-         throw MolDSException(ss.str());
+         throw MolDSException(this->errorMessageGetElectronicEnergyNULLCISEnergy);
       }
+#endif
       int numberExcitedStates = Parameters::GetInstance()->GetNumberExcitedStatesCIS();
       if(numberExcitedStates < elecState){
          stringstream ss;
@@ -1654,43 +1653,52 @@ void Cndo2::CalcElectronicDipoleMomentGroundState(double*** electronicTransition
                                                   double const* const* orbitalElectronPopulation,
                                                   double const* const* overlapAOs) const{
    int groundState = 0;
-   for(int axis=0; axis<CartesianType_end; axis++){
-      electronicTransitionDipoleMoments[groundState][groundState][axis] = this->GetElectronicTransitionDipoleMoment(
-                                                                                groundState,
-                                                                                groundState,
-                                                                                static_cast<CartesianType>(axis),
-                                                                                NULL,
-                                                                                NULL,
-                                                                                cartesianMatrix,
-                                                                                molecule,
-                                                                                orbitalElectronPopulation,
-                                                                                overlapAOs,
-                                                                                NULL);
-   }
+   this->CalcElectronicTransitionDipoleMoment(electronicTransitionDipoleMoments[groundState][groundState],
+                                              groundState,
+                                              groundState,
+                                              NULL,
+                                              NULL,
+                                              cartesianMatrix,
+                                              molecule,
+                                              orbitalElectronPopulation,
+                                              overlapAOs,
+                                              NULL);
 }
 
-double Cndo2::GetElectronicTransitionDipoleMoment(int to, int from, CartesianType axis,
-                                                  double const* const* fockMatrix,
-                                                  double const* const* matrixCIS,
-                                                  double const* const* const* cartesianMatrix,
-                                                  const MolDS_base::Molecule& molecule, 
-                                                  double const* const* orbitalElectronPopulation,
-                                                  double const* const* overlapAOs,
-                                                  double const* groundStateDipole) const{
+void Cndo2::CalcElectronicTransitionDipoleMoment(double* transitionDipoleMoment,
+                                                 int to, int from,
+                                                 double const* const* fockMatrix,
+                                                 double const* const* matrixCIS,
+                                                 double const* const* const* cartesianMatrix,
+                                                 const MolDS_base::Molecule& molecule, 
+                                                 double const* const* orbitalElectronPopulation,
+                                                 double const* const* overlapAOs,
+                                                 double const* groundStateDipole) const{
    int groundState = 0;
    if(from == groundState && to == groundState){
-      double value = 0.0;
+      double valueX=0.0;
+      double valueY=0.0;
+      double valueZ=0.0;
+      double const* xyzCOC = molecule.GetXyzCOC();
       int totalAONumber = molecule.GetTotalNumberAOs();
       stringstream ompErrors;
-#pragma omp parallel for reduction(+:value) schedule(auto) 
+#pragma omp parallel for reduction(+:valueX,valueY,valueZ) schedule(auto)
       for(int mu=0; mu<totalAONumber; mu++){
          try{
-            double threadValue = 0.0;
+            double threadValueX = 0.0;
+            double threadValueY = 0.0;
+            double threadValueZ = 0.0;
             for(int nu=0; nu<totalAONumber; nu++){
-               threadValue -= orbitalElectronPopulation[mu][nu]
-                             *(cartesianMatrix[mu][nu][axis]-molecule.GetXyzCOC()[axis]*overlapAOs[mu][nu]);
+               threadValueX -= orbitalElectronPopulation[mu][nu]
+                              *(cartesianMatrix[XAxis][mu][nu]-xyzCOC[XAxis]*overlapAOs[mu][nu]);
+               threadValueY -= orbitalElectronPopulation[mu][nu]
+                              *(cartesianMatrix[YAxis][mu][nu]-xyzCOC[YAxis]*overlapAOs[mu][nu]);
+               threadValueZ -= orbitalElectronPopulation[mu][nu]
+                              *(cartesianMatrix[ZAxis][mu][nu]-xyzCOC[ZAxis]*overlapAOs[mu][nu]);
             }
-            value += threadValue;
+            valueX += threadValueX;
+            valueY += threadValueY;
+            valueZ += threadValueZ;
          }
          catch(MolDSException ex){
 #pragma omp critical
@@ -1701,14 +1709,15 @@ double Cndo2::GetElectronicTransitionDipoleMoment(int to, int from, CartesianTyp
       if(!ompErrors.str().empty()){
          throw MolDSException(ompErrors.str());
       }
-      return value;
+      transitionDipoleMoment[XAxis] = valueX;
+      transitionDipoleMoment[YAxis] = valueY;
+      transitionDipoleMoment[ZAxis] = valueZ;
    }
    else{
       stringstream ss;
-      ss << this->errorMessageGetElectronicTransitionDipoleMomentBadState;
+      ss << this->errorMessageCalcElectronicTransitionDipoleMomentBadState;
       ss << this->errorMessageFromState << from << endl;
       ss << this->errorMessageToState << to << endl;
-      ss << this->errorMessageCartesianType << CartesianTypeStr(axis) << endl;
       throw MolDSException(ss.str());
    }
 }
@@ -1734,15 +1743,10 @@ void Cndo2::CalcCartesianMatrixByGTOExpansion(double*** cartesianMatrix,
                for(int b=0; b<atomB.GetValenceSize(); b++){
                   int mu = firstAOIndexAtomA + a;      
                   int nu = firstAOIndexAtomB + b;      
-                  for(int i=0; i<CartesianType_end; i++){
-                     double value = this->GetCartesianMatrixElementByGTOExpansion(atomA, 
-                                                                                  a, 
-                                                                                  atomB, 
-                                                                                  b, 
-                                                                                  static_cast<CartesianType>(i),
-                                                                                  stonG);
-                     cartesianMatrix[mu][nu][i] = value;
-                  }
+                  this->CalcCartesianMatrixElementsByGTOExpansion(cartesianMatrix[XAxis][mu][nu], 
+                                                                  cartesianMatrix[YAxis][mu][nu],
+                                                                  cartesianMatrix[ZAxis][mu][nu],
+                                                                  atomA, a, atomB, b, stonG);
                }
             }
             
@@ -1757,28 +1761,19 @@ void Cndo2::CalcCartesianMatrixByGTOExpansion(double*** cartesianMatrix,
    if(!ompErrors.str().empty()){
       throw MolDSException(ompErrors.str());
    }
-   /* 
-   this->OutputLog("cartesian matrix\n"); 
-   for(int o=0; o<molecule.GetTotalNumberAOs(); o++){
-      for(int p=0; p<molecule.GetTotalNumberAOs(); p++){
-         for(int i=0; i<CartesianType_end; i++){
-            this->OutputLog(boost::format("%lf\t") % cartesianMatrix[o][p][i]);
-         }
-         this->OutputLog("\n");
-      }
-      this->OutputLog("\n");
-   }
-   this->OutputLog("\n");
-   */
 }
 
 // Calculate elements of Cartesian matrix between atomic orbitals. 
 // The analytic Cartesian matrix is calculated with Gaussian expansion technique written in [DY_1977]
-double Cndo2::GetCartesianMatrixElementByGTOExpansion(const Atom& atomA, int valenceIndexA, 
+void Cndo2::CalcCartesianMatrixElementsByGTOExpansion(double& xComponent,
+                                                      double& yComponent,
+                                                      double& zComponent,
+                                                      const Atom& atomA, int valenceIndexA, 
                                                       const Atom& atomB, int valenceIndexB,
-                                                      CartesianType axis,
                                                       STOnGType stonG) const{
-   double value = 0.0;
+   xComponent=0.0;
+   yComponent=0.0;
+   zComponent=0.0;
    ShellType shellTypeA = atomA.GetValenceShellType();
    ShellType shellTypeB = atomB.GetValenceShellType();
    OrbitalType valenceOrbitalA = atomA.GetValence(valenceIndexA);
@@ -1794,7 +1789,10 @@ double Cndo2::GetCartesianMatrixElementByGTOExpansion(const Atom& atomA, int val
    double Rab = sqrt( pow(atomA.GetXyz()[XAxis]-atomB.GetXyz()[XAxis], 2.0) 
                      +pow(atomA.GetXyz()[YAxis]-atomB.GetXyz()[YAxis], 2.0) 
                      +pow(atomA.GetXyz()[ZAxis]-atomB.GetXyz()[ZAxis], 2.0) );
-   double temp = 0.0;
+   double temp  = 0.0;
+   double tempX = 0.0;
+   double tempY = 0.0;
+   double tempZ = 0.0;
    for(int i=0; i<=stonG; i++){
       for(int j=0; j<=stonG; j++){
          temp = GTOExpansionSTO::GetInstance()->GetCoefficient(stonG, 
@@ -1815,20 +1813,23 @@ double Cndo2::GetCartesianMatrixElementByGTOExpansion(const Atom& atomA, int val
                                                                          shellTypeB, 
                                                                          valenceOrbitalB, 
                                                                          j);
-         temp *= this->GetGaussianCartesianMatrix(atomA.GetAtomType(), 
-                                                  valenceOrbitalA, 
-                                                  gaussianExponentA, 
-                                                  atomA.GetXyz(),
-                                                  atomB.GetAtomType(), 
-                                                  valenceOrbitalB, 
-                                                  gaussianExponentB,
-                                                  atomB.GetXyz(), 
+         tempX = this->GetGaussianCartesianMatrix(atomA.GetAtomType(), valenceOrbitalA, gaussianExponentA, atomA.GetXyz(),
+                                                  atomB.GetAtomType(), valenceOrbitalB, gaussianExponentB, atomB.GetXyz(), 
                                                   Rab,
-                                                  axis);
-         value += temp;
+                                                  XAxis);
+         tempY = this->GetGaussianCartesianMatrix(atomA.GetAtomType(), valenceOrbitalA, gaussianExponentA, atomA.GetXyz(),
+                                                  atomB.GetAtomType(), valenceOrbitalB, gaussianExponentB, atomB.GetXyz(), 
+                                                  Rab,
+                                                  YAxis);
+         tempZ = this->GetGaussianCartesianMatrix(atomA.GetAtomType(), valenceOrbitalA, gaussianExponentA, atomA.GetXyz(),
+                                                  atomB.GetAtomType(), valenceOrbitalB, gaussianExponentB, atomB.GetXyz(), 
+                                                  Rab,
+                                                  ZAxis);
+         xComponent += temp*tempX;
+         yComponent += temp*tempY;
+         zComponent += temp*tempZ;
       }
    }
-   return value;
 }
 
 // calculate gaussian Caretesian integrals. 
@@ -3510,11 +3511,11 @@ void Cndo2::CalcOverlapAOsWithAnotherConfiguration(double** overlapAOs,
       ss << this->errorMessageRhs << rhsMolecule->GetNumberAtoms() << endl;
       throw MolDSException(ss.str());
    }
+#ifdef MOLDS_DBG
    if(overlapAOs == NULL){
-      stringstream ss;
-      ss << this->errorMessageCalcOverlapAOsDifferentConfigurationsOverlapAOsNULL;
-      throw MolDSException(ss.str());
+      throw MolDSException(this->errorMessageCalcOverlapAOsDifferentConfigurationsOverlapAOsNULL);
    }
+#endif
    
    int totalAONumber = lhsMolecule.GetTotalNumberAOs();
    int totalAtomNumber = lhsMolecule.GetNumberAtoms();
@@ -5035,11 +5036,11 @@ double Cndo2::GetGaussianOverlapAOs1stDerivative(AtomType atomTypeA,
 void Cndo2::CalcRotatingMatrix(double** rotatingMatrix, 
                                const Atom& atomA, 
                                const Atom& atomB) const{
+#ifdef MOLDS_DBG
    if(rotatingMatrix==NULL){
-      stringstream ss;
-      ss << this->errorMessageCalcRotatingMatrixNullRotMatrix;
-      throw MolDSException(ss.str());
+      throw MolDSException(this->errorMessageCalcRotatingMatrixNullRotMatrix);
    }
+#endif
    MallocerFreer::GetInstance()->Initialize<double>(rotatingMatrix,  OrbitalType_end, OrbitalType_end);
 
    double x = atomB.GetXyz()[0] - atomA.GetXyz()[0];
@@ -5337,11 +5338,11 @@ void Cndo2::CalcRotatingMatrix2ndDerivatives(double**** rotMat2ndDerivatives,
 void Cndo2::CalcDiatomicOverlapAOsInDiatomicFrame(double** diatomicOverlapAOs, 
                                                   const Atom& atomA, 
                                                   const Atom& atomB) const{
+#ifdef MOLDS_DBG
    if(diatomicOverlapAOs==NULL){
-      stringstream ss;
-      ss << this->errorMessageCalDiaOverlapAOsDiaFrameNullMatrix;
-      throw MolDSException(ss.str());
+      throw MolDSException(this->errorMessageCalDiaOverlapAOsDiaFrameNullMatrix);
    }
+#endif
    int na = atomA.GetValenceShellType() + 1;
    int nb = atomB.GetValenceShellType() + 1;
    int m = 0;
@@ -5624,16 +5625,14 @@ void Cndo2::CalcDiatomicOverlapAOs2ndDerivativeInDiatomicFrame(double** diatomic
 // see (B.63) in Pople book.
 void Cndo2::RotateDiatmicOverlapAOsToSpaceFrame(double** diatomicOverlapAOs, 
                                                 double const* const* rotatingMatrix) const{
+#ifdef MOLDS_DBG
    if(diatomicOverlapAOs==NULL){
-      stringstream ss;
-      ss << this->errorMessageRotDiaOverlapAOsToSpaceFrameNullDiaMatrix;
-      throw MolDSException(ss.str());
+      throw MolDSException(this->errorMessageRotDiaOverlapAOsToSpaceFrameNullDiaMatrix);
    }
    if(rotatingMatrix==NULL){
-      stringstream ss;
-      ss << this->errorMessageRotDiaOverlapAOsToSpaceFrameNullRotMatrix;
-      throw MolDSException(ss.str());
+      throw MolDSException(this->errorMessageRotDiaOverlapAOsToSpaceFrameNullRotMatrix);
    }
+#endif
    double** oldDiatomicOverlapAOs = NULL;
    try{
       MallocerFreer::GetInstance()->Malloc<double>(&oldDiatomicOverlapAOs, OrbitalType_end, OrbitalType_end);
@@ -5678,11 +5677,11 @@ void Cndo2::SetOverlapAOsElement(double** overlapAOs,
                                  const Atom& atomA, 
                                  const Atom& atomB,
                                  bool isSymmetricOverlapAOs) const{
+#ifdef MOLDS_DBG
    if(diatomicOverlapAOs==NULL){
-      stringstream ss;
-      ss << this->errorMessageSetOverlapAOsElementNullDiaMatrix;
-      throw MolDSException(ss.str());
+      throw MolDSException(this->errorMessageSetOverlapAOsElementNullDiaMatrix);
    }
+#endif
 
    int firstAOIndexAtomA = atomA.GetFirstAOIndex();
    int firstAOIndexAtomB = atomB.GetFirstAOIndex();

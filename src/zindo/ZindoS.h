@@ -48,14 +48,15 @@ protected:
    virtual void SetMessages();
    virtual void SetEnableAtomTypes();
    virtual void CalcCISProperties();
-   virtual double GetElectronicTransitionDipoleMoment(int to, int from, MolDS_base::CartesianType axis,
-                                                      double const* const* fockMatrix,
-                                                      double const* const* matrixCIS,
-                                                      double const* const* const* cartesianMatrix,
-                                                      const MolDS_base::Molecule& molecule, 
-                                                      double const* const* orbitalElectronPopulation,
-                                                      double const* const* overlapAOs,
-                                                      double const* groundStateDipole) const;
+   virtual void CalcElectronicTransitionDipoleMoment(double* transitionDipoleMoment,
+                                                     int to, int from,
+                                                     double const* const* fockMatrix,
+                                                     double const* const* matrixCIS,
+                                                     double const* const* const* cartesianMatrix,
+                                                     const MolDS_base::Molecule& molecule, 
+                                                     double const* const* orbitalElectronPopulation,
+                                                     double const* const* overlapAOs,
+                                                     double const* groundStateDipole) const;
    virtual void CalcGammaAB(double** gammaAB, const MolDS_base::Molecule& molecule) const;
    virtual double GetFockDiagElement(const MolDS_base_atoms::Atom& atomA, 
                                      int indexAtomA, 
@@ -100,6 +101,19 @@ protected:
                                               double const* const* fockMatrix, 
                                               double const* const* gammaAB) const;
    virtual void CalcCISMatrix(double** matrixCIS) const;
+   double GetCISDiagElement(double const* energiesMO,
+                            double const* const* const* const* nishimotoMatagaMatrix,
+                            const MolDS_base::Molecule& molecule,
+                            double const* const* fockMatrix, 
+                            int moI,
+                            int moA) const;
+   double GetCISOffDiagElement(double const* const* const* const* nishimotoMatagaMatrix,
+                               const MolDS_base::Molecule& molecule,
+                               double const* const* fockMatrix, 
+                               int moI,
+                               int moA,
+                               int moJ,
+                               int moB) const;
    virtual void CalcForce(const std::vector<int>& elecStates);
    int GetSlaterDeterminantIndex(int activeOccIndex, int activeVirIndex) const;
    int GetActiveOccIndex(const MolDS_base::Molecule& molecule, int matrixCISIndex) const;
@@ -175,11 +189,24 @@ private:
                                       MolDS_base::OrbitalType orbitalA, 
                                       const MolDS_base_atoms::Atom& atomB, 
                                       MolDS_base::OrbitalType orbitalB) const; // ref. [MN_1957] and (5a) in [AEZ_1986]
+   double GetNishimotoMatagaTwoEleInt(const MolDS_base_atoms::Atom& atomA, 
+                                      MolDS_base::OrbitalType orbitalA, 
+                                      const MolDS_base_atoms::Atom& atomB, 
+                                      MolDS_base::OrbitalType orbitalB,
+                                      const double rAB) const; // ref. [MN_1957] and (5a) in [AEZ_1986]
    double GetNishimotoMatagaTwoEleInt1stDerivative(const MolDS_base_atoms::Atom& atomA, 
                                                    MolDS_base::OrbitalType orbitalA, 
                                                    const MolDS_base_atoms::Atom& atomB, 
                                                    MolDS_base::OrbitalType orbitalB,
                                                    MolDS_base::CartesianType axisA) const;// ref. [MN_1957] and (5a) in [AEZ_1986]
+   double GetNishimotoMatagaTwoEleInt1stDerivative(const MolDS_base_atoms::Atom& atomA, 
+                                                   MolDS_base::OrbitalType orbitalA, 
+                                                   const MolDS_base_atoms::Atom& atomB, 
+                                                   MolDS_base::OrbitalType orbitalB,
+                                                   const double rAB,
+                                                   MolDS_base::CartesianType axisA) const;// ref. [MN_1957] and (5a) in [AEZ_1986]
+   void CalcNishimotoMatagaMatrix(double**** nishimotoMatagaMatrix, 
+                                  const MolDS_base::Molecule& molecule) const;
    void CalcRitzVector(double* ritzVector, 
                        double const* const* expansionVectors, 
                        double const* const* interactionMatrix, 

@@ -76,7 +76,7 @@ protected:
    std::string errorMessageGetElectronicEnergyEnergyNotCalculated;
    std::string errorMessageGetElectronicEnergyNumberCISStates;
    std::string errorMessageGetElectronicEnergySetElecState;
-   std::string errorMessageGetElectronicTransitionDipoleMomentBadState;
+   std::string errorMessageCalcElectronicTransitionDipoleMomentBadState;
    std::string errorMessageCalcFrequenciesNormalModesBadTheory;
    std::string errorMessageFromState;
    std::string errorMessageToState;
@@ -119,14 +119,15 @@ protected:
    virtual void CalcSCFProperties();
    virtual void CalcCISProperties();
    virtual void CalcNormalModes(double** normalModes, double* normalForceConstants, const MolDS_base::Molecule& molecule) const;
-   virtual double GetElectronicTransitionDipoleMoment(int to, int from, MolDS_base::CartesianType axis,
-                                                      double const* const* fockMatrix,
-                                                      double const* const* matrixCIS,
-                                                      double const* const* const* cartesianMatrix,
-                                                      const MolDS_base::Molecule& molecule, 
-                                                      double const* const* orbitalElectronPopulation,
-                                                      double const* const* overlapAOs,
-                                                      double const* groundStateDipole) const;
+   virtual void CalcElectronicTransitionDipoleMoment(double* transitionDipoleMoment,
+                                                     int to, int from,
+                                                     double const* const* fockMatrix,
+                                                     double const* const* matrixCIS,
+                                                     double const* const* const* cartesianMatrix,
+                                                     const MolDS_base::Molecule& molecule, 
+                                                     double const* const* orbitalElectronPopulation,
+                                                     double const* const* overlapAOs,
+                                                     double const* groundStateDipole) const;
    double GetBondingAdjustParameterK(MolDS_base::ShellType shellA, 
                                      MolDS_base::ShellType shellB) const;
    virtual double GetDiatomCoreRepulsionEnergy(int indexAtomA, int indexAtomB) const;
@@ -343,11 +344,13 @@ private:
    void CalcCartesianMatrixByGTOExpansion(double*** cartesianMatrix,
                                           const MolDS_base::Molecule& molecule, 
                                           MolDS_base::STOnGType stonG) const; 
-   double GetCartesianMatrixElementByGTOExpansion(const MolDS_base_atoms::Atom& atomA, 
+   void CalcCartesianMatrixElementsByGTOExpansion(double& xComponent,
+                                                  double& yComponent,
+                                                  double& zComponent,
+                                                  const MolDS_base_atoms::Atom& atomA, 
                                                   int valenceIndexA, 
                                                   const MolDS_base_atoms::Atom& atomB, 
                                                   int valenceIndexB,
-                                                  MolDS_base::CartesianType axis,
                                                   MolDS_base::STOnGType stonG) const;
    double GetGaussianCartesianMatrix(MolDS_base::AtomType atomTypeA, 
                                      MolDS_base::OrbitalType valenceOrbitalA, 
