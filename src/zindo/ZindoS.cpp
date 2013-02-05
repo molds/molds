@@ -129,8 +129,8 @@ void ZindoS::SetMessages(){
       = "Error in zindo::ZindoS::GetElectronicEnergy: Set electronic state is not calculated by CIS.\n";
    this->errorMessageGetElectronicEnergyNULLCISEnergy 
       = "Error in zindo::ZindoS::GetElectronicEnergy: excitedEnergies is NULL\n";
-   this->errorMessageGetElectronicTransitionDipoleMomentBadState
-      = "Error in zindo::ZindoS::GetElectronicTransitionDipoleMoment: Bad eigen state is set to calculate the transition dipole moment. Note taht state=0 means the ground state and other state = i means the i-th excited state in below.\n";
+   this->errorMessageCalcElectronicTransitionDipoleMomentBadState
+      = "Error in zindo::ZindoS::CalcElectronicTransitionDipoleMoment: Bad eigen state is set to calculate the transition dipole moment. Note taht state=0 means the ground state and other state = i means the i-th excited state in below.\n";
    this->errorMessageCalcFrequenciesNormalModesBadTheory
       = "Error in zindo::ZindoS::CalcFrequenciesNormalModesBadTheory: ZINDO/S is not supported for frequency (normal mode) analysis.\n";
    this->messageSCFMetConvergence = "\n\n\n\t\tZINDO/S-SCF met convergence criterion(^^b\n\n\n";
@@ -219,6 +219,7 @@ double ZindoS::GetFockDiagElement(const Atom& atomA,
             OrbitalType orbitalSigma;
             int sigma;
             int atomBNumberValence = atomB.GetValenceSize();
+            double rAB = molecule.GetDistanceAtoms(atomA, atomB);
             for(int i=0; i<atomBNumberValence; i++){
                sigma = i + atomB.GetFirstAOIndex();
                orbitalSigma = atomB.GetValence(i);
@@ -226,10 +227,11 @@ double ZindoS::GetFockDiagElement(const Atom& atomA,
                       *this->GetNishimotoMatagaTwoEleInt(atomA, 
                                                          orbitalMu, 
                                                          atomB, 
-                                                         orbitalSigma);
+                                                         orbitalSigma,
+                                                         rAB);
             }
             temp -= atomB.GetCoreCharge() 
-                   *this->GetNishimotoMatagaTwoEleInt(atomA, s, atomB, s);
+                   *this->GetNishimotoMatagaTwoEleInt(atomA, s, atomB, s, rAB);
          }
       }
       value += temp;
@@ -548,6 +550,13 @@ double ZindoS::GetExchangeInt(OrbitalType orbital1, OrbitalType orbital2, const 
 double ZindoS::GetNishimotoMatagaTwoEleInt(const Atom& atomA, OrbitalType orbitalA, 
                                            const Atom& atomB, OrbitalType orbitalB) const{
    double r = this->molecule->GetDistanceAtoms(atomA, atomB);
+   return this->GetNishimotoMatagaTwoEleInt(atomA, orbitalA, atomB, orbitalB,r);
+}
+
+// ref. [MN_1957] and (5a) in [AEZ_1986]
+double ZindoS::GetNishimotoMatagaTwoEleInt(const Atom& atomA, OrbitalType orbitalA, 
+                                           const Atom& atomB, OrbitalType orbitalB,
+                                           const double rAB) const{
    double gammaAA;
    if(orbitalA == s || 
       orbitalA == px ||
@@ -596,7 +605,8 @@ double ZindoS::GetNishimotoMatagaTwoEleInt(const Atom& atomA, OrbitalType orbita
       throw MolDSException(ss.str());
    }  
 
-   return this->nishimotoMatagaParamA/( r+this->nishimotoMatagaParamB/(gammaAA+gammaBB) );
+   double gamma=gammaAA+gammaBB;
+   return this->nishimotoMatagaParamA/( rAB+this->nishimotoMatagaParamB/gamma );
 
 }
 
@@ -604,10 +614,23 @@ double ZindoS::GetNishimotoMatagaTwoEleInt(const Atom& atomA, OrbitalType orbita
 // For Nishimoto-Mataga, See ZindoS::GetNishimotoMatagaTwoEleInt 
 // or ref. [MN_1957] and (5a) in [AEZ_1986]
 double ZindoS::GetNishimotoMatagaTwoEleInt1stDerivative(const Atom& atomA, 
-                                                          OrbitalType orbitalA, 
-                                                          const Atom& atomB, 
-                                                          OrbitalType orbitalB,
-                                                          CartesianType axisA) const{
+                                                        OrbitalType orbitalA, 
+                                                        const Atom& atomB, 
+                                                        OrbitalType orbitalB,
+                                                        CartesianType axisA) const{
+   double r = this->molecule->GetDistanceAtoms(atomA, atomB);
+   return this->GetNishimotoMatagaTwoEleInt1stDerivative(atomA, orbitalA, atomB, orbitalB, r, axisA);
+}
+
+// First derivative of Nishimoto-Mataga related to the coordinate of atom A.
+// For Nishimoto-Mataga, See ZindoS::GetNishimotoMatagaTwoEleInt 
+// or ref. [MN_1957] and (5a) in [AEZ_1986]
+double ZindoS::GetNishimotoMatagaTwoEleInt1stDerivative(const Atom& atomA, 
+                                                        OrbitalType orbitalA, 
+                                                        const Atom& atomB, 
+                                                        OrbitalType orbitalB,
+                                                        const double rAB,
+                                                        CartesianType axisA) const{
    double gammaAA;
    if(orbitalA == s || 
       orbitalA == px ||
@@ -656,12 +679,49 @@ double ZindoS::GetNishimotoMatagaTwoEleInt1stDerivative(const Atom& atomA,
       throw MolDSException(ss.str());
    }  
 
-   double r = this->molecule->GetDistanceAtoms(atomA, atomB);
    double dCartesian = atomA.GetXyz()[axisA] - atomB.GetXyz()[axisA];
-   double value = -1.0*dCartesian/r;
+   double value = -1.0*dCartesian/rAB;
    value *= this->nishimotoMatagaParamA;
-   value *= pow( r+this->nishimotoMatagaParamB/(gammaAA+gammaBB) ,-2.0);
+   value *= pow( rAB+this->nishimotoMatagaParamB/(gammaAA+gammaBB) ,-2.0);
    return value;
+}
+
+void ZindoS::CalcNishimotoMatagaMatrix(double**** nishimotoMatagaMatrix, const Molecule& molecule) const{
+   int totalNumberAtoms = molecule.GetNumberAtoms();
+   stringstream ompErrors;
+#pragma omp parallel for schedule(auto)
+   for(int A=0; A<totalNumberAtoms; A++){
+      try{
+         const Atom& atomA = *molecule.GetAtom(A);
+         int firstAOIndexA = atomA.GetFirstAOIndex();
+         int lastAOIndexA  = atomA.GetLastAOIndex();
+         for(int mu=firstAOIndexA; mu<=lastAOIndexA; mu++){
+            OrbitalType orbitalMu = atomA.GetValence(mu-firstAOIndexA);
+            for(int B=A; B<totalNumberAtoms; B++){
+               const Atom& atomB = *molecule.GetAtom(B);
+               int firstAOIndexB = atomB.GetFirstAOIndex();
+               int lastAOIndexB  = atomB.GetLastAOIndex();
+               double rAB = molecule.GetDistanceAtoms(atomA, atomB);
+               for(int nu=firstAOIndexB; nu<=lastAOIndexB; nu++){
+                  OrbitalType orbitalNu = atomB.GetValence(nu-firstAOIndexB);
+                  nishimotoMatagaMatrix[A][orbitalMu][B][orbitalNu] = this->GetNishimotoMatagaTwoEleInt(atomA, 
+                                                                                                        orbitalMu, 
+                                                                                                        atomB, 
+                                                                                                        orbitalNu,
+                                                                                                        rAB);
+               }
+            }
+         }
+      }
+      catch(MolDSException ex){
+#pragma omp critical
+         ompErrors << ex.what() << endl ;
+      }
+   }
+   // Exception throwing for omp-region
+   if(!ompErrors.str().empty()){
+      throw MolDSException(ompErrors.str());
+   }
 }
 
 void ZindoS::CalcDiatomicOverlapAOsInDiatomicFrame(double** diatomicOverlapAOs, 
@@ -839,7 +899,7 @@ void ZindoS::CalcOverlapESsWithAnotherElectronicStructure(double** overlapESs,
    MallocerFreer::GetInstance()->Free<double>(&tmpMatrix,            dimOverlapSingletSDs, dimOverlapESs);
 }
 
-// The order of mol, moJ, moK, moL is consistent with Eq. (9) in [RZ_1973]
+// The order of moI, moJ, moK, moL is consistent with Eq. (9) in [RZ_1973]
 double ZindoS::GetMolecularIntegralElement(int moI, int moJ, int moK, int moL, 
                                            const Molecule& molecule, 
                                            double const* const* fockMatrix, 
@@ -984,24 +1044,146 @@ void ZindoS::DoCIS(){
 }
 
 void ZindoS::CalcCISProperties(){
+//calculate dipole moments and transitiondipolemoment
+{
+   double*** dipoleMOs = NULL;
+   double**  overlapMOs = NULL;
+   int totalNumberAOs = this->molecule->GetTotalNumberAOs();
+   int numberOcc = this->molecule->GetTotalNumberValenceElectrons()/2;
+   int numberActiveOcc = Parameters::GetInstance()->GetActiveOccCIS();
+   int numberActiveVir = Parameters::GetInstance()->GetActiveVirCIS();
+   MallocerFreer::GetInstance()->Malloc<double>(&dipoleMOs,       CartesianType_end, totalNumberAOs, totalNumberAOs);
+   MallocerFreer::GetInstance()->Malloc<double>(&overlapMOs, totalNumberAOs, totalNumberAOs);
+   double alpha=1.0;
+   double beta =0.0;
+   //double ompStartTime = omp_get_wtime();
+   MolDS_wrappers::Blas::GetInstance()->Dgemmm(false, false, true, totalNumberAOs, totalNumberAOs, totalNumberAOs, totalNumberAOs,
+                                               alpha, 
+                                               this->fockMatrix,
+                                               this->cartesianMatrix[XAxis],
+                                               this->fockMatrix,
+                                               beta,
+                                               dipoleMOs[XAxis]);
+   MolDS_wrappers::Blas::GetInstance()->Dgemmm(false, false, true, totalNumberAOs, totalNumberAOs, totalNumberAOs, totalNumberAOs,
+                                               alpha, 
+                                               this->fockMatrix,
+                                               this->cartesianMatrix[YAxis],
+                                               this->fockMatrix,
+                                               beta,
+                                               dipoleMOs[YAxis]);
+   MolDS_wrappers::Blas::GetInstance()->Dgemmm(false, false, true, totalNumberAOs, totalNumberAOs, totalNumberAOs, totalNumberAOs,
+                                               alpha, 
+                                               this->fockMatrix,
+                                               this->cartesianMatrix[ZAxis],
+                                               this->fockMatrix,
+                                               beta,
+                                               dipoleMOs[ZAxis]);
+
+   double const* centerOfDipole = this->molecule->GetXyzCOC();
+   // set orign of dipole
+   MolDS_wrappers::Blas::GetInstance()->Dgemmm(false, false, true, totalNumberAOs, totalNumberAOs, totalNumberAOs, totalNumberAOs,
+                                               alpha, 
+                                               this->fockMatrix,
+                                               this->overlapAOs,
+                                               this->fockMatrix,
+                                               beta,
+                                               overlapMOs);
+   MolDS_wrappers::Blas::GetInstance()->Daxpy(totalNumberAOs*totalNumberAOs,
+                                              -centerOfDipole[XAxis], 
+                                              &overlapMOs[0][0],
+                                              &dipoleMOs[XAxis][0][0]);
+   MolDS_wrappers::Blas::GetInstance()->Daxpy(totalNumberAOs*totalNumberAOs,
+                                              -centerOfDipole[YAxis], 
+                                              &overlapMOs[0][0],
+                                              &dipoleMOs[YAxis][0][0]);
+   MolDS_wrappers::Blas::GetInstance()->Daxpy(totalNumberAOs*totalNumberAOs,
+                                              -centerOfDipole[ZAxis], 
+                                              &overlapMOs[0][0],
+                                              &dipoleMOs[ZAxis][0][0]);
+
 
    // dipole moments of excited states
-   this->CalcElectronicDipoleMomentsExcitedState(this->electronicTransitionDipoleMoments,
-                                                 this->fockMatrix,
-                                                 this->matrixCIS,
-                                                 this->cartesianMatrix,
-                                                 *this->molecule, 
-                                                 this->orbitalElectronPopulation,
-                                                 this->overlapAOs);
-   
+   //this->CalcElectronicDipoleMomentsExcitedStates(this->electronicTransitionDipoleMoments,
+   //                                               this->fockMatrix,
+   //                                               this->matrixCIS,
+   //                                               this->cartesianMatrix,
+   //                                               *this->molecule, 
+   //                                               this->orbitalElectronPopulation,
+   //                                               this->overlapAOs);
+   int groundState = 0;
+   for(int k=0; k<Parameters::GetInstance()->GetNumberExcitedStatesCIS(); k++){
+      int excitedState = k+1; // (k+1)-th excited state
+      this->electronicTransitionDipoleMoments[excitedState][excitedState][XAxis] = this->electronicTransitionDipoleMoments[groundState][groundState][XAxis];
+      this->electronicTransitionDipoleMoments[excitedState][excitedState][YAxis] = this->electronicTransitionDipoleMoments[groundState][groundState][YAxis];
+      this->electronicTransitionDipoleMoments[excitedState][excitedState][ZAxis] = this->electronicTransitionDipoleMoments[groundState][groundState][ZAxis];
+      for(int l=0; l<this->matrixCISdimension; l++){
+         // single excitation from I-th (occupied)MO to A-th (virtual)MO
+         int moI = this->GetActiveOccIndex(*this->molecule, l);
+         int moA = this->GetActiveVirIndex(*this->molecule, l);
+         double temp    = matrixCIS[k][l]*matrixCIS[k][l];
+         this->electronicTransitionDipoleMoments[excitedState][excitedState][XAxis] += temp*(-dipoleMOs[XAxis][moI][moI]+dipoleMOs[XAxis][moA][moA]);
+         this->electronicTransitionDipoleMoments[excitedState][excitedState][YAxis] += temp*(-dipoleMOs[YAxis][moI][moI]+dipoleMOs[YAxis][moA][moA]);
+         this->electronicTransitionDipoleMoments[excitedState][excitedState][ZAxis] += temp*(-dipoleMOs[ZAxis][moI][moI]+dipoleMOs[ZAxis][moA][moA]);
+      }
+   }
+
    // transition dipole moment
-   this->CalcElectronicTransitionDipoleMoments(this->electronicTransitionDipoleMoments,
-                                               this->fockMatrix,
-                                               this->matrixCIS,
-                                               this->cartesianMatrix,
-                                               *this->molecule, 
-                                               this->orbitalElectronPopulation,
-                                               this->overlapAOs);
+   //this->CalcElectronicTransitionDipoleMoments(this->electronicTransitionDipoleMoments,
+   //                                            this->fockMatrix,
+   //                                            this->matrixCIS,
+   //                                            this->cartesianMatrix,
+   //                                            *this->molecule, 
+   //                                            this->orbitalElectronPopulation,
+   //                                            this->overlapAOs);
+   for(int k=0; k<Parameters::GetInstance()->GetNumberExcitedStatesCIS(); k++){
+      int excitedState = k+1; // (k+1)-th excited state
+      this->electronicTransitionDipoleMoments[excitedState][groundState][XAxis] = 0.0;
+      this->electronicTransitionDipoleMoments[excitedState][groundState][YAxis] = 0.0;
+      this->electronicTransitionDipoleMoments[excitedState][groundState][ZAxis] = 0.0;
+      for(int l=0; l<this->matrixCISdimension; l++){
+         // single excitation from I-th (occupied)MO to A-th (virtual)MO
+         int moI = this->GetActiveOccIndex(*this->molecule, l);
+         int moA = this->GetActiveVirIndex(*this->molecule, l);
+         //double temp    = matrixCIS[k][l]*matrixCIS[k][l];
+         double temp    = this->matrixCIS[k][l]*sqrt(2.0);
+         this->electronicTransitionDipoleMoments[excitedState][groundState][XAxis] += temp*dipoleMOs[XAxis][moA][moI];
+         this->electronicTransitionDipoleMoments[excitedState][groundState][YAxis] += temp*dipoleMOs[YAxis][moA][moI];
+         this->electronicTransitionDipoleMoments[excitedState][groundState][ZAxis] += temp*dipoleMOs[ZAxis][moA][moI];
+      }
+   }
+   if(Parameters::GetInstance()->RequiresAllTransitionDipoleMomentsCIS()){
+      for(int k=0; k<Parameters::GetInstance()->GetNumberExcitedStatesCIS(); k++){
+         int departureExcitedState = k+1; // (k+1)-th excited state
+         for(int l=k+1; l<Parameters::GetInstance()->GetNumberExcitedStatesCIS(); l++){
+            int destinationExcitedState = l+1; // (l+1)-th excited state
+            this->electronicTransitionDipoleMoments[destinationExcitedState][departureExcitedState][XAxis] = 0.0;
+            this->electronicTransitionDipoleMoments[destinationExcitedState][departureExcitedState][YAxis] = 0.0;
+            this->electronicTransitionDipoleMoments[destinationExcitedState][departureExcitedState][ZAxis] = 0.0;
+            for(int l=0; l<this->matrixCISdimension; l++){
+               // single excitation from I-th (occupied)MO to A-th (virtual)MO
+               int moI = this->GetActiveOccIndex(*this->molecule, l);
+               int moA = this->GetActiveVirIndex(*this->molecule, l);
+               double temp    = matrixCIS[departureExcitedState-1][l]*matrixCIS[destinationExcitedState-1][l];
+               this->electronicTransitionDipoleMoments[destinationExcitedState][departureExcitedState][XAxis] += temp*(-dipoleMOs[XAxis][moI][moI]+dipoleMOs[XAxis][moA][moA]);
+               this->electronicTransitionDipoleMoments[destinationExcitedState][departureExcitedState][YAxis] += temp*(-dipoleMOs[YAxis][moI][moI]+dipoleMOs[YAxis][moA][moA]);
+               this->electronicTransitionDipoleMoments[destinationExcitedState][departureExcitedState][ZAxis] += temp*(-dipoleMOs[ZAxis][moI][moI]+dipoleMOs[ZAxis][moA][moA]);
+            }
+         }
+      }
+
+      for(int k=0; k<Parameters::GetInstance()->GetNumberExcitedStatesCIS()+1; k++){
+         for(int l=k+1; l<Parameters::GetInstance()->GetNumberExcitedStatesCIS()+1; l++){
+            for(int axis=0; axis<CartesianType_end; axis++){
+               this->electronicTransitionDipoleMoments[k][l][axis] 
+                  = this->electronicTransitionDipoleMoments[l][k][axis];
+            }
+         }
+      }
+   }
+   MallocerFreer::GetInstance()->Free<double>(&dipoleMOs, CartesianType_end, totalNumberAOs, totalNumberAOs);
+   MallocerFreer::GetInstance()->Free<double>(&overlapMOs, totalNumberAOs, totalNumberAOs);
+}// end of "calculate dipole moments and transitiondipolemoment"
+
 
 
    // free exciton energies
@@ -1028,30 +1210,27 @@ void ZindoS::CalcCISProperties(){
                                          *this->molecule);
 }
 
-void ZindoS::CalcElectronicDipoleMomentsExcitedState(double*** electronicTransitionDipoleMoments,
-                                                     double const* const* fockMatrix,
-                                                     double const* const* matrixCIS,
-                                                     double const* const* const* cartesianMatrix,
-                                                     const MolDS_base::Molecule& molecule, 
-                                                     double const* const* orbitalElectronPopulation,
-                                                     double const* const* overlapAOs) const{
+void ZindoS::CalcElectronicDipoleMomentsExcitedStates(double*** electronicTransitionDipoleMoments,
+                                                      double const* const* fockMatrix,
+                                                      double const* const* matrixCIS,
+                                                      double const* const* const* cartesianMatrix,
+                                                      const MolDS_base::Molecule& molecule, 
+                                                      double const* const* orbitalElectronPopulation,
+                                                      double const* const* overlapAOs) const{
    int groundState = 0;
    // dipole moment of excited states
    for(int k=0; k<Parameters::GetInstance()->GetNumberExcitedStatesCIS(); k++){
       int excitedState = k+1; // (k+1)-th excited state
-      for(int axis=0; axis<CartesianType_end; axis++){
-         electronicTransitionDipoleMoments[excitedState][excitedState][axis] 
-            = this->GetElectronicTransitionDipoleMoment(excitedState,
-                                                        excitedState,
-                                                        static_cast<CartesianType>(axis),
-                                                        fockMatrix,
-                                                        matrixCIS,
-                                                        cartesianMatrix,
-                                                        molecule,
-                                                        orbitalElectronPopulation,
-                                                        overlapAOs,
-                                                        electronicTransitionDipoleMoments[groundState][groundState]);
-      }
+      this->CalcElectronicTransitionDipoleMoment(electronicTransitionDipoleMoments[excitedState][excitedState],
+                                                 excitedState,
+                                                 excitedState,
+                                                 fockMatrix,
+                                                 matrixCIS,
+                                                 cartesianMatrix,
+                                                 molecule,
+                                                 orbitalElectronPopulation,
+                                                 overlapAOs,
+                                                 electronicTransitionDipoleMoments[groundState][groundState]);
    }
 }
 
@@ -1066,19 +1245,16 @@ void ZindoS::CalcElectronicTransitionDipoleMoments(double*** electronicTransitio
    // transition dipole moments from ground state to excited states
    for(int k=0; k<Parameters::GetInstance()->GetNumberExcitedStatesCIS(); k++){
       int excitedState = k+1; // (k+1)-th excited state
-      for(int axis=0; axis<CartesianType_end; axis++){
-         this->electronicTransitionDipoleMoments[excitedState][groundState][axis] 
-            = this->GetElectronicTransitionDipoleMoment(excitedState,
-                                                        groundState,
-                                                        static_cast<CartesianType>(axis),
-                                                        this->fockMatrix,
-                                                        this->matrixCIS,
-                                                        this->cartesianMatrix,
-                                                        *this->molecule,
-                                                        this->orbitalElectronPopulation,
-                                                        this->overlapAOs,
-                                                        this->electronicTransitionDipoleMoments[groundState][groundState]);
-      }
+      this->CalcElectronicTransitionDipoleMoment(electronicTransitionDipoleMoments[excitedState][groundState],
+                                                 excitedState,
+                                                 groundState,
+                                                 fockMatrix,
+                                                 matrixCIS,
+                                                 cartesianMatrix,
+                                                 molecule,
+                                                 orbitalElectronPopulation,
+                                                 overlapAOs,
+                                                 electronicTransitionDipoleMoments[groundState][groundState]);
    }
 
    if(Parameters::GetInstance()->RequiresAllTransitionDipoleMomentsCIS()){
@@ -1087,70 +1263,79 @@ void ZindoS::CalcElectronicTransitionDipoleMoments(double*** electronicTransitio
          int departureExcitedState = k+1; // (k+1)-th excited state
          for(int l=k+1; l<Parameters::GetInstance()->GetNumberExcitedStatesCIS(); l++){
             int destinationExcitedState = l+1; // (l+1)-th excited state
-            for(int axis=0; axis<CartesianType_end; axis++){
-               this->electronicTransitionDipoleMoments[destinationExcitedState][departureExcitedState][axis] 
-                  = this->GetElectronicTransitionDipoleMoment(destinationExcitedState,
-                                                              departureExcitedState,
-                                                              static_cast<CartesianType>(axis),
-                                                              this->fockMatrix,
-                                                              this->matrixCIS,
-                                                              this->cartesianMatrix,
-                                                              *this->molecule,
-                                                              this->orbitalElectronPopulation,
-                                                              this->overlapAOs,
-                                                              this->electronicTransitionDipoleMoments[groundState][groundState]);
-            }
+            this->CalcElectronicTransitionDipoleMoment(electronicTransitionDipoleMoments[destinationExcitedState][departureExcitedState],
+                                                       destinationExcitedState,
+                                                       departureExcitedState,
+                                                       fockMatrix,
+                                                       matrixCIS,
+                                                       cartesianMatrix,
+                                                       molecule,
+                                                       orbitalElectronPopulation,
+                                                       overlapAOs,
+                                                       electronicTransitionDipoleMoments[groundState][groundState]);
          }
       }
       for(int k=0; k<Parameters::GetInstance()->GetNumberExcitedStatesCIS()+1; k++){
          for(int l=k+1; l<Parameters::GetInstance()->GetNumberExcitedStatesCIS()+1; l++){
             for(int axis=0; axis<CartesianType_end; axis++){
-               this->electronicTransitionDipoleMoments[k][l][axis] 
-                  = this->electronicTransitionDipoleMoments[l][k][axis];
+               electronicTransitionDipoleMoments[k][l][axis] 
+                  = electronicTransitionDipoleMoments[l][k][axis];
             }
          }
       }
    }
 }
 
-double ZindoS::GetElectronicTransitionDipoleMoment(int to, int from, CartesianType axis,
-                                                   double const* const* fockMatrix,
-                                                   double const* const* matrixCIS,
-                                                   double const* const* const* cartesianMatrix,
-                                                   const MolDS_base::Molecule& molecule, 
-                                                   double const* const* orbitalElectronPopulation,
-                                                   double const* const* overlapAOs,
-                                                   double const* groundStateDipole) const{
-   double value = 0.0;
+void ZindoS::CalcElectronicTransitionDipoleMoment(double* transitionDipoleMoment,
+                                                  int to, int from,
+                                                  double const* const* fockMatrix,
+                                                  double const* const* matrixCIS,
+                                                  double const* const* const* cartesianMatrix,
+                                                  const MolDS_base::Molecule& molecule, 
+                                                  double const* const* orbitalElectronPopulation,
+                                                  double const* const* overlapAOs,
+                                                  double const* groundStateDipole) const{
+   double valueX = 0.0;
+   double valueY = 0.0;
+   double valueZ = 0.0;
+   double const* xyzCOC = molecule.GetXyzCOC();
    int groundState = 0;
+   int totalNumberAOs = molecule.GetTotalNumberAOs();
    stringstream ompErrors;
    if(Parameters::GetInstance()->GetNumberExcitedStatesCIS() < from ||
       Parameters::GetInstance()->GetNumberExcitedStatesCIS() < to ){
       stringstream ss;
-      ss << this->errorMessageGetElectronicTransitionDipoleMomentBadState;
+      ss << this->errorMessageCalcElectronicTransitionDipoleMomentBadState;
       ss << this->errorMessageFromState << from << endl;
       ss << this->errorMessageToState << to << endl;
-      ss << this->errorMessageCartesianType << CartesianTypeStr(axis) << endl;
       throw MolDSException(ss.str());
    }
 
    if(from != to){
       if(from != groundState && to != groundState){
          // transition dipole moment between different excited states
-#pragma omp parallel for reduction(+:value) schedule(auto)
+#pragma omp parallel for reduction(+:valueX,valueY,valueZ) schedule(auto)
          for(int l=0; l<this->matrixCISdimension; l++){
             try{
-               double temp = 0.0;
+               double temp  = 0.0;
+               double tempX = 0.0;
+               double tempY = 0.0;
+               double tempZ = 0.0;
                // single excitation from I-th (occupied)MO to A-th (virtual)MO
                int moI = this->GetActiveOccIndex(molecule, l);
                int moA = this->GetActiveVirIndex(molecule, l);
-               for(int mu=0; mu<molecule.GetTotalNumberAOs(); mu++){
-                  for(int nu=0; nu<molecule.GetTotalNumberAOs(); nu++){
-                     temp += (-1.0*fockMatrix[moI][mu]*fockMatrix[moI][nu] + fockMatrix[moA][mu]*fockMatrix[moA][nu])
-                             *(cartesianMatrix[mu][nu][axis] - molecule.GetXyzCOC()[axis]*overlapAOs[mu][nu]);
+               for(int mu=0; mu<totalNumberAOs; mu++){
+                  for(int nu=0; nu<totalNumberAOs; nu++){
+                     temp   = (-1.0*fockMatrix[moI][mu]*fockMatrix[moI][nu] + fockMatrix[moA][mu]*fockMatrix[moA][nu]);
+                     tempX += temp*(cartesianMatrix[XAxis][mu][nu] - xyzCOC[XAxis]*overlapAOs[mu][nu]);
+                     tempY += temp*(cartesianMatrix[YAxis][mu][nu] - xyzCOC[YAxis]*overlapAOs[mu][nu]);
+                     tempZ += temp*(cartesianMatrix[ZAxis][mu][nu] - xyzCOC[ZAxis]*overlapAOs[mu][nu]);
                   }
                }
-               value += matrixCIS[from-1][l]*matrixCIS[to-1][l]*temp;
+               temp    = matrixCIS[from-1][l]*matrixCIS[to-1][l];
+               valueX += temp*tempX;
+               valueY += temp*tempY;
+               valueZ += temp*tempZ;
             }
             catch(MolDSException ex){
 #pragma omp critical
@@ -1161,25 +1346,34 @@ double ZindoS::GetElectronicTransitionDipoleMoment(int to, int from, CartesianTy
          if(!ompErrors.str().empty()){
             throw MolDSException(ompErrors.str());
          }
-         return value;
+         transitionDipoleMoment[XAxis] = valueX;
+         transitionDipoleMoment[YAxis] = valueY;
+         transitionDipoleMoment[ZAxis] = valueZ;
       }
       else if(from == groundState && to != groundState){
          // transition dipole moment from the ground to excited states
-#pragma omp parallel for reduction(+:value) schedule(auto)
+#pragma omp parallel for reduction(+:valueX,valueY,valueZ) schedule(auto)
          for(int l=0; l<this->matrixCISdimension; l++){
             try{
-               double temp = 0.0;
+               double temp  = 0.0;
+               double tempX = 0.0;
+               double tempY = 0.0;
+               double tempZ = 0.0;
                // single excitation from I-th (occupied)MO to A-th (virtual)MO
                int moI = this->GetActiveOccIndex(molecule, l);
                int moA = this->GetActiveVirIndex(molecule, l);
-               for(int mu=0; mu<molecule.GetTotalNumberAOs(); mu++){
-                  for(int nu=0; nu<molecule.GetTotalNumberAOs(); nu++){
-                     temp += fockMatrix[moA][mu]
-                             *(cartesianMatrix[mu][nu][axis] - molecule.GetXyzCOC()[axis]*overlapAOs[mu][nu])
-                             *fockMatrix[moI][nu];
+               for(int mu=0; mu<totalNumberAOs; mu++){
+                  for(int nu=0; nu<totalNumberAOs; nu++){
+                     temp   = fockMatrix[moA][mu]*fockMatrix[moI][nu];
+                     tempX += temp*(cartesianMatrix[XAxis][mu][nu] - xyzCOC[XAxis]*overlapAOs[mu][nu]);
+                     tempY += temp*(cartesianMatrix[YAxis][mu][nu] - xyzCOC[YAxis]*overlapAOs[mu][nu]);
+                     tempZ += temp*(cartesianMatrix[ZAxis][mu][nu] - xyzCOC[ZAxis]*overlapAOs[mu][nu]);
                   }
                }
-               value += this->matrixCIS[to-1][l]*sqrt(2.0)*temp;
+               temp    = this->matrixCIS[to-1][l]*sqrt(2.0);
+               valueX += temp*tempX;
+               valueY += temp*tempY;
+               valueZ += temp*tempZ;
             }
             catch(MolDSException ex){
 #pragma omp critical
@@ -1190,25 +1384,34 @@ double ZindoS::GetElectronicTransitionDipoleMoment(int to, int from, CartesianTy
          if(!ompErrors.str().empty()){
             throw MolDSException(ompErrors.str());
          }
-         return value;
+         transitionDipoleMoment[XAxis] = valueX;
+         transitionDipoleMoment[YAxis] = valueY;
+         transitionDipoleMoment[ZAxis] = valueZ;
       }
       else if(from != groundState && to == groundState){
          // transition dipole moment from the excited to ground states
-#pragma omp parallel for reduction(+:value) schedule(auto)
+#pragma omp parallel for reduction(+:valueX,valueY,valueZ) schedule(auto)
          for(int l=0; l<this->matrixCISdimension; l++){
             try{
-               double temp = 0.0;
+               double temp  = 0.0;
+               double tempX = 0.0;
+               double tempY = 0.0;
+               double tempZ = 0.0;
                // single excitation from I-th (occupied)MO to A-th (virtual)MO
                int moI = this->GetActiveOccIndex(molecule, l);
                int moA = this->GetActiveVirIndex(molecule, l);
-               for(int mu=0; mu<molecule.GetTotalNumberAOs(); mu++){
-                  for(int nu=0; nu<molecule.GetTotalNumberAOs(); nu++){
-                     temp += fockMatrix[moI][mu]
-                             *(cartesianMatrix[mu][nu][axis] - molecule.GetXyzCOC()[axis]*overlapAOs[mu][nu])
-                             *fockMatrix[moA][nu];
+               for(int mu=0; mu<totalNumberAOs; mu++){
+                  for(int nu=0; nu<totalNumberAOs; nu++){
+                     temp   = fockMatrix[moI][mu]*fockMatrix[moA][nu];
+                     tempX += temp*(cartesianMatrix[XAxis][mu][nu] - xyzCOC[XAxis]*overlapAOs[mu][nu]);
+                     tempY += temp*(cartesianMatrix[YAxis][mu][nu] - xyzCOC[YAxis]*overlapAOs[mu][nu]);
+                     tempZ += temp*(cartesianMatrix[ZAxis][mu][nu] - xyzCOC[ZAxis]*overlapAOs[mu][nu]);
                   }
                }
-               value += matrixCIS[from-1][l]*sqrt(2.0)*temp;
+               temp    = matrixCIS[from-1][l]*sqrt(2.0);
+               valueX += temp*tempX;
+               valueY += temp*tempY;
+               valueZ += temp*tempZ;
             }
             catch(MolDSException ex){
 #pragma omp critical
@@ -1219,26 +1422,36 @@ double ZindoS::GetElectronicTransitionDipoleMoment(int to, int from, CartesianTy
          if(!ompErrors.str().empty()){
             throw MolDSException(ompErrors.str());
          }
-         return value;
+         transitionDipoleMoment[XAxis] = valueX;
+         transitionDipoleMoment[YAxis] = valueY;
+         transitionDipoleMoment[ZAxis] = valueZ;
       }
    }
    else{
       if(from != groundState){
          // dipole moment of the excited state. It is needed that the dipole of ground state has been already calculated!!
-#pragma omp parallel for reduction(+:value) schedule(auto)
+#pragma omp parallel for reduction(+:valueX,valueY,valueZ) schedule(auto)
          for(int l=0; l<this->matrixCISdimension; l++){
             try{
-               double temp = 0.0;
+               double temp  = 0.0;
+               double tempX = 0.0;
+               double tempY = 0.0;
+               double tempZ = 0.0;
                // single excitation from I-th (occupied)MO to A-th (virtual)MO
                int moI = this->GetActiveOccIndex(molecule, l);
                int moA = this->GetActiveVirIndex(molecule, l);
-               for(int mu=0; mu<molecule.GetTotalNumberAOs(); mu++){
-                  for(int nu=0; nu<molecule.GetTotalNumberAOs(); nu++){
-                     temp += (-1.0*fockMatrix[moI][mu]*fockMatrix[moI][nu] + fockMatrix[moA][mu]*fockMatrix[moA][nu])
-                             *(cartesianMatrix[mu][nu][axis] - molecule.GetXyzCOC()[axis]*overlapAOs[mu][nu]);
+               for(int mu=0; mu<totalNumberAOs; mu++){
+                  for(int nu=0; nu<totalNumberAOs; nu++){
+                     temp   = (-1.0*fockMatrix[moI][mu]*fockMatrix[moI][nu] + fockMatrix[moA][mu]*fockMatrix[moA][nu]);
+                     tempX += temp*(cartesianMatrix[XAxis][mu][nu] - xyzCOC[XAxis]*overlapAOs[mu][nu]);
+                     tempY += temp*(cartesianMatrix[YAxis][mu][nu] - xyzCOC[YAxis]*overlapAOs[mu][nu]);
+                     tempZ += temp*(cartesianMatrix[ZAxis][mu][nu] - xyzCOC[ZAxis]*overlapAOs[mu][nu]);
                   }
                }
-               value += matrixCIS[from-1][l]*matrixCIS[to-1][l]*temp;
+               temp    = matrixCIS[from-1][l]*matrixCIS[to-1][l];
+               valueX += temp*tempX;
+               valueY += temp*tempY;
+               valueZ += temp*tempZ;
             }
             catch(MolDSException ex){
 #pragma omp critical
@@ -1249,22 +1462,22 @@ double ZindoS::GetElectronicTransitionDipoleMoment(int to, int from, CartesianTy
          if(!ompErrors.str().empty()){
             throw MolDSException(ompErrors.str());
          }
-         value += groundStateDipole[axis];
-         return value;
+         transitionDipoleMoment[XAxis] = valueX + groundStateDipole[XAxis];
+         transitionDipoleMoment[YAxis] = valueY + groundStateDipole[YAxis];
+         transitionDipoleMoment[ZAxis] = valueZ + groundStateDipole[ZAxis];
       }
       else{
          // dipole moment of the ground state
-         value = Cndo2::GetElectronicTransitionDipoleMoment(to,
-                                                            from,
-                                                            axis,
-                                                            fockMatrix,
-                                                            matrixCIS,
-                                                            cartesianMatrix,
-                                                            molecule,
-                                                            orbitalElectronPopulation,
-                                                            overlapAOs,
-                                                            NULL);
-         return value;
+         Cndo2::CalcElectronicTransitionDipoleMoment(transitionDipoleMoment,
+                                                     to,
+                                                     from,
+                                                     fockMatrix,
+                                                     matrixCIS,
+                                                     cartesianMatrix,
+                                                     molecule,
+                                                     orbitalElectronPopulation,
+                                                     overlapAOs,
+                                                     NULL);
       }
    }
 }
@@ -2027,273 +2240,267 @@ void ZindoS::CalcCISMatrix(double** matrixCIS) const{
    this->OutputLog(this->messageStartCalcCISMatrix);
    double ompStartTime = omp_get_wtime();
 
-   stringstream ompErrors;
+   int totalNumberAtoms = this->molecule->GetNumberAtoms();
+   double**** nishimotoMatagaMatrix=NULL;
+   try{
+      MallocerFreer::GetInstance()->Malloc<double>(&nishimotoMatagaMatrix, totalNumberAtoms, OrbitalType_end, totalNumberAtoms, OrbitalType_end);
+      this->CalcNishimotoMatagaMatrix(nishimotoMatagaMatrix, *this->molecule);
+
+      stringstream ompErrors;
 #pragma omp parallel for schedule(auto)
-   for(int k=0; k<this->matrixCISdimension; k++){
-      try{
-         // single excitation from I-th (occupied)MO to A-th (virtual)MO
-         int moI = this->GetActiveOccIndex(*this->molecule, k);
-         int moA = this->GetActiveVirIndex(*this->molecule, k);
+      for(int k=0; k<this->matrixCISdimension; k++){
+         try{
+            // single excitation from I-th (occupied)MO to A-th (virtual)MO
+            int moI = this->GetActiveOccIndex(*this->molecule, k);
+            int moA = this->GetActiveVirIndex(*this->molecule, k);
 
-         for(int l=k; l<this->matrixCISdimension; l++){
-            // single excitation from J-th (occupied)MO to B-th (virtual)MO
-            int moJ = this->GetActiveOccIndex(*this->molecule, l);
-            int moB = this->GetActiveVirIndex(*this->molecule, l);
-            double value=0.0;
-         
-            // Fast algorithm, but this is not easy to read. 
-            // Slow algorithm is also written below.
-            double gamma;
-            double exchange;
-            double coulomb;
-            // Off diagonal term (right upper)
-            if(k<l){
-               for(int A=0; A<molecule->GetNumberAtoms(); A++){
-                  const Atom& atomA = *molecule->GetAtom(A);
-                  int firstAOIndexA = atomA.GetFirstAOIndex();
-                  int lastAOIndexA  = atomA.GetLastAOIndex();
+            for(int l=k; l<this->matrixCISdimension; l++){
+               // single excitation from J-th (occupied)MO to B-th (virtual)MO
+               int moJ = this->GetActiveOccIndex(*this->molecule, l);
+               int moB = this->GetActiveVirIndex(*this->molecule, l);
 
-                  for(int mu=firstAOIndexA; mu<=lastAOIndexA; mu++){
-                     OrbitalType orbitalMu = atomA.GetValence(mu-firstAOIndexA);
-
-                     // CNDO term
-                     for(int B=A; B<molecule->GetNumberAtoms(); B++){
-                        const Atom& atomB = *molecule->GetAtom(B);
-                        int firstAOIndexB = atomB.GetFirstAOIndex();
-                        int lastAOIndexB  = atomB.GetLastAOIndex();
-
-                        for(int nu=firstAOIndexB; nu<=lastAOIndexB; nu++){
-                           OrbitalType orbitalNu = atomB.GetValence(nu-firstAOIndexB);
-
-                           if(A<B){
-                              gamma = this->GetNishimotoMatagaTwoEleInt(atomA, 
-                                                                        orbitalMu, 
-                                                                        atomB, 
-                                                                        orbitalNu);
-                              value += 2.0*gamma*fockMatrix[moA][mu]
-                                                *fockMatrix[moI][mu]
-                                                *fockMatrix[moJ][nu]
-                                                *fockMatrix[moB][nu];
-                              value -=     gamma*fockMatrix[moA][mu]
-                                                *fockMatrix[moB][mu]
-                                                *fockMatrix[moI][nu]
-                                                *fockMatrix[moJ][nu];
-                              value += 2.0*gamma*fockMatrix[moA][nu]
-                                                *fockMatrix[moI][nu]
-                                                *fockMatrix[moJ][mu]
-                                                *fockMatrix[moB][mu];
-                              value -=     gamma*fockMatrix[moA][nu]
-                                                *fockMatrix[moB][nu]
-                                                *fockMatrix[moI][mu]
-                                                *fockMatrix[moJ][mu];
-                           }
-                           else{
-                              gamma = atomA.GetZindoF0ss();
-                              value += 2.0*gamma*fockMatrix[moA][mu]
-                                                *fockMatrix[moI][mu]
-                                                *fockMatrix[moJ][nu]
-                                                *fockMatrix[moB][nu];
-                              value -=     gamma*fockMatrix[moA][mu]
-                                                *fockMatrix[moB][mu]
-                                                *fockMatrix[moI][nu]
-                                                *fockMatrix[moJ][nu];
-                           }  
-                        }
-                     }
-
-                     // Aditional term for INDO or ZIND/S, see Eq. (10) in [RZ_1973]
-                     for(int nu=firstAOIndexA; nu<=lastAOIndexA; nu++){
-                        OrbitalType orbitalNu = atomA.GetValence(nu-firstAOIndexA);
-
-                        if(mu!=nu){
-                           exchange = this->GetExchangeInt(orbitalMu, orbitalNu, atomA);
-                           value += 2.0*exchange*fockMatrix[moA][mu]
-                                                *fockMatrix[moI][nu]
-                                                *fockMatrix[moJ][nu]
-                                                *fockMatrix[moB][mu];
-                           value += 2.0*exchange*fockMatrix[moA][mu]
-                                                *fockMatrix[moI][nu]
-                                                *fockMatrix[moJ][mu]
-                                                *fockMatrix[moB][nu];
-                           value -=     exchange*fockMatrix[moA][mu]
-                                                *fockMatrix[moB][nu]
-                                                *fockMatrix[moI][nu]
-                                                *fockMatrix[moJ][mu];
-                           value -=     exchange*fockMatrix[moA][mu]
-                                                *fockMatrix[moB][nu]
-                                                *fockMatrix[moI][mu]
-                                                *fockMatrix[moJ][nu];
-                        }
-
-                        coulomb = this->GetCoulombInt(orbitalMu, orbitalNu, atomA);
-
-                        if( (orbitalMu == s || orbitalMu == px || orbitalMu == py || orbitalMu == pz) &&
-                            (orbitalNu == s || orbitalNu == px || orbitalNu == py || orbitalNu == pz) ){
-                              gamma = atomA.GetZindoF0ss();
-                        }
-                        else{
-                           stringstream ss;
-                           ss << this->errorMessageCalcCISMatrix;
-                           ss << this->errorMessageAtomType << AtomTypeStr(atomA.GetAtomType()) << "\n";
-                           ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbitalMu) << "\n";
-                           ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbitalNu) << "\n";
-#pragma omp critical
-                           ompErrors << ss.str() << endl ;
-                        }   
-
-                        value += 2.0*(coulomb-gamma)*fockMatrix[moA][mu]
-                                                    *fockMatrix[moI][mu]
-                                                    *fockMatrix[moJ][nu]
-                                                    *fockMatrix[moB][nu];
-                        value -=     (coulomb-gamma)*fockMatrix[moA][mu]
-                                                    *fockMatrix[moB][mu]
-                                                    *fockMatrix[moI][nu]
-                                                    *fockMatrix[moJ][nu];
-                     }
-                  }
+               // Fast algorithm, but this is not easy to read. Slow algorithm is also written below.
+               if(k<l){
+                  // Off diagonal term (right upper)
+                  matrixCIS[k][l] = this->GetCISOffDiagElement(nishimotoMatagaMatrix, *this->molecule, this->fockMatrix, moI, moA, moJ, moB);
                }
-            }
-            // Diagonal term
-            else if(k==l){
-               value = this->energiesMO[moA] - this->energiesMO[moI];
-               for(int A=0; A<molecule->GetNumberAtoms(); A++){
-                  const Atom& atomA = *molecule->GetAtom(A);
-                  int firstAOIndexA = atomA.GetFirstAOIndex();
-                  int lastAOIndexA  = atomA.GetLastAOIndex();
+               else if(k==l){
+                  // Diagonal term
+                  matrixCIS[k][l] = this->GetCISDiagElement(energiesMO, nishimotoMatagaMatrix, *this->molecule, this->fockMatrix, moI, moA);
+               } 
+               // End of the fast algorith.
 
-                  for(int mu=firstAOIndexA; mu<=lastAOIndexA; mu++){
-                     OrbitalType orbitalMu = atomA.GetValence(mu-firstAOIndexA);
-
-                     // CNDO term
-                     for(int B=A; B<molecule->GetNumberAtoms(); B++){
-                        const Atom& atomB = *molecule->GetAtom(B);
-                        int firstAOIndexB = atomB.GetFirstAOIndex();
-                        int lastAOIndexB  = atomB.GetLastAOIndex();
-
-                        for(int nu=firstAOIndexB; nu<=lastAOIndexB; nu++){
-                           OrbitalType orbitalNu = atomB.GetValence(nu-firstAOIndexB);
-
-                           if(A<B){
-                              gamma = this->GetNishimotoMatagaTwoEleInt(atomA, 
-                                                                        orbitalMu, 
-                                                                        atomB, 
-                                                                        orbitalNu);
-                              value += 2.0*gamma*fockMatrix[moI][mu]
-                                                *fockMatrix[moA][mu]
-                                                *fockMatrix[moA][nu]
-                                                *fockMatrix[moI][nu];
-                              value -=     gamma*fockMatrix[moI][mu]
-                                                *fockMatrix[moI][mu]
-                                                *fockMatrix[moA][nu]
-                                                *fockMatrix[moA][nu];
-                              value += 2.0*gamma*fockMatrix[moI][nu]
-                                                *fockMatrix[moA][nu]
-                                                *fockMatrix[moA][mu]
-                                                *fockMatrix[moI][mu];
-                              value -=     gamma*fockMatrix[moI][nu]
-                                                *fockMatrix[moI][nu]
-                                                *fockMatrix[moA][mu]
-                                                *fockMatrix[moA][mu];
-                           }
-                           else{
-                              gamma = atomA.GetZindoF0ss();
-                              value += 2.0*gamma*fockMatrix[moI][mu]
-                                                *fockMatrix[moA][mu]
-                                                *fockMatrix[moA][nu]
-                                                *fockMatrix[moI][nu];
-                              value -=     gamma*fockMatrix[moI][mu]
-                                                *fockMatrix[moI][mu]
-                                                *fockMatrix[moA][nu]
-                                                *fockMatrix[moA][nu];
-                           }     
-                        }
-                     }
-
-                     // Aditional term for INDO or ZIND/S, see Eq. (10) in [RZ_1973]
-                     for(int nu=firstAOIndexA; nu<=lastAOIndexA; nu++){
-                        OrbitalType orbitalNu = atomA.GetValence(nu-firstAOIndexA);
-
-                        if(mu!=nu){
-                           exchange = this->GetExchangeInt(orbitalMu, orbitalNu, atomA);
-                           value += 2.0*exchange*fockMatrix[moI][mu]
-                                                *fockMatrix[moA][nu]
-                                                *fockMatrix[moA][nu]
-                                                *fockMatrix[moI][mu];
-                           value += 2.0*exchange*fockMatrix[moI][mu]
-                                                *fockMatrix[moA][nu]
-                                                *fockMatrix[moA][mu]
-                                                *fockMatrix[moI][nu];
-                           value -=     exchange*fockMatrix[moI][mu]
-                                                *fockMatrix[moI][nu]
-                                                *fockMatrix[moA][nu]
-                                                *fockMatrix[moA][mu];
-                           value -=     exchange*fockMatrix[moI][mu]
-                                                *fockMatrix[moI][nu]
-                                                *fockMatrix[moA][mu]
-                                                *fockMatrix[moA][nu];
-                        }
-
-                        coulomb = this->GetCoulombInt(orbitalMu, orbitalNu, atomA);
-
-                        if( (orbitalMu == s || orbitalMu == px || orbitalMu == py || orbitalMu == pz) &&
-                            (orbitalNu == s || orbitalNu == px || orbitalNu == py || orbitalNu == pz) ){
-                              gamma = atomA.GetZindoF0ss();
-                        }
-                        else{
-                           stringstream ss;
-                           ss << this->errorMessageCalcCISMatrix;
-                           ss << this->errorMessageAtomType << AtomTypeStr(atomA.GetAtomType()) << "\n";
-                           ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbitalMu) << "\n";
-                           ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbitalNu) << "\n";
-#pragma omp critical
-                           ompErrors << ss.str() << endl ;
-                        }   
-
-                        value += 2.0*(coulomb-gamma)*fockMatrix[moI][mu]
-                                                    *fockMatrix[moA][mu]
-                                                    *fockMatrix[moA][nu]
-                                                    *fockMatrix[moI][nu];
-                        value -=     (coulomb-gamma)*fockMatrix[moI][mu]
-                                                    *fockMatrix[moI][mu]
-                                                    *fockMatrix[moA][nu]
-                                                    *fockMatrix[moA][nu];
-                     }
-                  }
+               /*// Slow algorith, but this is easy to read. Fast altorithm is also written above.
+               double value=0.0;
+               value = 2.0*this->GetMolecularIntegralElement(moA, moI, moJ, moB, 
+                                                             *this->molecule, 
+                                                             this->fockMatrix, 
+                                                             NULL)
+                          -this->GetMolecularIntegralElement(moA, moB, moI, moJ, 
+                                                             *this->molecule, 
+                                                             this->fockMatrix, 
+                                                             NULL);
+               if(k==l){
+                  value += this->energiesMO[moA] - this->energiesMO[moI];
                }
+               matrixCIS[k][l] = value;
+               // End of the slow algorith. */
             }
-            // End of the fast algorith.
-            /* 
-            // Slow algorith, but this is easy to read. Fast altorithm is also written above.
-            value = 2.0*this->GetMolecularIntegralElement(moA, moI, moJ, moB, 
-                                                          this->molecule, 
-                                                          this->fockMatrix, 
-                                                          NULL)
-                       -this->GetMolecularIntegralElement(moA, moB, moI, moJ, 
-                                                          this->molecule, 
-                                                          this->fockMatrix, 
-                                                          NULL);
-            if(k==l){
-               value += this->energiesMO[moA] - this->energiesMO[moI];
-            }
-            // End of the slow algorith.
-            */
-            matrixCIS[k][l] = value;
          }
-      }
-      catch(MolDSException ex){
+         catch(MolDSException ex){
 #pragma omp critical
-         ompErrors << ex.what() << endl ;
+            ompErrors << ex.what() << endl ;
+         }
+      } // end of k-loop
+      // Exception throwing for omp-region
+      if(!ompErrors.str().empty()){
+         throw MolDSException(ompErrors.str());
       }
    }
-   // Exception throwing for omp-region
-   if(!ompErrors.str().empty()){
-      throw MolDSException(ompErrors.str());
+   catch(MolDSException ex){
+      MallocerFreer::GetInstance()->Free<double>(&nishimotoMatagaMatrix, totalNumberAtoms, OrbitalType_end, totalNumberAtoms, OrbitalType_end);
+      throw ex;
    }
+   MallocerFreer::GetInstance()->Free<double>(&nishimotoMatagaMatrix, totalNumberAtoms, OrbitalType_end, totalNumberAtoms, OrbitalType_end);
    double ompEndTime = omp_get_wtime();
    this->OutputLog(boost::format("%s%lf%s\n%s") % this->messageOmpElapsedTimeCalcCISMarix.c_str()
                                                 % (ompEndTime - ompStartTime)
                                                 % this->messageUnitSec.c_str()
                                                 % this->messageDoneCalcCISMatrix.c_str() );
+}
+
+double ZindoS::GetCISDiagElement(double const* energiesMO,
+                                 double const* const* const* const* nishimotoMatagaMatrix,
+                                 const MolDS_base::Molecule& molecule,
+                                 double const* const* fockMatrix, 
+                                 int moI,
+                                 int moA) const{
+   double value    = energiesMO[moA] - energiesMO[moI];
+   double gamma    = 0.0;
+   double exchange = 0.0;
+   double coulomb  = 0.0;
+   int totalNumberAtoms = molecule.GetNumberAtoms();
+   for(int A=0; A<totalNumberAtoms; A++){
+      const Atom& atomA = *molecule.GetAtom(A);
+      int firstAOIndexA = atomA.GetFirstAOIndex();
+      int lastAOIndexA  = atomA.GetLastAOIndex();
+
+      for(int mu=firstAOIndexA; mu<=lastAOIndexA; mu++){
+         OrbitalType orbitalMu = atomA.GetValence(mu-firstAOIndexA);
+         double tmp1 = fockMatrix[moA][mu]*fockMatrix[moI][mu]; 
+         double tmp2 = fockMatrix[moI][mu]*fockMatrix[moI][mu]; 
+         double tmp3 = fockMatrix[moA][mu]*fockMatrix[moA][mu];
+
+         // CNDO term
+         for(int B=A; B<totalNumberAtoms; B++){
+            const Atom& atomB = *molecule.GetAtom(B);
+            int firstAOIndexB = atomB.GetFirstAOIndex();
+            int lastAOIndexB  = atomB.GetLastAOIndex();
+
+            for(int nu=firstAOIndexB; nu<=lastAOIndexB; nu++){
+               OrbitalType orbitalNu = atomB.GetValence(nu-firstAOIndexB);
+
+               if(A<B){
+                  gamma = nishimotoMatagaMatrix[A][orbitalMu][B][orbitalNu];
+                  value += 4.0*gamma*tmp1
+                                    *fockMatrix[moA][nu]
+                                    *fockMatrix[moI][nu];
+                  value -=     gamma*tmp2
+                                    *fockMatrix[moA][nu]
+                                    *fockMatrix[moA][nu];
+                  value -=     gamma*tmp3
+                                    *fockMatrix[moI][nu]
+                                    *fockMatrix[moI][nu];
+               }
+               else{
+                  gamma = atomA.GetZindoF0ss();
+                  value += 2.0*gamma*tmp1
+                                    *fockMatrix[moA][nu]
+                                    *fockMatrix[moI][nu];
+                  value -=     gamma*tmp2
+                                    *fockMatrix[moA][nu]
+                                    *fockMatrix[moA][nu];
+               }     
+            }
+         }
+
+         //Aditional term for INDO or ZIND/S, see Eq. (10) in [RZ_1973]
+         for(int nu=firstAOIndexA; nu<=lastAOIndexA; nu++){
+            OrbitalType orbitalNu = atomA.GetValence(nu-firstAOIndexA);
+
+            if(mu!=nu){
+               exchange = this->GetExchangeInt(orbitalMu, orbitalNu, atomA);
+               value += 2.0*exchange*tmp2
+                                    *fockMatrix[moA][nu]
+                                    *fockMatrix[moA][nu];
+            }
+
+            coulomb = this->GetCoulombInt(orbitalMu, orbitalNu, atomA);
+
+            if( (orbitalMu == s || orbitalMu == px || orbitalMu == py || orbitalMu == pz) &&
+                (orbitalNu == s || orbitalNu == px || orbitalNu == py || orbitalNu == pz) ){
+                  gamma = atomA.GetZindoF0ss();
+            }
+            else{
+               stringstream ss;
+               ss << this->errorMessageCalcCISMatrix;
+               ss << this->errorMessageAtomType << AtomTypeStr(atomA.GetAtomType()) << "\n";
+               ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbitalMu) << "\n";
+               ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbitalNu) << "\n";
+               throw MolDSException(ss.str());
+            }   
+            value += 2.0*(coulomb-gamma)*tmp1
+                                        *fockMatrix[moA][nu]
+                                        *fockMatrix[moI][nu];
+            value -=     (coulomb-gamma)*tmp2
+                                        *fockMatrix[moA][nu]
+                                        *fockMatrix[moA][nu];
+         }
+      }
+   }
+   return value;
+}
+
+double ZindoS::GetCISOffDiagElement(double const* const* const* const* nishimotoMatagaMatrix,
+                                    const MolDS_base::Molecule& molecule,
+                                    double const* const* fockMatrix, 
+                                    int moI,
+                                    int moA,
+                                    int moJ,
+                                    int moB) const{
+   double value    = 0.0;
+   double gamma    = 0.0;
+   double exchange = 0.0;
+   double coulomb  = 0.0;
+   int totalNumberAtoms = molecule.GetNumberAtoms();
+   for(int A=0; A<totalNumberAtoms; A++){
+      const Atom& atomA = *molecule.GetAtom(A);
+      int firstAOIndexA = atomA.GetFirstAOIndex();
+      int lastAOIndexA  = atomA.GetLastAOIndex();
+
+      for(int mu=firstAOIndexA; mu<=lastAOIndexA; mu++){ 
+         OrbitalType orbitalMu = atomA.GetValence(mu-firstAOIndexA); 
+         double tmp1 = fockMatrix[moA][mu]*fockMatrix[moI][mu]; 
+         double tmp2 = fockMatrix[moA][mu]*fockMatrix[moB][mu]; 
+         double tmp3 = fockMatrix[moJ][mu]*fockMatrix[moB][mu];
+         double tmp4 = fockMatrix[moI][mu]*fockMatrix[moJ][mu];
+
+         // CNDO term
+         for(int B=A; B<totalNumberAtoms; B++){
+            const Atom& atomB = *molecule.GetAtom(B);
+            int firstAOIndexB = atomB.GetFirstAOIndex(); 
+            int lastAOIndexB  = atomB.GetLastAOIndex(); 
+            for(int nu=firstAOIndexB; nu<=lastAOIndexB; nu++){
+               OrbitalType orbitalNu = atomB.GetValence(nu-firstAOIndexB);
+               
+               if(A<B){
+                  gamma = nishimotoMatagaMatrix[A][orbitalMu][B][orbitalNu];
+                  value += 2.0*gamma*tmp1
+                                    *fockMatrix[moJ][nu]
+                                    *fockMatrix[moB][nu];
+                  value -=     gamma*tmp2
+                                    *fockMatrix[moI][nu]
+                                    *fockMatrix[moJ][nu];
+                  value += 2.0*gamma*tmp3
+                                    *fockMatrix[moA][nu]
+                                    *fockMatrix[moI][nu];
+                  value -=     gamma*tmp4
+                                    *fockMatrix[moA][nu]
+                                    *fockMatrix[moB][nu];
+               }
+               else{
+                  gamma = atomA.GetZindoF0ss();
+                  value += 2.0*gamma*tmp1
+                                    *fockMatrix[moJ][nu]
+                                    *fockMatrix[moB][nu];
+                  value -=     gamma*tmp2
+                                    *fockMatrix[moI][nu]
+                                    *fockMatrix[moJ][nu];
+               }  
+            }
+         }
+
+         // Aditional term for INDO or ZIND/S, see Eq. (10) in [RZ_1973]
+         double tmp5 = fockMatrix[moA][mu]*fockMatrix[moB][mu];
+         double tmp6 = fockMatrix[moA][mu]*fockMatrix[moJ][mu];
+         double tmp7 = fockMatrix[moA][mu]*fockMatrix[moI][mu];
+         for(int nu=firstAOIndexA; nu<=lastAOIndexA; nu++){
+            OrbitalType orbitalNu = atomA.GetValence(nu-firstAOIndexA);
+
+            if(mu!=nu){
+               exchange = this->GetExchangeInt(orbitalMu, orbitalNu, atomA);
+               value += 2.0*exchange
+                       *(tmp5*fockMatrix[moJ][nu] + tmp6*fockMatrix[moB][nu])
+                       *fockMatrix[moI][nu];
+               value -= exchange
+                       *(tmp6*fockMatrix[moI][nu] + tmp7*fockMatrix[moJ][nu])
+                       *fockMatrix[moB][nu];
+            }
+
+            coulomb = this->GetCoulombInt(orbitalMu, orbitalNu, atomA);
+
+            if( (orbitalMu == s || orbitalMu == px || orbitalMu == py || orbitalMu == pz) &&
+                (orbitalNu == s || orbitalNu == px || orbitalNu == py || orbitalNu == pz) ){
+                  gamma = atomA.GetZindoF0ss();
+            }
+            else{
+               stringstream ss;
+               ss << this->errorMessageCalcCISMatrix;
+               ss << this->errorMessageAtomType << AtomTypeStr(atomA.GetAtomType()) << "\n";
+               ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbitalMu) << "\n";
+               ss << this->errorMessageOrbitalType << OrbitalTypeStr(orbitalNu) << "\n";
+               throw MolDSException(ss.str());
+            }   
+            value += 2.0*(coulomb-gamma)*tmp7
+                                        *fockMatrix[moJ][nu]
+                                        *fockMatrix[moB][nu];
+            value -=     (coulomb-gamma)*tmp5
+                                        *fockMatrix[moI][nu]
+                                        *fockMatrix[moJ][nu];
+         }
+      }
+   }
+   return value;
 }
 
 void ZindoS::CheckMatrixForce(const vector<int>& elecStates){
@@ -2372,6 +2579,7 @@ void ZindoS::CalcForce(const vector<int>& elecStates){
                   const Atom& atomB = *molecule->GetAtom(b);
                   int firstAOIndexB = atomB.GetFirstAOIndex();
                   int lastAOIndexB  = atomB.GetLastAOIndex();
+                  double rAB = this->molecule->GetDistanceAtoms(atomA, atomB);
 
                   // calc. first derivative of overlapAOs.
                   this->CalcDiatomicOverlapAOs1stDerivatives(diatomicOverlapAOs1stDerivs, atomA, atomB);
@@ -2389,7 +2597,7 @@ void ZindoS::CalcForce(const vector<int>& elecStates){
                                              +atomB.GetCoreCharge()
                                              *atomicElectronPopulation[a])
                                              *this->GetNishimotoMatagaTwoEleInt1stDerivative(
-                                                    atomA, s, atomB, s, (CartesianType)i);
+                                                    atomA, s, atomB, s, rAB, static_cast<CartesianType>(i));
                   }
                   for(int mu=firstAOIndexA; mu<=lastAOIndexA; mu++){
                      OrbitalType orbitalMu = atomA.GetValence(mu-firstAOIndexA);
@@ -2408,7 +2616,8 @@ void ZindoS::CalcForce(const vector<int>& elecStates){
                                                   -0.5*pow(this->orbitalElectronPopulation[mu][nu],2.0))
                                                   *this->GetNishimotoMatagaTwoEleInt1stDerivative(
                                                          atomA, orbitalMu, atomB, orbitalNu,
-                                                         (CartesianType)i);
+                                                         rAB,
+                                                         static_cast<CartesianType>(i));
                         }
                      }
                   }
