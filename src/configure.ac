@@ -92,7 +92,7 @@ AS_IF([test "x$molds_blas_header_found" != "xyes"],
       [AC_MSG_FAILURE([Cannot find mkl.h or blas.h!])])
 
 dnl Check for CBLAS
-AC_CHECK_FUNCS([cblas_dcopy cblas_daxpy cblas_ddot cblas_dgemv cblas_dgemm cblas_dsymv cblas_dsyr],
+AC_CHECK_FUNCS([cblas_dcopy cblas_daxpy cblas_ddot cblas_dgemv cblas_dgemm cblas_dsymv cblas_dsyr cblas_dsyrk],
                 [molds_blas_cinterface_found=yes],
                 [molds_blas_cinterface_found=no;break])
 

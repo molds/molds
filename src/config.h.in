@@ -47,6 +47,9 @@
 /* Define to 1 if you have the `cblas_dsyr' function. */
 #undef HAVE_CBLAS_DSYR
 
+/* Define to 1 if you have the `cblas_dsyrk' function. */
+#undef HAVE_CBLAS_DSYRK
+
 /* Define to 1 if you have the <cblas.h> header file. */
 #undef HAVE_CBLAS_H
 
