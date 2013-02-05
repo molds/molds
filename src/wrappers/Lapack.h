@@ -18,11 +18,23 @@
 //************************************************************************//
 #ifndef INCLUDED_LAPACK
 #define INCLUDED_LAPACK
+#include "config.h"
+#ifdef HAVE_MKL_H
+#include <mkl.h>
+#endif
 namespace MolDS_wrappers{
 #if SIZEOF_LAPACKINT==64
+#ifdef HAVE_MKL_H
+typedef MKL_INT64 molds_lapack_int;
+#else
 typedef int64_t molds_lapack_int;
+#endif
 #elif SIZEOF_LAPACKINT==32
+#ifdef HAVE_MKL_H
+typedef MKL_INT molds_lapack_int;
+#else
 typedef int32_t molds_lapack_int;
+#endif
 #else
 #error SIZEOF_BLASINT is undefined or invalid!
 #endif
