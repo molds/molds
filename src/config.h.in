@@ -13,12 +13,18 @@
 /* define if the Boost library is available */
 #undef HAVE_BOOST
 
+/* Define to 1 if you have the <boost/format.hpp> header file. */
+#undef HAVE_BOOST_FORMAT_HPP
+
 /* Define to 1 if you have the <boost/math/special_functions/factorials.hpp>
    header file. */
 #undef HAVE_BOOST_MATH_SPECIAL_FUNCTIONS_FACTORIALS_HPP
 
 /* Define to 1 if you have the <boost/random.hpp> header file. */
 #undef HAVE_BOOST_RANDOM_HPP
+
+/* Define to 1 if you have the <boost/shared_ptr.hpp> header file. */
+#undef HAVE_BOOST_SHARED_PTR_HPP
 
 /* Define to 1 if you have the `cblas_daxpy' function. */
 #undef HAVE_CBLAS_DAXPY

@@ -174,8 +174,15 @@ AC_CACHE_CHECK([whether ld accepts -rpath option],[molds_cv_ld_accepts_rpath],
 AS_IF([test x$molds_cv_ld_accepts_rpath == xyes],
       [BOOST_LDFLAGS="$BOOST_LDFLAGS -Wl,-rpath=$BOOST_LIBDIR"])
 
+dnl Check for boost headers
+CPPFLAGS_save=$CPPFLAGS
+CPPFLAGS="$CPPFLAGS $BOOST_CPPFLAGS"
+AC_CHECK_HEADERS([boost/format.hpp],,[AC_MSG_FAILURE([Cannot find boost/format.hpp!])])
 AC_CHECK_HEADERS([boost/random.hpp],,[AC_MSG_FAILURE([Cannot find boost/random.hpp!])])
+AC_CHECK_HEADERS([boost/shared_ptr.hpp],,[AC_MSG_FAILURE([Cannot find boost/shared_ptr.hpp!])])
+
 AC_CHECK_HEADERS([boost/math/special_functions/factorials.hpp])
+CPPFLAGS=$CPPFLAGS_save
 
 dnl Checks for header files.
 AC_CHECK_HEADERS([stdlib.h string.h])

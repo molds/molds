@@ -7749,6 +7749,25 @@ if test x$molds_cv_ld_accepts_rpath == xyes; then :
   BOOST_LDFLAGS="$BOOST_LDFLAGS -Wl,-rpath=$BOOST_LIBDIR"
 fi
 
+CPPFLAGS_save=$CPPFLAGS
+CPPFLAGS="$CPPFLAGS $BOOST_CPPFLAGS"
+for ac_header in boost/format.hpp
+do :
+  ac_fn_cxx_check_header_mongrel "$LINENO" "boost/format.hpp" "ac_cv_header_boost_format_hpp" "$ac_includes_default"
+if test "x$ac_cv_header_boost_format_hpp" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_BOOST_FORMAT_HPP 1
+_ACEOF
+
+else
+  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+as_fn_error $? "Cannot find boost/format.hpp!
+See \`config.log' for more details" "$LINENO" 5; }
+fi
+
+done
+
 for ac_header in boost/random.hpp
 do :
   ac_fn_cxx_check_header_mongrel "$LINENO" "boost/random.hpp" "ac_cv_header_boost_random_hpp" "$ac_includes_default"
@@ -7766,6 +7785,24 @@ fi
 
 done
 
+for ac_header in boost/shared_ptr.hpp
+do :
+  ac_fn_cxx_check_header_mongrel "$LINENO" "boost/shared_ptr.hpp" "ac_cv_header_boost_shared_ptr_hpp" "$ac_includes_default"
+if test "x$ac_cv_header_boost_shared_ptr_hpp" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_BOOST_SHARED_PTR_HPP 1
+_ACEOF
+
+else
+  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+as_fn_error $? "Cannot find boost/shared_ptr.hpp!
+See \`config.log' for more details" "$LINENO" 5; }
+fi
+
+done
+
+
 for ac_header in boost/math/special_functions/factorials.hpp
 do :
   ac_fn_cxx_check_header_mongrel "$LINENO" "boost/math/special_functions/factorials.hpp" "ac_cv_header_boost_math_special_functions_factorials_hpp" "$ac_includes_default"
@@ -7778,6 +7815,7 @@ fi
 
 done
 
+CPPFLAGS=$CPPFLAGS_save
 
 for ac_header in stdlib.h string.h
 do :
