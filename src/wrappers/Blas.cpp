@@ -29,7 +29,6 @@
 #ifdef HAVE_MKL_H
 #if SIZEOF_BLASINT == 64
 #define MKL_ILP64
-#define MKL_INT int64_t
 #endif
 #include"mkl.h"
 #elif HAVE_CBLAS_H

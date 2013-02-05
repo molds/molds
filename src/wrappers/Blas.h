@@ -19,11 +19,23 @@
 //************************************************************************//
 #ifndef INCLUDED_BLAS
 #define INCLUDED_BLAS
+#include "config.h"
+#ifdef HAVE_MKL_H
+#include "mkl.h"
+#endif
 namespace MolDS_wrappers{
 #if SIZEOF_BLASINT==64
+#ifdef HAVE_MKL_H
+typedef MKL_INT64 molds_blas_int;
+#else
 typedef int64_t molds_blas_int;
+#endif
 #elif SIZEOF_BLASINT==32
+#ifdef HAVE_MKL_H
+typedef MKL_INT molds_blas_int;
+#else
 typedef int32_t molds_blas_int;
+#endif
 #else
 #error SIZEOF_BLASINT is undefined or invalid!
 #endif
