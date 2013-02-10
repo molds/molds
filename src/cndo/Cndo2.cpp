@@ -199,13 +199,13 @@ void Cndo2::SetMessages(){
    this->messageStartSCF = "**********  START: CNDO/2-SCF  **********\n";
    this->messageDoneSCF = "**********  DONE: CNDO/2-SCF  **********\n\n\n";
    this->messageOmpElapsedTimeSCF = "\tElapsed time(omp) for the SCF = ";
-   this->messageIterSCF =     "\tSCF iter ";
-   this->messageDensityRMS =  ":\tRMS density = ";
-   this->messageDiisError =   "\tDIIS error = ";
-   this->messageDiisApplied = " (DIIS was applied)";
-   this->messageEnergyMO =    "\tEnergy of MO:";
+   this->messageIterSCFTitle = "\t\t\t|  RMS density  | DIIS error | DIIS on/off | damping on/off |\n";
+   this->messageIterSCF =      "\tSCF iter ";
+   this->messageDiisApplied =     "on";
+   this->messageDampingApplied =  "on";
+   this->messageEnergyMO =     "\tEnergy of MO:";
    this->messageEnergyMOTitle = "\t\t\t| i-th | occ/unocc |  e[a.u.]  |  e[eV]  | \n";
-   this->messageOcc = "occ";
+   this->messageOcc   = "occ";
    this->messageUnOcc = "unocc";
    this->messageMullikenAtomsSCF   = "\tMulliken charge(SCF):";
    this->messageMullikenAtoms      = "\tMulliken charge:";
@@ -504,6 +504,7 @@ double Cndo2::GetDiatomVdWCorrection2ndDerivative(int indexAtomA,
 void Cndo2::DoSCF(bool requiresGuess){
    this->OutputLog(this->messageStartSCF);
    double ompStartTime = omp_get_wtime();
+   this->OutputLog(this->messageIterSCFTitle);
 #ifdef MOLDS_DBG
    if(this->molecule == NULL){
       throw MolDSException(this->errorMessageMoleculeNotSet);
@@ -534,6 +535,7 @@ void Cndo2::DoSCF(bool requiresGuess){
       int maxIterationsSCF = Parameters::GetInstance()->GetMaxIterationsSCF();
       bool isGuess=true;
       bool hasAppliedDIIS=false;
+      bool hasAppliedDamping=false;
       double diisError=0.0;
       for(int iterationStep=0; iterationStep<maxIterationsSCF; iterationStep++){
          this->CalcAtomicElectronPopulation(this->atomicElectronPopulation, 
@@ -570,7 +572,8 @@ void Cndo2::DoSCF(bool requiresGuess){
                                                                &rmsDensity, 
                                                                iterationStep,
                                                                diisError,
-                                                               hasAppliedDIIS);
+                                                               hasAppliedDIIS,
+                                                               hasAppliedDamping);
          if(hasConverged){
             this->OutputLog(this->messageSCFMetConvergence);
             this->CalcSCFProperties();
@@ -580,6 +583,7 @@ void Cndo2::DoSCF(bool requiresGuess){
          else{
             if(!isGuess){ 
                this->DoDamp(rmsDensity, 
+                            hasAppliedDamping,
                             this->orbitalElectronPopulation, 
                             oldOrbitalElectronPopulation, 
                             *this->molecule);
@@ -917,12 +921,15 @@ void Cndo2::DoDIIS(double** orbitalElectronPopulation,
 }
 
 void Cndo2::DoDamp(double rmsDensity, 
+                   bool&  hasAppliedDamping,
                    double** orbitalElectronPopulation, 
                    double const* const* oldOrbitalElectronPopulation, 
                    const Molecule& molecule) const{
    double dampingThresh = Parameters::GetInstance()->GetDampingThreshSCF();
    double dampingWeight = Parameters::GetInstance()->GetDampingWeightSCF();
+   hasAppliedDamping = false;
    if(0.0 < dampingWeight && dampingThresh < rmsDensity){
+      hasAppliedDamping = true;
       stringstream ompErrors;
 #pragma omp parallel for schedule(auto)
       for(int j=0; j<molecule.GetTotalNumberAOs(); j++){
@@ -1315,7 +1322,8 @@ bool Cndo2::SatisfyConvergenceCriterion(double const* const * oldOrbitalElectron
                                         double* rmsDensity,
                                         int     times,
                                         double  diisError,
-                                        bool    hasAppliedDIIS) const{
+                                        bool    hasAppliedDIIS,
+                                        bool    hasAppliedDamping) const{
    bool satisfy = false;
    double change = 0.0;
    stringstream ompErrors;
@@ -1337,14 +1345,14 @@ bool Cndo2::SatisfyConvergenceCriterion(double const* const * oldOrbitalElectron
    }
    *rmsDensity = sqrt(change);
  
-   string diisOnOff = hasAppliedDIIS ? this->messageDiisApplied : "";
-   this->OutputLog(boost::format("%s%d%s%.15lf%s%e%s\n") % this->messageIterSCF.c_str()
+   string diisOnOff    = hasAppliedDIIS    ? this->messageDiisApplied    : "";
+   string dampingOnOff = hasAppliedDamping ? this->messageDampingApplied : "";
+   this->OutputLog(boost::format("%s%d\t%e\t%e\t%s\t\t%s\n") % this->messageIterSCF.c_str()
                                                        % times
-                                                       % this->messageDensityRMS.c_str()
                                                        % *rmsDensity
-                                                       % this->messageDiisError.c_str()
                                                        % diisError
-                                                       % diisOnOff);
+                                                       % diisOnOff
+                                                       % dampingOnOff);
 
    if(*rmsDensity < Parameters::GetInstance()->GetThresholdSCF()){
       satisfy = true;
@@ -1371,14 +1379,15 @@ void Cndo2::CalcFockMatrix(double** fockMatrix,
    MallocerFreer::GetInstance()->Initialize<double>(fockMatrix, 
                                                     molecule.GetTotalNumberAOs(), 
                                                     molecule.GetTotalNumberAOs());
+   int totalNumberAtoms=molecule.GetNumberAtoms();
    stringstream ompErrors;
 #pragma omp parallel for schedule(auto) 
-   for(int A=0; A<molecule.GetNumberAtoms(); A++){
+   for(int A=0; A<totalNumberAtoms; A++){
       try{
         const Atom& atomA = *molecule.GetAtom(A);
          int firstAOIndexA = atomA.GetFirstAOIndex();
          int lastAOIndexA  = atomA.GetLastAOIndex();
-         for(int B=A; B<molecule.GetNumberAtoms(); B++){
+         for(int B=A; B<totalNumberAtoms; B++){
             const Atom& atomB = *molecule.GetAtom(B);
             int firstAOIndexB = atomB.GetFirstAOIndex();
             int lastAOIndexB  = atomB.GetLastAOIndex();
@@ -1676,42 +1685,27 @@ void Cndo2::CalcElectronicTransitionDipoleMoment(double* transitionDipoleMoment,
                                                  double const* groundStateDipole) const{
    int groundState = 0;
    if(from == groundState && to == groundState){
-      double valueX=0.0;
-      double valueY=0.0;
-      double valueZ=0.0;
-      double const* xyzCOC = molecule.GetXyzCOC();
+      double const* centerOfDipole = molecule.GetXyzCOC();
       int totalAONumber = molecule.GetTotalNumberAOs();
-      stringstream ompErrors;
-#pragma omp parallel for reduction(+:valueX,valueY,valueZ) schedule(auto)
-      for(int mu=0; mu<totalAONumber; mu++){
-         try{
-            double threadValueX = 0.0;
-            double threadValueY = 0.0;
-            double threadValueZ = 0.0;
-            for(int nu=0; nu<totalAONumber; nu++){
-               threadValueX -= orbitalElectronPopulation[mu][nu]
-                              *(cartesianMatrix[XAxis][mu][nu]-xyzCOC[XAxis]*overlapAOs[mu][nu]);
-               threadValueY -= orbitalElectronPopulation[mu][nu]
-                              *(cartesianMatrix[YAxis][mu][nu]-xyzCOC[YAxis]*overlapAOs[mu][nu]);
-               threadValueZ -= orbitalElectronPopulation[mu][nu]
-                              *(cartesianMatrix[ZAxis][mu][nu]-xyzCOC[ZAxis]*overlapAOs[mu][nu]);
-            }
-            valueX += threadValueX;
-            valueY += threadValueY;
-            valueZ += threadValueZ;
-         }
-         catch(MolDSException ex){
-#pragma omp critical
-            ompErrors << ex.what() << endl ;
-         }
-      }
-      // Exception throwing for omp-region
-      if(!ompErrors.str().empty()){
-         throw MolDSException(ompErrors.str());
-      }
-      transitionDipoleMoment[XAxis] = valueX;
-      transitionDipoleMoment[YAxis] = valueY;
-      transitionDipoleMoment[ZAxis] = valueZ;
+      transitionDipoleMoment[XAxis] = 0.0;
+      transitionDipoleMoment[YAxis] = 0.0;
+      transitionDipoleMoment[ZAxis] = 0.0;
+      transitionDipoleMoment[XAxis] -= MolDS_wrappers::Blas::GetInstance()->Ddot(totalAONumber*totalAONumber,
+                                                                                 &orbitalElectronPopulation[0][0],
+                                                                                 &cartesianMatrix[XAxis][0][0]);
+      transitionDipoleMoment[YAxis] -= MolDS_wrappers::Blas::GetInstance()->Ddot(totalAONumber*totalAONumber,
+                                                                                 &orbitalElectronPopulation[0][0],
+                                                                                 &cartesianMatrix[YAxis][0][0]);
+      transitionDipoleMoment[ZAxis] -= MolDS_wrappers::Blas::GetInstance()->Ddot(totalAONumber*totalAONumber,
+                                                                                 &orbitalElectronPopulation[0][0],
+                                                                                 &cartesianMatrix[ZAxis][0][0]);
+      // set orign of dipole
+      double temp = MolDS_wrappers::Blas::GetInstance()->Ddot(totalAONumber*totalAONumber,
+                                                              &orbitalElectronPopulation[0][0],
+                                                              &overlapAOs[0][0]);
+      transitionDipoleMoment[XAxis] += centerOfDipole[XAxis]*temp;
+      transitionDipoleMoment[YAxis] += centerOfDipole[YAxis]*temp;
+      transitionDipoleMoment[ZAxis] += centerOfDipole[ZAxis]*temp;
    }
    else{
       stringstream ss;
