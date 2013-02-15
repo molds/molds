@@ -30,6 +30,7 @@
 #include"../base/PrintController.h"
 #include"../base/MolDSException.h"
 #include"../base/Uncopyable.h"
+#include"../wrappers/Blas.h"
 #include"../wrappers/Lapack.h"
 #include"../base/Enums.h"
 #include"../base/MallocerFreer.h"
@@ -410,16 +411,23 @@ double Mndo::GetFockDiagElement(const Atom& atomA,
       value += temp;
 
       temp = 0.0;
-      for(int B=0; B<molecule.GetNumberAtoms(); B++){
+      int totalNumberAtoms=molecule.GetNumberAtoms();
+      for(int B=0; B<totalNumberAtoms; B++){
          if(B != indexAtomA){
             const Atom& atomB = *molecule.GetAtom(B);
             int firstAOIndexB = atomB.GetFirstAOIndex();
-            for(int lambda=0; lambda<atomB.GetValenceSize(); lambda++){
-               for(int sigma=0; sigma<atomB.GetValenceSize(); sigma++){
+            int valenceSizeB = atomB.GetValenceSize();
+            for(int lambda=0; lambda<valenceSizeB; lambda++){
+               for(int sigma=0; sigma<valenceSizeB; sigma++){
                   temp += orbitalElectronPopulation[lambda+firstAOIndexB]
                                                    [sigma+firstAOIndexB]
                          *twoElecTwoCore[indexAtomA][B][mu][mu][lambda][sigma];
                }
+               /*
+               temp += MolDS_wrappers::Blas::GetInstance()->Ddot(valenceSizeB, 
+                                                                 &orbitalElectronPopulation[lambda+firstAOIndexB][firstAOIndexB],
+                                                                 &twoElecTwoCore[indexAtomA][B][mu][mu][lambda][0]);
+               */
             }
             temp += this->GetElectronCoreAttraction(indexAtomA, 
                                                     B, 
@@ -466,16 +474,23 @@ double Mndo::GetFockOffDiagElement(const Atom& atomA,
          exchange = this->GetExchangeInt(orbitalMu, orbitalNu, atomA); 
          temp = (1.5*exchange - 0.5*coulomb)
                *orbitalElectronPopulation[mu+firstAOIndexA][nu+firstAOIndexB];
-         for(int BB=0; BB<molecule.GetNumberAtoms(); BB++){
+         int totalNumberAtoms = molecule.GetNumberAtoms();
+         for(int BB=0; BB<totalNumberAtoms; BB++){
             if(BB != indexAtomA){
                const Atom& atomBB = *molecule.GetAtom(BB);
                int firstAOIndexBB = atomBB.GetFirstAOIndex();
-               for(int lambda=0; lambda<atomBB.GetValenceSize(); lambda++){
-                  for(int sigma=0; sigma<atomBB.GetValenceSize(); sigma++){
+               int valenceSizeBB = atomBB.GetValenceSize();
+               for(int lambda=0; lambda<valenceSizeBB; lambda++){
+                  for(int sigma=0; sigma<valenceSizeBB; sigma++){
                      temp += orbitalElectronPopulation[lambda+firstAOIndexBB]
                                                       [sigma+firstAOIndexBB]
                             *twoElecTwoCore[indexAtomA][BB][mu][nu][lambda][sigma];
                   }
+                  /*
+                  temp += MolDS_wrappers::Blas::GetInstance()->Ddot(valenceSizeBB, 
+                                                                    &orbitalElectronPopulation[lambda+firstAOIndexBB][firstAOIndexBB],
+                                                                    &twoElecTwoCore[indexAtomA][BB][mu][nu][lambda][0]);
+                  */
                }
                temp += this->GetElectronCoreAttraction(indexAtomA, 
                                                        BB, 
@@ -488,11 +503,20 @@ double Mndo::GetFockOffDiagElement(const Atom& atomA,
       else{
          temp = bondParameter*overlapAOs[mu+firstAOIndexA][nu+firstAOIndexB];
          for(int sigma=0; sigma<atomA.GetValenceSize(); sigma++){
-            for(int lambda=0; lambda<atomB.GetValenceSize(); lambda++){
-               temp -= 0.5*orbitalElectronPopulation[lambda+firstAOIndexB]
-                                                    [sigma+firstAOIndexA]
+            int valenceSizeB = atomB.GetValenceSize();
+            for(int lambda=0; lambda<valenceSizeB; lambda++){
+               //temp -= 0.5*orbitalElectronPopulation[lambda+firstAOIndexB]
+               //                                     [sigma+firstAOIndexA]
+               //       *twoElecTwoCore[indexAtomA][indexAtomB][mu][sigma][nu][lambda];
+               temp -= 0.5*orbitalElectronPopulation[sigma+firstAOIndexA]
+                                                    [lambda+firstAOIndexB]
                       *twoElecTwoCore[indexAtomA][indexAtomB][mu][sigma][nu][lambda];
             }
+            /*
+            temp -= 0.5*MolDS_wrappers::Blas::GetInstance()->Ddot(valenceSizeB, 
+                                                              &orbitalElectronPopulation[sigma+firstAOIndexA][firstAOIndexB],
+                                                              &twoElecTwoCore[indexAtomA][indexAtomB][mu][sigma][nu][0]);
+            */
          }
       }
       value += temp;
@@ -1315,7 +1339,7 @@ double Mndo::GetAuxiliaryKNRKRElement(int moI, int moJ, int moK, int moL) const{
    // End of the fast algorith.
    
    /*
-   // slow algorythm
+   // slow algorithm
    value = 4.0*this->GetMolecularIntegralElement(moI, moJ, moK, moL, 
                                                  *this->molecule, 
                                                  this->fockMatrix, NULL)
@@ -2946,7 +2970,7 @@ void Mndo::CalcZMatrixForce(const vector<int>& elecStates){
                                  Parameters::GetInstance()->GetActiveOccCIS(),
                                  Parameters::GetInstance()->GetActiveVirCIS());
 
-   // malloc temporary arraies
+   // malloc temporary arrays
    double* delta = NULL; // Delta matrix, see (9) in [PT_1997]
    double* q = NULL; //// Q-vector in (19) in [PT_1997]
    double** gammaNRMinusKNR = NULL; // Gmamma_{NR} - K_{NR} matrix, see (40) and (45) to slove (54) in [PT_1996]
@@ -3916,7 +3940,7 @@ void Mndo::RotateDiatomicTwoElecTwoCoreToSpaceFrame(double**** matrix,
       }
    }
    
-   // rotate (fast algorythm, see also slow algorythm shown later)
+   // rotate (fast algorithm, see also slow algorithm shown later)
    for(int mu=0; mu<dxy; mu++){
       for(int nu=0; nu<dxy; nu++){
          for(int lambda=0; lambda<dxy; lambda++){
@@ -3943,7 +3967,7 @@ void Mndo::RotateDiatomicTwoElecTwoCoreToSpaceFrame(double**** matrix,
    }
 
    /*
-   // rotate (slow algorythm)
+   // rotate (slow algorithm)
    for(int mu=0; mu<dxy; mu++){
       for(int nu=0; nu<dxy; nu++){
          for(int lambda=0; lambda<dxy; lambda++){
@@ -3989,7 +4013,7 @@ void Mndo::RotateDiatomicTwoElecTwoCore1stDerivativesToSpaceFrame(
       }
    }
    
-   // rotate (fast algorythm, see also slow algorythm shown later)
+   // rotate (fast algorithm, see also slow algorithm shown later)
    for(int mu=0; mu<dxy; mu++){
       for(int nu=mu; nu<dxy; nu++){
          for(int lambda=0; lambda<dxy; lambda++){
@@ -4051,7 +4075,7 @@ void Mndo::RotateDiatomicTwoElecTwoCore1stDerivativesToSpaceFrame(
    }
 
    /*
-   // rotate (slow algorythm)
+   // rotate (slow algorithm)
    for(int mu=0; mu<dxy; mu++){
       for(int nu=0; nu<dxy; nu++){
          for(int lambda=0; lambda<dxy; lambda++){
@@ -4128,7 +4152,7 @@ void Mndo::RotateDiatomicTwoElecTwoCore2ndDerivativesToSpaceFrame(
       }
    }
 
-   // rotate (fast algorythm, see also slow algorythm shown later)
+   // rotate (fast algorithm, see also slow algorithm shown later)
    int numberTerms = 25;
    double* tempIJK = NULL;
    double* tempIJ = NULL;
@@ -4253,7 +4277,7 @@ void Mndo::RotateDiatomicTwoElecTwoCore2ndDerivativesToSpaceFrame(
    MallocerFreer::GetInstance()->Free<double>(&tempI, numberTerms);
 
    /*
-   // rotate (slow algorythm shown later)
+   // rotate (slow algorithm shown later)
    for(int mu=s; mu<dxy; mu++){
       for(int nu=s; nu<dxy; nu++){
          for(int lambda=s; lambda<dxy; lambda++){
