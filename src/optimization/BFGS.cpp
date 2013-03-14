@@ -202,7 +202,7 @@ void BFGS::SearchMinimum(boost::shared_ptr<ElectronicStructure> electronicStruct
 
          // Take a RFO step
          bool doLineSearch = false;
-         bool tempCanOutputLogs = false;
+         bool tempCanOutputLogs = true;
          lineSearchInitialEnergy = lineSearchCurrentEnergy;
          if(doLineSearch){
             this->LineSearch(electronicStructure, molecule, lineSearchCurrentEnergy, matrixStep, elecState, dt);
