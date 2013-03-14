@@ -85,6 +85,15 @@ public:
               double const* const* matrixB,
               double beta,
               double**             matrixC) const;
+   void Dgemm(bool isColumnMajorMatrixA, 
+              bool isColumnMajorMatrixB, 
+              bool isColumnMajorMatrixC, 
+              molds_blas_int m, molds_blas_int n, molds_blas_int k, 
+              double alpha,
+              double const* const* matrixA,
+              double const* const* matrixB,
+              double beta,
+              double**             matrixC) const;
    void Dgemmm(molds_blas_int m, molds_blas_int n, molds_blas_int k, molds_blas_int l,
                double const* const* matrixA, 
                double const* const* matrixB, 
@@ -100,6 +109,17 @@ public:
                double const* const* matrixC,
                double beta,
                double**             matrixD) const;
+   void Dgemmm(bool isColumnMajorMatrixA, 
+               bool isColumnMajorMatrixB, 
+               bool isColumnMajorMatrixC, 
+               molds_blas_int m, molds_blas_int n, molds_blas_int k, molds_blas_int l,
+               double alpha,
+               double const* const* matrixA,
+               double const* const* matrixB,
+               double const* const* matrixC,
+               double beta,
+               double**             matrixD,
+               double**             tmpMatrixBC) const;
   void Dsyrk(molds_blas_int n, molds_blas_int k,
              double const *const* matrixA,
              double**             matrixC)const;
