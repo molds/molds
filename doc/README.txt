@@ -67,9 +67,9 @@ COMPILE(using GNUmake):
 
    For both case, the compile succeeded if you could fine "MolDS.out" in the "src" directory. 
    Type "$ make clean" when you wanna clean the compilation.
-   If you want to compile MolDS in debug-mode, -g and -DMOLDS_DBG 
-   should be added to CFLAGBASE in the Makefile,
-   i.e. -O0 -openmp -openmp-report2 -DMKL_INT=intptr_t -g -DMOLDS_DBG
+   If you want to compile MolDS in debug-mode, 
+   -g and -DMOLDS_DBG should be added to CFLAGS, that is, hit the following command:
+   $make CFLAGS="-O0 -g -DMOLDS_DBG"
 
 ==============================================================================
 CARRY OUT MolDS:
@@ -103,7 +103,7 @@ CAPABILITIES:
    ---------|-----|-----|--------|--------|--------|--------|----------|----------|--------------|--------------|-----------------|
    INDO     | OK  | --  | --     | --     | OK     | --     | --       | --       | --           | --           | --              |
    ---------|-----|-----|--------|--------|--------|--------|----------|----------|--------------|--------------|-----------------|
-   ZINDO/S  | OK  | OK  | OK     | --     | OK     | OK     | OK       | --       | OK           | --           | --              |
+   ZINDO/S  | OK  | OK  | OK     | OK     | OK     | OK     | OK       | OK       | OK           | OK           | --              |
    ---------|-----|-----|--------|--------|--------|--------|----------|----------|--------------|--------------|-----------------|
    MNDO     | OK  | OK  | OK     | OK     | OK     | OK     | OK       | OK       | OK           | OK           | OK              |
    ---------|-----|-----|--------|--------|--------|--------|----------|----------|--------------|--------------|-----------------|
@@ -425,6 +425,7 @@ HOW TO WRITE INPUT:
       Write OPT-directive. This module uses line search and steepest descent algorythms.
       In the early stage the line search algorythm is used, 
       then the algorythm used in this module is switched to steepest descent algorythm.
+      Note that ZINDO/S is not suitable for geometry optimizations.
 
       E.g.
          OPTIMIZE
@@ -480,7 +481,7 @@ HOW TO WRITE INPUT:
       
 
    <MD (Molecular dynamics)>
-      Write MD-directive.
+      Write MD-directive. Note that ZINDO/S is not suitable for molcular dynamics simulations.
 
       E.g.
          MD 

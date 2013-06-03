@@ -39,15 +39,12 @@ public:
       return (*this->atomVect)[atomIndex];
    }
    void AddAtom(MolDS_base_atoms::Atom* atom);
-   double* GetXyzCOM() const;
-   double* GetXyzCOM();
-   double* GetXyzCOC() const;
-   double* GetXyzCOC();
-   void CalcXyzCOM();
-   void CalcXyzCOC();
+   double const* GetXyzCOM() const;
+   double const* GetXyzCOC() const;
    void CalcBasics();
+   void CalcBasicsConfiguration();
    int GetTotalNumberAOs() const;
-   int GetTotalNumberValenceElectrons() const;
+   inline int GetTotalNumberValenceElectrons() const{return this->totalNumberValenceElectrons;}
    double GetTotalCoreMass() const;
    void OutputXyzCOM() const;
    void OutputXyzCOC() const;
@@ -65,20 +62,22 @@ public:
    void SynchronizePhaseSpacePointTo(const Molecule& ref);
 private:
    std::vector<MolDS_base_atoms::Atom*>* atomVect;
-   double* xyzCOM; // x, y, z coordinates of Center of Mass;
-   double* xyzCOC; // x, y, z coordinates of Center of Core;
-   bool wasCalculatedXyzCOM;
-   bool wasCalculatedXyzCOC;
+   double*  xyzCOM; // x, y, z coordinates of Center of Mass;
+   double*  xyzCOC; // x, y, z coordinates of Center of Core;
+   double** distanceMatrix; // distance between each atom;
    int totalNumberAOs;
    int totalNumberValenceElectrons;
    double totalCoreMass;
    void Initialize();
    void CopyInitialize(const Molecule& rhs);
-   void Finalize(std::vector<MolDS_base_atoms::Atom*>** atomVect, double** xyzCOM, double**xyzCOC);
+   void Finalize(std::vector<MolDS_base_atoms::Atom*>** atomVect, double** xyzCOM, double** xyzCOC, double*** distanceMatrix);
    void SetMessages();
    void CalcTotalNumberValenceElectrons();
    void CalcTotalNumberAOs();
    void CalcTotalCoreMass();
+   void CalcXyzCOM();
+   void CalcXyzCOC();
+   void CalcDistanceMatrix();
    void CalcInertiaTensor(double** inertiaTensor, 
                           double const* inertiaTensorOrigin);
    void FreeInertiaTensorMoments(double*** inertiaTensor, 
@@ -98,8 +97,10 @@ private:
    std::string errorMessageGetAtomNull;
    std::string errorMessageAddAtomNull;
    std::string errorMessageGetNumberAtomsNull;
-   std::string errorMessageGetXyzCOCNull;
    std::string errorMessageGetXyzCOMNull;
+   std::string errorMessageGetXyzCOCNull;
+   std::string errorMessageCalcXyzCOMNull;
+   std::string errorMessageCalcXyzCOCNull;
    std::string messageTotalNumberAOs;
    std::string messageTotalNumberAtoms;
    std::string messageTotalNumberValenceElectrons;

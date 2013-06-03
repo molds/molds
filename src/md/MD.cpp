@@ -146,8 +146,7 @@ void MD::UpdateCoordinates(Molecule& molecule, double dt) const{
             atom->GetXyz()[i] += dt*atom->GetPxyz()[i]/coreMass;
          }
       }
-      molecule.CalcXyzCOM();
-      molecule.CalcXyzCOC();
+      molecule.CalcBasicsConfiguration();
 }
 
 void MD::SetMessages(){
@@ -173,7 +172,7 @@ void MD::SetMessages(){
 
 double MD::OutputEnergies(boost::shared_ptr<ElectronicStructure> electronicStructure){
    int elecState = Parameters::GetInstance()->GetElectronicStateIndexMD();
-   double eV2AU = Parameters::GetInstance()->GetEV2AU();
+   double eV2AU  = Parameters::GetInstance()->GetEV2AU();
    double coreKineticEnergy = 0.0;
    for(int a=0; a<this->molecule->GetNumberAtoms(); a++){
       Atom* atom = this->molecule->GetAtom(a);

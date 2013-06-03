@@ -51,16 +51,17 @@ Molecule::Molecule(const Molecule& rhs){
 }
 
 Molecule& Molecule::operator=(const Molecule& rhs){
-   double* oldXyzCOM = this->xyzCOM;
-   double* oldXyzCOC = this->xyzCOC;
+   double*  oldXyzCOM = this->xyzCOM;
+   double*  oldXyzCOC = this->xyzCOC;
+   double** oldDistanceMatrix = this->distanceMatrix;
    vector<Atom*>* oldAtomVect = this->atomVect;
    this->CopyInitialize(rhs);
-   this->Finalize(&oldAtomVect, &oldXyzCOM, &oldXyzCOC);
+   this->Finalize(&oldAtomVect, &oldXyzCOM, &oldXyzCOC, &oldDistanceMatrix);
    return *this;
 }
 
 Molecule::~Molecule(){
-   this->Finalize(&this->atomVect, &this->xyzCOM, &this->xyzCOC);
+   this->Finalize(&this->atomVect, &this->xyzCOM, &this->xyzCOC, &this->distanceMatrix);
    //this->OutputLog("molecule deleted\n");
 }
 
@@ -70,14 +71,13 @@ void Molecule::CopyInitialize(const Molecule& rhs){
       this->xyzCOM[i] = rhs.xyzCOM[i];
       this->xyzCOC[i] = rhs.xyzCOC[i];
    }
-   this->wasCalculatedXyzCOM = rhs.wasCalculatedXyzCOM;
-   this->wasCalculatedXyzCOC = rhs.wasCalculatedXyzCOC;
    this->totalNumberAOs = rhs.totalNumberAOs;
    this->totalNumberValenceElectrons = rhs.totalNumberValenceElectrons;
    this->totalCoreMass = rhs.totalCoreMass;
    for(int i=0; i<rhs.atomVect->size(); i++){
       Atom* atom = (*rhs.atomVect)[i];
       this->atomVect->push_back(AtomFactory::Create(atom->GetAtomType(),
+                                                    atom->GetIndex(),
                                                     atom->GetXyz()[XAxis],
                                                     atom->GetXyz()[YAxis],
                                                     atom->GetXyz()[ZAxis],
@@ -86,29 +86,37 @@ void Molecule::CopyInitialize(const Molecule& rhs){
                                                     atom->GetPxyz()[ZAxis]));
       (*this->atomVect)[i]->SetFirstAOIndex(atom->GetFirstAOIndex());
    }                                                                     
+   int atomNum = this->atomVect->size();
+   MallocerFreer::GetInstance()->Malloc<double>(&this->distanceMatrix, atomNum, atomNum);
+   for(int i=0; i<atomNum; i++){
+      for(int j=0; j<atomNum; j++){
+         this->distanceMatrix[i][j] = rhs.distanceMatrix[i][j];
+      }
+   }
+
 }
 
 void Molecule::Initialize(){
    this->SetMessages();
-   this->wasCalculatedXyzCOM = false;
-   this->wasCalculatedXyzCOC = false;
-   this->xyzCOM = NULL;
-   this->xyzCOC = NULL;
-   this->atomVect = NULL;
+   this->xyzCOM         = NULL;
+   this->xyzCOC         = NULL;
+   this->distanceMatrix = NULL;
+   this->atomVect       = NULL;
    try{
       this->atomVect = new vector<Atom*>;
       MallocerFreer::GetInstance()->Malloc<double>(&this->xyzCOM, CartesianType_end);
       MallocerFreer::GetInstance()->Malloc<double>(&this->xyzCOC, CartesianType_end);
    }
    catch(exception ex){
-      this->Finalize(&this->atomVect, &this->xyzCOM, &this->xyzCOC);
+      this->Finalize(&this->atomVect, &this->xyzCOM, &this->xyzCOC, &this->distanceMatrix);
       throw MolDSException(ex.what());
    }
 }
 
-void Molecule::Finalize(vector<Atom*>** atomVect, double** xyzCOM, double**xyzCOC){
+void Molecule::Finalize(vector<Atom*>** atomVect, double** xyzCOM, double** xyzCOC, double*** distanceMatrix){
+   int atomNum = (*atomVect)->size();
    if(*atomVect != NULL){
-      for(int i=0; i<(*atomVect)->size(); i++){
+      for(int i=0; i<atomNum; i++){
          if((**atomVect)[i] != NULL){
             delete (**atomVect)[i];
             (**atomVect)[i] = NULL;
@@ -121,14 +129,17 @@ void Molecule::Finalize(vector<Atom*>** atomVect, double** xyzCOM, double**xyzCO
    }
    MallocerFreer::GetInstance()->Free<double>(xyzCOM, CartesianType_end);
    MallocerFreer::GetInstance()->Free<double>(xyzCOC, CartesianType_end);
+   MallocerFreer::GetInstance()->Free<double>(distanceMatrix, atomNum, atomNum);
 }
 
 void Molecule::SetMessages(){
    this->errorMessageGetAtomNull = "Error in base::Molecule::GetAtom: atomVect is NULL.\n";
    this->errorMessageAddAtomNull = "Error in base::Molecule::AddAtom: atomVect is NULL.\n";
    this->errorMessageGetNumberAtomsNull = "Error in base::Molecule::GetNumberAtoms: atomVect is NULL.\n";
-   this->errorMessageGetXyzCOCNull = "Error in base::Molecule::GetXyzCOC: xyzCOC is NULL.\n";
    this->errorMessageGetXyzCOMNull = "Error in base::Molecule::GetXyzCOM: xyzCOM is NULL.\n";
+   this->errorMessageGetXyzCOCNull = "Error in base::Molecule::GetXyzCOC: xyzCOC is NULL.\n";
+   this->errorMessageCalcXyzCOMNull = "Error in base::Molecule::CalcXyzCOM: xyzCOM is NULL.\n";
+   this->errorMessageCalcXyzCOCNull = "Error in base::Molecule::CalcXyzCOC: xyzCOC is NULL.\n";
    this->messageTotalNumberAOs = "\tTotal number of valence AOs: ";
    this->messageTotalNumberAtoms = "\tTotal number of atoms: ";
    this->messageTotalNumberValenceElectrons = "\tTotal number of valence electrons: ";
@@ -170,39 +181,27 @@ void Molecule::AddAtom(Atom* atom){
    
 }
 
-double* Molecule::GetXyzCOM() const{
+double const* Molecule::GetXyzCOM() const{
 #ifdef MOLDS_DBG
    if(this->xyzCOM==NULL) throw MolDSException(this->errorMessageGetXyzCOMNull);
 #endif
    return this->xyzCOM;
 }
 
-double* Molecule::GetXyzCOM(){
-   if(!this->wasCalculatedXyzCOM){
-      this->CalcXyzCOM();
-   }
-   return this->xyzCOM;
-}
-
-double* Molecule::GetXyzCOC() const{
+double const* Molecule::GetXyzCOC() const{
 #ifdef MOLDS_DBG
    if(this->xyzCOC==NULL) throw MolDSException(this->errorMessageGetXyzCOCNull);
 #endif
    return this->xyzCOC;
 }
 
-double* Molecule::GetXyzCOC(){
-   if(!this->wasCalculatedXyzCOC){
-      this->CalcXyzCOC();
-   }
-   return this->xyzCOC;
-}
-
 void Molecule::CalcXyzCOM(){
-   MallocerFreer::GetInstance()->Malloc<double>(&this->xyzCOM, CartesianType_end);
-   double totalAtomicMass = 0.0;
+#ifdef MOLDS_DBG
+   if(this->xyzCOM==NULL) throw MolDSException(this->errorMessageCalcXyzCOMNull);
+#endif
+   double  totalAtomicMass = 0.0;
    double* atomicXyz;
-   double atomicMass = 0.0;
+   double  atomicMass = 0.0;
 
    for(int j=0; j<3; j++){
       this->xyzCOM[j] = 0.0;
@@ -220,14 +219,15 @@ void Molecule::CalcXyzCOM(){
    for(int i=0; i<3; i++){
       this->xyzCOM[i]/=totalAtomicMass;
    }
-   this->wasCalculatedXyzCOM = true;
 }
 
 void Molecule::CalcXyzCOC(){
-   MallocerFreer::GetInstance()->Malloc<double>(&this->xyzCOC, CartesianType_end);
-   double totalCoreMass = 0.0;
+#ifdef MOLDS_DBG
+   if(this->xyzCOC==NULL) throw MolDSException(this->errorMessageCalcXyzCOCNull);
+#endif
+   double  totalCoreMass = 0.0;
    double* atomicXyz;
-   double coreMass = 0.0;
+   double  coreMass = 0.0;
 
    for(int j=0; j<3; j++){
       this->xyzCOC[j] = 0.0;
@@ -245,7 +245,24 @@ void Molecule::CalcXyzCOC(){
    for(int i=0; i<3; i++){
       this->xyzCOC[i]/=totalCoreMass;
    }
-   this->wasCalculatedXyzCOC = true;
+}
+
+void Molecule::CalcDistanceMatrix(){
+   if(this->distanceMatrix==NULL){
+      MallocerFreer::GetInstance()->Malloc<double>(&this->distanceMatrix, this->atomVect->size(), this->atomVect->size());
+   }
+   for(int a=0; a<this->atomVect->size(); a++){
+      const Atom& atomA = *(*this->atomVect)[a];
+      for(int b=a; b<this->atomVect->size(); b++){
+         const Atom& atomB = *(*this->atomVect)[b];
+         double distance=0.0;
+         distance = sqrt( pow(atomA.GetXyz()[0] - atomB.GetXyz()[0], 2.0)
+                         +pow(atomA.GetXyz()[1] - atomB.GetXyz()[1], 2.0)
+                         +pow(atomA.GetXyz()[2] - atomB.GetXyz()[2], 2.0) );
+         this->distanceMatrix[a][b] = distance;
+         this->distanceMatrix[b][a] = distance;
+      }
+   }
 }
 
 int Molecule::GetTotalNumberAOs() const{
@@ -256,8 +273,13 @@ void Molecule::CalcBasics(){
    this->CalcTotalNumberAOs();
    this->CalcTotalNumberValenceElectrons();
    this->CalcTotalCoreMass();
+   this->CalcBasicsConfiguration();
+}
+
+void Molecule::CalcBasicsConfiguration(){
    this->CalcXyzCOM();
    this->CalcXyzCOC();
+   this->CalcDistanceMatrix();
 }
 
 void Molecule::CalcTotalNumberAOs(){
@@ -266,10 +288,6 @@ void Molecule::CalcTotalNumberAOs(){
       (*this->atomVect)[i]->SetFirstAOIndex(totalNumberAOs);
       this->totalNumberAOs += (*this->atomVect)[i]->GetValenceSize();
    }
-}
-
-int Molecule::GetTotalNumberValenceElectrons() const{
-   return this->totalNumberValenceElectrons;
 }
 
 void Molecule::CalcTotalNumberValenceElectrons(){
@@ -408,9 +426,7 @@ void Molecule::OutputInertiaTensorOrigin(double* inertiaTensorOrigin) const{
 
 void Molecule::CalcPrincipalAxes(){
    this->OutputLog(this->messageStartPrincipalAxes);
-   if(!this->wasCalculatedXyzCOM){
-      this->CalcXyzCOM();
-   }
+   this->CalcXyzCOM();
    double inertiaTensorOrigin[3] = {this->xyzCOM[0], this->xyzCOM[1], this->xyzCOM[2]};
    if(Parameters::GetInstance()->GetInertiaTensorOrigin() != NULL){
       inertiaTensorOrigin[0] = Parameters::GetInstance()->GetInertiaTensorOrigin()[0];
@@ -479,9 +495,7 @@ void Molecule::Rotate(){
    this->OutputLog(this->messageStartRotate);
 
    // Default values are set if some conditions are not specified.
-   if(!this->wasCalculatedXyzCOM){
-      this->CalcXyzCOM();
-   }
+   this->CalcXyzCOM();
    double rotatingOrigin[3] = {this->xyzCOM[0], this->xyzCOM[1], this->xyzCOM[2]};
    if(Parameters::GetInstance()->GetRotatingOrigin() != NULL){
       rotatingOrigin[0] = Parameters::GetInstance()->GetRotatingOrigin()[0];
@@ -489,10 +503,10 @@ void Molecule::Rotate(){
       rotatingOrigin[2] = Parameters::GetInstance()->GetRotatingOrigin()[2];
    }
 
-   RotatingType rotatingType = Parameters::GetInstance()->GetRotatingType();
-   double* rotatingAxis = Parameters::GetInstance()->GetRotatingAxis();
-   EularAngle rotatingEularAngles = Parameters::GetInstance()->GetRotatingEularAngles();
-   double rotatingAngle = Parameters::GetInstance()->GetRotatingAngle();
+   RotatingType  rotatingType        = Parameters::GetInstance()->GetRotatingType();
+   const double* rotatingAxis        = Parameters::GetInstance()->GetRotatingAxis();
+   EularAngle    rotatingEularAngles = Parameters::GetInstance()->GetRotatingEularAngles();
+   double        rotatingAngle       = Parameters::GetInstance()->GetRotatingAngle();
 
    this->OutputRotatingConditions(rotatingType, rotatingOrigin, 
                                   rotatingAxis, rotatingAngle, 
@@ -642,12 +656,8 @@ void Molecule::Translate(){
          atom.GetXyz()[1] += y;
          atom.GetXyz()[2] += z;
    }
-   
-   this->wasCalculatedXyzCOM = false;
    this->CalcXyzCOM();
-   this->wasCalculatedXyzCOC = false;
    this->CalcXyzCOC();
-
    this->OutputConfiguration();
    this->OutputXyzCOM();
    this->OutputXyzCOC();
@@ -668,19 +678,11 @@ void Molecule::OutputTranslatingConditions(double const* translatingDifference) 
 }
 
 double Molecule::GetDistanceAtoms(int indexAtomA, int indexAtomB) const{
-   const Atom& atomA = *(*this->atomVect)[indexAtomA];
-   const Atom& atomB = *(*this->atomVect)[indexAtomB];
-   return this->GetDistanceAtoms(atomA, atomB);
+   return this->distanceMatrix[indexAtomA][indexAtomB];
 }
 
 double Molecule::GetDistanceAtoms(const Atom& atomA, const Atom& atomB) const{
-
-   double distance=0.0;
-   distance = sqrt( pow(atomA.GetXyz()[0] - atomB.GetXyz()[0], 2.0)
-                   +pow(atomA.GetXyz()[1] - atomB.GetXyz()[1], 2.0)
-                   +pow(atomA.GetXyz()[2] - atomB.GetXyz()[2], 2.0) );
-   return distance;
-
+   return this->GetDistanceAtoms(atomA.GetIndex(), atomB.GetIndex());
 }
 
 void Molecule::SynchronizeConfigurationTo(const Molecule& ref){
@@ -691,8 +693,7 @@ void Molecule::SynchronizeConfigurationTo(const Molecule& ref){
          atom.GetXyz()[i] = refAtom.GetXyz()[i];
       }
    }
-   this->CalcXyzCOC();
-   this->CalcXyzCOM();
+   this->CalcBasicsConfiguration();
 }
 
 void Molecule::SynchronizeMomentaTo(const Molecule& ref){
@@ -714,8 +715,7 @@ void Molecule::SynchronizePhaseSpacePointTo(const Molecule& ref){
          atom.GetPxyz()[i] = refAtom.GetPxyz()[i];
       }
    }
-   this->CalcXyzCOC();
-   this->CalcXyzCOM();
+   this->CalcBasicsConfiguration();
 }
 
 }
