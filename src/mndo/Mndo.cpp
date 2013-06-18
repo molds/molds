@@ -731,21 +731,23 @@ double Mndo::GetMolecularIntegralElement(int moI, int moJ, int moK, int moL,
 void Mndo::CalcCISMatrix(double** matrixCIS) const{
    this->OutputLog(this->messageStartCalcCISMatrix);
    double ompStartTime = omp_get_wtime();
+   boost::mpi::communicator* world = MolDS_mpi::MpiProcess::GetInstance()->GetCommunicator();
 
-   stringstream ompErrors;
-#pragma omp parallel for schedule(auto)
    for(int k=0; k<this->matrixCISdimension; k++){
-      try{
-         // single excitation from I-th (occupied)MO to A-th (virtual)MO
-         int moI = this->GetActiveOccIndex(*this->molecule, k);
-         int moA = this->GetActiveVirIndex(*this->molecule, k);
+      // single excitation from I-th (occupied)MO to A-th (virtual)MO
+      int moI = this->GetActiveOccIndex(*this->molecule, k);
+      int moA = this->GetActiveVirIndex(*this->molecule, k);
+      if(k%world->size() != world->rank()){continue;}
 
-         for(int l=k; l<this->matrixCISdimension; l++){
+      stringstream ompErrors;
+#pragma omp parallel for schedule(auto)
+      for(int l=k; l<this->matrixCISdimension; l++){
+         try{
             // single excitation from J-th (occupied)MO to B-th (virtual)MO
             int moJ = this->GetActiveOccIndex(*this->molecule, l);
             int moB = this->GetActiveVirIndex(*this->molecule, l);
             double value=0.0;
-          
+             
             // Fast algorith, but this is not easy to read. 
             // Slow algorithm is alos written below.
             for(int A=0; A<molecule->GetNumberAtoms(); A++){
@@ -865,13 +867,13 @@ void Mndo::CalcCISMatrix(double** matrixCIS) const{
                }
             }
             // End of the fast algorith.
-         
+            
             /* 
             // Slow algorith, but this is easy to read. Fast altorithm is also written above.
             value = 2.0*this->GetMolecularIntegralElement(moA, moI, moJ, moB, 
-                                                          this->molecule, this->fockMatrix, NULL)
+                                                          *this->molecule, this->fockMatrix, NULL)
                        -this->GetMolecularIntegralElement(moA, moB, moI, moJ, 
-                                                          this->molecule, this->fockMatrix, NULL);
+                                                          *this->molecule, this->fockMatrix, NULL);
             // End of the slow algorith.
             */
             // Diagonal term
@@ -879,17 +881,38 @@ void Mndo::CalcCISMatrix(double** matrixCIS) const{
                value += this->energiesMO[moA] - this->energiesMO[moI];
             }
             matrixCIS[k][l] = value;
-         }
-      }
-      catch(MolDSException ex){
+         } 
+         catch(MolDSException ex){
 #pragma omp critical
-         ompErrors << ex.what() << endl ;
+            ompErrors << ex.what() << endl ;
+         }
+      }// end of l-loop
+      // Exception throwing for omp-region
+      if(!ompErrors.str().empty()){
+         throw MolDSException(ompErrors.str());
+      }
+   } // end of k-loop
+
+   // communication to collect all matrix data on rank 0
+   if(world->rank() == 0){
+      // receive the matrix data from other ranks
+      for(int k=0; k<this->matrixCISdimension; k++){
+         if(k%world->size() == 0){continue;}
+         int source = k%world->size();
+         int tag = k;
+         world->recv(source, tag, matrixCIS[k], this->matrixCISdimension);
       }
    }
-   // Exception throwing for omp-region
-   if(!ompErrors.str().empty()){
-      throw MolDSException(ompErrors.str());
+   else{
+      // send the matrix data to rank-0
+      for(int k=0; k<this->matrixCISdimension; k++){
+         if(k%world->size() != world->rank()){continue;}
+         int dest = 0;
+         int tag = k;
+         world->send(dest, tag, matrixCIS[k], this->matrixCISdimension);
+      }
    }
+
    double ompEndTime = omp_get_wtime();
    this->OutputLog(boost::format("%s%lf%s\n%s") % this->messageOmpElapsedTimeCalcCISMarix.c_str()
                                                 % (ompEndTime - ompStartTime)
