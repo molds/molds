@@ -29,9 +29,12 @@
 #include<omp.h>
 #include<boost/shared_ptr.hpp>
 #include<boost/random.hpp>
+#include<boost/mpi/environment.hpp>
+#include<boost/mpi/communicator.hpp>
+#include"Uncopyable.h"
+#include"../mpi/MpiProcess.h"
 #include"PrintController.h"
 #include"MolDSException.h"
-#include"Uncopyable.h"
 #include"../wrappers/Blas.h"
 #include"../wrappers/Lapack.h"
 #include"Utilities.h"

@@ -25,14 +25,17 @@
 #include<string>
 #include<stdexcept>
 #include<boost/format.hpp>
+#include<boost/mpi/environment.hpp>
+#include<boost/mpi/communicator.hpp>
 #ifdef __INTEL_COMPILER
 #include"mkl.h"
 #else
 #include"cblas.h"
 #endif
+#include"../base/Uncopyable.h"
+#include"../mpi/MpiProcess.h"
 #include"../base/PrintController.h"
 #include"../base/MolDSException.h"
-#include"../base/Uncopyable.h"
 #include"../base/MallocerFreer.h"
 #include"Blas.h"
 using namespace std;

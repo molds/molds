@@ -24,6 +24,8 @@
 #include<string>
 #include<stdexcept>
 #include<boost/format.hpp>
+#include<boost/mpi/environment.hpp>
+#include<boost/mpi/communicator.hpp>
 #ifdef __INTEL_COMPILER
 #include"mkl.h"
 #else
@@ -34,9 +36,10 @@
 #endif
 #include"lapacke.h"
 #endif
+#include"../base/Uncopyable.h"
+#include"../mpi/MpiProcess.h"
 #include"../base/PrintController.h"
 #include"../base/MolDSException.h"
-#include"../base/Uncopyable.h"
 #include"Lapack.h"
 
 #ifdef __INTEL_COMPILER

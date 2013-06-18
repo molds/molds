@@ -28,9 +28,12 @@
 #include<stdexcept>
 #include<omp.h>
 #include<boost/format.hpp>
+#include<boost/mpi/environment.hpp>
+#include<boost/mpi/communicator.hpp>
+#include"../base/Uncopyable.h"
+#include"../mpi/MpiProcess.h"
 #include"../base/PrintController.h"
 #include"../base/MolDSException.h"
-#include"../base/Uncopyable.h"
 #include"../wrappers/Blas.h"
 #include"../wrappers/Lapack.h"
 #include"../base/Enums.h"

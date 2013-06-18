@@ -28,9 +28,12 @@
 #include<vector>
 #include<stdexcept>
 #include<boost/format.hpp>
+#include<boost/mpi/environment.hpp>
+#include<boost/mpi/communicator.hpp>
+#include"Uncopyable.h"
+#include"../mpi/MpiProcess.h"
 #include"PrintController.h"
 #include"MolDSException.h"
-#include"Uncopyable.h"
 #include"Utilities.h"
 #include"Enums.h"
 #include"EularAngle.h"

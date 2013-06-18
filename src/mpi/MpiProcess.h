@@ -16,36 +16,26 @@
 // You should have received a copy of the GNU General Public License      // 
 // along with MolDS.  If not, see <http://www.gnu.org/licenses/>.         // 
 //************************************************************************//
-#include<stdio.h>
-#include<stdlib.h>
-#include<iostream>
-#include<vector>
-#include<stdexcept>
-#include<boost/shared_ptr.hpp>
-#include<boost/format.hpp>
-#include<boost/mpi/environment.hpp>
-#include<boost/mpi/communicator.hpp>
-#include"base/Uncopyable.h"
-#include"mpi/MpiProcess.h"
-#include"base/PrintController.h"
-#include"base/MolDSException.h"
-#include"base/Enums.h"
-#include"base/EularAngle.h"
-#include"base/atoms/Atom.h"
-#include"base/Molecule.h"
-#include"base/MolDS.h"
-using namespace std;
-using namespace MolDS_base;
-int main(int argc, char *argv[]){
-   try{
-      MolDS_mpi::MpiProcess::CreateInstance(argc, argv);
-      boost::shared_ptr<MolDS_base::MolDS> molds(new MolDS_base::MolDS());
-      molds->Run(argc, argv);
-      MolDS_mpi::MpiProcess::DeleteInstance();
-   }
-   catch(exception ex){
-      cout << ex.what();
-   }
-   return 0;
+#ifndef INCLUDED_MPIPROCESS
+#define INCLUDED_MPIPROCESS
+namespace MolDS_mpi{
+
+// MpiProcess is singleton
+class MpiProcess: private MolDS_base::Uncopyable{
+public:
+   static void        CreateInstance(int argc, char *argv[]);
+   static void        DeleteInstance();
+   static MpiProcess* GetInstance();
+   boost::mpi::communicator* GetCommunicator() const{ return this->communicator;}
+private:
+   static MpiProcess* mpiProcess;
+   MpiProcess();
+   MpiProcess(int argc, char *argv[]);
+   ~MpiProcess();
+   boost::mpi::environment*  environment;
+   boost::mpi::communicator* communicator;
+};
+
 }
+#endif
 

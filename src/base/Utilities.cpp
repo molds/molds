@@ -25,6 +25,10 @@
 #include<time.h>
 #include<omp.h>
 #include<boost/format.hpp>
+#include<boost/mpi/environment.hpp>
+#include<boost/mpi/communicator.hpp>
+#include"Uncopyable.h"
+#include"../mpi/MpiProcess.h"
 #include"PrintController.h"
 #include"Utilities.h"
 using namespace std;
