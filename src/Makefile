@@ -17,7 +17,7 @@
 #// You should have received a copy of the GNU General Public License      // 
 #// along with MolDS.  If not, see <http://www.gnu.org/licenses/>.         // 
 #//************************************************************************//
-CC = mpicxx
+CC = mpiicpc
 LIBSBASE = -lmkl_intel_thread -lmkl_core -liomp5 -lpthread -lboost_mpi -lboost_serialization
 LIBS32 = -lmkl_intel       $(LIBSBASE)
 LIBS64 = -lmkl_intel_ilp64 $(LIBSBASE)
