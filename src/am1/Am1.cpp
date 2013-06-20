@@ -24,8 +24,7 @@
 #include<string>
 #include<vector>
 #include<boost/format.hpp>
-#include<boost/mpi/environment.hpp>
-#include<boost/mpi/communicator.hpp>
+#include<boost/mpi.hpp>
 #include"../base/Uncopyable.h"
 #include"../mpi/MpiProcess.h"
 #include"../base/PrintController.h"

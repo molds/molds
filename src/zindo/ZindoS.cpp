@@ -28,8 +28,7 @@
 #include<algorithm>
 #include<omp.h>
 #include<boost/format.hpp>
-#include<boost/mpi/environment.hpp>
-#include<boost/mpi/communicator.hpp>
+#include<boost/mpi.hpp>
 #include"../base/Uncopyable.h"
 #include"../mpi/MpiProcess.h"
 #include"../base/PrintController.h"
@@ -1087,131 +1086,184 @@ void ZindoS::DoCIS(){
 void ZindoS::CalcCISProperties(){
 //calculate dipole moments and transitiondipolemoment
 {
-   double*** dipoleMOs = NULL;
-   double**  overlapMOs = NULL;
    int totalNumberAOs = this->molecule->GetTotalNumberAOs();
    int numberOcc = this->molecule->GetTotalNumberValenceElectrons()/2;
    int numberActiveOcc = Parameters::GetInstance()->GetActiveOccCIS();
    int numberActiveVir = Parameters::GetInstance()->GetActiveVirCIS();
-   MallocerFreer::GetInstance()->Malloc<double>(&dipoleMOs,       CartesianType_end, totalNumberAOs, totalNumberAOs);
-   MallocerFreer::GetInstance()->Malloc<double>(&overlapMOs, totalNumberAOs, totalNumberAOs);
-   double alpha=1.0;
-   double beta =0.0;
-   //double ompStartTime = omp_get_wtime();
-   MolDS_wrappers::Blas::GetInstance()->Dgemmm(false, false, true, totalNumberAOs, totalNumberAOs, totalNumberAOs, totalNumberAOs,
-                                               alpha, 
-                                               this->fockMatrix,
-                                               this->cartesianMatrix[XAxis],
-                                               this->fockMatrix,
-                                               beta,
-                                               dipoleMOs[XAxis]);
-   MolDS_wrappers::Blas::GetInstance()->Dgemmm(false, false, true, totalNumberAOs, totalNumberAOs, totalNumberAOs, totalNumberAOs,
-                                               alpha, 
-                                               this->fockMatrix,
-                                               this->cartesianMatrix[YAxis],
-                                               this->fockMatrix,
-                                               beta,
-                                               dipoleMOs[YAxis]);
-   MolDS_wrappers::Blas::GetInstance()->Dgemmm(false, false, true, totalNumberAOs, totalNumberAOs, totalNumberAOs, totalNumberAOs,
-                                               alpha, 
-                                               this->fockMatrix,
-                                               this->cartesianMatrix[ZAxis],
-                                               this->fockMatrix,
-                                               beta,
-                                               dipoleMOs[ZAxis]);
-
-   double const* centerOfDipole = this->molecule->GetXyzCOC();
-   // set orign of dipole
-   MolDS_wrappers::Blas::GetInstance()->Dgemmm(false, false, true, totalNumberAOs, totalNumberAOs, totalNumberAOs, totalNumberAOs,
-                                               alpha, 
-                                               this->fockMatrix,
-                                               this->overlapAOs,
-                                               this->fockMatrix,
-                                               beta,
-                                               overlapMOs);
-   MolDS_wrappers::Blas::GetInstance()->Daxpy(totalNumberAOs*totalNumberAOs,
-                                              -centerOfDipole[XAxis], 
-                                              &overlapMOs[0][0],
-                                              &dipoleMOs[XAxis][0][0]);
-   MolDS_wrappers::Blas::GetInstance()->Daxpy(totalNumberAOs*totalNumberAOs,
-                                              -centerOfDipole[YAxis], 
-                                              &overlapMOs[0][0],
-                                              &dipoleMOs[YAxis][0][0]);
-   MolDS_wrappers::Blas::GetInstance()->Daxpy(totalNumberAOs*totalNumberAOs,
-                                              -centerOfDipole[ZAxis], 
-                                              &overlapMOs[0][0],
-                                              &dipoleMOs[ZAxis][0][0]);
-
-
-   // dipole moments of excited states
-   //this->CalcElectronicDipoleMomentsExcitedStates(this->electronicTransitionDipoleMoments,
-   //                                               this->fockMatrix,
-   //                                               this->matrixCIS,
-   //                                               this->cartesianMatrix,
-   //                                               *this->molecule, 
-   //                                               this->orbitalElectronPopulation,
-   //                                               this->overlapAOs);
-   int groundState = 0;
-   for(int k=0; k<Parameters::GetInstance()->GetNumberExcitedStatesCIS(); k++){
-      int excitedState = k+1; // (k+1)-th excited state
-      this->electronicTransitionDipoleMoments[excitedState][excitedState][XAxis] = this->electronicTransitionDipoleMoments[groundState][groundState][XAxis];
-      this->electronicTransitionDipoleMoments[excitedState][excitedState][YAxis] = this->electronicTransitionDipoleMoments[groundState][groundState][YAxis];
-      this->electronicTransitionDipoleMoments[excitedState][excitedState][ZAxis] = this->electronicTransitionDipoleMoments[groundState][groundState][ZAxis];
-      for(int l=0; l<this->matrixCISdimension; l++){
-         // single excitation from I-th (occupied)MO to A-th (virtual)MO
-         int moI = this->GetActiveOccIndex(*this->molecule, l);
-         int moA = this->GetActiveVirIndex(*this->molecule, l);
-         double temp    = matrixCIS[k][l]*matrixCIS[k][l];
-         this->electronicTransitionDipoleMoments[excitedState][excitedState][XAxis] += temp*(-dipoleMOs[XAxis][moI][moI]+dipoleMOs[XAxis][moA][moA]);
-         this->electronicTransitionDipoleMoments[excitedState][excitedState][YAxis] += temp*(-dipoleMOs[YAxis][moI][moI]+dipoleMOs[YAxis][moA][moA]);
-         this->electronicTransitionDipoleMoments[excitedState][excitedState][ZAxis] += temp*(-dipoleMOs[ZAxis][moI][moI]+dipoleMOs[ZAxis][moA][moA]);
-      }
-   }
-
-   // transition dipole moment
-   //this->CalcElectronicTransitionDipoleMoments(this->electronicTransitionDipoleMoments,
-   //                                            this->fockMatrix,
-   //                                            this->matrixCIS,
-   //                                            this->cartesianMatrix,
-   //                                            *this->molecule, 
-   //                                            this->orbitalElectronPopulation,
-   //                                            this->overlapAOs);
-   for(int k=0; k<Parameters::GetInstance()->GetNumberExcitedStatesCIS(); k++){
-      int excitedState = k+1; // (k+1)-th excited state
-      this->electronicTransitionDipoleMoments[excitedState][groundState][XAxis] = 0.0;
-      this->electronicTransitionDipoleMoments[excitedState][groundState][YAxis] = 0.0;
-      this->electronicTransitionDipoleMoments[excitedState][groundState][ZAxis] = 0.0;
-      for(int l=0; l<this->matrixCISdimension; l++){
-         // single excitation from I-th (occupied)MO to A-th (virtual)MO
-         int moI = this->GetActiveOccIndex(*this->molecule, l);
-         int moA = this->GetActiveVirIndex(*this->molecule, l);
-         //double temp    = matrixCIS[k][l]*matrixCIS[k][l];
-         double temp    = this->matrixCIS[k][l]*sqrt(2.0);
-         this->electronicTransitionDipoleMoments[excitedState][groundState][XAxis] += temp*dipoleMOs[XAxis][moA][moI];
-         this->electronicTransitionDipoleMoments[excitedState][groundState][YAxis] += temp*dipoleMOs[YAxis][moA][moI];
-         this->electronicTransitionDipoleMoments[excitedState][groundState][ZAxis] += temp*dipoleMOs[ZAxis][moA][moI];
-      }
-   }
-   if(Parameters::GetInstance()->RequiresAllTransitionDipoleMomentsCIS()){
+   boost::mpi::communicator* world = MolDS_mpi::MpiProcess::GetInstance()->GetCommunicator();
+   double*** dipoleMOs = NULL;
+   double**  overlapMOs = NULL;
+   try{
+      MallocerFreer::GetInstance()->Malloc<double>(&dipoleMOs,       CartesianType_end, totalNumberAOs, totalNumberAOs);
+      MallocerFreer::GetInstance()->Malloc<double>(&overlapMOs, totalNumberAOs, totalNumberAOs);
+      double alpha=1.0;
+      double beta =0.0;
+      //double ompStartTime = omp_get_wtime();
+      MolDS_wrappers::Blas::GetInstance()->Dgemmm(false, false, true, totalNumberAOs, totalNumberAOs, totalNumberAOs, totalNumberAOs,
+                                                  alpha, 
+                                                  this->fockMatrix,
+                                                  this->cartesianMatrix[XAxis],
+                                                  this->fockMatrix,
+                                                  beta,
+                                                  dipoleMOs[XAxis]);
+      MolDS_wrappers::Blas::GetInstance()->Dgemmm(false, false, true, totalNumberAOs, totalNumberAOs, totalNumberAOs, totalNumberAOs,
+                                                  alpha, 
+                                                  this->fockMatrix,
+                                                  this->cartesianMatrix[YAxis],
+                                                  this->fockMatrix,
+                                                  beta,
+                                                  dipoleMOs[YAxis]);
+      MolDS_wrappers::Blas::GetInstance()->Dgemmm(false, false, true, totalNumberAOs, totalNumberAOs, totalNumberAOs, totalNumberAOs,
+                                                  alpha, 
+                                                  this->fockMatrix,
+                                                  this->cartesianMatrix[ZAxis],
+                                                  this->fockMatrix,
+                                                  beta,
+                                                  dipoleMOs[ZAxis]);
+ 
+      double const* centerOfDipole = this->molecule->GetXyzCOC();
+      // set orign of dipole
+      MolDS_wrappers::Blas::GetInstance()->Dgemmm(false, false, true, totalNumberAOs, totalNumberAOs, totalNumberAOs, totalNumberAOs,
+                                                  alpha, 
+                                                  this->fockMatrix,
+                                                  this->overlapAOs,
+                                                  this->fockMatrix,
+                                                  beta,
+                                                  overlapMOs);
+      MolDS_wrappers::Blas::GetInstance()->Daxpy(totalNumberAOs*totalNumberAOs,
+                                                 -centerOfDipole[XAxis], 
+                                                 &overlapMOs[0][0],
+                                                 &dipoleMOs[XAxis][0][0]);
+      MolDS_wrappers::Blas::GetInstance()->Daxpy(totalNumberAOs*totalNumberAOs,
+                                                 -centerOfDipole[YAxis], 
+                                                 &overlapMOs[0][0],
+                                                 &dipoleMOs[YAxis][0][0]);
+      MolDS_wrappers::Blas::GetInstance()->Daxpy(totalNumberAOs*totalNumberAOs,
+                                                 -centerOfDipole[ZAxis], 
+                                                 &overlapMOs[0][0],
+                                                 &dipoleMOs[ZAxis][0][0]);
+ 
+ 
+      // dipole moments of excited states
+      //this->CalcElectronicDipoleMomentsExcitedStates(this->electronicTransitionDipoleMoments,
+      //                                               this->fockMatrix,
+      //                                               this->matrixCIS,
+      //                                               this->cartesianMatrix,
+      //                                               *this->molecule, 
+      //                                               this->orbitalElectronPopulation,
+      //                                               this->overlapAOs);
+      int groundState = 0;
       for(int k=0; k<Parameters::GetInstance()->GetNumberExcitedStatesCIS(); k++){
-         int departureExcitedState = k+1; // (k+1)-th excited state
-         for(int l=k+1; l<Parameters::GetInstance()->GetNumberExcitedStatesCIS(); l++){
-            int destinationExcitedState = l+1; // (l+1)-th excited state
-            this->electronicTransitionDipoleMoments[destinationExcitedState][departureExcitedState][XAxis] = 0.0;
-            this->electronicTransitionDipoleMoments[destinationExcitedState][departureExcitedState][YAxis] = 0.0;
-            this->electronicTransitionDipoleMoments[destinationExcitedState][departureExcitedState][ZAxis] = 0.0;
-            for(int l=0; l<this->matrixCISdimension; l++){
-               // single excitation from I-th (occupied)MO to A-th (virtual)MO
-               int moI = this->GetActiveOccIndex(*this->molecule, l);
-               int moA = this->GetActiveVirIndex(*this->molecule, l);
-               double temp    = matrixCIS[departureExcitedState-1][l]*matrixCIS[destinationExcitedState-1][l];
-               this->electronicTransitionDipoleMoments[destinationExcitedState][departureExcitedState][XAxis] += temp*(-dipoleMOs[XAxis][moI][moI]+dipoleMOs[XAxis][moA][moA]);
-               this->electronicTransitionDipoleMoments[destinationExcitedState][departureExcitedState][YAxis] += temp*(-dipoleMOs[YAxis][moI][moI]+dipoleMOs[YAxis][moA][moA]);
-               this->electronicTransitionDipoleMoments[destinationExcitedState][departureExcitedState][ZAxis] += temp*(-dipoleMOs[ZAxis][moI][moI]+dipoleMOs[ZAxis][moA][moA]);
+         int excitedState = k+1; // (k+1)-th excited state
+         if(excitedState%world->size() != world->rank()){continue;}
+         this->electronicTransitionDipoleMoments[excitedState][excitedState][XAxis] = this->electronicTransitionDipoleMoments[groundState][groundState][XAxis];
+         this->electronicTransitionDipoleMoments[excitedState][excitedState][YAxis] = this->electronicTransitionDipoleMoments[groundState][groundState][YAxis];
+         this->electronicTransitionDipoleMoments[excitedState][excitedState][ZAxis] = this->electronicTransitionDipoleMoments[groundState][groundState][ZAxis];
+         double tmpX=0.0, tmpY=0.0, tmpZ=0.0;
+#pragma omp parallel for reduction(+:tmpX,tmpY,tmpZ) schedule(auto)
+         for(int l=0; l<this->matrixCISdimension; l++){
+            // single excitation from I-th (occupied)MO to A-th (virtual)MO
+            int moI = this->GetActiveOccIndex(*this->molecule, l);
+            int moA = this->GetActiveVirIndex(*this->molecule, l);
+            double temp    = matrixCIS[k][l]*matrixCIS[k][l];
+            tmpX += temp*(-dipoleMOs[XAxis][moI][moI]+dipoleMOs[XAxis][moA][moA]);
+            tmpY += temp*(-dipoleMOs[YAxis][moI][moI]+dipoleMOs[YAxis][moA][moA]);
+            tmpZ += temp*(-dipoleMOs[ZAxis][moI][moI]+dipoleMOs[ZAxis][moA][moA]);
+         }
+         this->electronicTransitionDipoleMoments[excitedState][excitedState][XAxis] += tmpX;
+         this->electronicTransitionDipoleMoments[excitedState][excitedState][YAxis] += tmpY;
+         this->electronicTransitionDipoleMoments[excitedState][excitedState][ZAxis] += tmpZ;
+         
+      }
+ 
+      // transition dipole moment
+      //this->CalcElectronicTransitionDipoleMoments(this->electronicTransitionDipoleMoments,
+      //                                            this->fockMatrix,
+      //                                            this->matrixCIS,
+      //                                            this->cartesianMatrix,
+      //                                            *this->molecule, 
+      //                                            this->orbitalElectronPopulation,
+      //                                            this->overlapAOs);
+      for(int k=0; k<Parameters::GetInstance()->GetNumberExcitedStatesCIS(); k++){
+         int excitedState = k+1; // (k+1)-th excited state
+         if(excitedState%world->size() != world->rank()){continue;}
+         this->electronicTransitionDipoleMoments[excitedState][groundState][XAxis] = 0.0;
+         this->electronicTransitionDipoleMoments[excitedState][groundState][YAxis] = 0.0;
+         this->electronicTransitionDipoleMoments[excitedState][groundState][ZAxis] = 0.0;
+         double tmpX=0.0, tmpY=0.0, tmpZ=0.0;
+#pragma omp parallel for reduction(+:tmpX,tmpY,tmpZ) schedule(auto)
+         for(int l=0; l<this->matrixCISdimension; l++){
+            // single excitation from I-th (occupied)MO to A-th (virtual)MO
+            int moI = this->GetActiveOccIndex(*this->molecule, l);
+            int moA = this->GetActiveVirIndex(*this->molecule, l);
+            //double temp    = matrixCIS[k][l]*matrixCIS[k][l];
+            double tmp    = this->matrixCIS[k][l]*sqrt(2.0);
+            tmpX += tmp*dipoleMOs[XAxis][moA][moI];
+            tmpY += tmp*dipoleMOs[YAxis][moA][moI];
+            tmpZ += tmp*dipoleMOs[ZAxis][moA][moI];
+         }
+         this->electronicTransitionDipoleMoments[excitedState][groundState][XAxis] += tmpX;
+         this->electronicTransitionDipoleMoments[excitedState][groundState][YAxis] += tmpY;
+         this->electronicTransitionDipoleMoments[excitedState][groundState][ZAxis] += tmpZ;
+      }
+      if(Parameters::GetInstance()->RequiresAllTransitionDipoleMomentsCIS()){
+         for(int k=0; k<Parameters::GetInstance()->GetNumberExcitedStatesCIS(); k++){
+            int departureExcitedState = k+1; // (k+1)-th excited state
+            for(int l=k+1; l<Parameters::GetInstance()->GetNumberExcitedStatesCIS(); l++){
+               int destinationExcitedState = l+1; // (l+1)-th excited state
+               if(destinationExcitedState%world->size() != world->rank()){continue;}
+               this->electronicTransitionDipoleMoments[destinationExcitedState][departureExcitedState][XAxis] = 0.0;
+               this->electronicTransitionDipoleMoments[destinationExcitedState][departureExcitedState][YAxis] = 0.0;
+               this->electronicTransitionDipoleMoments[destinationExcitedState][departureExcitedState][ZAxis] = 0.0;
+               double tmpX=0.0, tmpY=0.0, tmpZ=0.0;
+#pragma omp parallel for reduction(+:tmpX,tmpY,tmpZ) schedule(auto)
+               for(int l=0; l<this->matrixCISdimension; l++){
+                  // single excitation from I-th (occupied)MO to A-th (virtual)MO
+                  int moI = this->GetActiveOccIndex(*this->molecule, l);
+                  int moA = this->GetActiveVirIndex(*this->molecule, l);
+                  double tmp    = matrixCIS[departureExcitedState-1][l]*matrixCIS[destinationExcitedState-1][l];
+                  tmpX += tmp*(-dipoleMOs[XAxis][moI][moI]+dipoleMOs[XAxis][moA][moA]);
+                  tmpY += tmp*(-dipoleMOs[YAxis][moI][moI]+dipoleMOs[YAxis][moA][moA]);
+                  tmpZ += tmp*(-dipoleMOs[ZAxis][moI][moI]+dipoleMOs[ZAxis][moA][moA]);
+               }
+               this->electronicTransitionDipoleMoments[destinationExcitedState][departureExcitedState][XAxis] += tmpX;
+               this->electronicTransitionDipoleMoments[destinationExcitedState][departureExcitedState][YAxis] += tmpY;
+               this->electronicTransitionDipoleMoments[destinationExcitedState][departureExcitedState][ZAxis] += tmpZ;
             }
          }
       }
+   }
+   catch(MolDSException ex){
+      MallocerFreer::GetInstance()->Free<double>(&dipoleMOs, CartesianType_end, totalNumberAOs, totalNumberAOs);
+      MallocerFreer::GetInstance()->Free<double>(&overlapMOs, totalNumberAOs, totalNumberAOs);
+      throw ex;
+   }
+   MallocerFreer::GetInstance()->Free<double>(&dipoleMOs, CartesianType_end, totalNumberAOs, totalNumberAOs);
+   MallocerFreer::GetInstance()->Free<double>(&overlapMOs, totalNumberAOs, totalNumberAOs);
 
+   // communication to collect all matrix data on rank 0
+   int numTransported = (Parameters::GetInstance()->GetNumberExcitedStatesCIS()+1)*CartesianType_end;
+   if(world->rank() == 0){
+      // receive the matrix data from other ranks
+      for(int k=0; k<Parameters::GetInstance()->GetNumberExcitedStatesCIS()+1; k++){
+         if(k%world->size() == 0){continue;}
+         int source = k%world->size();
+         int tag = k;
+         world->recv(source, tag, &this->electronicTransitionDipoleMoments[k][0][0], numTransported);
+      }
+   }
+   else{
+      // send the matrix data to rank-0
+      for(int k=0; k<Parameters::GetInstance()->GetNumberExcitedStatesCIS()+1; k++){
+         if(k%world->size() != world->rank()){continue;}
+         int dest = 0;
+         int tag = k;
+         world->send(dest, tag, &this->electronicTransitionDipoleMoments[k][0][0], numTransported);
+      }
+   }
+
+   // right upper part of the matrix is copied from left lower part.
+   if(world->rank() == 0 && Parameters::GetInstance()->RequiresAllTransitionDipoleMomentsCIS()){
       for(int k=0; k<Parameters::GetInstance()->GetNumberExcitedStatesCIS()+1; k++){
          for(int l=k+1; l<Parameters::GetInstance()->GetNumberExcitedStatesCIS()+1; l++){
             for(int axis=0; axis<CartesianType_end; axis++){
@@ -1221,8 +1273,13 @@ void ZindoS::CalcCISProperties(){
          }
       }
    }
-   MallocerFreer::GetInstance()->Free<double>(&dipoleMOs, CartesianType_end, totalNumberAOs, totalNumberAOs);
-   MallocerFreer::GetInstance()->Free<double>(&overlapMOs, totalNumberAOs, totalNumberAOs);
+
+   // broadcast all matrix data to all ranks
+   numTransported *= (Parameters::GetInstance()->GetNumberExcitedStatesCIS()+1);
+   int source=0;
+   broadcast(*world, &this->electronicTransitionDipoleMoments[0][0][0], numTransported, source);
+
+
 }// end of "calculate dipole moments and transitiondipolemoment"
 
 
@@ -2354,6 +2411,10 @@ void ZindoS::CalcCISMatrix(double** matrixCIS) const{
          world->send(dest, tag, matrixCIS[k], this->matrixCISdimension);
       }
    }
+
+   // broadcast all matrix data to all rank
+   int source=0;
+   broadcast(*world, &matrixCIS[0][0], this->matrixCISdimension*this->matrixCISdimension, source);
 
    double ompEndTime = omp_get_wtime();
    this->OutputLog(boost::format("%s%lf%s\n%s") % this->messageOmpElapsedTimeCalcCISMarix.c_str()

@@ -23,8 +23,7 @@
 #include<math.h>
 #include<stdexcept>
 #include<boost/format.hpp>
-#include<boost/mpi/environment.hpp>
-#include<boost/mpi/communicator.hpp>
+#include<boost/mpi.hpp>
 #include<boost/math/special_functions/factorials.hpp>
 #include"Uncopyable.h"
 #include"../mpi/MpiProcess.h"

@@ -23,8 +23,7 @@
 #include<math.h>
 #include<string>
 #include<stdexcept>
-#include<boost/mpi/environment.hpp>
-#include<boost/mpi/communicator.hpp>
+#include<boost/mpi.hpp>
 #include"../base/MolDSException.h"
 #include"../base/Uncopyable.h"
 #include"MpiProcess.h"
