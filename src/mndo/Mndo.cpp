@@ -731,12 +731,14 @@ void Mndo::CalcCISMatrix(double** matrixCIS) const{
    this->OutputLog(this->messageStartCalcCISMatrix);
    double ompStartTime = omp_get_wtime();
    boost::mpi::communicator* world = MolDS_mpi::MpiProcess::GetInstance()->GetCommunicator();
+   int mpiRank = MolDS_mpi::MpiProcess::GetInstance()->GetRank();
+   int mpiSize = MolDS_mpi::MpiProcess::GetInstance()->GetSize();
 
    for(int k=0; k<this->matrixCISdimension; k++){
       // single excitation from I-th (occupied)MO to A-th (virtual)MO
       int moI = this->GetActiveOccIndex(*this->molecule, k);
       int moA = this->GetActiveVirIndex(*this->molecule, k);
-      if(k%world->size() != world->rank()){continue;}
+      if(k%mpiSize != mpiRank){continue;}
 
       stringstream ompErrors;
 #pragma omp parallel for schedule(auto)
@@ -893,11 +895,11 @@ void Mndo::CalcCISMatrix(double** matrixCIS) const{
    } // end of k-loop
 
    // communication to collect all matrix data on rank 0
-   if(world->rank() == 0){
+   if(mpiRank == 0){
       // receive the matrix data from other ranks
       for(int k=0; k<this->matrixCISdimension; k++){
-         if(k%world->size() == 0){continue;}
-         int source = k%world->size();
+         if(k%mpiSize == 0){continue;}
+         int source = k%mpiSize;
          int tag = k;
          world->recv(source, tag, matrixCIS[k], this->matrixCISdimension);
       }
@@ -905,7 +907,7 @@ void Mndo::CalcCISMatrix(double** matrixCIS) const{
    else{
       // send the matrix data to rank-0
       for(int k=0; k<this->matrixCISdimension; k++){
-         if(k%world->size() != world->rank()){continue;}
+         if(k%mpiSize != mpiRank){continue;}
          int dest = 0;
          int tag = k;
          world->send(dest, tag, matrixCIS[k], this->matrixCISdimension);

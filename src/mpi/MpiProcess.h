@@ -27,6 +27,8 @@ public:
    static void        DeleteInstance();
    static MpiProcess* GetInstance();
    boost::mpi::communicator* GetCommunicator() const{ return this->communicator;}
+   int GetRank(){return this->communicator->rank();}
+   int GetSize(){return this->communicator->size();}
 private:
    static MpiProcess* mpiProcess;
    MpiProcess();

@@ -1091,6 +1091,8 @@ void ZindoS::CalcCISProperties(){
    int numberActiveOcc = Parameters::GetInstance()->GetActiveOccCIS();
    int numberActiveVir = Parameters::GetInstance()->GetActiveVirCIS();
    boost::mpi::communicator* world = MolDS_mpi::MpiProcess::GetInstance()->GetCommunicator();
+   int mpiRank = MolDS_mpi::MpiProcess::GetInstance()->GetRank();
+   int mpiSize = MolDS_mpi::MpiProcess::GetInstance()->GetSize();
    double*** dipoleMOs = NULL;
    double**  overlapMOs = NULL;
    try{
@@ -1155,7 +1157,7 @@ void ZindoS::CalcCISProperties(){
       int groundState = 0;
       for(int k=0; k<Parameters::GetInstance()->GetNumberExcitedStatesCIS(); k++){
          int excitedState = k+1; // (k+1)-th excited state
-         if(excitedState%world->size() != world->rank()){continue;}
+         if(excitedState%mpiSize != mpiRank){continue;}
          this->electronicTransitionDipoleMoments[excitedState][excitedState][XAxis] = this->electronicTransitionDipoleMoments[groundState][groundState][XAxis];
          this->electronicTransitionDipoleMoments[excitedState][excitedState][YAxis] = this->electronicTransitionDipoleMoments[groundState][groundState][YAxis];
          this->electronicTransitionDipoleMoments[excitedState][excitedState][ZAxis] = this->electronicTransitionDipoleMoments[groundState][groundState][ZAxis];
@@ -1186,7 +1188,7 @@ void ZindoS::CalcCISProperties(){
       //                                            this->overlapAOs);
       for(int k=0; k<Parameters::GetInstance()->GetNumberExcitedStatesCIS(); k++){
          int excitedState = k+1; // (k+1)-th excited state
-         if(excitedState%world->size() != world->rank()){continue;}
+         if(excitedState%mpiSize != mpiRank){continue;}
          this->electronicTransitionDipoleMoments[excitedState][groundState][XAxis] = 0.0;
          this->electronicTransitionDipoleMoments[excitedState][groundState][YAxis] = 0.0;
          this->electronicTransitionDipoleMoments[excitedState][groundState][ZAxis] = 0.0;
@@ -1211,7 +1213,7 @@ void ZindoS::CalcCISProperties(){
             int departureExcitedState = k+1; // (k+1)-th excited state
             for(int l=k+1; l<Parameters::GetInstance()->GetNumberExcitedStatesCIS(); l++){
                int destinationExcitedState = l+1; // (l+1)-th excited state
-               if(destinationExcitedState%world->size() != world->rank()){continue;}
+               if(destinationExcitedState%mpiSize != mpiRank){continue;}
                this->electronicTransitionDipoleMoments[destinationExcitedState][departureExcitedState][XAxis] = 0.0;
                this->electronicTransitionDipoleMoments[destinationExcitedState][departureExcitedState][YAxis] = 0.0;
                this->electronicTransitionDipoleMoments[destinationExcitedState][departureExcitedState][ZAxis] = 0.0;
@@ -1243,11 +1245,11 @@ void ZindoS::CalcCISProperties(){
 
    // communication to collect all matrix data on rank 0
    int numTransported = (Parameters::GetInstance()->GetNumberExcitedStatesCIS()+1)*CartesianType_end;
-   if(world->rank() == 0){
+   if(mpiRank == 0){
       // receive the matrix data from other ranks
       for(int k=0; k<Parameters::GetInstance()->GetNumberExcitedStatesCIS()+1; k++){
-         if(k%world->size() == 0){continue;}
-         int source = k%world->size();
+         if(k%mpiSize == 0){continue;}
+         int source = k%mpiSize;
          int tag = k;
          world->recv(source, tag, &this->electronicTransitionDipoleMoments[k][0][0], numTransported);
       }
@@ -1255,7 +1257,7 @@ void ZindoS::CalcCISProperties(){
    else{
       // send the matrix data to rank-0
       for(int k=0; k<Parameters::GetInstance()->GetNumberExcitedStatesCIS()+1; k++){
-         if(k%world->size() != world->rank()){continue;}
+         if(k%mpiSize != mpiRank){continue;}
          int dest = 0;
          int tag = k;
          world->send(dest, tag, &this->electronicTransitionDipoleMoments[k][0][0], numTransported);
@@ -1263,7 +1265,7 @@ void ZindoS::CalcCISProperties(){
    }
 
    // right upper part of the matrix is copied from left lower part.
-   if(world->rank() == 0 && Parameters::GetInstance()->RequiresAllTransitionDipoleMomentsCIS()){
+   if(mpiRank == 0 && Parameters::GetInstance()->RequiresAllTransitionDipoleMomentsCIS()){
       for(int k=0; k<Parameters::GetInstance()->GetNumberExcitedStatesCIS()+1; k++){
          for(int l=k+1; l<Parameters::GetInstance()->GetNumberExcitedStatesCIS()+1; l++){
             for(int axis=0; axis<CartesianType_end; axis++){
@@ -2338,12 +2340,14 @@ void ZindoS::CalcCISMatrix(double** matrixCIS) const{
    this->OutputLog(this->messageStartCalcCISMatrix);
    double ompStartTime = omp_get_wtime();
    boost::mpi::communicator* world = MolDS_mpi::MpiProcess::GetInstance()->GetCommunicator();
+   int mpiRank = MolDS_mpi::MpiProcess::GetInstance()->GetRank();
+   int mpiSize = MolDS_mpi::MpiProcess::GetInstance()->GetSize();
 
    for(int k=0; k<this->matrixCISdimension; k++){
       // single excitation from I-th (occupied)MO to A-th (virtual)MO
       int moI = this->GetActiveOccIndex(*this->molecule, k);
       int moA = this->GetActiveVirIndex(*this->molecule, k);
-      if(k%world->size() != world->rank()){continue;}
+      if(k%mpiSize != mpiRank){continue;}
 
       stringstream ompErrors;
 #pragma omp parallel for schedule(auto)
@@ -2393,11 +2397,11 @@ void ZindoS::CalcCISMatrix(double** matrixCIS) const{
 
 
    // communication to collect all matrix data on rank 0
-   if(world->rank() == 0){
+   if(mpiRank == 0){
       // receive the matrix data from other ranks
       for(int k=0; k<this->matrixCISdimension; k++){
-         if(k%world->size() == 0){continue;}
-         int source = k%world->size();
+         if(k%mpiSize == 0){continue;}
+         int source = k%mpiSize;
          int tag = k;
          world->recv(source, tag, matrixCIS[k], this->matrixCISdimension);
       }
@@ -2405,7 +2409,7 @@ void ZindoS::CalcCISMatrix(double** matrixCIS) const{
    else{
       // send the matrix data to rank-0
       for(int k=0; k<this->matrixCISdimension; k++){
-         if(k%world->size() != world->rank()){continue;}
+         if(k%mpiSize != mpiRank){continue;}
          int dest = 0;
          int tag = k;
          world->send(dest, tag, matrixCIS[k], this->matrixCISdimension);
