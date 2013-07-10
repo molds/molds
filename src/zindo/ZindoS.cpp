@@ -1251,7 +1251,7 @@ void ZindoS::CalcCISProperties(){
          if(k%mpiSize == 0){continue;}
          int source = k%mpiSize;
          int tag = k;
-         world->recv(source, tag, &this->electronicTransitionDipoleMoments[k][0][0], numTransported);
+         MolDS_mpi::MpiProcess::GetInstance()->Recv(source, tag, &this->electronicTransitionDipoleMoments[k][0][0], numTransported);
       }
    }
    else{
@@ -1260,7 +1260,7 @@ void ZindoS::CalcCISProperties(){
          if(k%mpiSize != mpiRank){continue;}
          int dest = 0;
          int tag = k;
-         world->send(dest, tag, &this->electronicTransitionDipoleMoments[k][0][0], numTransported);
+         MolDS_mpi::MpiProcess::GetInstance()->Send(dest, tag, &this->electronicTransitionDipoleMoments[k][0][0], numTransported);
       }
    }
 
@@ -2403,7 +2403,7 @@ void ZindoS::CalcCISMatrix(double** matrixCIS) const{
          if(k%mpiSize == 0){continue;}
          int source = k%mpiSize;
          int tag = k;
-         world->recv(source, tag, matrixCIS[k], this->matrixCISdimension);
+         MolDS_mpi::MpiProcess::GetInstance()->Recv(source, tag, matrixCIS[k], this->matrixCISdimension);
       }
    }
    else{
@@ -2412,7 +2412,7 @@ void ZindoS::CalcCISMatrix(double** matrixCIS) const{
          if(k%mpiSize != mpiRank){continue;}
          int dest = 0;
          int tag = k;
-         world->send(dest, tag, matrixCIS[k], this->matrixCISdimension);
+         MolDS_mpi::MpiProcess::GetInstance()->Send(dest, tag, matrixCIS[k], this->matrixCISdimension);
       }
    }
 
