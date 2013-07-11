@@ -229,10 +229,11 @@ HOW TO WRITE INPUT:
       -options
        "limit_message" is only prepared. 
        This parameter means that maximum size of data on a message passing is restricted to the value.
-       If data more than this value is needed to be transfered, the original value is splitted 
-       to some chunks by MolDS automatically. Then, the chunks are transferred with sequential multiple message passing.
-       In general, users do not need to care about this parameter.
-       The default value is 1000[MB].
+       If data bigger than this value is needed to be transfered, the original data is splitted 
+       to some chunks by MolDS automatically. Then, the chunks are transferred with sequential 
+       multiple message passing. In general, users do not need to care about this parameter,
+       therefore, the default value that is 1000[MB] is reccomended to be used.
+       The value of this option should be written with the MByte unit if you want to set this option.
 
       E.g.
          MPI
