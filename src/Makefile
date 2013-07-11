@@ -28,8 +28,11 @@ BOOST_INC_DIR = $(BOOST_TOP_DIR)include/
 BOOST_LIB_DIR = $(BOOST_TOP_DIR)lib/
 BOOST_LIBS    = -lboost_mpi
 LIBSBASE = -lmkl_intel_thread -lmkl_core -liomp5 -lpthread
-LIBS32 = -lmkl_intel       $(LIBSBASE) $(BOOST_LIBS)
-LIBS64 = -lmkl_intel_ilp64 $(LIBSBASE) $(BOOST_LIBS)
+ifeq ($(INTEL), 64)
+LIBS = -lmkl_intel_ilp64 $(LIBSBASE) $(BOOST_LIBS)
+else
+LIBS = -lmkl_intel       $(LIBSBASE) $(BOOST_LIBS)
+endif
 EXENAME = MolDS.out
 DEPFILE = obj/objfile.dep
 LDFLAGS =
@@ -39,11 +42,7 @@ ALL_HEAD_FILES = base/Uncopyable.h mpi/MpiProcess.h base/PrintController.h base/
 ALL_OBJ_FILES  = obj/MpiProcess.o obj/Main.o obj/MolDSException.o obj/Blas.o obj/Lapack.o obj/Utilities.o obj/Enums.o obj/MathUtilities.o obj/MallocerFreer.o obj/EularAngle.o obj/Parameters.o obj/Atom.o obj/Hatom.o obj/Liatom.o obj/Catom.o obj/Natom.o obj/Oatom.o obj/Satom.o obj/AtomFactory.o obj/Molecule.o obj/InputParser.o obj/GTOExpansionSTO.o obj/RealSphericalHarmonicsIndex.o obj/MOLogger.o obj/DensityLogger.o obj/HoleDensityLogger.o obj/ParticleDensityLogger.o obj/Cndo2.o obj/Indo.o obj/ZindoS.o obj/Mndo.o obj/Am1.o obj/Am1D.o obj/Pm3.o obj/Pm3D.o obj/Pm3Pddg.o obj/ElectronicStructureFactory.o obj/MD.o obj/MC.o obj/RPMD.o obj/NASCO.o obj/Optimizer.o obj/ConjugateGradient.o obj/SteepestDescent.o obj/BFGS.o obj/OptimizerFactory.o obj/MolDS.o
 
 $(EXENAME): $(ALL_OBJ_FILES)
-ifeq ($(INTEL), 64)
-	$(CC) -o $@ -Wl,-rpath=$(BOOST_LIB_DIR) -L$(BOOST_LIB_DIR) $(LDFLAGS) $(ALL_OBJ_FILES) $(LIBS64)
-else
-	$(CC) -o $@ -Wl,-rpath=$(BOOST_LIB_DIR) -L$(BOOST_LIB_DIR) $(LDFLAGS) $(ALL_OBJ_FILES) $(LIBS32)
-endif
+	$(CC) -o $@ -Wl,-rpath=$(BOOST_LIB_DIR) -L$(BOOST_LIB_DIR) $(LDFLAGS) $(ALL_OBJ_FILES) $(LIBS)
 
 -include $(DEPFILE)
 
