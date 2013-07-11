@@ -218,6 +218,27 @@ HOW TO WRITE INPUT:
             limit_heap 512
          MEMORY_END
 
+   <MPI>
+      For settings of MPI usage, write options in MPI-directive.
+
+      E.g.
+         MPI
+            (options)
+         MPI_END
+
+      -options
+       "limit_message" is only prepared. 
+       This parameter means that maximum size of data on a message passing is restricted to the value.
+       If data more than this value is needed to be transfered, the original value is splitted 
+       to some chunks by MolDS automatically. Then, the chunks are transferred with sequential multiple message passing.
+       In general, users do not need to care about this parameter.
+       The default value is 1000[MB].
+
+      E.g.
+         MPI
+            limit_message 512
+         MPI_END
+
    <Frequencies (Normal modes analysis)>
       write frequencies-directive. Note taht not only the frequencies but also the normal modes are calculated.
 

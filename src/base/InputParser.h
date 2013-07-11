@@ -87,6 +87,9 @@ private:
    // Memory
    std::string messageMemoryConditions;
    std::string messageMemoryLimitHeap;
+   // MPI
+   std::string messageMpiConditions;
+   std::string messageMpiLimitMessage;
    // MD
    std::string messageMdConditions;
    std::string messageMdTotalSteps;
@@ -244,6 +247,10 @@ private:
    std::string stringMemory;
    std::string stringMemoryEnd;
    std::string stringMemoryLimitHeap;
+   // MPI
+   std::string stringMPI;
+   std::string stringMPIEnd;
+   std::string stringMPILimitMessage;
    // MD
    std::string stringMD;
    std::string stringMDEnd;
@@ -306,6 +313,7 @@ private:
    void OutputMolecularBasics(Molecule* molecule) const;
    void OutputScfConditions() const;
    void OutputMemoryConditions() const;
+   void OutputMpiConditions() const;
    void OutputCisConditions() const;
    void OutputMdConditions() const;
    void OutputMcConditions() const;
@@ -339,6 +347,7 @@ private:
    int ParseConditionsOptimization(std::vector<std::string>* inputTerms, int parseIndex) const;
    int ParseConditionsFrequencies(std::vector<std::string>* inputTerms, int parseIndex) const;
    int ParseConditionsMemory(std::vector<std::string>* inputTerms, int parseIndex) const;
+   int ParseConditionsMPI(std::vector<std::string>* inputTerms, int parseIndex) const;
 };
 
 }

@@ -176,6 +176,8 @@ void Parameters::SetDefaultValues(){
    this->requiresUnpairedPopCIS                = false;
    // Memory
    this->limitHeapMemory = 256;
+   // MPI
+   this->limitMessageMPI = 1000;
    // MD
    this->electronicStateIndexMD = 0;
    this->totalStepsMD           = 10;
@@ -368,6 +370,15 @@ double Parameters::GetLimitHeapMemory() const{
 
 void Parameters::SetLimitHeapMemory(double limitHeapMemory){
    this->limitHeapMemory = limitHeapMemory;
+}
+
+// methods for MPI
+double Parameters::GetLimitMessageMPI() const{
+   return this->limitMessageMPI;
+}
+
+void Parameters::SetLimitMessageMPI(double limitMessageMPI){
+   this->limitMessageMPI = limitMessageMPI;
 }
 
 // methods for MD
