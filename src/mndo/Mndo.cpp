@@ -901,7 +901,7 @@ void Mndo::CalcCISMatrix(double** matrixCIS) const{
          if(k%mpiSize == 0){continue;}
          int source = k%mpiSize;
          int tag = k;
-         world->recv(source, tag, matrixCIS[k], this->matrixCISdimension);
+         MolDS_mpi::MpiProcess::GetInstance()->Recv(source, tag, matrixCIS[k], this->matrixCISdimension);
       }
    }
    else{
@@ -910,9 +910,12 @@ void Mndo::CalcCISMatrix(double** matrixCIS) const{
          if(k%mpiSize != mpiRank){continue;}
          int dest = 0;
          int tag = k;
-         world->send(dest, tag, matrixCIS[k], this->matrixCISdimension);
+         MolDS_mpi::MpiProcess::GetInstance()->Send(dest, tag, matrixCIS[k], this->matrixCISdimension);
       }
    }
+   // broadcast all matrix data to all rank
+   int source=0;
+   broadcast(*world, &matrixCIS[0][0], this->matrixCISdimension*this->matrixCISdimension, source);
 
    double ompEndTime = omp_get_wtime();
    this->OutputLog(boost::format("%s%lf%s\n%s") % this->messageOmpElapsedTimeCalcCISMarix.c_str()
