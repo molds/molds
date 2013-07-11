@@ -24,7 +24,6 @@
 #include<string>
 #include<stdexcept>
 #include<boost/format.hpp>
-#include<boost/mpi.hpp>
 #ifdef __INTEL_COMPILER
 #include"mkl.h"
 #else

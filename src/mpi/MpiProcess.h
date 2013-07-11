@@ -18,6 +18,7 @@
 //************************************************************************//
 #ifndef INCLUDED_MPIPROCESS
 #define INCLUDED_MPIPROCESS
+#include<boost/mpi.hpp>
 namespace MolDS_mpi{
 
 // MpiProcess is singleton

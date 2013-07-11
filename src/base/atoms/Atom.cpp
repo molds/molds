@@ -26,7 +26,6 @@
 #include<vector>
 #include<stdexcept>
 #include<boost/format.hpp>
-#include<boost/mpi.hpp>
 #include"../Uncopyable.h"
 #include"../../mpi/MpiProcess.h"
 #include"../PrintController.h"
