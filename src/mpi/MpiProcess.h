@@ -26,11 +26,11 @@ public:
    static void        CreateInstance(int argc, char *argv[]);
    static void        DeleteInstance();
    static MpiProcess* GetInstance();
-   boost::mpi::communicator* GetCommunicator() const{ return this->communicator;}
    int GetRank() const{return this->communicator->rank();}
    int GetSize() const{return this->communicator->size();}
    template<typename T> void Send(int dest, int tag, const T* values, int n) const{this->communicator->send(dest, tag, values, n);}
    template<typename T> void Recv(int source, int tag, T* values, int n) const{this->communicator->recv(source, tag, values, n);}
+   template<typename T> void Broadcast(T* values, int n, int root) const{broadcast(*this->communicator, values, n, root);}
 private:
    static MpiProcess* mpiProcess;
    MpiProcess();

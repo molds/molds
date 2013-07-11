@@ -1090,7 +1090,6 @@ void ZindoS::CalcCISProperties(){
    int numberOcc = this->molecule->GetTotalNumberValenceElectrons()/2;
    int numberActiveOcc = Parameters::GetInstance()->GetActiveOccCIS();
    int numberActiveVir = Parameters::GetInstance()->GetActiveVirCIS();
-   boost::mpi::communicator* world = MolDS_mpi::MpiProcess::GetInstance()->GetCommunicator();
    int mpiRank = MolDS_mpi::MpiProcess::GetInstance()->GetRank();
    int mpiSize = MolDS_mpi::MpiProcess::GetInstance()->GetSize();
    double*** dipoleMOs = NULL;
@@ -1278,8 +1277,8 @@ void ZindoS::CalcCISProperties(){
 
    // broadcast all matrix data to all ranks
    numTransported *= (Parameters::GetInstance()->GetNumberExcitedStatesCIS()+1);
-   int source=0;
-   broadcast(*world, &this->electronicTransitionDipoleMoments[0][0][0], numTransported, source);
+   int root=0;
+   MolDS_mpi::MpiProcess::GetInstance()->Broadcast(&this->electronicTransitionDipoleMoments[0][0][0], numTransported, root);
 
 
 }// end of "calculate dipole moments and transitiondipolemoment"
@@ -2339,16 +2338,15 @@ void ZindoS::DoCISDirect(){
 void ZindoS::CalcCISMatrix(double** matrixCIS) const{
    this->OutputLog(this->messageStartCalcCISMatrix);
    double ompStartTime = omp_get_wtime();
-   boost::mpi::communicator* world = MolDS_mpi::MpiProcess::GetInstance()->GetCommunicator();
    int mpiRank = MolDS_mpi::MpiProcess::GetInstance()->GetRank();
    int mpiSize = MolDS_mpi::MpiProcess::GetInstance()->GetSize();
 
    for(int k=0; k<this->matrixCISdimension; k++){
+      if(k%mpiSize != mpiRank){continue;}
+
       // single excitation from I-th (occupied)MO to A-th (virtual)MO
       int moI = this->GetActiveOccIndex(*this->molecule, k);
       int moA = this->GetActiveVirIndex(*this->molecule, k);
-      if(k%mpiSize != mpiRank){continue;}
-
       stringstream ompErrors;
 #pragma omp parallel for schedule(auto)
       for(int l=k; l<this->matrixCISdimension; l++){
@@ -2417,8 +2415,8 @@ void ZindoS::CalcCISMatrix(double** matrixCIS) const{
    }
 
    // broadcast all matrix data to all rank
-   int source=0;
-   broadcast(*world, &matrixCIS[0][0], this->matrixCISdimension*this->matrixCISdimension, source);
+   int root=0;
+   MolDS_mpi::MpiProcess::GetInstance()->Broadcast(&matrixCIS[0][0], this->matrixCISdimension*this->matrixCISdimension, root);
 
    double ompEndTime = omp_get_wtime();
    this->OutputLog(boost::format("%s%lf%s\n%s") % this->messageOmpElapsedTimeCalcCISMarix.c_str()

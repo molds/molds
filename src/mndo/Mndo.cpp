@@ -730,16 +730,15 @@ double Mndo::GetMolecularIntegralElement(int moI, int moJ, int moK, int moL,
 void Mndo::CalcCISMatrix(double** matrixCIS) const{
    this->OutputLog(this->messageStartCalcCISMatrix);
    double ompStartTime = omp_get_wtime();
-   boost::mpi::communicator* world = MolDS_mpi::MpiProcess::GetInstance()->GetCommunicator();
    int mpiRank = MolDS_mpi::MpiProcess::GetInstance()->GetRank();
    int mpiSize = MolDS_mpi::MpiProcess::GetInstance()->GetSize();
 
    for(int k=0; k<this->matrixCISdimension; k++){
+      if(k%mpiSize != mpiRank){continue;}
+
       // single excitation from I-th (occupied)MO to A-th (virtual)MO
       int moI = this->GetActiveOccIndex(*this->molecule, k);
       int moA = this->GetActiveVirIndex(*this->molecule, k);
-      if(k%mpiSize != mpiRank){continue;}
-
       stringstream ompErrors;
 #pragma omp parallel for schedule(auto)
       for(int l=k; l<this->matrixCISdimension; l++){
@@ -914,8 +913,9 @@ void Mndo::CalcCISMatrix(double** matrixCIS) const{
       }
    }
    // broadcast all matrix data to all rank
-   int source=0;
-   broadcast(*world, &matrixCIS[0][0], this->matrixCISdimension*this->matrixCISdimension, source);
+   int root=0;
+   MolDS_mpi::MpiProcess::GetInstance()->Broadcast(&matrixCIS[0][0], this->matrixCISdimension*this->matrixCISdimension, root);
+
 
    double ompEndTime = omp_get_wtime();
    this->OutputLog(boost::format("%s%lf%s\n%s") % this->messageOmpElapsedTimeCalcCISMarix.c_str()
