@@ -18,9 +18,6 @@
 #// along with MolDS.  If not, see <http://www.gnu.org/licenses/>.         // 
 #//************************************************************************//
 CC = mpiicpc
-LIBSBASE = -lmkl_intel_thread -lmkl_core -liomp5 -lpthread -lboost_mpi -lboost_serialization
-LIBS32 = -lmkl_intel       $(LIBSBASE)
-LIBS64 = -lmkl_intel_ilp64 $(LIBSBASE)
 CFLAGS = -O0
 override CFLAGS += -openmp -openmp-report2 -DMKL_INT=intptr_t
 ifeq ($(INTEL), 64)
@@ -29,6 +26,10 @@ endif
 BOOST_TOP_DIR = /usr/local/boost/
 BOOST_INC_DIR = $(BOOST_TOP_DIR)include/
 BOOST_LIB_DIR = $(BOOST_TOP_DIR)lib/
+BOOST_LIBS    = -lboost_mpi
+LIBSBASE = -lmkl_intel_thread -lmkl_core -liomp5 -lpthread
+LIBS32 = -lmkl_intel       $(LIBSBASE) $(BOOST_LIBS)
+LIBS64 = -lmkl_intel_ilp64 $(LIBSBASE) $(BOOST_LIBS)
 EXENAME = MolDS.out
 DEPFILE = obj/objfile.dep
 LDFLAGS =
