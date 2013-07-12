@@ -25,17 +25,19 @@
 #include<string>
 #include<stdexcept>
 #include<boost/format.hpp>
-#ifdef __INTEL_COMPILER
-#include"mkl.h"
-#else
-#include"cblas.h"
-#endif
 #include"../base/Uncopyable.h"
 #include"../mpi/MpiProcess.h"
 #include"../base/PrintController.h"
 #include"../base/MolDSException.h"
 #include"../base/MallocerFreer.h"
 #include"Blas.h"
+
+#ifdef __INTEL_COMPILER
+#include"mkl.h"
+#else
+#include"cblas.h"
+#endif
+
 using namespace std;
 using namespace MolDS_base;
 
