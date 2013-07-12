@@ -18,9 +18,9 @@
 //************************************************************************//
 #ifndef INCLUDED_MPIPROCESS
 #define INCLUDED_MPIPROCESS
+#include<limits.h>
 #include<boost/mpi.hpp>
 namespace MolDS_mpi{
-
 // MpiProcess is singleton
 class MpiProcess: private MolDS_base::Uncopyable{
 public:
@@ -29,9 +29,28 @@ public:
    static MpiProcess* GetInstance();
    int GetRank() const{return this->communicator->rank();}
    int GetSize() const{return this->communicator->size();}
-   template<typename T> void Send(int dest, int tag, const T* values, int n) const{this->communicator->send(dest, tag, values, n);}
-   template<typename T> void Recv(int source, int tag, T* values, int n) const{this->communicator->recv(source, tag, values, n);}
-   template<typename T> void Broadcast(T* values, int n, int root) const{broadcast(*this->communicator, values, n, root);}
+   template<typename T> void Send(int dest, int tag, const T* values, intptr_t num) const{
+      std::vector<Chunk> chunks;
+      this->SplitMessage2Chunks(chunks, tag, values, num);
+      for(intptr_t i=0; i<chunks.size(); i++){
+         this->communicator->send(dest, chunks[i].tag, &values[chunks[i].first], chunks[i].num);
+      }
+   }
+   template<typename T> void Recv(int source, int tag, T* values, intptr_t num) const{
+      std::vector<Chunk> chunks;
+      this->SplitMessage2Chunks(chunks, tag, values, num);
+      for(intptr_t i=0; i<chunks.size(); i++){
+         this->communicator->recv(source, chunks[i].tag, &values[chunks[i].first], chunks[i].num);
+      }
+   }
+   template<typename T> void Broadcast(T* values, intptr_t num, int root) const{
+      std::vector<Chunk> chunks;
+      intptr_t tag=0;
+      this->SplitMessage2Chunks(chunks, tag, values, num);
+      for(intptr_t i=0; i<chunks.size(); i++){
+         broadcast(*this->communicator, &values[chunks[i].first], chunks[i].num, root);
+      }
+   }
 private:
    static MpiProcess* mpiProcess;
    MpiProcess();
@@ -39,6 +58,31 @@ private:
    ~MpiProcess();
    boost::mpi::environment*  environment;
    boost::mpi::communicator* communicator;
+   struct Chunk{int tag; intptr_t first; int num;};
+   double messageLimit;
+   template<typename T> void SplitMessage2Chunks(std::vector<Chunk>& chunks, const int origianlTag, T* values, intptr_t num) const{
+      if(this->messageLimit < static_cast<double>(sizeof(T))*static_cast<double>(num) ){
+         int  elementsLimit = static_cast<intptr_t>(messageLimit/sizeof(T));
+         intptr_t numChunks = num/elementsLimit;
+         int      remaining = num%elementsLimit;
+         if(0 < remaining){
+            numChunks++;
+         }
+         int tagBase = origianlTag*numChunks;
+         for(intptr_t i=0; i<numChunks; i++){
+            int tag = tagBase+i;
+            Chunk chunk = {tag, i*elementsLimit, elementsLimit};
+            chunks.push_back(chunk);
+         }
+         if(0 < remaining){
+            chunks[numChunks-1].num = remaining;
+         }
+      }
+      else{
+         Chunk chunk = {origianlTag, 0, num};
+         chunks.push_back(chunk);
+      }
+   }
 };
 
 }

@@ -37,6 +37,7 @@ MpiProcess::MpiProcess(){
 MpiProcess::MpiProcess(int argc, char *argv[]){
    this->environment  = new boost::mpi::environment(argc, argv);
    this->communicator = new boost::mpi::communicator();
+   this->messageLimit = INT_MAX;
 }
 
 MpiProcess::~MpiProcess(){
