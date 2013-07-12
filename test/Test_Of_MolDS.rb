@@ -365,8 +365,6 @@ mklNumThreads = "4"
 ompNumThreads = "2"
 tester.doesTestMpi(mklNumThreads,ompNumThreads)
 
-prefix = "c2h6_mndo_davidsonCIS_singlet_force"
-tester = Tester.new(prefix, <<"SECTION", <<"TITLE")
 prefix = "ch4_mndo"
 tester = Tester.new(prefix, <<"SECTION", <<"TITLE")
 -------------------------------------------

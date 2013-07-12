@@ -28,6 +28,7 @@
 #include"../mpi/MpiProcess.h"
 #include"../base/PrintController.h"
 #include"../base/MolDSException.h"
+#include"../base/Enums.h"
 #include"Lapack.h"
 
 #ifdef __INTEL_COMPILER
@@ -118,7 +119,9 @@ molds_lapack_int Lapack::Dsyevd(double** matrix, double* eigenValues, molds_lapa
    if(size < 1 ){
       stringstream ss;
       ss << errorMessageDsyevdSize;
-      throw MolDSException(ss.str());
+      MolDSException ex(ss.str());
+      ex.SetKeyValue<int>(LapackInfo, info);
+      throw ex;
    }
    else if(size == 1){
       lwork = 1;
@@ -194,7 +197,9 @@ molds_lapack_int Lapack::Dsyevd(double** matrix, double* eigenValues, molds_lapa
       stringstream ss;
       ss << errorMessageDsyevdInfo;
       ss << info << endl;
-      throw MolDSException(ss.str());
+      MolDSException ex(ss.str());
+      ex.SetKeyValue<int>(LapackInfo, info);
+      throw ex;
    }
    return info;
 }
@@ -274,7 +279,9 @@ molds_lapack_int Lapack::Dsysv(double const* const* matrix, double* b, molds_lap
       stringstream ss;
       ss << errorMessageDsysvInfo;
       ss << info << endl;
-      throw MolDSException(ss.str());
+      MolDSException ex(ss.str());
+      ex.SetKeyValue<int>(LapackInfo, info);
+      throw ex;
    }
    return info;
 }
@@ -394,7 +401,9 @@ molds_lapack_int Lapack::Dgetrf(double* matrix, molds_lapack_int* ipiv, molds_la
       stringstream ss;
       ss << errorMessageDgetrfInfo;
       ss << info << endl;
-      throw MolDSException(ss.str());
+      MolDSException ex(ss.str());
+      ex.SetKeyValue<int>(LapackInfo, info);
+      throw ex;
    }
    return info;
 }
