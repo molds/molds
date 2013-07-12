@@ -75,10 +75,14 @@ COMPILE(using GNUmake):
 ==============================================================================
 CARRY OUT MolDS:
    After the compile, in the "src" directory,
+
+   For the calculations with single process:
    $ ./MolDS.out < input.in
    or
    $ ./MolDS.out input.in
 
+   For the calculations with multiple processes(n) by MPI:
+   $ mpirun -np n MolDS.out input.in
 ==============================================================================
 SAMPLE and TEST
    See files in "test" directories for sample files.
