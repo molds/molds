@@ -146,9 +146,6 @@ public:
    // Memory
    double GetLimitHeapMemory() const;
    void   SetLimitHeapMemory(double limitHeap);
-   // MPI
-   double GetLimitMessageMPI() const;
-   void   SetLimitMessageMPI(double limitMessageMPI);
    // MD
    int    GetElectronicStateIndexMD() const;
    void   SetElectronicStateIndexMD(int electronicStateIndex);
@@ -293,8 +290,6 @@ private:
    bool              requiresUnpairedPopCIS;
    // Memory
    double limitHeapMemory; // in [MB]
-   // MPI
-   double limitMessageMPI; // in [MB]
    // MD
    int    electronicStateIndexMD;
    int    totalStepsMD;

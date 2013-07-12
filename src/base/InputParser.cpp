@@ -147,10 +147,6 @@ void InputParser::SetMessages(){
    this->messageMemoryConditions = "\tMemory conditions:\n";
    this->messageMemoryLimitHeap  = "\t\tHeap limit: ";
 
-   // MPI
-   this->messageMpiConditions    = "\tMPI conditions:\n";
-   this->messageMpiLimitMessage  = "\t\tMessage limit: ";
-
    // MD
    this->messageMdConditions = "\tMD conditions:\n";
    this->messageMdTotalSteps = "\t\tTotal steps: ";
@@ -328,11 +324,6 @@ void InputParser::SetMessages(){
    this->stringMemory          = "memory";
    this->stringMemoryEnd       = "memory_end";
    this->stringMemoryLimitHeap = "limit_heap";
-
-   // MPI
-   this->stringMPI             = "mpi";
-   this->stringMPIEnd          = "mpi_end";
-   this->stringMPILimitMessage = "limit_message";
 
    // MD
    this->stringMD           = "md";
@@ -1151,20 +1142,6 @@ int InputParser::ParseConditionsMemory(vector<string>* inputTerms, int parseInde
    return parseIndex;
 }
 
-int InputParser::ParseConditionsMPI(vector<string>* inputTerms, int parseIndex) const{
-   parseIndex++;
-   while((*inputTerms)[parseIndex].compare(this->stringMPIEnd) != 0){
-      // max of heap
-      if((*inputTerms)[parseIndex].compare(this->stringMPILimitMessage) == 0){
-         double limitMessage = atof((*inputTerms)[parseIndex+1].c_str());
-         Parameters::GetInstance()->SetLimitMessageMPI(limitMessage);
-         parseIndex++;
-      }
-      parseIndex++;   
-   }
-   return parseIndex;
-}
-
 void InputParser::Parse(Molecule* molecule, int argc, char *argv[]) const{
 
    this->OutputLog(messageStartParseInput);
@@ -1230,11 +1207,6 @@ void InputParser::Parse(Molecule* molecule, int argc, char *argv[]) const{
          i = this->ParseConditionsMemory(&inputTerms, i);
       }
 
-      // MPI
-      if(inputTerms[i].compare(this->stringMPI) == 0){
-         i = this->ParseConditionsMPI(&inputTerms, i);
-      }
-
       // MD condition
       if(inputTerms[i].compare(this->stringMD) == 0){
          i = this->ParseConditionsMD(&inputTerms, i);
@@ -1296,7 +1268,6 @@ void InputParser::Parse(Molecule* molecule, int argc, char *argv[]) const{
    this->OutputMolecularBasics(molecule);
    this->OutputScfConditions();
    this->OutputMemoryConditions();
-   this->OutputMpiConditions();
    if(Parameters::GetInstance()->RequiresCIS()){
       this->OutputCisConditions();
    }
@@ -1608,14 +1579,6 @@ void InputParser::OutputMemoryConditions() const{
    this->OutputLog(this->messageMemoryConditions);
    this->OutputLog(boost::format("%s%e%s\n") % this->messageMemoryLimitHeap.c_str() 
                                            % Parameters::GetInstance()->GetLimitHeapMemory()
-                                           % this->messageMB.c_str());
-   this->OutputLog("\n");
-}
-
-void InputParser::OutputMpiConditions() const{
-   this->OutputLog(this->messageMpiConditions);
-   this->OutputLog(boost::format("%s%e%s\n") % this->messageMpiLimitMessage.c_str() 
-                                           % Parameters::GetInstance()->GetLimitMessageMPI()
                                            % this->messageMB.c_str());
    this->OutputLog("\n");
 }
