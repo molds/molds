@@ -27,9 +27,10 @@
 #ifdef HAVE_BOOST_MATH_SPECIAL_FUNCTIONS_FACTORIALS_HPP
 #include<boost/math/special_functions/factorials.hpp>
 #endif
+#include"Uncopyable.h"
+#include"../mpi/MpiProcess.h"
 #include"PrintController.h"
 #include"MolDSException.h"
-#include"Uncopyable.h"
 #include"../wrappers/Lapack.h"
 #include"Enums.h"
 #include"MathUtilities.h"

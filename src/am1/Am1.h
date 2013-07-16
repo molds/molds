@@ -21,7 +21,7 @@
 namespace MolDS_am1{
 
 /***
- *  Main Refferences for AM1 are [DZHS_1985, DY_1990]
+ *  Main References for AM1 are [DZHS_1985, DY_1990]
  */
 class Am1 : public MolDS_mndo::Mndo{
 public:
@@ -41,9 +41,15 @@ protected:
                                                       MolDS_base::CartesianType axisA1,
                                                       MolDS_base::CartesianType axisA2) const;
 private:
-   double GetAdditionalDiatomCoreRepulsionTerm(double k, double l, double m, double distance) const;
-   double GetAdditionalDiatomCoreRepulsionTerm1stDerivative(double k, double l, double m, double distance) const;
-   double GetAdditionalDiatomCoreRepulsionTerm2ndDerivative(double k, double l, double m, double distance) const;
+   inline double GetAdditionalDiatomCoreRepulsionTerm             (double k, double l, double m, double distance) const{
+      return k*exp(-l*pow(distance-m,2.0));
+   }
+   inline double GetAdditionalDiatomCoreRepulsionTerm1stDerivative(double k, double l, double m, double distance) const{
+      return -2.0*l*(distance-m)*k*exp(-l*pow(distance-m,2.0));
+   }
+   inline double GetAdditionalDiatomCoreRepulsionTerm2ndDerivative(double k, double l, double m, double distance) const{
+      return (-2.0*l + pow(2.0*l*(distance-m),2.0))*k*exp(-l*pow(distance-m,2.0));
+   }
 };
 
 }

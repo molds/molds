@@ -23,8 +23,9 @@
 #include<math.h>
 #include<vector>
 #include<boost/format.hpp>
-#include"../PrintController.h"
 #include"../Uncopyable.h"
+#include"../../mpi/MpiProcess.h"
+#include"../PrintController.h"
 #include"../Enums.h"
 #include"../EularAngle.h"
 #include"../Parameters.h"
@@ -33,7 +34,7 @@
 using namespace std;
 using namespace MolDS_base;
 namespace MolDS_base_atoms{
-Satom::Satom() : Atom(){
+Satom::Satom(int index) : Atom(index){
    this->SetAtomicParameters();
 }
 

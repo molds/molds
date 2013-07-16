@@ -1,5 +1,5 @@
 //************************************************************************//
-// Copyright (C) 2011-2012 Mikiya Fujii                                   // 
+// Copyright (C) 2011-2013 Mikiya Fujii                                   //
 //                                                                        // 
 // This file is part of MolDS.                                            // 
 //                                                                        // 
@@ -23,6 +23,8 @@
 #include<stdexcept>
 #include<boost/shared_ptr.hpp>
 #include<boost/format.hpp>
+#include"base/Uncopyable.h"
+#include"mpi/MpiProcess.h"
 #include"base/PrintController.h"
 #include"base/MolDSException.h"
 #include"base/Enums.h"
@@ -31,10 +33,13 @@
 #include"base/Molecule.h"
 #include"base/MolDS.h"
 using namespace std;
+using namespace MolDS_base;
 int main(int argc, char *argv[]){
    try{
+      MolDS_mpi::MpiProcess::CreateInstance(argc, argv);
       boost::shared_ptr<MolDS_base::MolDS> molds(new MolDS_base::MolDS());
       molds->Run(argc, argv);
+      MolDS_mpi::MpiProcess::DeleteInstance();
    }
    catch(exception ex){
       cout << ex.what();

@@ -37,25 +37,42 @@ else
 	end.freeze
 end
 
-class TesterOmp
+class Tester
    @@surfixDat = ".dat"
    @@surfixInp = ".in"
    @@tempFile = "temp.dat"
    @@moldsBin = MolDSBin
    @@command = "command: "
+   @@mpiCommand = "mpirun -np "
+   @@mpiProcesses = "2"
    @@deleteDiff = " | gawk '{if(($2!=\"SCF\")&&($3!=\"iter\")){print $0}}' | gawk '{if(($4!=\"time:\")){print $0}}' | gawk '{if(($3!=\"Elapsed\")){print $0}}' | gawk '{if(($2!=\"Elapsed\")){print $0}}' | gawk '{if(($3!=\"Welcome\")){print $0}}' | gawk '{if(($7!=\"residual\")){print $0}}' | gawk '{if(($3!=\"mode(nmw):\") ){print $0}}' | gawk '{if( !(($3==\"mode(mw):\")&&($4<6)) ){print $0}}'" 
 	 @@printed_section = []
    def doesTestOmp(mklNumThreads, ompNumThreads)
       return unless should_run?
       ENV["MKL_NUM_THREADS"] = mklNumThreads
       ENV["OMP_NUM_THREADS"] = ompNumThreads
-			puts <<EOS % [ENV["MKL_NUM_THREADS"],ENV["OMP_NUM_THREADS"]]
-MPI:no
+			puts <<EOS % [0,ENV["MKL_NUM_THREADS"],ENV["OMP_NUM_THREADS"]]
+MPI processes:  %s
 MKL_NUM_THREADS:%s
 OMP_NUM_THREADS:%s
 EOS
       puts @@command + @moldsCommand
       system(@moldsCommand)
+      puts @@command + @diffCommand + @@deleteDiff
+      system(@diffCommand + @@deleteDiff)
+			puts '','',''
+   end
+   def doesTestMpi(mklNumThreads, ompNumThreads)
+      return unless should_run?
+      ENV["MKL_NUM_THREADS"] = mklNumThreads
+      ENV["OMP_NUM_THREADS"] = ompNumThreads
+			puts <<EOS % [@@mpiProcesses,ENV["MKL_NUM_THREADS"],ENV["OMP_NUM_THREADS"]]
+MPI processes:  %s
+MKL_NUM_THREADS:%s
+OMP_NUM_THREADS:%s
+EOS
+      puts @@command + @moldsCommandMPI
+      system(@moldsCommandMPI)
       puts @@command + @diffCommand + @@deleteDiff
       system(@diffCommand + @@deleteDiff)
 			puts '','',''
@@ -72,6 +89,7 @@ EOS
       @inputFile = prefix + @@surfixInp
       @outputFile = prefix + @@surfixDat
       @moldsCommand = @@moldsBin + " < " + @inputFile + " > " + @@tempFile 
+      @moldsCommandMPI = @@mpiCommand + @@mpiProcesses + " " + @@moldsBin + " "  + @inputFile + " > " + @@tempFile 
       @diffCommand = "diff " + @outputFile + " " + @@tempFile
 			@title = title
 			# Update section title if given, otherwise reuse previous one.
@@ -110,7 +128,7 @@ system "md5sum #{MolDSBin}"
 puts '',''
 
 prefix = "FNC1_principal"
-testerOmp = TesterOmp.new(prefix, <<"SECTION",<<"TITLE")
+tester = Tester.new(prefix, <<"SECTION",<<"TITLE")
 ---------------------------------------------------
 -----------  Test of principal axes  --------------
 ---------------------------------------------------
@@ -119,10 +137,10 @@ SECTION
 TITLE
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 
 prefix = "FNC1_rot120"
-testerOmp = TesterOmp.new(prefix, <<"SECTION",<<"TITLE")
+tester = Tester.new(prefix, <<"SECTION",<<"TITLE")
 ---------------------------------------------------
 -----------  Test of rotate  ----------------------
 ---------------------------------------------------
@@ -131,10 +149,10 @@ SECTION
 TITLE
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 
 prefix = "FNC1_translate"
-testerOmp = TesterOmp.new(prefix, <<"SECTION", <<"TITLE")
+tester = Tester.new(prefix, <<"SECTION", <<"TITLE")
 ---------------------------------------------------
 -----------  Test of translate  -------------------
 ---------------------------------------------------
@@ -143,10 +161,10 @@ SECTION
 TITLE
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 
 prefix = "ch4_cndo2"
-testerOmp = TesterOmp.new(prefix, <<"SECTION", <<"TITLE")
+tester = Tester.new(prefix, <<"SECTION", <<"TITLE")
 -------------------------------------------
 ----------   Test of CNDO2/HF     ---------
 -------------------------------------------
@@ -155,35 +173,35 @@ SECTION
 TITLE
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 mklNumThreads = "2"
 ompNumThreads = "2"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 
 prefix = "c2h6_cndo2"
-testerOmp = TesterOmp.new(prefix, <<"TITLE")
+tester = Tester.new(prefix, <<"TITLE")
 \t\t\t>>> C2H6 <<<
 TITLE
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 mklNumThreads = "2"
 ompNumThreads = "2"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 
 prefix = "h2s_cndo2"
-testerOmp = TesterOmp.new(prefix, <<"TITLE")
+tester = Tester.new(prefix, <<"TITLE")
 \t\t\t>>> H2S <<<
 TITLE
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 mklNumThreads = "2"
 ompNumThreads = "2"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 
 prefix = "ch4_indo"
-testerOmp = TesterOmp.new(prefix, <<"SECTION", <<"TITLE")
+tester = Tester.new(prefix, <<"SECTION", <<"TITLE")
 -------------------------------------------
 ----------   Test of INDO/HF    -----------
 -------------------------------------------
@@ -192,24 +210,24 @@ SECTION
 TITLE
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 mklNumThreads = "2"
 ompNumThreads = "2"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 
 prefix = "c2h6_indo"
-testerOmp = TesterOmp.new(prefix, <<"TITLE")
+tester = Tester.new(prefix, <<"TITLE")
 \t\t\t>>> C2H6 <<<
 TITLE
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 mklNumThreads = "2"
 ompNumThreads = "2"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 
 prefix = "ch4_zindos_directCIS_singlet"
-testerOmp = TesterOmp.new(prefix, <<"SECTION", <<"TITLE")
+tester = Tester.new(prefix, <<"SECTION", <<"TITLE")
 ---------------------------------------------------
 ----------  Test of ZINDO/CIS-singlet     ---------
 ----------  Without Davidson for the CIS  ---------
@@ -219,46 +237,55 @@ SECTION
 TITLE
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 mklNumThreads = "2"
 ompNumThreads = "2"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 
 prefix = "c2h6_zindos_directCIS_singlet"
-testerOmp = TesterOmp.new(prefix, <<"TITLE")
+tester = Tester.new(prefix, <<"TITLE")
 \t\t\t>>> C2H6 <<<
 TITLE
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 mklNumThreads = "2"
 ompNumThreads = "2"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
+mklNumThreads = "4"
+ompNumThreads = "2"
+tester.doesTestMpi(mklNumThreads,ompNumThreads)
 
 prefix = "h2s_zindos_directCIS_singlet"
-testerOmp = TesterOmp.new(prefix, <<"TITLE")
+tester = Tester.new(prefix, <<"TITLE")
 \t\t\t>>> H2S <<<
 TITLE
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 mklNumThreads = "2"
 ompNumThreads = "2"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
+mklNumThreads = "4"
+ompNumThreads = "2"
+tester.doesTestMpi(mklNumThreads,ompNumThreads)
 
 prefix = "h2o_zindos_directCIS_singlet"
-testerOmp = TesterOmp.new(prefix, <<"TITLE")
+tester = Tester.new(prefix, <<"TITLE")
 \t\t\t>>> H2O <<<
 TITLE
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 mklNumThreads = "2"
 ompNumThreads = "2"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
+mklNumThreads = "4"
+ompNumThreads = "2"
+tester.doesTestMpi(mklNumThreads,ompNumThreads)
 
 prefix = "ch4_zindos_davidsonCIS_singlet"
-testerOmp = TesterOmp.new(prefix, <<"SECTION", <<"TITLE")
+tester = Tester.new(prefix, <<"SECTION", <<"TITLE")
 ------------------------------------------------
 ----------  Test of ZINDO/CIS-singlet  ---------
 ----------  With Davidson for the CIS  ---------
@@ -268,35 +295,44 @@ SECTION
 TITLE
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 mklNumThreads = "2"
 ompNumThreads = "2"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
+mklNumThreads = "4"
+ompNumThreads = "2"
+tester.doesTestMpi(mklNumThreads,ompNumThreads)
 
 prefix = "c2h6_zindos_davidsonCIS_singlet"
-testerOmp = TesterOmp.new(prefix, <<"TITLE")
+tester = Tester.new(prefix, <<"TITLE")
 \t\t\t>>> C2H6 <<<
 TITLE
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 mklNumThreads = "2"
 ompNumThreads = "2"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
+mklNumThreads = "4"
+ompNumThreads = "2"
+tester.doesTestMpi(mklNumThreads,ompNumThreads)
 
 prefix = "h2s_zindos_davidsonCIS_singlet"
-testerOmp = TesterOmp.new(prefix, <<"TITLE")
+tester = Tester.new(prefix, <<"TITLE")
 \t\t\t>>> H2S <<<
 TITLE
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 mklNumThreads = "2"
 ompNumThreads = "2"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
+mklNumThreads = "4"
+ompNumThreads = "2"
+tester.doesTestMpi(mklNumThreads,ompNumThreads)
 
 prefix = "c2h6_zindos_force"
-testerOmp = TesterOmp.new(prefix, <<"SECTION", <<"TITLE")
+tester = Tester.new(prefix, <<"SECTION", <<"TITLE")
 ------------------------------------------------
 ----------  Test of ZINDO/HF-Force  ------------
 ------------------------------------------------
@@ -305,13 +341,32 @@ SECTION
 TITLE
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 mklNumThreads = "2"
 ompNumThreads = "2"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
+
+prefix = "c2h6_zindos_directCIS_singlet_force"
+tester = Tester.new(prefix, <<"SECTION", <<"TITLE")
+---------------------------------------------------
+----------  Test of ZINDO/CIS-singlet-force --------
+----------  Without Davidson for the CIS   --------
+---------------------------------------------------
+SECTION
+\t\t\t>>> C2H6 <<<
+TITLE
+mklNumThreads = "1"
+ompNumThreads = "1"
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
+mklNumThreads = "2"
+ompNumThreads = "2"
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
+mklNumThreads = "4"
+ompNumThreads = "2"
+tester.doesTestMpi(mklNumThreads,ompNumThreads)
 
 prefix = "ch4_mndo"
-testerOmp = TesterOmp.new(prefix, <<"SECTION", <<"TITLE")
+tester = Tester.new(prefix, <<"SECTION", <<"TITLE")
 -------------------------------------------
 ----------   Test of MNDO/HF     ----------
 -------------------------------------------
@@ -320,24 +375,24 @@ SECTION
 TITLE
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 mklNumThreads = "2"
 ompNumThreads = "2"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 
 prefix = "c2h6_mndo"
-testerOmp = TesterOmp.new(prefix, <<"TITLE")
+tester = Tester.new(prefix, <<"TITLE")
 \t\t\t>>> C2H6 <<<
 TITLE
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 mklNumThreads = "2"
 ompNumThreads = "2"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 
 prefix = "ch4_mndo_directCIS_singlet"
-testerOmp = TesterOmp.new(prefix, <<"SECTION", <<"TITLE")
+tester = Tester.new(prefix, <<"SECTION", <<"TITLE")
 ---------------------------------------------------
 ----------  Test of MNDO/CIS-singlet      ---------
 ----------  Without Davidson for the CIS  ---------
@@ -347,24 +402,30 @@ SECTION
 TITLE
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 mklNumThreads = "2"
 ompNumThreads = "2"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
+mklNumThreads = "4"
+ompNumThreads = "2"
+tester.doesTestMpi(mklNumThreads,ompNumThreads)
 
 prefix = "c2h6_mndo_directCIS_singlet"
-testerOmp = TesterOmp.new(prefix, <<"TITLE")
+tester = Tester.new(prefix, <<"TITLE")
 \t\t\t>>> C2H6 <<<
 TITLE
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 mklNumThreads = "2"
 ompNumThreads = "2"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
+mklNumThreads = "4"
+ompNumThreads = "2"
+tester.doesTestMpi(mklNumThreads,ompNumThreads)
 
 prefix = "ch4_mndo_davidsonCIS_singlet"
-testerOmp = TesterOmp.new(prefix, <<"SECTION", <<"TITLE")
+tester = Tester.new(prefix, <<"SECTION", <<"TITLE")
 ---------------------------------------------------
 ----------  Test of MNDO/CIS-singlet      ---------
 ----------  With Davidson for the CIS     ---------
@@ -374,24 +435,30 @@ SECTION
 TITLE
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 mklNumThreads = "2"
 ompNumThreads = "2"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
+mklNumThreads = "4"
+ompNumThreads = "2"
+tester.doesTestMpi(mklNumThreads,ompNumThreads)
 
 prefix = "c2h6_mndo_davidsonCIS_singlet"
-testerOmp = TesterOmp.new(prefix, <<"TITLE")
+tester = Tester.new(prefix, <<"TITLE")
 \t\t\t>>> C2H6 <<<
 TITLE
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 mklNumThreads = "2"
 ompNumThreads = "2"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
+mklNumThreads = "4"
+ompNumThreads = "2"
+tester.doesTestMpi(mklNumThreads,ompNumThreads)
 
 prefix = "c2h6_mndo_force"
-testerOmp = TesterOmp.new(prefix, <<"SECTION", <<"TITLE")
+tester = Tester.new(prefix, <<"SECTION", <<"TITLE")
 ------------------------------------------------
 ----------  Test of MNDO/HF-Force  ------------
 ------------------------------------------------
@@ -400,13 +467,13 @@ SECTION
 TITLE
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 mklNumThreads = "2"
 ompNumThreads = "2"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 
 prefix = "c2h6_mndo_directCIS_singlet_force"
-testerOmp = TesterOmp.new(prefix, <<"SECTION", <<"TITLE")
+tester = Tester.new(prefix, <<"SECTION", <<"TITLE")
 ---------------------------------------------------
 ----------  Test of MNDO/CIS-singlet-force --------
 ----------  Without Davidson for the CIS   --------
@@ -416,13 +483,16 @@ SECTION
 TITLE
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 mklNumThreads = "2"
 ompNumThreads = "2"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
+mklNumThreads = "4"
+ompNumThreads = "2"
+tester.doesTestMpi(mklNumThreads,ompNumThreads)
 
 prefix = "c2h6_mndo_davidsonCIS_singlet_force"
-testerOmp = TesterOmp.new(prefix, <<"SECTION", <<"TITLE")
+tester = Tester.new(prefix, <<"SECTION", <<"TITLE")
 ---------------------------------------------------
 ----------  Test of MNDO/CIS-singlet-force --------
 ----------  With Davidson for the CIS      --------
@@ -432,13 +502,16 @@ SECTION
 TITLE
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 mklNumThreads = "2"
 ompNumThreads = "2"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
+mklNumThreads = "4"
+ompNumThreads = "2"
+tester.doesTestMpi(mklNumThreads,ompNumThreads)
 
 prefix = "ch4_am1"
-testerOmp = TesterOmp.new(prefix, <<"SECTION", <<"TITLE")
+tester = Tester.new(prefix, <<"SECTION", <<"TITLE")
 -------------------------------------------
 ----------   Test of AM1/HF    ------------
 -------------------------------------------
@@ -447,24 +520,24 @@ SECTION
 TITLE
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 mklNumThreads = "2"
 ompNumThreads = "2"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 
 prefix = "c2h6_am1"
-testerOmp = TesterOmp.new(prefix, <<"TITLE")
+tester = Tester.new(prefix, <<"TITLE")
 \t\t\t>>> C2H6 <<<
 TITLE
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 mklNumThreads = "2"
 ompNumThreads = "2"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 
 prefix = "ch4_am1_directCIS_singlet"
-testerOmp = TesterOmp.new(prefix, <<"SECTION", <<"TITLE")
+tester = Tester.new(prefix, <<"SECTION", <<"TITLE")
 ---------------------------------------------------
 ----------  Test of AM1/CIS-singlet       ---------
 ----------  Without Davidson for the CIS  ---------
@@ -474,24 +547,30 @@ SECTION
 TITLE
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 mklNumThreads = "2"
 ompNumThreads = "2"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
+mklNumThreads = "4"
+ompNumThreads = "2"
+tester.doesTestMpi(mklNumThreads,ompNumThreads)
 
 prefix = "c2h6_am1_directCIS_singlet"
-testerOmp = TesterOmp.new(prefix, <<"TITLE")
+tester = Tester.new(prefix, <<"TITLE")
 \t\t\t>>> C2H6 <<<\n
 TITLE
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 mklNumThreads = "2"
 ompNumThreads = "2"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
+mklNumThreads = "4"
+ompNumThreads = "2"
+tester.doesTestMpi(mklNumThreads,ompNumThreads)
 
 prefix = "ch4_am1_davidsonCIS_singlet"
-testerOmp = TesterOmp.new(prefix, <<"SECTION", <<"TITLE")
+tester = Tester.new(prefix, <<"SECTION", <<"TITLE")
 ---------------------------------------------------
 ----------  Test of AM1/CIS-singlet       ---------
 ----------  With Davidson for the CIS     ---------
@@ -501,24 +580,30 @@ SECTION
 TITLE
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 mklNumThreads = "2"
 ompNumThreads = "2"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
+mklNumThreads = "4"
+ompNumThreads = "2"
+tester.doesTestMpi(mklNumThreads,ompNumThreads)
 
 prefix = "c2h6_am1_davidsonCIS_singlet"
-testerOmp = TesterOmp.new(prefix, <<"TITLE")
+tester = Tester.new(prefix, <<"TITLE")
 \t\t\t>>> C2H6 <<<
 TITLE
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 mklNumThreads = "2"
 ompNumThreads = "2"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
+mklNumThreads = "4"
+ompNumThreads = "2"
+tester.doesTestMpi(mklNumThreads,ompNumThreads)
 
 prefix = "c2h6_am1_force"
-testerOmp = TesterOmp.new(prefix, <<"SECTION", <<"TITLE")
+tester = Tester.new(prefix, <<"SECTION", <<"TITLE")
 ------------------------------------------------
 ----------  Test of AM1/HF-Force  ------------
 ------------------------------------------------
@@ -527,13 +612,13 @@ SECTION
 TITLE
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 mklNumThreads = "2"
 ompNumThreads = "2"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 
 prefix = "c2h6_am1_directCIS_singlet_force"
-testerOmp = TesterOmp.new(prefix, <<"SECTION", <<"TITLE")
+tester = Tester.new(prefix, <<"SECTION", <<"TITLE")
 ---------------------------------------------------
 ----------  Test of AM1/CIS-singlet-force  --------
 ----------  Without Davidson for the CIS   --------
@@ -543,13 +628,16 @@ SECTION
 TITLE
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 mklNumThreads = "2"
 ompNumThreads = "2"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
+mklNumThreads = "4"
+ompNumThreads = "2"
+tester.doesTestMpi(mklNumThreads,ompNumThreads)
 
 prefix = "c2h6_am1_davidsonCIS_singlet_force"
-testerOmp = TesterOmp.new(prefix, <<"SECTION", <<"TITLE")
+tester = Tester.new(prefix, <<"SECTION", <<"TITLE")
 ---------------------------------------------------
 ----------  Test of AM1/CIS-singlet-force  --------
 ----------  With Davidson for the CIS      --------
@@ -559,13 +647,16 @@ SECTION
 TITLE
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 mklNumThreads = "2"
 ompNumThreads = "2"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
+mklNumThreads = "4"
+ompNumThreads = "2"
+tester.doesTestMpi(mklNumThreads,ompNumThreads)
 
 prefix = "ch4_pm3"
-testerOmp = TesterOmp.new(prefix, <<"SECTION", <<"TITLE")
+tester = Tester.new(prefix, <<"SECTION", <<"TITLE")
 -------------------------------------------
 ----------   Test of PM3/HF    ------------
 -------------------------------------------
@@ -574,24 +665,24 @@ SECTION
 TITLE
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 mklNumThreads = "2"
 ompNumThreads = "2"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 
 prefix = "c2h6_pm3"
-testerOmp = TesterOmp.new(prefix, <<"TITLE")
+tester = Tester.new(prefix, <<"TITLE")
 \t\t\t>>> C2H6 <<<
 TITLE
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 mklNumThreads = "2"
 ompNumThreads = "2"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 
 prefix = "ch4_pm3_directCIS_singlet"
-testerOmp = TesterOmp.new(prefix, <<"SECTION", <<"TITLE")
+tester = Tester.new(prefix, <<"SECTION", <<"TITLE")
 ---------------------------------------------------
 ----------  Test of PM3/CIS-singlet       ---------
 ----------  Without Davidson for the CIS  ---------
@@ -601,24 +692,30 @@ SECTION
 TITLE
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 mklNumThreads = "2"
 ompNumThreads = "2"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
+mklNumThreads = "4"
+ompNumThreads = "2"
+tester.doesTestMpi(mklNumThreads,ompNumThreads)
 
 prefix = "c2h6_pm3_directCIS_singlet"
-testerOmp = TesterOmp.new(prefix, <<"TITLE")
+tester = Tester.new(prefix, <<"TITLE")
 \t\t\t>>> C2H6 <<<
 TITLE
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 mklNumThreads = "2"
 ompNumThreads = "2"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
+mklNumThreads = "4"
+ompNumThreads = "2"
+tester.doesTestMpi(mklNumThreads,ompNumThreads)
 
 prefix = "ch4_pm3_davidsonCIS_singlet"
-testerOmp = TesterOmp.new(prefix, <<"SECTION", <<"TITLE")
+tester = Tester.new(prefix, <<"SECTION", <<"TITLE")
 ---------------------------------------------------
 ----------  Test of PM3/CIS-singlet       ---------
 ----------  With Davidson for the CIS     ---------
@@ -628,24 +725,30 @@ SECTION
 TITLE
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 mklNumThreads = "2"
 ompNumThreads = "2"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
+mklNumThreads = "4"
+ompNumThreads = "2"
+tester.doesTestMpi(mklNumThreads,ompNumThreads)
 
 prefix = "c2h6_pm3_davidsonCIS_singlet"
-testerOmp = TesterOmp.new(prefix, <<"TITLE")
+tester = Tester.new(prefix, <<"TITLE")
 \t\t\t>>> C2H6 <<<\n
 TITLE
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 mklNumThreads = "2"
 ompNumThreads = "2"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
+mklNumThreads = "4"
+ompNumThreads = "2"
+tester.doesTestMpi(mklNumThreads,ompNumThreads)
 
 prefix = "c2h6_pm3_force"
-testerOmp = TesterOmp.new(prefix, <<"SECTION", <<"TITLE")
+tester = Tester.new(prefix, <<"SECTION", <<"TITLE")
 ------------------------------------------------
 ----------  Test of PM3/HF-Force  --------------
 ------------------------------------------------
@@ -654,13 +757,13 @@ SECTION
 TITLE
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 mklNumThreads = "2"
 ompNumThreads = "2"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 
 prefix = "c2h6_pm3_directCIS_singlet_force"
-testerOmp = TesterOmp.new(prefix, <<"SECTION", <<"TITLE")
+tester = Tester.new(prefix, <<"SECTION", <<"TITLE")
 ---------------------------------------------------
 ----------  Test of PM3/CIS-singlet-force  --------
 ----------  Without Davidson for the CIS   --------
@@ -670,13 +773,16 @@ SECTION
 TITLE
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 mklNumThreads = "2"
 ompNumThreads = "2"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
+mklNumThreads = "4"
+ompNumThreads = "2"
+tester.doesTestMpi(mklNumThreads,ompNumThreads)
 
 prefix = "c2h6_pm3_davidsonCIS_singlet_force"
-testerOmp = TesterOmp.new(prefix, <<"SECTION", <<"TITLE")
+tester = Tester.new(prefix, <<"SECTION", <<"TITLE")
 ---------------------------------------------------
 ----------  Test of PM3/CIS-singlet-force  --------
 ----------  With Davidson for the CIS      --------
@@ -686,13 +792,16 @@ SECTION
 TITLE
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 mklNumThreads = "2"
 ompNumThreads = "2"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
+mklNumThreads = "4"
+ompNumThreads = "2"
+tester.doesTestMpi(mklNumThreads,ompNumThreads)
 
 prefix = "c2h6_pm3pddg"
-testerOmp = TesterOmp.new(prefix, <<"SECTION", <<"TITLE")
+tester = Tester.new(prefix, <<"SECTION", <<"TITLE")
 -------------------------------------------
 ---------- Test of PM3/PDDG/HF ------------
 -------------------------------------------
@@ -701,13 +810,13 @@ SECTION
 TITLE
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 mklNumThreads = "2"
 ompNumThreads = "2"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 
 prefix = "c2h6_pm3pddg_directCIS_singlet"
-testerOmp = TesterOmp.new(prefix, <<"SECTION", <<"TITLE")
+tester = Tester.new(prefix, <<"SECTION", <<"TITLE")
 ---------------------------------------------------
 ----------  Test of PM3/PDDG/CIS-singlet  ---------
 ----------  Without Davidson for the CIS  ---------
@@ -717,13 +826,16 @@ SECTION
 TITLE
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 mklNumThreads = "2"
 ompNumThreads = "2"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
+mklNumThreads = "4"
+ompNumThreads = "2"
+tester.doesTestMpi(mklNumThreads,ompNumThreads)
 
 prefix = "c2h6_pm3pddg_davidsonCIS_singlet"
-testerOmp = TesterOmp.new(prefix, <<"SECTION", <<"TITLE")
+tester = Tester.new(prefix, <<"SECTION", <<"TITLE")
 ---------------------------------------------------
 ----------  Test of PM3/PDDG/CIS-singlet  ---------
 ----------  With Davidson for the CIS     ---------
@@ -733,13 +845,16 @@ SECTION
 TITLE
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 mklNumThreads = "2"
 ompNumThreads = "2"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
+mklNumThreads = "4"
+ompNumThreads = "2"
+tester.doesTestMpi(mklNumThreads,ompNumThreads)
 
 prefix = "c2h6_pm3pddg_force"
-testerOmp = TesterOmp.new(prefix, <<"SECTION", <<"TITLE")
+tester = Tester.new(prefix, <<"SECTION", <<"TITLE")
 ------------------------------------------------
 ----------  Test of PM3/PDDG/HF-Force  ---------
 ------------------------------------------------
@@ -748,13 +863,13 @@ SECTION
 TITLE
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 mklNumThreads = "2"
 ompNumThreads = "2"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 
 prefix = "c2h6_pm3pddg_directCIS_singlet_force"
-testerOmp = TesterOmp.new(prefix, <<"SECTION", <<"TITLE")
+tester = Tester.new(prefix, <<"SECTION", <<"TITLE")
 ---------------------------------------------------
 ---------  Test of PM3/PDDG/CIS-singlet-force  ----
 ---------  Without Davidson for the CIS    --------
@@ -764,13 +879,16 @@ SECTION
 TITLE
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 mklNumThreads = "2"
 ompNumThreads = "2"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
+mklNumThreads = "4"
+ompNumThreads = "2"
+tester.doesTestMpi(mklNumThreads,ompNumThreads)
 
 prefix = "c2h6_pm3pddg_davidsonCIS_singlet_force"
-testerOmp = TesterOmp.new(prefix, <<"SECTION", <<"TITLE")
+tester = Tester.new(prefix, <<"SECTION", <<"TITLE")
 ---------------------------------------------------
 ---------  Test of PM3/PDDG/CIS-singlet-force  ----
 ---------  With Davidson for the CIS      --------
@@ -780,13 +898,16 @@ SECTION
 TITLE
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 mklNumThreads = "2"
 ompNumThreads = "2"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
+mklNumThreads = "4"
+ompNumThreads = "2"
+tester.doesTestMpi(mklNumThreads,ompNumThreads)
 
 prefix = "c2h6_pm3pddg_opt_steepest"
-testerOmp = TesterOmp.new(prefix, <<"SECTION", <<"TITLE")
+tester = Tester.new(prefix, <<"SECTION", <<"TITLE")
 ------------------------------------------------
 ------  Test of PM3/PDDG/Steepest Descent ------
 ------------------------------------------------
@@ -795,13 +916,13 @@ SECTION
 TITLE
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 mklNumThreads = "2"
 ompNumThreads = "2"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 
 prefix = "c2h6_pm3pddg_opt_conjugate"
-testerOmp = TesterOmp.new(prefix, <<"SECTION", <<"TITLE")
+tester = Tester.new(prefix, <<"SECTION", <<"TITLE")
 ------------------------------------------------
 ----  Test of PM3/PDDG/Conjugate gradient ------
 ------------------------------------------------
@@ -810,13 +931,13 @@ SECTION
 TITLE
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 mklNumThreads = "2"
 ompNumThreads = "2"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 
 prefix = "c2h6_pm3pddg_opt_bfgs"
-testerOmp = TesterOmp.new(prefix, <<"SECTION", <<"TITLE")
+tester = Tester.new(prefix, <<"SECTION", <<"TITLE")
 ------------------------------------------------
 ------  Test of PM3/PDDG/BFGS ------------------
 ------------------------------------------------
@@ -825,13 +946,13 @@ SECTION
 TITLE
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 mklNumThreads = "2"
 ompNumThreads = "2"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 
 prefix = "c2h6_pm3_MC"
-testerOmp = TesterOmp.new(prefix, <<"SECTION", <<"TITLE")
+tester = Tester.new(prefix, <<"SECTION", <<"TITLE")
 ---------------------------------------------------
 ---------  Test of PM3/HF-MC  ---------------------
 ---------------------------------------------------
@@ -840,13 +961,13 @@ SECTION
 TITLE
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 mklNumThreads = "2"
 ompNumThreads = "2"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 
 prefix = "c2h6_pm3_directCIS_singlet_MC"
-testerOmp = TesterOmp.new(prefix, <<"SECTION", <<"TITLE")
+tester = Tester.new(prefix, <<"SECTION", <<"TITLE")
 ---------------------------------------------------
 ---------  Test of PM3/CIS-singlet-MC    ----------
 ---------  Without Davidson for the CIS  ----------
@@ -856,13 +977,16 @@ SECTION
 TITLE
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 mklNumThreads = "2"
 ompNumThreads = "2"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
+mklNumThreads = "4"
+ompNumThreads = "2"
+tester.doesTestMpi(mklNumThreads,ompNumThreads)
 
 prefix = "c2h6_pm3pddg_rpmd"
-testerOmp = TesterOmp.new(prefix, <<"SECTION", <<"TITLE")
+tester = Tester.new(prefix, <<"SECTION", <<"TITLE")
 ------------------------------------------------
 ----------  Test of PM3/PDDG/RPMD  -------------
 ------------------------------------------------
@@ -871,13 +995,13 @@ SECTION
 TITLE
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 mklNumThreads = "2"
 ompNumThreads = "2"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 
 prefix = "c2h6_pm3pddg_davidsonCIS_singlet_rpmd"
-testerOmp = TesterOmp.new(prefix, <<"SECTION", <<"TITLE")
+tester = Tester.new(prefix, <<"SECTION", <<"TITLE")
 ---------------------------------------------------
 ---------  Test of PM3/PDDG/CIS/RPMD      ---------
 ---------  With Davidson for the CIS      ---------
@@ -887,13 +1011,16 @@ SECTION
 TITLE
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 mklNumThreads = "2"
 ompNumThreads = "2"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
+mklNumThreads = "4"
+ompNumThreads = "2"
+tester.doesTestMpi(mklNumThreads,ompNumThreads)
 
 prefix = "c2h6_pm3d"
-testerOmp = TesterOmp.new(prefix, <<"SECTION", <<"TITLE")
+tester = Tester.new(prefix, <<"SECTION", <<"TITLE")
 -------------------------------------------
 ------------ Test of PM3-D/HF -------------
 -------------------------------------------
@@ -903,13 +1030,13 @@ TITLE
 
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 mklNumThreads = "2"
 ompNumThreads = "2"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 
 prefix = "c2h6_pm3_vdw"
-testerOmp = TesterOmp.new(prefix, <<"SECTION", <<"TITLE")
+tester = Tester.new(prefix, <<"SECTION", <<"TITLE")
 ---------------------------------------------------
 ------  Test of vdw correction in PM3/HF  ---------
 ---------------------------------------------------
@@ -918,13 +1045,13 @@ SECTION
 TITLE
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 mklNumThreads = "2"
 ompNumThreads = "2"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 
 prefix = "c2h6_pm3_vdw_force"
-testerOmp = TesterOmp.new(prefix, <<"SECTION", <<"TITLE")
+tester = Tester.new(prefix, <<"SECTION", <<"TITLE")
 ---------------------------------------------------
 ----  Test of vdw correction in PM3/HF-Force  -----
 ---------------------------------------------------
@@ -933,13 +1060,13 @@ SECTION
 TITLE
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 mklNumThreads = "2"
 ompNumThreads = "2"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 
 prefix = "c2h6_pm3_vdw_MC"
-testerOmp = TesterOmp.new(prefix, <<"SECTION", <<"TITLE")
+tester = Tester.new(prefix, <<"SECTION", <<"TITLE")
 ---------------------------------------------------
 ------  Test of vdw correction in PM3/HF-MC  ------
 ---------------------------------------------------
@@ -948,13 +1075,13 @@ SECTION
 TITLE
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 mklNumThreads = "2"
 ompNumThreads = "2"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 
 prefix = "c2h6-h2o-cluster_pm3pddg_freq"
-testerOmp = TesterOmp.new(prefix, <<"SECTION", <<"TITLE")
+tester = Tester.new(prefix, <<"SECTION", <<"TITLE")
 -------------------------------------------
 ----   Test of PM3/PDDG/HF/FREQUENCIES  ---
 -------------------------------------------
@@ -963,13 +1090,13 @@ SECTION
 TITLE
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 mklNumThreads = "2"
 ompNumThreads = "2"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 
 prefix = "c2h6-nh3-cluster_pm3d_freq"
-testerOmp = TesterOmp.new(prefix, <<"SECTION", <<"TITLE")
+tester = Tester.new(prefix, <<"SECTION", <<"TITLE")
 -------------------------------------------
 -----   Test of PM3-D/HF/FREQUENCIES   ----
 -------------------------------------------
@@ -978,13 +1105,13 @@ SECTION
 TITLE
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 mklNumThreads = "2"
 ompNumThreads = "2"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 
 prefix = "c2h6_mndo_directCIS_singlet_force_heap_limit"
-testerOmp = TesterOmp.new(prefix, <<"SECTION", <<"TITLE")
+tester = Tester.new(prefix, <<"SECTION", <<"TITLE")
 ---------------------------------------------------
 -----------  Test of limitation of Heap  ----------
 ---------------------------------------------------
@@ -993,10 +1120,10 @@ SECTION
 TITLE
 mklNumThreads = "1"
 ompNumThreads = "1"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 mklNumThreads = "2"
 ompNumThreads = "2"
-testerOmp.doesTestOmp(mklNumThreads,ompNumThreads)
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
 
 
 

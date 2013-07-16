@@ -27,9 +27,10 @@
 #include<boost/shared_ptr.hpp>
 #include<boost/random.hpp>
 #include<boost/format.hpp>
+#include"../base/Uncopyable.h"
+#include"../mpi/MpiProcess.h"
 #include"../base/PrintController.h"
 #include"../base/MolDSException.h"
-#include"../base/Uncopyable.h"
 #include"../base/Enums.h"
 #include"../base/MallocerFreer.h"
 #include"../base/EularAngle.h"
@@ -193,8 +194,7 @@ void NASCO::UpdateCoordinates(Molecule& tmpMolecule,
          tmpAtom->GetXyz()[i] =  atom->GetXyz()[i] + dt*atom->GetPxyz()[i]/coreMass;
       }
    }
-   tmpMolecule.CalcXyzCOM();
-   tmpMolecule.CalcXyzCOC();
+   tmpMolecule.CalcBasicsConfiguration();
 }
 
 void NASCO::DecideNextElecState(int* elecState, 

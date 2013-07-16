@@ -1,5 +1,5 @@
 //************************************************************************//
-// Copyright (C) 2011-2013 Mikiya Fujii                                   //
+// Copyright (C) 2011-2012 Mikiya Fujii                                   // 
 //                                                                        // 
 // This file is part of MolDS.                                            // 
 //                                                                        // 
@@ -18,62 +18,58 @@
 //************************************************************************//
 #include<stdio.h>
 #include<stdlib.h>
+#include<iostream>
 #include<sstream>
-#include<string>
 #include<math.h>
+#include<string>
 #include<stdexcept>
-#include"MolDSException.h"
-#include"EularAngle.h"
+#include"../base/MolDSException.h"
+#include"../base/Uncopyable.h"
+#include"MpiProcess.h"
 using namespace std;
-namespace MolDS_base{
+namespace MolDS_mpi{
 
-EularAngle::EularAngle(){
-   this->SetMessage();
-   // e the [BFB_1997] for defenitions of alpha, beta, gamma;
-   this->alpha = 0.0; // (= "phi" in P25 in J. A. Pople book)
-   this->beta  = 0.0; // (= "theta" in P25 in J. A. Pople book)
-   this->gamma = 0.0;
+MpiProcess* MpiProcess::mpiProcess = NULL;
+
+MpiProcess::MpiProcess(){
 }
 
-EularAngle::EularAngle(double x, double y, double z){
-   this->SetMessage();
-   double r = 0.0;
+MpiProcess::MpiProcess(int argc, char *argv[]){
+   this->environment  = new boost::mpi::environment(argc, argv);
+   this->communicator = new boost::mpi::communicator();
+   this->messageLimit = INT_MAX;
+}
 
-   // calc. beta
-   if(x==0.0 && y==0.0 && z==0.0){
-      stringstream ss;
-      ss << this->errorMessageInvalidXYZ;
-      throw MolDSException(ss.str());
+MpiProcess::~MpiProcess(){
+   delete this->environment;
+   delete this->communicator;
+}
+
+void MpiProcess::CreateInstance(int argc, char *argv[]){
+   if(mpiProcess != NULL){
+      // ToDo: error
    }
+   mpiProcess = new MpiProcess(argc, argv);
+}
 
-   r = sqrt( pow(x, 2.0) + pow(y, 2.0) + pow(z, 2.0) );
-   this->beta = acos(z/r);
-
-   // calc. alpha
-   if(x==0.0 && y==0.0){
-      this->alpha = 0.0;
+void MpiProcess::DeleteInstance(){
+   if(mpiProcess != NULL){
+      delete mpiProcess; 
    }
-   else{ 
-      r = sqrt( pow(x, 2.0) + pow(y, 2.0) );
-      this->alpha = atan2(y/r, x/r);
+   mpiProcess = NULL;
+}
+
+MpiProcess* MpiProcess::GetInstance(){
+   if(mpiProcess == NULL){
+      //mpiProcess = new MpiProcess();
+      // ToDo: error
    }
-
-   // set gamma
-   this->gamma = 0.0;
-   
+   return mpiProcess;
 }
 
-EularAngle::EularAngle(double* angles){
-   this->SetMessage();
-   this->alpha = angles[0];
-   this->beta  = angles[1];
-   this->gamma = angles[2];
-}
-
-void EularAngle::SetMessage(){
-   this->errorMessageInvalidXYZ="Error in base::EularAngle: Invalid coordinates. x=y=z=0.\n";
 }
 
 
 
-}
+
+

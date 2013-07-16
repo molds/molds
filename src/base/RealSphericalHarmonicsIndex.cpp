@@ -1,5 +1,5 @@
 //************************************************************************//
-// Copyright (C) 2011-2012 Mikiya Fujii                                   // 
+// Copyright (C) 2011-2013 Mikiya Fujii                                   //
 //                                                                        // 
 // This file is part of MolDS.                                            // 
 //                                                                        // 
@@ -80,14 +80,6 @@ RealSphericalHarmonicsIndex::RealSphericalHarmonicsIndex(OrbitalType orbitalType
 RealSphericalHarmonicsIndex::RealSphericalHarmonicsIndex(int l, int m){
    this->l = l;
    this->m = m;
-}
-
-int RealSphericalHarmonicsIndex::GetL() const{
-   return this->l;
-}
-
-int RealSphericalHarmonicsIndex::GetM() const{
-   return this->m;
 }
 
 }

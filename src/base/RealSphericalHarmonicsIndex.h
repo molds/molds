@@ -1,5 +1,5 @@
 //************************************************************************//
-// Copyright (C) 2011-2012 Mikiya Fujii                                   // 
+// Copyright (C) 2011-2013 Mikiya Fujii                                   //
 //                                                                        // 
 // This file is part of MolDS.                                            // 
 //                                                                        // 
@@ -25,8 +25,8 @@ class RealSphericalHarmonicsIndex {
 public:
    RealSphericalHarmonicsIndex(int l, int m);
    explicit RealSphericalHarmonicsIndex(MolDS_base::OrbitalType  orbitalType);
-   int GetL() const;
-   int GetM() const;
+   int GetL() const{return this->l;}
+   int GetM() const{return this->m;}
 private:
    int l;
    int m;

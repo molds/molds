@@ -1,6 +1,6 @@
 //************************************************************************//
-// Copyright (C) 2011-2012 Mikiya Fujii                                   // 
-// Copyright (C) 2012-2012 Katsuhiko Nishimra                             // 
+// Copyright (C) 2011-2013 Mikiya Fujii                                   //
+// Copyright (C) 2012-2013 Katsuhiko Nishimra                             //
 //                                                                        // 
 // This file is part of MolDS.                                            // 
 //                                                                        // 
@@ -26,6 +26,13 @@
 #include<stdexcept>
 #include<boost/format.hpp>
 #include"config.h"
+#include"../base/Uncopyable.h"
+#include"../mpi/MpiProcess.h"
+#include"../base/PrintController.h"
+#include"../base/MolDSException.h"
+#include"../base/MallocerFreer.h"
+#include"Blas.h"
+
 #ifdef HAVE_MKL_H
 #if SIZEOF_BLASINT == 64
 #define MKL_ILP64
@@ -36,11 +43,7 @@
 #else
 #error Cannot find mkl.h or cblas.h!
 #endif
-#include"../base/PrintController.h"
-#include"../base/MolDSException.h"
-#include"../base/Uncopyable.h"
-#include"../base/MallocerFreer.h"
-#include"Blas.h"
+
 using namespace std;
 using namespace MolDS_base;
 
@@ -259,6 +262,23 @@ void Blas::Dgemm(bool isColumnMajorMatrixA,
                  double const* const* matrixB,
                  double beta,
                  double** matrixC) const{
+   bool isColumnMajorMatrixC = false;
+   this->Dgemm(isColumnMajorMatrixA, isColumnMajorMatrixB, isColumnMajorMatrixC,m, n, k, alpha, matrixA, matrixB, beta, matrixC);
+}
+
+// matrixC = alpha*matrixA*matrixB + beta*matrixC
+//    matrixA: m*k-matrix 
+//    matrixB: k*n-matrix
+//    matrixC: m*n-matrix
+void Blas::Dgemm(bool isColumnMajorMatrixA, 
+                 bool isColumnMajorMatrixB, 
+                 bool isColumnMajorMatrixC, 
+                 molds_blas_int m, molds_blas_int n, molds_blas_int k,  
+                 double alpha,
+                 double const* const* matrixA,
+                 double const* const* matrixB,
+                 double beta,
+                 double** matrixC) const{
    double* a = const_cast<double*>(&matrixA[0][0]);
    double* b = const_cast<double*>(&matrixB[0][0]);
    double*       c = &matrixC[0][0];
@@ -291,17 +311,31 @@ void Blas::Dgemm(bool isColumnMajorMatrixA,
 #else
    tmpC = (double*)malloc( sizeof(double)*m*n);
 #endif
-   for(molds_blas_int i=0; i<m; i++){
-      for(molds_blas_int j=0; j<n; j++){
-         tmpC[i+j*m] = matrixC[i][j];
-      }
+   molds_blas_int ldc;
+   if(isColumnMajorMatrixC){
+      this->Dcopy(m*n, &matrixC[0][0], tmpC);
+      ldc = m;
    }
-   molds_blas_int ldc = m;
+   else{
+      for(molds_blas_int i=0; i<m; i++){
+         for(molds_blas_int j=0; j<n; j++){
+            tmpC[i+j*m] = matrixC[i][j];
+         }
+      }
+      ldc = n;
+   }
+
    //call blas
    cblas_dgemm(CblasColMajor, transA, transB, m, n, k, alpha, a, lda, b, ldb, beta, tmpC, ldc);
-   for(molds_blas_int i=0; i<m; i++){
-      for(molds_blas_int j=0; j<n; j++){
-         matrixC[i][j] = tmpC[i+j*m];
+
+   if(isColumnMajorMatrixC){
+      this->Dcopy(m*n, tmpC, &matrixC[0][0]);
+   }
+   else{
+      for(molds_blas_int i=0; i<m; i++){
+         for(molds_blas_int j=0; j<n; j++){
+            matrixC[i][j] = tmpC[i+j*m];
+         }
       }
    }
 #ifdef HAVE_MKL_FREE
@@ -345,20 +379,50 @@ void Blas::Dgemmm(bool isColumnMajorMatrixA,
                   double beta,
                   double** matrixD) const{
    
-   double alphaBC = 1.0;
-   double betaBC  = 0.0;
-   bool isColumnMajorMatrixBC = false;
    double** matrixBC = NULL;
    try{
       MallocerFreer::GetInstance()->Malloc<double>(&matrixBC, k, n); 
-      this->Dgemm(isColumnMajorMatrixB, isColumnMajorMatrixC,  k, n, l, alphaBC, matrixB, matrixC,  betaBC, matrixBC);
-      this->Dgemm(isColumnMajorMatrixA, isColumnMajorMatrixBC, m, n, k, alpha,   matrixA, matrixBC, beta,   matrixD );
+      this->Dgemmm(isColumnMajorMatrixA, isColumnMajorMatrixB, isColumnMajorMatrixC,
+                   m, n, k, l, 
+                   alpha,
+                   matrixA,
+                   matrixB,
+                   matrixC,
+                   beta,
+                   matrixD,
+                   matrixBC);
    }
    catch(MolDSException ex){
       MallocerFreer::GetInstance()->Free<double>(&matrixBC, k, n); 
       throw ex;
    }
    MallocerFreer::GetInstance()->Free<double>(&matrixBC, k, n); 
+}
+
+// matrixD = alpha*matrixA*matrixB*matrixC + beta*matrixD
+//    matrixA: m*k-matrix 
+//    matrixB: k*l-matrix
+//    matrixC: l*n-matrix
+//    matrixD: m*n-matrix (matrixC[m][n] in row-major (C/C++ style))
+//       tmpMatrixBC is temporary calculated matrix in row-major, (C/C++ style) 
+//       tmpMatrixBC = matrixB*matrixC
+void Blas::Dgemmm(bool isColumnMajorMatrixA,
+                  bool isColumnMajorMatrixB, 
+                  bool isColumnMajorMatrixC, 
+                  molds_blas_int m, molds_blas_int n, molds_blas_int k, molds_blas_int l,
+                  double alpha,
+                  double const* const* matrixA,
+                  double const* const* matrixB,
+                  double const* const* matrixC,
+                  double beta,
+                  double** matrixD,
+                  double** tmpMatrixBC) const{
+   
+   double alphaBC = 1.0;
+   double betaBC  = 0.0;
+   bool isColumnMajorMatrixBC = false;
+   this->Dgemm(isColumnMajorMatrixB, isColumnMajorMatrixC,  k, n, l, alphaBC, matrixB, matrixC,     betaBC, tmpMatrixBC);
+   this->Dgemm(isColumnMajorMatrixA, isColumnMajorMatrixBC, m, n, k, alpha,   matrixA, tmpMatrixBC, beta,   matrixD );
 }
 
 // matrixC = matrixA*matrixA^T

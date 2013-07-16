@@ -1,5 +1,5 @@
 //************************************************************************//
-// Copyright (C) 2011-2012 Mikiya Fujii                                   // 
+// Copyright (C) 2011-2013 Mikiya Fujii                                   //
 // Copyright (C) 2012-2013 Michihiro Okuyama
 //                                                                        // 
 // This file is part of MolDS.                                            // 
@@ -22,7 +22,7 @@
 namespace MolDS_cndo{
 
 /***
- *  Refferences for Cndo2 are [PB_1970], [PSS_1965], and [PS_1965].
+ *  References for Cndo2 are [PB_1970], [PSS_1965], and [PS_1965].
  */
 class Cndo2 : public MolDS_base::ElectronicStructure{
 public:
@@ -184,6 +184,7 @@ protected:
                                         double const* const* orbitalElectronPopulation, 
                                         double const* const* const* const* const* const* twoElecTwoCore, 
                                         bool isGuess) const;
+   void TransposeFockMatrixMatrix(double** transposedFockMatrix) const;
    virtual void CalcDiatomicOverlapAOsInDiatomicFrame(double** diatomicOverlapAOs, 
                                                       const MolDS_base_atoms::Atom& atomA, 
                                                       const MolDS_base_atoms::Atom& atomB) const;
@@ -210,7 +211,7 @@ protected:
                                                          MolDS_base::CartesianType axisA1,
                                                          MolDS_base::CartesianType axisA2,
                                                          double* cartesian,
-                                                         double Rab) const;
+                                                         double rAB) const;
    virtual double GetMolecularIntegralElement(int moI, int moJ, int moK, int moL, 
                                               const MolDS_base::Molecule& molecule, 
                                               double const* const* fockMatrix, 
@@ -361,7 +362,18 @@ private:
                                      MolDS_base::OrbitalType valenceOrbitalB, 
                                      double gaussianExponentB, 
                                      double const* xyzB,
-                                     double Rab,
+                                     double rAB,
+                                     MolDS_base::CartesianType axis) const;
+   double GetGaussianCartesianMatrix(MolDS_base::AtomType atomTypeA, 
+                                     MolDS_base::OrbitalType valenceOrbitalA, 
+                                     double gaussianExponentA, 
+                                     double const* xyzA,
+                                     MolDS_base::AtomType atomTypeB, 
+                                     MolDS_base::OrbitalType valenceOrbitalB, 
+                                     double gaussianExponentB, 
+                                     double const* xyzB,
+                                     double rAB,
+                                     double ovelapSASB,
                                      MolDS_base::CartesianType axis) const;
    void CalcOverlapAOs(double** overlapAOs, const MolDS_base::Molecule& molecule) const;
    void CalcOverlapAOsByGTOExpansion(double** overlapAOs, 
@@ -372,9 +384,9 @@ private:
                                              const MolDS_base_atoms::Atom& atomB, 
                                              int valenceIndexB,
                                              MolDS_base::STOnGType stonG) const; // see [DY_1977]
-   double GetGaussianOverlapAOsSaSb(double gaussianExponentA, 
+   double GetGaussianOverlapAOsSASB(double gaussianExponentA, 
                                     double gaussianExponentB, 
-                                    double Rab) const; // see [DY_1977]
+                                    double rAB) const; // see [DY_1977]
    double GetGaussianOverlapAOs(MolDS_base::AtomType atomTypeA, 
                                 MolDS_base::OrbitalType valenceOrbitalA, 
                                 double gaussianExponentA, 
@@ -384,7 +396,18 @@ private:
                                 double dx, 
                                 double dy, 
                                 double dz, 
-                                double Rab) const; // see [DY_1977]
+                                double rAB) const; // see [DY_1977]
+   double GetGaussianOverlapAOs(MolDS_base::AtomType atomTypeA, 
+                                MolDS_base::OrbitalType valenceOrbitalA, 
+                                double gaussianExponentA, 
+                                MolDS_base::AtomType atomTypeB, 
+                                MolDS_base::OrbitalType valenceOrbitalB, 
+                                double gaussianExponentB, 
+                                double dx, 
+                                double dy, 
+                                double dz, 
+                                double rAB,
+                                double ovelapSASB) const; // see [DY_1977]
    double GetGaussianOverlapAOs1stDerivative(MolDS_base::AtomType atomTypeA, 
                                              MolDS_base::OrbitalType valenceOrbitalA, 
                                              double gaussianExponentA, 
@@ -394,7 +417,7 @@ private:
                                              double dx, 
                                              double dy, 
                                              double dz, 
-                                             double Rab, 
+                                             double rAB, 
                                              MolDS_base::CartesianType axisA) const;// see [DY_1977]
    void CalcFockMatrix(double** fockMatrix, 
                        const MolDS_base::Molecule& molecule, 
@@ -462,7 +485,10 @@ private:
    void MallocDiatomicOverlapAOs1stDeriTemps(double***  diaOverlapAOsInDiaFrame, 
                                              double***  diaOverlapAOs1stDerivInDiaFrame,
                                              double***  rotMat,
-                                             double**** rotMat1stDerivs) const;
+                                             double**** rotMat1stDerivs,
+                                             double***  rotatedDiatomicOverlap,
+                                             double***  tmpRotMat1stDeriv,
+                                             double***  tmpMatrix) const;
    void MallocDiatomicOverlapAOs2ndDeriTemps(double***   diaOverlapAOsInDiaFrame, 
                                              double***   diaOverlapAOs1stDerivInDiaFrame,
                                              double***   diaOverlapAOs2ndDerivInDiaFrame,
@@ -474,7 +500,10 @@ private:
    void FreeDiatomicOverlapAOs1stDeriTemps(double***  diaOverlapAOsInDiaFrame, 
                                            double***  diaOverlapAOs1stDerivInDiaFrame,
                                            double***  rotMat,
-                                           double**** rotMat1stDerivs) const;
+                                           double**** rotMat1stDerivs,
+                                           double***  rotatedDiatomicOverlap,
+                                           double***  tmpRotMat1stDeriv,
+                                           double***  tmpMatrix) const;
    void FreeDiatomicOverlapAOs2ndDeriTemps(double***   diaOverlapAOsInDiaFrame, 
                                            double***   diaOverlapAOs1stDerivInDiaFrame,
                                            double***   diaOverlapAOs2ndDerivInDiaFrame,

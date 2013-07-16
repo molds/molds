@@ -1,5 +1,5 @@
 //************************************************************************//
-// Copyright (C) 2011-2012 Mikiya Fujii                                   // 
+// Copyright (C) 2011-2013 Mikiya Fujii                                   //
 //                                                                        // 
 // This file is part of MolDS.                                            // 
 //                                                                        // 
@@ -24,9 +24,10 @@
 #include<string>
 #include<vector>
 #include<boost/format.hpp>
+#include"../base/Uncopyable.h"
+#include"../mpi/MpiProcess.h"
 #include"../base/PrintController.h"
 #include"../base/MolDSException.h"
-#include"../base/Uncopyable.h"
 #include"../base/Enums.h"
 #include"../base/EularAngle.h"
 #include"../base/Parameters.h"
@@ -51,7 +52,7 @@ using namespace MolDS_base_atoms;
 namespace MolDS_pm3{
 
 /***
- *  Main Refferences for PM3 are [S_1989, S_1989-2, S_1991, S_2004, S_2007]
+ *  Main References for PM3 are [S_1989, S_1989-2, S_1991, S_2004, S_2007]
  */
 Pm3::Pm3() : MolDS_am1::Am1(){
    this->theory = PM3;

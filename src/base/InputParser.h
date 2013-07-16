@@ -1,7 +1,7 @@
 //************************************************************************//
 // Copyright (C) 2011-2012 Mikiya Fujii                                   // 
 // Copyright (C) 2012-2012 Katsuhiko Nishimra                             // 
-// Copyright (C) 2012-2012 Michihiro Okuyama                              // 
+// Copyright (C) 2012-2013 Michihiro Okuyama                              //
 //                                                                        // 
 // This file is part of MolDS.                                            // 
 //                                                                        // 
@@ -35,12 +35,15 @@ private:
    void SetMessages();
    std::string errorMessageInputFileEmpty;
    std::string errorMessageNotFoundInputFile; 
+   std::string errorMessageNonValidTheoriesMD;
    std::string errorMessageNonValidExcitedStatesMD;
    std::string errorMessageNonValidExcitedStatesMC;
+   std::string errorMessageNonValidTheoriesRPMD;
    std::string errorMessageNonValidExcitedStatesRPMD;
    std::string errorMessageNonValidTheoriesNASCO;
    std::string errorMessageNonValidNumberExcitedStatesNASCO;
    std::string errorMessageNonValidInitialElectronicStateNASCO;
+   std::string errorMessageNonValidTheoriesOptimization;
    std::string errorMessageNonValidExcitedStatesOptimization;
    std::string errorMessageNonValidElectronicStateFrequencies;
    std::string errorMessageNonValidTheoryFrequencies;

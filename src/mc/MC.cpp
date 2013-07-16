@@ -27,9 +27,10 @@
 #include<boost/shared_ptr.hpp>
 #include<boost/random.hpp>
 #include<boost/format.hpp>
+#include"../base/Uncopyable.h"
+#include"../mpi/MpiProcess.h"
 #include"../base/PrintController.h"
 #include"../base/MolDSException.h"
-#include"../base/Uncopyable.h"
 #include"../base/Enums.h"
 #include"../base/EularAngle.h"
 #include"../base/Parameters.h"
@@ -174,8 +175,7 @@ void MC::CreateTrialConfiguration(Molecule* trial,
          trialAtom->GetXyz()[i] -= coreCenterShift[i];
       }
    }
-   trial->CalcXyzCOC();
-   trial->CalcXyzCOM();
+   trial->CalcBasicsConfiguration();
 }
 
 bool MC::UsesTrial(const ElectronicStructure& currentES, 

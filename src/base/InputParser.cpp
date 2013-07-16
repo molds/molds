@@ -1,7 +1,7 @@
 //************************************************************************//
 // Copyright (C) 2011-2012 Mikiya Fujii                                   // 
 // Copyright (C) 2012-2012 Katsuhiko Nishimra                             // 
-// Copyright (C) 2012-2012 Michihiro Okuyama                              // 
+// Copyright (C) 2012-2013 Michihiro Okuyama                              //
 //                                                                        // 
 // This file is part of MolDS.                                            // 
 //                                                                        // 
@@ -28,9 +28,10 @@
 #include<vector>
 #include<stdexcept>
 #include<boost/format.hpp>
+#include"Uncopyable.h"
+#include"../mpi/MpiProcess.h"
 #include"PrintController.h"
 #include"MolDSException.h"
-#include"Uncopyable.h"
 #include"Utilities.h"
 #include"Enums.h"
 #include"EularAngle.h"
@@ -78,10 +79,14 @@ void InputParser::SetMessages(){
       = "Error in base::InputParser::GetInputTerms: Input file is empty.\n"; 
    this->errorMessageNotFoundInputFile
       = "Error in base::InputParser::StoreInputTermsFromFile: Not found.\n"; 
+   this->errorMessageNonValidTheoriesMD
+      = "Error in base::InputParser::ValidateMdConditions: Theory you set is not supported for MD.\n";
    this->errorMessageNonValidExcitedStatesMD
       = "Error in base::InputParser::ValidateMdConditions: Excited state on which MD runs or CIS condition are wrong.\n";
    this->errorMessageNonValidExcitedStatesMC
       = "Error in base::InputParser::ValidateMcConditions: Excited state on which MC runs or CIS condition are wrong.\n";
+   this->errorMessageNonValidTheoriesRPMD
+      = "Error in base::InputParser::ValidateRpmdConditions: heory you set is not supported for RMPD.\n";
    this->errorMessageNonValidExcitedStatesRPMD
       = "Error in base::InputParser::ValidateRpmdConditions: Excited state on which RPMD runs or CIS condition are wrong.\n";
    this->errorMessageNonValidTheoriesNASCO
@@ -90,6 +95,8 @@ void InputParser::SetMessages(){
       = "Error in base::InputParser::ValidateNascoConditions: The Number of electronic states of NASCO should be not over the number of CIS excited states plus 1.\n";
    this->errorMessageNonValidInitialElectronicStateNASCO
       = "Error in base::InputParser::ValidateNascoConditions: The initial electronic states for NASCO should be set to one of the electronic eigenstates used in NASCO.\n";
+   this->errorMessageNonValidTheoriesOptimization
+      = "Error in base::InputParser::ValidateOptimizationConditions: heory you set is not supported for optimization.\n";
    this->errorMessageNonValidExcitedStatesOptimization
       = "Error in base::InputParser::ValidateOptimizationConditions: Excited state on which optimization is carried out or CIS condition are wrong.\n";
    this->errorMessageNonValidElectronicStateFrequencies
@@ -469,7 +476,8 @@ int InputParser::ParseMolecularGeometry(Molecule* molecule, vector<string>* inpu
       else if((*inputTerms)[parseIndex] == "s"){
          atomType = S;
       }
-      Atom* atom = AtomFactory::Create(atomType, x, y, z);
+      int index = molecule->GetNumberAtoms();
+      Atom* atom = AtomFactory::Create(atomType, index, x, y, z);
       molecule->AddAtom(atom);
       parseIndex += 4;
    }
@@ -1369,10 +1377,9 @@ void InputParser::ValidateMdConditions(const Molecule& molecule) const{
    int targetStateIndex = Parameters::GetInstance()->GetElectronicStateIndexMD();
    TheoryType theory = Parameters::GetInstance()->GetCurrentTheory();
    // Validate theory
-   if(theory == CNDO2 || theory == INDO || (theory == ZINDOS && groundStateIndex < targetStateIndex)){
+   if(theory == CNDO2 || theory == INDO ){
       stringstream ss;
-      ss << this->errorMessageNonValidExcitedStatesMD;
-      ss << this->errorMessageElecState << targetStateIndex << endl;
+      ss << this->errorMessageNonValidTheoriesMD;
       ss << this->errorMessageTheory << TheoryTypeStr(theory) << endl;
       throw MolDSException(ss.str());
    }
@@ -1383,7 +1390,7 @@ void InputParser::ValidateMdConditions(const Molecule& molecule) const{
       this->ValidateCisConditions(molecule);
    }
    int numberExcitedStatesCIS = Parameters::GetInstance()->GetNumberExcitedStatesCIS();
-   if(numberExcitedStatesCIS < targetStateIndex){
+   if(groundStateIndex < targetStateIndex && numberExcitedStatesCIS < targetStateIndex){
       stringstream ss;
       ss << this->errorMessageNonValidExcitedStatesMD;
       ss << this->errorMessageElecState << targetStateIndex << endl;
@@ -1425,10 +1432,9 @@ void InputParser::ValidateRpmdConditions(const Molecule& molecule) const{
    int targetStateIndex = Parameters::GetInstance()->GetElectronicStateIndexRPMD();
    TheoryType theory = Parameters::GetInstance()->GetCurrentTheory();
    // Validate theory
-   if(theory == CNDO2 || theory == INDO || (theory == ZINDOS && groundStateIndex < targetStateIndex)){
+   if(theory == CNDO2 || theory == INDO ){
       stringstream ss;
-      ss << this->errorMessageNonValidExcitedStatesRPMD;
-      ss << this->errorMessageElecState << targetStateIndex << endl;
+      ss << this->errorMessageNonValidTheoriesRPMD;
       ss << this->errorMessageTheory << TheoryTypeStr(theory) << endl;
       throw MolDSException(ss.str());
    }
@@ -1439,7 +1445,7 @@ void InputParser::ValidateRpmdConditions(const Molecule& molecule) const{
       this->ValidateCisConditions(molecule);
    }
    int numberExcitedStatesCIS = Parameters::GetInstance()->GetNumberExcitedStatesCIS();
-   if(numberExcitedStatesCIS < targetStateIndex){
+   if(groundStateIndex < targetStateIndex && numberExcitedStatesCIS < targetStateIndex){
       stringstream ss;
       ss << this->errorMessageNonValidExcitedStatesRPMD;
       ss << this->errorMessageElecState << targetStateIndex << endl;
@@ -1489,9 +1495,9 @@ void InputParser::ValidateOptimizationConditions(const Molecule& molecule) const
    int targetStateIndex = Parameters::GetInstance()->GetElectronicStateIndexOptimization();
    TheoryType theory = Parameters::GetInstance()->GetCurrentTheory();
    // Validate theory
-   if(theory == CNDO2 || theory == INDO || (theory == ZINDOS && groundStateIndex < targetStateIndex)){
+   if(theory == CNDO2 || theory == INDO ){
       stringstream ss;
-      ss << this->errorMessageNonValidExcitedStatesOptimization;
+      ss << this->errorMessageNonValidTheoriesOptimization;
       ss << this->errorMessageElecState << targetStateIndex << endl;
       ss << this->errorMessageTheory << TheoryTypeStr(theory) << endl;
       throw MolDSException(ss.str());
@@ -1503,7 +1509,7 @@ void InputParser::ValidateOptimizationConditions(const Molecule& molecule) const
       this->ValidateCisConditions(molecule);
    }
    int numberExcitedStatesCIS = Parameters::GetInstance()->GetNumberExcitedStatesCIS();
-   if(numberExcitedStatesCIS < targetStateIndex){
+   if(groundStateIndex < targetStateIndex && numberExcitedStatesCIS < targetStateIndex){
       stringstream ss;
       ss << this->errorMessageNonValidExcitedStatesOptimization;
       ss << this->errorMessageElecState << targetStateIndex << endl;
@@ -1755,12 +1761,12 @@ void InputParser::OutputMOPlotConditions() const{
       this->OutputLog(boost::format("%s%d\n") % this->messageMOPlotIndex.c_str() 
                                               % (*moIndeces)[i]);
    }
-   int* gridNum = Parameters::GetInstance()->GetGridNumberMOPlot();
+   const int* gridNum = Parameters::GetInstance()->GetGridNumberMOPlot();
    this->OutputLog(boost::format("%s%d %d %d\n") % this->messageMOPlotGridNumber.c_str() 
                                                  % gridNum[XAxis] 
                                                  % gridNum[YAxis]
                                                  % gridNum[ZAxis]);
-   double* frameLength = Parameters::GetInstance()->GetFrameLengthMOPlot();
+   const double* frameLength = Parameters::GetInstance()->GetFrameLengthMOPlot();
    double ang2AU = Parameters::GetInstance()->GetAngstrom2AU();
    this->OutputLog(boost::format("%s%e %e %e\n") % this->messageMOPlotFrameLength.c_str() 
                                                  % (frameLength[XAxis]/ang2AU) 
@@ -1779,12 +1785,12 @@ void InputParser::OutputHolePlotConditions() const{
       this->OutputLog(boost::format("%s%d\n") % this->messageHolePlotElecIndex.c_str() 
                                               % (*moIndeces)[i]);
    }
-   int* gridNum = Parameters::GetInstance()->GetGridNumberHolePlot();
+   const int* gridNum = Parameters::GetInstance()->GetGridNumberHolePlot();
    this->OutputLog(boost::format("%s%d %d %d\n") % this->messageHolePlotGridNumber.c_str() 
                                                  % gridNum[XAxis] 
                                                  % gridNum[YAxis]
                                                  % gridNum[ZAxis]);
-   double* frameLength = Parameters::GetInstance()->GetFrameLengthHolePlot();
+   const double* frameLength = Parameters::GetInstance()->GetFrameLengthHolePlot();
    double ang2AU = Parameters::GetInstance()->GetAngstrom2AU();
    this->OutputLog(boost::format("%s%e %e %e\n") % this->messageHolePlotFrameLength.c_str() 
                                                  % (frameLength[XAxis]/ang2AU) 
@@ -1798,17 +1804,17 @@ void InputParser::OutputHolePlotConditions() const{
 
 void InputParser::OutputParticlePlotConditions() const{
    this->OutputLog(this->messageParticlePlotConditions);
-   vector<int>* moIndeces = Parameters::GetInstance()->GetElecIndecesParticlePlot();
+   const vector<int>* moIndeces = Parameters::GetInstance()->GetElecIndecesParticlePlot();
    for(int i=0; i<moIndeces->size(); i++){
       this->OutputLog(boost::format("%s%d\n") % this->messageParticlePlotElecIndex.c_str() 
                                               % (*moIndeces)[i]);
    }
-   int* gridNum = Parameters::GetInstance()->GetGridNumberParticlePlot();
+   const int* gridNum = Parameters::GetInstance()->GetGridNumberParticlePlot();
    this->OutputLog(boost::format("%s%d %d %d\n") % this->messageParticlePlotGridNumber.c_str() 
                                                  % gridNum[XAxis] 
                                                  % gridNum[YAxis]
                                                  % gridNum[ZAxis]);
-   double* frameLength = Parameters::GetInstance()->GetFrameLengthParticlePlot();
+   const double* frameLength = Parameters::GetInstance()->GetFrameLengthParticlePlot();
    double ang2AU = Parameters::GetInstance()->GetAngstrom2AU();
    this->OutputLog(boost::format("%s%e %e %e\n") % this->messageParticlePlotFrameLength.c_str() 
                                                  % (frameLength[XAxis]/ang2AU) 

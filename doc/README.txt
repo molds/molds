@@ -29,14 +29,15 @@
 
 ==============================================================================
 REQUIREMENTS:
-   MolDS requires c/c++ compiler of Intel (icpc) or GNU (g++) and boost-libraries. 
-   Valid versions of these compiler are icpc 12.0.4(MkL 10.3 update 4), g++ 4.4, or later 
+   MolDS requires c++ mpi compiler that is wrapping Intel (icpc) or GNU (g++) and boost-libraries. 
+   Valid versions of the wrapped c++ compilers are icpc 12.0.4(MkL 10.3 update 4), g++ 4.4, or later 
    because the MolDS is implemented with openMP 3.0. 
-   To compile MolDS with g++, furthermore, openBLAS (version 0.2.5 or later) is also required. 
-   The default compiler is the intel c++ compiler (icpc). 
+   To compile MolDS with GNU, furthermore, openBLAS (version 0.2.5 or later) is also required. 
 
    To get and install the boost-libraries, see the HP:<http://www.boost.org/>.
    The version of the boost would be no problem if 1.48.0 or later is used.
+   Especially, the boost-libraries should be builded with MPI 
+   because MolDS needs boost_mpi-library(i.e. -lboost_mpi).
 
    To get and install the openBLAS-libraries, see the HP:<http://xianyi.github.com/OpenBLAS/>.
    Note that "USE_OPENMP = 1" should be set for the installation of the opneBLAS.
@@ -46,7 +47,7 @@ REQUIREMENTS:
 COMPILE(using GNUmake): 
    In the "src" directory in the MolDS package.
 
-   Case i) Using Intel c/c++ compiler (icpc)
+   Case i) Using Intel mpi c++ compiler (mpiicpc)
       Change the "BOOST_TOP_DIR" in Makefile to the top directory of the 
       boost-libraries in your systems.
 
@@ -56,7 +57,7 @@ COMPILE(using GNUmake):
       To compile MolDS on 64 bits machine,
       $ make INTEL=64
 
-   Case ii) Using GNU c/c++ compiler (g++)
+   Case ii) Using GNU c++ compiler (mpicxx)
       Change the "BOOST_TOP_DIR" in "Makefile_GNU" to the top directory of the 
       boost-libraries in your systems.
       Change the "OPENBLAS_TOP_DIR" in "Makefile_GNU" to the top directory of the 
@@ -67,17 +68,22 @@ COMPILE(using GNUmake):
 
    For both case, the compile succeeded if you could fine "MolDS.out" in the "src" directory. 
    Type "$ make clean" when you wanna clean the compilation.
-   If you want to compile MolDS in debug-mode, -g and -DMOLDS_DBG 
-   should be added to CFLAGBASE in the Makefile,
-   i.e. -O0 -openmp -openmp-report2 -DMKL_INT=intptr_t -g -DMOLDS_DBG
+   If you want to compile MolDS in debug-mode, 
+   -g, -rdynamic(for function names in backtrace) and -DMOLDS_DBG should be added to CFLAGS,
+   that is, hit the following command:
+   $make CFLAGS="-O0 -g -rdynamic -DMOLDS_DBG"
 
 ==============================================================================
 CARRY OUT MolDS:
    After the compile, in the "src" directory,
+
+   For the calculations with single process:
    $ ./MolDS.out < input.in
    or
    $ ./MolDS.out input.in
 
+   For the calculations with multiple processes(n) by MPI:
+   $ mpirun -np n MolDS.out input.in
 ==============================================================================
 SAMPLE and TEST
    See files in "test" directories for sample files.
@@ -103,7 +109,7 @@ CAPABILITIES:
    ---------|-----|-----|--------|--------|--------|--------|----------|----------|--------------|--------------|-----------------|
    INDO     | OK  | --  | --     | --     | OK     | --     | --       | --       | --           | --           | --              |
    ---------|-----|-----|--------|--------|--------|--------|----------|----------|--------------|--------------|-----------------|
-   ZINDO/S  | OK  | OK  | OK     | --     | OK     | OK     | OK       | --       | OK           | --           | --              |
+   ZINDO/S  | OK  | OK  | OK     | OK     | OK     | OK     | OK       | OK       | OK           | OK           | --              |
    ---------|-----|-----|--------|--------|--------|--------|----------|----------|--------------|--------------|-----------------|
    MNDO     | OK  | OK  | OK     | OK     | OK     | OK     | OK       | OK       | OK           | OK           | OK              |
    ---------|-----|-----|--------|--------|--------|--------|----------|----------|--------------|--------------|-----------------|
@@ -425,6 +431,7 @@ HOW TO WRITE INPUT:
       Write OPT-directive. This module uses line search and steepest descent algorythms.
       In the early stage the line search algorythm is used, 
       then the algorythm used in this module is switched to steepest descent algorythm.
+      Note that ZINDO/S is not suitable for geometry optimizations.
 
       E.g.
          OPTIMIZE
@@ -480,7 +487,7 @@ HOW TO WRITE INPUT:
       
 
    <MD (Molecular dynamics)>
-      Write MD-directive.
+      Write MD-directive. Note that ZINDO/S is not suitable for molcular dynamics simulations.
 
       E.g.
          MD 
