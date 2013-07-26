@@ -47,7 +47,7 @@ build/MolDS: build/Makefile $(wildcard *.cpp) $(wildcard */*.cpp) $(wildcard */*
 	+make -C build
 
 MolDS.out: build/MolDS
-	cp $< $@
+	install $< $@
 
 clean:
 	rm -rf build MolDS.out
