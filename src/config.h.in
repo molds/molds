@@ -20,8 +20,14 @@
    header file. */
 #undef HAVE_BOOST_MATH_SPECIAL_FUNCTIONS_FACTORIALS_HPP
 
+/* define if the Boost::Mpi library is available */
+#undef HAVE_BOOST_MPI
+
 /* Define to 1 if you have the <boost/random.hpp> header file. */
 #undef HAVE_BOOST_RANDOM_HPP
+
+/* define if the Boost::Serialization library is available */
+#undef HAVE_BOOST_SERIALIZATION
 
 /* Define to 1 if you have the <boost/shared_ptr.hpp> header file. */
 #undef HAVE_BOOST_SHARED_PTR_HPP
@@ -100,6 +106,9 @@
 
 /* Define to 1 if you have the <mkl.h> header file. */
 #undef HAVE_MKL_H
+
+/* Define if you have the MPI library. */
+#undef HAVE_MPI
 
 /* Define to 1 if you have the <omp.h> header file. */
 #undef HAVE_OMP_H

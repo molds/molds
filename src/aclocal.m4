@@ -971,5 +971,8 @@ AC_SUBST([am__untar])
 
 m4_include([m4/ax_blas.m4])
 m4_include([m4/ax_boost_base.m4])
+m4_include([m4/ax_boost_mpi.m4])
+m4_include([m4/ax_boost_serialization.m4])
 m4_include([m4/ax_lapack.m4])
+m4_include([m4/ax_mpi.m4])
 m4_include([m4/ax_openmp.m4])

@@ -60,8 +60,10 @@ DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ax_blas.m4 \
 	$(top_srcdir)/m4/ax_boost_base.m4 \
-	$(top_srcdir)/m4/ax_lapack.m4 $(top_srcdir)/m4/ax_openmp.m4 \
-	$(top_srcdir)/configure.ac
+	$(top_srcdir)/m4/ax_boost_mpi.m4 \
+	$(top_srcdir)/m4/ax_boost_serialization.m4 \
+	$(top_srcdir)/m4/ax_lapack.m4 $(top_srcdir)/m4/ax_mpi.m4 \
+	$(top_srcdir)/m4/ax_openmp.m4 $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
@@ -72,9 +74,9 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_MolDS_OBJECTS = Main.$(OBJEXT) MolDSException.$(OBJEXT) \
-	Blas.$(OBJEXT) Lapack.$(OBJEXT) Utilities.$(OBJEXT) \
-	Enums.$(OBJEXT) MathUtilities.$(OBJEXT) \
+am_MolDS_OBJECTS = Main.$(OBJEXT) MpiProcess.$(OBJEXT) \
+	MolDSException.$(OBJEXT) Blas.$(OBJEXT) Lapack.$(OBJEXT) \
+	Utilities.$(OBJEXT) Enums.$(OBJEXT) MathUtilities.$(OBJEXT) \
 	MallocerFreer.$(OBJEXT) EularAngle.$(OBJEXT) \
 	Parameters.$(OBJEXT) Atom.$(OBJEXT) Hatom.$(OBJEXT) \
 	Liatom.$(OBJEXT) Catom.$(OBJEXT) Natom.$(OBJEXT) \
@@ -138,6 +140,8 @@ AWK = @AWK@
 BLAS_LIBS = @BLAS_LIBS@
 BOOST_CPPFLAGS = @BOOST_CPPFLAGS@
 BOOST_LDFLAGS = @BOOST_LDFLAGS@
+BOOST_MPI_LIB = @BOOST_MPI_LIB@
+BOOST_SERIALIZATION_LIB = @BOOST_SERIALIZATION_LIB@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
@@ -170,6 +174,8 @@ LIBS = @LIBS@
 LTLIBOBJS = @LTLIBOBJS@
 MAKEINFO = @MAKEINFO@
 MKDIR_P = @MKDIR_P@
+MPICC = @MPICC@
+MPILIBS = @MPILIBS@
 OBJEXT = @OBJEXT@
 OPENMP_CXXFLAGS = @OPENMP_CXXFLAGS@
 PACKAGE = @PACKAGE@
@@ -236,9 +242,9 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-MolDS_SOURCES = Main.cpp base/MolDSException.cpp wrappers/Blas.cpp \
-	wrappers/Lapack.cpp base/Utilities.cpp base/Enums.cpp \
-	base/MathUtilities.cpp base/MallocerFreer.cpp \
+MolDS_SOURCES = Main.cpp mpi/MpiProcess.cpp base/MolDSException.cpp \
+	wrappers/Blas.cpp wrappers/Lapack.cpp base/Utilities.cpp \
+	base/Enums.cpp base/MathUtilities.cpp base/MallocerFreer.cpp \
 	base/EularAngle.cpp base/Parameters.cpp base/atoms/Atom.cpp \
 	base/atoms/Hatom.cpp base/atoms/Liatom.cpp \
 	base/atoms/Catom.cpp base/atoms/Natom.cpp base/atoms/Oatom.cpp \
@@ -255,14 +261,14 @@ MolDS_SOURCES = Main.cpp base/MolDSException.cpp wrappers/Blas.cpp \
 	optimization/Optimizer.cpp optimization/ConjugateGradient.cpp \
 	optimization/SteepestDescent.cpp optimization/BFGS.cpp \
 	base/factories/OptimizerFactory.cpp base/MolDS.cpp \
-	base/PrintController.h base/MolDSException.h base/Uncopyable.h \
-	wrappers/Blas.h wrappers/Lapack.h base/Utilities.h \
-	base/Enums.h base/MathUtilities.h base/MallocerFreer.h \
-	base/EularAngle.h base/Parameters.h base/atoms/Atom.h \
-	base/atoms/Hatom.h base/atoms/Liatom.h base/atoms/Catom.h \
-	base/atoms/Natom.h base/atoms/Oatom.h base/atoms/Satom.h \
-	base/factories/AtomFactory.h base/Molecule.h \
-	base/InputParser.h base/GTOExpansionSTO.h \
+	base/Uncopyable.h mpi/MpiProcess.h base/PrintController.h \
+	base/MolDSException.h wrappers/Blas.h wrappers/Lapack.h \
+	base/Utilities.h base/Enums.h base/MathUtilities.h \
+	base/MallocerFreer.h base/EularAngle.h base/Parameters.h \
+	base/atoms/Atom.h base/atoms/Hatom.h base/atoms/Liatom.h \
+	base/atoms/Catom.h base/atoms/Natom.h base/atoms/Oatom.h \
+	base/atoms/Satom.h base/factories/AtomFactory.h \
+	base/Molecule.h base/InputParser.h base/GTOExpansionSTO.h \
 	base/RealSphericalHarmonicsIndex.h base/loggers/MOLogger.h \
 	base/loggers/DensityLogger.h base/loggers/HoleDensityLogger.h \
 	base/loggers/ParticleDensityLogger.h \
@@ -278,7 +284,7 @@ MolDS_SOURCES = Main.cpp base/MolDSException.cpp wrappers/Blas.cpp \
 ACLOCAL_AMFLAGS = -I m4
 AM_CXXFLAGS = $(OPENMP_CXXFLAGS)
 AM_CPPFLAGS = $(BOOST_CPPFLAGS)
-AM_LDFLAGS = $(BOOST_LDFLAGS)
+AM_LDFLAGS = $(BOOST_LDFLAGS) $(BOOST_MPI_LIB) $(BOOST_SERIALIZATION_LIB)
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
@@ -413,6 +419,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MolDS.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MolDSException.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Molecule.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MpiProcess.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NASCO.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Natom.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Oatom.Po@am__quote@
@@ -443,6 +450,20 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXXCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
+
+MpiProcess.o: mpi/MpiProcess.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT MpiProcess.o -MD -MP -MF $(DEPDIR)/MpiProcess.Tpo -c -o MpiProcess.o `test -f 'mpi/MpiProcess.cpp' || echo '$(srcdir)/'`mpi/MpiProcess.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/MpiProcess.Tpo $(DEPDIR)/MpiProcess.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='mpi/MpiProcess.cpp' object='MpiProcess.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o MpiProcess.o `test -f 'mpi/MpiProcess.cpp' || echo '$(srcdir)/'`mpi/MpiProcess.cpp
+
+MpiProcess.obj: mpi/MpiProcess.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT MpiProcess.obj -MD -MP -MF $(DEPDIR)/MpiProcess.Tpo -c -o MpiProcess.obj `if test -f 'mpi/MpiProcess.cpp'; then $(CYGPATH_W) 'mpi/MpiProcess.cpp'; else $(CYGPATH_W) '$(srcdir)/mpi/MpiProcess.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/MpiProcess.Tpo $(DEPDIR)/MpiProcess.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='mpi/MpiProcess.cpp' object='MpiProcess.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o MpiProcess.obj `if test -f 'mpi/MpiProcess.cpp'; then $(CYGPATH_W) 'mpi/MpiProcess.cpp'; else $(CYGPATH_W) '$(srcdir)/mpi/MpiProcess.cpp'; fi`
 
 MolDSException.o: base/MolDSException.cpp
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT MolDSException.o -MD -MP -MF $(DEPDIR)/MolDSException.Tpo -c -o MolDSException.o `test -f 'base/MolDSException.cpp' || echo '$(srcdir)/'`base/MolDSException.cpp
