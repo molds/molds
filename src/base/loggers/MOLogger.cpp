@@ -28,9 +28,10 @@
 #include<stdexcept>
 #include<omp.h>
 #include<boost/format.hpp>
+#include"../Uncopyable.h"
+#include"../../mpi/MpiProcess.h"
 #include"../PrintController.h"
 #include"../MolDSException.h"
-#include"../Uncopyable.h"
 #include"../Utilities.h"
 #include"../Enums.h"
 #include"../EularAngle.h"
@@ -129,12 +130,12 @@ void MOLogger::DrawMO(vector<int> moIndeces){
       }
       catch(MolDSException ex){
 #pragma omp critical
-         ompErrors << ex.what() << endl ;
+         ex.Serialize(ompErrors);
       }
    }
    // Exception throwing for omp-region
    if(!ompErrors.str().empty()){
-      throw MolDSException(ompErrors.str());
+      throw MolDSException::Deserialize(ompErrors);
    }
 
    double ompEndTime = omp_get_wtime();

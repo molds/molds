@@ -18,7 +18,10 @@
 //************************************************************************//
 #ifndef INCLUDED_MOLDSEXCEPTION
 #define INCLUDED_MOLDSEXCEPTION
+#include<map>
+#include<boost/shared_ptr.hpp>
 #include<boost/shared_array.hpp>
+#include<boost/serialization/access.hpp>
 namespace MolDS_base{
 class MolDSException : public std::domain_error {
 public:
@@ -27,11 +30,39 @@ public:
    MolDSException(const boost::format& cause);
 #endif
    ~MolDSException() throw(){};
-   void PrintBacktrace();
+   template <class T>
+   T GetKeyValue(int key);
+   template <class T>
+   void SetKeyValue(int key, T value);
+   bool HasKey(int key);
+   const MolDSException* NextException() const{return this->nextException.get();}
+   virtual const char* what() const throw();
+   const char* What() const throw(){return domain_error::what();}
+   void Serialize(std::ostream& os);
+   static MolDSException Deserialize(std::istream& is);
 private:
    void GetBacktrace(int bufsize);
    size_t backtraceSize;
    boost::shared_array<void*> backtracePtr;
+
+   typedef std::map<int, int> intKeyValueMap_t;
+   intKeyValueMap_t intKeyValueMap;
+   //typedef std::map<int, other> otherKeyValueMap_t;
+   //otherKeyValueMap_t otherKeyValueMap;
+
+   boost::shared_ptr<MolDSException> nextException;
+   MolDSException* LastException(){
+      if(this->nextException.get()==NULL){
+         return this;
+      }
+      else{
+         return this->nextException->LastException();
+      }
+   }
+
+   friend class boost::serialization::access;
+   template<class Archive>
+   void serialize(Archive& ar, const unsigned int ver);
 };
 }
 #endif

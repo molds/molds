@@ -1,5 +1,5 @@
 //************************************************************************//
-// Copyright (C) 2011-2012 Mikiya Fujii                                   // 
+// Copyright (C) 2011-2013 Mikiya Fujii                                   //
 // Copyright (C) 2012-2012 Katsuhiko Nishimra                             // 
 // Copyright (C) 2012-2013 Michihiro Okuyama
 //                                                                        // 
@@ -27,9 +27,10 @@
 #include<vector>
 #include<stdexcept>
 #include<boost/format.hpp>
+#include"Uncopyable.h"
+#include"../mpi/MpiProcess.h"
 #include"PrintController.h"
 #include"MolDSException.h"
-#include"Uncopyable.h"
 #include"Enums.h"
 #include"MallocerFreer.h"
 #include"EularAngle.h"

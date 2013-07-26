@@ -1,5 +1,5 @@
 //************************************************************************//
-// Copyright (C) 2011-2012 Mikiya Fujii                                   // 
+// Copyright (C) 2011-2013 Mikiya Fujii                                   //
 //                                                                        // 
 // This file is part of MolDS.                                            // 
 //                                                                        // 
@@ -26,9 +26,10 @@
 #include<vector>
 #include<stdexcept>
 #include<boost/format.hpp>
+#include"../Uncopyable.h"
+#include"../../mpi/MpiProcess.h"
 #include"../PrintController.h"
 #include"../MolDSException.h"
-#include"../Uncopyable.h"
 #include"../Enums.h"
 #include"../MathUtilities.h"
 #include"../MallocerFreer.h"

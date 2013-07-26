@@ -1,5 +1,5 @@
 //************************************************************************//
-// Copyright (C) 2011-2012 Mikiya Fujii                                   // 
+// Copyright (C) 2011-2013 Mikiya Fujii                                   //
 // Copyright (C) 2012-2013 Michihiro Okuyama
 //                                                                        // 
 // This file is part of MolDS.                                            // 
@@ -31,12 +31,12 @@ public:
    virtual void SetMolecule(MolDS_base::Molecule* molecule);
    void DoSCF(bool requiresGuess=true);
    virtual void OutputSCFResults() const;
-   double const* const* GetFockMatrix() const;
-   double const*        GetEnergiesMO() const;
+   double const* const* GetFockMatrix() const{return this->fockMatrix;};
+   double const*        GetEnergiesMO() const{return this->energiesMO;};
    virtual void DoCIS();
    virtual void OutputCISResults() const;
-   double const* const* GetMatrixCIS() const;
-   double const*        GetExcitedEnergies() const;
+   double const* const* GetMatrixCIS() const{return this->matrixCIS;};
+   double const*        GetExcitedEnergies() const{return this->excitedEnergies;};
    double** GetForce(int elecState);
    double*** GetForce(const std::vector<int>& elecStates);
    double GetElectronicEnergy(int elecState) const;

@@ -27,9 +27,10 @@
 #include<boost/shared_ptr.hpp>
 #include<boost/random.hpp>
 #include<boost/format.hpp>
+#include"../base/Uncopyable.h"
+#include"../mpi/MpiProcess.h"
 #include"../base/PrintController.h"
 #include"../base/MolDSException.h"
-#include"../base/Uncopyable.h"
 #include"../base/Enums.h"
 #include"../base/EularAngle.h"
 #include"../base/Parameters.h"
@@ -146,8 +147,8 @@ void MC::DoMC(int totalSteps, int elecState, double temperature, double stepWidt
 
 void MC::CreateTrialConfiguration(Molecule* trial,
                                   const Molecule& current,
-                                  boost::random::variate_generator<
-                                     boost::random::mt19937&,
+                                  boost::variate_generator<
+                                     boost::mt19937&,
                                      boost::uniform_real<>
                                   > (*realRand),
                                   double stepWidth) const{
@@ -180,8 +181,8 @@ void MC::CreateTrialConfiguration(Molecule* trial,
 bool MC::UsesTrial(const ElectronicStructure& currentES, 
                    const ElectronicStructure& trialES,
                    int elecState,
-                   boost::random::variate_generator<
-                     boost::random::mt19937&,
+                   boost::variate_generator<
+                     boost::mt19937&,
                      boost::uniform_real<>
                    > (*realRand),
                    double temperature) const{

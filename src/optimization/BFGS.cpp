@@ -29,9 +29,10 @@
 #include<list>
 #include<boost/shared_ptr.hpp>
 #include<boost/format.hpp>
+#include"../base/Uncopyable.h"
+#include"../mpi/MpiProcess.h"
 #include"../base/PrintController.h"
 #include"../base/MolDSException.h"
-#include"../base/Uncopyable.h"
 #include"../wrappers/Blas.h"
 #include"../wrappers/Lapack.h"
 #include"../base/Enums.h"

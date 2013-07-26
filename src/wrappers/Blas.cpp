@@ -1,6 +1,6 @@
 //************************************************************************//
-// Copyright (C) 2011-2012 Mikiya Fujii                                   // 
-// Copyright (C) 2012-2012 Katsuhiko Nishimra                             // 
+// Copyright (C) 2011-2013 Mikiya Fujii                                   //
+// Copyright (C) 2012-2013 Katsuhiko Nishimra                             //
 //                                                                        // 
 // This file is part of MolDS.                                            // 
 //                                                                        // 
@@ -25,16 +25,19 @@
 #include<string>
 #include<stdexcept>
 #include<boost/format.hpp>
+#include"../base/Uncopyable.h"
+#include"../mpi/MpiProcess.h"
+#include"../base/PrintController.h"
+#include"../base/MolDSException.h"
+#include"../base/MallocerFreer.h"
+#include"Blas.h"
+
 #ifdef __INTEL_COMPILER
 #include"mkl.h"
 #else
 #include"cblas.h"
 #endif
-#include"../base/PrintController.h"
-#include"../base/MolDSException.h"
-#include"../base/Uncopyable.h"
-#include"../base/MallocerFreer.h"
-#include"Blas.h"
+
 using namespace std;
 using namespace MolDS_base;
 

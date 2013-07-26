@@ -27,9 +27,10 @@
 #include<boost/shared_ptr.hpp>
 #include<boost/random.hpp>
 #include<boost/format.hpp>
+#include"../base/Uncopyable.h"
+#include"../mpi/MpiProcess.h"
 #include"../base/PrintController.h"
 #include"../base/MolDSException.h"
-#include"../base/Uncopyable.h"
 #include"../base/Enums.h"
 #include"../base/MallocerFreer.h"
 #include"../base/EularAngle.h"
@@ -200,8 +201,8 @@ void NASCO::DecideNextElecState(int* elecState,
                                 int* nonAdiabaticPhaseIndex,
                                 int numElecStates,
                                 double const* const* overlapESs,
-                                boost::random::variate_generator<
-                                   boost::random::mt19937&,
+                                boost::variate_generator<
+                                   boost::mt19937&,
                                    boost::uniform_real<>
                                 > (*realRand)) const{
    double normalizedConstantHoppProbability=0.0;
