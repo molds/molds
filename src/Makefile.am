@@ -1,7 +1,7 @@
 bin_PROGRAMS = MolDS
-MolDS_SOURCES = Main.cpp base/MolDSException.cpp wrappers/Blas.cpp \
-	wrappers/Lapack.cpp base/Utilities.cpp base/Enums.cpp \
-	base/MathUtilities.cpp base/MallocerFreer.cpp \
+MolDS_SOURCES = Main.cpp mpi/MpiProcess.cpp base/MolDSException.cpp \
+	wrappers/Blas.cpp wrappers/Lapack.cpp base/Utilities.cpp \
+	base/Enums.cpp base/MathUtilities.cpp base/MallocerFreer.cpp \
 	base/EularAngle.cpp base/Parameters.cpp base/atoms/Atom.cpp \
 	base/atoms/Hatom.cpp base/atoms/Liatom.cpp \
 	base/atoms/Catom.cpp base/atoms/Natom.cpp base/atoms/Oatom.cpp \
@@ -18,14 +18,14 @@ MolDS_SOURCES = Main.cpp base/MolDSException.cpp wrappers/Blas.cpp \
 	optimization/Optimizer.cpp optimization/ConjugateGradient.cpp \
 	optimization/SteepestDescent.cpp optimization/BFGS.cpp \
 	base/factories/OptimizerFactory.cpp base/MolDS.cpp \
-	base/PrintController.h base/MolDSException.h base/Uncopyable.h \
-	wrappers/Blas.h wrappers/Lapack.h base/Utilities.h \
-	base/Enums.h base/MathUtilities.h base/MallocerFreer.h \
-	base/EularAngle.h base/Parameters.h base/atoms/Atom.h \
-	base/atoms/Hatom.h base/atoms/Liatom.h base/atoms/Catom.h \
-	base/atoms/Natom.h base/atoms/Oatom.h base/atoms/Satom.h \
-	base/factories/AtomFactory.h base/Molecule.h \
-	base/InputParser.h base/GTOExpansionSTO.h \
+	base/Uncopyable.h mpi/MpiProcess.h base/PrintController.h \
+	base/MolDSException.h wrappers/Blas.h wrappers/Lapack.h \
+	base/Utilities.h base/Enums.h base/MathUtilities.h \
+	base/MallocerFreer.h base/EularAngle.h base/Parameters.h \
+	base/atoms/Atom.h base/atoms/Hatom.h base/atoms/Liatom.h \
+	base/atoms/Catom.h base/atoms/Natom.h base/atoms/Oatom.h \
+	base/atoms/Satom.h base/factories/AtomFactory.h \
+	base/Molecule.h base/InputParser.h base/GTOExpansionSTO.h \
 	base/RealSphericalHarmonicsIndex.h base/loggers/MOLogger.h \
 	base/loggers/DensityLogger.h base/loggers/HoleDensityLogger.h \
 	base/loggers/ParticleDensityLogger.h \
