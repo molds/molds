@@ -758,12 +758,12 @@ void ZindoS::CalcNishimotoMatagaMatrix(double**** nishimotoMatagaMatrix, const M
       }
       catch(MolDSException ex){
 #pragma omp critical
-         ompErrors << ex.what() << endl ;
+         ex.Serialize(ompErrors);
       }
    }
    // Exception throwing for omp-region
    if(!ompErrors.str().empty()){
-      throw MolDSException(ompErrors.str());
+      throw MolDSException::Deserialize(ompErrors);
    }
 }
 
@@ -1438,12 +1438,12 @@ void ZindoS::CalcElectronicTransitionDipoleMoment(double* transitionDipoleMoment
             }
             catch(MolDSException ex){
 #pragma omp critical
-               ompErrors << ex.what() << endl ;
+               ex.Serialize(ompErrors);
             }
          }
          // Exception throwing for omp-region
          if(!ompErrors.str().empty()){
-            throw MolDSException(ompErrors.str());
+            throw MolDSException::Deserialize(ompErrors);
          }
          transitionDipoleMoment[XAxis] = valueX;
          transitionDipoleMoment[YAxis] = valueY;
@@ -1476,12 +1476,12 @@ void ZindoS::CalcElectronicTransitionDipoleMoment(double* transitionDipoleMoment
             }
             catch(MolDSException ex){
 #pragma omp critical
-               ompErrors << ex.what() << endl ;
+               ex.Serialize(ompErrors);
             }
          }
          // Exception throwing for omp-region
          if(!ompErrors.str().empty()){
-            throw MolDSException(ompErrors.str());
+            throw MolDSException::Deserialize(ompErrors);
          }
          transitionDipoleMoment[XAxis] = valueX;
          transitionDipoleMoment[YAxis] = valueY;
@@ -1514,12 +1514,12 @@ void ZindoS::CalcElectronicTransitionDipoleMoment(double* transitionDipoleMoment
             }
             catch(MolDSException ex){
 #pragma omp critical
-               ompErrors << ex.what() << endl ;
+               ex.Serialize(ompErrors);
             }
          }
          // Exception throwing for omp-region
          if(!ompErrors.str().empty()){
-            throw MolDSException(ompErrors.str());
+            throw MolDSException::Deserialize(ompErrors);
          }
          transitionDipoleMoment[XAxis] = valueX;
          transitionDipoleMoment[YAxis] = valueY;
@@ -1554,12 +1554,12 @@ void ZindoS::CalcElectronicTransitionDipoleMoment(double* transitionDipoleMoment
             }
             catch(MolDSException ex){
 #pragma omp critical
-               ompErrors << ex.what() << endl ;
+               ex.Serialize(ompErrors);
             }
          }
          // Exception throwing for omp-region
          if(!ompErrors.str().empty()){
-            throw MolDSException(ompErrors.str());
+            throw MolDSException::Deserialize(ompErrors);
          }
          transitionDipoleMoment[XAxis] = valueX + groundStateDipole[XAxis];
          transitionDipoleMoment[YAxis] = valueY + groundStateDipole[YAxis];
@@ -1671,12 +1671,12 @@ void ZindoS::CalcOrbitalElectronPopulationCIS(double**** orbitalElectronPopulati
          }
          catch(MolDSException ex){
 #pragma omp critical
-            ompErrors << ex.what() << endl ;
+            ex.Serialize(ompErrors);
          }
       }
       // Exception throwing for omp-region
       if(!ompErrors.str().empty()){
-         throw MolDSException(ompErrors.str());
+         throw MolDSException::Deserialize(ompErrors);
       }
    }
 }
@@ -1714,12 +1714,12 @@ void ZindoS::CalcAtomicElectronPopulationCIS(double*** atomicElectronPopulationC
          }
          catch(MolDSException ex){
 #pragma omp critical
-            ompErrors << ex.what() << endl ;
+            ex.Serialize(ompErrors);
          }
       }
       // Exception throwing for omp-region
       if(!ompErrors.str().empty()){
-         throw MolDSException(ompErrors.str());
+         throw MolDSException::Deserialize(ompErrors);
       }
    }
 }
@@ -1766,12 +1766,12 @@ void ZindoS::CalcAtomicUnpairedPopulationCIS(double*** atomicUnpairedPopulationC
          }
          catch(MolDSException ex){
 #pragma omp critical
-            ompErrors << ex.what() << endl ;
+            ex.Serialize(ompErrors);
          }
       }
       // Exception throwing for omp-region
       if(!ompErrors.str().empty()){
-         throw MolDSException(ompErrors.str());
+         throw MolDSException::Deserialize(ompErrors);
       }
    }
 }
@@ -2106,12 +2106,12 @@ void ZindoS::CalcInteractionMatrix(double** interactionMatrix,
       }
       catch(MolDSException ex){
 #pragma omp critical
-         ompErrors << ex.what() << endl ;
+         ex.Serialize(ompErrors);
       }
    }
    // Exception throwing for omp-region
    if(!ompErrors.str().empty()){
-      throw MolDSException(ompErrors.str());
+      throw MolDSException::Deserialize(ompErrors);
    }
 }
 
@@ -2384,12 +2384,12 @@ void ZindoS::CalcCISMatrix(double** matrixCIS) const{
          }
          catch(MolDSException ex){
 #pragma omp critical
-            ompErrors << ex.what() << endl ;
+            ex.Serialize(ompErrors);
          }
       } // end of l-loop
       // Exception throwing for omp-region
       if(!ompErrors.str().empty()){
-         throw MolDSException(ompErrors.str());
+         throw MolDSException::Deserialize(ompErrors);
       }
    } // end of k-loop
 
@@ -2740,12 +2740,12 @@ void ZindoS::CalcEtaMatrixForce(const vector<int>& elecStates){
                }
                catch(MolDSException ex){
 #pragma omp critical
-                  ompErrors << ex.what() << endl ;
+                  ex.Serialize(ompErrors);
                }
             }
             // Exception throwing for omp-region
             if(!ompErrors.str().empty()){
-               throw MolDSException(ompErrors.str());
+               throw MolDSException::Deserialize(ompErrors);
             }
 
          }
@@ -2834,12 +2834,12 @@ void ZindoS::CalcZMatrixForce(const vector<int>& elecStates){
             }
             catch(MolDSException ex){
 #pragma omp critical
-               ompErrors << ex.what() << endl ;
+               ex.Serialize(ompErrors);
             }
          }
          // Exception throwing for omp-region
          if(!ompErrors.str().empty()){
-            throw MolDSException(ompErrors.str());
+            throw MolDSException::Deserialize(ompErrors);
          }
       }
    }
@@ -2977,12 +2977,12 @@ void ZindoS::CalcDeltaVector(double* delta, int exciteState) const{
       }
       catch(MolDSException ex){
 #pragma omp critical
-         ompErrors << ex.what() << endl ;
+         ex.Serialize(ompErrors);
       }
    }
    // Exception throwing for omp-region
    if(!ompErrors.str().empty()){
-      throw MolDSException(ompErrors.str());
+      throw MolDSException::Deserialize(ompErrors);
    }
 }
 
@@ -3057,12 +3057,12 @@ void ZindoS::CalcQVector(double* q,
       }
       catch(MolDSException ex){
 #pragma omp critical
-         ompErrors << ex.what() << endl ;
+         ex.Serialize(ompErrors);
       }
    }
    // Exception throwing for omp-region
    if(!ompErrors.str().empty()){
-      throw MolDSException(ompErrors.str());
+      throw MolDSException::Deserialize(ompErrors);
    }
 #pragma omp parallel for schedule(auto)
    for(int i=0; i<redundantQIndeces.size(); i++){
@@ -3081,12 +3081,12 @@ void ZindoS::CalcQVector(double* q,
       }
       catch(MolDSException ex){
 #pragma omp critical
-         ompErrors << ex.what() << endl ;
+         ex.Serialize(ompErrors);
       }
    }
    // Exception throwing for omp-region
    if(!ompErrors.str().empty()){
-      throw MolDSException(ompErrors.str());
+      throw MolDSException::Deserialize(ompErrors);
    }
    /* 
    for(int i=0; i<nonRedundantQIndeces.size(); i++){
@@ -3233,12 +3233,12 @@ void ZindoS::CalcXiMatrices(double** xiOcc,
       }
       catch(MolDSException ex){
 #pragma omp critical
-         ompErrors << ex.what() << endl ;
+         ex.Serialize(ompErrors);
       }
    }
    // Exception throwing for omp-region
    if(!ompErrors.str().empty()){
-      throw MolDSException(ompErrors.str());
+      throw MolDSException::Deserialize(ompErrors);
    }
    // xiVir
 #pragma omp parallel for schedule(auto)
@@ -3255,12 +3255,12 @@ void ZindoS::CalcXiMatrices(double** xiOcc,
       }
       catch(MolDSException ex){
 #pragma omp critical
-         ompErrors << ex.what() << endl ;
+         ex.Serialize(ompErrors);
       }
    }
    // Exception throwing for omp-region
    if(!ompErrors.str().empty()){
-      throw MolDSException(ompErrors.str());
+      throw MolDSException::Deserialize(ompErrors);
    }
 }
 
@@ -3291,13 +3291,13 @@ void ZindoS::CalcAuxiliaryVector(double* y,
          }
          catch(MolDSException ex){
 #pragma omp critical
-            ompErrors << ex.what() << endl ;
+            ex.Serialize(ompErrors);
          }
       }
    }
    // Exception throwing for omp-region
    if(!ompErrors.str().empty()){
-      throw MolDSException(ompErrors.str());
+      throw MolDSException::Deserialize(ompErrors);
    }
 }
 
@@ -3320,12 +3320,12 @@ void ZindoS::CalcGammaNRMinusKNRMatrix(double** gammaNRMinusKNR, const vector<Mo
       }
       catch(MolDSException ex){
 #pragma omp critical
-         ompErrors << ex.what() << endl ;
+         ex.Serialize(ompErrors);
       }
    }
    // Exception throwing for omp-region
    if(!ompErrors.str().empty()){
-      throw MolDSException(ompErrors.str());
+      throw MolDSException::Deserialize(ompErrors);
    }
 }
 
@@ -3350,12 +3350,12 @@ void ZindoS::CalcKRDagerGammaRInvMatrix(double** kRDagerGammaRInv,
       }
       catch(MolDSException ex){
 #pragma omp critical
-         ompErrors << ex.what() << endl ;
+         ex.Serialize(ompErrors);
       }
    }
    // Exception throwing for omp-region
    if(!ompErrors.str().empty()){
-      throw MolDSException(ompErrors.str());
+      throw MolDSException::Deserialize(ompErrors);
    }
 }
 
@@ -3719,7 +3719,7 @@ void ZindoS::CalcForce(const vector<int>& elecStates){
       }       // end of try
       catch(MolDSException ex){
 #pragma omp critical
-         ompErrors << ex.what() << endl ;
+         ex.Serialize(ompErrors);
       }
       MallocerFreer::GetInstance()->Free<double>(&diatomicTwoElecTwoCore1stDerivs, 
                                                  OrbitalType_end,
@@ -3732,7 +3732,7 @@ void ZindoS::CalcForce(const vector<int>& elecStates){
    }
    // Exception throwing for omp-region
    if(!ompErrors.str().empty()){
-      throw MolDSException(ompErrors.str());
+      throw MolDSException::Deserialize(ompErrors);
    }
   
    /*
@@ -3808,12 +3808,12 @@ void ZindoS::CalcForce(const vector<int>& elecStates){
       }
       catch(MolDSException ex){
 #pragma omp critical
-         ompErrors << ex.what() << endl ;
+         ex.Serialize(ompErrors);
       }
    }
    // Exception throwing for omp-region
    if(!ompErrors.str().empty()){
-      throw MolDSException(ompErrors.str());
+      throw MolDSException::Deserialize(ompErrors);
    }
    */
 }

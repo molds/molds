@@ -20,10 +20,32 @@
 #include<sstream>
 #include<string>
 #include<stdexcept>
+#include<iostream>
+#include<cctype>
 #include<boost/format.hpp>
+#include<boost/serialization/map.hpp>
+#include<boost/archive/text_iarchive.hpp>
+#include<boost/archive/text_oarchive.hpp>
+#include<boost/scoped_ptr.hpp>
 #include"MolDSException.h"
 #include"Enums.h"
 using namespace std;
+
+namespace boost { namespace serialization {
+template<class Archive>
+void save_construct_data(Archive& ar, const MolDS_base::MolDSException* t, const unsigned int){
+   string what(t->What());
+   ar << what;
+}
+
+template<class Archive>
+void load_construct_data(Archive& ar, MolDS_base::MolDSException* t, const unsigned int){
+   string what;
+   ar >> what;
+   ::new(t)MolDS_base::MolDSException(what.c_str());
+}
+}}
+
 namespace MolDS_base{
 MolDSException::MolDSException(string cause) : domain_error(cause), backtraceSize(0){
    this->GetBacktrace(80);
@@ -37,33 +59,25 @@ void MolDSException::GetBacktrace(int bufsize){
    backtracePtr.reset(new void*[bufsize]);
    this->backtraceSize = backtrace(this->backtracePtr.get(), bufsize);
    if(this->backtraceSize==bufsize){
-      GetBacktrace(bufsize*2);
+      this->GetBacktrace(bufsize*2);
    }
-}
-
-void MolDSException::PrintBacktrace(){
-   if(this->backtraceSize <= 0){
-      return;
-   }
-   cout<<"backtrace:" << endl;
-   backtrace_symbols_fd(this->backtracePtr.get(), this->backtraceSize, 1);
 }
 
 template<>
 int MolDSException::GetKeyValue(int key){
-   return intKeyValueMap[key];
+   return this->intKeyValueMap[key];
 }
 
 /*
 template<>
 other MolDSException::GetKeyValue(int key){
-   return otherKeyValueMap[key];
+   return this->otherKeyValueMap[key];
 }
 */
 
 template<>
 void MolDSException::SetKeyValue(int key, int value){
-   intKeyValueMap[key]=value;
+   this->intKeyValueMap[key]=value;
 }
 
 /*
@@ -74,19 +88,110 @@ void MolDSException::SetKeyValue(int key, other value){
 */
 
 bool MolDSException::HasKey(int key){
-   if(!(intKeyValueMap.find(key)==intKeyValueMap.end())) return true;
-   //if(otherKeyValueMap.find(key)!=otherKeyValueMap::end) return true;
+   if(!(this->intKeyValueMap.find(key)==this->intKeyValueMap.end())) return true;
+   //if(this->otherKeyValueMap.find(key)!=this->otherKeyValueMap::end) return true;
    return false;
 }
 
 const char* MolDSException::what() const throw(){
    static string str;
    stringstream ss;
-   ss << domain_error::what() << "key value pairs:";
-   for(intKeyValueMap_t::const_iterator i = intKeyValueMap.begin(); i != intKeyValueMap.end(); i++){
+   ss << domain_error::what();
+
+   ss << "\nkey value pairs:";
+   for(intKeyValueMap_t::const_iterator i = this->intKeyValueMap.begin();
+       i != this->intKeyValueMap.end(); i++){
       ss << endl << '\t' << ExceptionKeyStr(i->first) << ":" << i->second;
+   }
+   char** backtraceSymbols = backtrace_symbols(this->backtracePtr.get(),
+                                               this->backtraceSize);
+   if(backtraceSymbols == NULL){
+      ss << "\nCannot Get Backtraces!";
+   }
+   else{
+      ss << "\nbacktrace:";
+      for(int i = 0; i < this->backtraceSize; i++){
+         ss << "\n\t" << backtraceSymbols[i];
+      }
+   }
+   free(backtraceSymbols);
+
+   if(this->nextException.get() != NULL){
+      ss << "\n--- Next Exception ---\n";
+      ss << this->nextException->what();
    }
    str = ss.str();
    return str.c_str();
+}
+
+template<class Archive>
+void MolDSException::serialize(Archive& ar, const unsigned int ver){
+   ar & this->intKeyValueMap;
+   // ar & this->otherKeyValueMap;
+
+   ar & this->backtraceSize;
+   if(!Archive::is_saving::value){
+      this->backtracePtr.reset(new void*[this->backtraceSize]);
+   }
+   for(int i = 0; i < this->backtraceSize; i++){
+      if(Archive::is_saving::value){
+         intptr_t p = reinterpret_cast<intptr_t>(this->backtracePtr[i]);
+         ar & p;
+      }
+      else{
+         intptr_t p;
+         ar & p;
+         this->backtracePtr[i]=reinterpret_cast<void*>(p);
+      }
+   }
+
+   bool hasnext = this->nextException.get() != NULL;
+   ar & hasnext;
+   MolDSException* pe = NULL;
+   if(Archive::is_saving::value){
+      pe = this->nextException.get();
+   }
+   if(hasnext){
+      ar & pe;
+   }
+   if(!Archive::is_saving::value){
+      this->nextException.reset(pe);
+   }
+}
+
+void MolDSException::Serialize(std::ostream& os){
+   boost::archive::text_oarchive oa(os);
+   std::string what = domain_error::what();
+   oa << this;
+}
+
+MolDSException MolDSException::Deserialize(std::istream& is){
+   boost::archive::text_iarchive ia(is);
+   MolDSException *p = NULL;
+   boost::scoped_ptr<MolDSException> sp(p);
+   ia >> p;
+   sp.reset(p);
+
+   while(isspace(is.peek())){
+      is.get();
+   }
+   while(!is.eof()){
+      try{
+         boost::archive::text_iarchive ia(is);
+         MolDSException* pnext = NULL;
+         ia >> pnext;
+         p->LastException()->nextException.reset(pnext);
+         p = pnext;
+         while(isspace(is.peek())){
+            is.get();
+         }
+      }
+      catch(...){
+         p->LastException()->nextException.reset();
+         break;
+      }
+   }
+
+   return *sp.get();
 }
 }
