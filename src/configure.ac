@@ -43,8 +43,12 @@ AS_IF([test -z "$CXXFLAGS"],
 
 dnl Checks for programs.
 AC_PROG_CC([icc gcc])
-AC_PROG_CXX([icpc g++])
+AC_PROG_CXX([mpiicpc mpicxx])
 AC_PROG_F77([ifort gfortran])
+
+dnl Check if any MPI compiler is availbale
+AX_MPI([],
+       [AC_MSG_FAILURE([Cannot find any MPI compiler!])])
 
 dnl Use C++
 AC_LANG_PUSH([C++])
