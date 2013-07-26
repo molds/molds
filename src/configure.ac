@@ -161,7 +161,7 @@ dnl Size of BLAS int
 AC_DEFINE([SIZEOF_LAPACKINT], [SIZEOF_BLASINT], [The size of integer variables used by LAPACK library])
 
 dnl Boost
-AX_BOOST_BASE([1.48],,[AC_MSG_FAILURE([boost library is too old!])])
+AX_BOOST_BASE([1.46],,[AC_MSG_FAILURE([boost library is too old!])])
 AX_BOOST_SERIALIZATION
 AX_BOOST_MPI
 
