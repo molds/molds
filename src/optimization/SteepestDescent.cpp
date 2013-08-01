@@ -28,9 +28,10 @@
 #include<boost/shared_ptr.hpp>
 #include<boost/format.hpp>
 #include"../base/Uncopyable.h"
-#include"../mpi/MpiProcess.h"
 #include"../base/PrintController.h"
 #include"../base/MolDSException.h"
+#include"../base/MallocerFreer.h"
+#include"../mpi/MpiProcess.h"
 #include"../base/Enums.h"
 #include"../base/EularAngle.h"
 #include"../base/Parameters.h"
@@ -71,9 +72,9 @@ void SteepestDescent::SearchMinimum(boost::shared_ptr<ElectronicStructure> elect
    int    totalSteps           = Parameters::GetInstance()->GetTotalStepsOptimization();
    double maxGradientThreshold = Parameters::GetInstance()->GetMaxGradientOptimization();
    double rmsGradientThreshold = Parameters::GetInstance()->GetRmsGradientOptimization();
-   double lineSearchCurrentEnergy = 0.0;
-   double lineSearchInitialEnergy = 0.0;
-   double** matrixForce = NULL;
+   double lineSearchCurrentEnergy   = 0.0;
+   double lineSearchInitialEnergy   = 0.0;
+   double const* const* matrixForce = NULL;
 
    // initial calculation
    bool requireGuess = true;
@@ -88,6 +89,8 @@ void SteepestDescent::SearchMinimum(boost::shared_ptr<ElectronicStructure> elect
 
       // do line search
       this->LineSearch(electronicStructure, molecule, lineSearchCurrentEnergy, matrixForce, elecState, dt);
+
+      // update force
       matrixForce = electronicStructure->GetForce(elecState);
 
       // check convergence

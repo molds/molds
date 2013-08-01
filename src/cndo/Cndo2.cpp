@@ -29,9 +29,10 @@
 #include<omp.h>
 #include<boost/format.hpp>
 #include"../base/Uncopyable.h"
-#include"../mpi/MpiProcess.h"
 #include"../base/PrintController.h"
 #include"../base/MolDSException.h"
+#include"../base/MallocerFreer.h"
+#include"../mpi/MpiProcess.h"
 #include"../wrappers/Blas.h"
 #include"../wrappers/Lapack.h"
 #include"../base/Enums.h"
@@ -709,12 +710,12 @@ double Cndo2::GetVdWCorrectionEnergy() const{
    return this->vdWCorrectionEnergy;
 }
 
-double*** Cndo2::GetForce(const vector<int>& elecStates){
+double const* const* const* Cndo2::GetForce(const vector<int>& elecStates){
    this->CalcForce(elecStates);
    return this->matrixForce;
 }
 
-double** Cndo2::GetForce(int elecState){
+double const* const* Cndo2::GetForce(int elecState){
    vector<int> elecStates;
    elecStates.push_back(elecState);
    this->CalcForce(elecStates);

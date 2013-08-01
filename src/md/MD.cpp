@@ -27,9 +27,10 @@
 #include<boost/shared_ptr.hpp>
 #include<boost/format.hpp>
 #include"../base/Uncopyable.h"
-#include"../mpi/MpiProcess.h"
 #include"../base/PrintController.h"
 #include"../base/MolDSException.h"
+#include"../base/MallocerFreer.h"
+#include"../mpi/MpiProcess.h"
 #include"../base/Enums.h"
 #include"../base/EularAngle.h"
 #include"../base/Parameters.h"
@@ -76,8 +77,8 @@ void MD::DoMD(){
    double dt            = Parameters::GetInstance()->GetTimeWidthMD();
    double time          = 0.0;
    bool requireGuess    = false;
-   double** matrixForce = NULL;
    double initialEnergy = 0.0;
+   double const* const* matrixForce = NULL;
 
    // initial calculation
    electronicStructure->DoSCF();
@@ -113,6 +114,10 @@ void MD::DoMD(){
 
       // update momenta
       this->UpdateMomenta(*this->molecule, matrixForce, dt);
+
+      // Broadcast to all processes
+      int root=0;
+      this->molecule->BroadcastPhaseSpacePointToAllProcesses(root);
 
       // output results
       this->OutputEnergies(electronicStructure, initialEnergy);

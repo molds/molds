@@ -29,9 +29,10 @@
 #include<omp.h>
 #include<boost/format.hpp>
 #include"../Uncopyable.h"
-#include"../../mpi/MpiProcess.h"
 #include"../PrintController.h"
 #include"../MolDSException.h"
+#include"../MallocerFreer.h"
+#include"../../mpi/MpiProcess.h"
 #include"../Utilities.h"
 #include"../Enums.h"
 #include"../EularAngle.h"
@@ -106,14 +107,6 @@ string ParticleDensityLogger::GetFileName(int elecStateIndex, int digit) const{
    fileName << Utilities::Num2String(elecStateIndex,digit);
    fileName << this->stringCubeExtension;
    return fileName.str();
-}
-
-double const* ParticleDensityLogger::GetFrameLength() const{
-   return Parameters::GetInstance()->GetFrameLengthParticlePlot();
-}
-
-int const* ParticleDensityLogger::GetGridNumber() const{
-   return Parameters::GetInstance()->GetGridNumberParticlePlot();
 }
 
 }

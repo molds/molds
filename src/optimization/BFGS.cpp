@@ -30,13 +30,13 @@
 #include<boost/shared_ptr.hpp>
 #include<boost/format.hpp>
 #include"../base/Uncopyable.h"
-#include"../mpi/MpiProcess.h"
 #include"../base/PrintController.h"
 #include"../base/MolDSException.h"
+#include"../base/MallocerFreer.h"
+#include"../mpi/MpiProcess.h"
 #include"../wrappers/Blas.h"
 #include"../wrappers/Lapack.h"
 #include"../base/Enums.h"
-#include"../base/MallocerFreer.h"
 #include"../base/EularAngle.h"
 #include"../base/Parameters.h"
 #include"../base/atoms/Atom.h"
@@ -108,10 +108,10 @@ void BFGS::SearchMinimum(boost::shared_ptr<ElectronicStructure> electronicStruct
    int totalSteps = Parameters::GetInstance()->GetTotalStepsOptimization();
    double maxGradientThreshold = Parameters::GetInstance()->GetMaxGradientOptimization();
    double rmsGradientThreshold = Parameters::GetInstance()->GetRmsGradientOptimization();
-   double lineSearchCurrentEnergy = 0.0;
-   double lineSearchInitialEnergy = 0.0;
-   double** matrixForce = NULL;
-   double* vectorForce = NULL;
+   double lineSearchCurrentEnergy   = 0.0;
+   double lineSearchInitialEnergy   = 0.0;
+   double const* const* matrixForce = NULL;
+   double const* vectorForce        = NULL;
    const int dimension = molecule.GetNumberAtoms()*CartesianType_end;
    double** matrixHessian        = NULL;
    double*  vectorOldForce       = NULL;
@@ -210,6 +210,11 @@ void BFGS::SearchMinimum(boost::shared_ptr<ElectronicStructure> electronicStruct
          }
          else{
             this->UpdateMolecularCoordinates(molecule, matrixStep);
+
+            // Broadcast to all processes
+            int root=0;
+            molecule.BroadcastConfigurationToAllProcesses(root);
+
             this->UpdateElectronicStructure(electronicStructure, molecule, requireGuess, tempCanOutputLogs);
             lineSearchCurrentEnergy = electronicStructure->GetElectronicEnergy(elecState);
          }

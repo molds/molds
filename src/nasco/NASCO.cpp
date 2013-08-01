@@ -28,11 +28,11 @@
 #include<boost/random.hpp>
 #include<boost/format.hpp>
 #include"../base/Uncopyable.h"
-#include"../mpi/MpiProcess.h"
 #include"../base/PrintController.h"
 #include"../base/MolDSException.h"
-#include"../base/Enums.h"
 #include"../base/MallocerFreer.h"
+#include"../mpi/MpiProcess.h"
+#include"../base/Enums.h"
 #include"../base/EularAngle.h"
 #include"../base/Parameters.h"
 #include"../base/atoms/Atom.h"
@@ -90,8 +90,8 @@ void NASCO::DoNASCO(Molecule& molecule){
    int nonAdiabaticPhaseIndex = 0;
    double time                = 0.0;
    bool requireGuess          = false;
-   double** matrixForce       = NULL;
    double initialEnergy       = 0.0;
+   double const* const* matrixForce = NULL;
 
    // initial calculation
    elecState = Parameters::GetInstance()->GetInitialElectronicStateNASCO();

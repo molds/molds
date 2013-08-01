@@ -28,9 +28,10 @@
 #include<boost/random.hpp>
 #include<boost/format.hpp>
 #include"../base/Uncopyable.h"
-#include"../mpi/MpiProcess.h"
 #include"../base/PrintController.h"
 #include"../base/MolDSException.h"
+#include"../base/MallocerFreer.h"
+#include"../mpi/MpiProcess.h"
 #include"../base/Enums.h"
 #include"../base/EularAngle.h"
 #include"../base/Parameters.h"
@@ -136,6 +137,11 @@ void MC::DoMC(int totalSteps, int elecState, double temperature, double stepWidt
       else{
          trialMolecule.SynchronizeConfigurationTo(*this->molecule);
       }
+
+      // Broadcast to all processes
+      int root=0;
+      this->molecule->BroadcastConfigurationToAllProcesses(root);
+      trialMolecule.BroadcastConfigurationToAllProcesses(root);
       
       // output molecular states
       this->OutputMolecule(*currentES, *this->molecule, elecState);

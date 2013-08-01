@@ -28,9 +28,10 @@
 #include<boost/shared_ptr.hpp>
 #include<boost/format.hpp>
 #include"../base/Uncopyable.h"
-#include"../mpi/MpiProcess.h"
 #include"../base/PrintController.h"
 #include"../base/MolDSException.h"
+#include"../base/MallocerFreer.h"
+#include"../mpi/MpiProcess.h"
 #include"../base/Enums.h"
 #include"../base/EularAngle.h"
 #include"../base/Parameters.h"
@@ -157,9 +158,9 @@ void Optimizer::UpdateMolecularCoordinates(Molecule& molecule, double const* con
 }
 
 void Optimizer::UpdateElectronicStructure(boost::shared_ptr<ElectronicStructure> electronicStructure, 
-                                                Molecule& molecule,
-                                                bool requireGuess, 
-                                                bool canOutputLogs) const{
+                                          Molecule& molecule,
+                                          bool requireGuess, 
+                                          bool canOutputLogs) const{
    electronicStructure->SetCanOutputLogs(canOutputLogs);
    molecule.SetCanOutputLogs(canOutputLogs);
    electronicStructure->DoSCF(requireGuess);
@@ -169,8 +170,8 @@ void Optimizer::UpdateElectronicStructure(boost::shared_ptr<ElectronicStructure>
 }
 
 void Optimizer::OutputMoleculeElectronicStructure(boost::shared_ptr<ElectronicStructure> electronicStructure, 
-                                                        Molecule& molecule,
-                                                        bool canOutputLogs) const{
+                                                  Molecule& molecule,
+                                                  bool canOutputLogs) const{
    // output molecular configuration
    molecule.SetCanOutputLogs(canOutputLogs);
    molecule.OutputConfiguration();
@@ -195,9 +196,10 @@ void Optimizer::LineSearch(boost::shared_ptr<ElectronicStructure> electronicStru
    int lineSearchSteps = 0;
    double lineSearchOldEnergy = lineSearchCurrentEnergy;
 
+   bool requireGuess = false;
    while(lineSearchCurrentEnergy <= lineSearchOldEnergy){
       this->UpdateMolecularCoordinates(molecule, matrixForce, dt);
-      this->UpdateElectronicStructure(electronicStructure, molecule, false, tempCanOutputLogs);
+      this->UpdateElectronicStructure(electronicStructure, molecule, requireGuess, tempCanOutputLogs);
       lineSearchOldEnergy = lineSearchCurrentEnergy;
       lineSearchCurrentEnergy = electronicStructure->GetElectronicEnergy(elecState);
       lineSearchSteps++;
@@ -206,13 +208,19 @@ void Optimizer::LineSearch(boost::shared_ptr<ElectronicStructure> electronicStru
    // final state of line search
    this->OutputLog(boost::format("%s%d\n\n") % this->messageLineSearchSteps.c_str() % lineSearchSteps);
    this->UpdateMolecularCoordinates(molecule, matrixForce, -0.5*dt);
-   this->UpdateElectronicStructure(electronicStructure, molecule, false, tempCanOutputLogs);
+
+   // Broadcast to all processes
+   int root=0;
+   molecule.BroadcastConfigurationToAllProcesses(root);
+
+   // update and output electronic structure
+   this->UpdateElectronicStructure(electronicStructure, molecule, requireGuess, tempCanOutputLogs);
    this->OutputMoleculeElectronicStructure(electronicStructure, molecule, this->CanOutputLogs());
 
    lineSearchCurrentEnergy = electronicStructure->GetElectronicEnergy(elecState);
 }
 
-bool Optimizer::SatisfiesConvergenceCriterion(double** matrixForce, 
+bool Optimizer::SatisfiesConvergenceCriterion(double const* const* matrixForce, 
                                               const MolDS_base::Molecule& molecule,
                                               double oldEnergy,
                                               double currentEnergy,
