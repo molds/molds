@@ -164,6 +164,7 @@ dnl Boost
 AX_BOOST_BASE([1.46],,[AC_MSG_FAILURE([boost library is too old!])])
 AX_BOOST_SERIALIZATION
 AX_BOOST_MPI
+AX_BOOST_THREAD
 
 dnl Check whether ld accepts -rpath option
 AC_CACHE_CHECK([whether ld accepts -rpath option],[molds_cv_ld_accepts_rpath],
