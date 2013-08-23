@@ -20,6 +20,7 @@
 #include<stdlib.h>
 #include<iostream>
 #include<sstream>
+#include<algorithm>
 #include<math.h>
 #include<string>
 #include<stdexcept>
@@ -34,6 +35,9 @@
 
 #ifdef __INTEL_COMPILER
 #include"mkl.h"
+#include"mkl_scalapack.h"
+#include"mkl_blacs.h"
+#include"mkl_pblas.h"
 #else
 #if ( __WORDSIZE == 32 )
 #else
@@ -87,6 +91,141 @@ void Lapack::DeleteInstance(){
    lapack = NULL;
 }
 
+
+/***
+ *
+ * Eigenvalue and eigenvector of a real symmetirc matrix are calculated:
+ *   - i-th eigenvalue will be stored in eigenValues[i].
+ *   - i-th eigenvector will be stored as (matirx[i][0], matirx[i][1], matirx[i][2], ....).
+ *
+ * ***/
+molds_lapack_int Lapack::Dsyevd_sca(double** matrix, double* eigenValues, molds_lapack_int size, bool calcEigenVectors){
+   if(size < 1 ){
+      stringstream ss;
+      ss << errorMessageDsyevdSize;
+      MolDSException ex(ss.str());
+      throw ex;
+   }
+
+   molds_lapack_int info = 0;
+   char job;
+   char uplo = 'U';
+   molds_lapack_int lda = size;
+   double* localMatrix;
+   double* localEigenVector;
+   double* tempEigenValues;
+
+   // set job type
+   if(calcEigenVectors){
+      job = 'V';
+   }
+   else{
+      job = 'N';
+   }
+
+   char order='R';
+   molds_lapack_int npRow=2;     // ToDo: change to dynamical setting
+   molds_lapack_int npCol=2;     // ToDo: change to dynamical setting
+   molds_lapack_int blockSize=3; // ToDo: change to dynamical setting
+
+   //tmporal values
+   molds_lapack_int intOne=1;
+   molds_lapack_int intZero=0;
+   double dblOne =1e0;
+   double dblZero=0e0;
+   molds_lapack_int myRow   =intZero;
+   molds_lapack_int myCol   =intZero;
+   molds_lapack_int iContext=intZero;
+   molds_lapack_int what    =intZero;
+   molds_lapack_int val     =intZero;
+   molds_lapack_int rsrc    =intZero;
+   molds_lapack_int csrc    =intZero;
+   molds_lapack_int mpiRank =intZero;
+   molds_lapack_int mpiSize =intZero;
+
+   // initialize blacs for calling scalapack
+   blacs_pinfo_(&mpiRank, &mpiSize);
+   blacs_get_(&iContext, &what, &val);
+   blacs_gridinit_(&iContext, &order, &npRow, &npCol);
+   blacs_gridinfo_(&iContext, &npRow, &npCol, &myRow, &myCol);
+
+   // calculate size of local matrix on each node
+   molds_lapack_int mp = numroc_(&size, &blockSize, &myRow, &rsrc, &npRow);
+   molds_lapack_int nq = numroc_(&size, &blockSize, &myCol, &rsrc, &npCol);
+   localMatrix = (double*)MOLDS_LAPACK_malloc( sizeof(double)*mp*nq, 16 );
+   localEigenVector   = (double*)MOLDS_LAPACK_malloc( sizeof(double)*mp*nq, 16 );
+   tempEigenValues = (double*)MOLDS_LAPACK_malloc( sizeof(double)*size, 16 );
+   molds_lapack_int lldA=max(intOne,mp);
+   molds_lapack_int lldZ=max(intOne,mp);
+   molds_lapack_int descA[9];
+   molds_lapack_int descZ[9];
+   descinit_(descA, &size, &size, &blockSize, &blockSize, &intZero, &intZero, &iContext, &lldA,       &info);
+   descinit_(descZ, &size, &size, &blockSize, &blockSize, &intZero, &intZero, &iContext, &lldZ,       &info);
+
+   // distribute data to local matrix on each node accoding to the block syclic decomposition
+   for(molds_lapack_int i=0; i<mp; i++){
+      for(molds_lapack_int j=0; j<nq; j++){
+         molds_lapack_int globalI = (myRow + (i/blockSize)*npRow)*blockSize + i%blockSize;
+         molds_lapack_int globalJ = (myCol + (j/blockSize)*npCol)*blockSize + j%blockSize;
+         localMatrix[j*mp+i] = matrix[globalI][globalJ];
+      }
+   }
+
+   // calculate working array space for pdsyevd
+   molds_lapack_int  lwork = -1;
+   molds_lapack_int liwork = -1;
+   double           tmpWork[3]  = {0.0, 0.0, 0.0};
+   molds_lapack_int tmpIwork[3] = {0, 0, 0};
+   molds_lapack_int ia=intOne;
+   molds_lapack_int ja=intOne;
+   molds_lapack_int iz=intOne;
+   molds_lapack_int jz=intOne;
+   pdsyevd(&job, &uplo, &size, localMatrix, &ia, &ja, descA, tempEigenValues, localEigenVector, &iz, &jz ,descZ, tmpWork, &lwork, tmpIwork, &liwork, &info);
+
+   // cll scalapack (pdsyevd)
+   info = 0;
+   double*            work=NULL;
+   molds_lapack_int* iwork=NULL;
+   lwork  = tmpWork[0];
+   liwork = tmpIwork[0];
+   work = (double*)MOLDS_LAPACK_malloc( sizeof(double)*lwork, 16 );
+   iwork = (molds_lapack_int*)MOLDS_LAPACK_malloc( sizeof(molds_lapack_int)*liwork, 16 );
+   pdsyevd(&job, &uplo, &size, localMatrix, &ia, &ja, descA, eigenValues, localEigenVector, &iz, &jz ,descZ, work, &lwork, iwork, &liwork, &info);
+
+   // gathter block cyclic decomposed eigenvector to the global data
+   MallocerFreer::GetInstance()->Initialize<double>(matrix, size, size);
+   for(molds_lapack_int j=0; j<nq; j++){
+      molds_lapack_int globalJ = (myCol + (j/blockSize)*npCol)*blockSize + j%blockSize;
+      for(molds_lapack_int i=0; i<mp; i++){
+         molds_lapack_int globalI = (myRow + (i/blockSize)*npRow)*blockSize + i%blockSize;
+         matrix[globalJ][globalI] = localEigenVector[j*mp+i]; // globalj-th row    is globalj-th eigen vector
+         //matrix[globalI][globalJ] = localEigenVector[j*mp+i]; // globalj-th column is globalj-th eigen vector
+      }
+   }
+   MolDS_mpi::MpiProcess::GetInstance()->AllReduce(&matrix[0][0], size*size, std::plus<double>());
+
+   for(molds_lapack_int i=0;i<size;i++){
+      double temp = 0.0;
+      for(molds_lapack_int j=0;j<size;j++){
+         temp += matrix[i][j];
+      }
+      if(temp<0){
+         for(molds_lapack_int j=0;j<size;j++){
+            matrix[i][j]*=-1.0;
+         }
+      }
+   }   
+
+   // free
+   MOLDS_LAPACK_free(work);
+   MOLDS_LAPACK_free(iwork);
+   MOLDS_LAPACK_free(localMatrix);
+   MOLDS_LAPACK_free(localEigenVector);
+   MOLDS_LAPACK_free(tempEigenValues);
+
+   blacs_gridexit_(&iContext);
+   return info;
+}
 
 /***
  *
@@ -186,6 +325,16 @@ molds_lapack_int Lapack::Dsyevd(double** matrix, double* eigenValues, molds_lapa
    for(molds_lapack_int i = 0; i < size; i++){
       eigenValues[i] = tempEigenValues[i];
    }
+
+   molds_lapack_int mpiRank;
+   molds_lapack_int mpiSize;
+   blacs_pinfo_(&mpiRank, &mpiSize);
+   if(mpiRank==0){
+      for(molds_lapack_int i = 0; i < size; i++){
+         printf("eig:%ld %e\n",i,eigenValues[i]);
+      }
+   }
+
    //this->OutputLog(boost::format("size=%d lwork=%d liwork=%d k=%d info=%d\n") % size % lwork % liwork % k % info);
 
    // free

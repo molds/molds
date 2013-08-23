@@ -18,6 +18,39 @@
 //************************************************************************//
 #ifndef INCLUDED_LAPACK
 #define INCLUDED_LAPACK
+/*
+extern int numroc_(molds_lapack_int* order, 
+                   molds_lapack_int* block_size, 
+                   molds_lapack_int* my_process_row_or_col, 
+                   molds_lapack_int* first_process_row_or_col, 
+                   molds_lapack_int* nproc_rows_or_cols);
+*/
+extern "C" {
+MKL_INT numroc_(MKL_INT* order, 
+                MKL_INT* block_size, 
+                MKL_INT* my_process_row_or_col, 
+                MKL_INT* first_process_row_or_col, 
+                MKL_INT* nproc_rows_or_cols);
+void descinit_(MKL_INT* desc, 
+               MKL_INT* m, 
+               MKL_INT* n, 
+               MKL_INT* mb, 
+               MKL_INT* nb, 
+               MKL_INT* irsrc, 
+               MKL_INT* icsrc,
+               MKL_INT* ictxt, 
+               MKL_INT* lld, 
+               MKL_INT* info);
+}
+/*
+extern "C" {
+int numroc_(int* order, 
+            int* block_size, 
+            int* my_process_row_or_col, 
+            int* first_process_row_or_col, 
+            int* nproc_rows_or_cols);
+}
+*/
 namespace MolDS_wrappers{
 //typedef intptr_t molds_lapack_int;
 typedef intptr_t molds_lapack_int;
@@ -27,6 +60,7 @@ public:
    static Lapack* GetInstance();
    static void DeleteInstance();
    molds_lapack_int Dsyevd(double** matrix, double* eigenValues, molds_lapack_int size, bool calcEigenVectors);
+   molds_lapack_int Dsyevd_sca(double** matrix, double* eigenValues, molds_lapack_int size, bool calcEigenVectors);
    molds_lapack_int Dsysv(double const* const* matrix, double* b, molds_lapack_int size);
    molds_lapack_int Dgetrs(double const* const* matrix, double** b, molds_lapack_int size, molds_lapack_int nrhs) const;
    molds_lapack_int Dgetrf(double** matrix, molds_lapack_int sizeM, molds_lapack_int sizeN) const;
@@ -43,6 +77,7 @@ private:
    std::string errorMessageDgetrsSize;
    std::string errorMessageDgetrfInfo;
    molds_lapack_int Dgetrf(double* matrix, molds_lapack_int* ipiv, molds_lapack_int sizeM, molds_lapack_int sizeN) const;
+
 };
 }
 #endif

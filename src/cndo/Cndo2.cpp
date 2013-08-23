@@ -553,7 +553,7 @@ void Cndo2::DoSCF(bool requiresGuess){
 
          // diagonalization of the Fock matrix
          bool calcEigenVectors = true;
-         MolDS_wrappers::Lapack::GetInstance()->Dsyevd(this->fockMatrix, 
+         MolDS_wrappers::Lapack::GetInstance()->Dsyevd_sca(this->fockMatrix, 
                                                        this->energiesMO, 
                                                        this->molecule->GetTotalNumberAOs(), 
                                                        calcEigenVectors);

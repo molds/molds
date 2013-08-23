@@ -27,9 +27,9 @@ BOOST_TOP_DIR = /usr/local/boost/
 BOOST_INC_DIR = $(BOOST_TOP_DIR)include/
 BOOST_LIB_DIR = $(BOOST_TOP_DIR)lib/
 BOOST_LIBS    = -lboost_serialization -lboost_mpi -lboost_thread
-LIBSBASE = -lmkl_intel_thread -lmkl_core -liomp5 -lpthread
+LIBSBASE = -lmkl_intel_thread -lmkl_lapack95_ilp64 -lmkl_core -liomp5 -lpthread
 ifeq ($(INTEL), 64)
-LIBS = -lmkl_intel_ilp64 $(LIBSBASE) $(BOOST_LIBS)
+LIBS = -lmkl_scalapack_ilp64 -lmkl_blacs_openmpi_ilp64 -lmkl_intel_ilp64 $(LIBSBASE) $(BOOST_LIBS)
 else
 LIBS = -lmkl_intel       $(LIBSBASE) $(BOOST_LIBS)
 endif
