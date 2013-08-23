@@ -58,10 +58,11 @@ DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(top_srcdir)/configure AUTHORS COPYING ChangeLog INSTALL NEWS \
 	config.guess config.sub depcomp install-sh missing
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/m4/ax_blas.m4 \
-	$(top_srcdir)/m4/ax_boost_base.m4 \
+am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_namespaces.m4 \
+	$(top_srcdir)/m4/ax_blas.m4 $(top_srcdir)/m4/ax_boost_base.m4 \
 	$(top_srcdir)/m4/ax_boost_mpi.m4 \
 	$(top_srcdir)/m4/ax_boost_serialization.m4 \
+	$(top_srcdir)/m4/ax_boost_thread.m4 \
 	$(top_srcdir)/m4/ax_lapack.m4 $(top_srcdir)/m4/ax_mpi.m4 \
 	$(top_srcdir)/m4/ax_openmp.m4 $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -74,24 +75,25 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_MolDS_OBJECTS = Main.$(OBJEXT) MpiProcess.$(OBJEXT) \
-	MolDSException.$(OBJEXT) Blas.$(OBJEXT) Lapack.$(OBJEXT) \
-	Utilities.$(OBJEXT) Enums.$(OBJEXT) MathUtilities.$(OBJEXT) \
-	MallocerFreer.$(OBJEXT) EularAngle.$(OBJEXT) \
-	Parameters.$(OBJEXT) Atom.$(OBJEXT) Hatom.$(OBJEXT) \
-	Liatom.$(OBJEXT) Catom.$(OBJEXT) Natom.$(OBJEXT) \
-	Oatom.$(OBJEXT) Satom.$(OBJEXT) AtomFactory.$(OBJEXT) \
-	Molecule.$(OBJEXT) InputParser.$(OBJEXT) \
-	GTOExpansionSTO.$(OBJEXT) \
-	RealSphericalHarmonicsIndex.$(OBJEXT) MOLogger.$(OBJEXT) \
-	DensityLogger.$(OBJEXT) HoleDensityLogger.$(OBJEXT) \
-	ParticleDensityLogger.$(OBJEXT) Cndo2.$(OBJEXT) Indo.$(OBJEXT) \
-	ZindoS.$(OBJEXT) Mndo.$(OBJEXT) Am1.$(OBJEXT) Am1D.$(OBJEXT) \
-	Pm3.$(OBJEXT) Pm3D.$(OBJEXT) Pm3Pddg.$(OBJEXT) \
-	ElectronicStructureFactory.$(OBJEXT) MD.$(OBJEXT) MC.$(OBJEXT) \
-	RPMD.$(OBJEXT) NASCO.$(OBJEXT) Optimizer.$(OBJEXT) \
-	ConjugateGradient.$(OBJEXT) SteepestDescent.$(OBJEXT) \
-	BFGS.$(OBJEXT) OptimizerFactory.$(OBJEXT) MolDS.$(OBJEXT)
+am_MolDS_OBJECTS = Enums.$(OBJEXT) PrintController.$(OBJEXT) \
+	MolDSException.$(OBJEXT) MallocerFreer.$(OBJEXT) \
+	MpiProcess.$(OBJEXT) AsyncCommunicator.$(OBJEXT) \
+	Blas.$(OBJEXT) Lapack.$(OBJEXT) Utilities.$(OBJEXT) \
+	MathUtilities.$(OBJEXT) EularAngle.$(OBJEXT) \
+	Parameters.$(OBJEXT) RealSphericalHarmonicsIndex.$(OBJEXT) \
+	Atom.$(OBJEXT) Hatom.$(OBJEXT) Liatom.$(OBJEXT) \
+	Catom.$(OBJEXT) Natom.$(OBJEXT) Oatom.$(OBJEXT) \
+	Satom.$(OBJEXT) AtomFactory.$(OBJEXT) Molecule.$(OBJEXT) \
+	InputParser.$(OBJEXT) GTOExpansionSTO.$(OBJEXT) \
+	MOLogger.$(OBJEXT) DensityLogger.$(OBJEXT) \
+	HoleDensityLogger.$(OBJEXT) ParticleDensityLogger.$(OBJEXT) \
+	Cndo2.$(OBJEXT) Indo.$(OBJEXT) ZindoS.$(OBJEXT) Mndo.$(OBJEXT) \
+	Am1.$(OBJEXT) Am1D.$(OBJEXT) Pm3.$(OBJEXT) Pm3D.$(OBJEXT) \
+	Pm3Pddg.$(OBJEXT) ElectronicStructureFactory.$(OBJEXT) \
+	MD.$(OBJEXT) MC.$(OBJEXT) RPMD.$(OBJEXT) NASCO.$(OBJEXT) \
+	Optimizer.$(OBJEXT) ConjugateGradient.$(OBJEXT) \
+	SteepestDescent.$(OBJEXT) BFGS.$(OBJEXT) GEDIIS.$(OBJEXT) \
+	OptimizerFactory.$(OBJEXT) MolDS.$(OBJEXT) Main.$(OBJEXT)
 MolDS_OBJECTS = $(am_MolDS_OBJECTS)
 MolDS_LDADD = $(LDADD)
 DEFAULT_INCLUDES = -I.@am__isrc@
@@ -142,6 +144,7 @@ BOOST_CPPFLAGS = @BOOST_CPPFLAGS@
 BOOST_LDFLAGS = @BOOST_LDFLAGS@
 BOOST_MPI_LIB = @BOOST_MPI_LIB@
 BOOST_SERIALIZATION_LIB = @BOOST_SERIALIZATION_LIB@
+BOOST_THREAD_LIBS = @BOOST_THREAD_LIBS@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
@@ -170,7 +173,8 @@ INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 LAPACK_LIBS = @LAPACK_LIBS@
 LDFLAGS = @LDFLAGS@
 LIBOBJS = @LIBOBJS@
-LIBS = @LIBS@
+LIBS = @LIBS@ $(BOOST_MPI_LIB) $(BOOST_SERIALIZATION_LIB) \
+	$(BOOST_THREAD_LIBS)
 LTLIBOBJS = @LTLIBOBJS@
 MAKEINFO = @MAKEINFO@
 MKDIR_P = @MKDIR_P@
@@ -242,49 +246,13 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-MolDS_SOURCES = Main.cpp mpi/MpiProcess.cpp base/MolDSException.cpp \
-	wrappers/Blas.cpp wrappers/Lapack.cpp base/Utilities.cpp \
-	base/Enums.cpp base/MathUtilities.cpp base/MallocerFreer.cpp \
-	base/EularAngle.cpp base/Parameters.cpp base/atoms/Atom.cpp \
-	base/atoms/Hatom.cpp base/atoms/Liatom.cpp \
-	base/atoms/Catom.cpp base/atoms/Natom.cpp base/atoms/Oatom.cpp \
-	base/atoms/Satom.cpp base/factories/AtomFactory.cpp \
-	base/Molecule.cpp base/InputParser.cpp \
-	base/GTOExpansionSTO.cpp base/RealSphericalHarmonicsIndex.cpp \
-	base/loggers/MOLogger.cpp base/loggers/DensityLogger.cpp \
-	base/loggers/HoleDensityLogger.cpp \
-	base/loggers/ParticleDensityLogger.cpp cndo/Cndo2.cpp \
-	indo/Indo.cpp zindo/ZindoS.cpp mndo/Mndo.cpp am1/Am1.cpp \
-	am1/Am1D.cpp pm3/Pm3.cpp pm3/Pm3D.cpp pm3/Pm3Pddg.cpp \
-	base/factories/ElectronicStructureFactory.cpp md/MD.cpp \
-	mc/MC.cpp rpmd/RPMD.cpp nasco/NASCO.cpp \
-	optimization/Optimizer.cpp optimization/ConjugateGradient.cpp \
-	optimization/SteepestDescent.cpp optimization/BFGS.cpp \
-	base/factories/OptimizerFactory.cpp base/MolDS.cpp \
-	base/Uncopyable.h mpi/MpiProcess.h base/PrintController.h \
-	base/MolDSException.h wrappers/Blas.h wrappers/Lapack.h \
-	base/Utilities.h base/Enums.h base/MathUtilities.h \
-	base/MallocerFreer.h base/EularAngle.h base/Parameters.h \
-	base/atoms/Atom.h base/atoms/Hatom.h base/atoms/Liatom.h \
-	base/atoms/Catom.h base/atoms/Natom.h base/atoms/Oatom.h \
-	base/atoms/Satom.h base/factories/AtomFactory.h \
-	base/Molecule.h base/InputParser.h base/GTOExpansionSTO.h \
-	base/RealSphericalHarmonicsIndex.h base/loggers/MOLogger.h \
-	base/loggers/DensityLogger.h base/loggers/HoleDensityLogger.h \
-	base/loggers/ParticleDensityLogger.h \
-	base/ElectronicStructure.h cndo/Cndo2.h \
-	cndo/ReducedOverlapAOsParameters.h indo/Indo.h zindo/ZindoS.h \
-	mndo/Mndo.h am1/Am1.h am1/Am1D.h pm3/Pm3.h pm3/Pm3D.h \
-	pm3/Pm3Pddg.h base/factories/ElectronicStructureFactory.h \
-	md/MD.h mc/MC.h rpmd/RPMD.h nasco/NASCO.h \
-	optimization/Optimizer.h optimization/ConjugateGradient.h \
-	optimization/SteepestDescent.h optimization/BFGS.h \
-	base/factories/OptimizerFactory.h base/MolDS.h
+MolDS_SOURCES = base/Enums.cpp                   base/PrintController.cpp base/MolDSException.cpp                                     base/MallocerFreer.cpp mpi/MpiProcess.cpp mpi/AsyncCommunicator.cpp wrappers/Blas.cpp wrappers/Lapack.cpp base/Utilities.cpp base/MathUtilities.cpp base/EularAngle.cpp base/Parameters.cpp base/RealSphericalHarmonicsIndex.cpp base/atoms/Atom.cpp base/atoms/Hatom.cpp base/atoms/Liatom.cpp base/atoms/Catom.cpp base/atoms/Natom.cpp base/atoms/Oatom.cpp base/atoms/Satom.cpp base/factories/AtomFactory.cpp base/Molecule.cpp base/InputParser.cpp base/GTOExpansionSTO.cpp base/loggers/MOLogger.cpp base/loggers/DensityLogger.cpp base/loggers/HoleDensityLogger.cpp base/loggers/ParticleDensityLogger.cpp                            cndo/Cndo2.cpp                                    indo/Indo.cpp zindo/ZindoS.cpp mndo/Mndo.cpp am1/Am1.cpp am1/Am1D.cpp pm3/Pm3.cpp pm3/Pm3D.cpp pm3/Pm3Pddg.cpp base/factories/ElectronicStructureFactory.cpp md/MD.cpp mc/MC.cpp rpmd/RPMD.cpp nasco/NASCO.cpp optimization/Optimizer.cpp optimization/ConjugateGradient.cpp optimization/SteepestDescent.cpp optimization/BFGS.cpp optimization/GEDIIS.cpp base/factories/OptimizerFactory.cpp  base/MolDS.cpp     Main.cpp \
+                base/Enums.h   base/Uncopyable.h base/PrintController.h   base/MolDSException.h   base/containers/ThreadSafeQueue.h   base/MallocerFreer.h   mpi/MpiProcess.h   mpi/AsyncCommunicator.h   wrappers/Blas.h   wrappers/Lapack.h   base/Utilities.h   base/MathUtilities.h   base/EularAngle.h   base/Parameters.h   base/RealSphericalHarmonicsIndex.h   base/atoms/Atom.h   base/atoms/Hatom.h   base/atoms/Liatom.h   base/atoms/Catom.h   base/atoms/Natom.h   base/atoms/Oatom.h   base/atoms/Satom.h   base/factories/AtomFactory.h   base/Molecule.h   base/InputParser.h   base/GTOExpansionSTO.h   base/loggers/MOLogger.h   base/loggers/DensityLogger.h   base/loggers/HoleDensityLogger.h   base/loggers/ParticleDensityLogger.h   base/ElectronicStructure.h cndo/Cndo2.h   cndo/ReducedOverlapAOsParameters.h indo/Indo.h   zindo/ZindoS.h   mndo/Mndo.h   am1/Am1.h   am1/Am1D.h   pm3/Pm3.h   pm3/Pm3D.h   pm3/Pm3Pddg.h   base/factories/ElectronicStructureFactory.h   md/MD.h   mc/MC.h   rpmd/RPMD.h   nasco/NASCO.h   optimization/Optimizer.h   optimization/ConjugateGradient.h   optimization/SteepestDescent.h   optimization/BFGS.h   optimization/GEDIIS.h   base/factories/OptimizerFactory.h    base/MolDS.h
 
 ACLOCAL_AMFLAGS = -I m4
 AM_CXXFLAGS = $(OPENMP_CXXFLAGS)
 AM_CPPFLAGS = $(BOOST_CPPFLAGS)
-AM_LDFLAGS = $(BOOST_LDFLAGS) $(BOOST_MPI_LIB) $(BOOST_SERIALIZATION_LIB)
+AM_LDFLAGS = $(BOOST_LDFLAGS)
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
@@ -391,6 +359,7 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Am1.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Am1D.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AsyncCommunicator.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Atom.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AtomFactory.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BFGS.Po@am__quote@
@@ -402,6 +371,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ElectronicStructureFactory.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Enums.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/EularAngle.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GEDIIS.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GTOExpansionSTO.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Hatom.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HoleDensityLogger.Po@am__quote@
@@ -430,6 +400,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Pm3.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Pm3D.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Pm3Pddg.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PrintController.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RPMD.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RealSphericalHarmonicsIndex.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Satom.Po@am__quote@
@@ -451,19 +422,33 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXXCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
 
-MpiProcess.o: mpi/MpiProcess.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT MpiProcess.o -MD -MP -MF $(DEPDIR)/MpiProcess.Tpo -c -o MpiProcess.o `test -f 'mpi/MpiProcess.cpp' || echo '$(srcdir)/'`mpi/MpiProcess.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/MpiProcess.Tpo $(DEPDIR)/MpiProcess.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='mpi/MpiProcess.cpp' object='MpiProcess.o' libtool=no @AMDEPBACKSLASH@
+Enums.o: base/Enums.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT Enums.o -MD -MP -MF $(DEPDIR)/Enums.Tpo -c -o Enums.o `test -f 'base/Enums.cpp' || echo '$(srcdir)/'`base/Enums.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/Enums.Tpo $(DEPDIR)/Enums.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='base/Enums.cpp' object='Enums.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o MpiProcess.o `test -f 'mpi/MpiProcess.cpp' || echo '$(srcdir)/'`mpi/MpiProcess.cpp
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o Enums.o `test -f 'base/Enums.cpp' || echo '$(srcdir)/'`base/Enums.cpp
 
-MpiProcess.obj: mpi/MpiProcess.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT MpiProcess.obj -MD -MP -MF $(DEPDIR)/MpiProcess.Tpo -c -o MpiProcess.obj `if test -f 'mpi/MpiProcess.cpp'; then $(CYGPATH_W) 'mpi/MpiProcess.cpp'; else $(CYGPATH_W) '$(srcdir)/mpi/MpiProcess.cpp'; fi`
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/MpiProcess.Tpo $(DEPDIR)/MpiProcess.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='mpi/MpiProcess.cpp' object='MpiProcess.obj' libtool=no @AMDEPBACKSLASH@
+Enums.obj: base/Enums.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT Enums.obj -MD -MP -MF $(DEPDIR)/Enums.Tpo -c -o Enums.obj `if test -f 'base/Enums.cpp'; then $(CYGPATH_W) 'base/Enums.cpp'; else $(CYGPATH_W) '$(srcdir)/base/Enums.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/Enums.Tpo $(DEPDIR)/Enums.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='base/Enums.cpp' object='Enums.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o MpiProcess.obj `if test -f 'mpi/MpiProcess.cpp'; then $(CYGPATH_W) 'mpi/MpiProcess.cpp'; else $(CYGPATH_W) '$(srcdir)/mpi/MpiProcess.cpp'; fi`
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o Enums.obj `if test -f 'base/Enums.cpp'; then $(CYGPATH_W) 'base/Enums.cpp'; else $(CYGPATH_W) '$(srcdir)/base/Enums.cpp'; fi`
+
+PrintController.o: base/PrintController.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT PrintController.o -MD -MP -MF $(DEPDIR)/PrintController.Tpo -c -o PrintController.o `test -f 'base/PrintController.cpp' || echo '$(srcdir)/'`base/PrintController.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/PrintController.Tpo $(DEPDIR)/PrintController.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='base/PrintController.cpp' object='PrintController.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o PrintController.o `test -f 'base/PrintController.cpp' || echo '$(srcdir)/'`base/PrintController.cpp
+
+PrintController.obj: base/PrintController.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT PrintController.obj -MD -MP -MF $(DEPDIR)/PrintController.Tpo -c -o PrintController.obj `if test -f 'base/PrintController.cpp'; then $(CYGPATH_W) 'base/PrintController.cpp'; else $(CYGPATH_W) '$(srcdir)/base/PrintController.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/PrintController.Tpo $(DEPDIR)/PrintController.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='base/PrintController.cpp' object='PrintController.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o PrintController.obj `if test -f 'base/PrintController.cpp'; then $(CYGPATH_W) 'base/PrintController.cpp'; else $(CYGPATH_W) '$(srcdir)/base/PrintController.cpp'; fi`
 
 MolDSException.o: base/MolDSException.cpp
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT MolDSException.o -MD -MP -MF $(DEPDIR)/MolDSException.Tpo -c -o MolDSException.o `test -f 'base/MolDSException.cpp' || echo '$(srcdir)/'`base/MolDSException.cpp
@@ -478,6 +463,48 @@ MolDSException.obj: base/MolDSException.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='base/MolDSException.cpp' object='MolDSException.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o MolDSException.obj `if test -f 'base/MolDSException.cpp'; then $(CYGPATH_W) 'base/MolDSException.cpp'; else $(CYGPATH_W) '$(srcdir)/base/MolDSException.cpp'; fi`
+
+MallocerFreer.o: base/MallocerFreer.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT MallocerFreer.o -MD -MP -MF $(DEPDIR)/MallocerFreer.Tpo -c -o MallocerFreer.o `test -f 'base/MallocerFreer.cpp' || echo '$(srcdir)/'`base/MallocerFreer.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/MallocerFreer.Tpo $(DEPDIR)/MallocerFreer.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='base/MallocerFreer.cpp' object='MallocerFreer.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o MallocerFreer.o `test -f 'base/MallocerFreer.cpp' || echo '$(srcdir)/'`base/MallocerFreer.cpp
+
+MallocerFreer.obj: base/MallocerFreer.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT MallocerFreer.obj -MD -MP -MF $(DEPDIR)/MallocerFreer.Tpo -c -o MallocerFreer.obj `if test -f 'base/MallocerFreer.cpp'; then $(CYGPATH_W) 'base/MallocerFreer.cpp'; else $(CYGPATH_W) '$(srcdir)/base/MallocerFreer.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/MallocerFreer.Tpo $(DEPDIR)/MallocerFreer.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='base/MallocerFreer.cpp' object='MallocerFreer.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o MallocerFreer.obj `if test -f 'base/MallocerFreer.cpp'; then $(CYGPATH_W) 'base/MallocerFreer.cpp'; else $(CYGPATH_W) '$(srcdir)/base/MallocerFreer.cpp'; fi`
+
+MpiProcess.o: mpi/MpiProcess.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT MpiProcess.o -MD -MP -MF $(DEPDIR)/MpiProcess.Tpo -c -o MpiProcess.o `test -f 'mpi/MpiProcess.cpp' || echo '$(srcdir)/'`mpi/MpiProcess.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/MpiProcess.Tpo $(DEPDIR)/MpiProcess.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='mpi/MpiProcess.cpp' object='MpiProcess.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o MpiProcess.o `test -f 'mpi/MpiProcess.cpp' || echo '$(srcdir)/'`mpi/MpiProcess.cpp
+
+MpiProcess.obj: mpi/MpiProcess.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT MpiProcess.obj -MD -MP -MF $(DEPDIR)/MpiProcess.Tpo -c -o MpiProcess.obj `if test -f 'mpi/MpiProcess.cpp'; then $(CYGPATH_W) 'mpi/MpiProcess.cpp'; else $(CYGPATH_W) '$(srcdir)/mpi/MpiProcess.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/MpiProcess.Tpo $(DEPDIR)/MpiProcess.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='mpi/MpiProcess.cpp' object='MpiProcess.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o MpiProcess.obj `if test -f 'mpi/MpiProcess.cpp'; then $(CYGPATH_W) 'mpi/MpiProcess.cpp'; else $(CYGPATH_W) '$(srcdir)/mpi/MpiProcess.cpp'; fi`
+
+AsyncCommunicator.o: mpi/AsyncCommunicator.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT AsyncCommunicator.o -MD -MP -MF $(DEPDIR)/AsyncCommunicator.Tpo -c -o AsyncCommunicator.o `test -f 'mpi/AsyncCommunicator.cpp' || echo '$(srcdir)/'`mpi/AsyncCommunicator.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/AsyncCommunicator.Tpo $(DEPDIR)/AsyncCommunicator.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='mpi/AsyncCommunicator.cpp' object='AsyncCommunicator.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o AsyncCommunicator.o `test -f 'mpi/AsyncCommunicator.cpp' || echo '$(srcdir)/'`mpi/AsyncCommunicator.cpp
+
+AsyncCommunicator.obj: mpi/AsyncCommunicator.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT AsyncCommunicator.obj -MD -MP -MF $(DEPDIR)/AsyncCommunicator.Tpo -c -o AsyncCommunicator.obj `if test -f 'mpi/AsyncCommunicator.cpp'; then $(CYGPATH_W) 'mpi/AsyncCommunicator.cpp'; else $(CYGPATH_W) '$(srcdir)/mpi/AsyncCommunicator.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/AsyncCommunicator.Tpo $(DEPDIR)/AsyncCommunicator.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='mpi/AsyncCommunicator.cpp' object='AsyncCommunicator.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o AsyncCommunicator.obj `if test -f 'mpi/AsyncCommunicator.cpp'; then $(CYGPATH_W) 'mpi/AsyncCommunicator.cpp'; else $(CYGPATH_W) '$(srcdir)/mpi/AsyncCommunicator.cpp'; fi`
 
 Blas.o: wrappers/Blas.cpp
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT Blas.o -MD -MP -MF $(DEPDIR)/Blas.Tpo -c -o Blas.o `test -f 'wrappers/Blas.cpp' || echo '$(srcdir)/'`wrappers/Blas.cpp
@@ -521,20 +548,6 @@ Utilities.obj: base/Utilities.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o Utilities.obj `if test -f 'base/Utilities.cpp'; then $(CYGPATH_W) 'base/Utilities.cpp'; else $(CYGPATH_W) '$(srcdir)/base/Utilities.cpp'; fi`
 
-Enums.o: base/Enums.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT Enums.o -MD -MP -MF $(DEPDIR)/Enums.Tpo -c -o Enums.o `test -f 'base/Enums.cpp' || echo '$(srcdir)/'`base/Enums.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/Enums.Tpo $(DEPDIR)/Enums.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='base/Enums.cpp' object='Enums.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o Enums.o `test -f 'base/Enums.cpp' || echo '$(srcdir)/'`base/Enums.cpp
-
-Enums.obj: base/Enums.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT Enums.obj -MD -MP -MF $(DEPDIR)/Enums.Tpo -c -o Enums.obj `if test -f 'base/Enums.cpp'; then $(CYGPATH_W) 'base/Enums.cpp'; else $(CYGPATH_W) '$(srcdir)/base/Enums.cpp'; fi`
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/Enums.Tpo $(DEPDIR)/Enums.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='base/Enums.cpp' object='Enums.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o Enums.obj `if test -f 'base/Enums.cpp'; then $(CYGPATH_W) 'base/Enums.cpp'; else $(CYGPATH_W) '$(srcdir)/base/Enums.cpp'; fi`
-
 MathUtilities.o: base/MathUtilities.cpp
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT MathUtilities.o -MD -MP -MF $(DEPDIR)/MathUtilities.Tpo -c -o MathUtilities.o `test -f 'base/MathUtilities.cpp' || echo '$(srcdir)/'`base/MathUtilities.cpp
 @am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/MathUtilities.Tpo $(DEPDIR)/MathUtilities.Po
@@ -548,20 +561,6 @@ MathUtilities.obj: base/MathUtilities.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='base/MathUtilities.cpp' object='MathUtilities.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o MathUtilities.obj `if test -f 'base/MathUtilities.cpp'; then $(CYGPATH_W) 'base/MathUtilities.cpp'; else $(CYGPATH_W) '$(srcdir)/base/MathUtilities.cpp'; fi`
-
-MallocerFreer.o: base/MallocerFreer.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT MallocerFreer.o -MD -MP -MF $(DEPDIR)/MallocerFreer.Tpo -c -o MallocerFreer.o `test -f 'base/MallocerFreer.cpp' || echo '$(srcdir)/'`base/MallocerFreer.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/MallocerFreer.Tpo $(DEPDIR)/MallocerFreer.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='base/MallocerFreer.cpp' object='MallocerFreer.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o MallocerFreer.o `test -f 'base/MallocerFreer.cpp' || echo '$(srcdir)/'`base/MallocerFreer.cpp
-
-MallocerFreer.obj: base/MallocerFreer.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT MallocerFreer.obj -MD -MP -MF $(DEPDIR)/MallocerFreer.Tpo -c -o MallocerFreer.obj `if test -f 'base/MallocerFreer.cpp'; then $(CYGPATH_W) 'base/MallocerFreer.cpp'; else $(CYGPATH_W) '$(srcdir)/base/MallocerFreer.cpp'; fi`
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/MallocerFreer.Tpo $(DEPDIR)/MallocerFreer.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='base/MallocerFreer.cpp' object='MallocerFreer.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o MallocerFreer.obj `if test -f 'base/MallocerFreer.cpp'; then $(CYGPATH_W) 'base/MallocerFreer.cpp'; else $(CYGPATH_W) '$(srcdir)/base/MallocerFreer.cpp'; fi`
 
 EularAngle.o: base/EularAngle.cpp
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT EularAngle.o -MD -MP -MF $(DEPDIR)/EularAngle.Tpo -c -o EularAngle.o `test -f 'base/EularAngle.cpp' || echo '$(srcdir)/'`base/EularAngle.cpp
@@ -590,6 +589,20 @@ Parameters.obj: base/Parameters.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='base/Parameters.cpp' object='Parameters.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o Parameters.obj `if test -f 'base/Parameters.cpp'; then $(CYGPATH_W) 'base/Parameters.cpp'; else $(CYGPATH_W) '$(srcdir)/base/Parameters.cpp'; fi`
+
+RealSphericalHarmonicsIndex.o: base/RealSphericalHarmonicsIndex.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT RealSphericalHarmonicsIndex.o -MD -MP -MF $(DEPDIR)/RealSphericalHarmonicsIndex.Tpo -c -o RealSphericalHarmonicsIndex.o `test -f 'base/RealSphericalHarmonicsIndex.cpp' || echo '$(srcdir)/'`base/RealSphericalHarmonicsIndex.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/RealSphericalHarmonicsIndex.Tpo $(DEPDIR)/RealSphericalHarmonicsIndex.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='base/RealSphericalHarmonicsIndex.cpp' object='RealSphericalHarmonicsIndex.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o RealSphericalHarmonicsIndex.o `test -f 'base/RealSphericalHarmonicsIndex.cpp' || echo '$(srcdir)/'`base/RealSphericalHarmonicsIndex.cpp
+
+RealSphericalHarmonicsIndex.obj: base/RealSphericalHarmonicsIndex.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT RealSphericalHarmonicsIndex.obj -MD -MP -MF $(DEPDIR)/RealSphericalHarmonicsIndex.Tpo -c -o RealSphericalHarmonicsIndex.obj `if test -f 'base/RealSphericalHarmonicsIndex.cpp'; then $(CYGPATH_W) 'base/RealSphericalHarmonicsIndex.cpp'; else $(CYGPATH_W) '$(srcdir)/base/RealSphericalHarmonicsIndex.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/RealSphericalHarmonicsIndex.Tpo $(DEPDIR)/RealSphericalHarmonicsIndex.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='base/RealSphericalHarmonicsIndex.cpp' object='RealSphericalHarmonicsIndex.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o RealSphericalHarmonicsIndex.obj `if test -f 'base/RealSphericalHarmonicsIndex.cpp'; then $(CYGPATH_W) 'base/RealSphericalHarmonicsIndex.cpp'; else $(CYGPATH_W) '$(srcdir)/base/RealSphericalHarmonicsIndex.cpp'; fi`
 
 Atom.o: base/atoms/Atom.cpp
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT Atom.o -MD -MP -MF $(DEPDIR)/Atom.Tpo -c -o Atom.o `test -f 'base/atoms/Atom.cpp' || echo '$(srcdir)/'`base/atoms/Atom.cpp
@@ -744,20 +757,6 @@ GTOExpansionSTO.obj: base/GTOExpansionSTO.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='base/GTOExpansionSTO.cpp' object='GTOExpansionSTO.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o GTOExpansionSTO.obj `if test -f 'base/GTOExpansionSTO.cpp'; then $(CYGPATH_W) 'base/GTOExpansionSTO.cpp'; else $(CYGPATH_W) '$(srcdir)/base/GTOExpansionSTO.cpp'; fi`
-
-RealSphericalHarmonicsIndex.o: base/RealSphericalHarmonicsIndex.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT RealSphericalHarmonicsIndex.o -MD -MP -MF $(DEPDIR)/RealSphericalHarmonicsIndex.Tpo -c -o RealSphericalHarmonicsIndex.o `test -f 'base/RealSphericalHarmonicsIndex.cpp' || echo '$(srcdir)/'`base/RealSphericalHarmonicsIndex.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/RealSphericalHarmonicsIndex.Tpo $(DEPDIR)/RealSphericalHarmonicsIndex.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='base/RealSphericalHarmonicsIndex.cpp' object='RealSphericalHarmonicsIndex.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o RealSphericalHarmonicsIndex.o `test -f 'base/RealSphericalHarmonicsIndex.cpp' || echo '$(srcdir)/'`base/RealSphericalHarmonicsIndex.cpp
-
-RealSphericalHarmonicsIndex.obj: base/RealSphericalHarmonicsIndex.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT RealSphericalHarmonicsIndex.obj -MD -MP -MF $(DEPDIR)/RealSphericalHarmonicsIndex.Tpo -c -o RealSphericalHarmonicsIndex.obj `if test -f 'base/RealSphericalHarmonicsIndex.cpp'; then $(CYGPATH_W) 'base/RealSphericalHarmonicsIndex.cpp'; else $(CYGPATH_W) '$(srcdir)/base/RealSphericalHarmonicsIndex.cpp'; fi`
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/RealSphericalHarmonicsIndex.Tpo $(DEPDIR)/RealSphericalHarmonicsIndex.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='base/RealSphericalHarmonicsIndex.cpp' object='RealSphericalHarmonicsIndex.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o RealSphericalHarmonicsIndex.obj `if test -f 'base/RealSphericalHarmonicsIndex.cpp'; then $(CYGPATH_W) 'base/RealSphericalHarmonicsIndex.cpp'; else $(CYGPATH_W) '$(srcdir)/base/RealSphericalHarmonicsIndex.cpp'; fi`
 
 MOLogger.o: base/loggers/MOLogger.cpp
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT MOLogger.o -MD -MP -MF $(DEPDIR)/MOLogger.Tpo -c -o MOLogger.o `test -f 'base/loggers/MOLogger.cpp' || echo '$(srcdir)/'`base/loggers/MOLogger.cpp
@@ -1066,6 +1065,20 @@ BFGS.obj: optimization/BFGS.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='optimization/BFGS.cpp' object='BFGS.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o BFGS.obj `if test -f 'optimization/BFGS.cpp'; then $(CYGPATH_W) 'optimization/BFGS.cpp'; else $(CYGPATH_W) '$(srcdir)/optimization/BFGS.cpp'; fi`
+
+GEDIIS.o: optimization/GEDIIS.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT GEDIIS.o -MD -MP -MF $(DEPDIR)/GEDIIS.Tpo -c -o GEDIIS.o `test -f 'optimization/GEDIIS.cpp' || echo '$(srcdir)/'`optimization/GEDIIS.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/GEDIIS.Tpo $(DEPDIR)/GEDIIS.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='optimization/GEDIIS.cpp' object='GEDIIS.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o GEDIIS.o `test -f 'optimization/GEDIIS.cpp' || echo '$(srcdir)/'`optimization/GEDIIS.cpp
+
+GEDIIS.obj: optimization/GEDIIS.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT GEDIIS.obj -MD -MP -MF $(DEPDIR)/GEDIIS.Tpo -c -o GEDIIS.obj `if test -f 'optimization/GEDIIS.cpp'; then $(CYGPATH_W) 'optimization/GEDIIS.cpp'; else $(CYGPATH_W) '$(srcdir)/optimization/GEDIIS.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/GEDIIS.Tpo $(DEPDIR)/GEDIIS.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='optimization/GEDIIS.cpp' object='GEDIIS.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o GEDIIS.obj `if test -f 'optimization/GEDIIS.cpp'; then $(CYGPATH_W) 'optimization/GEDIIS.cpp'; else $(CYGPATH_W) '$(srcdir)/optimization/GEDIIS.cpp'; fi`
 
 OptimizerFactory.o: base/factories/OptimizerFactory.cpp
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT OptimizerFactory.o -MD -MP -MF $(DEPDIR)/OptimizerFactory.Tpo -c -o OptimizerFactory.o `test -f 'base/factories/OptimizerFactory.cpp' || echo '$(srcdir)/'`base/factories/OptimizerFactory.cpp

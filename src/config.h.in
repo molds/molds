@@ -32,6 +32,9 @@
 /* Define to 1 if you have the <boost/shared_ptr.hpp> header file. */
 #undef HAVE_BOOST_SHARED_PTR_HPP
 
+/* define if the Boost::Thread library is available */
+#undef HAVE_BOOST_THREAD
+
 /* Define to 1 if you have the `cblas_daxpy' function. */
 #undef HAVE_CBLAS_DAXPY
 
@@ -109,6 +112,9 @@
 
 /* Define if you have the MPI library. */
 #undef HAVE_MPI
+
+/* define if the compiler implements namespaces */
+#undef HAVE_NAMESPACES
 
 /* Define to 1 if you have the <omp.h> header file. */
 #undef HAVE_OMP_H
