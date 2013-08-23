@@ -25,12 +25,12 @@
 #include<vector>
 #include<stdexcept>
 #include<boost/format.hpp>
+#include"Enums.h"
 #include"Uncopyable.h"
-#include"../mpi/MpiProcess.h"
 #include"PrintController.h"
 #include"MolDSException.h"
-#include"Enums.h"
 #include"MallocerFreer.h"
+#include"../mpi/MpiProcess.h"
 #include"EularAngle.h"
 #include"Parameters.h"
 using namespace std;
@@ -95,13 +95,19 @@ void MallocerFreer::DeleteInstance(){
 }
 
 void MallocerFreer::AddCurrentMalloced(double amount){
-#pragma omp critical
-   {
-      MallocerFreer::currentMalloced += amount;
-      if(0 < amount && MallocerFreer::maxMalloced < MallocerFreer::currentMalloced){
-         MallocerFreer::maxMalloced = MallocerFreer::currentMalloced;
-      }
-   }
+   #pragma omp atomic 
+   MallocerFreer::currentMalloced += amount;
+   if(0 < amount){
+      #pragma omp flush(MallocerFreer::maxMalloced, MallocerFreer::currentMalloced)
+      if(MallocerFreer::maxMalloced < MallocerFreer::currentMalloced){
+         #pragma omp critical
+         {   
+            if(MallocerFreer::maxMalloced < MallocerFreer::currentMalloced){
+               MallocerFreer::maxMalloced = MallocerFreer::currentMalloced;
+            }   
+         }   
+      }   
+   }   
 }
 
 }

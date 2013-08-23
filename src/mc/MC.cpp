@@ -27,13 +27,15 @@
 #include<boost/shared_ptr.hpp>
 #include<boost/random.hpp>
 #include<boost/format.hpp>
+#include"../base/Enums.h"
 #include"../base/Uncopyable.h"
-#include"../mpi/MpiProcess.h"
 #include"../base/PrintController.h"
 #include"../base/MolDSException.h"
-#include"../base/Enums.h"
+#include"../base/MallocerFreer.h"
+#include"../mpi/MpiProcess.h"
 #include"../base/EularAngle.h"
 #include"../base/Parameters.h"
+#include"../base/RealSphericalHarmonicsIndex.h"
 #include"../base/atoms/Atom.h"
 #include"../base/Molecule.h"
 #include"../base/ElectronicStructure.h"
@@ -136,6 +138,11 @@ void MC::DoMC(int totalSteps, int elecState, double temperature, double stepWidt
       else{
          trialMolecule.SynchronizeConfigurationTo(*this->molecule);
       }
+
+      // Broadcast to all processes
+      int root = MolDS_mpi::MpiProcess::GetInstance()->GetHeadRank();
+      this->molecule->BroadcastConfigurationToAllProcesses(root);
+      trialMolecule.BroadcastConfigurationToAllProcesses(root);
       
       // output molecular states
       this->OutputMolecule(*currentES, *this->molecule, elecState);

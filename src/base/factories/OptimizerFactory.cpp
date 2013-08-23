@@ -25,20 +25,22 @@
 #include<stdexcept>
 #include<boost/shared_ptr.hpp>
 #include<boost/format.hpp>
+#include"../Enums.h"
 #include"../Uncopyable.h"
-#include"../../mpi/MpiProcess.h"
 #include"../PrintController.h"
 #include"../MolDSException.h"
-#include"../Enums.h"
 #include"../MallocerFreer.h"
+#include"../../mpi/MpiProcess.h"
 #include"../EularAngle.h"
 #include"../Parameters.h"
+#include"../RealSphericalHarmonicsIndex.h"
 #include"../atoms/Atom.h"
 #include"../Molecule.h"
 #include"../ElectronicStructure.h"
 #include"../../optimization/Optimizer.h"
 #include"../../optimization/ConjugateGradient.h"
 #include"../../optimization/BFGS.h"
+#include"../../optimization/GEDIIS.h"
 #include"../../optimization/SteepestDescent.h"
 #include"OptimizerFactory.h"
 using namespace std;
@@ -55,6 +57,9 @@ MolDS_optimization::Optimizer* OptimizerFactory::Create(OptimizationMethodType m
    }
    else if(methodType == BFGSMethod ){
       optimizer = new MolDS_optimization::BFGS();
+   }
+   else if(methodType == GEDIISMethod ){
+      optimizer = new MolDS_optimization::GEDIIS();
    }
    else if(methodType == SteepestDescentMethod ){
       optimizer = new MolDS_optimization::SteepestDescent();

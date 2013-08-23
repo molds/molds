@@ -28,14 +28,16 @@
 #include<stdexcept>
 #include<omp.h>
 #include<boost/format.hpp>
+#include"../Enums.h"
 #include"../Uncopyable.h"
-#include"../../mpi/MpiProcess.h"
 #include"../PrintController.h"
 #include"../MolDSException.h"
+#include"../MallocerFreer.h"
+#include"../../mpi/MpiProcess.h"
 #include"../Utilities.h"
-#include"../Enums.h"
 #include"../EularAngle.h"
 #include"../Parameters.h"
+#include"../RealSphericalHarmonicsIndex.h"
 #include"../atoms/Atom.h"
 #include"../Molecule.h"
 #include"DensityLogger.h"
@@ -106,14 +108,6 @@ string HoleDensityLogger::GetFileName(int elecStateIndex, int digit) const{
    fileName << Utilities::Num2String(elecStateIndex,digit);
    fileName << this->stringCubeExtension;
    return fileName.str();
-}
-
-double const* HoleDensityLogger::GetFrameLength() const{
-   return Parameters::GetInstance()->GetFrameLengthHolePlot();
-}
-
-int const* HoleDensityLogger::GetGridNumber() const{
-   return Parameters::GetInstance()->GetGridNumberHolePlot();
 }
 
 }

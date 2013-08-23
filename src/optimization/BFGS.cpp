@@ -21,6 +21,7 @@
 #include<stdlib.h>
 #include<string.h>
 #include<iostream>
+#include<algorithm>
 #include<sstream>
 #include<math.h>
 #include<string>
@@ -29,16 +30,17 @@
 #include<boost/shared_ptr.hpp>
 #include<boost/format.hpp>
 #include"config.h"
+#include"../base/Enums.h"
 #include"../base/Uncopyable.h"
-#include"../mpi/MpiProcess.h"
 #include"../base/PrintController.h"
 #include"../base/MolDSException.h"
+#include"../base/MallocerFreer.h"
+#include"../mpi/MpiProcess.h"
 #include"../wrappers/Blas.h"
 #include"../wrappers/Lapack.h"
-#include"../base/Enums.h"
-#include"../base/MallocerFreer.h"
 #include"../base/EularAngle.h"
 #include"../base/Parameters.h"
+#include"../base/RealSphericalHarmonicsIndex.h"
 #include"../base/atoms/Atom.h"
 #include"../base/Molecule.h"
 #include"../base/ElectronicStructure.h"
@@ -107,10 +109,10 @@ void BFGS::SearchMinimum(boost::shared_ptr<ElectronicStructure> electronicStruct
    int totalSteps = Parameters::GetInstance()->GetTotalStepsOptimization();
    double maxGradientThreshold = Parameters::GetInstance()->GetMaxGradientOptimization();
    double rmsGradientThreshold = Parameters::GetInstance()->GetRmsGradientOptimization();
-   double lineSearchCurrentEnergy = 0.0;
-   double lineSearchInitialEnergy = 0.0;
-   double** matrixForce = NULL;
-   double* vectorForce = NULL;
+   double lineSearchCurrentEnergy   = 0.0;
+   double lineSearchInitialEnergy   = 0.0;
+   double const* const* matrixForce = NULL;
+   double const* vectorForce        = NULL;
    const int dimension = molecule.GetNumberAtoms()*CartesianType_end;
    double** matrixHessian        = NULL;
    double*  vectorOldForce       = NULL;
@@ -142,19 +144,10 @@ void BFGS::SearchMinimum(boost::shared_ptr<ElectronicStructure> electronicStruct
 
          // Store old Force data
          MallocerFreer::GetInstance()->Malloc(&vectorOldForce, dimension);
-         for(int i =0;i < dimension; i++){
-            vectorOldForce[i] = vectorForce[i];
-         }
+         MolDS_wrappers::Blas::GetInstance()->Dcopy(dimension, vectorForce, vectorOldForce);
 
-         //Store old coordinates
-         MallocerFreer::GetInstance()->Malloc(&matrixOldCoordinates, molecule.GetNumberAtoms(), CartesianType_end);
-         for(int i=0;i<molecule.GetNumberAtoms();i++){
-            const Atom*   atom = molecule.GetAtom(i);
-            const double* xyz  = atom->GetXyz();
-            for(int j=0;j<CartesianType_end;j++){
-               matrixOldCoordinates[i][j] = xyz[j];
-            }
-         }
+         this->StoreMolecularGeometry(matrixOldCoordinates, molecule);
+
          // Level shift Hessian redundant modes
          this->ShiftHessianRedundantMode(matrixHessian, molecule);
 
@@ -166,19 +159,7 @@ void BFGS::SearchMinimum(boost::shared_ptr<ElectronicStructure> electronicStruct
          vectorStep = &matrixStep[0][0];
          this->CalcRFOStep(vectorStep, matrixHessian, vectorForce, trustRadius, dimension);
 
-         // Calculate approximate change of energy using
-         // [2/2] Pade approximant
-         // See Eq. (2) in [BB_1998]
-         double approximateChangeNumerator   = 0;
-         double approximateChangeDenominator = 1;
-         for(int i=0;i<dimension;i++){
-            approximateChangeNumerator -= vectorForce[i] * vectorStep[i];
-            approximateChangeDenominator += vectorStep[i] * vectorStep[i];
-            for(int j=0;j<dimension;j++){
-               approximateChangeNumerator += vectorStep[i] * matrixHessian[i][j] * vectorStep[j] / 2;
-            }
-         }
-         double approximateChange = approximateChangeNumerator / approximateChangeDenominator;
+         double approximateChange = this->ApproximateEnergyChange(dimension, matrixHessian, vectorForce, vectorStep);
 
          // Take a RFO step
          bool doLineSearch = false;
@@ -189,20 +170,17 @@ void BFGS::SearchMinimum(boost::shared_ptr<ElectronicStructure> electronicStruct
          }
          else{
             this->UpdateMolecularCoordinates(molecule, matrixStep);
+
+            // Broadcast to all processes
+            int root = MolDS_mpi::MpiProcess::GetInstance()->GetHeadRank();
+            molecule.BroadcastConfigurationToAllProcesses(root);
+
             this->UpdateElectronicStructure(electronicStructure, molecule, requireGuess, tempCanOutputLogs);
             lineSearchCurrentEnergy = electronicStructure->GetElectronicEnergy(elecState);
          }
          this->OutputMoleculeElectronicStructure(electronicStructure, molecule, this->CanOutputLogs());
 
-         // Calculate the correctness of the approximation
-         double r = (lineSearchCurrentEnergy - lineSearchInitialEnergy)
-            / approximateChange; // correctness of the step
-         bool aproxcheckCanOutputLogs = true;
-         tempCanOutputLogs = molecule.CanOutputLogs();
-         molecule.SetCanOutputLogs(aproxcheckCanOutputLogs);
-         this->OutputLog(boost::format(this->formatEnergyChangeComparison)
-               % (lineSearchCurrentEnergy-lineSearchInitialEnergy) % approximateChange % r);
-         molecule.SetCanOutputLogs(tempCanOutputLogs);
+         this->UpdateTrustRadius(trustRadius, approximateChange, lineSearchInitialEnergy, lineSearchCurrentEnergy);
 
          // check convergence
          if(this->SatisfiesConvergenceCriterion(matrixForce,
@@ -215,49 +193,15 @@ void BFGS::SearchMinimum(boost::shared_ptr<ElectronicStructure> electronicStruct
             break;
          }
 
-         // Update the trust radius
-         if(r < 0)
-         {
-            // Rollback molecular geometry
-            bool tempCanOutputLogs = molecule.CanOutputLogs();
-            bool rollbackCanOutputLogs = true;
-            molecule.SetCanOutputLogs(rollbackCanOutputLogs);
+         if(lineSearchCurrentEnergy > lineSearchInitialEnergy){
             this->OutputLog(this->messageHillClimbing);
-            for(int i=0;i<molecule.GetNumberAtoms();i++){
-               const Atom* atom = molecule.GetAtom(i);
-               double*     xyz  = atom->GetXyz();
-               for(int j=0;j<CartesianType_end;j++){
-                  xyz[j] = matrixOldCoordinates[i][j];
-               }
-            }
+            this->RollbackMolecularGeometry(molecule, matrixOldCoordinates);
             lineSearchCurrentEnergy = lineSearchInitialEnergy;
-            molecule.SetCanOutputLogs(tempCanOutputLogs);
-            // and rerun with smaller trust radius
-            // without updating Hessian
-            trustRadius /= 4;
-            continue;
          }
-         else if(r<0.25){
-            trustRadius /= 4;
-         }
-         else if(r<0.75){
-            // keep trust radius
-         }
-         else if(r<2){
-            trustRadius *= 2;
-         }
-         else{
-            trustRadius /= 2;
-         }
+
          //Calculate displacement (K_k at Eq. (15) in [SJTO_1983])
-         MallocerFreer::GetInstance()->Malloc(&matrixDisplacement, molecule.GetNumberAtoms(), CartesianType_end);
-         for(int i=0;i<molecule.GetNumberAtoms();i++){
-            const Atom*   atom = molecule.GetAtom(i);
-            const double* xyz  = atom->GetXyz();
-            for(int j=0;j<CartesianType_end;j++){
-               matrixDisplacement[i][j] = xyz[j] - matrixOldCoordinates[i][j];
-            }
-         }
+         this->CalcDisplacement(matrixDisplacement, matrixOldCoordinates, molecule);
+
          matrixForce = electronicStructure->GetForce(elecState);
          vectorForce = &matrixForce[0][0];
 
@@ -547,5 +491,96 @@ void BFGS::ShiftHessianRedundantMode(double** matrixHessian,
    MallocerFreer::GetInstance()->Free(&matrixShiftedHessianBuffer, dimension, dimension);
    MallocerFreer::GetInstance()->Free(&vectorHessianEigenValues, dimension);
    MallocerFreer::GetInstance()->Free(&vectorsHessianModes, dimension, dimension);
+}
+
+double BFGS::ApproximateEnergyChange(int dimension,
+                                     double const* const* matrixHessian,
+                                     double const* vectorForce,
+                                     double const* vectorStep) const{
+   // Calculate approximate change of energy using
+   // [2/2] Pade approximant
+   // See Eq. (2) in [BB_1998]
+   double approximateChangeNumerator   = 0;
+   double approximateChangeDenominator = 1;
+   for(int i=0;i<dimension;i++){
+      approximateChangeNumerator -= vectorForce[i] * vectorStep[i];
+      approximateChangeDenominator += vectorStep[i] * vectorStep[i];
+      for(int j=0;j<dimension;j++){
+         approximateChangeNumerator += vectorStep[i] * matrixHessian[i][j] * vectorStep[j] / 2;
+      }
+   }
+   return approximateChangeNumerator / approximateChangeDenominator;
+}
+
+void BFGS::UpdateTrustRadius(double &trustRadius,
+                       double approximateEnergyChange,
+                       double initialEnergy,
+                       double currentEnergy)const{
+   // Calculate the correctness of the approximation
+   double r = (currentEnergy - initialEnergy)
+            / approximateEnergyChange;
+
+   this->OutputLog(boost::format(this->formatEnergyChangeComparison)
+                   % (currentEnergy-initialEnergy) % approximateEnergyChange % r);
+
+   if(r < 0)
+   {
+      trustRadius /= 4;
+   }
+   else if(r<0.25){
+      trustRadius /= 4;
+   }
+   else if(r<0.75){
+      // keep trust radius
+   }
+   else if(r<2){
+      trustRadius *= 2;
+   }
+   else{
+      trustRadius /= 2;
+   }
+}
+
+void BFGS::RollbackMolecularGeometry(MolDS_base::Molecule& molecule,
+                                     double const* const* matrixOldCoordinates)const{
+   // Rollback molecular geometry
+   bool tempCanOutputLogs = molecule.CanOutputLogs();
+   bool rollbackCanOutputLogs = true;
+   molecule.SetCanOutputLogs(rollbackCanOutputLogs);
+   for(int i=0;i<molecule.GetNumberAtoms();i++){
+      const Atom* atom = molecule.GetAtom(i);
+      double*     xyz  = atom->GetXyz();
+      for(int j=0;j<CartesianType_end;j++){
+         xyz[j] = matrixOldCoordinates[i][j];
+      }
+   }
+   molecule.SetCanOutputLogs(tempCanOutputLogs);
+}
+
+void BFGS::CalcDisplacement(double      *      *& matrixDisplacement,
+                            double const* const*  matrixOldCoordinates,
+                            const MolDS_base::Molecule& molecule)const{
+   //Calculate displacement (K_k at Eq. (15) in [SJTO_1983])
+   MallocerFreer::GetInstance()->Malloc(&matrixDisplacement, molecule.GetNumberAtoms(), CartesianType_end);
+   for(int i=0;i<molecule.GetNumberAtoms();i++){
+      const Atom*   atom = molecule.GetAtom(i);
+      const double* xyz  = atom->GetXyz();
+      for(int j=0;j<CartesianType_end;j++){
+         matrixDisplacement[i][j] = xyz[j] - matrixOldCoordinates[i][j];
+      }
+   }
+}
+
+void BFGS::StoreMolecularGeometry(double **& matrixCoordinates, 
+                                  const MolDS_base::Molecule& molecule)const{
+   //Store old coordinates
+   MallocerFreer::GetInstance()->Malloc(&matrixCoordinates, molecule.GetNumberAtoms(), CartesianType_end);
+   for(int i=0;i<molecule.GetNumberAtoms();i++){
+      const Atom*   atom = molecule.GetAtom(i);
+      const double* xyz  = atom->GetXyz();
+      for(int j=0;j<CartesianType_end;j++){
+         matrixCoordinates[i][j] = xyz[j];
+      }
+   }
 }
 }

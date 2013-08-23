@@ -23,12 +23,15 @@
 #include<math.h>
 #include<vector>
 #include<boost/format.hpp>
-#include"../Uncopyable.h"
-#include"../../mpi/MpiProcess.h"
-#include"../PrintController.h"
 #include"../Enums.h"
+#include"../Uncopyable.h"
+#include"../PrintController.h"
+#include"../MolDSException.h"
+#include"../MallocerFreer.h"
+#include"../../mpi/MpiProcess.h"
 #include"../EularAngle.h"
 #include"../Parameters.h"
+#include"../RealSphericalHarmonicsIndex.h"
 #include"Atom.h"
 #include"Liatom.h"
 using namespace std;
@@ -49,6 +52,9 @@ void Liatom::SetAtomicParameters(){
    this->valence.push_back(py);
    this->valence.push_back(pz);
    this->valence.push_back(px);
+   for(int i=0; i<this->valence.size();i++){
+      this->realSphericalHarmonicsIndeces.push_back(new RealSphericalHarmonicsIndex(this->valence[i]));
+   }
    this->bondingParameter = -9.0*Parameters::GetInstance()->GetEV2AU();
    this->imuAmuS = 3.106*Parameters::GetInstance()->GetEV2AU();
    this->imuAmuP = 1.258*Parameters::GetInstance()->GetEV2AU();

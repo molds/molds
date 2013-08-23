@@ -23,8 +23,12 @@
 #include<math.h>
 #include<string>
 #include<stdexcept>
-#include"../base/MolDSException.h"
+#include<omp.h>
+#include<boost/format.hpp>
 #include"../base/Uncopyable.h"
+#include"../base/PrintController.h"
+#include"../base/MolDSException.h"
+#include"../base/MallocerFreer.h"
 #include"MpiProcess.h"
 using namespace std;
 namespace MolDS_mpi{
@@ -38,9 +42,22 @@ MpiProcess::MpiProcess(int argc, char *argv[]){
    this->environment  = new boost::mpi::environment(argc, argv);
    this->communicator = new boost::mpi::communicator();
    this->messageLimit = INT_MAX;
+   this->mpiConsumingTime=0.0;
+   this->mpiConsumingTimeSend=0.0;
+   this->mpiConsumingTimeRecv=0.0;
+   this->mpiConsumingTimeBrodCast=0.0;
+   this->mpiConsumingTimeAllReduce=0.0;
 }
 
 MpiProcess::~MpiProcess(){
+   /*
+   int rank = this->GetRank();
+   printf("\nrnk:%d mpiconsumingtime          = %e [s]\n",rank, this->mpiConsumingTime);
+   printf("\nrnk:%d mpiconsumingtimeSend      = %e [s]\n",rank, this->mpiConsumingTimeSend);
+   printf("\nrnk:%d mpiconsumingtimeRecv      = %e [s]\n",rank, this->mpiConsumingTimeRecv);
+   printf("\nrnk:%d mpiconsumingtimeBroadcast = %e [s]\n",rank, this->mpiConsumingTimeBrodCast);
+   printf("\nrnk:%d mpiconsumingtimeAllReduce = %e [s]\n",rank, this->mpiConsumingTimeAllReduce);
+   */
    delete this->environment;
    delete this->communicator;
 }
@@ -66,6 +83,25 @@ MpiProcess* MpiProcess::GetInstance(){
    }
    return mpiProcess;
 }
+
+void MpiProcess::Barrier(){this->communicator->barrier();}
+
+int MpiProcess::GetMessagePassingTimes(intptr_t num)const{
+   int mpiRank     = MolDS_mpi::MpiProcess::GetInstance()->GetRank();
+   int mpiSize     = MolDS_mpi::MpiProcess::GetInstance()->GetSize();
+   int mpiHeadRank = MolDS_mpi::MpiProcess::GetInstance()->GetHeadRank();
+   int calcTimes = num/mpiSize;
+   if(mpiRank < num%mpiSize){calcTimes+=1;}
+   int mpiPassingTimes;
+   if(mpiRank == mpiHeadRank){
+      mpiPassingTimes = num - calcTimes;
+   }
+   else{
+      mpiPassingTimes = calcTimes;
+   }
+   return mpiPassingTimes;
+}
+
 
 }
 

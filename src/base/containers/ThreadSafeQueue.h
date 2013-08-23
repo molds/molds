@@ -1,5 +1,6 @@
 //************************************************************************//
 // Copyright (C) 2011-2013 Mikiya Fujii                                   //
+// Copyright (C) 2012-2012 Katushiko Nishimra                             // 
 //                                                                        // 
 // This file is part of MolDS.                                            // 
 //                                                                        // 
@@ -16,36 +17,59 @@
 // You should have received a copy of the GNU General Public License      // 
 // along with MolDS.  If not, see <http://www.gnu.org/licenses/>.         // 
 //************************************************************************//
-#include<stdio.h>
-#include<stdlib.h>
-#include<iostream>
-#include<vector>
-#include<stdexcept>
+#ifndef INCLUDED_THREADSAFEQUEQUE
+#define INCLUDED_THREADSAFEQUEQUE
+#include<queue>
 #include<boost/shared_ptr.hpp>
-#include<boost/format.hpp>
-#include"base/Enums.h"
-#include"base/Uncopyable.h"
-#include"base/PrintController.h"
-#include"base/MolDSException.h"
-#include"base/MallocerFreer.h"
-#include"mpi/MpiProcess.h"
-#include"base/EularAngle.h"
-#include"base/RealSphericalHarmonicsIndex.h"
-#include"base/atoms/Atom.h"
-#include"base/Molecule.h"
-#include"base/MolDS.h"
-using namespace std;
-using namespace MolDS_base;
-int main(int argc, char *argv[]){
-   try{
-      MolDS_mpi::MpiProcess::CreateInstance(argc, argv);
-      boost::shared_ptr<MolDS_base::MolDS> molds(new MolDS_base::MolDS());
-      molds->Run(argc, argv);
-      MolDS_mpi::MpiProcess::DeleteInstance();
-   }
-   catch(exception ex){
-      cout << ex.what();
-   }
-   return 0;
-}
+#include<boost/thread.hpp>
+#include<boost/thread/condition.hpp>
+namespace MolDS_base_containers{
 
+// This Queue class is thread-safe
+
+template <typename T>
+class ThreadSafeQueue
+{
+public:
+   ThreadSafeQueue(){}
+   ~ThreadSafeQueue(){}
+
+   void Push(const T& data){
+      boost::mutex::scoped_lock lk(this->stateGuard);
+      this->stdQueue.push(data);
+      this->stateChange.notify_all();
+   } 
+
+   T FrontPop(){
+      boost::mutex::scoped_lock lk(this->stateGuard);
+      if(this->stdQueue.empty()){
+         std::stringstream ss;
+         ss << "naitive queue has no member\n";
+         MolDS_base::MolDSException ex(ss.str());
+         int info = 0;
+         ex.SetKeyValue<int>(MolDS_base::EmptyQueue, info);
+         throw ex;
+      }
+      T ret = this->stdQueue.front();
+      this->stdQueue.pop();
+      this->stateChange.notify_all();
+      return ret;
+   }
+     
+   int Size(){
+     boost::mutex::scoped_lock lk(this->stateGuard);
+     return this->stdQueue.size();
+   }
+   
+   bool Empty(){
+     boost::mutex::scoped_lock lk(this->stateGuard);
+     return this->stdQueue.empty();
+   }
+private:
+   std::queue<T> stdQueue;
+   boost::mutex  stateGuard;
+   boost::condition_variable stateChange;
+};
+
+}
+#endif

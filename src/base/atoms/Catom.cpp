@@ -23,12 +23,15 @@
 #include<math.h>
 #include<vector>
 #include<boost/format.hpp>
-#include"../Uncopyable.h"
-#include"../../mpi/MpiProcess.h"
-#include"../PrintController.h"
 #include"../Enums.h"
+#include"../Uncopyable.h"
+#include"../PrintController.h"
+#include"../MolDSException.h"
+#include"../MallocerFreer.h"
+#include"../../mpi/MpiProcess.h"
 #include"../EularAngle.h"
 #include"../Parameters.h"
+#include"../RealSphericalHarmonicsIndex.h"
 #include"Atom.h"
 #include"Catom.h"
 using namespace std;
@@ -48,6 +51,9 @@ void Catom::SetAtomicParameters(){
    this->valence.push_back(py);
    this->valence.push_back(pz);
    this->valence.push_back(px);
+   for(int i=0; i<this->valence.size();i++){
+      this->realSphericalHarmonicsIndeces.push_back(new RealSphericalHarmonicsIndex(this->valence[i]));
+   }
    this->vdWCoefficient = 1.65*Parameters::GetInstance()->GetJ2AU()
                               *pow(Parameters::GetInstance()->GetNm2AU(),6.0)
                               /Parameters::GetInstance()->GetAvogadro();

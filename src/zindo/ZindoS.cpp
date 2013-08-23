@@ -29,17 +29,18 @@
 #include<omp.h>
 #include<boost/format.hpp>
 #include"config.h"
+#include"../base/Enums.h"
 #include"../base/Uncopyable.h"
-#include"../mpi/MpiProcess.h"
 #include"../base/PrintController.h"
 #include"../base/MolDSException.h"
+#include"../base/MallocerFreer.h"
+#include"../mpi/MpiProcess.h"
 #include"../wrappers/Blas.h"
 #include"../wrappers/Lapack.h"
-#include"../base/Enums.h"
 #include"../base/MathUtilities.h"
-#include"../base/MallocerFreer.h"
 #include"../base/EularAngle.h"
 #include"../base/Parameters.h"
+#include"../base/RealSphericalHarmonicsIndex.h"
 #include"../base/atoms/Atom.h"
 #include"../base/atoms/Hatom.h"
 #include"../base/atoms/Liatom.h"
@@ -1094,9 +1095,11 @@ void ZindoS::CalcCISProperties(){
    int mpiSize = MolDS_mpi::MpiProcess::GetInstance()->GetSize();
    double*** dipoleMOs = NULL;
    double**  overlapMOs = NULL;
+   double**  tmpMatrixBC = NULL;
    try{
       MallocerFreer::GetInstance()->Malloc<double>(&dipoleMOs,       CartesianType_end, totalNumberAOs, totalNumberAOs);
       MallocerFreer::GetInstance()->Malloc<double>(&overlapMOs, totalNumberAOs, totalNumberAOs);
+      MallocerFreer::GetInstance()->Malloc<double>(&tmpMatrixBC, totalNumberAOs, totalNumberAOs);
       double alpha=1.0;
       double beta =0.0;
       //double ompStartTime = omp_get_wtime();
@@ -1106,21 +1109,24 @@ void ZindoS::CalcCISProperties(){
                                                   this->cartesianMatrix[XAxis],
                                                   this->fockMatrix,
                                                   beta,
-                                                  dipoleMOs[XAxis]);
+                                                  dipoleMOs[XAxis],
+                                                  tmpMatrixBC);
       MolDS_wrappers::Blas::GetInstance()->Dgemmm(false, false, true, totalNumberAOs, totalNumberAOs, totalNumberAOs, totalNumberAOs,
                                                   alpha, 
                                                   this->fockMatrix,
                                                   this->cartesianMatrix[YAxis],
                                                   this->fockMatrix,
                                                   beta,
-                                                  dipoleMOs[YAxis]);
+                                                  dipoleMOs[YAxis],
+                                                  tmpMatrixBC);
       MolDS_wrappers::Blas::GetInstance()->Dgemmm(false, false, true, totalNumberAOs, totalNumberAOs, totalNumberAOs, totalNumberAOs,
                                                   alpha, 
                                                   this->fockMatrix,
                                                   this->cartesianMatrix[ZAxis],
                                                   this->fockMatrix,
                                                   beta,
-                                                  dipoleMOs[ZAxis]);
+                                                  dipoleMOs[ZAxis],
+                                                  tmpMatrixBC);
  
       double const* centerOfDipole = this->molecule->GetXyzCOC();
       // set orign of dipole
@@ -1130,7 +1136,8 @@ void ZindoS::CalcCISProperties(){
                                                   this->overlapAOs,
                                                   this->fockMatrix,
                                                   beta,
-                                                  overlapMOs);
+                                                  overlapMOs,
+                                                  tmpMatrixBC);
       MolDS_wrappers::Blas::GetInstance()->Daxpy(totalNumberAOs*totalNumberAOs,
                                                  -centerOfDipole[XAxis], 
                                                  &overlapMOs[0][0],
@@ -1237,34 +1244,37 @@ void ZindoS::CalcCISProperties(){
    catch(MolDSException ex){
       MallocerFreer::GetInstance()->Free<double>(&dipoleMOs, CartesianType_end, totalNumberAOs, totalNumberAOs);
       MallocerFreer::GetInstance()->Free<double>(&overlapMOs, totalNumberAOs, totalNumberAOs);
+      MallocerFreer::GetInstance()->Free<double>(&tmpMatrixBC, totalNumberAOs, totalNumberAOs);
       throw ex;
    }
    MallocerFreer::GetInstance()->Free<double>(&dipoleMOs, CartesianType_end, totalNumberAOs, totalNumberAOs);
    MallocerFreer::GetInstance()->Free<double>(&overlapMOs, totalNumberAOs, totalNumberAOs);
+   MallocerFreer::GetInstance()->Free<double>(&tmpMatrixBC, totalNumberAOs, totalNumberAOs);
 
-   // communication to collect all matrix data on rank 0
+   // communication to collect all matrix data on head-rank  
+   int mpiHeadRank = MolDS_mpi::MpiProcess::GetInstance()->GetHeadRank();
    int numTransported = (Parameters::GetInstance()->GetNumberExcitedStatesCIS()+1)*CartesianType_end;
-   if(mpiRank == 0){
+   if(mpiRank == mpiHeadRank){
       // receive the matrix data from other ranks
       for(int k=0; k<Parameters::GetInstance()->GetNumberExcitedStatesCIS()+1; k++){
-         if(k%mpiSize == 0){continue;}
+         if(k%mpiSize == mpiHeadRank){continue;}
          int source = k%mpiSize;
          int tag = k;
          MolDS_mpi::MpiProcess::GetInstance()->Recv(source, tag, &this->electronicTransitionDipoleMoments[k][0][0], numTransported);
       }
    }
    else{
-      // send the matrix data to rank-0
+      // send the matrix data to head-rank
       for(int k=0; k<Parameters::GetInstance()->GetNumberExcitedStatesCIS()+1; k++){
          if(k%mpiSize != mpiRank){continue;}
-         int dest = 0;
+         int dest = mpiHeadRank;
          int tag = k;
          MolDS_mpi::MpiProcess::GetInstance()->Send(dest, tag, &this->electronicTransitionDipoleMoments[k][0][0], numTransported);
       }
    }
 
    // right upper part of the matrix is copied from left lower part.
-   if(mpiRank == 0 && Parameters::GetInstance()->RequiresAllTransitionDipoleMomentsCIS()){
+   if(mpiRank == mpiHeadRank && Parameters::GetInstance()->RequiresAllTransitionDipoleMomentsCIS()){
       for(int k=0; k<Parameters::GetInstance()->GetNumberExcitedStatesCIS()+1; k++){
          for(int l=k+1; l<Parameters::GetInstance()->GetNumberExcitedStatesCIS()+1; l++){
             for(int axis=0; axis<CartesianType_end; axis++){
@@ -1277,7 +1287,7 @@ void ZindoS::CalcCISProperties(){
 
    // broadcast all matrix data to all ranks
    numTransported *= (Parameters::GetInstance()->GetNumberExcitedStatesCIS()+1);
-   int root=0;
+   int root=mpiHeadRank;
    MolDS_mpi::MpiProcess::GetInstance()->Broadcast(&this->electronicTransitionDipoleMoments[0][0][0], numTransported, root);
 
 
@@ -2394,28 +2404,29 @@ void ZindoS::CalcCISMatrix(double** matrixCIS) const{
    } // end of k-loop
 
 
-   // communication to collect all matrix data on rank 0
-   if(mpiRank == 0){
+   // communication to collect all matrix data on head-rank 
+   int mpiHeadRank = MolDS_mpi::MpiProcess::GetInstance()->GetHeadRank();
+   if(mpiRank == mpiHeadRank){
       // receive the matrix data from other ranks
       for(int k=0; k<this->matrixCISdimension; k++){
-         if(k%mpiSize == 0){continue;}
+         if(k%mpiSize == mpiHeadRank){continue;}
          int source = k%mpiSize;
          int tag = k;
          MolDS_mpi::MpiProcess::GetInstance()->Recv(source, tag, matrixCIS[k], this->matrixCISdimension);
       }
    }
    else{
-      // send the matrix data to rank-0
+      // send the matrix data to head-rank
       for(int k=0; k<this->matrixCISdimension; k++){
          if(k%mpiSize != mpiRank){continue;}
-         int dest = 0;
+         int dest = mpiHeadRank;
          int tag = k;
          MolDS_mpi::MpiProcess::GetInstance()->Send(dest, tag, matrixCIS[k], this->matrixCISdimension);
       }
    }
 
    // broadcast all matrix data to all rank
-   int root=0;
+   int root=mpiHeadRank;
    MolDS_mpi::MpiProcess::GetInstance()->Broadcast(&matrixCIS[0][0], this->matrixCISdimension*this->matrixCISdimension, root);
 
    double ompEndTime = omp_get_wtime();
@@ -3575,31 +3586,43 @@ void ZindoS::CalcDiatomicTwoElecTwoCore1stDerivatives(double*** matrix,
 // elecStates is indeces of the electroinc eigen states.
 // The index = 0 means electronic ground state. 
 void ZindoS::CalcForce(const vector<int>& elecStates){
+   int mpiRank = MolDS_mpi::MpiProcess::GetInstance()->GetRank();
+   int mpiSize = MolDS_mpi::MpiProcess::GetInstance()->GetSize();
    this->CheckMatrixForce(elecStates);
    if(this->RequiresExcitedStatesForce(elecStates)){
       this->CalcEtaMatrixForce(elecStates);
       this->CalcZMatrixForce(elecStates);
    }
-   stringstream ompErrors;
+  
+   // this loop is MPI-parallelized
+   for(int a=0; a<this->molecule->GetNumberAtoms(); a++){
+      if(a%mpiSize != mpiRank){continue;}
+      const Atom& atomA = *molecule->GetAtom(a);
+      int firstAOIndexA = atomA.GetFirstAOIndex();
+      int lastAOIndexA  = atomA.GetLastAOIndex();
+      stringstream ompErrors;
 #pragma omp parallel 
-   {
-      double*** diatomicTwoElecTwoCore1stDerivs = NULL;
-      double*** diatomicOverlapAOs1stDerivs = NULL;
-      try{
-         MallocerFreer::GetInstance()->Malloc<double>(&diatomicTwoElecTwoCore1stDerivs,
-                                                      OrbitalType_end, 
-                                                      OrbitalType_end, 
-                                                      CartesianType_end);
-         MallocerFreer::GetInstance()->Malloc<double>(&diatomicOverlapAOs1stDerivs,
-                                                      OrbitalType_end, 
-                                                      OrbitalType_end, 
-                                                      CartesianType_end);
-
+      {
+         double*** diatomicOverlapAOs1stDerivs        = NULL;
+         double*** diatomicTwoElecTwoCore1stDerivs    = NULL;
+         double**  tmpDiaOverlapAOsInDiaFrame         = NULL; // diatomic overlapAOs in diatomic frame
+         double**  tmpDiaOverlapAOs1stDerivInDiaFrame = NULL; // first derivative of the diaOverlapAOs. This derivative is related to the distance between two atoms.
+         double**  tmpRotMat                          = NULL; // rotating Matrix from the diatomic frame to space fixed frame.
+         double**  tmpRotMat1stDeriv                  = NULL;
+         double*** tmpRotMat1stDerivs                 = NULL; // first derivatives of the rotMat.
+         double**  tmpRotatedDiatomicOverlap          = NULL;
+         double**  tmpMatrix                          = NULL;
+         try{
+            MallocTempMatricesCalcForce(&diatomicOverlapAOs1stDerivs, 
+                                        &diatomicTwoElecTwoCore1stDerivs,
+                                        &tmpDiaOverlapAOsInDiaFrame,       
+                                        &tmpDiaOverlapAOs1stDerivInDiaFrame,
+                                        &tmpRotMat,
+                                        &tmpRotMat1stDeriv,
+                                        &tmpRotMat1stDerivs,
+                                        &tmpRotatedDiatomicOverlap,
+                                        &tmpMatrix);
 #pragma omp for schedule(auto)
-         for(int a=0; a<this->molecule->GetNumberAtoms(); a++){
-            const Atom& atomA = *molecule->GetAtom(a);
-            int firstAOIndexA = atomA.GetFirstAOIndex();
-            int lastAOIndexA  = atomA.GetLastAOIndex();
             for(int b=0; b<this->molecule->GetNumberAtoms(); b++){
                if(a == b){continue;}
                const Atom& atomB = *molecule->GetAtom(b);
@@ -3608,7 +3631,16 @@ void ZindoS::CalcForce(const vector<int>& elecStates){
                double rAB = this->molecule->GetDistanceAtoms(atomA, atomB);
 
                // calc. first derivative of overlapAOs.
-               this->CalcDiatomicOverlapAOs1stDerivatives(diatomicOverlapAOs1stDerivs, atomA, atomB);
+               this->CalcDiatomicOverlapAOs1stDerivatives(diatomicOverlapAOs1stDerivs, 
+                                                          tmpDiaOverlapAOsInDiaFrame,        
+                                                          tmpDiaOverlapAOs1stDerivInDiaFrame,
+                                                          tmpRotMat,                         
+                                                          tmpRotMat1stDeriv,                 
+                                                          tmpRotMat1stDerivs,                
+                                                          tmpRotatedDiatomicOverlap,         
+                                                          tmpMatrix,                         
+                                                          atomA, 
+                                                          atomB);
 
                // calc. first derivative of two elec two core interaction by Nishimoto-Mataga
                this->CalcDiatomicTwoElecTwoCore1stDerivatives(diatomicTwoElecTwoCore1stDerivs, a, b);
@@ -3714,27 +3746,32 @@ void ZindoS::CalcForce(const vector<int>& elecStates){
                      }
                   }
                }
-            } // end of for(int b)
-         }    // end of for(int a)
-      }       // end of try
-      catch(MolDSException ex){
+            } // end of for(int b) with omp parallelization
+         }// end of try for omp-for
+         catch(MolDSException ex){
 #pragma omp critical
-         ex.Serialize(ompErrors);
+            ex.Serialize(ompErrors);
+         }
+         FreeTempMatricesCalcForce(&diatomicOverlapAOs1stDerivs, 
+                                   &diatomicTwoElecTwoCore1stDerivs,
+                                   &tmpDiaOverlapAOsInDiaFrame,       
+                                   &tmpDiaOverlapAOs1stDerivInDiaFrame,
+                                   &tmpRotMat,
+                                   &tmpRotMat1stDeriv,
+                                   &tmpRotMat1stDerivs,
+                                   &tmpRotatedDiatomicOverlap,
+                                   &tmpMatrix);
+      } //end of omp-parallelized region
+      // Exception throwing for omp-region
+      if(!ompErrors.str().empty()){
+         throw MolDSException::Deserialize(ompErrors);
       }
-      MallocerFreer::GetInstance()->Free<double>(&diatomicTwoElecTwoCore1stDerivs, 
-                                                 OrbitalType_end,
-                                                 OrbitalType_end,
-                                                 CartesianType_end);
-      MallocerFreer::GetInstance()->Free<double>(&diatomicOverlapAOs1stDerivs, 
-                                                 OrbitalType_end,
-                                                 OrbitalType_end,
-                                                 CartesianType_end);
-   }
-   // Exception throwing for omp-region
-   if(!ompErrors.str().empty()){
-      throw MolDSException::Deserialize(ompErrors);
-   }
-  
+   }    // end of for(int a) with MPI parallelization
+
+   // communication to reduce thsi->matrixForce on all node (namely, all_reduce)
+   int numTransported = elecStates.size()*this->molecule->GetNumberAtoms()*CartesianType_end;
+   MolDS_mpi::MpiProcess::GetInstance()->AllReduce(&this->matrixForce[0][0][0], numTransported, std::plus<double>());
+
    /*
    // Calculate force (on the ground state only). 
    // First derivative of overlapAOs integral is
@@ -3816,6 +3853,46 @@ void ZindoS::CalcForce(const vector<int>& elecStates){
       throw MolDSException::Deserialize(ompErrors);
    }
    */
+}
+
+void ZindoS::MallocTempMatricesCalcForce(double**** diatomicOverlapAOs1stDerivs, 
+                                         double**** diatomicTwoElecTwoCore1stDerivs,
+                                         double***  tmpDiaOverlapAOsInDiaFrame,       
+                                         double***  tmpDiaOverlapAOs1stDerivInDiaFrame,
+                                         double***  tmpRotMat,
+                                         double***  tmpRotMat1stDeriv,
+                                         double**** tmpRotMat1stDerivs,
+                                         double***  tmpRotatedDiatomicOverlap,
+                                         double***  tmpMatrix) const{
+   MallocerFreer::GetInstance()->Malloc<double>(diatomicOverlapAOs1stDerivs,        OrbitalType_end, OrbitalType_end, CartesianType_end);
+   MallocerFreer::GetInstance()->Malloc<double>(diatomicTwoElecTwoCore1stDerivs,    OrbitalType_end, OrbitalType_end, CartesianType_end);
+   MallocerFreer::GetInstance()->Malloc<double>(tmpDiaOverlapAOsInDiaFrame,         OrbitalType_end, OrbitalType_end);
+   MallocerFreer::GetInstance()->Malloc<double>(tmpDiaOverlapAOs1stDerivInDiaFrame, OrbitalType_end, OrbitalType_end);
+   MallocerFreer::GetInstance()->Malloc<double>(tmpRotMat,                          OrbitalType_end, OrbitalType_end);
+   MallocerFreer::GetInstance()->Malloc<double>(tmpRotMat1stDeriv,                  OrbitalType_end, OrbitalType_end);
+   MallocerFreer::GetInstance()->Malloc<double>(tmpRotMat1stDerivs,                 OrbitalType_end, OrbitalType_end, CartesianType_end);
+   MallocerFreer::GetInstance()->Malloc<double>(tmpRotatedDiatomicOverlap,          OrbitalType_end, OrbitalType_end);
+   MallocerFreer::GetInstance()->Malloc<double>(tmpMatrix,                          OrbitalType_end, OrbitalType_end);
+}
+
+void ZindoS::FreeTempMatricesCalcForce(double**** diatomicOverlapAOs1stDerivs, 
+                                       double**** diatomicTwoElecTwoCore1stDerivs,
+                                       double***  tmpDiaOverlapAOsInDiaFrame,       
+                                       double***  tmpDiaOverlapAOs1stDerivInDiaFrame,
+                                       double***  tmpRotMat,
+                                       double***  tmpRotMat1stDeriv,
+                                       double**** tmpRotMat1stDerivs,
+                                       double***  tmpRotatedDiatomicOverlap,
+                                       double***  tmpMatrix) const{
+   MallocerFreer::GetInstance()->Free<double>(diatomicOverlapAOs1stDerivs,        OrbitalType_end, OrbitalType_end, CartesianType_end);
+   MallocerFreer::GetInstance()->Free<double>(diatomicTwoElecTwoCore1stDerivs,    OrbitalType_end, OrbitalType_end, CartesianType_end);
+   MallocerFreer::GetInstance()->Free<double>(tmpDiaOverlapAOsInDiaFrame,         OrbitalType_end, OrbitalType_end);
+   MallocerFreer::GetInstance()->Free<double>(tmpDiaOverlapAOs1stDerivInDiaFrame, OrbitalType_end, OrbitalType_end);
+   MallocerFreer::GetInstance()->Free<double>(tmpRotMat,                          OrbitalType_end, OrbitalType_end);
+   MallocerFreer::GetInstance()->Free<double>(tmpRotMat1stDeriv,                  OrbitalType_end, OrbitalType_end);
+   MallocerFreer::GetInstance()->Free<double>(tmpRotMat1stDerivs,                 OrbitalType_end, OrbitalType_end, CartesianType_end);
+   MallocerFreer::GetInstance()->Free<double>(tmpRotatedDiatomicOverlap,          OrbitalType_end, OrbitalType_end);
+   MallocerFreer::GetInstance()->Free<double>(tmpMatrix,                          OrbitalType_end, OrbitalType_end);
 }
 
 void ZindoS::CalcForceExcitedStaticPart(double* force, 

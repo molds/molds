@@ -1,6 +1,5 @@
 //************************************************************************//
-// Copyright (C) 2011-2012 Mikiya Fujii                                   // 
-// Copyright (C) 2012-2012 Katsuhiko Nishimra                             // 
+// Copyright (C) 2011-2013 Mikiya Fujii                                   //
 //                                                                        // 
 // This file is part of MolDS.                                            // 
 //                                                                        // 
@@ -17,21 +16,26 @@
 // You should have received a copy of the GNU General Public License      // 
 // along with MolDS.  If not, see <http://www.gnu.org/licenses/>.         // 
 //************************************************************************//
-#ifndef INCLUDED_PRINTCONTROLLER
-#define INCLUDED_PRINTCONTROLLER
-namespace MolDS_base{
+#include<stdio.h>
+#include<sstream>
+#include<queue>
+#include<boost/format.hpp>
+#include"../Enums.h"
+#include"../Uncopyable.h"
+#include"../PrintController.h"
+#include"../MolDSException.h"
+#include"ThreadSafeQueue.h"
+using namespace std;
+//using namespace MolDS_base;
 
-class PrintController{
-public:
-   PrintController();
-   virtual ~PrintController();
-   bool CanOutputLogs() const               {return this->canOutputLogs;}
-   void SetCanOutputLogs(bool canOutputLogs){this->canOutputLogs = canOutputLogs;}
-protected:
-   void OutputLog(const boost::format& log) const{this->OutputLog(log.str());}
-   void OutputLog(std::string log) const;
-private:
-   bool canOutputLogs;
+namespace MolDS_base_containers{
+   int ThreadSafeQueue::Size(){
+     boost::mutex::scoped_lock lk(this->stateGuard);
+     return this->stdQueue.size();
+   }
+   
+   bool ThreadSafeQueue::Empty(){
+     boost::mutex::scoped_lock lk(this->stateGuard);
+     return this->stdQueue.empty();
+   }
 };
-}
-#endif

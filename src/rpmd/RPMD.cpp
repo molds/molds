@@ -27,13 +27,15 @@
 #include<boost/shared_ptr.hpp>
 #include<boost/random.hpp>
 #include<boost/format.hpp>
+#include"../base/Enums.h"
 #include"../base/Uncopyable.h"
-#include"../mpi/MpiProcess.h"
 #include"../base/PrintController.h"
 #include"../base/MolDSException.h"
-#include"../base/Enums.h"
+#include"../base/MallocerFreer.h"
+#include"../mpi/MpiProcess.h"
 #include"../base/EularAngle.h"
 #include"../base/Parameters.h"
+#include"../base/RealSphericalHarmonicsIndex.h"
 #include"../base/atoms/Atom.h"
 #include"../base/Molecule.h"
 #include"../base/ElectronicStructure.h"
@@ -95,7 +97,8 @@ void RPMD::UpdateMomenta(const vector<boost::shared_ptr<Molecule> >& molecularBe
    for(int b=0; b<numBeads; b++){
       int preB  = b==0 ? numBeads-1 : b-1;
       int postB = b==numBeads-1 ? 0 : b+1;
-      double** electronicForceMatrix = electronicStructureBeads[b]->GetForce(elecState);;
+      double const* const* electronicForceMatrix 
+         = electronicStructureBeads[b]->GetForce(elecState);;
       for(int a=0; a<numAtom; a++){
          Atom* atom      = molecularBeads[b]->GetAtom(a);
          Atom* preAtom   = molecularBeads[preB]->GetAtom(a);
@@ -124,6 +127,13 @@ void RPMD::UpdateCoordinates(const vector<boost::shared_ptr<Molecule> >& molecul
          }
       }
       molecularBeads[b]->CalcBasicsConfiguration();
+   }
+}
+
+void RPMD::BroadcastPhaseSpacepointsToAllProcesses(std::vector<boost::shared_ptr<MolDS_base::Molecule> >& molecularBeads, int root) const{
+   int numBeads = molecularBeads.size();
+   for(int b=0; b<numBeads; b++){
+      molecularBeads[b]->BroadcastPhaseSpacePointToAllProcesses(root);
    }
 }
 
@@ -191,6 +201,10 @@ void RPMD::DoRPMD(const Molecule& refferenceMolecule){
 
       // update momenta
       this->UpdateMomenta(molecularBeads, electronicStructureBeads, elecState, dt, temperature);
+
+      // Broadcast coordinates and momenta of beads to all processes
+      int root = MolDS_mpi::MpiProcess::GetInstance()->GetHeadRank();
+      this->BroadcastPhaseSpacepointsToAllProcesses(molecularBeads, root);
 
       // output energy
       this->OutputEnergies(molecularBeads, 
@@ -315,6 +329,7 @@ void RPMD::SetEnableTheoryTypes(){
 
    // excited state
    this->enableExcitedStateTheoryTypes.clear();
+   this->enableExcitedStateTheoryTypes.push_back(ZINDOS);
    this->enableExcitedStateTheoryTypes.push_back(MNDO);
    this->enableExcitedStateTheoryTypes.push_back(AM1);
    this->enableExcitedStateTheoryTypes.push_back(AM1D);

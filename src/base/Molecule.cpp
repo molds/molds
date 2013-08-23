@@ -24,18 +24,20 @@
 #include<string>
 #include<vector>
 #include<stdexcept>
+#include<omp.h>
 #include<boost/format.hpp>
 #include"config.h"
+#include"Enums.h"
 #include"Uncopyable.h"
-#include"../mpi/MpiProcess.h"
 #include"PrintController.h"
 #include"MolDSException.h"
-#include"../wrappers/Lapack.h"
-#include"Enums.h"
-#include"MathUtilities.h"
 #include"MallocerFreer.h"
+#include"../mpi/MpiProcess.h"
+#include"../wrappers/Lapack.h"
+#include"MathUtilities.h"
 #include"EularAngle.h"
 #include"Parameters.h"
+#include"RealSphericalHarmonicsIndex.h"
 #include"atoms/Atom.h"
 #include"factories/AtomFactory.h"
 #include"Molecule.h"
@@ -710,6 +712,88 @@ void Molecule::SynchronizePhaseSpacePointTo(const Molecule& ref){
       }
    }
    this->CalcBasicsConfiguration();
+}
+
+void Molecule::BroadcastConfigurationToAllProcesses(int root) const{
+   int numTransported = this->GetNumberAtoms()*CartesianType_end;
+   double* tmp=NULL;
+   try{
+      MolDS_base::MallocerFreer::GetInstance()->Malloc<double>(&tmp, numTransported);
+      for(int a=0; a<this->GetNumberAtoms(); a++){
+         Atom& atom = *this->GetAtom(a);
+         for(int i=0; i<CartesianType_end; i++){
+            tmp[a*CartesianType_end+i] = atom.GetXyz()[i];
+         }
+      }
+      MolDS_mpi::MpiProcess::GetInstance()->Broadcast(tmp, numTransported, root);
+      for(int a=0; a<this->GetNumberAtoms(); a++){
+         Atom& atom = *this->GetAtom(a);
+         for(int i=0; i<CartesianType_end; i++){
+            atom.GetXyz()[i] = tmp[a*CartesianType_end+i];
+         }
+      }
+   }
+   catch(MolDS_base::MolDSException ex){
+      MolDS_base::MallocerFreer::GetInstance()->Free<double>(&tmp, numTransported);
+      throw ex;
+   }
+   MolDS_base::MallocerFreer::GetInstance()->Free<double>(&tmp, numTransported);
+}
+
+void Molecule::BroadcastMomentaToAllProcesses(int root) const{
+   int numTransported = this->GetNumberAtoms()*CartesianType_end;
+   double* tmp=NULL;
+   try{
+      MolDS_base::MallocerFreer::GetInstance()->Malloc<double>(&tmp, numTransported);
+      for(int a=0; a<this->GetNumberAtoms(); a++){
+         Atom& atom = *this->GetAtom(a);
+         for(int i=0; i<CartesianType_end; i++){
+            tmp[a*CartesianType_end+i] = atom.GetPxyz()[i];
+         }
+      }
+      MolDS_mpi::MpiProcess::GetInstance()->Broadcast(tmp, numTransported, root);
+      for(int a=0; a<this->GetNumberAtoms(); a++){
+         Atom& atom = *this->GetAtom(a);
+         for(int i=0; i<CartesianType_end; i++){
+            atom.GetPxyz()[i] = tmp[a*CartesianType_end+i];
+         }
+      }
+   }
+   catch(MolDS_base::MolDSException ex){
+      MolDS_base::MallocerFreer::GetInstance()->Free<double>(&tmp, numTransported);
+      throw ex;
+   }
+   MolDS_base::MallocerFreer::GetInstance()->Free<double>(&tmp, numTransported);
+}
+
+void Molecule::BroadcastPhaseSpacePointToAllProcesses(int root) const{
+   int numTransported = 2*this->GetNumberAtoms()*CartesianType_end;
+   double* tmp=NULL;
+   try{
+      MolDS_base::MallocerFreer::GetInstance()->Malloc<double>(&tmp, numTransported);
+      for(int a=0; a<this->GetNumberAtoms(); a++){
+         Atom& atom = *this->GetAtom(a);
+         for(int i=0; i<CartesianType_end; i++){
+            int k = a*CartesianType_end+i;
+            tmp[2*k  ] = atom.GetXyz() [i];
+            tmp[2*k+1] = atom.GetPxyz()[i];
+         }
+      }
+      MolDS_mpi::MpiProcess::GetInstance()->Broadcast(tmp, numTransported, root);
+      for(int a=0; a<this->GetNumberAtoms(); a++){
+         Atom& atom = *this->GetAtom(a);
+         for(int i=0; i<CartesianType_end; i++){
+            int k = a*CartesianType_end+i;
+            atom.GetXyz() [i] = tmp[2*k  ];
+            atom.GetPxyz()[i] = tmp[2*k+1];
+         }
+      }
+   }
+   catch(MolDS_base::MolDSException ex){
+      MolDS_base::MallocerFreer::GetInstance()->Free<double>(&tmp, numTransported);
+      throw ex;
+   }
+   MolDS_base::MallocerFreer::GetInstance()->Free<double>(&tmp, numTransported);
 }
 
 }

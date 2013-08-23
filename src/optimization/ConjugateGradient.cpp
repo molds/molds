@@ -27,14 +27,15 @@
 #include<stdexcept>
 #include<boost/shared_ptr.hpp>
 #include<boost/format.hpp>
+#include"../base/Enums.h"
 #include"../base/Uncopyable.h"
-#include"../mpi/MpiProcess.h"
 #include"../base/PrintController.h"
 #include"../base/MolDSException.h"
-#include"../base/Enums.h"
 #include"../base/MallocerFreer.h"
+#include"../mpi/MpiProcess.h"
 #include"../base/EularAngle.h"
 #include"../base/Parameters.h"
+#include"../base/RealSphericalHarmonicsIndex.h"
 #include"../base/atoms/Atom.h"
 #include"../base/Molecule.h"
 #include"../base/ElectronicStructure.h"
@@ -74,7 +75,7 @@ void ConjugateGradient::SearchMinimum(boost::shared_ptr<ElectronicStructure> ele
    double rmsGradientThreshold = Parameters::GetInstance()->GetRmsGradientOptimization();
    double lineSearchCurrentEnergy = 0.0;
    double lineSearchInitialEnergy = 0.0;
-   double** matrixForce = NULL;
+   double const* const* matrixForce = NULL;
    double** oldMatrixForce = NULL;
    double** matrixSearchDirection = NULL;
 
@@ -127,7 +128,7 @@ void ConjugateGradient::SearchMinimum(boost::shared_ptr<ElectronicStructure> ele
    *lineSearchedEnergy = lineSearchCurrentEnergy;
 }
 
-void ConjugateGradient::UpdateSearchDirection(double*** matrixForce, 
+void ConjugateGradient::UpdateSearchDirection(double const* const** matrixForce, 
                                               double** oldMatrixForce, 
                                               double** matrixSearchDirection,
                                               boost::shared_ptr<ElectronicStructure> electronicStructure, 

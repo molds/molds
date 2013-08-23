@@ -27,10 +27,10 @@
 #include<boost/format.hpp>
 #include"config.h"
 #include"../base/Uncopyable.h"
-#include"../mpi/MpiProcess.h"
 #include"../base/PrintController.h"
 #include"../base/MolDSException.h"
 #include"../base/MallocerFreer.h"
+#include"../mpi/MpiProcess.h"
 #include"Blas.h"
 
 #ifdef HAVE_MKL_H
@@ -311,10 +311,9 @@ void Blas::Dgemm(bool isColumnMajorMatrixA,
 #else
    tmpC = (double*)malloc( sizeof(double)*m*n);
 #endif
-   molds_blas_int ldc;
+   molds_blas_int ldc = m;
    if(isColumnMajorMatrixC){
       this->Dcopy(m*n, &matrixC[0][0], tmpC);
-      ldc = m;
    }
    else{
       for(molds_blas_int i=0; i<m; i++){
@@ -322,7 +321,6 @@ void Blas::Dgemm(bool isColumnMajorMatrixA,
             tmpC[i+j*m] = matrixC[i][j];
          }
       }
-      ldc = n;
    }
 
    //call blas

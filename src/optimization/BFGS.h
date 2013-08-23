@@ -27,7 +27,7 @@ public:
    ~BFGS();
 protected:
    void SetMessages();
-private:
+
    std::string errorMessageNaNInRFOStep;
 
    std::string messageStartBFGSStep;
@@ -44,15 +44,21 @@ private:
    std::string formatTrustRadiusIs;
    std::string formatIncreaseScalingFactor;
 
+private:
    virtual void SearchMinimum(boost::shared_ptr<MolDS_base::ElectronicStructure> electronicStructure,
                               MolDS_base::Molecule& molecule,
                               double* lineSearchedEnergy,
                               bool* obainesOptimizedStructure) const;
+
+protected:
    void CalcRFOStep(double* vectorStep,
                     double const* const* matrixHessian,
                     double const* vectorForce,
                     const double maxNormStep,
                     const int dimension) const;
+   void CalcDisplacement(double      *      *& matrixDisplacement,
+                         double const* const*  matrixOldCoordinates,
+                         const MolDS_base::Molecule& molecule)const;
    void UpdateHessian(double**      matrixHessian,
                       const int     dimension,
                       double const* vectorForce,
@@ -60,6 +66,18 @@ private:
                       double const* vectorDisplacement) const;
    void ShiftHessianRedundantMode(double** matrixHessian,
                                   const MolDS_base::Molecule& molecule) const;
+   double ApproximateEnergyChange(int dimension,
+                                  double const* const* matrixHessian,
+                                  double const* vectorForce,
+                                  double const* vectorStep) const;
+   void UpdateTrustRadius(double &trustRadius,
+                          double approximateEnergyChange,
+                          double currentEnergy,
+                          double initialEnergy)const;
+   void StoreMolecularGeometry(double **& matrixCoordinates,     
+                               const MolDS_base::Molecule& molecule)const;
+   void RollbackMolecularGeometry(MolDS_base::Molecule& molecule,
+                                  double const* const* matrixOldCoordinates) const;
 };
 
 }

@@ -29,17 +29,21 @@
 #include<omp.h>
 #include<boost/format.hpp>
 #include"config.h"
+#include"../base/Enums.h"
 #include"../base/Uncopyable.h"
-#include"../mpi/MpiProcess.h"
 #include"../base/PrintController.h"
 #include"../base/MolDSException.h"
+#include"../base/MallocerFreer.h"
+#include"../base/containers/ThreadSafeQueue.h"
+#include"../mpi/MpiProcess.h"
+#include"../mpi/AsyncCommunicator.h"
 #include"../wrappers/Blas.h"
 #include"../wrappers/Lapack.h"
-#include"../base/Enums.h"
 #include"../base/MathUtilities.h"
 #include"../base/MallocerFreer.h"
 #include"../base/EularAngle.h"
 #include"../base/Parameters.h"
+#include"../base/RealSphericalHarmonicsIndex.h"
 #include"../base/atoms/Atom.h"
 #include"../base/atoms/Hatom.h"
 #include"../base/atoms/Liatom.h"
@@ -49,7 +53,6 @@
 #include"../base/atoms/Satom.h"
 #include"../base/Molecule.h"
 #include"../base/GTOExpansionSTO.h"
-#include"../base/RealSphericalHarmonicsIndex.h"
 #include"../base/loggers/MOLogger.h"
 #include"../base/ElectronicStructure.h"
 #include"Cndo2.h"
@@ -179,6 +182,10 @@ void Cndo2::SetMessages(){
       = "Error in cndo::Cndo2::RotateDiatmicOverlapAOsToSpaceFrame diatomicOverlapAOs is NULL.\n";
    this->errorMessageRotDiaOverlapAOsToSpaceFrameNullRotMatrix 
       = "Error in cndo::Cndo2::RotateDiatmicOverlapAOsToSpaceFrame: rotatingMatrix is NULL.\n";
+   this->errorMessageRotDiaOverlapAOsToSpaceFrameNullTmpOldDiaMatrix 
+      = "Error in cndo::Cndo2::RotateDiatmicOverlapAOsToSpaceFrame: tmpOldDiatomicOverlapAOs is NULL.\n";
+   this->errorMessageRotDiaOverlapAOsToSpaceFrameNullTmpMatrixBC
+      = "Error in cndo::Cndo2::RotateDiatmicOverlapAOsToSpaceFrame: tmpMatrixBC is NULL.\n";
    this->errorMessageSetOverlapAOsElementNullDiaMatrix 
       = "Error in cndo::Cndo2::SetOverlapAOsElement: diatomicOverlapAOs is NULL.\n";
    this->errorMessageCalcElectronicTransitionDipoleMomentBadState
@@ -354,7 +361,7 @@ double Cndo2::GetDiatomCoreRepulsion1stDerivative(int indexAtomA, int indexAtomB
    double distance = this->molecule->GetDistanceAtoms(indexAtomA, indexAtomB);
    value = atomA.GetCoreCharge()*atomB.GetCoreCharge();
    value *= (atomA.GetXyz()[axisA] - atomB.GetXyz()[axisA])/distance;
-   value *= -1.0/pow(distance,2.0);
+   value *= -1.0/(distance*distance);
    return value;
 }
 
@@ -391,7 +398,8 @@ double Cndo2::GetVdwDampingValue1stDerivative(double vdWDistance, double distanc
    double dampingFactor = Parameters::GetInstance()->GetVdWDampingFactorSCF();
    return (dampingFactor/vdWDistance)
          *exp(-1.0*dampingFactor*(distance/vdWDistance - 1.0))
-         *pow(1.0+exp(-1.0*dampingFactor*(distance/vdWDistance - 1.0)),-2.0);
+         /(1.0+exp(-1.0*dampingFactor*(distance/vdWDistance - 1.0)))
+         /(1.0+exp(-1.0*dampingFactor*(distance/vdWDistance - 1.0)));
 }
 
 // See damping function in (2) in [G_2004] ((11) in [G_2006])
@@ -400,8 +408,8 @@ double Cndo2::GetVdwDampingValue2ndDerivative(double vdWDistance, double distanc
    double exponent = -1.0*dampingFactor*(distance/vdWDistance - 1.0);
    double pre = dampingFactor/vdWDistance;
    double dominator = 1.0+exp(exponent);
-   return 2.0*pow(dominator,-3.0)*pre*pre*exp(2.0*exponent) 
-         -    pow(dominator,-2.0)*pre*pre*exp(    exponent);
+   return 2.0*pre*pre*exp(2.0*exponent)/(dominator*dominator*dominator) 
+         -    pre*pre*exp(    exponent)/(dominator*dominator);
 }
 
 // See (2) in [G_2004] ((11) in [G_2006])
@@ -414,7 +422,8 @@ double Cndo2::GetDiatomVdWCorrectionEnergy(int indexAtomA, int indexAtomB) const
                            /(atomA.GetVdWCoefficient()+atomB.GetVdWCoefficient());
    double damping = this->GetVdwDampingValue(vdWDistance, distance);
    double scalingFactor = Parameters::GetInstance()->GetVdWScalingFactorSCF();
-   return -1.0*scalingFactor*vdWCoefficients*pow(distance,-6.0)*damping;
+   return -1.0*scalingFactor*vdWCoefficients*damping
+         /(distance*distance*distance*distance*distance*distance);
 }
 
 // First derivative of the vdW correction related to the coordinate of atom A.
@@ -431,7 +440,9 @@ double Cndo2::GetDiatomVdWCorrection1stDerivative(int indexAtomA, int indexAtomB
    double damping = this->GetVdwDampingValue(vdWDistance, distance);
    double damping1stDerivative = this->GetVdwDampingValue1stDerivative(vdWDistance, distance);
    double value=0.0;
-   value += 6.0*pow(distance,-7.0)*damping - pow(distance,-6.0)*damping1stDerivative;
+   double tmp = distance*distance*distance*distance*distance*distance;
+   value += 6.0*damping/(tmp*distance) 
+           -damping1stDerivative/tmp;
    value *= vdWCoefficients;
    value *= Parameters::GetInstance()->GetVdWScalingFactorSCF();
    value *= (atomA.GetXyz()[axisA] - atomB.GetXyz()[axisA])/distance;
@@ -459,24 +470,25 @@ double Cndo2::GetDiatomVdWCorrection2ndDerivative(int indexAtomA,
    double damping1stDerivative = this->GetVdwDampingValue1stDerivative(vdWDistance, distance);
    double damping2ndDerivative = this->GetVdwDampingValue2ndDerivative(vdWDistance, distance);
 
-   double temp1 = -6.0*pow(distance,-7.0)*damping 
-                  +    pow(distance,-6.0)*damping1stDerivative;
-   double temp2 = 42.0*pow(distance,-8.0)*damping 
-                 -12.0*pow(distance,-7.0)*damping1stDerivative
-                 +     pow(distance,-6.0)*damping2ndDerivative;
+   double dis6 = distance*distance*distance*distance*distance*distance;
+   double tmp1 = -6.0*damping             /(dis6*distance) 
+                 +    damping1stDerivative/dis6;
+   double tmp2 = 42.0*damping             /(dis6*distance*distance) 
+                -12.0*damping1stDerivative/(dis6*distance)
+                +     damping2ndDerivative/dis6;
 
    double pre1=0.0;
    double pre2=0.0;
    if(axisA1 != axisA2){
-      pre1 = -dCartesian1*dCartesian2/pow(distance,3.0);
-      pre2 =  dCartesian1*dCartesian2/pow(distance,2.0);
+      pre1 = -dCartesian1*dCartesian2/(distance*distance*distance);
+      pre2 =  dCartesian1*dCartesian2/(distance*distance);
    }
    else{
-      pre1 = 1.0/distance - dCartesian1*dCartesian1/pow(distance,3.0);
-      pre2 = pow(dCartesian1/distance,2.0);
+      pre1 = 1.0/distance - dCartesian1*dCartesian1/(distance*distance*distance);
+      pre2 = (dCartesian1*dCartesian1)/(distance*distance);
    }
 
-   double value= pre1*temp1 + pre2*temp2;
+   double value= pre1*tmp1 + pre2*tmp2;
    value *= -1.0*vdWScalingFacotor*vdWCoefficients;
    return value;
 }
@@ -710,12 +722,12 @@ double Cndo2::GetVdWCorrectionEnergy() const{
    return this->vdWCorrectionEnergy;
 }
 
-double*** Cndo2::GetForce(const vector<int>& elecStates){
+double const* const* const* Cndo2::GetForce(const vector<int>& elecStates){
    this->CalcForce(elecStates);
    return this->matrixForce;
 }
 
-double** Cndo2::GetForce(int elecState){
+double const* const* Cndo2::GetForce(int elecState){
    vector<int> elecStates;
    elecStates.push_back(elecState);
    this->CalcForce(elecStates);
@@ -1328,7 +1340,8 @@ bool Cndo2::SatisfyConvergenceCriterion(double const* const * oldOrbitalElectron
    for(int i=0; i<numberAOs; i++){
       try{
          for(int j=0; j<numberAOs; j++){
-            change += pow(oldOrbitalElectronPopulation[i][j] - orbitalElectronPopulation[i][j], 2.0);
+            change += (oldOrbitalElectronPopulation[i][j] - orbitalElectronPopulation[i][j])
+                     *(oldOrbitalElectronPopulation[i][j] - orbitalElectronPopulation[i][j]);
          }
       }
       catch(MolDSException ex){
@@ -1374,67 +1387,100 @@ void Cndo2::CalcFockMatrix(double** fockMatrix,
                            double const* atomicElectronPopulation,
                            double const* const* const* const* const* const* twoElecTwoCore, 
                            bool isGuess) const{
-   MallocerFreer::GetInstance()->Initialize<double>(fockMatrix, 
-                                                    molecule.GetTotalNumberAOs(), 
-                                                    molecule.GetTotalNumberAOs());
-   int totalNumberAtoms=molecule.GetNumberAtoms();
-   stringstream ompErrors;
-#pragma omp parallel for schedule(auto) 
+   int totalNumberAOs   = molecule.GetTotalNumberAOs();
+   int totalNumberAtoms = molecule.GetNumberAtoms();
+
+   // MPI setting of each rank
+   int mpiRank       = MolDS_mpi::MpiProcess::GetInstance()->GetRank();
+   int mpiSize       = MolDS_mpi::MpiProcess::GetInstance()->GetSize();
+   int mpiHeadRank   = MolDS_mpi::MpiProcess::GetInstance()->GetHeadRank();
+   int mPassingTimes = MolDS_mpi::MpiProcess::GetInstance()->GetMessagePassingTimes(totalNumberAOs);
+   MolDS_mpi::AsyncCommunicator asyncCommunicator;
+   boost::thread communicationThread( boost::bind(&MolDS_mpi::AsyncCommunicator::Run<double>, 
+                                                  &asyncCommunicator, 
+                                                  mPassingTimes) );
+
+   MallocerFreer::GetInstance()->Initialize<double>(fockMatrix, totalNumberAOs, totalNumberAOs);
    for(int A=0; A<totalNumberAtoms; A++){
-      try{
-        const Atom& atomA = *molecule.GetAtom(A);
-         int firstAOIndexA = atomA.GetFirstAOIndex();
-         int lastAOIndexA  = atomA.GetLastAOIndex();
-         for(int B=A; B<totalNumberAtoms; B++){
-            const Atom& atomB = *molecule.GetAtom(B);
-            int firstAOIndexB = atomB.GetFirstAOIndex();
-            int lastAOIndexB  = atomB.GetLastAOIndex();
-            for(int mu=firstAOIndexA; mu<=lastAOIndexA; mu++){
-               for(int nu=firstAOIndexB; nu<=lastAOIndexB; nu++){
-                  if(mu == nu){
-                     // diagonal part
-                     fockMatrix[mu][mu] = this->GetFockDiagElement(atomA, 
-                                                                   A, 
-                                                                   mu, 
-                                                                   molecule, 
-                                                                   gammaAB,
-                                                                   orbitalElectronPopulation, 
-                                                                   atomicElectronPopulation,
-                                                                   twoElecTwoCore,
-                                                                   isGuess);
-                  }
-                  else if(mu < nu){
-                     // upper right part
-                     fockMatrix[mu][nu] = this->GetFockOffDiagElement(atomA, 
-                                                                      atomB,
+      const Atom& atomA = *molecule.GetAtom(A);
+      int firstAOIndexA = atomA.GetFirstAOIndex();
+      int lastAOIndexA  = atomA.GetLastAOIndex();
+      for(int mu=firstAOIndexA; mu<=lastAOIndexA; mu++){
+         int calcRank = mu%mpiSize;
+         if(mpiRank == calcRank){
+            stringstream ompErrors;
+#pragma omp parallel for schedule(auto)
+            for(int B=A; B<totalNumberAtoms; B++){
+               try{
+                  const Atom& atomB = *molecule.GetAtom(B);
+                  int firstAOIndexB = atomB.GetFirstAOIndex();
+                  int lastAOIndexB  = atomB.GetLastAOIndex();
+                  for(int nu=firstAOIndexB; nu<=lastAOIndexB; nu++){
+                     if(mu == nu){
+                        // diagonal part
+                        fockMatrix[mu][mu] = this->GetFockDiagElement(atomA, 
                                                                       A, 
-                                                                      B, 
                                                                       mu, 
-                                                                      nu, 
                                                                       molecule, 
                                                                       gammaAB,
-                                                                      overlapAOs,
                                                                       orbitalElectronPopulation, 
+                                                                      atomicElectronPopulation,
                                                                       twoElecTwoCore,
                                                                       isGuess);
-                  }
-                  else{
-                     // lower left part (not calculated)
-                  }
-
-               }
-            }
-         }
-      }
-      catch(MolDSException ex){
+                     }
+                     else if(mu < nu){
+                        // upper right part
+                        fockMatrix[mu][nu] = this->GetFockOffDiagElement(atomA, 
+                                                                         atomB,
+                                                                         A, 
+                                                                         B, 
+                                                                         mu, 
+                                                                         nu, 
+                                                                         molecule, 
+                                                                         gammaAB,
+                                                                         overlapAOs,
+                                                                         orbitalElectronPopulation, 
+                                                                         twoElecTwoCore,
+                                                                         isGuess);
+                     }
+                     else{
+                        // lower left part (not calculated)
+                     }
+                  }  // end of loop nu
+               }  // end of try
+               catch(MolDSException ex){
 #pragma omp critical
-         ex.Serialize(ompErrors);
-      }
-   }
-   // Exception throwing for omp-region
-   if(!ompErrors.str().empty()){
-      throw MolDSException::Deserialize(ompErrors);
-   }
+                  ex.Serialize(ompErrors);
+               }
+            }  // end of loop B parallelized with openMP
+            // Exception throwing for omp-region
+            if(!ompErrors.str().empty()){
+               throw MolDSException::Deserialize(ompErrors);
+            }
+         }  // end of if(mpiRank == calcRank) 
+
+         // set data to gater in mpiHeadRank with asynchronous MPI 
+         int tag = mu;
+         int source = calcRank;
+         int dest = mpiHeadRank;
+         if(mpiRank == mpiHeadRank && mpiRank != calcRank){
+            asyncCommunicator.SetRecvedVector(&fockMatrix[mu][mu], 
+                                              totalNumberAOs-mu, 
+                                              source,
+                                              tag);
+         }
+         if(mpiRank != mpiHeadRank && mpiRank == calcRank){
+            asyncCommunicator.SetSentVector(&fockMatrix[mu][mu], 
+                                            totalNumberAOs-mu, 
+                                            dest,
+                                            tag);
+         }
+      }  // end of loop mu parallelized with MPI
+   }  // end of loop A 
+   // Delete the communication thread.
+   communicationThread.join();
+   MolDS_mpi::MpiProcess::GetInstance()->Broadcast(&fockMatrix[0][0], totalNumberAOs*totalNumberAOs, mpiHeadRank);
+
    /*  
    this->OutputLog("fock matrix\n");
    for(int o=0; o<this->molecule.GetTotalNumberAOs(); o++){
@@ -1562,73 +1608,107 @@ void Cndo2::CalcAtomicElectronPopulation(double* atomicElectronPopulation,
 // calculate gammaAB matrix. (B.56) and (B.62) in J. A. Pople book.
 void Cndo2::CalcGammaAB(double** gammaAB, const Molecule& molecule) const{
    int totalAtomNumber = molecule.GetNumberAtoms();
-   stringstream ompErrors;
-#pragma omp parallel for schedule(auto) 
+
+   // MPI setting of each rank
+   int mpiRank       = MolDS_mpi::MpiProcess::GetInstance()->GetRank();
+   int mpiSize       = MolDS_mpi::MpiProcess::GetInstance()->GetSize();
+   int mpiHeadRank   = MolDS_mpi::MpiProcess::GetInstance()->GetHeadRank();
+   int mPassingTimes = MolDS_mpi::MpiProcess::GetInstance()->GetMessagePassingTimes(totalAtomNumber);
+   MolDS_mpi::AsyncCommunicator asyncCommunicator;
+   boost::thread communicationThread( boost::bind(&MolDS_mpi::AsyncCommunicator::Run<double>, 
+                                                  &asyncCommunicator, 
+                                                  mPassingTimes) );
+
+   // This loop (A) is parallelized by MPI
    for(int A=0; A<totalAtomNumber; A++){
-      try{
+      int calcRank = A%mpiSize;
+      if(mpiRank == calcRank){
          const Atom& atomA = *molecule.GetAtom(A);
          int na = atomA.GetValenceShellType() + 1;
          double orbitalExponentA = atomA.GetOrbitalExponent(
                                          atomA.GetValenceShellType(), s, this->theory);
+         stringstream ompErrors;
+#pragma omp parallel for schedule(auto)
          for(int B=A; B<totalAtomNumber; B++){
-            const Atom& atomB = *molecule.GetAtom(B);
-            int nb = atomB.GetValenceShellType() + 1;
-            double orbitalExponentB = atomB.GetOrbitalExponent(
-                                            atomB.GetValenceShellType(), s, this->theory);
+            try{
+               const Atom& atomB = *molecule.GetAtom(B);
+               int nb = atomB.GetValenceShellType() + 1;
+               double orbitalExponentB = atomB.GetOrbitalExponent(
+                                               atomB.GetValenceShellType(), s, this->theory);
 
-            double value = 0.0;
-            double R = molecule.GetDistanceAtoms(A, B);
-            double temp = 0.0;
-            if(R>0.0){
-               // (B.56)
-               value = pow(0.5*R, 2.0*na);
-               value *= this->GetReducedOverlapAOs(2*na-1, 0, 2.0*orbitalExponentA*R, 0);
+               double value = 0.0;
+               double R = molecule.GetDistanceAtoms(A, B);
+               double temp = 0.0;
+               if(R>0.0){
+                  // (B.56)
+                  value = pow(0.5*R, 2.0*na);
+                  value *= this->GetReducedOverlapAOs(2*na-1, 0, 2.0*orbitalExponentA*R, 0);
 
-               for(int l=1; l<=2*nb; l++){
-                  temp = 0.0;
-                  temp = l;
-                  temp *= pow(2.0*orbitalExponentB, 2*nb-l);
-                  temp /= Factorial(2*nb-l)*2.0*nb;
-                  temp *= pow(0.5*R, 2.0*nb-l+2.0*na);
-                  temp *= this->GetReducedOverlapAOs(2*na-1, 
-                                                     2*nb-l, 
-                                                     2.0*orbitalExponentA*R, 
-                                                     2.0*orbitalExponentB*R);
-                  value -= temp;
+                  for(int l=1; l<=2*nb; l++){
+                     temp = 0.0;
+                     temp = l;
+                     temp *= pow(2.0*orbitalExponentB, 2*nb-l);
+                     temp /= Factorial(2*nb-l)*2.0*nb;
+                     temp *= pow(0.5*R, 2.0*nb-l+2.0*na);
+                     temp *= this->GetReducedOverlapAOs(2*na-1, 
+                                                        2*nb-l, 
+                                                        2.0*orbitalExponentA*R, 
+                                                        2.0*orbitalExponentB*R);
+                     value -= temp;
+                  }
+
+                  value *= pow(2.0*orbitalExponentA, 2.0*na+1.0);
+                  value /= Factorial(2*na);
                }
+               else{
+                  // (B.62)
+                  value =  Factorial(2*na-1);
+                  value /= pow(2.0*orbitalExponentA, 2.0*na);
 
-               value *= pow(2.0*orbitalExponentA, 2.0*na+1.0);
-               value /= Factorial(2*na);
-            }
-            else{
-               // (B.62)
-               value =  Factorial(2*na-1);
-               value /= pow(2.0*orbitalExponentA, 2.0*na);
-
-               for(int l=1; l<=2*nb; l++){
-                  temp = l;
-                  temp *= pow(2.0*orbitalExponentB, 2*nb-l);
-                  temp *= Factorial(2*na+2*nb-l-1);
-                  temp /= Factorial(2*nb-l);
-                  temp /= 2.0*nb;
-                  temp /= pow( 2.0*orbitalExponentA + 2.0*orbitalExponentB, 2.0*(na+nb)-l );
-                  value -= temp;
+                  for(int l=1; l<=2*nb; l++){
+                     temp = l;
+                     temp *= pow(2.0*orbitalExponentB, 2*nb-l);
+                     temp *= Factorial(2*na+2*nb-l-1);
+                     temp /= Factorial(2*nb-l);
+                     temp /= 2.0*nb;
+                     temp /= pow( 2.0*orbitalExponentA + 2.0*orbitalExponentB, 2.0*(na+nb)-l );
+                     value -= temp;
+                  }
+                  value *= pow(2.0*orbitalExponentA, 2.0*na+1);
+                  value /= Factorial(2*na);
                }
-               value *= pow(2.0*orbitalExponentA, 2.0*na+1);
-               value /= Factorial(2*na);
+               gammaAB[A][B] = value;
             }
-            gammaAB[A][B] = value;
+            catch(MolDSException ex){
+            #pragma omp critical
+               ex.Serialize(ompErrors);
+            }
+         }  // end of loop B parallelized by openMP
+         // Exception throwing for omp-region
+         if(!ompErrors.str().empty()){
+            throw MolDSException::Deserialize(ompErrors);
          }
+      }  //  end of if(mpiRank==calcRank)
+
+      // set data to gater in mpiHeadRank with asynchronous MPI 
+      int tag = A;
+      int source = calcRank;
+      int dest = mpiHeadRank;
+      if(mpiRank == mpiHeadRank && mpiRank != calcRank){
+         asyncCommunicator.SetRecvedVector(&gammaAB[A][A], 
+                                           totalAtomNumber-A, 
+                                           source,
+                                           tag);
       }
-      catch(MolDSException ex){
-#pragma omp critical
-         ex.Serialize(ompErrors);
+      if(mpiRank != mpiHeadRank && mpiRank == calcRank){
+         asyncCommunicator.SetSentVector(&gammaAB[A][A], 
+                                         totalAtomNumber-A, 
+                                         dest,
+                                         tag);
       }
-   }
-   // Exception throwing for omp-region
-   if(!ompErrors.str().empty()){
-      throw MolDSException::Deserialize(ompErrors);
-   }
+   }  // end of loop A prallelized by MPI
+   communicationThread.join();
+   MolDS_mpi::MpiProcess::GetInstance()->Broadcast(&gammaAB[0][0], totalAtomNumber*totalAtomNumber, mpiHeadRank);
 
 #pragma omp parallel for schedule(auto)
    for(int A=0; A<totalAtomNumber; A++){
@@ -1727,40 +1807,130 @@ void Cndo2::CalcElectronicTransitionDipoleMoment(double* transitionDipoleMoment,
 void Cndo2::CalcCartesianMatrixByGTOExpansion(double*** cartesianMatrix, 
                                               const Molecule& molecule, 
                                               STOnGType stonG) const{
-   int totalAONumber = molecule.GetTotalNumberAOs();
+   int totalAONumber   = molecule.GetTotalNumberAOs();
    int totalAtomNumber = molecule.GetNumberAtoms();
 
-   stringstream ompErrors;
-#pragma omp parallel for schedule(auto) 
+   // MPI setting of each rank
+   int mpiRank       = MolDS_mpi::MpiProcess::GetInstance()->GetRank();
+   int mpiSize       = MolDS_mpi::MpiProcess::GetInstance()->GetSize();
+   int mpiHeadRank   = MolDS_mpi::MpiProcess::GetInstance()->GetHeadRank();
+   int mPassingTimes = MolDS_mpi::MpiProcess::GetInstance()->GetMessagePassingTimes(totalAtomNumber);
+   mPassingTimes    *= CartesianType_end;
+   MolDS_mpi::AsyncCommunicator asyncCommunicator;
+   boost::thread communicationThread( boost::bind(&MolDS_mpi::AsyncCommunicator::Run<double>, 
+                                                  &asyncCommunicator, 
+                                                  mPassingTimes) );
+
+   // This loop (A and mu) is parallelized by MPI
    for(int A=0; A<totalAtomNumber; A++){
-      try{
-         const Atom& atomA = *molecule.GetAtom(A);
-         int firstAOIndexAtomA = atomA.GetFirstAOIndex();
-         for(int B=0; B<totalAtomNumber; B++){
-            const Atom& atomB = *molecule.GetAtom(B);
-            int firstAOIndexAtomB = atomB.GetFirstAOIndex();
-            for(int a=0; a<atomA.GetValenceSize(); a++){
-               for(int b=0; b<atomB.GetValenceSize(); b++){
-                  int mu = firstAOIndexAtomA + a;      
-                  int nu = firstAOIndexAtomB + b;      
-                  this->CalcCartesianMatrixElementsByGTOExpansion(cartesianMatrix[XAxis][mu][nu], 
-                                                                  cartesianMatrix[YAxis][mu][nu],
-                                                                  cartesianMatrix[ZAxis][mu][nu],
-                                                                  atomA, a, atomB, b, stonG);
+      const Atom& atomA  = *molecule.GetAtom(A);
+      int firstAOIndexA  = atomA.GetFirstAOIndex();
+      int numValenceAOsA = atomA.GetValenceSize();
+      int calcRank = A%mpiSize;
+      if(mpiRank == calcRank){
+         for(int a=0; a<numValenceAOsA; a++){
+            int mu = firstAOIndexA + a;      
+            stringstream ompErrors;
+#pragma omp parallel for schedule(auto)
+            for(int B=0; B<totalAtomNumber; B++){
+               try{
+                  const Atom& atomB  = *molecule.GetAtom(B);
+                  int firstAOIndexB  = atomB.GetFirstAOIndex();
+                  int numValenceAOsB = atomB.GetValenceSize();
+                  for(int b=0; b<numValenceAOsB; b++){
+                     int nu = firstAOIndexB + b;      
+                     this->CalcCartesianMatrixElementsByGTOExpansion(cartesianMatrix[XAxis][mu][nu], 
+                                                                     cartesianMatrix[YAxis][mu][nu],
+                                                                     cartesianMatrix[ZAxis][mu][nu],
+                                                                     atomA, a, atomB, b, stonG);
+                  }
                }
-            }
-            
-         }
-      }
-      catch(MolDSException ex){
+               catch(MolDSException ex){
 #pragma omp critical
-         ex.Serialize(ompErrors);
+                  ex.Serialize(ompErrors);
+               }  
+            }// end of loop for int B with openMP
+            // Exception throwing for omp-region
+            if(!ompErrors.str().empty()){
+               throw MolDSException::Deserialize(ompErrors);
+            }
+         } 
+      } // end lof if(mpiRank == calcRank)
+
+      // set data to gater in mpiHeadRank with asynchronous MPI 
+      int tagX = A* CartesianType_end + XAxis;
+      int tagY = A* CartesianType_end + YAxis;
+      int tagZ = A* CartesianType_end + ZAxis;
+      int source = calcRank;
+      int dest = mpiHeadRank;
+      if(mpiRank == mpiHeadRank && mpiRank != calcRank){
+         asyncCommunicator.SetRecvedVector(&cartesianMatrix[XAxis][firstAOIndexA][0], 
+                                           numValenceAOsA*totalAONumber, 
+                                           source,
+                                           tagX);
+         asyncCommunicator.SetRecvedVector(&cartesianMatrix[YAxis][firstAOIndexA][0], 
+                                           numValenceAOsA*totalAONumber, 
+                                           source,
+                                           tagY);
+         asyncCommunicator.SetRecvedVector(&cartesianMatrix[ZAxis][firstAOIndexA][0], 
+                                           numValenceAOsA*totalAONumber, 
+                                           source,
+                                           tagZ);
+      }
+      if(mpiRank != mpiHeadRank && mpiRank == calcRank){
+         asyncCommunicator.SetSentVector(&cartesianMatrix[XAxis][firstAOIndexA][0], 
+                                         numValenceAOsA*totalAONumber, 
+                                         dest,
+                                         tagX);
+         asyncCommunicator.SetSentVector(&cartesianMatrix[YAxis][firstAOIndexA][0], 
+                                         numValenceAOsA*totalAONumber, 
+                                         dest,
+                                         tagY);
+         asyncCommunicator.SetSentVector(&cartesianMatrix[ZAxis][firstAOIndexA][0], 
+                                         numValenceAOsA*totalAONumber, 
+                                         dest,
+                                         tagZ);
+      }
+   } // end of loop for int A with MPI
+   // Delete the communication thread.
+   communicationThread.join();
+   MolDS_mpi::MpiProcess::GetInstance()->Broadcast(&cartesianMatrix[0][0][0], CartesianType_end*totalAONumber*totalAONumber, mpiHeadRank);
+
+/*
+   // communication to collect all matrix data on head-rank
+   int mpiHeadRank = MolDS_mpi::MpiProcess::GetInstance()->GetHeadRank();
+   if(mpiRank == mpiHeadRank){
+      // receive the matrix data from other ranks
+      for(int mu=0; mu<totalAONumber; mu++){
+         if(mu%mpiSize == mpiHeadRank){continue;}
+         int source  = mu%mpiSize;
+         int tagBase = 3*mu;
+         int tagX    = tagBase + XAxis;
+         int tagY    = tagBase + YAxis;
+         int tagZ    = tagBase + ZAxis;
+         MolDS_mpi::MpiProcess::GetInstance()->Recv(source, tagX, cartesianMatrix[XAxis][mu], totalAONumber);
+         MolDS_mpi::MpiProcess::GetInstance()->Recv(source, tagY, cartesianMatrix[YAxis][mu], totalAONumber);
+         MolDS_mpi::MpiProcess::GetInstance()->Recv(source, tagZ, cartesianMatrix[ZAxis][mu], totalAONumber);
       }
    }
-   // Exception throwing for omp-region
-   if(!ompErrors.str().empty()){
-      throw MolDSException::Deserialize(ompErrors);
+   else{
+      // send the matrix data to head-rank
+      for(int mu=0; mu<totalAONumber; mu++){
+         if(mu%mpiSize != mpiRank){continue;}
+         int dest = mpiHeadRank;
+         int tagBase = 3*mu;
+         int tagX    = tagBase + XAxis;
+         int tagY    = tagBase + YAxis;
+         int tagZ    = tagBase + ZAxis;
+         MolDS_mpi::MpiProcess::GetInstance()->Send(dest, tagX, cartesianMatrix[XAxis][mu], totalAONumber);
+         MolDS_mpi::MpiProcess::GetInstance()->Send(dest, tagY, cartesianMatrix[YAxis][mu], totalAONumber);
+         MolDS_mpi::MpiProcess::GetInstance()->Send(dest, tagZ, cartesianMatrix[ZAxis][mu], totalAONumber);
+      }
    }
+   // broadcast all matrix data to all rank
+   int root=mpiHeadRank;
+   MolDS_mpi::MpiProcess::GetInstance()->Broadcast(&cartesianMatrix[0][0][0], CartesianType_end*totalAONumber*totalAONumber, root);
+   */
 }
 
 // Calculate elements of Cartesian matrix between atomic orbitals. 
@@ -1787,9 +1957,10 @@ void Cndo2::CalcCartesianMatrixElementsByGTOExpansion(double& xComponent,
    double gaussianExponentA = 0.0;
    double gaussianExponentB = 0.0;
    double overlapSASB = 0.0;
-   double rAB = sqrt( pow(atomA.GetXyz()[XAxis]-atomB.GetXyz()[XAxis], 2.0) 
-                     +pow(atomA.GetXyz()[YAxis]-atomB.GetXyz()[YAxis], 2.0) 
-                     +pow(atomA.GetXyz()[ZAxis]-atomB.GetXyz()[ZAxis], 2.0) );
+   double dX  = atomA.GetXyz()[XAxis] - atomB.GetXyz()[XAxis];
+   double dY  = atomA.GetXyz()[YAxis] - atomB.GetXyz()[YAxis];
+   double dZ  = atomA.GetXyz()[ZAxis] - atomB.GetXyz()[ZAxis];
+   double rAB = sqrt(dX*dX + dY*dY + dZ*dZ);
    double temp  = 0.0;
    double tempX = 0.0;
    double tempY = 0.0;
@@ -1804,12 +1975,12 @@ void Cndo2::CalcCartesianMatrixElementsByGTOExpansion(double& xComponent,
                                                                 shellTypeB, 
                                                                 valenceOrbitalB, 
                                                                 j); 
-         gaussianExponentA = pow(orbitalExponentA, 2.0) *
+         gaussianExponentA = (orbitalExponentA*orbitalExponentA) *
                              GTOExpansionSTO::GetInstance()->GetExponent(stonG, 
                                                                          shellTypeA, 
                                                                          valenceOrbitalA, 
                                                                          i);
-         gaussianExponentB = pow(orbitalExponentB, 2.0) *
+         gaussianExponentB = (orbitalExponentB*orbitalExponentB) *
                              GTOExpansionSTO::GetInstance()->GetExponent(stonG, 
                                                                          shellTypeB, 
                                                                          valenceOrbitalB, 
@@ -1865,13 +2036,14 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
                                          CartesianType axis) const{
 
    double value = 0.0;
-   double beta = gaussianExponentA + gaussianExponentB;
+   double gauPlusAB = gaussianExponentA+gaussianExponentB;
+   double gauMultAB = gaussianExponentA*gaussianExponentB;
    double dxyz[CartesianType_end] = {xyzA[XAxis] - xyzB[XAxis], 
                                      xyzA[YAxis] - xyzB[YAxis], 
                                      xyzA[ZAxis] - xyzB[ZAxis]};
    if(valenceOrbitalA == s && valenceOrbitalB == s){
       value = gaussianExponentA*xyzA[axis] + gaussianExponentB*xyzB[axis];
-      value /= beta;
+      value /= gauPlusAB;
       value *= overlapSASB;
       return value;
    }
@@ -2000,8 +2172,8 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
       double temp2 = gaussianExponentA*xyzA[axis] - gaussianExponentA*xyzB[axis];
       double temp3 = gaussianExponentB*xyzA[axis] - gaussianExponentB*xyzB[axis];
       value = 0.5*(temp1+temp2-temp3);
-      value -= temp1*temp2*temp3*pow(beta,-1.0);
-      value *= 4.0*sqrt(gaussianExponentA*gaussianExponentB)*pow(beta,-2.0);
+      value -= temp1*temp2*temp3/gauPlusAB;
+      value *= 4.0*sqrt(gauMultAB)/(gauPlusAB*gauPlusAB);
       value *= overlapSASB;
       return value;
    }
@@ -2023,9 +2195,9 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
       }
       double temp1 = gaussianExponentA*xyzA[piDirection] - gaussianExponentA*xyzB[piDirection];
       double temp2 = gaussianExponentB*xyzA[piDirection] - gaussianExponentB*xyzB[piDirection];
-      value = 0.5 - temp1*temp2*pow(beta,-1.0);
+      value = 0.5 - temp1*temp2/gauPlusAB;
       value *= gaussianExponentA*xyzA[axis] + gaussianExponentB*xyzB[axis];
-      value *= 4.0*sqrt(gaussianExponentA*gaussianExponentB)*pow(beta,-2.0);
+      value *= 4.0*sqrt(gauMultAB)/(gauPlusAB*gauPlusAB);
       value *= overlapSASB;
       return value;
    }
@@ -2047,9 +2219,9 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
       }
       double temp1 = gaussianExponentA*xyzA[axis] + gaussianExponentB*xyzB[axis];
       double temp2 = gaussianExponentA*xyzA[axis] - gaussianExponentA*xyzB[axis];
-      value = 0.5 + temp1*temp2*pow(beta,-1.0);
+      value = 0.5 + temp1*temp2/gauPlusAB;
       value *= gaussianExponentB*xyzA[piDirectionA] - gaussianExponentB*xyzB[piDirectionA];
-      value *= -4.0*sqrt(gaussianExponentA*gaussianExponentB)*pow(beta,-2.0);
+      value *= -4.0*sqrt(gauMultAB)/(gauPlusAB*gauPlusAB);
       value *= overlapSASB;
       return value;
    }
@@ -2071,9 +2243,9 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
       }
       double temp1 = gaussianExponentA*xyzA[axis] + gaussianExponentB*xyzB[axis];
       double temp2 = gaussianExponentB*xyzA[axis] - gaussianExponentB*xyzB[axis];
-      value = 0.5 - temp1*temp2*pow(beta,-1.0);
+      value = 0.5 - temp1*temp2/gauPlusAB;
       value *= gaussianExponentA*xyzA[piDirectionB] - gaussianExponentA*xyzB[piDirectionB];
-      value *= 4.0*sqrt(gaussianExponentA*gaussianExponentB)*pow(beta,-2.0);
+      value *= 4.0*sqrt(gauMultAB)/(gauPlusAB*gauPlusAB);
       value *= overlapSASB;
       return value;
    }
@@ -2106,7 +2278,7 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
       double temp1 = gaussianExponentB*xyzA[piDirectionA] - gaussianExponentB*xyzB[piDirectionA];
       double temp2 = gaussianExponentA*xyzA[axis]         + gaussianExponentB*xyzB[axis];
       double temp3 = gaussianExponentA*xyzA[piDirectionB] - gaussianExponentA*xyzB[piDirectionB];
-      value = -4.0*sqrt(gaussianExponentA*gaussianExponentB)*pow(beta,-3.0);
+      value = -4.0*sqrt(gauMultAB)/(gauPlusAB*gauPlusAB*gauPlusAB);
       value *= temp1*temp2*temp3;
       value *= overlapSASB;
       return value;
@@ -2155,8 +2327,10 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
                                                        overlapSASB);
       value = 0.5*gaussianExponentA*dxyz[axis]
              -gaussianExponentB*dxyz[axis]
-             +pow(gaussianExponentB,2.0)*gaussianExponentA*pow(dxyz[axis],3.0)/beta;
-      value *= 8.0*pow(gaussianExponentA, 1.5)*gaussianExponentB*pow(beta,-3.0)*dxyz[anotherAxis]*overlapSASB;
+             +(gaussianExponentB*gaussianExponentB)*gaussianExponentA
+             *dxyz[axis]*dxyz[axis]*dxyz[axis]/gauPlusAB;
+      value *= 8.0*gaussianExponentA*sqrt(gaussianExponentA)
+              *gaussianExponentB*dxyz[anotherAxis]*overlapSASB/(gauPlusAB*gauPlusAB*gauPlusAB);
       value += xyzA[axis]*overlapAOs1;
       return value;
    }
@@ -2204,8 +2378,10 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
                                                        overlapSASB);
       value = 0.5*gaussianExponentB*dxyz[axis]
              -gaussianExponentA*dxyz[axis]
-             +pow(gaussianExponentA,2.0)*gaussianExponentB*pow(dxyz[axis],3.0)/beta;
-      value *= 8.0*pow(gaussianExponentB, 1.5)*gaussianExponentA*pow(beta,-3.0)*dxyz[anotherAxis]*overlapSASB;
+             +(gaussianExponentA*gaussianExponentA)*gaussianExponentB
+             *dxyz[axis]*dxyz[axis]*dxyz[axis]/gauPlusAB;
+      value *= 8.0*gaussianExponentB*sqrt(gaussianExponentB)*gaussianExponentA
+              *dxyz[anotherAxis]*overlapSASB/(gauPlusAB*gauPlusAB*gauPlusAB);
       value += xyzB[axis]*overlapAOs1;
       return value;
    }
@@ -2238,8 +2414,9 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
                                                 dxyz[ZAxis], 
                                                 rAB,
                                                 overlapSASB);
-      value = 0.5+pow(gaussianExponentB*dxyz[axis], 2.0)/beta;
-      value *= 8.0*pow(gaussianExponentA, 2.5)*gaussianExponentB*pow(beta, -3.0)*overlapSASB;
+      value = 0.5+gaussianExponentB*gaussianExponentB*dxyz[axis]*dxyz[axis]/gauPlusAB;
+      value *= 8.0*gaussianExponentA*gaussianExponentA*sqrt(gaussianExponentA)
+              *gaussianExponentB*overlapSASB/(gauPlusAB*gauPlusAB*gauPlusAB);
       value *= dxyz[anotherAxis1]*dxyz[anotherAxis2];
       value += xyzA[axis]*overlapAOs1;
       return value;
@@ -2272,8 +2449,9 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
                                                        dxyz[ZAxis], 
                                                        rAB,
                                                        overlapSASB);
-      value = 0.5+pow(gaussianExponentA*dxyz[axis], 2.0)/beta;
-      value *= 8.0*pow(gaussianExponentB, 2.5)*gaussianExponentA*pow(beta, -3.0)*overlapSASB;
+      value = 0.5+gaussianExponentA*gaussianExponentA*dxyz[axis]*dxyz[axis]/gauPlusAB;
+      value *= 8.0*gaussianExponentB*gaussianExponentB*sqrt(gaussianExponentB)
+              *gaussianExponentA*overlapSASB/(gauPlusAB*gauPlusAB*gauPlusAB);
       value *= dxyz[anotherAxis1]*dxyz[anotherAxis2];
       value += xyzB[axis]*overlapAOs1;
       return value;
@@ -2426,11 +2604,12 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
                                                        dxyz[ZAxis], 
                                                        rAB,
                                                        overlapSASB);
-      value = 0.5-2.0*gaussianExponentA*gaussianExponentB*pow(dxyz[XAxis],2.0)/beta;
-      value += 0.5*pow(gaussianExponentA,2.0)*(pow(dxyz[XAxis],2.0)-pow(dxyz[YAxis],2.0))/beta;
-      value += pow(gaussianExponentA*gaussianExponentB*dxyz[XAxis]/beta,2.0)
-              *(pow(dxyz[XAxis],2.0)-pow(dxyz[YAxis],2.0));
-      value *= 4.0*pow(gaussianExponentA,0.5)*gaussianExponentB*pow(beta,-2.0);
+      value = 0.5-2.0*gauMultAB*(dxyz[XAxis]*dxyz[XAxis])/gauPlusAB;
+      value += 0.5*(gaussianExponentA*gaussianExponentA)*((dxyz[XAxis]*dxyz[XAxis])-(dxyz[YAxis]*dxyz[YAxis]))/gauPlusAB;
+      value += (gauMultAB*dxyz[XAxis]
+               *gauMultAB*dxyz[XAxis])
+              *((dxyz[XAxis]*dxyz[XAxis])-(dxyz[YAxis]*dxyz[YAxis]))/(gauPlusAB*gauPlusAB);
+      value *= 4.0*sqrt(gaussianExponentA)*gaussianExponentB/(gauPlusAB*gauPlusAB);
       value *= overlapSASB;
       value += xyzA[axis]*overlapAOs1;
       return value;
@@ -2447,11 +2626,12 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
                                                        dxyz[ZAxis], 
                                                        rAB,
                                                        overlapSASB);
-      value = 0.5-2.0*gaussianExponentA*gaussianExponentB*pow(dxyz[XAxis],2.0)/beta;
-      value += 0.5*pow(gaussianExponentB,2.0)*(pow(dxyz[XAxis],2.0)-pow(dxyz[YAxis],2.0))/beta;
-      value += pow(gaussianExponentA*gaussianExponentB*dxyz[XAxis]/beta,2.0)
-              *(pow(dxyz[XAxis],2.0)-pow(dxyz[YAxis],2.0));
-      value *= 4.0*pow(gaussianExponentB,0.5)*gaussianExponentA*pow(beta,-2.0);
+      value = 0.5-2.0*gauMultAB*(dxyz[XAxis]*dxyz[XAxis])/gauPlusAB;
+      value += 0.5*(gaussianExponentB*gaussianExponentB)*((dxyz[XAxis]*dxyz[XAxis])-(dxyz[YAxis]*dxyz[YAxis]))/gauPlusAB;
+      value += (gauMultAB*dxyz[XAxis]
+               *gauMultAB*dxyz[XAxis])
+              *((dxyz[XAxis]*dxyz[XAxis])-(dxyz[YAxis]*dxyz[YAxis]))/(gauPlusAB*gauPlusAB);
+      value *= 4.0*sqrt(gaussianExponentB)*gaussianExponentA/(gauPlusAB*gauPlusAB);
       value *= overlapSASB;
       value += xyzB[axis]*overlapAOs1;
       return value;
@@ -2468,11 +2648,12 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
                                                        dxyz[ZAxis], 
                                                        rAB,
                                                        overlapSASB);
-      value = 0.5-2.0*gaussianExponentA*gaussianExponentB*pow(dxyz[YAxis],2.0)/beta;
-      value += 0.5*pow(gaussianExponentA,2.0)*(pow(dxyz[YAxis],2.0)-pow(dxyz[XAxis],2.0))/beta;
-      value += pow(gaussianExponentA*gaussianExponentB*dxyz[YAxis]/beta,2.0)
-              *(pow(dxyz[YAxis],2.0)-pow(dxyz[XAxis],2.0));
-      value *= -4.0*pow(gaussianExponentA,0.5)*gaussianExponentB*pow(beta,-2.0);
+      value = 0.5-2.0*gauMultAB*(dxyz[YAxis]*dxyz[YAxis])/gauPlusAB;
+      value += 0.5*(gaussianExponentA*gaussianExponentA)*((dxyz[YAxis]*dxyz[YAxis])-(dxyz[XAxis]*dxyz[XAxis]))/gauPlusAB;
+      value += (gauMultAB*dxyz[YAxis]
+               *gauMultAB*dxyz[YAxis])
+              *((dxyz[YAxis]*dxyz[YAxis])-(dxyz[XAxis]*dxyz[XAxis]))/(gauPlusAB*gauPlusAB);
+      value *= -4.0*sqrt(gaussianExponentA)*gaussianExponentB/(gauPlusAB*gauPlusAB);
       value *= overlapSASB;
       value += xyzA[axis]*overlapAOs1;
       return value;
@@ -2489,11 +2670,12 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
                                                        dxyz[ZAxis], 
                                                        rAB,
                                                        overlapSASB);
-      value = 0.5-2.0*gaussianExponentA*gaussianExponentB*pow(dxyz[YAxis],2.0)/beta;
-      value += 0.5*pow(gaussianExponentB,2.0)*(pow(dxyz[YAxis],2.0)-pow(dxyz[XAxis],2.0))/beta;
-      value += pow(gaussianExponentA*gaussianExponentB*dxyz[YAxis]/beta,2.0)
-              *(pow(dxyz[YAxis],2.0)-pow(dxyz[XAxis],2.0));
-      value *= -4.0*pow(gaussianExponentB,0.5)*gaussianExponentA*pow(beta,-2.0);
+      value = 0.5-2.0*gauMultAB*(dxyz[YAxis]*dxyz[YAxis])/gauPlusAB;
+      value += 0.5*(gaussianExponentB*gaussianExponentB)*((dxyz[YAxis]*dxyz[YAxis])-(dxyz[XAxis]*dxyz[XAxis]))/gauPlusAB;
+      value += (gauMultAB*dxyz[YAxis]
+               *gauMultAB*dxyz[YAxis])
+              *((dxyz[YAxis]*dxyz[YAxis])-(dxyz[XAxis]*dxyz[XAxis]))/(gauPlusAB*gauPlusAB);
+      value *= -4.0*sqrt(gaussianExponentB)*gaussianExponentA/(gauPlusAB*gauPlusAB);
       value *= overlapSASB;
       value += xyzB[axis]*overlapAOs1;
       return value;
@@ -2510,11 +2692,12 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
                                                        dxyz[ZAxis], 
                                                        rAB,
                                                        overlapSASB);
-      value = 0.5*(pow(dxyz[XAxis],2.0)-pow(dxyz[YAxis],2.0));
-      value += pow(gaussianExponentB*dxyz[ZAxis],2.0)
-              *(pow(dxyz[XAxis],2.0)-pow(dxyz[YAxis],2.0))
-              /beta;
-      value *= 4.0*pow(gaussianExponentA,2.5)*gaussianExponentB*pow(beta,-3.0);
+      value = 0.5*((dxyz[XAxis]*dxyz[XAxis])-(dxyz[YAxis]*dxyz[YAxis]));
+      value += gaussianExponentB*gaussianExponentB*dxyz[ZAxis]*dxyz[ZAxis]
+              *((dxyz[XAxis]*dxyz[XAxis])-(dxyz[YAxis]*dxyz[YAxis]))
+              /gauPlusAB;
+      value *= 4.0*gaussianExponentA*gaussianExponentA*sqrt(gaussianExponentA)
+              *gaussianExponentB/(gauPlusAB*gauPlusAB*gauPlusAB);
       value *= overlapSASB;
       value += xyzA[axis]*overlapAOs1;
       return value;
@@ -2531,11 +2714,12 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
                                                        dxyz[ZAxis], 
                                                        rAB,
                                                        overlapSASB);
-      value = 0.5*(pow(dxyz[XAxis],2.0)-pow(dxyz[YAxis],2.0));
-      value += pow(gaussianExponentA*dxyz[ZAxis],2.0)
-              *(pow(dxyz[XAxis],2.0)-pow(dxyz[YAxis],2.0))
-              /beta;
-      value *= 4.0*pow(gaussianExponentB,2.5)*gaussianExponentA*pow(beta,-3.0);
+      value = 0.5*((dxyz[XAxis]*dxyz[XAxis])-(dxyz[YAxis]*dxyz[YAxis]));
+      value += gaussianExponentA*gaussianExponentA*dxyz[ZAxis]*dxyz[ZAxis]
+              *((dxyz[XAxis]*dxyz[XAxis])-(dxyz[YAxis]*dxyz[YAxis]))
+              /gauPlusAB;
+      value *= 4.0*gaussianExponentB*gaussianExponentB*sqrt(gaussianExponentB)
+              *gaussianExponentA/(gauPlusAB*gauPlusAB*gauPlusAB);
       value *= overlapSASB;
       value += xyzA[axis]*overlapAOs1;
       return value;
@@ -2554,12 +2738,12 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
                                                        rAB,
                                                        overlapSASB);
       value = -0.5
-             +2.0*gaussianExponentA*gaussianExponentB*pow(dxyz[axis],2.0)/beta
-             +0.5*pow(gaussianExponentA,2.0)
-                 *(2.0*pow(dxyz[ZAxis],2.0)-pow(dxyz[XAxis],2.0)-pow(dxyz[YAxis],2.0))/beta
-             +pow(gaussianExponentA*gaussianExponentB*dxyz[axis]/beta,2.0)
-              *(2.0*pow(dxyz[ZAxis],2.0)-pow(dxyz[XAxis],2.0)-pow(dxyz[YAxis],2.0));
-      value *= 4.0*pow(gaussianExponentA,0.5)*gaussianExponentB*pow(beta,-2.0)/sqrt(3.0);
+             +2.0*gauMultAB*(dxyz[axis]*dxyz[axis])/gauPlusAB
+             +0.5*(gaussianExponentA*gaussianExponentA)
+                 *(2.0*(dxyz[ZAxis]*dxyz[ZAxis])-(dxyz[XAxis]*dxyz[XAxis])-(dxyz[YAxis]*dxyz[YAxis]))/gauPlusAB
+             +(gauMultAB*gauMultAB*dxyz[axis]*dxyz[axis]/(gauPlusAB*gauPlusAB))
+              *(2.0*(dxyz[ZAxis]*dxyz[ZAxis])-(dxyz[XAxis]*dxyz[XAxis])-(dxyz[YAxis]*dxyz[YAxis]));
+      value *= 4.0*sqrt(gaussianExponentA)*gaussianExponentB/(gauPlusAB*gauPlusAB*sqrt(3.0));
       value *= overlapSASB;
       value += xyzA[axis]*overlapAOs1;
       return value;
@@ -2578,12 +2762,12 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
                                                        rAB,
                                                        overlapSASB);
       value = -0.5
-             +2.0*gaussianExponentA*gaussianExponentB*pow(dxyz[axis],2.0)/beta
-             +0.5*pow(gaussianExponentB,2.0)
-                 *(2.0*pow(dxyz[ZAxis],2.0)-pow(dxyz[XAxis],2.0)-pow(dxyz[YAxis],2.0))/beta
-             +pow(gaussianExponentA*gaussianExponentB*dxyz[axis]/beta,2.0)
-              *(2.0*pow(dxyz[ZAxis],2.0)-pow(dxyz[XAxis],2.0)-pow(dxyz[YAxis],2.0));
-      value *= 4.0*pow(gaussianExponentB,0.5)*gaussianExponentA*pow(beta,-2.0)/sqrt(3.0);
+             +2.0*gauMultAB*(dxyz[axis]*dxyz[axis])/gauPlusAB
+             +0.5*(gaussianExponentB*gaussianExponentB)
+                 *(2.0*(dxyz[ZAxis]*dxyz[ZAxis])-(dxyz[XAxis]*dxyz[XAxis])-(dxyz[YAxis]*dxyz[YAxis]))/gauPlusAB
+             +(gauMultAB*gauMultAB*dxyz[axis]*dxyz[axis]/(gauPlusAB*gauPlusAB))
+              *(2.0*(dxyz[ZAxis]*dxyz[ZAxis])-(dxyz[XAxis]*dxyz[XAxis])-(dxyz[YAxis]*dxyz[YAxis]));
+      value *= 4.0*sqrt(gaussianExponentB)*gaussianExponentA/(gauPlusAB*gauPlusAB*sqrt(3.0));
       value *= overlapSASB;
       value += xyzB[axis]*overlapAOs1;
       return value;
@@ -2601,12 +2785,12 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
                                                        rAB,
                                                        overlapSASB);
       value = 1.0
-             -4.0*gaussianExponentA*gaussianExponentB*pow(dxyz[axis],2.0)/beta
-             +0.5*pow(gaussianExponentA,2.0)
-                 *(2.0*pow(dxyz[ZAxis],2.0)-pow(dxyz[XAxis],2.0)-pow(dxyz[YAxis],2.0))/beta
-             +pow(gaussianExponentA*gaussianExponentB*dxyz[axis]/beta,2.0)
-              *(2.0*pow(dxyz[ZAxis],2.0)-pow(dxyz[XAxis],2.0)-pow(dxyz[YAxis],2.0));
-      value *= 4.0*pow(gaussianExponentA,0.5)*gaussianExponentB*pow(beta,-2.0)/sqrt(3.0);
+             -4.0*gauMultAB*(dxyz[axis]*dxyz[axis])/gauPlusAB
+             +0.5*(gaussianExponentA*gaussianExponentA)
+                 *(2.0*(dxyz[ZAxis]*dxyz[ZAxis])-(dxyz[XAxis]*dxyz[XAxis])-(dxyz[YAxis]*dxyz[YAxis]))/gauPlusAB
+             +(gauMultAB*gauMultAB*dxyz[axis]*dxyz[axis]/(gauPlusAB*gauPlusAB))
+              *(2.0*(dxyz[ZAxis]*dxyz[ZAxis])-(dxyz[XAxis]*dxyz[XAxis])-(dxyz[YAxis]*dxyz[YAxis]));
+      value *= 4.0*sqrt(gaussianExponentA)*gaussianExponentB/(gauPlusAB*gauPlusAB*sqrt(3.0));
       value *= overlapSASB;
       value += xyzA[axis]*overlapAOs1;
       return value;
@@ -2624,12 +2808,12 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
                                                        rAB,
                                                        overlapSASB);
       value = 1.0
-             -4.0*gaussianExponentA*gaussianExponentB*pow(dxyz[axis],2.0)/beta
-             +0.5*pow(gaussianExponentB,2.0)
-                 *(2.0*pow(dxyz[ZAxis],2.0)-pow(dxyz[XAxis],2.0)-pow(dxyz[YAxis],2.0))/beta
-             +pow(gaussianExponentA*gaussianExponentB*dxyz[axis]/beta,2.0)
-              *(2.0*pow(dxyz[ZAxis],2.0)-pow(dxyz[XAxis],2.0)-pow(dxyz[YAxis],2.0));
-      value *= 4.0*pow(gaussianExponentB,0.5)*gaussianExponentA*pow(beta,-2.0)/sqrt(3.0);
+             -4.0*gauMultAB*(dxyz[axis]*dxyz[axis])/gauPlusAB
+             +0.5*(gaussianExponentB*gaussianExponentB)
+                 *(2.0*(dxyz[ZAxis]*dxyz[ZAxis])-(dxyz[XAxis]*dxyz[XAxis])-(dxyz[YAxis]*dxyz[YAxis]))/gauPlusAB
+             +(gauMultAB*gauMultAB*dxyz[axis]*dxyz[axis]/(gauPlusAB*gauPlusAB))
+              *(2.0*(dxyz[ZAxis]*dxyz[ZAxis])-(dxyz[XAxis]*dxyz[XAxis])-(dxyz[YAxis]*dxyz[YAxis]));
+      value *= 4.0*sqrt(gaussianExponentB)*gaussianExponentA/(gauPlusAB*gauPlusAB*sqrt(3.0));
       value *= overlapSASB;
       value += xyzB[axis]*overlapAOs1;
       return value;
@@ -2665,7 +2849,7 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
             anotherAxis = ZAxis;
          }
       }
-      double axisAverage = (gaussianExponentA*xyzA[axis]+gaussianExponentB*xyzB[axis])/beta;
+      double axisAverage = (gaussianExponentA*xyzA[axis]+gaussianExponentB*xyzB[axis])/gauPlusAB;
       double overlapAOs1 = this->GetGaussianOverlapAOs(atomTypeA,
                                                        valenceOrbitalA, 
                                                        gaussianExponentA, 
@@ -2677,10 +2861,11 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
                                                        dxyz[ZAxis], 
                                                        rAB,
                                                        overlapSASB);
-      value = 0.5*(gaussianExponentA-gaussianExponentB)*dxyz[axis]
-             +(gaussianExponentA-gaussianExponentB)*(gaussianExponentA*gaussianExponentB)
-              *dxyz[axis]*pow(dxyz[anotherAxis],2.0)/beta;
-      value *= 8.0*(gaussianExponentA*gaussianExponentB)*pow(beta,-3.0);
+      double gauMinsAB = gaussianExponentA-gaussianExponentB;
+      value = 0.5*gauMinsAB*dxyz[axis]
+             +gauMinsAB*gauMultAB
+              *dxyz[axis]*(dxyz[anotherAxis]*dxyz[anotherAxis])/gauPlusAB;
+      value *= 8.0*gauMultAB/(gauPlusAB*gauPlusAB*gauPlusAB);
       value *= overlapSASB;
       value += axisAverage*overlapAOs1;
       return value;
@@ -2689,7 +2874,7 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
             (valenceOrbitalA == dyz   && axis == XAxis && valenceOrbitalB == valenceOrbitalA) || 
             (valenceOrbitalA == dzx   && axis == YAxis && valenceOrbitalB == valenceOrbitalA) ||
             (valenceOrbitalA == dxxyy && axis == ZAxis && valenceOrbitalB == valenceOrbitalA) ){
-      double axisAverage = (gaussianExponentA*xyzA[axis]+gaussianExponentB*xyzB[axis])/beta;
+      double axisAverage = (gaussianExponentA*xyzA[axis]+gaussianExponentB*xyzB[axis])/gauPlusAB;
       double overlapAOs1 = this->GetGaussianOverlapAOs(atomTypeA,
                                                        valenceOrbitalA, 
                                                        gaussianExponentA, 
@@ -2713,7 +2898,7 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
       else{
          anotherAxis = XAxis;
       }
-      double axisAverage = (gaussianExponentA*xyzA[axis]+gaussianExponentB*xyzB[axis])/beta;
+      double axisAverage = (gaussianExponentA*xyzA[axis]+gaussianExponentB*xyzB[axis])/gauPlusAB;
       double overlapAOs1 = this->GetGaussianOverlapAOs(atomTypeA,
                                                        valenceOrbitalA, 
                                                        gaussianExponentA, 
@@ -2725,17 +2910,18 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
                                                        dxyz[ZAxis], 
                                                        rAB,
                                                        overlapSASB);
-      value = (gaussianExponentA-gaussianExponentB)*dxyz[axis]
-             -(gaussianExponentA-gaussianExponentB)*(gaussianExponentA*gaussianExponentB)
-              *(pow(dxyz[axis],2.0) - pow(dxyz[anotherAxis],2.0))*dxyz[axis]/beta;
-      value *= 4.0*(gaussianExponentA*gaussianExponentB)*pow(beta,-3.0);
+      double gauMinsAB = gaussianExponentA-gaussianExponentB;
+      value = gauMinsAB*dxyz[axis]
+             -gauMinsAB*gauMultAB
+              *((dxyz[axis]*dxyz[axis]) - (dxyz[anotherAxis]*dxyz[anotherAxis]))*dxyz[axis]/gauPlusAB;
+      value *= 4.0*gauMultAB/(gauPlusAB*gauPlusAB*gauPlusAB);
       value *= overlapSASB;
       value += axisAverage*overlapAOs1;
       return value;
    }
    else if( (valenceOrbitalA == dzz && axis == XAxis && valenceOrbitalB == valenceOrbitalA) ||
             (valenceOrbitalA == dzz && axis == YAxis && valenceOrbitalB == valenceOrbitalA) ){
-      double axisAverage = (gaussianExponentA*xyzA[axis]+gaussianExponentB*xyzB[axis])/beta;
+      double axisAverage = (gaussianExponentA*xyzA[axis]+gaussianExponentB*xyzB[axis])/gauPlusAB;
       double overlapAOs1 = this->GetGaussianOverlapAOs(atomTypeA,
                                                        valenceOrbitalA, 
                                                        gaussianExponentA, 
@@ -2747,16 +2933,17 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
                                                        dxyz[ZAxis], 
                                                        rAB,
                                                        overlapSASB);
-      value = (gaussianExponentA-gaussianExponentB)*dxyz[axis]
-             -(gaussianExponentA-gaussianExponentB)*(gaussianExponentA*gaussianExponentB)
-              *(2.0*pow(dxyz[ZAxis],2.0) - pow(dxyz[XAxis],2.0) - pow(dxyz[YAxis],2.0))*dxyz[axis]/beta;
-      value *= 4.0*(gaussianExponentA*gaussianExponentB)*pow(beta,-3.0)/3.0;
+      double gauMinsAB = gaussianExponentA-gaussianExponentB;
+      value = gauMinsAB*dxyz[axis]
+             -gauMinsAB*gauMultAB
+              *(2.0*(dxyz[ZAxis]*dxyz[ZAxis]) - (dxyz[XAxis]*dxyz[XAxis]) - (dxyz[YAxis]*dxyz[YAxis]))*dxyz[axis]/gauPlusAB;
+      value *= 4.0*gauMultAB/(3.0*gauPlusAB*gauPlusAB*gauPlusAB);
       value *= overlapSASB;
       value += axisAverage*overlapAOs1;
       return value;
    }
    else if( valenceOrbitalA == dzz && axis == ZAxis && valenceOrbitalB == valenceOrbitalA) {
-      double axisAverage = (gaussianExponentA*xyzA[axis]+gaussianExponentB*xyzB[axis])/beta;
+      double axisAverage = (gaussianExponentA*xyzA[axis]+gaussianExponentB*xyzB[axis])/gauPlusAB;
       double overlapAOs1 = this->GetGaussianOverlapAOs(atomTypeA,
                                                        valenceOrbitalA, 
                                                        gaussianExponentA, 
@@ -2768,10 +2955,11 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
                                                        dxyz[ZAxis], 
                                                        rAB,
                                                        overlapSASB);
-      value = 2.0*(gaussianExponentA-gaussianExponentB)*dxyz[axis]
-             -(gaussianExponentA-gaussianExponentB)*(gaussianExponentA*gaussianExponentB)
-              *(2.0*pow(dxyz[ZAxis],2.0) - pow(dxyz[XAxis],2.0) - pow(dxyz[YAxis],2.0))*dxyz[axis]/beta;
-      value *= 8.0*(gaussianExponentA*gaussianExponentB)*pow(beta,-3.0)/3.0;
+      double gauMinsAB = gaussianExponentA-gaussianExponentB;
+      value = 2.0*gauMinsAB*dxyz[axis]
+             -gauMinsAB*gauMultAB
+              *(2.0*(dxyz[ZAxis]*dxyz[ZAxis]) - (dxyz[XAxis]*dxyz[XAxis]) - (dxyz[YAxis]*dxyz[YAxis]))*dxyz[axis]/gauPlusAB;
+      value *= 8.0*gauMultAB/(3.0*gauPlusAB*gauPlusAB*gauPlusAB);
       value *= overlapSASB;
       value += axisAverage*overlapAOs1;
       return value;
@@ -2782,7 +2970,7 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
             (valenceOrbitalA == dyz && axis == YAxis && valenceOrbitalB == dxy) ||
             (valenceOrbitalA == dzx && axis == ZAxis && valenceOrbitalB == dyz) ||
             (valenceOrbitalA == dxy && axis == XAxis && valenceOrbitalB == dzx) ){
-      double axisAverage = (gaussianExponentA*xyzA[axis]+gaussianExponentB*xyzB[axis])/beta;
+      double axisAverage = (gaussianExponentA*xyzA[axis]+gaussianExponentB*xyzB[axis])/gauPlusAB;
       double overlapAOs1 = this->GetGaussianOverlapAOs(atomTypeA,
                                                        valenceOrbitalA, 
                                                        gaussianExponentA, 
@@ -2794,8 +2982,9 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
                                                        dxyz[ZAxis], 
                                                        rAB,
                                                        overlapSASB);
-      value = -8.0*pow(gaussianExponentA*gaussianExponentB,2.0)*dxyz[XAxis]*dxyz[YAxis]*dxyz[ZAxis]
-             *(gaussianExponentA-gaussianExponentB)*pow(beta,-4.0);
+      double gauMinsAB = gaussianExponentA-gaussianExponentB;
+      value = -8.0*(gaussianExponentA*gauMultAB*gaussianExponentB)*dxyz[XAxis]*dxyz[YAxis]*dxyz[ZAxis]
+             *gauMinsAB/(gauPlusAB*gauPlusAB*gauPlusAB*gauPlusAB);
       value *= overlapSASB;
       value += axisAverage*overlapAOs1;
       return value;
@@ -2832,7 +3021,7 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
          anotherAxis1 = XAxis;
          anotherAxis2 = ZAxis;
       }
-      double axisAverage = (gaussianExponentA*xyzA[axis]+gaussianExponentB*xyzB[axis])/beta;
+      double axisAverage = (gaussianExponentA*xyzA[axis]+gaussianExponentB*xyzB[axis])/gauPlusAB;
       double overlapAOs1 = this->GetGaussianOverlapAOs(atomTypeA,
                                                        valenceOrbitalA, 
                                                        gaussianExponentA, 
@@ -2844,8 +3033,8 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
                                                        dxyz[ZAxis], 
                                                        rAB,
                                                        overlapSASB);
-      value = 0.5-gaussianExponentA*gaussianExponentB*pow(dxyz[anotherAxis1],2.0)/beta;
-      value *= 8.0*pow(gaussianExponentA,2.0)*gaussianExponentB*pow(beta,-3.0)*dxyz[anotherAxis2];
+      value = 0.5-gauMultAB*dxyz[anotherAxis1]*dxyz[anotherAxis1]/gauPlusAB;
+      value *= 8.0*(gaussianExponentA*gaussianExponentA)*gaussianExponentB*dxyz[anotherAxis2]/(gauPlusAB*gauPlusAB*gauPlusAB);
       value *= overlapSASB;
       value += axisAverage*overlapAOs1;
       return value;
@@ -2883,7 +3072,7 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
          anotherAxis2 = ZAxis;
       }
 
-      double axisAverage = (gaussianExponentA*xyzA[axis]+gaussianExponentB*xyzB[axis])/beta;
+      double axisAverage = (gaussianExponentA*xyzA[axis]+gaussianExponentB*xyzB[axis])/gauPlusAB;
       double overlapAOs1 = this->GetGaussianOverlapAOs(atomTypeA,
                                                        valenceOrbitalA, 
                                                        gaussianExponentA, 
@@ -2895,14 +3084,14 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
                                                        dxyz[ZAxis], 
                                                        rAB,
                                                        overlapSASB);
-      value = 0.5-gaussianExponentA*gaussianExponentB*pow(dxyz[anotherAxis1],2.0)/beta;
-      value *= -8.0*pow(gaussianExponentB,2.0)*gaussianExponentA*pow(beta,-3.0)*dxyz[anotherAxis2];
+      value = 0.5-gauMultAB*dxyz[anotherAxis1]*dxyz[anotherAxis1]/gauPlusAB;
+      value *= -8.0*(gaussianExponentB*gaussianExponentB)*gaussianExponentA*dxyz[anotherAxis2]/(gauPlusAB*gauPlusAB*gauPlusAB);
       value *= overlapSASB;
       value += axisAverage*overlapAOs1;
       return value;
    }
    else if(valenceOrbitalA == dxxyy && axis == XAxis && valenceOrbitalB == dxy){
-      double axisAverage = (gaussianExponentA*xyzA[axis]+gaussianExponentB*xyzB[axis])/beta;
+      double axisAverage = (gaussianExponentA*xyzA[axis]+gaussianExponentB*xyzB[axis])/gauPlusAB;
       double overlapAOs1 = this->GetGaussianOverlapAOs(atomTypeA,
                                                        valenceOrbitalA, 
                                                        gaussianExponentA, 
@@ -2914,17 +3103,17 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
                                                        dxyz[ZAxis], 
                                                        rAB,
                                                        overlapSASB);
-      value = 0.5*beta
-             -pow(gaussianExponentA,2.0)*gaussianExponentB*pow(dxyz[XAxis],2.0)/beta
-             +pow(gaussianExponentB,2.0)*gaussianExponentA
-             *(pow(dxyz[XAxis],2.0)-pow(dxyz[YAxis],2.0))/(2.0*beta);
-      value *= 8.0*gaussianExponentA*gaussianExponentB*pow(beta,-3.0)*dxyz[YAxis];
+      value = 0.5*gauPlusAB
+             -(gaussianExponentA*gaussianExponentA)*gaussianExponentB*(dxyz[XAxis]*dxyz[XAxis])/gauPlusAB
+             +(gaussianExponentB*gaussianExponentB)*gaussianExponentA
+             *((dxyz[XAxis]*dxyz[XAxis])-(dxyz[YAxis]*dxyz[YAxis]))/(2.0*gauPlusAB);
+      value *= 8.0*gauMultAB*dxyz[YAxis]/(gauPlusAB*gauPlusAB*gauPlusAB);
       value *= overlapSASB;
       value += axisAverage*overlapAOs1;
       return value;
    }
    else if(valenceOrbitalA == dxy && axis == XAxis && valenceOrbitalB == dxxyy){
-      double axisAverage = (gaussianExponentA*xyzA[axis]+gaussianExponentB*xyzB[axis])/beta;
+      double axisAverage = (gaussianExponentA*xyzA[axis]+gaussianExponentB*xyzB[axis])/gauPlusAB;
       double overlapAOs1 = this->GetGaussianOverlapAOs(atomTypeA,
                                                        valenceOrbitalA, 
                                                        gaussianExponentA, 
@@ -2936,17 +3125,17 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
                                                        dxyz[ZAxis], 
                                                        rAB,
                                                        overlapSASB);
-      value = 0.5*beta
-             -pow(gaussianExponentB,2.0)*gaussianExponentA*pow(dxyz[XAxis],2.0)/beta
-             +pow(gaussianExponentA,2.0)*gaussianExponentB
-             *(pow(dxyz[XAxis],2.0)-pow(dxyz[YAxis],2.0))/(2.0*beta);
-      value *= -8.0*gaussianExponentA*gaussianExponentB*pow(beta,-3.0)*dxyz[YAxis];
+      value = 0.5*gauPlusAB
+             -(gaussianExponentB*gaussianExponentB)*gaussianExponentA*(dxyz[XAxis]*dxyz[XAxis])/gauPlusAB
+             +(gaussianExponentA*gaussianExponentA)*gaussianExponentB
+             *((dxyz[XAxis]*dxyz[XAxis])-(dxyz[YAxis]*dxyz[YAxis]))/(2.0*gauPlusAB);
+      value *= -8.0*gauMultAB*dxyz[YAxis]/(gauPlusAB*gauPlusAB*gauPlusAB);
       value *= overlapSASB;
       value += axisAverage*overlapAOs1;
       return value;
    } 
    else if(valenceOrbitalA == dxxyy && axis == YAxis && valenceOrbitalB == dxy){
-      double axisAverage = (gaussianExponentA*xyzA[axis]+gaussianExponentB*xyzB[axis])/beta;
+      double axisAverage = (gaussianExponentA*xyzA[axis]+gaussianExponentB*xyzB[axis])/gauPlusAB;
       double overlapAOs1 = this->GetGaussianOverlapAOs(atomTypeA,
                                                        valenceOrbitalA, 
                                                        gaussianExponentA, 
@@ -2958,17 +3147,17 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
                                                        dxyz[ZAxis], 
                                                        rAB,
                                                        overlapSASB);
-      value = -0.5*beta
-             +pow(gaussianExponentA,2.0)*gaussianExponentB*pow(dxyz[YAxis],2.0)/beta
-             +pow(gaussianExponentB,2.0)*gaussianExponentA
-             *(pow(dxyz[XAxis],2.0)-pow(dxyz[YAxis],2.0))/(2.0*beta);
-      value *= 8.0*gaussianExponentA*gaussianExponentB*pow(beta,-3.0)*dxyz[XAxis];
+      value = -0.5*gauPlusAB
+             +(gaussianExponentA*gaussianExponentA)*gaussianExponentB*(dxyz[YAxis]*dxyz[YAxis])/gauPlusAB
+             +(gaussianExponentB*gaussianExponentB)*gaussianExponentA
+             *((dxyz[XAxis]*dxyz[XAxis])-(dxyz[YAxis]*dxyz[YAxis]))/(2.0*gauPlusAB);
+      value *= 8.0*gauMultAB*dxyz[XAxis]/(gauPlusAB*gauPlusAB*gauPlusAB);
       value *= overlapSASB;
       value += axisAverage*overlapAOs1;
       return value;
    }
    else if(valenceOrbitalA == dxy && axis == YAxis && valenceOrbitalB == dxxyy){
-      double axisAverage = (gaussianExponentA*xyzA[axis]+gaussianExponentB*xyzB[axis])/beta;
+      double axisAverage = (gaussianExponentA*xyzA[axis]+gaussianExponentB*xyzB[axis])/gauPlusAB;
       double overlapAOs1 = this->GetGaussianOverlapAOs(atomTypeA,
                                                        valenceOrbitalA, 
                                                        gaussianExponentA, 
@@ -2980,11 +3169,11 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
                                                        dxyz[ZAxis], 
                                                        rAB,
                                                        overlapSASB);
-      value = -0.5*beta
-             +pow(gaussianExponentB,2.0)*gaussianExponentA*pow(dxyz[YAxis],2.0)/beta
-             +pow(gaussianExponentA,2.0)*gaussianExponentB
-             *(pow(dxyz[XAxis],2.0)-pow(dxyz[YAxis],2.0))/(2.0*beta);
-      value *= -8.0*gaussianExponentA*gaussianExponentB*pow(beta,-3.0)*dxyz[XAxis];
+      value = -0.5*gauPlusAB
+             +(gaussianExponentB*gaussianExponentB)*gaussianExponentA*(dxyz[YAxis]*dxyz[YAxis])/gauPlusAB
+             +(gaussianExponentA*gaussianExponentA)*gaussianExponentB
+             *((dxyz[XAxis]*dxyz[XAxis])-(dxyz[YAxis]*dxyz[YAxis]))/(2.0*gauPlusAB);
+      value *= -8.0*gauMultAB*dxyz[XAxis]/(gauPlusAB*gauPlusAB*gauPlusAB);
       value *= overlapSASB;
       value += axisAverage*overlapAOs1;
       return value;
@@ -3003,9 +3192,11 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
                                                        dxyz[ZAxis], 
                                                        rAB,
                                                        overlapSASB);
-      value = 8.0*pow(gaussianExponentA,4.0)*pow(gaussianExponentB,3.0)
+      value = 8.0*(gaussianExponentA*gaussianExponentA*gaussianExponentA*gaussianExponentA)
+             *(gaussianExponentB*gaussianExponentB*gaussianExponentB)
              *dxyz[XAxis]*dxyz[YAxis]*dxyz[ZAxis]
-             *(pow(dxyz[XAxis],2.0)-pow(dxyz[YAxis],2.0))/pow(beta,5.0);
+             *((dxyz[XAxis]*dxyz[XAxis])-(dxyz[YAxis]*dxyz[YAxis]))
+             /(gauPlusAB*gauPlusAB*gauPlusAB*gauPlusAB*gauPlusAB);
       value *= overlapSASB;
       value += xyzB[axis]*overlapAOs1;
       return value;
@@ -3024,15 +3215,17 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
                                                        dxyz[ZAxis], 
                                                        rAB,
                                                        overlapSASB);
-      value = -8.0*pow(gaussianExponentA,3.0)*pow(gaussianExponentB,4.0)
+      value = -8.0*(gaussianExponentA*gaussianExponentA*gaussianExponentA)
+             *(gaussianExponentB*gaussianExponentB*gaussianExponentB*gaussianExponentB)
              *dxyz[XAxis]*dxyz[YAxis]*dxyz[ZAxis]
-             *(pow(dxyz[XAxis],2.0)-pow(dxyz[YAxis],2.0))/pow(beta,5.0);
+             *((dxyz[XAxis]*dxyz[XAxis])-(dxyz[YAxis]*dxyz[YAxis]))
+             /(gauPlusAB*gauPlusAB*gauPlusAB*gauPlusAB*gauPlusAB);
       value *= overlapSASB;
       value += xyzA[axis]*overlapAOs1;
       return value;
    }
    else if(valenceOrbitalA == dxxyy && axis == YAxis && valenceOrbitalB == dyz){
-      double axisAverage = (gaussianExponentA*xyzA[axis]+gaussianExponentB*xyzB[axis])/beta;
+      double axisAverage = (gaussianExponentA*xyzA[axis]+gaussianExponentB*xyzB[axis])/gauPlusAB;
       double overlapAOs1 = this->GetGaussianOverlapAOs(atomTypeA,
                                                        valenceOrbitalA, 
                                                        gaussianExponentA, 
@@ -3045,16 +3238,16 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
                                                        rAB,
                                                        overlapSASB);
       value = -0.5*gaussianExponentA
-             +pow(gaussianExponentA,2.0)*gaussianExponentB*pow(dxyz[YAxis],2.0)/beta
-             +pow(gaussianExponentB,2.0)*gaussianExponentA
-             *(pow(dxyz[XAxis],2.0)-pow(dxyz[YAxis],2.0))/(2.0*beta);
-      value *= 8.0*gaussianExponentA*gaussianExponentB*dxyz[ZAxis]*pow(beta,-3.0);
+             +(gaussianExponentA*gaussianExponentA)*gaussianExponentB*(dxyz[YAxis]*dxyz[YAxis])/gauPlusAB
+             +(gaussianExponentB*gaussianExponentB)*gaussianExponentA
+             *((dxyz[XAxis]*dxyz[XAxis])-(dxyz[YAxis]*dxyz[YAxis]))/(2.0*gauPlusAB);
+      value *= 8.0*gauMultAB*dxyz[ZAxis]/(gauPlusAB*gauPlusAB*gauPlusAB);
       value *= overlapSASB;
       value += axisAverage*overlapAOs1;
       return value;
    }
    else if(valenceOrbitalA == dyz && axis == YAxis && valenceOrbitalB == dxxyy){
-      double axisAverage = (gaussianExponentA*xyzA[axis]+gaussianExponentB*xyzB[axis])/beta;
+      double axisAverage = (gaussianExponentA*xyzA[axis]+gaussianExponentB*xyzB[axis])/gauPlusAB;
       double overlapAOs1 = this->GetGaussianOverlapAOs(atomTypeA,
                                                        valenceOrbitalA, 
                                                        gaussianExponentA, 
@@ -3067,16 +3260,16 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
                                                        rAB,
                                                        overlapSASB);
       value = -0.5*gaussianExponentB
-             +pow(gaussianExponentB,2.0)*gaussianExponentA*pow(dxyz[YAxis],2.0)/beta
-             +pow(gaussianExponentA,2.0)*gaussianExponentB
-             *(pow(dxyz[XAxis],2.0)-pow(dxyz[YAxis],2.0))/(2.0*beta);
-      value *= -8.0*gaussianExponentA*gaussianExponentB*dxyz[ZAxis]*pow(beta,-3.0);
+             +(gaussianExponentB*gaussianExponentB)*gaussianExponentA*(dxyz[YAxis]*dxyz[YAxis])/gauPlusAB
+             +(gaussianExponentA*gaussianExponentA)*gaussianExponentB
+             *((dxyz[XAxis]*dxyz[XAxis])-(dxyz[YAxis]*dxyz[YAxis]))/(2.0*gauPlusAB);
+      value *= -8.0*gauMultAB*dxyz[ZAxis]/(gauPlusAB*gauPlusAB*gauPlusAB);
       value *= overlapSASB;
       value += axisAverage*overlapAOs1;
       return value;
    }
    else if(valenceOrbitalA == dxxyy && axis == XAxis && valenceOrbitalB == dzx){
-      double axisAverage = (gaussianExponentA*xyzA[axis]+gaussianExponentB*xyzB[axis])/beta;
+      double axisAverage = (gaussianExponentA*xyzA[axis]+gaussianExponentB*xyzB[axis])/gauPlusAB;
       double overlapAOs1 = this->GetGaussianOverlapAOs(atomTypeA,
                                                        valenceOrbitalA, 
                                                        gaussianExponentA, 
@@ -3089,16 +3282,16 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
                                                        rAB,
                                                        overlapSASB);
       value = -0.5*gaussianExponentA
-             +pow(gaussianExponentA,2.0)*gaussianExponentB*pow(dxyz[XAxis],2.0)/beta
-             +pow(gaussianExponentB,2.0)*gaussianExponentA
-             *(pow(dxyz[YAxis],2.0)-pow(dxyz[XAxis],2.0))/(2.0*beta);
-      value *= -8.0*gaussianExponentA*gaussianExponentB*dxyz[ZAxis]*pow(beta,-3.0);
+             +(gaussianExponentA*gaussianExponentA)*gaussianExponentB*(dxyz[XAxis]*dxyz[XAxis])/gauPlusAB
+             +(gaussianExponentB*gaussianExponentB)*gaussianExponentA
+             *((dxyz[YAxis]*dxyz[YAxis])-(dxyz[XAxis]*dxyz[XAxis]))/(2.0*gauPlusAB);
+      value *= -8.0*gauMultAB*dxyz[ZAxis]/(gauPlusAB*gauPlusAB*gauPlusAB);
       value *= overlapSASB;
       value += axisAverage*overlapAOs1;
       return value;
    }
    else if(valenceOrbitalA == dzx && axis == XAxis && valenceOrbitalB == dxxyy){
-      double axisAverage = (gaussianExponentA*xyzA[axis]+gaussianExponentB*xyzB[axis])/beta;
+      double axisAverage = (gaussianExponentA*xyzA[axis]+gaussianExponentB*xyzB[axis])/gauPlusAB;
       double overlapAOs1 = this->GetGaussianOverlapAOs(atomTypeA,
                                                        valenceOrbitalA, 
                                                        gaussianExponentA, 
@@ -3111,16 +3304,16 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
                                                        rAB,
                                                        overlapSASB);
       value = -0.5*gaussianExponentB
-             +pow(gaussianExponentB,2.0)*gaussianExponentA*pow(dxyz[YAxis],2.0)/beta
-             +pow(gaussianExponentA,2.0)*gaussianExponentB
-             *(pow(dxyz[YAxis],2.0)-pow(dxyz[XAxis],2.0))/(2.0*beta);
-      value *= 8.0*gaussianExponentA*gaussianExponentB*dxyz[ZAxis]*pow(beta,-3.0);
+             +(gaussianExponentB*gaussianExponentB)*gaussianExponentA*(dxyz[YAxis]*dxyz[YAxis])/gauPlusAB
+             +(gaussianExponentA*gaussianExponentA)*gaussianExponentB
+             *((dxyz[YAxis]*dxyz[YAxis])-(dxyz[XAxis]*dxyz[XAxis]))/(2.0*gauPlusAB);
+      value *= 8.0*gauMultAB*dxyz[ZAxis]/(gauPlusAB*gauPlusAB*gauPlusAB);
       value *= overlapSASB;
       value += axisAverage*overlapAOs1;
       return value;
    }
    else if(valenceOrbitalA == dxxyy && axis == ZAxis && valenceOrbitalB == dyz){
-      double axisAverage = (gaussianExponentA*xyzA[axis]+gaussianExponentB*xyzB[axis])/beta;
+      double axisAverage = (gaussianExponentA*xyzA[axis]+gaussianExponentB*xyzB[axis])/gauPlusAB;
       double overlapAOs1 = this->GetGaussianOverlapAOs(atomTypeA,
                                                        valenceOrbitalA, 
                                                        gaussianExponentA, 
@@ -3132,14 +3325,14 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
                                                        dxyz[ZAxis], 
                                                        rAB,
                                                        overlapSASB);
-      value = gaussianExponentA*gaussianExponentB*(pow(dxyz[XAxis],2.0)-pow(dxyz[YAxis],2.0))/beta+1.0;
-      value *= 4.0*gaussianExponentA*pow(gaussianExponentB,2.0)*dxyz[YAxis]*pow(beta,-3.0);
+      value = gauMultAB*((dxyz[XAxis]*dxyz[XAxis])-(dxyz[YAxis]*dxyz[YAxis]))/gauPlusAB+1.0;
+      value *= 4.0*gaussianExponentA*(gaussianExponentB*gaussianExponentB)*dxyz[YAxis]/(gauPlusAB*gauPlusAB*gauPlusAB);
       value *= overlapSASB;
       value += axisAverage*overlapAOs1;
       return value;
    }
    else if(valenceOrbitalA == dyz && axis == ZAxis && valenceOrbitalB == dxxyy){
-      double axisAverage = (gaussianExponentA*xyzA[axis]+gaussianExponentB*xyzB[axis])/beta;
+      double axisAverage = (gaussianExponentA*xyzA[axis]+gaussianExponentB*xyzB[axis])/gauPlusAB;
       double overlapAOs1 = this->GetGaussianOverlapAOs(atomTypeA,
                                                        valenceOrbitalA, 
                                                        gaussianExponentA, 
@@ -3151,14 +3344,14 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
                                                        dxyz[ZAxis], 
                                                        rAB,
                                                        overlapSASB);
-      value = gaussianExponentA*gaussianExponentB*(pow(dxyz[XAxis],2.0)-pow(dxyz[YAxis],2.0))/beta+1.0;
-      value *= -4.0*gaussianExponentB*pow(gaussianExponentA,2.0)*dxyz[YAxis]*pow(beta,-3.0);
+      value = gauMultAB*((dxyz[XAxis]*dxyz[XAxis])-(dxyz[YAxis]*dxyz[YAxis]))/gauPlusAB+1.0;
+      value *= -4.0*gaussianExponentB*(gaussianExponentA*gaussianExponentA)*dxyz[YAxis]/(gauPlusAB*gauPlusAB*gauPlusAB);
       value *= overlapSASB;
       value += axisAverage*overlapAOs1;
       return value;
    }
    else if(valenceOrbitalA == dxxyy && axis == ZAxis && valenceOrbitalB == dzx){
-      double axisAverage = (gaussianExponentA*xyzA[axis]+gaussianExponentB*xyzB[axis])/beta;
+      double axisAverage = (gaussianExponentA*xyzA[axis]+gaussianExponentB*xyzB[axis])/gauPlusAB;
       double overlapAOs1 = this->GetGaussianOverlapAOs(atomTypeA,
                                                        valenceOrbitalA, 
                                                        gaussianExponentA, 
@@ -3170,14 +3363,14 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
                                                        dxyz[ZAxis], 
                                                        rAB,
                                                        overlapSASB);
-      value = gaussianExponentA*gaussianExponentB*(pow(dxyz[YAxis],2.0)-pow(dxyz[XAxis],2.0))/beta+1.0;
-      value *= -4.0*gaussianExponentA*pow(gaussianExponentB,2.0)*dxyz[XAxis]*pow(beta,-3.0);
+      value = gauMultAB*((dxyz[YAxis]*dxyz[YAxis])-(dxyz[XAxis]*dxyz[XAxis]))/gauPlusAB+1.0;
+      value *= -4.0*gaussianExponentA*(gaussianExponentB*gaussianExponentB)*dxyz[XAxis]/(gauPlusAB*gauPlusAB*gauPlusAB);
       value *= overlapSASB;
       value += axisAverage*overlapAOs1;
       return value;
    }
    else if(valenceOrbitalA == dzx && axis == ZAxis && valenceOrbitalB == dxxyy){
-      double axisAverage = (gaussianExponentA*xyzA[axis]+gaussianExponentB*xyzB[axis])/beta;
+      double axisAverage = (gaussianExponentA*xyzA[axis]+gaussianExponentB*xyzB[axis])/gauPlusAB;
       double overlapAOs1 = this->GetGaussianOverlapAOs(atomTypeA,
                                                        valenceOrbitalA, 
                                                        gaussianExponentA, 
@@ -3189,8 +3382,8 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
                                                        dxyz[ZAxis], 
                                                        rAB,
                                                        overlapSASB);
-      value = gaussianExponentA*gaussianExponentB*(pow(dxyz[YAxis],2.0)-pow(dxyz[XAxis],2.0))/beta+1.0;
-      value *= 4.0*gaussianExponentB*pow(gaussianExponentA,2.0)*dxyz[XAxis]*pow(beta,-3.0);
+      value = gauMultAB*((dxyz[YAxis]*dxyz[YAxis])-(dxyz[XAxis]*dxyz[XAxis]))/gauPlusAB+1.0;
+      value *= 4.0*gaussianExponentB*(gaussianExponentA*gaussianExponentA)*dxyz[XAxis]/(gauPlusAB*gauPlusAB*gauPlusAB);
       value *= overlapSASB;
       value += axisAverage*overlapAOs1;
       return value;
@@ -3209,10 +3402,11 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
                                                        dxyz[ZAxis], 
                                                        rAB,
                                                        overlapSASB);
-      value = 2.0*pow(dxyz[ZAxis],2.0) - pow(dxyz[XAxis],2.0) - pow(dxyz[YAxis],2.0);
+      value = 2.0*(dxyz[ZAxis]*dxyz[ZAxis]) - (dxyz[XAxis]*dxyz[XAxis]) - (dxyz[YAxis]*dxyz[YAxis]);
       value *= dxyz[XAxis]*dxyz[YAxis]*dxyz[ZAxis];
-      value *= 8.0*pow(gaussianExponentA,4.0)*pow(gaussianExponentB,3.0);
-      value /= sqrt(3.0)*pow(beta,5.0);
+      value *= 8.0*(gaussianExponentA*gaussianExponentA*gaussianExponentA*gaussianExponentA)
+              *(gaussianExponentB*gaussianExponentB*gaussianExponentB);
+      value /= sqrt(3.0)*(gauPlusAB*gauPlusAB*gauPlusAB*gauPlusAB*gauPlusAB);
       value *= overlapSASB;
       value += xyzB[axis]*overlapAOs1;
       return value;
@@ -3231,10 +3425,10 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
                                                        dxyz[ZAxis], 
                                                        rAB,
                                                        overlapSASB);
-      value = 2.0*pow(dxyz[ZAxis],2.0) - pow(dxyz[XAxis],2.0) - pow(dxyz[YAxis],2.0);
+      value = 2.0*(dxyz[ZAxis]*dxyz[ZAxis]) - (dxyz[XAxis]*dxyz[XAxis]) - (dxyz[YAxis]*dxyz[YAxis]);
       value *= dxyz[XAxis]*dxyz[YAxis]*dxyz[ZAxis];
-      value *= -8.0*pow(gaussianExponentB,4.0)*pow(gaussianExponentA,3.0);
-      value /= sqrt(3.0)*pow(beta,5.0);
+      value *= -8.0*(gaussianExponentB*gaussianExponentB*gaussianExponentB*gaussianExponentB)*(gaussianExponentA*gaussianExponentA*gaussianExponentA);
+      value /= sqrt(3.0)*(gauPlusAB*gauPlusAB*gauPlusAB*gauPlusAB*gauPlusAB);
       value *= overlapSASB;
       value += xyzA[axis]*overlapAOs1;
       return value;
@@ -3260,12 +3454,14 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
                                                        rAB,
                                                        overlapSASB);
       value = 0.5*(gaussianExponentB-gaussianExponentA)
-             +3.0*pow(gaussianExponentA,2.0)*gaussianExponentB*pow(dxyz[axis],2.0)*pow(beta,-2.0)
-             +gaussianExponentA*pow(gaussianExponentB,2.0)
-             *(2.0*pow(dxyz[ZAxis],2.0) - pow(dxyz[XAxis],2.0) - pow(dxyz[YAxis],2.0))/(2.0*beta)
-             +pow(gaussianExponentA,3.0)*pow(gaussianExponentB,2.0)*pow(dxyz[axis],2.0)
-             *(2.0*pow(dxyz[ZAxis],2.0) - pow(dxyz[XAxis],2.0) - pow(dxyz[YAxis],2.0))*pow(beta,-2.0);
-      value *= 8.0*gaussianExponentA*gaussianExponentB*dxyz[anotherAxis]/(sqrt(3.0)*pow(beta,3.0));
+             +3.0*(gaussianExponentA*gaussianExponentA)*gaussianExponentB
+             *(dxyz[axis]*dxyz[axis])/(gauPlusAB*gauPlusAB)
+             +gaussianExponentA*(gaussianExponentB*gaussianExponentB)
+             *(2.0*(dxyz[ZAxis]*dxyz[ZAxis]) - (dxyz[XAxis]*dxyz[XAxis]) - (dxyz[YAxis]*dxyz[YAxis]))/(2.0*gauPlusAB)
+             +(gaussianExponentA*gaussianExponentA*gaussianExponentA)*(gaussianExponentB*gaussianExponentB)*(dxyz[axis]*dxyz[axis])
+             *(2.0*(dxyz[ZAxis]*dxyz[ZAxis]) - (dxyz[XAxis]*dxyz[XAxis]) - (dxyz[YAxis]*dxyz[YAxis]))
+             /(gauPlusAB*gauPlusAB);
+      value *= 8.0*gauMultAB*dxyz[anotherAxis]/(sqrt(3.0)*gauPlusAB*gauPlusAB*gauPlusAB);
       value *= overlapSASB;
       value += xyzB[axis]*overlapAOs1;
       return value;
@@ -3290,13 +3486,15 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
                                                        dxyz[ZAxis], 
                                                        rAB,
                                                        overlapSASB);
-      value = 0.5*(gaussianExponentA-gaussianExponentB)
-             +3.0*pow(gaussianExponentB,2.0)*gaussianExponentA*pow(dxyz[axis],2.0)*pow(beta,-2.0)
-             +gaussianExponentB*pow(gaussianExponentA,2.0)
-             *(2.0*pow(dxyz[ZAxis],2.0) - pow(dxyz[XAxis],2.0) - pow(dxyz[YAxis],2.0))/(2.0*beta)
-             +pow(gaussianExponentB,3.0)*pow(gaussianExponentA,2.0)*pow(dxyz[axis],2.0)
-             *(2.0*pow(dxyz[ZAxis],2.0) - pow(dxyz[XAxis],2.0) - pow(dxyz[YAxis],2.0))*pow(beta,-2.0);
-      value *= -8.0*gaussianExponentA*gaussianExponentB*dxyz[anotherAxis]/(sqrt(3.0)*pow(beta,3.0));
+      double gauMinsAB = gaussianExponentA-gaussianExponentB;
+      value = 0.5*gauMinsAB
+             +3.0*(gaussianExponentB*gaussianExponentB)*gaussianExponentA
+             *(dxyz[axis]*dxyz[axis])/(gauPlusAB*gauPlusAB)
+             +gaussianExponentB*(gaussianExponentA*gaussianExponentA)
+             *(2.0*(dxyz[ZAxis]*dxyz[ZAxis]) - (dxyz[XAxis]*dxyz[XAxis]) - (dxyz[YAxis]*dxyz[YAxis]))/(2.0*gauPlusAB)
+             +(gaussianExponentB*gaussianExponentB*gaussianExponentB)*(gaussianExponentA*gaussianExponentA)*(dxyz[axis]*dxyz[axis])
+             *(2.0*(dxyz[ZAxis]*dxyz[ZAxis]) - (dxyz[XAxis]*dxyz[XAxis]) - (dxyz[YAxis]*dxyz[YAxis]))/(gauPlusAB*gauPlusAB);
+      value *= -8.0*gauMultAB*dxyz[anotherAxis]/(sqrt(3.0)*(gauPlusAB*gauPlusAB*gauPlusAB));
       value *= overlapSASB;
       value += xyzA[axis]*overlapAOs1;
       return value;
@@ -3315,13 +3513,14 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
                                                        rAB,
                                                        overlapSASB);
       value = gaussianExponentB-0.5*gaussianExponentA
-             +gaussianExponentA*pow(gaussianExponentB,2.0)
-             *(2.0*pow(dxyz[ZAxis],2.0) - pow(dxyz[XAxis],2.0) - pow(dxyz[YAxis],2.0))/(2.0*beta)
-             +pow(gaussianExponentA,3.0)*pow(gaussianExponentB*dxyz[axis],2.0)
-             *(2.0*pow(dxyz[ZAxis],2.0) - pow(dxyz[XAxis],2.0) - pow(dxyz[YAxis],2.0))
-             *pow(beta,-2.0);
-      value *= 8.0*gaussianExponentA*gaussianExponentB*dxyz[ZAxis]
-              /(sqrt(3.0)*pow(beta,3.0));
+             +gaussianExponentA*(gaussianExponentB*gaussianExponentB)
+             *(2.0*(dxyz[ZAxis]*dxyz[ZAxis]) - (dxyz[XAxis]*dxyz[XAxis]) - (dxyz[YAxis]*dxyz[YAxis]))/(2.0*gauPlusAB)
+             +(gaussianExponentA*gaussianExponentA*gaussianExponentA)
+             *(gaussianExponentB*gaussianExponentB*dxyz[axis]*dxyz[axis])
+             *(2.0*(dxyz[ZAxis]*dxyz[ZAxis]) - (dxyz[XAxis]*dxyz[XAxis]) - (dxyz[YAxis]*dxyz[YAxis]))
+             /(gauPlusAB*gauPlusAB);
+      value *= 8.0*gauMultAB*dxyz[ZAxis]
+              /(sqrt(3.0)*(gauPlusAB*gauPlusAB*gauPlusAB));
       value *= overlapSASB;
       value += xyzB[axis]*overlapAOs1;
       return value;
@@ -3340,13 +3539,13 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
                                                        rAB,
                                                        overlapSASB);
       value = gaussianExponentA-0.5*gaussianExponentB
-             +gaussianExponentB*pow(gaussianExponentA,2.0)
-             *(2.0*pow(dxyz[ZAxis],2.0) - pow(dxyz[XAxis],2.0) - pow(dxyz[YAxis],2.0))/(2.0*beta)
-             +pow(gaussianExponentB,3.0)*pow(gaussianExponentA*dxyz[axis],2.0)
-             *(2.0*pow(dxyz[ZAxis],2.0) - pow(dxyz[XAxis],2.0) - pow(dxyz[YAxis],2.0))
-             *pow(beta,-2.0);
-      value *= -8.0*gaussianExponentA*gaussianExponentB*dxyz[ZAxis]
-              /(sqrt(3.0)*pow(beta,3.0));
+             +gaussianExponentB*(gaussianExponentA*gaussianExponentA)
+             *(2.0*(dxyz[ZAxis]*dxyz[ZAxis]) - (dxyz[XAxis]*dxyz[XAxis]) - (dxyz[YAxis]*dxyz[YAxis]))/(2.0*gauPlusAB)
+             +(gaussianExponentB*gaussianExponentB*gaussianExponentB)*(gaussianExponentA*gaussianExponentA*dxyz[axis]*dxyz[axis])
+             *(2.0*(dxyz[ZAxis]*dxyz[ZAxis]) - (dxyz[XAxis]*dxyz[XAxis]) - (dxyz[YAxis]*dxyz[YAxis]))
+             /(gauPlusAB*gauPlusAB);
+      value *= -8.0*gauMultAB*dxyz[ZAxis]
+              /(sqrt(3.0)*(gauPlusAB*gauPlusAB*gauPlusAB));
       value *= overlapSASB;
       value += xyzA[axis]*overlapAOs1;
       return value;
@@ -3372,14 +3571,16 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
                                                        rAB,
                                                        overlapSASB);
       value = gaussianExponentA-0.5*gaussianExponentB
-             -3.0*pow(gaussianExponentA,2.0)*gaussianExponentB*pow(dxyz[axis]/beta,2.0)
-             +gaussianExponentA*pow(gaussianExponentB,2.0)
-             *(2.0*pow(dxyz[ZAxis],2.0) - pow(dxyz[XAxis],2.0) - pow(dxyz[YAxis],2.0))/(2.0*beta)
-             +pow(gaussianExponentA,3.0)*pow(gaussianExponentB*dxyz[axis],2.0)
-             *(2.0*pow(dxyz[ZAxis],2.0) - pow(dxyz[XAxis],2.0) - pow(dxyz[YAxis],2.0))
-             *pow(beta,-2.0);
-      value *= 8.0*gaussianExponentA*gaussianExponentB*dxyz[anotherAxis]
-              /(sqrt(3.0)*pow(beta,3.0));
+             -3.0*(gaussianExponentA*gaussianExponentA)*gaussianExponentB
+             *dxyz[axis]*dxyz[axis]/(gauPlusAB*gauPlusAB)
+             +gaussianExponentA*(gaussianExponentB*gaussianExponentB)
+             *(2.0*(dxyz[ZAxis]*dxyz[ZAxis]) - (dxyz[XAxis]*dxyz[XAxis]) - (dxyz[YAxis]*dxyz[YAxis]))/(2.0*gauPlusAB)
+             +(gaussianExponentA*gaussianExponentA*gaussianExponentA)
+             *(gaussianExponentB*gaussianExponentB*dxyz[axis]*dxyz[axis])
+             *(2.0*(dxyz[ZAxis]*dxyz[ZAxis]) - (dxyz[XAxis]*dxyz[XAxis]) - (dxyz[YAxis]*dxyz[YAxis]))
+             /(gauPlusAB*gauPlusAB);
+      value *= 8.0*gauMultAB*dxyz[anotherAxis]
+              /(sqrt(3.0)*(gauPlusAB*gauPlusAB*gauPlusAB));
       value *= overlapSASB;
       value += xyzB[axis]*overlapAOs1;
       return value;
@@ -3405,20 +3606,21 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
                                                        rAB,
                                                        overlapSASB);
       value = gaussianExponentB-0.5*gaussianExponentA
-             -3.0*pow(gaussianExponentB,2.0)*gaussianExponentA*pow(dxyz[axis]/beta,2.0)
-             +gaussianExponentB*pow(gaussianExponentA,2.0)
-             *(2.0*pow(dxyz[ZAxis],2.0) - pow(dxyz[XAxis],2.0) - pow(dxyz[YAxis],2.0))/(2.0*beta)
-             +pow(gaussianExponentB,3.0)*pow(gaussianExponentA*dxyz[axis],2.0)
-             *(2.0*pow(dxyz[ZAxis],2.0) - pow(dxyz[XAxis],2.0) - pow(dxyz[YAxis],2.0))
-             *pow(beta,-2.0);
-      value *= -8.0*gaussianExponentA*gaussianExponentB*dxyz[anotherAxis]
-              /(sqrt(3.0)*pow(beta,3.0));
+             -3.0*(gaussianExponentB*gaussianExponentB)*gaussianExponentA*dxyz[axis]*dxyz[axis]/(gauPlusAB*gauPlusAB)
+             +gaussianExponentB*(gaussianExponentA*gaussianExponentA)
+             *(2.0*(dxyz[ZAxis]*dxyz[ZAxis]) - (dxyz[XAxis]*dxyz[XAxis]) - (dxyz[YAxis]*dxyz[YAxis]))/(2.0*gauPlusAB)
+             +(gaussianExponentB*gaussianExponentB*gaussianExponentB)
+             *(gaussianExponentA*gaussianExponentA*dxyz[axis]*dxyz[axis])
+             *(2.0*(dxyz[ZAxis]*dxyz[ZAxis]) - (dxyz[XAxis]*dxyz[XAxis]) - (dxyz[YAxis]*dxyz[YAxis]))
+             /(gauPlusAB*gauPlusAB);
+      value *= -8.0*gauMultAB*dxyz[anotherAxis]
+              /(sqrt(3.0)*(gauPlusAB*gauPlusAB*gauPlusAB));
       value *= overlapSASB;
       value += xyzA[axis]*overlapAOs1;
       return value;
    }
    else if(valenceOrbitalA == dzz && axis == XAxis && valenceOrbitalB == dxxyy){
-      double axisAverage = (gaussianExponentA*xyzA[axis]+gaussianExponentB*xyzB[axis])/beta;
+      double axisAverage = (gaussianExponentA*xyzA[axis]+gaussianExponentB*xyzB[axis])/gauPlusAB;
       double overlapAOs1 = this->GetGaussianOverlapAOs(atomTypeA,
                                                        valenceOrbitalA, 
                                                        gaussianExponentA, 
@@ -3431,17 +3633,17 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
                                                        rAB,
                                                        overlapSASB);
       value = gaussianExponentB - gaussianExponentA
-             +gaussianExponentA*pow(gaussianExponentB,2.0)
-             *(2.0*pow(dxyz[ZAxis],2.0) - pow(dxyz[XAxis],2.0) - pow(dxyz[YAxis],2.0))/beta
-             +pow(gaussianExponentA,2.0)*gaussianExponentB
-             *(pow(dxyz[XAxis],2.0) - pow(dxyz[YAxis],2.0))/beta;
-      value *= 4.0*gaussianExponentA*gaussianExponentB*dxyz[XAxis]*pow(beta,-3.0)/sqrt(3.0);
+             +gaussianExponentA*(gaussianExponentB*gaussianExponentB)
+             *(2.0*(dxyz[ZAxis]*dxyz[ZAxis]) - (dxyz[XAxis]*dxyz[XAxis]) - (dxyz[YAxis]*dxyz[YAxis]))/gauPlusAB
+             +(gaussianExponentA*gaussianExponentA)*gaussianExponentB
+             *((dxyz[XAxis]*dxyz[XAxis]) - (dxyz[YAxis]*dxyz[YAxis]))/gauPlusAB;
+      value *= 4.0*gauMultAB*dxyz[XAxis]/(gauPlusAB*gauPlusAB*gauPlusAB*sqrt(3.0));
       value *= overlapSASB;
       value += axisAverage*overlapAOs1;
       return value;
    }
    else if(valenceOrbitalA == dxxyy && axis == XAxis && valenceOrbitalB == dzz){
-      double axisAverage = (gaussianExponentA*xyzA[axis]+gaussianExponentB*xyzB[axis])/beta;
+      double axisAverage = (gaussianExponentA*xyzA[axis]+gaussianExponentB*xyzB[axis])/gauPlusAB;
       double overlapAOs1 = this->GetGaussianOverlapAOs(atomTypeA,
                                                        valenceOrbitalA, 
                                                        gaussianExponentA, 
@@ -3454,17 +3656,17 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
                                                        rAB,
                                                        overlapSASB);
       value = gaussianExponentA - gaussianExponentB
-             +gaussianExponentB*pow(gaussianExponentA,2.0)
-             *(2.0*pow(dxyz[ZAxis],2.0) - pow(dxyz[XAxis],2.0) - pow(dxyz[YAxis],2.0))/beta
-             +pow(gaussianExponentB,2.0)*gaussianExponentA
-             *(pow(dxyz[XAxis],2.0) - pow(dxyz[YAxis],2.0))/beta;
-      value *= -4.0*gaussianExponentA*gaussianExponentB*dxyz[XAxis]*pow(beta,-3.0)/sqrt(3.0);
+             +gaussianExponentB*(gaussianExponentA*gaussianExponentA)
+             *(2.0*(dxyz[ZAxis]*dxyz[ZAxis]) - (dxyz[XAxis]*dxyz[XAxis]) - (dxyz[YAxis]*dxyz[YAxis]))/gauPlusAB
+             +(gaussianExponentB*gaussianExponentB)*gaussianExponentA
+             *((dxyz[XAxis]*dxyz[XAxis]) - (dxyz[YAxis]*dxyz[YAxis]))/gauPlusAB;
+      value *= -4.0*gauMultAB*dxyz[XAxis]/(gauPlusAB*gauPlusAB*gauPlusAB*sqrt(3.0));
       value *= overlapSASB;
       value += axisAverage*overlapAOs1;
       return value;
    }
    else if(valenceOrbitalA == dzz && axis == YAxis && valenceOrbitalB == dxxyy){
-      double axisAverage = (gaussianExponentA*xyzA[axis]+gaussianExponentB*xyzB[axis])/beta;
+      double axisAverage = (gaussianExponentA*xyzA[axis]+gaussianExponentB*xyzB[axis])/gauPlusAB;
       double overlapAOs1 = this->GetGaussianOverlapAOs(atomTypeA,
                                                        valenceOrbitalA, 
                                                        gaussianExponentA, 
@@ -3477,17 +3679,17 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
                                                        rAB,
                                                        overlapSASB);
       value = gaussianExponentB - gaussianExponentA
-             +gaussianExponentA*pow(gaussianExponentB,2.0)
-             *(2.0*pow(dxyz[ZAxis],2.0) - pow(dxyz[XAxis],2.0) - pow(dxyz[YAxis],2.0))/beta
-             +pow(gaussianExponentA,2.0)*gaussianExponentB
-             *(pow(dxyz[YAxis],2.0) - pow(dxyz[XAxis],2.0))/beta;
-      value *= -4.0*gaussianExponentA*gaussianExponentB*dxyz[YAxis]*pow(beta,-3.0)/sqrt(3.0);
+             +gaussianExponentA*(gaussianExponentB*gaussianExponentB)
+             *(2.0*(dxyz[ZAxis]*dxyz[ZAxis]) - (dxyz[XAxis]*dxyz[XAxis]) - (dxyz[YAxis]*dxyz[YAxis]))/gauPlusAB
+             +(gaussianExponentA*gaussianExponentA)*gaussianExponentB
+             *((dxyz[YAxis]*dxyz[YAxis]) - (dxyz[XAxis]*dxyz[XAxis]))/gauPlusAB;
+      value *= -4.0*gauMultAB*dxyz[YAxis]/(gauPlusAB*gauPlusAB*gauPlusAB*sqrt(3.0));
       value *= overlapSASB;
       value += axisAverage*overlapAOs1;
       return value;
    }
    else if(valenceOrbitalA == dxxyy && axis == YAxis && valenceOrbitalB == dzz){
-      double axisAverage = (gaussianExponentA*xyzA[axis]+gaussianExponentB*xyzB[axis])/beta;
+      double axisAverage = (gaussianExponentA*xyzA[axis]+gaussianExponentB*xyzB[axis])/gauPlusAB;
       double overlapAOs1 = this->GetGaussianOverlapAOs(atomTypeA,
                                                        valenceOrbitalA, 
                                                        gaussianExponentA, 
@@ -3500,17 +3702,17 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
                                                        rAB,
                                                        overlapSASB);
       value = gaussianExponentA - gaussianExponentB
-             +gaussianExponentB*pow(gaussianExponentA,2.0)
-             *(2.0*pow(dxyz[ZAxis],2.0) - pow(dxyz[XAxis],2.0) - pow(dxyz[YAxis],2.0))/beta
-             +pow(gaussianExponentB,2.0)*gaussianExponentA
-             *(pow(dxyz[YAxis],2.0) - pow(dxyz[XAxis],2.0))/beta;
-      value *= 4.0*gaussianExponentA*gaussianExponentB*dxyz[YAxis]*pow(beta,-3.0)/sqrt(3.0);
+             +gaussianExponentB*(gaussianExponentA*gaussianExponentA)
+             *(2.0*(dxyz[ZAxis]*dxyz[ZAxis]) - (dxyz[XAxis]*dxyz[XAxis]) - (dxyz[YAxis]*dxyz[YAxis]))/gauPlusAB
+             +(gaussianExponentB*gaussianExponentB)*gaussianExponentA
+             *((dxyz[YAxis]*dxyz[YAxis]) - (dxyz[XAxis]*dxyz[XAxis]))/gauPlusAB;
+      value *= 4.0*gauMultAB*dxyz[YAxis]/(gauPlusAB*gauPlusAB*gauPlusAB*sqrt(3.0));
       value *= overlapSASB;
       value += axisAverage*overlapAOs1;
       return value;
    }
    else if(valenceOrbitalA == dzz && axis == ZAxis && valenceOrbitalB == dxxyy){
-      double axisAverage = (gaussianExponentA*xyzA[axis]+gaussianExponentB*xyzB[axis])/beta;
+      double axisAverage = (gaussianExponentA*xyzA[axis]+gaussianExponentB*xyzB[axis])/gauPlusAB;
       double overlapAOs1 = this->GetGaussianOverlapAOs(atomTypeA,
                                                        valenceOrbitalA, 
                                                        gaussianExponentA, 
@@ -3522,15 +3724,15 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
                                                        dxyz[ZAxis], 
                                                        rAB,
                                                        overlapSASB);
-      value = pow(dxyz[XAxis],2.0) - pow(dxyz[YAxis],2.0);
-      value *= -8.0*pow(gaussianExponentA,3.0)*pow(gaussianExponentB,2.0)*dxyz[ZAxis];
-      value /= sqrt(3.0)*pow(beta,4.0);
+      value = (dxyz[XAxis]*dxyz[XAxis]) - (dxyz[YAxis]*dxyz[YAxis]);
+      value *= -8.0*(gaussianExponentA*gaussianExponentA*gaussianExponentA)*(gaussianExponentB*gaussianExponentB)*dxyz[ZAxis];
+      value /= sqrt(3.0)*gauPlusAB*gauPlusAB*gauPlusAB*gauPlusAB;
       value *= overlapSASB;
       value += axisAverage*overlapAOs1;
       return value;
    }
    else if(valenceOrbitalA == dxxyy && axis == ZAxis && valenceOrbitalB == dzz){
-      double axisAverage = (gaussianExponentA*xyzA[axis]+gaussianExponentB*xyzB[axis])/beta;
+      double axisAverage = (gaussianExponentA*xyzA[axis]+gaussianExponentB*xyzB[axis])/gauPlusAB;
       double overlapAOs1 = this->GetGaussianOverlapAOs(atomTypeA,
                                                        valenceOrbitalA, 
                                                        gaussianExponentA, 
@@ -3542,9 +3744,9 @@ double Cndo2::GetGaussianCartesianMatrix(AtomType atomTypeA,
                                                        dxyz[ZAxis], 
                                                        rAB,
                                                        overlapSASB);
-      value = pow(dxyz[XAxis],2.0) - pow(dxyz[YAxis],2.0);
-      value *= 8.0*pow(gaussianExponentA,2.0)*pow(gaussianExponentB,3.0)*dxyz[ZAxis];
-      value /= sqrt(3.0)*pow(beta,4.0);
+      value = (dxyz[XAxis]*dxyz[XAxis]) - (dxyz[YAxis]*dxyz[YAxis]);
+      value *= 8.0*(gaussianExponentA*gaussianExponentA)*(gaussianExponentB*gaussianExponentB*gaussianExponentB)*dxyz[ZAxis];
+      value /= sqrt(3.0)*gauPlusAB*gauPlusAB*gauPlusAB*gauPlusAB;
       value *= overlapSASB;
       value += axisAverage*overlapAOs1;
       return value;
@@ -3724,46 +3926,105 @@ void Cndo2::CalcOverlapAOs(double** overlapAOs, const Molecule& molecule) const{
    int totalAONumber = molecule.GetTotalNumberAOs();
    int totalAtomNumber = molecule.GetNumberAtoms();
 
-   stringstream ompErrors;
-#pragma omp parallel 
-   {
-      double** diatomicOverlapAOs = NULL;
-      double** rotatingMatrix = NULL;
-      try{
-         // malloc
-         MallocerFreer::GetInstance()->Malloc<double>(&diatomicOverlapAOs,
-                                                      OrbitalType_end, 
-                                                      OrbitalType_end);
-         MallocerFreer::GetInstance()->Malloc<double>(&rotatingMatrix,
-                                                      OrbitalType_end, 
-                                                      OrbitalType_end);
-         // calculation overlapAOs matrix
-         for(int mu=0; mu<totalAONumber; mu++){
-            overlapAOs[mu][mu] = 1.0;
-         }
+   // MPI setting of each rank
+   int mpiRank       = MolDS_mpi::MpiProcess::GetInstance()->GetRank();
+   int mpiSize       = MolDS_mpi::MpiProcess::GetInstance()->GetSize();
+   int mpiHeadRank   = MolDS_mpi::MpiProcess::GetInstance()->GetHeadRank();
+   int mPassingTimes = MolDS_mpi::MpiProcess::GetInstance()->GetMessagePassingTimes(totalAtomNumber);
+   MolDS_mpi::AsyncCommunicator asyncCommunicator;
+   boost::thread communicationThread( boost::bind(&MolDS_mpi::AsyncCommunicator::Run<double>, 
+                                                  &asyncCommunicator, 
+                                                  mPassingTimes) );
 
+   MallocerFreer::GetInstance()->Initialize<double>(overlapAOs,
+                                                    totalAONumber,
+                                                    totalAONumber);
+
+   // This loop A is parallelized with MPI
+   for(int A=0; A<totalAtomNumber; A++){
+      const Atom& atomA = *molecule.GetAtom(A);
+      int firstAOIndexA = atomA.GetFirstAOIndex();
+      int numValenceAOs = atomA.GetValenceSize();
+      int calcRank = A%mpiSize;
+      if(mpiRank == calcRank){
+         stringstream ompErrors;
+#pragma omp parallel 
+         {
+            double** diatomicOverlapAOs = NULL;
+            double** rotatingMatrix = NULL;
+            double** tmpOldDiatomicOverlapAOs = NULL;
+            double** tmpMatrixBC           = NULL;
+            try{
+               // malloc
+               MallocerFreer::GetInstance()->Malloc<double>(&diatomicOverlapAOs,
+                                                            OrbitalType_end, 
+                                                            OrbitalType_end);
+               MallocerFreer::GetInstance()->Malloc<double>(&rotatingMatrix,
+                                                            OrbitalType_end, 
+                                                            OrbitalType_end);
+               MallocerFreer::GetInstance()->Malloc<double>(&tmpOldDiatomicOverlapAOs, 
+                                                            OrbitalType_end, 
+                                                            OrbitalType_end);
+               MallocerFreer::GetInstance()->Malloc<double>(&tmpMatrixBC,              
+                                                            OrbitalType_end, 
+                                                            OrbitalType_end);
+               bool symmetrize = false;
 #pragma omp for schedule(auto)
-         for(int A=0; A<totalAtomNumber; A++){
-            const Atom& atomA = *molecule.GetAtom(A);
-            for(int B=A+1; B<totalAtomNumber; B++){
-               const Atom& atomB = *molecule.GetAtom(B);
-               this->CalcDiatomicOverlapAOsInDiatomicFrame(diatomicOverlapAOs, atomA, atomB);
-               this->CalcRotatingMatrix(rotatingMatrix, atomA, atomB);
-               this->RotateDiatmicOverlapAOsToSpaceFrame(diatomicOverlapAOs, rotatingMatrix);
-               this->SetOverlapAOsElement(overlapAOs, diatomicOverlapAOs, atomA, atomB);
-            }
-         }
-      }
-      catch(MolDSException ex){
+               for(int B=A+1; B<totalAtomNumber; B++){
+                  const Atom& atomB = *molecule.GetAtom(B);
+                  this->CalcDiatomicOverlapAOsInDiatomicFrame(diatomicOverlapAOs, atomA, atomB);
+                  this->CalcRotatingMatrix(rotatingMatrix, atomA, atomB);
+                  this->RotateDiatmicOverlapAOsToSpaceFrame(diatomicOverlapAOs, rotatingMatrix, tmpOldDiatomicOverlapAOs, tmpMatrixBC);
+                  this->SetOverlapAOsElement(overlapAOs, diatomicOverlapAOs, atomA, atomB, symmetrize);
+               } // end of loop B parallelized with openMP
+
+            }  // end of try
+            catch(MolDSException ex){
 #pragma omp critical
-         ex.Serialize(ompErrors);
+               ex.Serialize(ompErrors);
+            }
+            this->FreeDiatomicOverlapAOsAndRotatingMatrix(&diatomicOverlapAOs, &rotatingMatrix);
+            MallocerFreer::GetInstance()->Free<double>(&tmpOldDiatomicOverlapAOs, 
+                                                       OrbitalType_end, 
+                                                       OrbitalType_end);
+            MallocerFreer::GetInstance()->Free<double>(&tmpMatrixBC,              
+                                                       OrbitalType_end, 
+                                                       OrbitalType_end);
+         }  // end of omp-parallelized region
+         // Exception throwing for omp-region
+         if(!ompErrors.str().empty()){
+            throw MolDSException::Deserialize(ompErrors);
+         }
+      } // end of if(mpiRank == calcRnak)
+
+      // set data to gater in mpiHeadRank with asynchronous MPI 
+      int tag = A;
+      int source = calcRank;
+      int dest = mpiHeadRank;
+      if(mpiRank == mpiHeadRank && mpiRank != calcRank){
+         asyncCommunicator.SetRecvedVector(overlapAOs[firstAOIndexA], 
+                                           totalAONumber*numValenceAOs, 
+                                           source,
+                                           tag);
       }
-      this->FreeDiatomicOverlapAOsAndRotatingMatrix(&diatomicOverlapAOs, &rotatingMatrix);
+      if(mpiRank != mpiHeadRank && mpiRank == calcRank){
+         asyncCommunicator.SetSentVector(overlapAOs[firstAOIndexA], 
+                                         totalAONumber*numValenceAOs, 
+                                         dest,
+                                         tag);
+      }
+   }  // end of loop A parallelized with MPI
+   communicationThread.join();
+   MolDS_mpi::MpiProcess::GetInstance()->Broadcast(&overlapAOs[0][0], totalAONumber*totalAONumber, mpiHeadRank);
+
+   #pragma omp parallel for schedule(auto)
+   for(int mu=0; mu<totalAONumber; mu++){
+      overlapAOs[mu][mu] = 1.0;
+      for(int nu=mu+1; nu<totalAONumber; nu++){
+         overlapAOs[nu][mu] = overlapAOs[mu][nu];
+      }
    }
-   // Exception throwing for omp-region
-   if(!ompErrors.str().empty()){
-      throw MolDSException::Deserialize(ompErrors);
-   }
+
    /* 
    this->OutputLog("overlapAOs matrix\n"); 
    for(int o=0; o<molecule.GetTotalNumberAOs(); o++){
@@ -3781,143 +4042,126 @@ void Cndo2::CalcOverlapAOs(double** overlapAOs, const Molecule& molecule) const{
 // Note that this method can not treat d-obitals 
 // because CalcRotatingMatrix1stDerivatives can not treat d-orbitals.
 void Cndo2::CalcDiatomicOverlapAOs1stDerivatives(double*** diatomicOverlapAOs1stDerivs, 
-                                                 const Atom& atomA, 
-                                                 const Atom& atomB) const{
+                                                 double**  tmpDiaOverlapAOsInDiaFrame,         
+                                                 double**  tmpDiaOverlapAOs1stDerivInDiaFrame,
+                                                 double**  tmpRotMat, 
+                                                 double**  tmpRotMat1stDeriv,
+                                                 double*** tmpRotMat1stDerivs,
+                                                 double**  tmpRotatedDiatomicOverlap,
+                                                 double**  tmpMatrix,
+                                                 const     Atom& atomA, 
+                                                 const     Atom& atomB) const{
    double cartesian[CartesianType_end] = {atomA.GetXyz()[XAxis] - atomB.GetXyz()[XAxis], 
                                           atomA.GetXyz()[YAxis] - atomB.GetXyz()[YAxis],
                                           atomA.GetXyz()[ZAxis] - atomB.GetXyz()[ZAxis]};
-   double R = sqrt( pow(cartesian[XAxis],2.0) + 
-                    pow(cartesian[YAxis],2.0) + 
-                    pow(cartesian[ZAxis],2.0) );
+   double R = this->molecule->GetDistanceAtoms(atomA, atomB);
    
-   double**  diaOverlapAOsInDiaFrame = NULL;  // diatomic overlapAOs in diatomic frame
-   double**  diaOverlapAOs1stDerivInDiaFrame = NULL; // first derivative of the diaOverlapAOs. This derivative is related to the distance between two atoms.
-   double**  rotMat = NULL; // rotating Matrix from the diatomic frame to space fixed frame.
-   double*** rotMat1stDerivs = NULL; // first derivatives of the rotMat.
-   double**  rotatedDiatomicOverlap = NULL;
-   double**  tmpRotMat1stDeriv = NULL;
-   double**  tmpMatrix         = NULL;
+   this->CalcDiatomicOverlapAOsInDiatomicFrame(tmpDiaOverlapAOsInDiaFrame, atomA, atomB);
+   this->CalcDiatomicOverlapAOs1stDerivativeInDiatomicFrame(tmpDiaOverlapAOs1stDerivInDiaFrame, atomA, atomB);
+   this->CalcRotatingMatrix(tmpRotMat, atomA, atomB);
+   this->CalcRotatingMatrix1stDerivatives(tmpRotMat1stDerivs, atomA, atomB);
 
-   try{
-      this->MallocDiatomicOverlapAOs1stDeriTemps(&diaOverlapAOsInDiaFrame,
-                                                 &diaOverlapAOs1stDerivInDiaFrame,
-                                                 &rotMat,
-                                                 &rotMat1stDerivs,
-                                                 &rotatedDiatomicOverlap,
-                                                 &tmpRotMat1stDeriv,
-                                                 &tmpMatrix);
-      this->CalcDiatomicOverlapAOsInDiatomicFrame(diaOverlapAOsInDiaFrame, atomA, atomB);
-      this->CalcDiatomicOverlapAOs1stDerivativeInDiatomicFrame(diaOverlapAOs1stDerivInDiaFrame, atomA, atomB);
-      this->CalcRotatingMatrix(rotMat, atomA, atomB);
-      this->CalcRotatingMatrix1stDerivatives(rotMat1stDerivs, atomA, atomB);
+   // rotate (fast algorithm, see also slow algorithm shown later)
+   int incrementOne = 1;
+   bool isColumnMajorRotatingMatrix = false;
+   bool isColumnMajorDiaOverlapAOs  = false;
+   double alpha = 0.0;
+   double beta  = 0.0;
+   for(int c=0; c<CartesianType_end; c++){
+      MolDS_wrappers::Blas::GetInstance()->Dcopy(OrbitalType_end*OrbitalType_end, 
+                                                 &tmpRotMat1stDerivs[0][0][c], CartesianType_end,
+                                                 &tmpRotMat1stDeriv[0][0],  incrementOne);
+      alpha = cartesian[c]/R;
+      beta  = 0.0;
+      MolDS_wrappers::Blas::GetInstance()->Dgemmm(isColumnMajorRotatingMatrix,
+                                                  isColumnMajorDiaOverlapAOs,
+                                                  !isColumnMajorRotatingMatrix,
+                                                  OrbitalType_end, OrbitalType_end, OrbitalType_end, OrbitalType_end,
+                                                  alpha,
+                                                  tmpRotMat,
+                                                  tmpDiaOverlapAOs1stDerivInDiaFrame,
+                                                  tmpRotMat,
+                                                  beta,
+                                                  tmpRotatedDiatomicOverlap,
+                                                  tmpMatrix);
+      alpha = 1.0;
+      beta  = 1.0;
+      MolDS_wrappers::Blas::GetInstance()->Dgemmm(isColumnMajorRotatingMatrix,
+                                                  isColumnMajorDiaOverlapAOs,
+                                                  !isColumnMajorRotatingMatrix,
+                                                  OrbitalType_end, OrbitalType_end, OrbitalType_end, OrbitalType_end,
+                                                  alpha,
+                                                  tmpRotMat1stDeriv,
+                                                  tmpDiaOverlapAOsInDiaFrame,
+                                                  tmpRotMat,
+                                                  beta,
+                                                  tmpRotatedDiatomicOverlap,
+                                                  tmpMatrix);
+      MolDS_wrappers::Blas::GetInstance()->Dgemmm(isColumnMajorRotatingMatrix,
+                                                  isColumnMajorDiaOverlapAOs,
+                                                  !isColumnMajorRotatingMatrix,
+                                                  OrbitalType_end, OrbitalType_end, OrbitalType_end, OrbitalType_end,
+                                                  alpha,
+                                                  tmpRotMat,
+                                                  tmpDiaOverlapAOsInDiaFrame,
+                                                  tmpRotMat1stDeriv,
+                                                  beta,
+                                                  tmpRotatedDiatomicOverlap,
+                                                  tmpMatrix);
+      MolDS_wrappers::Blas::GetInstance()->Dcopy(OrbitalType_end*OrbitalType_end, 
+                                                 &tmpRotatedDiatomicOverlap[0][0],                      incrementOne,
+                                                 &diatomicOverlapAOs1stDerivs[0][0][c], CartesianType_end);
+   }
 
-      // rotate (fast algorithm, see also slow algorithm shown later)
-      int incrementOne = 1;
-      bool isColumnMajorRotatingMatrix = false;
-      bool isColumnMajorDiaOverlapAOs  = false;
-      double alpha = 0.0;
-      double beta  = 0.0;
-      for(int c=0; c<CartesianType_end; c++){
-         MolDS_wrappers::Blas::GetInstance()->Dcopy(OrbitalType_end*OrbitalType_end, 
-                                                    &rotMat1stDerivs[0][0][c], CartesianType_end,
-                                                    &tmpRotMat1stDeriv[0][0],  incrementOne);
-         alpha = cartesian[c]/R;
-         beta  = 0.0;
-         MolDS_wrappers::Blas::GetInstance()->Dgemmm(isColumnMajorRotatingMatrix,
-                                                     isColumnMajorDiaOverlapAOs,
-                                                     !isColumnMajorRotatingMatrix,
-                                                     OrbitalType_end, OrbitalType_end, OrbitalType_end, OrbitalType_end,
-                                                     alpha,
-                                                     rotMat,
-                                                     diaOverlapAOs1stDerivInDiaFrame,
-                                                     rotMat,
-                                                     beta,
-                                                     rotatedDiatomicOverlap,
-                                                     tmpMatrix);
-         alpha = 1.0;
-         beta  = 1.0;
-         MolDS_wrappers::Blas::GetInstance()->Dgemmm(isColumnMajorRotatingMatrix,
-                                                     isColumnMajorDiaOverlapAOs,
-                                                     !isColumnMajorRotatingMatrix,
-                                                     OrbitalType_end, OrbitalType_end, OrbitalType_end, OrbitalType_end,
-                                                     alpha,
-                                                     tmpRotMat1stDeriv,
-                                                     diaOverlapAOsInDiaFrame,
-                                                     rotMat,
-                                                     beta,
-                                                     rotatedDiatomicOverlap,
-                                                     tmpMatrix);
-         MolDS_wrappers::Blas::GetInstance()->Dgemmm(isColumnMajorRotatingMatrix,
-                                                     isColumnMajorDiaOverlapAOs,
-                                                     !isColumnMajorRotatingMatrix,
-                                                     OrbitalType_end, OrbitalType_end, OrbitalType_end, OrbitalType_end,
-                                                     alpha,
-                                                     rotMat,
-                                                     diaOverlapAOsInDiaFrame,
-                                                     tmpRotMat1stDeriv,
-                                                     beta,
-                                                     rotatedDiatomicOverlap,
-                                                     tmpMatrix);
-         MolDS_wrappers::Blas::GetInstance()->Dcopy(OrbitalType_end*OrbitalType_end, 
-                                                    &rotatedDiatomicOverlap[0][0],                      incrementOne,
-                                                    &diatomicOverlapAOs1stDerivs[0][0][c], CartesianType_end);
-      }
+   /* 
+   // rotate (slow)
+   for(int i=0; i<OrbitalType_end; i++){
+      for(int j=0; j<OrbitalType_end; j++){
+         for(int c=0; c<CartesianType_end; c++){
+            diatomicOverlapAOs1stDerivs[i][j][c] = 0.0;
 
-      /* 
-      // rotate (slow)
-      for(int i=0; i<OrbitalType_end; i++){
-         for(int j=0; j<OrbitalType_end; j++){
-            for(int c=0; c<CartesianType_end; c++){
-               diatomicOverlapAOs1stDerivs[i][j][c] = 0.0;
-
-               double temp1 = 0.0;
-               double temp2 = 0.0;
-               double temp3 = 0.0;
-               for(int k=0; k<OrbitalType_end; k++){
-                  for(int l=0; l<OrbitalType_end; l++){
-                     temp1 += rotMat[i][k] 
-                             *rotMat[j][l]
-                             *(cartesian[c]/R)
-                             *diaOverlapAOs1stDerivInDiaFrame[k][l];
-                     temp2 += rotMat1stDerivs[i][k][c] 
-                             *rotMat[j][l]
-                             *diaOverlapAOsInDiaFrame[k][l];
-                     temp3 += rotMat[i][k] 
-                             *rotMat1stDerivs[j][l][c]
-                             *diaOverlapAOsInDiaFrame[k][l];
-                  }
+            double temp1 = 0.0;
+            double temp2 = 0.0;
+            double temp3 = 0.0;
+            for(int k=0; k<OrbitalType_end; k++){
+               for(int l=0; l<OrbitalType_end; l++){
+                  temp1 += tmpRotMat[i][k] 
+                          *tmpRotMat[j][l]
+                          *(cartesian[c]/R)
+                          *tmpDiaOverlapAOs1stDerivInDiaFrame[k][l];
+                  temp2 += tmpRotMat1stDerivs[i][k][c] 
+                          *tmpRotMat[j][l]
+                          *tmpDiaOverlapAOsInDiaFrame[k][l];
+                  temp3 += tmpRotMat[i][k] 
+                          *tmpRotMat1stDerivs[j][l][c]
+                          *tmpDiaOverlapAOsInDiaFrame[k][l];
                }
-               diatomicOverlapAOs1stDerivs[i][j][c] = temp1 + temp2 + temp3;
             }
+            diatomicOverlapAOs1stDerivs[i][j][c] = temp1 + temp2 + temp3;
          }
       }
-      */
-
    }
-   catch(MolDSException ex){
-      this->FreeDiatomicOverlapAOs1stDeriTemps(&diaOverlapAOsInDiaFrame,
-                                               &diaOverlapAOs1stDerivInDiaFrame,
-                                               &rotMat,
-                                               &rotMat1stDerivs,
-                                               &rotatedDiatomicOverlap,
-                                               &tmpRotMat1stDeriv,
-                                               &tmpMatrix);
-      throw ex;
-   }
-   // free
-   this->FreeDiatomicOverlapAOs1stDeriTemps(&diaOverlapAOsInDiaFrame,
-                                            &diaOverlapAOs1stDerivInDiaFrame,
-                                            &rotMat,
-                                            &rotMat1stDerivs,
-                                            &rotatedDiatomicOverlap,
-                                            &tmpRotMat1stDeriv,
-                                            &tmpMatrix);
+   */
 }
 
 void Cndo2::CalcDiatomicOverlapAOs1stDerivatives(double*** diatomicOverlapAOs1stDerivs, 
-                                                 int indexAtomA, 
-                                                 int indexAtomB) const{
+                                                 double**  tmpDiaOverlapAOsInDiaFrame,         
+                                                 double**  tmpDiaOverlapAOs1stDerivInDiaFrame,
+                                                 double**  tmpRotMat, 
+                                                 double**  tmpRotMat1stDeriv,
+                                                 double*** tmpRotMat1stDerivs,
+                                                 double**  tmpRotatedDiatomicOverlap,
+                                                 double**  tmpMatrix,
+                                                 int       indexAtomA, 
+                                                 int       indexAtomB) const{
    this->CalcDiatomicOverlapAOs1stDerivatives(diatomicOverlapAOs1stDerivs,
+                                              tmpDiaOverlapAOsInDiaFrame,         
+                                              tmpDiaOverlapAOs1stDerivInDiaFrame,
+                                              tmpRotMat, 
+                                              tmpRotMat1stDeriv,
+                                              tmpRotMat1stDerivs,
+                                              tmpRotatedDiatomicOverlap,
+                                              tmpMatrix,
                                               *this->molecule->GetAtom(indexAtomA),
                                               *this->molecule->GetAtom(indexAtomB));
 }
@@ -3927,138 +4171,105 @@ void Cndo2::CalcDiatomicOverlapAOs1stDerivatives(double*** diatomicOverlapAOs1st
 // Note that this method can not treat d-obitals 
 // because CalcRotatingMatrix1stDerivatives can not treat d-orbitals.
 void Cndo2::CalcDiatomicOverlapAOs2ndDerivatives(double**** diatomicOverlapAOs2ndDerivs, 
+                                                 double**   tmpDiaOverlapAOsInDiaFrame,
+                                                 double**   tmpDiaOverlapAOs1stDerivInDiaFrame,
+                                                 double**   tmpDiaOverlapAOs2ndDerivInDiaFrame,
+                                                 double***  tmpDiaOverlapAOs1stDerivs,
+                                                 double**** tmpDiaOverlapAOs2ndDerivs,
+                                                 double**   tmpRotMat,
+                                                 double***  tmpRotMat1stDerivs,
+                                                 double**** tmpRotMat2ndDerivs,
                                                  const Atom& atomA, 
                                                  const Atom& atomB) const{
    double cartesian[CartesianType_end] = {atomA.GetXyz()[XAxis] - atomB.GetXyz()[XAxis], 
                                           atomA.GetXyz()[YAxis] - atomB.GetXyz()[YAxis],
                                           atomA.GetXyz()[ZAxis] - atomB.GetXyz()[ZAxis]};
-   double R = sqrt( pow(cartesian[XAxis],2.0) + 
-                    pow(cartesian[YAxis],2.0) + 
-                    pow(cartesian[ZAxis],2.0) );
+   double R = this->molecule->GetDistanceAtoms(atomA, atomB);
    
-   double**   diaOverlapAOsInDiaFrame = NULL;  // diatomic overlapAOs in diatomic frame
-   double**   diaOverlapAOs1stDerivInDiaFrame = NULL; // first derivative of the diaOverlapAOs. This derivative is related to the distance between two atoms.
-   double**   diaOverlapAOs2ndDerivInDiaFrame = NULL; // second derivative of the diaOverlapAOs. This derivative is related to the distance between two atoms.
-   double**   rotMat = NULL; // rotating Matrix from the diatomic frame to space fixed frame.
-   double***  rotMat1stDerivatives = NULL; //first derivatives of the rotMat
-   double**** rotMat2ndDerivatives = NULL; //second derivatives of the rotMat
-   double***  tempDiaOverlapAOs1stDerivs = NULL; // first derivatives of the diaOverlapAOs. This derivatives are related to the all Cartesian coordinates.
-   double**** tempDiaOverlapAOs2ndDerivs = NULL; //sedond derivatives of the diaOverlapAOs. This derivatives are related to the all Cartesian coordinates.
+   this->CalcDiatomicOverlapAOsInDiatomicFrame(tmpDiaOverlapAOsInDiaFrame, atomA, atomB);
+   this->CalcDiatomicOverlapAOs1stDerivativeInDiatomicFrame(tmpDiaOverlapAOs1stDerivInDiaFrame, atomA, atomB);
+   this->CalcDiatomicOverlapAOs2ndDerivativeInDiatomicFrame(tmpDiaOverlapAOs2ndDerivInDiaFrame, atomA, atomB);
+   this->CalcRotatingMatrix(tmpRotMat, atomA, atomB);
+   this->CalcRotatingMatrix1stDerivatives(tmpRotMat1stDerivs, atomA, atomB);
+   this->CalcRotatingMatrix2ndDerivatives(tmpRotMat2ndDerivs, atomA, atomB);
 
-   try{
-      this->MallocDiatomicOverlapAOs2ndDeriTemps(&diaOverlapAOsInDiaFrame,
-                                                 &diaOverlapAOs1stDerivInDiaFrame,
-                                                 &diaOverlapAOs2ndDerivInDiaFrame,
-                                                 &rotMat,
-                                                 &rotMat1stDerivatives,
-                                                 &rotMat2ndDerivatives,
-                                                 &tempDiaOverlapAOs1stDerivs,
-                                                 &tempDiaOverlapAOs2ndDerivs);
-      this->CalcDiatomicOverlapAOsInDiatomicFrame(diaOverlapAOsInDiaFrame, atomA, atomB);
-      this->CalcDiatomicOverlapAOs1stDerivativeInDiatomicFrame(diaOverlapAOs1stDerivInDiaFrame, atomA, atomB);
-      this->CalcDiatomicOverlapAOs2ndDerivativeInDiatomicFrame(diaOverlapAOs2ndDerivInDiaFrame, atomA, atomB);
-      this->CalcRotatingMatrix(rotMat, atomA, atomB);
-      this->CalcRotatingMatrix1stDerivatives(rotMat1stDerivatives, atomA, atomB);
-      this->CalcRotatingMatrix2ndDerivatives(rotMat2ndDerivatives, atomA, atomB);
+   // calculate each element of first derivatives
+   for(int i=0; i<OrbitalType_end; i++){
+      for(int j=0; j<OrbitalType_end; j++){
+         for(int dimA1=0; dimA1<CartesianType_end; dimA1++){
+            tmpDiaOverlapAOs1stDerivs[i][j][dimA1] = (cartesian[dimA1]/R)*tmpDiaOverlapAOs1stDerivInDiaFrame[i][j];
+         }
+      }
+   }
 
-      // calculate each element of first derivatives
-      for(int i=0; i<OrbitalType_end; i++){
-         for(int j=0; j<OrbitalType_end; j++){
-            for(int dimA1=0; dimA1<CartesianType_end; dimA1++){
-               tempDiaOverlapAOs1stDerivs[i][j][dimA1] = (cartesian[dimA1]/R)*diaOverlapAOs1stDerivInDiaFrame[i][j];
+   // calculate each element of second derivatives
+   for(int i=0; i<OrbitalType_end; i++){
+      for(int j=0; j<OrbitalType_end; j++){
+         for(int dimA1=XAxis; dimA1<CartesianType_end; dimA1++){
+            for(int dimA2=XAxis; dimA2<CartesianType_end; dimA2++){
+               tmpDiaOverlapAOs2ndDerivs[i][j][dimA1][dimA2] 
+                  = this->Get2ndDerivativeElementFromDistanceDerivatives(tmpDiaOverlapAOs1stDerivInDiaFrame[i][j],
+                                                                         tmpDiaOverlapAOs2ndDerivInDiaFrame[i][j],
+                                                                         static_cast<CartesianType>(dimA1),
+                                                                         static_cast<CartesianType>(dimA2),
+                                                                         cartesian,
+                                                                         R);
             }
          }
       }
+   }
 
-      // calculate each element of second derivatives
-      for(int i=0; i<OrbitalType_end; i++){
-         for(int j=0; j<OrbitalType_end; j++){
-            for(int dimA1=XAxis; dimA1<CartesianType_end; dimA1++){
-               for(int dimA2=XAxis; dimA2<CartesianType_end; dimA2++){
-                  tempDiaOverlapAOs2ndDerivs[i][j][dimA1][dimA2] 
-                     = this->Get2ndDerivativeElementFromDistanceDerivatives(diaOverlapAOs1stDerivInDiaFrame[i][j],
-                                                                            diaOverlapAOs2ndDerivInDiaFrame[i][j],
-                                                                            static_cast<CartesianType>(dimA1),
-                                                                            static_cast<CartesianType>(dimA2),
-                                                                            cartesian,
-                                                                            R);
-               }
-            }
-         }
-      }
-
-      // rotate
-      for(int i=0; i<OrbitalType_end; i++){
-         for(int j=0; j<OrbitalType_end; j++){
-            for(int dimA1=XAxis; dimA1<CartesianType_end; dimA1++){
-               for(int dimA2=XAxis; dimA2<CartesianType_end; dimA2++){
-                  diatomicOverlapAOs2ndDerivs[i][j][dimA1][dimA2] = 0.0;
-               
-                  double temp1 = 0.0, temp2=0.0, temp3 = 0.0;
-                  double temp4 = 0.0, temp5=0.0, temp6 = 0.0;
-                  double temp7 = 0.0, temp8=0.0, temp9 = 0.0;
-                  for(int k=0; k<OrbitalType_end; k++){
-                     for(int l=0; l<OrbitalType_end; l++){
-              
-                        temp1 += rotMat2ndDerivatives   [i][k][dimA1][dimA2]
-                                *rotMat                 [j][l]
-                                *diaOverlapAOsInDiaFrame[k][l];
-                        temp2 += rotMat                 [i][k]
-                                *rotMat2ndDerivatives   [j][l][dimA1][dimA2]
-                                *diaOverlapAOsInDiaFrame[k][l];
-                        temp3 += rotMat                 [i][k]
-                                *rotMat                 [j][l]
-                                *tempDiaOverlapAOs2ndDerivs[k][l][dimA1][dimA2];
-                        temp4 += rotMat1stDerivatives   [i][k][dimA1] 
-                                *rotMat1stDerivatives   [j][l][dimA2]
-                                *diaOverlapAOsInDiaFrame[k][l];
-                        temp5 += rotMat1stDerivatives   [i][k][dimA1] 
-                                *rotMat                 [j][l]
-                                *tempDiaOverlapAOs1stDerivs[k][l][dimA2];
-                        temp6 += rotMat1stDerivatives   [i][k][dimA2] 
-                                *rotMat1stDerivatives   [j][l][dimA1]
-                                *diaOverlapAOsInDiaFrame[k][l];
-                        temp7 += rotMat                 [i][k] 
-                                *rotMat1stDerivatives   [j][l][dimA1]
-                                *tempDiaOverlapAOs1stDerivs[k][l][dimA2];
-                        temp8 += rotMat1stDerivatives   [i][k][dimA2] 
-                                *rotMat                 [j][l]
-                                *tempDiaOverlapAOs1stDerivs[k][l][dimA1];
-                        temp9 += rotMat                 [i][k] 
-                                *rotMat1stDerivatives   [j][l][dimA2]
-                                *tempDiaOverlapAOs1stDerivs[k][l][dimA1];
-                     }
+   // rotate
+   for(int i=0; i<OrbitalType_end; i++){
+      for(int j=0; j<OrbitalType_end; j++){
+         for(int dimA1=XAxis; dimA1<CartesianType_end; dimA1++){
+            for(int dimA2=XAxis; dimA2<CartesianType_end; dimA2++){
+               diatomicOverlapAOs2ndDerivs[i][j][dimA1][dimA2] = 0.0;
+            
+               double temp1 = 0.0, temp2=0.0, temp3 = 0.0;
+               double temp4 = 0.0, temp5=0.0, temp6 = 0.0;
+               double temp7 = 0.0, temp8=0.0, temp9 = 0.0;
+               for(int k=0; k<OrbitalType_end; k++){
+                  for(int l=0; l<OrbitalType_end; l++){
+           
+                     temp1 += tmpRotMat2ndDerivs        [i][k][dimA1][dimA2]
+                             *tmpRotMat                 [j][l]
+                             *tmpDiaOverlapAOsInDiaFrame[k][l];
+                     temp2 += tmpRotMat                 [i][k]
+                             *tmpRotMat2ndDerivs        [j][l][dimA1][dimA2]
+                             *tmpDiaOverlapAOsInDiaFrame[k][l];
+                     temp3 += tmpRotMat                 [i][k]
+                             *tmpRotMat                 [j][l]
+                             *tmpDiaOverlapAOs2ndDerivs [k][l][dimA1][dimA2];
+                     temp4 += tmpRotMat1stDerivs        [i][k][dimA1] 
+                             *tmpRotMat1stDerivs        [j][l][dimA2]
+                             *tmpDiaOverlapAOsInDiaFrame[k][l];
+                     temp5 += tmpRotMat1stDerivs        [i][k][dimA1] 
+                             *tmpRotMat                 [j][l]
+                             *tmpDiaOverlapAOs1stDerivs [k][l][dimA2];
+                     temp6 += tmpRotMat1stDerivs        [i][k][dimA2] 
+                             *tmpRotMat1stDerivs        [j][l][dimA1]
+                             *tmpDiaOverlapAOsInDiaFrame[k][l];
+                     temp7 += tmpRotMat                 [i][k] 
+                             *tmpRotMat1stDerivs        [j][l][dimA1]
+                             *tmpDiaOverlapAOs1stDerivs [k][l][dimA2];
+                     temp8 += tmpRotMat1stDerivs        [i][k][dimA2] 
+                             *tmpRotMat                 [j][l]
+                             *tmpDiaOverlapAOs1stDerivs [k][l][dimA1];
+                     temp9 += tmpRotMat                 [i][k] 
+                             *tmpRotMat1stDerivs        [j][l][dimA2]
+                             *tmpDiaOverlapAOs1stDerivs [k][l][dimA1];
                   }
-
-                  diatomicOverlapAOs2ndDerivs[i][j][dimA1][dimA2] = temp1+temp2+temp3 
-                                                                   +temp4+temp5+temp6 
-                                                                   +temp7+temp8+temp9;
                }
+
+               diatomicOverlapAOs2ndDerivs[i][j][dimA1][dimA2] = temp1+temp2+temp3 
+                                                                +temp4+temp5+temp6 
+                                                                +temp7+temp8+temp9;
             }
          }
       }
-      
    }
-   catch(MolDSException ex){
-      this->FreeDiatomicOverlapAOs2ndDeriTemps(&diaOverlapAOsInDiaFrame,
-                                               &diaOverlapAOs1stDerivInDiaFrame,
-                                               &diaOverlapAOs2ndDerivInDiaFrame,
-                                               &rotMat,
-                                               &rotMat1stDerivatives,
-                                               &rotMat2ndDerivatives,
-                                               &tempDiaOverlapAOs1stDerivs,
-                                               &tempDiaOverlapAOs2ndDerivs);
-      throw ex;
-   }
-   // free
-   this->FreeDiatomicOverlapAOs2ndDeriTemps(&diaOverlapAOsInDiaFrame,
-                                            &diaOverlapAOs1stDerivInDiaFrame,
-                                            &diaOverlapAOs2ndDerivInDiaFrame,
-                                            &rotMat,
-                                            &rotMat1stDerivatives,
-                                            &rotMat2ndDerivatives,
-                                            &tempDiaOverlapAOs1stDerivs,
-                                            &tempDiaOverlapAOs2ndDerivs);
+
    /*
    for(int i=0; i<OrbitalType_end; i++){
       for(int j=0; j<OrbitalType_end; j++){
@@ -4073,9 +4284,25 @@ void Cndo2::CalcDiatomicOverlapAOs2ndDerivatives(double**** diatomicOverlapAOs2n
 }
 
 void Cndo2::CalcDiatomicOverlapAOs2ndDerivatives(double**** diatomicOverlapAOs2ndDerivs, 
+                                                 double**   tmpDiaOverlapAOsInDiaFrame,
+                                                 double**   tmpDiaOverlapAOs1stDerivInDiaFrame,
+                                                 double**   tmpDiaOverlapAOs2ndDerivInDiaFrame,
+                                                 double***  tmpDiaOverlapAOs1stDerivs,
+                                                 double**** tmpDiaOverlapAOs2ndDerivs,
+                                                 double**   tmpRotMat,
+                                                 double***  tmpRotMat1stDerivs,
+                                                 double**** tmpRotMat2ndDerivs,
                                                  int indexAtomA, 
                                                  int indexAtomB) const{
    this->CalcDiatomicOverlapAOs2ndDerivatives(diatomicOverlapAOs2ndDerivs,
+                                              tmpDiaOverlapAOsInDiaFrame,
+                                              tmpDiaOverlapAOs1stDerivInDiaFrame,
+                                              tmpDiaOverlapAOs2ndDerivInDiaFrame,
+                                              tmpDiaOverlapAOs1stDerivs,
+                                              tmpDiaOverlapAOs2ndDerivs,
+                                              tmpRotMat,
+                                              tmpRotMat1stDerivs,
+                                              tmpRotMat2ndDerivs,
                                               *this->molecule->GetAtom(indexAtomA),
                                               *this->molecule->GetAtom(indexAtomB));
 }
@@ -4088,83 +4315,15 @@ double Cndo2::Get2ndDerivativeElementFromDistanceDerivatives(double firstDistanc
                                                              double rAB) const{
    double value=0.0;               
    if(axisA1 != axisA2){
-      value = -1.0*pow(rAB, -3.0)*firstDistanceDeri;
-      value += pow(rAB, -2.0)*secondDistanceDeri;
+      value = -1.0*firstDistanceDeri/(rAB*rAB*rAB);
+      value += secondDistanceDeri/(rAB*rAB);
       value *= cartesian[axisA1]*cartesian[axisA2];
    }
    else{
-      value = (pow(rAB,2.0) - pow(cartesian[axisA1],2.0))*pow(rAB, -3.0)*firstDistanceDeri;
-      value += pow(cartesian[axisA1]/rAB, 2.0)*secondDistanceDeri;
+      value = (rAB*rAB - cartesian[axisA1]*cartesian[axisA1])*firstDistanceDeri/(rAB*rAB*rAB);
+      value += cartesian[axisA1]*cartesian[axisA1]*secondDistanceDeri/(rAB*rAB);
    }
    return value;
-}
-
-void Cndo2::MallocDiatomicOverlapAOs1stDeriTemps(double***  diaOverlapAOsInDiaFrame, 
-                                                 double***  diaOverlapAOs1stDerivInDiaFrame,
-                                                 double***  rotMat,
-                                                 double**** rotMat1stDerivs,
-                                                 double***  rotatedDiatomicOverlap,
-                                                 double***  tmpRotMat1stDeriv,
-                                                 double***  tmpMatrix) const{
-   MallocerFreer::GetInstance()->Malloc<double>(diaOverlapAOsInDiaFrame,         OrbitalType_end, OrbitalType_end);
-   MallocerFreer::GetInstance()->Malloc<double>(diaOverlapAOs1stDerivInDiaFrame, OrbitalType_end, OrbitalType_end);
-   MallocerFreer::GetInstance()->Malloc<double>(rotMat,                          OrbitalType_end, OrbitalType_end);
-   MallocerFreer::GetInstance()->Malloc<double>(rotMat1stDerivs,                 OrbitalType_end, OrbitalType_end, CartesianType_end);
-   MallocerFreer::GetInstance()->Malloc<double>(rotatedDiatomicOverlap,          OrbitalType_end, OrbitalType_end);
-   MallocerFreer::GetInstance()->Malloc<double>(tmpMatrix,                       OrbitalType_end, OrbitalType_end);
-   MallocerFreer::GetInstance()->Malloc<double>(tmpRotMat1stDeriv,               OrbitalType_end, OrbitalType_end);
-}
-
-void Cndo2::MallocDiatomicOverlapAOs2ndDeriTemps(double*** diaOverlapAOsInDiaFrame, 
-                                                 double*** diaOverlapAOs1stDerivInDiaFrame,
-                                                 double*** diaOverlapAOs2ndDerivInDiaFrame,
-                                                 double***   rotMat,
-                                                 double****  rotMat1stDerivs,
-                                                 double***** rotMat2ndDerivs,
-                                                 double****  tempDiaOverlapAOs1stDerivs,
-                                                 double***** tempDiaOverlapAOs2ndDerivs) const{
-   MallocerFreer::GetInstance()->Malloc<double>(diaOverlapAOsInDiaFrame,         OrbitalType_end, OrbitalType_end);
-   MallocerFreer::GetInstance()->Malloc<double>(diaOverlapAOs1stDerivInDiaFrame, OrbitalType_end, OrbitalType_end);
-   MallocerFreer::GetInstance()->Malloc<double>(diaOverlapAOs2ndDerivInDiaFrame, OrbitalType_end, OrbitalType_end);
-   MallocerFreer::GetInstance()->Malloc<double>(rotMat,                       OrbitalType_end, OrbitalType_end);
-   MallocerFreer::GetInstance()->Malloc<double>(rotMat1stDerivs,              OrbitalType_end, OrbitalType_end, CartesianType_end);
-   MallocerFreer::GetInstance()->Malloc<double>(rotMat2ndDerivs,              OrbitalType_end, OrbitalType_end, CartesianType_end, CartesianType_end);
-   MallocerFreer::GetInstance()->Malloc<double>(tempDiaOverlapAOs1stDerivs,      OrbitalType_end, OrbitalType_end, CartesianType_end);
-   MallocerFreer::GetInstance()->Malloc<double>(tempDiaOverlapAOs2ndDerivs,      OrbitalType_end, OrbitalType_end, CartesianType_end, CartesianType_end);
-}
-
-void Cndo2::FreeDiatomicOverlapAOs1stDeriTemps(double*** diaOverlapAOsInDiaFrame, 
-                                               double*** diaOverlapAOs1stDerivInDiaFrame,
-                                               double*** rotMat,
-                                               double**** rotMat1stDerivs,
-                                               double***  rotatedDiatomicOverlap,
-                                               double***  tmpRotMat1stDeriv,
-                                               double***  tmpMatrix) const{
-   MallocerFreer::GetInstance()->Free<double>(diaOverlapAOsInDiaFrame,         OrbitalType_end, OrbitalType_end);
-   MallocerFreer::GetInstance()->Free<double>(diaOverlapAOs1stDerivInDiaFrame, OrbitalType_end, OrbitalType_end);
-   MallocerFreer::GetInstance()->Free<double>(rotMat,                          OrbitalType_end, OrbitalType_end);
-   MallocerFreer::GetInstance()->Free<double>(rotMat1stDerivs,                 OrbitalType_end, OrbitalType_end, CartesianType_end);
-   MallocerFreer::GetInstance()->Free<double>(rotatedDiatomicOverlap,          OrbitalType_end, OrbitalType_end);
-   MallocerFreer::GetInstance()->Free<double>(tmpMatrix,                       OrbitalType_end, OrbitalType_end);
-   MallocerFreer::GetInstance()->Free<double>(tmpRotMat1stDeriv,               OrbitalType_end, OrbitalType_end);
-}
-
-void Cndo2::FreeDiatomicOverlapAOs2ndDeriTemps(double*** diaOverlapAOsInDiaFrame, 
-                                               double*** diaOverlapAOs1stDerivInDiaFrame,
-                                               double*** diaOverlapAOs2ndDerivInDiaFrame,
-                                               double***   rotMat,
-                                               double****  rotMat1stDerivs,
-                                               double***** rotMat2ndDerivs,
-                                               double****  tempDiaOverlapAOs1stDerivs,
-                                               double***** tempDiaOverlapAOs2ndDerivs) const{
-   MallocerFreer::GetInstance()->Free<double>(diaOverlapAOsInDiaFrame,         OrbitalType_end, OrbitalType_end);
-   MallocerFreer::GetInstance()->Free<double>(diaOverlapAOs1stDerivInDiaFrame, OrbitalType_end, OrbitalType_end);
-   MallocerFreer::GetInstance()->Free<double>(diaOverlapAOs2ndDerivInDiaFrame, OrbitalType_end, OrbitalType_end);
-   MallocerFreer::GetInstance()->Free<double>(rotMat,                       OrbitalType_end, OrbitalType_end);
-   MallocerFreer::GetInstance()->Free<double>(rotMat1stDerivs,              OrbitalType_end, OrbitalType_end, CartesianType_end);
-   MallocerFreer::GetInstance()->Free<double>(rotMat2ndDerivs,              OrbitalType_end, OrbitalType_end, CartesianType_end, CartesianType_end);
-   MallocerFreer::GetInstance()->Free<double>(tempDiaOverlapAOs1stDerivs,      OrbitalType_end, OrbitalType_end, CartesianType_end);
-   MallocerFreer::GetInstance()->Free<double>(tempDiaOverlapAOs2ndDerivs,      OrbitalType_end, OrbitalType_end, CartesianType_end, CartesianType_end);
 }
 
 // calculate OverlapAOs matrix. E.g. S_{\mu\nu} in (3.74) in J. A. Pople book by GTO expansion.
@@ -4231,7 +4390,7 @@ double Cndo2::GetOverlapAOsElementByGTOExpansion(const Atom& atomA, int valenceI
    double dx = atomA.GetXyz()[XAxis] - atomB.GetXyz()[XAxis];
    double dy = atomA.GetXyz()[YAxis] - atomB.GetXyz()[YAxis];
    double dz = atomA.GetXyz()[ZAxis] - atomB.GetXyz()[ZAxis];
-   double rAB = sqrt( pow(dx, 2.0) + pow(dy, 2.0) + pow(dz,2.0) );
+   double rAB = sqrt( dx*dx + dy*dy + dz*dz );
    ShellType shellTypeA = atomA.GetValenceShellType();
    ShellType shellTypeB = atomB.GetValenceShellType();
    OrbitalType valenceOrbitalA = atomA.GetValence(valenceIndexA);
@@ -4256,12 +4415,12 @@ double Cndo2::GetOverlapAOsElementByGTOExpansion(const Atom& atomA, int valenceI
                                                                 shellTypeB, 
                                                                 valenceOrbitalB, 
                                                                 j); 
-         gaussianExponentA = pow(orbitalExponentA, 2.0) *
+         gaussianExponentA = (orbitalExponentA*orbitalExponentA) *
                              GTOExpansionSTO::GetInstance()->GetExponent(stonG, 
                                                                          shellTypeA, 
                                                                          valenceOrbitalA, 
                                                                          i);
-         gaussianExponentB = pow(orbitalExponentB, 2.0) *
+         gaussianExponentB = (orbitalExponentB*orbitalExponentB) *
                              GTOExpansionSTO::GetInstance()->GetExponent(stonG, 
                                                                          shellTypeB, 
                                                                          valenceOrbitalB, 
@@ -4287,11 +4446,11 @@ double Cndo2::GetGaussianOverlapAOsSASB(double gaussianExponentA,
    double value;
    double temp1 = 0.0;
    double temp2 = 0.0;
-   temp1 = 2.0*pow(gaussianExponentA*gaussianExponentB, 0.5)
-            /(gaussianExponentA+gaussianExponentB);
-   temp2 = -1.0* gaussianExponentA*gaussianExponentB
-            /(gaussianExponentA+gaussianExponentB);
-   value = pow(temp1, 1.5)*exp(temp2*rAB*rAB);
+   double gauPlusAB = gaussianExponentA+gaussianExponentB;
+   double gauMultAB = gaussianExponentA*gaussianExponentB;
+   temp1 = 2.0*sqrt(gauMultAB)/gauPlusAB;
+   temp2 = -1.0* gauMultAB/gauPlusAB;
+   value = temp1*sqrt(temp1)*exp(temp2*rAB*rAB);
    return value;
 }
 
@@ -4330,130 +4489,132 @@ double Cndo2::GetGaussianOverlapAOs(AtomType atomTypeA,
                                     double overlapSASB) const{
 
    double value = 0.0;
+   double gauPlusAB = gaussianExponentA+gaussianExponentB;
+   double gauMultAB = gaussianExponentA*gaussianExponentB;
    if(valenceOrbitalA == s && valenceOrbitalB == s){
       value = 1.0;
    }
 
    else if(valenceOrbitalA == s && valenceOrbitalB == px){
-      value = 2.0*gaussianExponentA*pow(gaussianExponentB, 0.5)*dx;
-      value /= (gaussianExponentA+gaussianExponentB);
+      value = 2.0*gaussianExponentA*sqrt(gaussianExponentB)*dx;
+      value /= gauPlusAB;
    }
    else if(valenceOrbitalA == s && valenceOrbitalB == py){
-      value = 2.0*gaussianExponentA*pow(gaussianExponentB, 0.5)*dy;
-      value /= (gaussianExponentA+gaussianExponentB);
+      value = 2.0*gaussianExponentA*sqrt(gaussianExponentB)*dy;
+      value /= gauPlusAB;
    }
    else if(valenceOrbitalA == s && valenceOrbitalB == pz){
-      value = 2.0*gaussianExponentA*pow(gaussianExponentB, 0.5)*dz;
-      value /= (gaussianExponentA+gaussianExponentB);
+      value = 2.0*gaussianExponentA*sqrt(gaussianExponentB)*dz;
+      value /= gauPlusAB;
    }
 
    else if(valenceOrbitalA == px && valenceOrbitalB == s){
-      value = -2.0*pow(gaussianExponentA, 0.5)*gaussianExponentB*dx;
-      value /= (gaussianExponentA+gaussianExponentB);
+      value = -2.0*sqrt(gaussianExponentA)*gaussianExponentB*dx;
+      value /= gauPlusAB;
    }
    else if(valenceOrbitalA == py && valenceOrbitalB == s){
-      value = -2.0*pow(gaussianExponentA, 0.5)*gaussianExponentB*dy;
-      value /= (gaussianExponentA+gaussianExponentB);
+      value = -2.0*sqrt(gaussianExponentA)*gaussianExponentB*dy;
+      value /= gauPlusAB;
    }
    else if(valenceOrbitalA == pz && valenceOrbitalB == s){
-      value = -2.0*pow(gaussianExponentA, 0.5)*gaussianExponentB*dz;
-      value /= (gaussianExponentA+gaussianExponentB);
+      value = -2.0*sqrt(gaussianExponentA)*gaussianExponentB*dz;
+      value /= gauPlusAB;
    }
 
    else if(valenceOrbitalA == px && valenceOrbitalB == px){
       double temp = 0.0;
-      temp = -1.0*pow(dx,2.0)*gaussianExponentA*gaussianExponentB;
-      temp /= (gaussianExponentA+gaussianExponentB);
+      temp = -1.0*(dx*dx)*gauMultAB;
+      temp /= gauPlusAB;
       temp += 0.5;
-      value = 4.0*pow(gaussianExponentA*gaussianExponentB, 0.5);
-      value /= (gaussianExponentA+gaussianExponentB);
+      value = 4.0*sqrt(gauMultAB);
+      value /= gauPlusAB;
       value *= temp;
    }
    else if(valenceOrbitalA == px && valenceOrbitalB == py){
-      value = -4.0*pow(gaussianExponentA*gaussianExponentB, 1.5);
-      value *= pow(gaussianExponentA+gaussianExponentB, -2.0);
+      value = -4.0*gauMultAB*sqrt(gauMultAB);
+      value /= gauPlusAB*gauPlusAB;
       value *= dx*dy;
    }
    else if(valenceOrbitalA == px && valenceOrbitalB == pz){
-      value = -4.0*pow(gaussianExponentA*gaussianExponentB, 1.5);
-      value *= pow(gaussianExponentA+gaussianExponentB, -2.0);
+      value = -4.0*gauMultAB*sqrt(gauMultAB);
+      value /= gauPlusAB*gauPlusAB;
       value *= dx*dz;
    }
 
    else if(valenceOrbitalA == py && valenceOrbitalB == px){
-      value = -4.0*pow(gaussianExponentA*gaussianExponentB, 1.5);
-      value *= pow(gaussianExponentA+gaussianExponentB, -2.0);
+      value = -4.0*gauMultAB*sqrt(gauMultAB);
+      value /= gauPlusAB*gauPlusAB;
       value *= dy*dx;
    }
    else if(valenceOrbitalA == py && valenceOrbitalB == py){
       double temp = 0.0;
-      temp = -1.0*pow(dy,2.0)*gaussianExponentA*gaussianExponentB;
-      temp /= (gaussianExponentA+gaussianExponentB);
+      temp = -1.0*(dy*dy)*gauMultAB;
+      temp /= gauPlusAB;
       temp += 0.5;
-      value = 4.0*pow(gaussianExponentA*gaussianExponentB, 0.5);
-      value /= (gaussianExponentA+gaussianExponentB);
+      value = 4.0*sqrt(gauMultAB);
+      value /= gauPlusAB;
       value *= temp;
    }
    else if(valenceOrbitalA == py && valenceOrbitalB == pz){
-      value = -4.0*pow(gaussianExponentA*gaussianExponentB, 1.5);
-      value *= pow(gaussianExponentA+gaussianExponentB, -2.0);
+      value = -4.0*gauMultAB*sqrt(gauMultAB);
+      value /= gauPlusAB*gauPlusAB;
       value *= dy*dz;
    }
 
    else if(valenceOrbitalA == pz && valenceOrbitalB == px){
-      value = -4.0*pow(gaussianExponentA*gaussianExponentB, 1.5);
-      value *= pow(gaussianExponentA+gaussianExponentB, -2.0);
+      value = -4.0*gauMultAB*sqrt(gauMultAB);
+      value /= gauPlusAB*gauPlusAB;
       value *= dz*dx;
    }
    else if(valenceOrbitalA == pz && valenceOrbitalB == py){
-      value = -4.0*pow(gaussianExponentA*gaussianExponentB, 1.5);
-      value *= pow(gaussianExponentA+gaussianExponentB, -2.0);
+      value = -4.0*gauMultAB*sqrt(gauMultAB);
+      value /= gauPlusAB*gauPlusAB;
       value *= dz*dy;
    }
    else if(valenceOrbitalA == pz && valenceOrbitalB == pz){
       double temp = 0.0;
-      temp = -1.0*pow(dz,2.0)*gaussianExponentA*gaussianExponentB;
-      temp /= (gaussianExponentA+gaussianExponentB);
+      temp = -1.0*(dz*dz)*gauMultAB;
+      temp /= gauPlusAB;
       temp += 0.5;
-      value = 4.0*pow(gaussianExponentA*gaussianExponentB, 0.5);
-      value /= (gaussianExponentA+gaussianExponentB);
+      value = 4.0*sqrt(gauMultAB);
+      value /= gauPlusAB;
       value *= temp;
    }
 
    else if(valenceOrbitalA == dxy && valenceOrbitalB == s){
       value = 4.0*gaussianExponentA;
-      value *= pow(gaussianExponentA+gaussianExponentB, -2.0);
+      value /= gauPlusAB*gauPlusAB;
       value *= gaussianExponentB*dx;
       value *= gaussianExponentB*dy;
    }
    else if(valenceOrbitalA == dyz && valenceOrbitalB == s){
       value = 4.0*gaussianExponentA;
-      value *= pow(gaussianExponentA+gaussianExponentB, -2.0);
+      value /= gauPlusAB*gauPlusAB;
       value *= gaussianExponentB*dy;
       value *= gaussianExponentB*dz;
    }
    else if(valenceOrbitalA == dzx && valenceOrbitalB == s){
       value = 4.0*gaussianExponentA;
-      value *= pow(gaussianExponentA+gaussianExponentB, -2.0);
+      value /= gauPlusAB*gauPlusAB;
       value *= gaussianExponentB*dz;
       value *= gaussianExponentB*dx;
    }
 
    else if(valenceOrbitalA == s && valenceOrbitalB == dxy){
       value = 4.0*gaussianExponentB;
-      value *= pow(gaussianExponentA+gaussianExponentB, -2.0);
+      value /= gauPlusAB*gauPlusAB;
       value *= gaussianExponentA*dx;
       value *= gaussianExponentA*dy;
    }
    else if(valenceOrbitalA == s && valenceOrbitalB == dyz){
       value = 4.0*gaussianExponentB;
-      value *= pow(gaussianExponentA+gaussianExponentB, -2.0);
+      value /= gauPlusAB*gauPlusAB;
       value *= gaussianExponentA*dy;
       value *= gaussianExponentA*dz;
    }
    else if(valenceOrbitalA == s && valenceOrbitalB == dzx){
       value = 4.0*gaussianExponentB;
-      value *= pow(gaussianExponentA+gaussianExponentB, -2.0);
+      value /= gauPlusAB*gauPlusAB;
       value *= gaussianExponentA*dz;
       value *= gaussianExponentA*dx;
    }
@@ -4461,403 +4622,399 @@ double Cndo2::GetGaussianOverlapAOs(AtomType atomTypeA,
    else if(valenceOrbitalA == dxy && valenceOrbitalB == px){
       double temp1 = -0.5*gaussianExponentB*dy;
       double temp2 = gaussianExponentB*dx*gaussianExponentA*dx*gaussianExponentB*dy;
-      temp2 /= gaussianExponentA+gaussianExponentB;
+      temp2 /= gauPlusAB;
       value = temp1 + temp2;
-      value *= 8.0*gaussianExponentA*pow(gaussianExponentB, 0.5);
-      value /= pow(gaussianExponentA+gaussianExponentB, 2.0);
+      value *= 8.0*gaussianExponentA*sqrt(gaussianExponentB);
+      value /= (gauPlusAB*gauPlusAB);
    }
    else if(valenceOrbitalA == dxy && valenceOrbitalB == py){
       double temp1 = -0.5*gaussianExponentB*dx;
       double temp2 = gaussianExponentB*dy*gaussianExponentA*dy*gaussianExponentB*dx;
-      temp2 /= gaussianExponentA+gaussianExponentB;
+      temp2 /= gauPlusAB;
       value = temp1 + temp2;
-      value *= 8.0*gaussianExponentA*pow(gaussianExponentB, 0.5);
-      value /= pow(gaussianExponentA+gaussianExponentB, 2.0);
+      value *= 8.0*gaussianExponentA*sqrt(gaussianExponentB);
+      value /= (gauPlusAB*gauPlusAB);
    }
    else if(valenceOrbitalA == dyz && valenceOrbitalB == py){
       double temp1 = -0.5*gaussianExponentB*dz;
       double temp2 = gaussianExponentB*dy*gaussianExponentA*dy*gaussianExponentB*dz;
-      temp2 /= gaussianExponentA+gaussianExponentB;
+      temp2 /= gauPlusAB;
       value = temp1 + temp2;
-      value *= 8.0*gaussianExponentA*pow(gaussianExponentB, 0.5);
-      value /= pow(gaussianExponentA+gaussianExponentB, 2.0);
+      value *= 8.0*gaussianExponentA*sqrt(gaussianExponentB);
+      value /= (gauPlusAB*gauPlusAB);
    }
    else if(valenceOrbitalA == dyz && valenceOrbitalB == pz){
       double temp1 = -0.5*gaussianExponentB*dy;
       double temp2 = gaussianExponentB*dz*gaussianExponentA*dz*gaussianExponentB*dy;
-      temp2 /= gaussianExponentA+gaussianExponentB;
+      temp2 /= gauPlusAB;
       value = temp1 + temp2;
-      value *= 8.0*gaussianExponentA*pow(gaussianExponentB, 0.5);
-      value /= pow(gaussianExponentA+gaussianExponentB, 2.0);
+      value *= 8.0*gaussianExponentA*sqrt(gaussianExponentB);
+      value /= (gauPlusAB*gauPlusAB);
    }
    else if(valenceOrbitalA == dzx && valenceOrbitalB == pz){
       double temp1 = -0.5*gaussianExponentB*dx;
       double temp2 = gaussianExponentB*dz*gaussianExponentA*dz*gaussianExponentB*dx;
-      temp2 /= gaussianExponentA+gaussianExponentB;
+      temp2 /= gauPlusAB;
       value = temp1 + temp2;
-      value *= 8.0*gaussianExponentA*pow(gaussianExponentB, 0.5);
-      value /= pow(gaussianExponentA+gaussianExponentB, 2.0);
+      value *= 8.0*gaussianExponentA*sqrt(gaussianExponentB);
+      value /= (gauPlusAB*gauPlusAB);
    }
    else if(valenceOrbitalA == dzx && valenceOrbitalB == px){
       double temp1 = -0.5*gaussianExponentB*dz;
       double temp2 = gaussianExponentB*dx*gaussianExponentA*dx*gaussianExponentB*dz;
-      temp2 /= gaussianExponentA+gaussianExponentB;
+      temp2 /= gauPlusAB;
       value = temp1 + temp2;
-      value *= 8.0*gaussianExponentA*pow(gaussianExponentB, 0.5);
-      value /= pow(gaussianExponentA+gaussianExponentB, 2.0);
+      value *= 8.0*gaussianExponentA*sqrt(gaussianExponentB);
+      value /= (gauPlusAB*gauPlusAB);
    }
 
    else if(valenceOrbitalA == px && valenceOrbitalB == dxy){
       double temp1 = 0.5*gaussianExponentA*dy;
       double temp2 = -1.0*gaussianExponentA*dx*gaussianExponentB*dx*gaussianExponentA*dy;
-      temp2 /= gaussianExponentA+gaussianExponentB;
+      temp2 /= gauPlusAB;
       value = temp1 + temp2;
-      value *= 8.0*gaussianExponentB*pow(gaussianExponentA, 0.5);
-      value /= pow(gaussianExponentA+gaussianExponentB, 2.0);
+      value *= 8.0*gaussianExponentB*sqrt(gaussianExponentA);
+      value /= (gauPlusAB*gauPlusAB);
    }
    else if(valenceOrbitalA == py && valenceOrbitalB == dxy){
       double temp1 = 0.5*gaussianExponentA*dx;
       double temp2 = -1.0*gaussianExponentA*dy*gaussianExponentB*dy*gaussianExponentA*dx;
-      temp2 /= gaussianExponentA+gaussianExponentB;
+      temp2 /= gauPlusAB;
       value = temp1 + temp2;
-      value *= 8.0*gaussianExponentB*pow(gaussianExponentA, 0.5);
-      value /= pow(gaussianExponentA+gaussianExponentB, 2.0);
+      value *= 8.0*gaussianExponentB*sqrt(gaussianExponentA);
+      value /= (gauPlusAB*gauPlusAB);
    }
    else if(valenceOrbitalA == py && valenceOrbitalB == dyz){
       double temp1 = 0.5*gaussianExponentA*dz;
       double temp2 = -1.0*gaussianExponentA*dy*gaussianExponentB*dy*gaussianExponentA*dz;
-      temp2 /= gaussianExponentA+gaussianExponentB;
+      temp2 /= gauPlusAB;
       value = temp1 + temp2;
-      value *= 8.0*gaussianExponentB*pow(gaussianExponentA, 0.5);
-      value /= pow(gaussianExponentA+gaussianExponentB, 2.0);
+      value *= 8.0*gaussianExponentB*sqrt(gaussianExponentA);
+      value /= (gauPlusAB*gauPlusAB);
    }
    else if(valenceOrbitalA == pz && valenceOrbitalB == dyz){
       double temp1 = 0.5*gaussianExponentA*dy;
       double temp2 = -1.0*gaussianExponentA*dz*gaussianExponentB*dz*gaussianExponentA*dy;
-      temp2 /= gaussianExponentA+gaussianExponentB;
+      temp2 /= gauPlusAB;
       value = temp1 + temp2;
-      value *= 8.0*gaussianExponentB*pow(gaussianExponentA, 0.5);
-      value /= pow(gaussianExponentA+gaussianExponentB, 2.0);
+      value *= 8.0*gaussianExponentB*sqrt(gaussianExponentA);
+      value /= (gauPlusAB*gauPlusAB);
    }
    else if(valenceOrbitalA == pz && valenceOrbitalB == dzx){
       double temp1 = 0.5*gaussianExponentA*dx;
       double temp2 = -1.0*gaussianExponentA*dz*gaussianExponentB*dz*gaussianExponentA*dx;
-      temp2 /= gaussianExponentA+gaussianExponentB;
+      temp2 /= gauPlusAB;
       value = temp1 + temp2;
-      value *= 8.0*gaussianExponentB*pow(gaussianExponentA, 0.5);
-      value /= pow(gaussianExponentA+gaussianExponentB, 2.0);
+      value *= 8.0*gaussianExponentB*sqrt(gaussianExponentA);
+      value /= (gauPlusAB*gauPlusAB);
    }
    else if(valenceOrbitalA == px && valenceOrbitalB == dzx){
       double temp1 = 0.5*gaussianExponentA*dz;
       double temp2 = -1.0*gaussianExponentA*dx*gaussianExponentB*dx*gaussianExponentA*dz;
-      temp2 /= gaussianExponentA+gaussianExponentB;
+      temp2 /= gauPlusAB;
       value = temp1 + temp2;
-      value *= 8.0*gaussianExponentB*pow(gaussianExponentA, 0.5);
-      value /= pow(gaussianExponentA+gaussianExponentB, 2.0);
+      value *= 8.0*gaussianExponentB*sqrt(gaussianExponentA);
+      value /= (gauPlusAB*gauPlusAB);
    }
 
    else if(valenceOrbitalA == dxy && valenceOrbitalB == pz){
-      value = 8.0*gaussianExponentA*pow(gaussianExponentB, 0.5);
-      value /= pow(gaussianExponentA+gaussianExponentB, 3.0);
+      value = 8.0*gaussianExponentA*sqrt(gaussianExponentB);
+      value /= (gauPlusAB*gauPlusAB*gauPlusAB);
       value *= gaussianExponentB*dx*gaussianExponentB*dy*gaussianExponentA*dz;
    }
    else if(valenceOrbitalA == dyz && valenceOrbitalB == px){
-      value = 8.0*gaussianExponentA*pow(gaussianExponentB, 0.5);
-      value /= pow(gaussianExponentA+gaussianExponentB, 3.0);
+      value = 8.0*gaussianExponentA*sqrt(gaussianExponentB);
+      value /= (gauPlusAB*gauPlusAB*gauPlusAB);
       value *= gaussianExponentB*dy*gaussianExponentB*dz*gaussianExponentA*dx;
    }
    else if(valenceOrbitalA == dzx && valenceOrbitalB == py){
-      value = 8.0*gaussianExponentA*pow(gaussianExponentB, 0.5);
-      value /= pow(gaussianExponentA+gaussianExponentB, 3.0);
+      value = 8.0*gaussianExponentA*sqrt(gaussianExponentB);
+      value /= (gauPlusAB*gauPlusAB*gauPlusAB);
       value *= gaussianExponentB*dz*gaussianExponentB*dx*gaussianExponentA*dy;
    }
 
    else if(valenceOrbitalA == pz && valenceOrbitalB == dxy){
-      value = -8.0*gaussianExponentB*pow(gaussianExponentA, 0.5);
-      value /= pow(gaussianExponentA+gaussianExponentB, 3.0);
+      value = -8.0*gaussianExponentB*sqrt(gaussianExponentA);
+      value /= (gauPlusAB*gauPlusAB*gauPlusAB);
       value *= gaussianExponentA*dx*gaussianExponentA*dy*gaussianExponentB*dz;
    }
    else if(valenceOrbitalA == px && valenceOrbitalB == dyz){
-      value = -8.0*gaussianExponentB*pow(gaussianExponentA, 0.5);
-      value /= pow(gaussianExponentA+gaussianExponentB, 3.0);
+      value = -8.0*gaussianExponentB*sqrt(gaussianExponentA);
+      value /= (gauPlusAB*gauPlusAB*gauPlusAB);
       value *= gaussianExponentA*dy*gaussianExponentA*dz*gaussianExponentB*dx;
    }
    else if(valenceOrbitalA == py && valenceOrbitalB == dzx){
-      value = -8.0*gaussianExponentB*pow(gaussianExponentA, 0.5);
-      value /= pow(gaussianExponentA+gaussianExponentB, 3.0);
+      value = -8.0*gaussianExponentB*sqrt(gaussianExponentA);
+      value /= (gauPlusAB*gauPlusAB*gauPlusAB);
       value *= gaussianExponentA*dz*gaussianExponentA*dx*gaussianExponentB*dy;
    }
 
    else if(valenceOrbitalA == dxxyy && valenceOrbitalB == s){
       value = 2.0*gaussianExponentA;
-      value *= pow(gaussianExponentA+gaussianExponentB, -2.0);
-      value *= pow(gaussianExponentB*dx, 2.0) - pow(gaussianExponentB*dy, 2.0);
+      value /= gauPlusAB*gauPlusAB;
+      value *= (gaussianExponentB*gaussianExponentB*dx*dx) - (gaussianExponentB*gaussianExponentB*dy*dy);
    }
    else if(valenceOrbitalA == s && valenceOrbitalB == dxxyy){
       value = 2.0*gaussianExponentB;
-      value *= pow(gaussianExponentA+gaussianExponentB, -2.0);
-      value *= pow(gaussianExponentA*dx, 2.0) - pow(gaussianExponentA*dy, 2.0);
+      value /= gauPlusAB*gauPlusAB;
+      value *= (gaussianExponentA*gaussianExponentA*dx*dx) - (gaussianExponentA*gaussianExponentA*dy*dy);
    }
    else if(valenceOrbitalA == dxxyy && valenceOrbitalB == px){
       value = gaussianExponentB*dx;
-      value -= pow(gaussianExponentB*dx, 2.0)*gaussianExponentA*dx/(gaussianExponentA+gaussianExponentB);
-      value += pow(gaussianExponentB*dy, 2.0)*gaussianExponentA*dx/(gaussianExponentA+gaussianExponentB);
-      value *= -4.0*gaussianExponentA*pow(gaussianExponentB, 0.5);
-      value /= pow(gaussianExponentA+gaussianExponentB, 2.0);
+      value -= (gaussianExponentB*gaussianExponentB*dx*dx)*gaussianExponentA*dx/gauPlusAB;
+      value += (gaussianExponentB*gaussianExponentB*dy*dy)*gaussianExponentA*dx/gauPlusAB;
+      value *= -4.0*gaussianExponentA*sqrt(gaussianExponentB);
+      value /= (gauPlusAB*gauPlusAB);
    }
    else if(valenceOrbitalA == px && valenceOrbitalB == dxxyy){
       value = gaussianExponentA*dx;
-      value -= pow(gaussianExponentA*dx, 2.0)*gaussianExponentB*dx/(gaussianExponentA+gaussianExponentB);
-      value += pow(gaussianExponentA*dy, 2.0)*gaussianExponentB*dx/(gaussianExponentA+gaussianExponentB);
-      value *= 4.0*gaussianExponentB*pow(gaussianExponentA, 0.5);
-      value /= pow(gaussianExponentA+gaussianExponentB, 2.0);
+      value -= (gaussianExponentA*gaussianExponentA*dx*dx)*gaussianExponentB*dx/gauPlusAB;
+      value += (gaussianExponentA*gaussianExponentA*dy*dy)*gaussianExponentB*dx/gauPlusAB;
+      value *= 4.0*gaussianExponentB*sqrt(gaussianExponentA);
+      value /= (gauPlusAB*gauPlusAB);
    }
    else if(valenceOrbitalA == dxxyy && valenceOrbitalB == py){
       value = gaussianExponentB*dy;
-      value += pow(gaussianExponentB*dx, 2.0)*gaussianExponentA*dy/(gaussianExponentA+gaussianExponentB);
-      value -= pow(gaussianExponentB*dy, 2.0)*gaussianExponentA*dy/(gaussianExponentA+gaussianExponentB);
-      value *= 4.0*gaussianExponentA*pow(gaussianExponentB, 0.5);
-      value /= pow(gaussianExponentA+gaussianExponentB, 2.0);
+      value += (gaussianExponentB*gaussianExponentB*dx*dx)*gaussianExponentA*dy/gauPlusAB;
+      value -= (gaussianExponentB*gaussianExponentB*dy*dy)*gaussianExponentA*dy/gauPlusAB;
+      value *= 4.0*gaussianExponentA*sqrt(gaussianExponentB);
+      value /= (gauPlusAB*gauPlusAB);
    }
    else if(valenceOrbitalA == py && valenceOrbitalB == dxxyy){
       value = gaussianExponentA*dy;
-      value += pow(gaussianExponentA*dx, 2.0)*gaussianExponentB*dy/(gaussianExponentA+gaussianExponentB);
-      value -= pow(gaussianExponentA*dy, 2.0)*gaussianExponentB*dy/(gaussianExponentA+gaussianExponentB);
-      value *= -4.0*gaussianExponentB*pow(gaussianExponentA, 0.5);
-      value /= pow(gaussianExponentA+gaussianExponentB, 2.0);
+      value += (gaussianExponentA*gaussianExponentA*dx*dx)*gaussianExponentB*dy/gauPlusAB;
+      value -= (gaussianExponentA*gaussianExponentA*dy*dy)*gaussianExponentB*dy/gauPlusAB;
+      value *= -4.0*gaussianExponentB*sqrt(gaussianExponentA);
+      value /= (gauPlusAB*gauPlusAB);
    }
    else if(valenceOrbitalA == dxxyy && valenceOrbitalB == pz){
-      value = pow(gaussianExponentB*dx, 2.0) - pow(gaussianExponentB*dy, 2.0);
+      value = (gaussianExponentB*gaussianExponentB*dx*dx) - (gaussianExponentB*gaussianExponentB*dy*dy);
       value *= gaussianExponentA*dz;
-      value *= 4.0*gaussianExponentA*pow(gaussianExponentB, 0.5);
-      value /= pow(gaussianExponentA+gaussianExponentB, 3.0);
+      value *= 4.0*gaussianExponentA*sqrt(gaussianExponentB);
+      value /= (gauPlusAB*gauPlusAB*gauPlusAB);
    }
    else if(valenceOrbitalA == pz && valenceOrbitalB == dxxyy){
-      value = pow(gaussianExponentA*dx, 2.0) - pow(gaussianExponentA*dy, 2.0);
+      value = (gaussianExponentA*gaussianExponentA*dx*dx) - (gaussianExponentA*gaussianExponentA*dy*dy);
       value *= gaussianExponentB*dz;
-      value *= -4.0*gaussianExponentB*pow(gaussianExponentA, 0.5);
-      value /= pow(gaussianExponentA+gaussianExponentB, 3.0);
+      value *= -4.0*gaussianExponentB*sqrt(gaussianExponentA);
+      value /= (gauPlusAB*gauPlusAB*gauPlusAB);
    }
 
    else if(valenceOrbitalA == dzz && valenceOrbitalB == s){
       double temp = 0.0;
-      temp = 2.0*pow(gaussianExponentB*dz, 2.0) 
-            -    pow(gaussianExponentB*dx, 2.0) 
-            -    pow(gaussianExponentB*dy, 2.0);
+      temp = 2.0*(gaussianExponentB*gaussianExponentB*dz*dz) 
+            -    (gaussianExponentB*gaussianExponentB*dx*dx) 
+            -    (gaussianExponentB*gaussianExponentB*dy*dy);
       value = 2.0*gaussianExponentA/sqrt(3.0);
-      value *= pow(gaussianExponentA+gaussianExponentB, -2.0);
+      value /= gauPlusAB*gauPlusAB;
       value *= temp;
    }
    else if(valenceOrbitalA == s && valenceOrbitalB == dzz){
       double temp = 0.0;
-      temp = 2.0*pow(gaussianExponentA*dz, 2.0) 
-            -    pow(gaussianExponentA*dx, 2.0) 
-            -    pow(gaussianExponentA*dy, 2.0);
+      temp = 2.0*(gaussianExponentA*gaussianExponentA*dz*dz) 
+            -    (gaussianExponentA*gaussianExponentA*dx*dx) 
+            -    (gaussianExponentA*gaussianExponentA*dy*dy);
       value = 2.0*gaussianExponentB/sqrt(3.0);
-      value *= pow(gaussianExponentA+gaussianExponentB, -2.0);
+      value /= gauPlusAB*gauPlusAB;
       value *= temp;
    }
    else if(valenceOrbitalA == dzz && valenceOrbitalB == px){
       double temp = 0.0;
       temp = gaussianExponentB*dx;
-      temp += 2.0*pow(gaussianExponentB*dz, 2.0)*gaussianExponentA*dx/(gaussianExponentA+gaussianExponentB);
-      temp -=     pow(gaussianExponentB*dx, 2.0)*gaussianExponentA*dx/(gaussianExponentA+gaussianExponentB);
-      temp -=     pow(gaussianExponentB*dy, 2.0)*gaussianExponentA*dx/(gaussianExponentA+gaussianExponentB);
+      temp += 2.0*(gaussianExponentB*gaussianExponentB*dz*dz)*gaussianExponentA*dx/gauPlusAB;
+      temp -=     (gaussianExponentB*gaussianExponentB*dx*dx)*gaussianExponentA*dx/gauPlusAB;
+      temp -=     (gaussianExponentB*gaussianExponentB*dy*dy)*gaussianExponentA*dx/gauPlusAB;
       value = temp;
-      value *= 4.0*gaussianExponentA*pow(gaussianExponentB, 0.5)/sqrt(3.0);
-      value *= pow(gaussianExponentA+gaussianExponentB, -2.0);
+      value *= 4.0*gaussianExponentA*sqrt(gaussianExponentB)/sqrt(3.0);
+      value /= gauPlusAB*gauPlusAB;
    }
    else if(valenceOrbitalA == px && valenceOrbitalB == dzz){
       double temp = 0.0;
       temp = gaussianExponentA*dx;
-      temp += 2.0*pow(gaussianExponentA*dz, 2.0)*gaussianExponentB*dx/(gaussianExponentA+gaussianExponentB);
-      temp -=     pow(gaussianExponentA*dx, 2.0)*gaussianExponentB*dx/(gaussianExponentA+gaussianExponentB);
-      temp -=     pow(gaussianExponentA*dy, 2.0)*gaussianExponentB*dx/(gaussianExponentA+gaussianExponentB);
+      temp += 2.0*(gaussianExponentA*gaussianExponentA*dz*dz)*gaussianExponentB*dx/gauPlusAB;
+      temp -=     (gaussianExponentA*gaussianExponentA*dx*dx)*gaussianExponentB*dx/gauPlusAB;
+      temp -=     (gaussianExponentA*gaussianExponentA*dy*dy)*gaussianExponentB*dx/gauPlusAB;
       value = temp;
-      value *= -4.0*gaussianExponentB*pow(gaussianExponentA, 0.5)/sqrt(3.0);
-      value *= pow(gaussianExponentA+gaussianExponentB, -2.0);
+      value *= -4.0*gaussianExponentB*sqrt(gaussianExponentA)/sqrt(3.0);
+      value /= gauPlusAB*gauPlusAB;
    }
    else if(valenceOrbitalA == dzz && valenceOrbitalB == py){
       double temp = 0.0;
       temp = gaussianExponentB*dy;
-      temp += 2.0*pow(gaussianExponentB*dz, 2.0)*gaussianExponentA*dy/(gaussianExponentA+gaussianExponentB);
-      temp -=     pow(gaussianExponentB*dx, 2.0)*gaussianExponentA*dy/(gaussianExponentA+gaussianExponentB);
-      temp -=     pow(gaussianExponentB*dy, 2.0)*gaussianExponentA*dy/(gaussianExponentA+gaussianExponentB);
+      temp += 2.0*(gaussianExponentB*gaussianExponentB*dz*dz)*gaussianExponentA*dy/gauPlusAB;
+      temp -=     (gaussianExponentB*gaussianExponentB*dx*dx)*gaussianExponentA*dy/gauPlusAB;
+      temp -=     (gaussianExponentB*gaussianExponentB*dy*dy)*gaussianExponentA*dy/gauPlusAB;
       value = temp;
-      value *= 4.0*gaussianExponentA*pow(gaussianExponentB, 0.5)/sqrt(3.0);
-      value *= pow(gaussianExponentA+gaussianExponentB, -2.0);
+      value *= 4.0*gaussianExponentA*sqrt(gaussianExponentB)/sqrt(3.0);
+      value /= gauPlusAB*gauPlusAB;
    }
    else if(valenceOrbitalA == py && valenceOrbitalB == dzz){
       double temp = 0.0;
       temp = gaussianExponentA*dy;
-      temp += 2.0*pow(gaussianExponentA*dz, 2.0)*gaussianExponentB*dy/(gaussianExponentA+gaussianExponentB);
-      temp -=     pow(gaussianExponentA*dx, 2.0)*gaussianExponentB*dy/(gaussianExponentA+gaussianExponentB);
-      temp -=     pow(gaussianExponentA*dy, 2.0)*gaussianExponentB*dy/(gaussianExponentA+gaussianExponentB);
+      temp += 2.0*(gaussianExponentA*gaussianExponentA*dz*dz)*gaussianExponentB*dy/gauPlusAB;
+      temp -=     (gaussianExponentA*gaussianExponentA*dx*dx)*gaussianExponentB*dy/gauPlusAB;
+      temp -=     (gaussianExponentA*gaussianExponentA*dy*dy)*gaussianExponentB*dy/gauPlusAB;
       value = temp;
-      value *= -4.0*gaussianExponentB*pow(gaussianExponentA, 0.5)/sqrt(3.0);
-      value *= pow(gaussianExponentA+gaussianExponentB, -2.0);
+      value *= -4.0*gaussianExponentB*sqrt(gaussianExponentA)/sqrt(3.0);
+      value /= gauPlusAB*gauPlusAB;
    }
    else if(valenceOrbitalA == dzz && valenceOrbitalB == pz){
       double temp = 0.0;
       temp = -2.0*gaussianExponentB*dz;
-      temp += 2.0*pow(gaussianExponentB*dz, 2.0)*gaussianExponentA*dz/(gaussianExponentA+gaussianExponentB);
-      temp -=     pow(gaussianExponentB*dx, 2.0)*gaussianExponentA*dz/(gaussianExponentA+gaussianExponentB);
-      temp -=     pow(gaussianExponentB*dy, 2.0)*gaussianExponentA*dz/(gaussianExponentA+gaussianExponentB);
+      temp += 2.0*(gaussianExponentB*gaussianExponentB*dz*dz)*gaussianExponentA*dz/gauPlusAB;
+      temp -=     (gaussianExponentB*gaussianExponentB*dx*dx)*gaussianExponentA*dz/gauPlusAB;
+      temp -=     (gaussianExponentB*gaussianExponentB*dy*dy)*gaussianExponentA*dz/gauPlusAB;
       value = temp;
-      value *= 4.0*gaussianExponentA*pow(gaussianExponentB, 0.5)/sqrt(3.0);
-      value *= pow(gaussianExponentA+gaussianExponentB, -2.0);
+      value *= 4.0*gaussianExponentA*sqrt(gaussianExponentB)/sqrt(3.0);
+      value /= gauPlusAB*gauPlusAB;
    }
    else if(valenceOrbitalA == pz && valenceOrbitalB == dzz){
       double temp = 0.0;
       temp = -2.0*gaussianExponentA*dz;
-      temp += 2.0*pow(gaussianExponentA*dz, 2.0)*gaussianExponentB*dz/(gaussianExponentA+gaussianExponentB);
-      temp -=     pow(gaussianExponentA*dx, 2.0)*gaussianExponentB*dz/(gaussianExponentA+gaussianExponentB);
-      temp -=     pow(gaussianExponentA*dy, 2.0)*gaussianExponentB*dz/(gaussianExponentA+gaussianExponentB);
+      temp += 2.0*(gaussianExponentA*gaussianExponentA*dz*dz)*gaussianExponentB*dz/gauPlusAB;
+      temp -=     (gaussianExponentA*gaussianExponentA*dx*dx)*gaussianExponentB*dz/gauPlusAB;
+      temp -=     (gaussianExponentA*gaussianExponentA*dy*dy)*gaussianExponentB*dz/gauPlusAB;
       value = temp;
-      value *= -4.0*gaussianExponentB*pow(gaussianExponentA, 0.5)/sqrt(3.0);
-      value *= pow(gaussianExponentA+gaussianExponentB, -2.0);
+      value *= -4.0*gaussianExponentB*sqrt(gaussianExponentA)/sqrt(3.0);
+      value /= gauPlusAB*gauPlusAB;
    }
 
    else if(valenceOrbitalA == dxy && valenceOrbitalB == dxy){
       double temp = 0.25;
-      temp -= 0.5*gaussianExponentB*dx*gaussianExponentA*dx/(gaussianExponentA+gaussianExponentB);
-      temp -= 0.5*gaussianExponentB*dy*gaussianExponentA*dy/(gaussianExponentA+gaussianExponentB);
+      temp -= 0.5*gaussianExponentB*dx*gaussianExponentA*dx/gauPlusAB;
+      temp -= 0.5*gaussianExponentB*dy*gaussianExponentA*dy/gauPlusAB;
       temp += gaussianExponentB*dx*gaussianExponentA*dx
              *gaussianExponentB*dy*gaussianExponentA*dy
-             *pow(gaussianExponentA+gaussianExponentB, -2.0);
-      value = 16.0*temp*gaussianExponentA*gaussianExponentB
-             *pow(gaussianExponentA+gaussianExponentB, -2.0);
+             /(gauPlusAB*gauPlusAB);
+      value = 16.0*temp*gauMultAB
+             /(gauPlusAB*gauPlusAB);
    }
    else if(valenceOrbitalA == dyz && valenceOrbitalB == dyz){
       double temp = 0.25;
-      temp -= 0.5*gaussianExponentB*dy*gaussianExponentA*dy/(gaussianExponentA+gaussianExponentB);
-      temp -= 0.5*gaussianExponentB*dz*gaussianExponentA*dz/(gaussianExponentA+gaussianExponentB);
+      temp -= 0.5*gaussianExponentB*dy*gaussianExponentA*dy/gauPlusAB;
+      temp -= 0.5*gaussianExponentB*dz*gaussianExponentA*dz/gauPlusAB;
       temp += gaussianExponentB*dy*gaussianExponentA*dy
              *gaussianExponentB*dz*gaussianExponentA*dz
-             *pow(gaussianExponentA+gaussianExponentB, -2.0);
-      value = 16.0*temp*gaussianExponentA*gaussianExponentB
-             *pow(gaussianExponentA+gaussianExponentB, -2.0);
+             /(gauPlusAB*gauPlusAB);
+      value = 16.0*temp*gauMultAB
+             /(gauPlusAB*gauPlusAB);
    }
    else if(valenceOrbitalA == dzx && valenceOrbitalB == dzx){
       double temp = 0.25;
-      temp -= 0.5*gaussianExponentB*dz*gaussianExponentA*dz/(gaussianExponentA+gaussianExponentB);
-      temp -= 0.5*gaussianExponentB*dx*gaussianExponentA*dx/(gaussianExponentA+gaussianExponentB);
+      temp -= 0.5*gaussianExponentB*dz*gaussianExponentA*dz/gauPlusAB;
+      temp -= 0.5*gaussianExponentB*dx*gaussianExponentA*dx/gauPlusAB;
       temp += gaussianExponentB*dz*gaussianExponentA*dz
              *gaussianExponentB*dx*gaussianExponentA*dx
-             *pow(gaussianExponentA+gaussianExponentB, -2.0);
-      value = 16.0*temp*gaussianExponentA*gaussianExponentB
-             *pow(gaussianExponentA+gaussianExponentB, -2.0);
+             /(gauPlusAB*gauPlusAB);
+      value = 16.0*temp*gauMultAB
+             /(gauPlusAB*gauPlusAB);
    }
    else if(valenceOrbitalA == dxxyy && valenceOrbitalB == dxxyy){
       double temp1 = 1.0;
-      temp1 -= 2.0*gaussianExponentB*dx*gaussianExponentA*dx/(gaussianExponentA+gaussianExponentB);
-      temp1 -= 2.0*gaussianExponentB*dy*gaussianExponentA*dy/(gaussianExponentA+gaussianExponentB);
-      double temp2 = gaussianExponentA*gaussianExponentB*(pow(dx,2.0)-pow(dy,2.0))
-             /(gaussianExponentA+gaussianExponentB);
-      temp1 += pow(temp2,2.0);
-      value = 4.0*temp1*gaussianExponentA*gaussianExponentB
-             *pow(gaussianExponentA+gaussianExponentB, -2.0);
+      temp1 -= 2.0*gaussianExponentB*dx*gaussianExponentA*dx/gauPlusAB;
+      temp1 -= 2.0*gaussianExponentB*dy*gaussianExponentA*dy/gauPlusAB;
+      double temp2 = gauMultAB*((dx*dx)-(dy*dy))
+             /gauPlusAB;
+      temp1 += temp2*temp2;
+      value = 4.0*temp1*gauMultAB
+             /(gauPlusAB*gauPlusAB);
    }
    else if(valenceOrbitalA == dzz && valenceOrbitalB == dzz){
       double temp = 3.0;
-      temp -= gaussianExponentA*gaussianExponentB
-             /(gaussianExponentA+gaussianExponentB)
-             *(8.0*pow(dz,2.0)+2.0*pow(dx,2.0)+2.0*pow(dy,2.0));
-      temp += pow(gaussianExponentA*gaussianExponentB,2.0)
-             *pow(gaussianExponentA+gaussianExponentB, -2.0)
-             *(4.0*pow(dz,4.0)
-                  +pow(dx,4.0)
-                  +pow(dy,4.0)
-              -4.0*pow(dx*dz,2.0)
-              -4.0*pow(dy*dz,2.0)
-              +2.0*pow(dx*dy,2.0));
-      value = 4.0*temp*gaussianExponentA*gaussianExponentB
-             *pow(gaussianExponentA+gaussianExponentB, -2.0)
-             /3.0;
+      temp -= gauMultAB
+             /gauPlusAB
+             *(8.0*(dz*dz)+2.0*(dx*dx)+2.0*(dy*dy));
+      temp += (gaussianExponentA*gauMultAB*gaussianExponentB)
+             *(4.0*(dz*dz*dz*dz)
+                  +(dx*dx*dx*dx)
+                  +(dy*dy*dy*dy)
+              -4.0*(dx*dx*dz*dz)
+              -4.0*(dy*dy*dz*dz)
+              +2.0*(dx*dx*dy*dy))
+             /(gauPlusAB*gauPlusAB);
+      value = 4.0*temp*gauMultAB
+             /(3.0*gauPlusAB*gauPlusAB);
    }
 
    else if((valenceOrbitalA == dxy && valenceOrbitalB == dyz) ||
            (valenceOrbitalA == dyz && valenceOrbitalB == dxy)){
       double temp = 0.5;
-      temp -= gaussianExponentA*gaussianExponentB*pow(dy,2.0)/(gaussianExponentA+gaussianExponentB);
-      value = -16.0*pow(gaussianExponentA*gaussianExponentB,2.0)
-             *pow(gaussianExponentA+gaussianExponentB,-3.0)
-             *dx*dz*temp;
+      temp -= gauMultAB*(dy*dy)/gauPlusAB;
+      value = -16.0*(gaussianExponentA*gauMultAB*gaussianExponentB)
+             *dx*dz*temp/(gauPlusAB*gauPlusAB*gauPlusAB);
    }
    else if((valenceOrbitalA == dyz && valenceOrbitalB == dzx) ||
            (valenceOrbitalA == dzx && valenceOrbitalB == dyz)){
       double temp = 0.5;
-      temp -= gaussianExponentA*gaussianExponentB*pow(dz,2.0)/(gaussianExponentA+gaussianExponentB);
-      value = -16.0*pow(gaussianExponentA*gaussianExponentB,2.0)
-             *pow(gaussianExponentA+gaussianExponentB,-3.0)
-             *dy*dx*temp;
+      temp -= gauMultAB*(dz*dz)/gauPlusAB;
+      value = -16.0*(gaussianExponentA*gauMultAB*gaussianExponentB)
+             *dy*dx*temp/(gauPlusAB*gauPlusAB*gauPlusAB);
    }
    else if((valenceOrbitalA == dzx && valenceOrbitalB == dxy) ||
            (valenceOrbitalA == dxy && valenceOrbitalB == dzx)){
       double temp = 0.5;
-      temp -= gaussianExponentA*gaussianExponentB*pow(dx,2.0)/(gaussianExponentA+gaussianExponentB);
-      value = -16.0*pow(gaussianExponentA*gaussianExponentB,2.0)
-             *pow(gaussianExponentA+gaussianExponentB,-3.0)
-             *dz*dy*temp;
+      temp -= gauMultAB*(dx*dx)/gauPlusAB;
+      value = -16.0*(gaussianExponentA*gauMultAB*gaussianExponentB)
+             *dz*dy*temp/(gauPlusAB*gauPlusAB*gauPlusAB);
    }
 
    else if((valenceOrbitalA == dxxyy && valenceOrbitalB == dxy) ||
            (valenceOrbitalA == dxy && valenceOrbitalB == dxxyy)){
-      double temp = 2.0*gaussianExponentA*gaussianExponentB;
-      value = pow(temp,3.0)*(dy*pow(dx,3.0)-dx*pow(dy,3.0))
-             *pow(gaussianExponentA+gaussianExponentB,-4.0);
+      double temp = 2.0*gauMultAB;
+      value = (temp*temp*temp)*(dy*(dx*dx*dx)-dx*(dy*dy*dy))
+             /(gauPlusAB*gauPlusAB*gauPlusAB*gauPlusAB);
    }
    else if((valenceOrbitalA == dxxyy && valenceOrbitalB == dyz) ||
            (valenceOrbitalA == dyz && valenceOrbitalB == dxxyy)){
-      double temp = 2.0*gaussianExponentA*gaussianExponentB;
-      value = pow(temp,3.0)*(dy*dz*(gaussianExponentA+gaussianExponentB)
-                            /(gaussianExponentA*gaussianExponentB)
-                             +(pow(dx,2.0)*dy*dz - pow(dy,3.0)*dz))
-             *pow(gaussianExponentA+gaussianExponentB,-4.0);
+      double temp = 2.0*gauMultAB;
+      value = (temp*temp*temp)*(dy*dz*gauPlusAB
+                            /gauMultAB
+                             +((dx*dx)*dy*dz - (dy*dy*dy)*dz))
+             /(gauPlusAB*gauPlusAB*gauPlusAB*gauPlusAB);
    }
    else if((valenceOrbitalA == dxxyy && valenceOrbitalB == dzx) ||
            (valenceOrbitalA == dzx && valenceOrbitalB == dxxyy)){
-      double temp = 2.0*gaussianExponentA*gaussianExponentB;
-      value = -1.0*pow(temp,3.0)*(dx*dz*(gaussianExponentA+gaussianExponentB)
-                            /(gaussianExponentA*gaussianExponentB)
-                             +(pow(dy,2.0)*dx*dz - pow(dx,3.0)*dz))
-             *pow(gaussianExponentA+gaussianExponentB,-4.0);
+      double temp = 2.0*gauMultAB;
+      value = -1.0*(temp*temp*temp)*(dx*dz*gauPlusAB
+                            /gauMultAB
+                             +((dy*dy)*dx*dz - (dx*dx*dx)*dz))
+             /(gauPlusAB*gauPlusAB*gauPlusAB*gauPlusAB);
    }
 
    else if((valenceOrbitalA == dzz && valenceOrbitalB == dxy) ||
            (valenceOrbitalA == dxy && valenceOrbitalB == dzz)){
-      double temp = 2.0*dx*dy*pow(dz,2.0) - pow(dx,3.0)*dy - dx*pow(dy,3.0);
-      temp *= gaussianExponentA*gaussianExponentB/(gaussianExponentA+gaussianExponentB);
+      double temp = 2.0*dx*dy*(dz*dz) - (dx*dx*dx)*dy - dx*(dy*dy*dy);
+      temp *= gauMultAB/gauPlusAB;
       temp += 2.0*dx*dy;
-      value = 8.0*pow(gaussianExponentA*gaussianExponentB,2.0)*temp;
-      value /= sqrt(3.0)*pow(gaussianExponentA+gaussianExponentB,3.0);
+      value = 8.0*(gaussianExponentA*gauMultAB*gaussianExponentB)*temp;
+      value /= sqrt(3.0)*(gauPlusAB*gauPlusAB*gauPlusAB);
    }
    else if((valenceOrbitalA == dzz && valenceOrbitalB == dyz) ||
            (valenceOrbitalA == dyz && valenceOrbitalB == dzz)){
       double temp1 = -1.0*dy*dz;
-      double temp2 = 2.0*dy*pow(dz,3.0) - pow(dy,3.0)*dz - pow(dx,2.0)*dy*dz;
-      temp2 *= gaussianExponentA*gaussianExponentB/(gaussianExponentA+gaussianExponentB);
+      double temp2 = 2.0*dy*(dz*dz*dz) - (dy*dy*dy)*dz - (dx*dx)*dy*dz;
+      temp2 *= gauMultAB/gauPlusAB;
       temp1 += temp2;
-      value = 8.0*pow(gaussianExponentA*gaussianExponentB,2.0)*temp1;
-      value /= sqrt(3.0)*pow(gaussianExponentA+gaussianExponentB,3.0);
+      value = 8.0*(gaussianExponentA*gauMultAB*gaussianExponentB)*temp1;
+      value /= sqrt(3.0)*(gauPlusAB*gauPlusAB*gauPlusAB);
    }
    else if((valenceOrbitalA == dzz && valenceOrbitalB == dzx) ||
            (valenceOrbitalA == dzx && valenceOrbitalB == dzz)){
       double temp1 = -1.0*dx*dz;
-      double temp2 = 2.0*dx*pow(dz,3.0) - pow(dx,3.0)*dz - pow(dy,2.0)*dx*dz;
-      temp2 *= gaussianExponentA*gaussianExponentB/(gaussianExponentA+gaussianExponentB);
+      double temp2 = 2.0*dx*(dz*dz*dz) - (dx*dx*dx)*dz - (dy*dy)*dx*dz;
+      temp2 *= gauMultAB/gauPlusAB;
       temp1 += temp2;
-      value = 8.0*pow(gaussianExponentA*gaussianExponentB,2.0)*temp1;
-      value /= sqrt(3.0)*pow(gaussianExponentA+gaussianExponentB,3.0);
+      value = 8.0*(gaussianExponentA*gauMultAB*gaussianExponentB)*temp1;
+      value /= sqrt(3.0)*(gauPlusAB*gauPlusAB*gauPlusAB);
    }
    else if((valenceOrbitalA == dxxyy && valenceOrbitalB == dzz) ||
            (valenceOrbitalA == dzz && valenceOrbitalB == dxxyy)){
-      double temp = 2.0*pow(dz,2.0)-pow(dx,2.0)-pow(dy,2.0);
-      temp *= gaussianExponentA*gaussianExponentB/(gaussianExponentA+gaussianExponentB);
+      double temp = 2.0*(dz*dz)-(dx*dx)-(dy*dy);
+      temp *= gauMultAB/gauPlusAB;
       temp += 2.0;
-      value = 4.0*pow(gaussianExponentA*gaussianExponentB,2.0);
-      value /= sqrt(3.0)*pow(gaussianExponentA+gaussianExponentB,3.0);
-      value *= (pow(dx,2.0)-pow(dy,2.0))*temp;
+      value = 4.0*(gaussianExponentA*gauMultAB*gaussianExponentB);
+      value /= sqrt(3.0)*(gauPlusAB*gauPlusAB*gauPlusAB);
+      value *= ((dx*dx)-(dy*dy))*temp;
    }
 
    else{
@@ -4890,7 +5047,7 @@ double Cndo2::GetOverlapAOsElement1stDerivativeByGTOExpansion(const Atom& atomA,
    double dx = atomA.GetXyz()[XAxis] - atomB.GetXyz()[XAxis];
    double dy = atomA.GetXyz()[YAxis] - atomB.GetXyz()[YAxis];
    double dz = atomA.GetXyz()[ZAxis] - atomB.GetXyz()[ZAxis];
-   double rAB = sqrt( pow(dx, 2.0) + pow(dy, 2.0) + pow(dz,2.0) );
+   double rAB = sqrt( dx*dx + dy*dy + dz*dz );
    ShellType shellTypeA = atomA.GetValenceShellType();
    ShellType shellTypeB = atomB.GetValenceShellType();
    OrbitalType valenceOrbitalA = atomA.GetValence(valenceIndexA);
@@ -4915,12 +5072,12 @@ double Cndo2::GetOverlapAOsElement1stDerivativeByGTOExpansion(const Atom& atomA,
                                                                 shellTypeB, 
                                                                 valenceOrbitalB, 
                                                                 j); 
-         gaussianExponentA = pow(orbitalExponentA, 2.0) 
+         gaussianExponentA = (orbitalExponentA*orbitalExponentA) 
                             *GTOExpansionSTO::GetInstance()->GetExponent(stonG, 
                                                                          shellTypeA, 
                                                                          valenceOrbitalA, 
                                                                          i);
-         gaussianExponentB = pow(orbitalExponentB, 2.0)
+         gaussianExponentB = (orbitalExponentB*orbitalExponentB)
                             *GTOExpansionSTO::GetInstance()->GetExponent(stonG, 
                                                                          shellTypeB, 
                                                                          valenceOrbitalB, 
@@ -4953,10 +5110,12 @@ double Cndo2::GetGaussianOverlapAOs1stDerivative(AtomType atomTypeA,
                                                  double dx, double dy, double dz, double rAB, 
                                                  CartesianType axisA) const{
    double value = 0.0;
+   double gauPlusAB = gaussianExponentA+gaussianExponentB;
+   double gauMultAB = gaussianExponentA*gaussianExponentB;
 
    if(valenceOrbitalA == s && valenceOrbitalB == s){
-      double temp = -2.0*gaussianExponentA*gaussianExponentB
-                     /(gaussianExponentA+gaussianExponentB);
+      double temp = -2.0*gauMultAB
+                     /gauPlusAB;
       value = temp;
       if(axisA == XAxis){
          value *= dx;
@@ -4969,11 +5128,11 @@ double Cndo2::GetGaussianOverlapAOs1stDerivative(AtomType atomTypeA,
       }
    }
    else if(valenceOrbitalA == s && valenceOrbitalB == px){
-      double temp1 = 4.0*pow(gaussianExponentA,2.0)*pow(gaussianExponentB, 1.5)
-                     /pow(gaussianExponentA+gaussianExponentB,2.0);
+      double temp1 = 4.0*(gaussianExponentA*gaussianExponentA)*gaussianExponentB*sqrt(gaussianExponentB)
+                     /(gauPlusAB*gauPlusAB);
       if(axisA == XAxis){
-         double temp2 = 2.0*gaussianExponentA*pow(gaussianExponentB, 0.5)
-                        /(gaussianExponentA+gaussianExponentB);
+         double temp2 = 2.0*gaussianExponentA*sqrt(gaussianExponentB)
+                        /gauPlusAB;
          value = temp2-temp1*dx*dx;
       }
       else if(axisA == YAxis){
@@ -4984,14 +5143,14 @@ double Cndo2::GetGaussianOverlapAOs1stDerivative(AtomType atomTypeA,
       }
    }
    else if(valenceOrbitalA == s && valenceOrbitalB == py){
-      double temp1 = 4.0*pow(gaussianExponentA,2.0)*pow(gaussianExponentB, 1.5)
-                     /pow(gaussianExponentA+gaussianExponentB,2.0);
+      double temp1 = 4.0*(gaussianExponentA*gaussianExponentA)*gaussianExponentB*sqrt(gaussianExponentB)
+                     /(gauPlusAB*gauPlusAB);
       if(axisA == XAxis){
          value = -1.0*temp1*dx*dy;
       }
       else if(axisA == YAxis){
-         double temp2 = 2.0*gaussianExponentA*pow(gaussianExponentB, 0.5)
-                        /(gaussianExponentA+gaussianExponentB);
+         double temp2 = 2.0*gaussianExponentA*sqrt(gaussianExponentB)
+                        /gauPlusAB;
          value = temp2-temp1*dy*dy;
       }
       else if(axisA == ZAxis){
@@ -4999,8 +5158,8 @@ double Cndo2::GetGaussianOverlapAOs1stDerivative(AtomType atomTypeA,
       }
    }
    else if(valenceOrbitalA == s && valenceOrbitalB == pz){
-      double temp1 = 4.0*pow(gaussianExponentA,2.0)*pow(gaussianExponentB, 1.5)
-                     /pow(gaussianExponentA+gaussianExponentB,2.0);
+      double temp1 = 4.0*(gaussianExponentA*gaussianExponentA)*gaussianExponentB*sqrt(gaussianExponentB)
+                     /(gauPlusAB*gauPlusAB);
       if(axisA == XAxis){
          value = -1.0*temp1*dx*dz;
       }
@@ -5008,17 +5167,18 @@ double Cndo2::GetGaussianOverlapAOs1stDerivative(AtomType atomTypeA,
          value = -1.0*temp1*dy*dz;
       }
       else if(axisA == ZAxis){
-         double temp2 = 2.0*gaussianExponentA*pow(gaussianExponentB, 0.5)
-                        /(gaussianExponentA+gaussianExponentB);
+         double temp2 = 2.0*gaussianExponentA*sqrt(gaussianExponentB)
+                        /gauPlusAB;
          value = temp2-temp1*dz*dz;
       }
    }
    else if(valenceOrbitalA == px && valenceOrbitalB == s){
-      double temp1 = 4.0*pow(gaussianExponentA,1.5)*pow(gaussianExponentB, 2.0)
-                     /pow(gaussianExponentA+gaussianExponentB,2.0);
+      double temp1 = 4.0*gaussianExponentA*sqrt(gaussianExponentA)
+                    *gaussianExponentB*gaussianExponentB
+                    /(gauPlusAB*gauPlusAB);
       if(axisA == XAxis){
-         double temp2 = 2.0*pow(gaussianExponentA,0.5)*gaussianExponentB
-                        /(gaussianExponentA+gaussianExponentB);
+         double temp2 = 2.0*sqrt(gaussianExponentA)*gaussianExponentB
+                        /gauPlusAB;
          value = -1.0*temp2+temp1*dx*dx;
       }
       else if(axisA == YAxis){
@@ -5029,14 +5189,15 @@ double Cndo2::GetGaussianOverlapAOs1stDerivative(AtomType atomTypeA,
       }
    }
    else if(valenceOrbitalA == py && valenceOrbitalB == s){
-      double temp1 = 4.0*pow(gaussianExponentA,1.5)*pow(gaussianExponentB, 2.0)
-                     /pow(gaussianExponentA+gaussianExponentB,2.0);
+      double temp1 = 4.0*gaussianExponentA*sqrt(gaussianExponentA)
+                    *gaussianExponentB*gaussianExponentB
+                    /(gauPlusAB*gauPlusAB);
       if(axisA == XAxis){
          value = temp1*dx*dy;
       }
       else if(axisA == YAxis){
-         double temp2 = 2.0*pow(gaussianExponentA,0.5)*gaussianExponentB
-                        /(gaussianExponentA+gaussianExponentB);
+         double temp2 = 2.0*sqrt(gaussianExponentA)*gaussianExponentB
+                        /gauPlusAB;
          value = -1.0*temp2+temp1*dy*dy;
       }
       else if(axisA == ZAxis){
@@ -5044,8 +5205,9 @@ double Cndo2::GetGaussianOverlapAOs1stDerivative(AtomType atomTypeA,
       }
    }
    else if(valenceOrbitalA == pz && valenceOrbitalB == s){
-      double temp1 = 4.0*pow(gaussianExponentA,1.5)*pow(gaussianExponentB, 2.0)
-                     /pow(gaussianExponentA+gaussianExponentB,2.0);
+      double temp1 = 4.0*gaussianExponentA*sqrt(gaussianExponentA)
+                    *gaussianExponentB*gaussianExponentB
+                    /(gauPlusAB*gauPlusAB);
       if(axisA == XAxis){
          value = temp1*dx*dz;
       }
@@ -5053,16 +5215,16 @@ double Cndo2::GetGaussianOverlapAOs1stDerivative(AtomType atomTypeA,
          value = temp1*dy*dz;
       }
       else if(axisA == ZAxis){
-         double temp2 = 2.0*pow(gaussianExponentA,0.5)*gaussianExponentB
-                        /(gaussianExponentA+gaussianExponentB);
+         double temp2 = 2.0*sqrt(gaussianExponentA)*gaussianExponentB
+                        /gauPlusAB;
          value = -1.0*temp2+temp1*dz*dz;
       }
    }
    else if(valenceOrbitalA == px && valenceOrbitalB == py){
-      double temp1 = 8.0*pow(gaussianExponentA*gaussianExponentB,2.5)
-                     /pow(gaussianExponentA+gaussianExponentB,3.0);
-      double temp2 = 4.0*pow(gaussianExponentA*gaussianExponentB,1.5)
-                     /pow(gaussianExponentA+gaussianExponentB,2.0);
+      double temp1 = 8.0*(gauMultAB*gauMultAB*sqrt(gauMultAB))
+                     /(gauPlusAB*gauPlusAB*gauPlusAB);
+      double temp2 = 4.0*gauMultAB*sqrt(gauMultAB)
+                     /(gauPlusAB*gauPlusAB);
       if(axisA == XAxis){
          value = -1.0*temp2*dy+temp1*dx*dx*dy;
       }
@@ -5074,10 +5236,10 @@ double Cndo2::GetGaussianOverlapAOs1stDerivative(AtomType atomTypeA,
       }
    }
    else if(valenceOrbitalA == py && valenceOrbitalB == px){
-      double temp1 = 8.0*pow(gaussianExponentA*gaussianExponentB,2.5)
-                     /pow(gaussianExponentA+gaussianExponentB,3.0);
-      double temp2 = 4.0*pow(gaussianExponentA*gaussianExponentB,1.5)
-                     /pow(gaussianExponentA+gaussianExponentB,2.0);
+      double temp1 = 8.0*(gauMultAB*gauMultAB*sqrt(gauMultAB))
+                     /(gauPlusAB*gauPlusAB*gauPlusAB);
+      double temp2 = 4.0*gauMultAB*sqrt(gauMultAB)
+                     /(gauPlusAB*gauPlusAB);
       if(axisA == XAxis){
          value = -1.0*temp2*dy+temp1*dy*dx*dx;
       }
@@ -5089,10 +5251,10 @@ double Cndo2::GetGaussianOverlapAOs1stDerivative(AtomType atomTypeA,
       }
    }
    else if(valenceOrbitalA == px && valenceOrbitalB == pz){
-      double temp1 = 8.0*pow(gaussianExponentA*gaussianExponentB,2.5)
-                     /pow(gaussianExponentA+gaussianExponentB,3.0);
-      double temp2 = 4.0*pow(gaussianExponentA*gaussianExponentB,1.5)
-                     /pow(gaussianExponentA+gaussianExponentB,2.0);
+      double temp1 = 8.0*(gauMultAB*gauMultAB*sqrt(gauMultAB))
+                     /(gauPlusAB*gauPlusAB*gauPlusAB);
+      double temp2 = 4.0*gauMultAB*sqrt(gauMultAB)
+                     /(gauPlusAB*gauPlusAB);
       if(axisA == XAxis){
          value = -1.0*temp2*dz+temp1*dx*dx*dz;
       }
@@ -5104,10 +5266,10 @@ double Cndo2::GetGaussianOverlapAOs1stDerivative(AtomType atomTypeA,
       }
    }
    else if(valenceOrbitalA == pz && valenceOrbitalB == px){
-      double temp1 = 8.0*pow(gaussianExponentA*gaussianExponentB,2.5)
-                     /pow(gaussianExponentA+gaussianExponentB,3.0);
-      double temp2 = 4.0*pow(gaussianExponentA*gaussianExponentB,1.5)
-                     /pow(gaussianExponentA+gaussianExponentB,2.0);
+      double temp1 = 8.0*(gauMultAB*gauMultAB*sqrt(gauMultAB))
+                     /(gauPlusAB*gauPlusAB*gauPlusAB);
+      double temp2 = 4.0*gauMultAB*sqrt(gauMultAB)
+                     /(gauPlusAB*gauPlusAB);
       if(axisA == XAxis){
          value = -1.0*temp2*dz+temp1*dz*dx*dx;
       }
@@ -5119,10 +5281,10 @@ double Cndo2::GetGaussianOverlapAOs1stDerivative(AtomType atomTypeA,
       }
    }
    else if(valenceOrbitalA == py && valenceOrbitalB == pz){
-      double temp1 = 8.0*pow(gaussianExponentA*gaussianExponentB,2.5)
-                     /pow(gaussianExponentA+gaussianExponentB,3.0);
-      double temp2 = 4.0*pow(gaussianExponentA*gaussianExponentB,1.5)
-                     /pow(gaussianExponentA+gaussianExponentB,2.0);
+      double temp1 = 8.0*(gauMultAB*gauMultAB*sqrt(gauMultAB))
+                     /(gauPlusAB*gauPlusAB*gauPlusAB);
+      double temp2 = 4.0*gauMultAB*sqrt(gauMultAB)
+                     /(gauPlusAB*gauPlusAB);
       if(axisA == XAxis){
          value = temp1*dx*dy*dz;
       }
@@ -5134,10 +5296,10 @@ double Cndo2::GetGaussianOverlapAOs1stDerivative(AtomType atomTypeA,
       }
    }
    else if(valenceOrbitalA == pz && valenceOrbitalB == py){
-      double temp1 = 8.0*pow(gaussianExponentA*gaussianExponentB,2.5)
-                     /pow(gaussianExponentA+gaussianExponentB,3.0);
-      double temp2 = 4.0*pow(gaussianExponentA*gaussianExponentB,1.5)
-                     /pow(gaussianExponentA+gaussianExponentB,2.0);
+      double temp1 = 8.0*(gauMultAB*gauMultAB*sqrt(gauMultAB))
+                     /(gauPlusAB*gauPlusAB*gauPlusAB);
+      double temp2 = 4.0*gauMultAB*sqrt(gauMultAB)
+                     /(gauPlusAB*gauPlusAB);
       if(axisA == XAxis){
          value = temp1*dx*dy*dz;
       }
@@ -5149,10 +5311,10 @@ double Cndo2::GetGaussianOverlapAOs1stDerivative(AtomType atomTypeA,
       }
    }
    else if(valenceOrbitalA == px && valenceOrbitalB == px){
-      double temp1 = 8.0*pow(gaussianExponentA*gaussianExponentB,1.5)
-                     /pow(gaussianExponentA+gaussianExponentB,2.0);
-      double temp2 = gaussianExponentA*gaussianExponentB
-                     /(gaussianExponentA+gaussianExponentB); 
+      double temp1 = 8.0*gauMultAB*sqrt(gauMultAB)
+                     /(gauPlusAB*gauPlusAB);
+      double temp2 = gauMultAB
+                     /gauPlusAB; 
       if(axisA == XAxis){
          value = -1.0*temp1*dx*(1.5-temp2*dx*dx);
       }
@@ -5164,10 +5326,10 @@ double Cndo2::GetGaussianOverlapAOs1stDerivative(AtomType atomTypeA,
       }
    }
    else if(valenceOrbitalA == py && valenceOrbitalB == py){
-      double temp1 = 8.0*pow(gaussianExponentA*gaussianExponentB,1.5)
-                     /pow(gaussianExponentA+gaussianExponentB,2.0);
-      double temp2 = gaussianExponentA*gaussianExponentB
-                     /(gaussianExponentA+gaussianExponentB); 
+      double temp1 = 8.0*gauMultAB*sqrt(gauMultAB)
+                     /(gauPlusAB*gauPlusAB);
+      double temp2 = gauMultAB
+                     /gauPlusAB; 
       if(axisA == XAxis){
          value = -1.0*temp1*dx*(0.5-temp2*dy*dy);
       }
@@ -5179,10 +5341,10 @@ double Cndo2::GetGaussianOverlapAOs1stDerivative(AtomType atomTypeA,
       }
    }
    else if(valenceOrbitalA == pz && valenceOrbitalB == pz){
-      double temp1 = 8.0*pow(gaussianExponentA*gaussianExponentB,1.5)
-                     /pow(gaussianExponentA+gaussianExponentB,2.0);
-      double temp2 = gaussianExponentA*gaussianExponentB
-                     /(gaussianExponentA+gaussianExponentB); 
+      double temp1 = 8.0*gauMultAB*sqrt(gauMultAB)
+                     /(gauPlusAB*gauPlusAB);
+      double temp2 = gauMultAB
+                     /gauPlusAB; 
       if(axisA == XAxis){
          value = -1.0*temp1*dx*(0.5-temp2*dz*dz);
       }
@@ -5250,54 +5412,46 @@ void Cndo2::CalcRotatingMatrix(double** rotatingMatrix,
 
    // rotating matrix for d-function
    // dMatrix is (37) in J. Mol. Strct. 419, 19(1997) (ref. [BFB_1997])
-   double** dMatrix = NULL;
-   try{
-      MallocerFreer::GetInstance()->Malloc<double>(&dMatrix, OrbitalType_end, OrbitalType_end);
-      dMatrix[dzz][dzz] = 0.5*(3.0*pow(cos(beta),2.0) - 1.0);
-      dMatrix[dxxyy][dxxyy] = pow(cos(0.5*beta),4.0);
-      dMatrix[dzx][dzx] = (2.0*cos(beta)-1.0)*pow(cos(0.5*beta),2.0);
-      dMatrix[dxxyy][dzx] = -2.0*sin(0.5*beta)*pow(cos(0.5*beta),3.0);
-      dMatrix[dxxyy][dzz] = sqrt(6.0)*pow(sin(0.5*beta),2.0)*pow(cos(0.5*beta),2.0);
-      dMatrix[dxxyy][dyz] = -2.0*pow(sin(0.5*beta),3.0)*pow(cos(0.5*beta),1.0);
-      dMatrix[dxxyy][dxy] = pow(sin(0.5*beta),4.0);
-      dMatrix[dzx][dzz] = -sqrt(6.0)*cos(beta)*cos(0.5*beta)*sin(0.5*beta);
-      dMatrix[dzx][dyz] = (2.0*cos(beta)+1.0)*pow(sin(0.5*beta),2.0);
+   double dMatrix[OrbitalType_end][OrbitalType_end];
+   dMatrix[dzz][dzz] = 0.5*(3.0*(cos(beta)*cos(beta)) - 1.0);
+   dMatrix[dxxyy][dxxyy] = cos(0.5*beta)*cos(0.5*beta)*cos(0.5*beta)*cos(0.5*beta);
+   dMatrix[dzx][dzx] = (2.0*cos(beta)-1.0)*cos(0.5*beta)*cos(0.5*beta);
+   dMatrix[dxxyy][dzx] = -2.0*sin(0.5*beta)*cos(0.5*beta)*cos(0.5*beta)*cos(0.5*beta);
+   dMatrix[dxxyy][dzz] = sqrt(6.0)*(sin(0.5*beta)*sin(0.5*beta))*((cos(0.5*beta))*(cos(0.5*beta)));
+   dMatrix[dxxyy][dyz] = -2.0*sin(0.5*beta)*sin(0.5*beta)*sin(0.5*beta)*cos(0.5*beta);
+   dMatrix[dxxyy][dxy] = sin(0.5*beta)*sin(0.5*beta)*sin(0.5*beta)*sin(0.5*beta);
+   dMatrix[dzx][dzz] = -sqrt(6.0)*cos(beta)*cos(0.5*beta)*sin(0.5*beta);
+   dMatrix[dzx][dyz] = (2.0*cos(beta)+1.0)*(sin(0.5*beta)*sin(0.5*beta));
 
-      rotatingMatrix[dxy][dxy] = cos(2.0*alpha)*            (dMatrix[dxxyy][dxxyy] - dMatrix[dxxyy][dxy]);
-      rotatingMatrix[dxy][dyz] = cos(2.0*alpha)*            (-1.0*dMatrix[dxxyy][dzx] - dMatrix[dxxyy][dyz]);
-      rotatingMatrix[dxy][dzz] = sqrt(2.0)*sin(2.0*alpha)*  dMatrix[dxxyy][dzz];
-      rotatingMatrix[dxy][dzx] = sin(2.0*alpha)*            (-1.0*dMatrix[dxxyy][dzx] + dMatrix[dxxyy][dyz]);
-      rotatingMatrix[dxy][dxxyy] = sin(2.0*alpha)*          (dMatrix[dxxyy][dxxyy] + dMatrix[dxxyy][dxy]);
+   rotatingMatrix[dxy][dxy] = cos(2.0*alpha)*            (dMatrix[dxxyy][dxxyy] - dMatrix[dxxyy][dxy]);
+   rotatingMatrix[dxy][dyz] = cos(2.0*alpha)*            (-1.0*dMatrix[dxxyy][dzx] - dMatrix[dxxyy][dyz]);
+   rotatingMatrix[dxy][dzz] = sqrt(2.0)*sin(2.0*alpha)*  dMatrix[dxxyy][dzz];
+   rotatingMatrix[dxy][dzx] = sin(2.0*alpha)*            (-1.0*dMatrix[dxxyy][dzx] + dMatrix[dxxyy][dyz]);
+   rotatingMatrix[dxy][dxxyy] = sin(2.0*alpha)*          (dMatrix[dxxyy][dxxyy] + dMatrix[dxxyy][dxy]);
 
-      rotatingMatrix[dyz][dxy] = cos(alpha)*                (dMatrix[dxxyy][dzx] + dMatrix[dxxyy][dyz]);
-      rotatingMatrix[dyz][dyz] = cos(alpha)*                (dMatrix[dzx][dzx] + dMatrix[dzx][dyz]);
-      rotatingMatrix[dyz][dzz] = -1.0*sqrt(2.0)*sin(alpha)* dMatrix[dzx][dzz];
-      rotatingMatrix[dyz][dzx] = sin(alpha)*                (dMatrix[dzx][dzx] - dMatrix[dzx][dyz]);
-      rotatingMatrix[dyz][dxxyy] = sin(alpha)*              (dMatrix[dxxyy][dzx] - dMatrix[dxxyy][dyz]);
+   rotatingMatrix[dyz][dxy] = cos(alpha)*                (dMatrix[dxxyy][dzx] + dMatrix[dxxyy][dyz]);
+   rotatingMatrix[dyz][dyz] = cos(alpha)*                (dMatrix[dzx][dzx] + dMatrix[dzx][dyz]);
+   rotatingMatrix[dyz][dzz] = -1.0*sqrt(2.0)*sin(alpha)* dMatrix[dzx][dzz];
+   rotatingMatrix[dyz][dzx] = sin(alpha)*                (dMatrix[dzx][dzx] - dMatrix[dzx][dyz]);
+   rotatingMatrix[dyz][dxxyy] = sin(alpha)*              (dMatrix[dxxyy][dzx] - dMatrix[dxxyy][dyz]);
 
-      rotatingMatrix[dzz][dxy] = 0.0;
-      rotatingMatrix[dzz][dyz] = 0.0;
-      rotatingMatrix[dzz][dzz] = dMatrix[dzz][dzz];
-      rotatingMatrix[dzz][dzx] = sqrt(2.0)*dMatrix[dzx][dzz];
-      rotatingMatrix[dzz][dxxyy] = sqrt(2.0)*dMatrix[dxxyy][dzz];
+   rotatingMatrix[dzz][dxy] = 0.0;
+   rotatingMatrix[dzz][dyz] = 0.0;
+   rotatingMatrix[dzz][dzz] = dMatrix[dzz][dzz];
+   rotatingMatrix[dzz][dzx] = sqrt(2.0)*dMatrix[dzx][dzz];
+   rotatingMatrix[dzz][dxxyy] = sqrt(2.0)*dMatrix[dxxyy][dzz];
 
-      rotatingMatrix[dzx][dxy] = -1.0*sin(alpha)*           (dMatrix[dxxyy][dzx] + dMatrix[dxxyy][dyz]);
-      rotatingMatrix[dzx][dyz] = -1.0*sin(alpha)*           (dMatrix[dzx][dzx] + dMatrix[dzx][dyz]);
-      rotatingMatrix[dzx][dzz] = -1.0*sqrt(2.0)*cos(alpha)* dMatrix[dzx][dzz];
-      rotatingMatrix[dzx][dzx] = cos(alpha)*                (dMatrix[dzx][dzx] - dMatrix[dzx][dyz]);
-      rotatingMatrix[dzx][dxxyy] = cos(alpha)*              (dMatrix[dxxyy][dzx] - dMatrix[dxxyy][dyz]);
+   rotatingMatrix[dzx][dxy] = -1.0*sin(alpha)*           (dMatrix[dxxyy][dzx] + dMatrix[dxxyy][dyz]);
+   rotatingMatrix[dzx][dyz] = -1.0*sin(alpha)*           (dMatrix[dzx][dzx] + dMatrix[dzx][dyz]);
+   rotatingMatrix[dzx][dzz] = -1.0*sqrt(2.0)*cos(alpha)* dMatrix[dzx][dzz];
+   rotatingMatrix[dzx][dzx] = cos(alpha)*                (dMatrix[dzx][dzx] - dMatrix[dzx][dyz]);
+   rotatingMatrix[dzx][dxxyy] = cos(alpha)*              (dMatrix[dxxyy][dzx] - dMatrix[dxxyy][dyz]);
 
-      rotatingMatrix[dxxyy][dxy] = -1.0*sin(2.0*alpha)*     (dMatrix[dxxyy][dxxyy] - dMatrix[dxxyy][dxy]);
-      rotatingMatrix[dxxyy][dyz] = -1.0*sin(2.0*alpha)*     (-1.0*dMatrix[dxxyy][dzx] - dMatrix[dxxyy][dyz]);
-      rotatingMatrix[dxxyy][dzz] = sqrt(2.0)*cos(2.0*alpha)*dMatrix[dxxyy][dzz];
-      rotatingMatrix[dxxyy][dzx] = cos(2.0*alpha)*          (-1.0*dMatrix[dxxyy][dzx] + dMatrix[dxxyy][dyz]);
-      rotatingMatrix[dxxyy][dxxyy] = cos(2.0*alpha)*        (dMatrix[dxxyy][dxxyy] + dMatrix[dxxyy][dxy]);
-   }
-   catch(MolDSException ex){
-      MallocerFreer::GetInstance()->Free<double>(&dMatrix, OrbitalType_end, OrbitalType_end);
-      throw ex;
-   }
-   MallocerFreer::GetInstance()->Free<double>(&dMatrix, OrbitalType_end, OrbitalType_end);
+   rotatingMatrix[dxxyy][dxy] = -1.0*sin(2.0*alpha)*     (dMatrix[dxxyy][dxxyy] - dMatrix[dxxyy][dxy]);
+   rotatingMatrix[dxxyy][dyz] = -1.0*sin(2.0*alpha)*     (-1.0*dMatrix[dxxyy][dzx] - dMatrix[dxxyy][dyz]);
+   rotatingMatrix[dxxyy][dzz] = sqrt(2.0)*cos(2.0*alpha)*dMatrix[dxxyy][dzz];
+   rotatingMatrix[dxxyy][dzx] = cos(2.0*alpha)*          (-1.0*dMatrix[dxxyy][dzx] + dMatrix[dxxyy][dyz]);
+   rotatingMatrix[dxxyy][dxxyy] = cos(2.0*alpha)*        (dMatrix[dxxyy][dxxyy] + dMatrix[dxxyy][dxy]);
 }
 
 // First derivative of rotating matirx. 
@@ -5318,8 +5472,8 @@ void Cndo2::CalcRotatingMatrix1stDerivatives(double*** rotMat1stDerivatives,
    double x = atomB.GetXyz()[0] - atomA.GetXyz()[0];
    double y = atomB.GetXyz()[1] - atomA.GetXyz()[1];
    double z = atomB.GetXyz()[2] - atomA.GetXyz()[2];
-   double r = sqrt( pow(x,2.0) + pow(y,2.0) );
-   double R = sqrt( pow(x,2.0) + pow(y,2.0) + pow(z,2.0) );
+   double r = sqrt( x*x + y*y );
+   double R = sqrt( x*x + y*y + z*z );
 
    if(r==0e0){
       return;
@@ -5331,43 +5485,43 @@ void Cndo2::CalcRotatingMatrix1stDerivatives(double*** rotMat1stDerivatives,
    rotMat1stDerivatives[s][s][ZAxis] = 0.0;
 
    // for p-function
-   rotMat1stDerivatives[py][py][XAxis] = -1.0/r + pow(x,2.0)/pow(r,3.0);
-   rotMat1stDerivatives[py][pz][XAxis] = x*y/pow(R,3.0);
-   rotMat1stDerivatives[py][px][XAxis] = (1.0/(pow(r,3.0)*R) + 1.0/(pow(R,3.0)*r))*x*y*z;
+   rotMat1stDerivatives[py][py][XAxis] = -1.0/r + x*x/(r*r*r);
+   rotMat1stDerivatives[py][pz][XAxis] = x*y/(R*R*R);
+   rotMat1stDerivatives[py][px][XAxis] = (1.0/(r*r*r*R) + 1.0/(R*R*R*r))*x*y*z;
 
    rotMat1stDerivatives[pz][py][XAxis] = 0.0;
-   rotMat1stDerivatives[pz][pz][XAxis] = x*z/pow(R,3.0);
-   rotMat1stDerivatives[pz][px][XAxis] = x/(r*R) - x*r/pow(R,3.0);
+   rotMat1stDerivatives[pz][pz][XAxis] = x*z/(R*R*R);
+   rotMat1stDerivatives[pz][px][XAxis] = x/(r*R) - x*r/(R*R*R);
 
-   rotMat1stDerivatives[px][py][XAxis] = -1.0*x*y/pow(r,3.0);
-   rotMat1stDerivatives[px][pz][XAxis] = -1.0/R + x*x/pow(R,3.0); 
+   rotMat1stDerivatives[px][py][XAxis] = -1.0*x*y/(r*r*r);
+   rotMat1stDerivatives[px][pz][XAxis] = -1.0/R + x*x/(R*R*R); 
    rotMat1stDerivatives[px][px][XAxis] = -1.0*z/(r*R) + 
-                                  (1.0/(pow(r,3.0)*R) + 1.0/(pow(R,3.0)*r))*x*x*z;
+                                         (1.0/(r*r*r*R) + 1.0/(R*R*R*r))*x*x*z;
 
-   rotMat1stDerivatives[py][py][YAxis] = x*y/pow(r,3.0);
-   rotMat1stDerivatives[py][pz][YAxis] = -1.0/R + y*y/pow(R,3.0);
+   rotMat1stDerivatives[py][py][YAxis] = x*y/(r*r*r);
+   rotMat1stDerivatives[py][pz][YAxis] = -1.0/R + y*y/(R*R*R);
    rotMat1stDerivatives[py][px][YAxis] = -1.0*z/(r*R) +
-                                  (1.0/(pow(r,3.0)*R) + 1.0/(pow(R,3.0)*r))*y*y*z;
+                                         (1.0/(r*r*r*R) + 1.0/(R*R*R*r))*y*y*z;
 
    rotMat1stDerivatives[pz][py][YAxis] = 0.0;
-   rotMat1stDerivatives[pz][pz][YAxis] = y*z/pow(R,3.0); 
-   rotMat1stDerivatives[pz][px][YAxis] = y/(r*R) - y*r/pow(R,3.0);
+   rotMat1stDerivatives[pz][pz][YAxis] = y*z/(R*R*R); 
+   rotMat1stDerivatives[pz][px][YAxis] = y/(r*R) - y*r/(R*R*R);
 
-   rotMat1stDerivatives[px][py][YAxis] = 1.0/r - y*y/pow(r,3.0);
-   rotMat1stDerivatives[px][pz][YAxis] = x*y/pow(R,3.0);
-   rotMat1stDerivatives[px][px][YAxis] = (1.0/(pow(r,3.0)*R) + 1.0/(pow(R,3.0)*r))*x*y*z;
+   rotMat1stDerivatives[px][py][YAxis] = 1.0/r - y*y/(r*r*r);
+   rotMat1stDerivatives[px][pz][YAxis] = x*y/(R*R*R);
+   rotMat1stDerivatives[px][px][YAxis] = (1.0/(r*r*r*R) + 1.0/(R*R*R*r))*x*y*z;
 
    rotMat1stDerivatives[py][py][ZAxis] = 0.0;
-   rotMat1stDerivatives[py][pz][ZAxis] = y*z/pow(R,3.0);
-   rotMat1stDerivatives[py][px][ZAxis] = -1.0*y/(r*R) + y*z*z/(r*pow(R,3.0));
+   rotMat1stDerivatives[py][pz][ZAxis] = y*z/(R*R*R);
+   rotMat1stDerivatives[py][px][ZAxis] = -1.0*y/(r*R) + y*z*z/(r*R*R*R);
 
    rotMat1stDerivatives[pz][py][ZAxis] = 0.0;
-   rotMat1stDerivatives[pz][pz][ZAxis] = -1.0/R + z*z/pow(R,3.0); 
-   rotMat1stDerivatives[pz][px][ZAxis] = -1.0*z*r/pow(R,3.0);
+   rotMat1stDerivatives[pz][pz][ZAxis] = -1.0/R + z*z/(R*R*R); 
+   rotMat1stDerivatives[pz][px][ZAxis] = -1.0*z*r/(R*R*R);
 
    rotMat1stDerivatives[px][py][ZAxis] = 0.0;
-   rotMat1stDerivatives[px][pz][ZAxis] = x*z/pow(R,3.0);
-   rotMat1stDerivatives[px][px][ZAxis] = -1.0*x/(r*R) + x*z*z/(r*pow(R,3.0));
+   rotMat1stDerivatives[px][pz][ZAxis] = x*z/(R*R*R);
+   rotMat1stDerivatives[px][px][ZAxis] = -1.0*x/(r*R) + x*z*z/(r*R*R*R);
 
    // for d-function
    // ToDo: First derivative of rotating matrix for d-orbital...
@@ -5393,16 +5547,16 @@ void Cndo2::CalcRotatingMatrix2ndDerivatives(double**** rotMat2ndDerivatives,
    double x = atomB.GetXyz()[0] - atomA.GetXyz()[0];
    double y = atomB.GetXyz()[1] - atomA.GetXyz()[1];
    double z = atomB.GetXyz()[2] - atomA.GetXyz()[2];
-   double r = sqrt( pow(x,2.0) + pow(y,2.0) );
-   double R = sqrt( pow(x,2.0) + pow(y,2.0) + pow(z,2.0) );
+   double r = sqrt( x*x + y*y );
+   double R = sqrt( x*x + y*y + z*z );
 
    if(r==0e0){
       return;
    }
 
-   double temp1 = 1.0/(pow(r,3.0)*R) + 1.0/(r*pow(R,3.0));
-   double temp2 = 2.0*pow(r*R,-3.0) + 3.0/(pow(r,5.0)*R) + 3.0/(r*pow(R,5.0));
-   double temp3 = pow(r*R,-3.0) + 3.0/(r*pow(R,5.0));
+   double temp1 = 1.0/(r*r*r*R) + 1.0/(r*R*R*R);
+   double temp2 = 2.0/(r*r*r*R*R*R) + 3.0/(r*r*r*r*r*R) + 3.0/(r*R*R*R*R*R);
+   double temp3 = 1.0/(r*r*r*R*R*R) + 3.0/(r*R*R*R*R*R);
 
    // for s-function
    rotMat2ndDerivatives[s][s][XAxis][XAxis] = 0.0;
@@ -5416,29 +5570,29 @@ void Cndo2::CalcRotatingMatrix2ndDerivatives(double**** rotMat2ndDerivatives,
    rotMat2ndDerivatives[s][s][ZAxis][ZAxis] = 0.0;
 
    // for p-function, xx-derivatives
-   rotMat2ndDerivatives[py][py][XAxis][XAxis] = -3.0*x*pow(r,-3.0) + 3.0*pow(x,3.0)*pow(r,-5.0);
-   rotMat2ndDerivatives[py][pz][XAxis][XAxis] = -1.0*y*pow(R,-3.0) + 3.0*pow(x,2.0)*y*pow(R,-5.0);
-   rotMat2ndDerivatives[py][px][XAxis][XAxis] = -1.0*temp1*y*z+temp2*pow(x,2.0)*y*z;
+   rotMat2ndDerivatives[py][py][XAxis][XAxis] = -3.0*x/(r*r*r) + 3.0*x*x*x/(r*r*r*r*r);
+   rotMat2ndDerivatives[py][pz][XAxis][XAxis] = -1.0*y/(R*R*R) + 3.0*x*x*y/(R*R*R*R*R);
+   rotMat2ndDerivatives[py][px][XAxis][XAxis] = -1.0*temp1*y*z+temp2*x*x*y*z;
                                               
    rotMat2ndDerivatives[pz][py][XAxis][XAxis] = 0.0;
-   rotMat2ndDerivatives[pz][pz][XAxis][XAxis] = -1.0*z*pow(R,-3.0) + 3.0*pow(x,2.0)*z*pow(R,-5.0);
-   rotMat2ndDerivatives[pz][px][XAxis][XAxis] = -1.0*pow(r*R,-1.0) + temp1*pow(x,2.0)
-                                                   +r*pow(R,-3.0) - 3.0*pow(x,2.0)*r*pow(R,-5.0) + pow(x,2.0)*pow(r,-1.0)*pow(R,-3.0);
+   rotMat2ndDerivatives[pz][pz][XAxis][XAxis] = -1.0*z/(R*R*R) + 3.0*x*x*z/(R*R*R*R*R);
+   rotMat2ndDerivatives[pz][px][XAxis][XAxis] = -1.0/(r*R) + temp1*x*x
+                                                   +r/(R*R*R) - 3.0*x*x*r/(R*R*R*R*R) + x*x/(r*R*R*R);
                                               
-   rotMat2ndDerivatives[px][py][XAxis][XAxis] = y*pow(r,-3.0) - 3.0*pow(x,2.0)*y*pow(r,-5.0);
-   rotMat2ndDerivatives[px][pz][XAxis][XAxis] = -3.0*x*pow(R,-3.0) + 3.0*pow(x,3.0)*pow(R,-5.0);
-   rotMat2ndDerivatives[px][px][XAxis][XAxis] = -3.0*temp1*x*z+temp2*pow(x,3.0)*z;
+   rotMat2ndDerivatives[px][py][XAxis][XAxis] = y/(r*r*r) - 3.0*x*x*y/(r*r*r*r*r);
+   rotMat2ndDerivatives[px][pz][XAxis][XAxis] = -3.0*x/(R*R*R) + 3.0*x*x*x/(R*R*R*R*R);
+   rotMat2ndDerivatives[px][px][XAxis][XAxis] = -3.0*temp1*x*z+temp2*x*x*x*z;
 
    // for p-function, xy-derivatives
-   rotMat2ndDerivatives[py][py][XAxis][YAxis] = -1.0*y*pow(r,-3.0) + 3.0*pow(x,2.0)*y*pow(r,-5.0);
-   rotMat2ndDerivatives[py][pz][XAxis][YAxis] = -1.0*x*pow(R,-3.0) + 3.0*x*pow(y,2.0)*pow(R,-5.0);  
-   rotMat2ndDerivatives[py][px][XAxis][YAxis] = -1.0*temp1*x*z+temp2*x*pow(y,2.0)*z;
+   rotMat2ndDerivatives[py][py][XAxis][YAxis] = -1.0*y/(r*r*r) + 3.0*x*x*y/(r*r*r*r*r);
+   rotMat2ndDerivatives[py][pz][XAxis][YAxis] = -1.0*x/(R*R*R) + 3.0*x*y*y/(R*R*R*R*R);  
+   rotMat2ndDerivatives[py][px][XAxis][YAxis] = -1.0*temp1*x*z+temp2*x*y*y*z;
                                               
    rotMat2ndDerivatives[pz][py][XAxis][YAxis] = 0.0;
-   rotMat2ndDerivatives[pz][pz][XAxis][YAxis] = 3.0*x*y*z*pow(R,-5.0);
-   rotMat2ndDerivatives[pz][px][XAxis][YAxis] = temp1*x*y + x*y*pow(r,-1.0)*pow(R,-3.0) - 3.0*x*y*r*pow(R,-5.0);
+   rotMat2ndDerivatives[pz][pz][XAxis][YAxis] = 3.0*x*y*z/(R*R*R*R*R);
+   rotMat2ndDerivatives[pz][px][XAxis][YAxis] = temp1*x*y + x*y/(r*R*R*R) - 3.0*x*y*r/(R*R*R*R*R);
                                               
-   rotMat2ndDerivatives[px][py][XAxis][YAxis] = x*pow(r,-3.0) - 3.0*x*pow(y,2.0)*pow(r,-5.0);
+   rotMat2ndDerivatives[px][py][XAxis][YAxis] = x/(r*r*r) - 3.0*x*y*y/(r*r*r*r*r);
    rotMat2ndDerivatives[px][pz][XAxis][YAxis] = rotMat2ndDerivatives[py][pz][XAxis][XAxis];
    rotMat2ndDerivatives[px][px][XAxis][YAxis] = rotMat2ndDerivatives[py][px][XAxis][XAxis];
 
@@ -5451,16 +5605,16 @@ void Cndo2::CalcRotatingMatrix2ndDerivatives(double**** rotMat2ndDerivatives,
    // for p-function, xz-derivatives
    rotMat2ndDerivatives[py][py][XAxis][ZAxis] = 0.0;
    rotMat2ndDerivatives[py][pz][XAxis][ZAxis] = rotMat2ndDerivatives[pz][pz][XAxis][YAxis];
-   rotMat2ndDerivatives[py][px][XAxis][ZAxis] = -1.0*temp1*x*y +temp3*x*y*pow(z,2.0);
+   rotMat2ndDerivatives[py][px][XAxis][ZAxis] = -1.0*temp1*x*y +temp3*x*y*z*z;
                                               
    rotMat2ndDerivatives[pz][py][XAxis][ZAxis] = 0.0;
-   rotMat2ndDerivatives[pz][pz][XAxis][ZAxis] = -1.0*x*pow(R,-3.0) + 3.0*x*pow(z,2.0)*pow(R,-5.0); 
-   rotMat2ndDerivatives[pz][px][XAxis][ZAxis] = x*z*pow(r,-1.0)*pow(R,-3.0) - 3.0*x*z*r*pow(R,-5.0);
+   rotMat2ndDerivatives[pz][pz][XAxis][ZAxis] = -1.0*x/(R*R*R) + 3.0*x*z*z/(R*R*R*R*R); 
+   rotMat2ndDerivatives[pz][px][XAxis][ZAxis] = x*z/(r*R*R*R) - 3.0*x*z*r/(R*R*R*R*R);
                                               
    rotMat2ndDerivatives[px][py][XAxis][ZAxis] = 0.0;
    rotMat2ndDerivatives[px][pz][XAxis][ZAxis] = rotMat2ndDerivatives[pz][pz][XAxis][XAxis];
-   rotMat2ndDerivatives[px][px][XAxis][ZAxis] = pow(r*R,-1.0) - pow(z,2.0)*pow(r,-1.0)*pow(R,-3.0)
-                                                   -1.0*temp1*pow(x,2.0)+temp3*pow(x*z,2.0);
+   rotMat2ndDerivatives[px][px][XAxis][ZAxis] = 1.0/(r*R) - z*z/(r*R*R*R)
+                                                   -1.0*temp1*x*x+temp3*x*x*z*z;
 
 
    // for p-function, zx-derivatives
@@ -5471,32 +5625,32 @@ void Cndo2::CalcRotatingMatrix2ndDerivatives(double**** rotMat2ndDerivatives,
    }
 
    // for p-function, yy-derivatives
-   rotMat2ndDerivatives[py][py][YAxis][YAxis] = -1.0*x*pow(r,-3.0) + 3.0*x*pow(y,2.0)*pow(r,-5.0); 
-   rotMat2ndDerivatives[py][pz][YAxis][YAxis] = -3.0*y*pow(R,-3.0) + 3.0*pow(y,3.0)*pow(R,-5.0);
-   rotMat2ndDerivatives[py][px][YAxis][YAxis] = -3.0*temp1*y*z+temp2*pow(y,3.0)*z;
+   rotMat2ndDerivatives[py][py][YAxis][YAxis] = -1.0*x/(r*r*r) + 3.0*x*y*y/(r*r*r*r*r); 
+   rotMat2ndDerivatives[py][pz][YAxis][YAxis] = -3.0*y/(R*R*R) + 3.0*y*y*y/(R*R*R*R*R);
+   rotMat2ndDerivatives[py][px][YAxis][YAxis] = -3.0*temp1*y*z+temp2*y*y*y*z;
                                               
    rotMat2ndDerivatives[pz][py][YAxis][YAxis] = 0.0;
-   rotMat2ndDerivatives[pz][pz][YAxis][YAxis] = -1.0*z*pow(R,-3.0) + 3.0*pow(y,2.0)*z*pow(R,-5.0);
-   rotMat2ndDerivatives[pz][px][YAxis][YAxis] = -1.0*pow(r*R,-1.0) + temp1*pow(y,2.0)
-                                                   +r*pow(R,-3.0) - 3.0*pow(y,2.0)*r*pow(R,-5.0) + pow(y,2.0)*pow(r,-1.0)*pow(R,-3.0);
+   rotMat2ndDerivatives[pz][pz][YAxis][YAxis] = -1.0*z/(R*R*R) + 3.0*y*y*z/(R*R*R*R*R);
+   rotMat2ndDerivatives[pz][px][YAxis][YAxis] = -1.0/(r*R) + temp1*y*y
+                                                   +r/(R*R*R) - 3.0*y*y*r/(R*R*R*R*R) + y*y/(r*R*R*R);
                                               
-   rotMat2ndDerivatives[px][py][YAxis][YAxis] = 3.0*y*pow(r,-3.0) - 3.0*pow(y,3.0)*pow(r,-5.0);
+   rotMat2ndDerivatives[px][py][YAxis][YAxis] = 3.0*y/(r*r*r) - 3.0*y*y*y/(r*r*r*r*r);
    rotMat2ndDerivatives[px][pz][YAxis][YAxis] = rotMat2ndDerivatives[py][pz][XAxis][YAxis];
-   rotMat2ndDerivatives[px][px][YAxis][YAxis] = -1.0*temp1*x*z+temp2*x*pow(y,2.0)*z;
+   rotMat2ndDerivatives[px][px][YAxis][YAxis] = -1.0*temp1*x*z+temp2*x*y*y*z;
                
    // for p-function, yz-derivatives
    rotMat2ndDerivatives[py][py][YAxis][ZAxis] = 0.0;
    rotMat2ndDerivatives[py][pz][YAxis][ZAxis] = rotMat2ndDerivatives[pz][pz][YAxis][YAxis];
-   rotMat2ndDerivatives[py][px][YAxis][ZAxis] = pow(r*R,-1.0) - pow(z,2.0)*pow(r,-1.0)*pow(R,-3.0)
-                                                   -1.0*temp1*pow(y,2.0)+temp3*pow(y*z,2.0);
+   rotMat2ndDerivatives[py][px][YAxis][ZAxis] = 1.0/(r*R) - z*z/(r*R*R*R)
+                                                   -1.0*temp1*y*y+temp3*y*y*z*z;
                                               
    rotMat2ndDerivatives[pz][py][YAxis][ZAxis] = 0.0;
-   rotMat2ndDerivatives[pz][pz][YAxis][ZAxis] = -1.0*y*pow(R,-3.0) + 3.0*y*pow(z,2.0)*pow(R,-5.0);
-   rotMat2ndDerivatives[pz][px][YAxis][ZAxis] = y*z*pow(r,-1.0)*pow(R,-3.0) - 3.0*y*z*r*pow(R,-5.0);
+   rotMat2ndDerivatives[pz][pz][YAxis][ZAxis] = -1.0*y/(R*R*R) + 3.0*y*z*z/(R*R*R*R*R);
+   rotMat2ndDerivatives[pz][px][YAxis][ZAxis] = y*z/(r*R*R*R) - 3.0*y*z*r/(R*R*R*R*R);
                                               
    rotMat2ndDerivatives[px][py][YAxis][ZAxis] = 0.0;
    rotMat2ndDerivatives[px][pz][YAxis][ZAxis] = rotMat2ndDerivatives[pz][pz][XAxis][YAxis];
-   rotMat2ndDerivatives[px][px][YAxis][ZAxis] = -1.0*temp1*x*y+temp3*x*y*pow(z,2.0);
+   rotMat2ndDerivatives[px][px][YAxis][ZAxis] = -1.0*temp1*x*y+temp3*x*y*z*z;
                                           
                
    // for p-function, zy-derivatives
@@ -5509,15 +5663,15 @@ void Cndo2::CalcRotatingMatrix2ndDerivatives(double**** rotMat2ndDerivatives,
    // for p-function, zz-derivatives
    rotMat2ndDerivatives[py][py][ZAxis][ZAxis] = 0.0;
    rotMat2ndDerivatives[py][pz][ZAxis][ZAxis] = rotMat2ndDerivatives[pz][pz][YAxis][ZAxis];
-   rotMat2ndDerivatives[py][px][ZAxis][ZAxis] = -3.0*y*z*pow(r,-1.0)*pow(R,-3.0) + 3.0*y*pow(z,3.0)*pow(r,-1.0)*pow(R,-5.0);
+   rotMat2ndDerivatives[py][px][ZAxis][ZAxis] = -3.0*y*z/(r*R*R*R) + 3.0*y*z*z*z/(r*R*R*R*R*R);
                                               
    rotMat2ndDerivatives[pz][py][ZAxis][ZAxis] = 0.0;
-   rotMat2ndDerivatives[pz][pz][ZAxis][ZAxis] = -3.0*z*pow(R,-3.0) + 3.0*pow(z,3.0)*pow(R,-5.0); 
-   rotMat2ndDerivatives[pz][px][ZAxis][ZAxis] = -3.0*pow(z,2.0)*r*pow(R,-5.0) + r*pow(R,-3.0);
+   rotMat2ndDerivatives[pz][pz][ZAxis][ZAxis] = -3.0*z/(R*R*R) + 3.0*z*z*z/(R*R*R*R*R); 
+   rotMat2ndDerivatives[pz][px][ZAxis][ZAxis] = -3.0*z*z*r/(R*R*R*R*R) + r/(R*R*R);
                                               
    rotMat2ndDerivatives[px][py][ZAxis][ZAxis] = 0.0;
    rotMat2ndDerivatives[px][pz][ZAxis][ZAxis] = rotMat2ndDerivatives[pz][pz][XAxis][ZAxis];
-   rotMat2ndDerivatives[px][px][ZAxis][ZAxis] = -3.0*x*z*pow(r,-1.0)*pow(R,-3.0) + 3.0*x*pow(z,3.0)*pow(r,-1.0)*pow(R,-5.0);
+   rotMat2ndDerivatives[px][px][ZAxis][ZAxis] = -3.0*x*z/(r*R*R*R) + 3.0*x*z*z*z/(r*R*R*R*R*R);
 
    // for d-function
    // ToDo: Second derivative of rotating matrix for d-orbital...
@@ -5548,7 +5702,8 @@ void Cndo2::CalcDiatomicOverlapAOsInDiatomicFrame(double** diatomicOverlapAOs,
 
    for(int a=0; a<atomA.GetValenceSize(); a++){
       OrbitalType valenceOrbitalA = atomA.GetValence(a);
-      RealSphericalHarmonicsIndex realShpericalHarmonicsA(valenceOrbitalA);
+      RealSphericalHarmonicsIndex const* realShpericalHarmonicsA 
+         = atomA.GetRealSphericalHarmonicsIndex(a);
       orbitalExponentA = atomA.GetOrbitalExponent(
                                atomA.GetValenceShellType(), 
                                valenceOrbitalA, 
@@ -5556,19 +5711,20 @@ void Cndo2::CalcDiatomicOverlapAOsInDiatomicFrame(double** diatomicOverlapAOs,
 
       for(int b=0; b<atomB.GetValenceSize(); b++){
          OrbitalType valenceOrbitalB = atomB.GetValence(b);
-         RealSphericalHarmonicsIndex realShpericalHarmonicsB(valenceOrbitalB);
+         RealSphericalHarmonicsIndex const* realShpericalHarmonicsB
+            = atomB.GetRealSphericalHarmonicsIndex(b);
          orbitalExponentB = atomB.GetOrbitalExponent(
                                   atomB.GetValenceShellType(), 
                                   valenceOrbitalB, 
                                   this->theory);
 
-         if(realShpericalHarmonicsA.GetM() == realShpericalHarmonicsB.GetM()){
-            m = abs(realShpericalHarmonicsA.GetM());
+         if(realShpericalHarmonicsA->GetM() == realShpericalHarmonicsB->GetM()){
+            m = abs(realShpericalHarmonicsA->GetM());
             alpha = orbitalExponentA * rAB;
             beta =  orbitalExponentB * rAB;
 
-            reducedOverlapAOs = this->GetReducedOverlapAOs(na, realShpericalHarmonicsA.GetL(), m,
-                                                           nb, realShpericalHarmonicsB.GetL(), alpha, beta);
+            reducedOverlapAOs = this->GetReducedOverlapAOs(na, realShpericalHarmonicsA->GetL(), m,
+                                                           nb, realShpericalHarmonicsB->GetL(), alpha, beta);
 
 
             pre =  pow(2.0*orbitalExponentA, na+0.5);
@@ -5813,7 +5969,9 @@ void Cndo2::CalcDiatomicOverlapAOs2ndDerivativeInDiatomicFrame(double** diatomic
 
 // see (B.63) in Pople book.
 void Cndo2::RotateDiatmicOverlapAOsToSpaceFrame(double** diatomicOverlapAOs, 
-                                                double const* const* rotatingMatrix) const{
+                                                double const* const* rotatingMatrix,
+                                                double** tmpOldDiatomicOverlapAOs,
+                                                double** tmpMatrixBC) const{
 #ifdef MOLDS_DBG
    if(diatomicOverlapAOs==NULL){
       throw MolDSException(this->errorMessageRotDiaOverlapAOsToSpaceFrameNullDiaMatrix);
@@ -5821,37 +5979,34 @@ void Cndo2::RotateDiatmicOverlapAOsToSpaceFrame(double** diatomicOverlapAOs,
    if(rotatingMatrix==NULL){
       throw MolDSException(this->errorMessageRotDiaOverlapAOsToSpaceFrameNullRotMatrix);
    }
+   if(tmpOldDiatomicOverlapAOs==NULL){
+      throw MolDSException(this->errorMessageRotDiaOverlapAOsToSpaceFrameNullTmpOldDiaMatrix);
+   }
+   if(tmpMatrixBC==NULL){
+      throw MolDSException(this->errorMessageRotDiaOverlapAOsToSpaceFrameNullTmpMatrixBC);
+   }
 #endif
-   double** oldDiatomicOverlapAOs = NULL;
-   try{
-      MallocerFreer::GetInstance()->Malloc<double>(&oldDiatomicOverlapAOs, OrbitalType_end, OrbitalType_end);
-      for(int i=0; i<OrbitalType_end; i++){
-         for(int j=0; j<OrbitalType_end; j++){
-            oldDiatomicOverlapAOs[i][j] = diatomicOverlapAOs[i][j];
-         }
+   for(int i=0; i<OrbitalType_end; i++){
+      for(int j=0; j<OrbitalType_end; j++){
+         tmpOldDiatomicOverlapAOs[i][j] = diatomicOverlapAOs[i][j];
       }
-      // rotate
-      bool isColumnMajorRotatingMatrix = false;
-      bool isColumnMajorOldDiatomicOverlap        = false;
-      double alpha = 1.0;
-      double beta  = 0.0;
-      MolDS_wrappers::Blas::GetInstance()->Dgemmm(isColumnMajorRotatingMatrix,
-                                                  isColumnMajorOldDiatomicOverlap,
-                                                  !isColumnMajorRotatingMatrix,
-                                                  OrbitalType_end, OrbitalType_end, OrbitalType_end, OrbitalType_end, 
-                                                  alpha,
-                                                  rotatingMatrix,
-                                                  oldDiatomicOverlapAOs,
-                                                  rotatingMatrix,
-                                                  beta, 
-                                                  diatomicOverlapAOs);
    }
-   catch(MolDSException ex){
-      MallocerFreer::GetInstance()->Free<double>(&oldDiatomicOverlapAOs, OrbitalType_end, OrbitalType_end);
-      throw ex;
-   }
-   MallocerFreer::GetInstance()->Free<double>(&oldDiatomicOverlapAOs, OrbitalType_end, OrbitalType_end);
-
+   // rotate
+   bool isColumnMajorRotatingMatrix        = false;
+   bool isColumnMajorTmpOldDiatomicOverlap = false;
+   double alpha = 1.0;
+   double beta  = 0.0;
+   MolDS_wrappers::Blas::GetInstance()->Dgemmm(isColumnMajorRotatingMatrix,
+                                               isColumnMajorTmpOldDiatomicOverlap,
+                                               !isColumnMajorRotatingMatrix,
+                                               OrbitalType_end, OrbitalType_end, OrbitalType_end, OrbitalType_end, 
+                                               alpha,
+                                               rotatingMatrix,
+                                               tmpOldDiatomicOverlapAOs,
+                                               rotatingMatrix,
+                                               beta, 
+                                               diatomicOverlapAOs,
+                                               tmpMatrixBC);
    /*
    for(int i=0;i<OrbitalType_end;i++){
       for(int j=0;j<OrbitalType_end;j++){
@@ -6171,7 +6326,8 @@ double Cndo2::GetAuxiliaryD(int la, int lb, int m) const{
       throw MolDSException(ss.str());
    }
 
-   double pre = pow(Factorial(m+1)/8.0, 2.0);
+   double tmp = Factorial(m+1)/8.0;
+   double pre = tmp*tmp;
    double termA = ( (2.0*la+1.0)*Factorial(la-m) ) / ( 2.0*Factorial(la+m) );
    double termB = ( (2.0*lb+1.0)*Factorial(lb-m) ) / ( 2.0*Factorial(lb+m) );
    value = pre*sqrt(termA)*sqrt(termB);

@@ -144,74 +144,74 @@ public:
    inline bool       RequiresUnpairedPopCIS() const                         {return this->requiresUnpairedPopCIS;}
    inline void       SetRequiresUnpairedPopCIS(bool requires)               {this->requiresUnpairedPopCIS = requires;}
    // Memory
-   double GetLimitHeapMemory() const;
-   void   SetLimitHeapMemory(double limitHeap);
+   double GetLimitHeapMemory() const          {return this->limitHeapMemory;}
+   void   SetLimitHeapMemory(double limitHeap){this->limitHeapMemory = limitHeap;}
    // MD
-   int    GetElectronicStateIndexMD() const;
-   void   SetElectronicStateIndexMD(int electronicStateIndex);
-   int    GetTotalStepsMD() const;
-   void   SetTotalStepsMD(int totalSteps);
-   double GetTimeWidthMD() const;
-   void   SetTimeWidthMD(double timeWidth);
+   int    GetElectronicStateIndexMD() const   {return this->electronicStateIndexMD;}
+   void   SetElectronicStateIndexMD(int index){this->electronicStateIndexMD = index;}
+   int    GetTotalStepsMD() const             {return this->totalStepsMD;}
+   void   SetTotalStepsMD(int steps)          {this->totalStepsMD = steps;}
+   double GetTimeWidthMD() const              {return this->timeWidthMD;}
+   void   SetTimeWidthMD(double dt)           {this->timeWidthMD = dt;}
    // MC
-   int           GetElectronicStateIndexMC() const;
-   void          SetElectronicStateIndexMC(int electronicStateIndex);
-   int           GetTotalStepsMC() const;
-   void          SetTotalStepsMC(int totalSteps);
-   double        GetTemperatureMC() const;
-   void          SetTemperatureMC(double temperature);
-   double        GetStepWidthMC() const;
-   void          SetStepWidthMC(double stepWidth);
-   unsigned long GetSeedMC() const;
-   void          SetSeedMC(unsigned long seed);
+   int           GetElectronicStateIndexMC() const{return this->electronicStateIndexMC;}
+   void          SetElectronicStateIndexMC(int i) {this->electronicStateIndexMC = i;}
+   int           GetTotalStepsMC() const          {return this->totalStepsMC;}
+   void          SetTotalStepsMC(int steps)       {this->totalStepsMC = steps;}
+   double        GetTemperatureMC() const         {return this->temperatureMC;}
+   void          SetTemperatureMC(double t)       {this->temperatureMC = t;}
+   double        GetStepWidthMC() const           {return this->stepWidthMC;}
+   void          SetStepWidthMC(double dr)        {this->stepWidthMC = dr;}
+   unsigned long GetSeedMC() const                {return this->seedMC;}
+   void          SetSeedMC(unsigned long seed)    {this->seedMC = seed;}
    // RPMD
-   int           GetElectronicStateIndexRPMD() const;
-   void          SetElectronicStateIndexRPMD(int electronicStateIndex);
-   int           GetNumberElectronicStatesRPMD() const;
-   void          SetNumberElectronicStatesRPMD(int NumberElectronicStates);
-   int           GetTotalStepsRPMD() const;
-   void          SetTotalStepsRPMD(int totalSteps);
-   double        GetTemperatureRPMD() const;
-   void          SetTemperatureRPMD(double temperature);
-   double        GetTimeWidthRPMD() const;
-   void          SetTimeWidthRPMD(double stepWidth);
-   int           GetNumberBeadsRPMD() const;
-   void          SetNumberBeadsRPMD(int numberBeads);
-   unsigned long GetSeedRPMD() const;
-   void          SetSeedRPMD(unsigned long seed);
+   int           GetElectronicStateIndexRPMD() const  {return this->electronicStateIndexRPMD;}
+   void          SetElectronicStateIndexRPMD(int i)   {this->electronicStateIndexRPMD = i;}
+   int           GetNumberElectronicStatesRPMD() const{return this->numberElectronicStatesRPMD;}
+   void          SetNumberElectronicStatesRPMD(int n) {this->numberElectronicStatesRPMD = n;}
+   int           GetTotalStepsRPMD() const            {return this->totalStepsRPMD;}
+   void          SetTotalStepsRPMD(int steps)         {this->totalStepsRPMD = steps;}
+   double        GetTemperatureRPMD() const           {return this->temperatureRPMD;}
+   void          SetTemperatureRPMD(double t)         {this->temperatureRPMD = t;}
+   double        GetTimeWidthRPMD() const             {return this->timeWidthRPMD;}
+   void          SetTimeWidthRPMD(double dr)          {this->timeWidthRPMD = dr;}
+   int           GetNumberBeadsRPMD() const           {return this->numberBeadsRPMD;}
+   void          SetNumberBeadsRPMD(int b)            {this->numberBeadsRPMD = b;}
+   unsigned long GetSeedRPMD() const                  {return this->seedRPMD;}
+   void          SetSeedRPMD(unsigned long seed)      {this->seedRPMD = seed;}
    // NASCO
-   int           GetTotalStepsNASCO() const;
-   void          SetTotalStepsNASCO(int totalSteps);
-   int           GetNumberElectronicStatesNASCO() const;
-   void          SetNumberElectronicStatesNASCO(int NumberElectronicStates);
-   int           GetInitialElectronicStateNASCO() const;
-   void          SetInitialElectronicStateNASCO(int initialElectronicState);
-   unsigned long GetSeedNASCO() const;
-   void          SetSeedNASCO(unsigned long seed);
-   double        GetTimeWidthNASCO() const;
-   void          SetTimeWidthNASCO(double stepWidth);
+   int           GetTotalStepsNASCO() const            {return this->totalStepsNASCO;}
+   void          SetTotalStepsNASCO(int steps)         {this->totalStepsNASCO = steps;}
+   int           GetNumberElectronicStatesNASCO() const{return this->numberElectronicStatesNASCO;}
+   void          SetNumberElectronicStatesNASCO(int n) {this->numberElectronicStatesNASCO = n;}
+   int           GetInitialElectronicStateNASCO() const{return this->initialElectronicStateNASCO;}
+   void          SetInitialElectronicStateNASCO(int i) {this->initialElectronicStateNASCO = i;}
+   unsigned long GetSeedNASCO() const                  {return this->seedNASCO;}
+   void          SetSeedNASCO(unsigned long seed)      {this->seedNASCO = seed;}
+   double        GetTimeWidthNASCO() const             {return this->timeWidthNASCO;}
+   void          SetTimeWidthNASCO(double dt)          {this->timeWidthNASCO = dt;}
    // Optimization
-   OptimizationMethodType GetMethodOptimization() const;
-   void                   SetMethodOptimization(OptimizationMethodType method);
-   int                    GetTotalStepsOptimization() const;
-   void                   SetTotalStepsOptimization(int totalSteps);
-   int                    GetElectronicStateIndexOptimization() const;
-   void                   SetElectronicStateIndexOptimization(int electronicStateIndex);
-   double                 GetMaxGradientOptimization() const;
-   void                   SetMaxGradientOptimization(double maxGradient);
-   double                 GetRmsGradientOptimization() const;
-   void                   SetRmsGradientOptimization(double rmsGradient);
-   double                 GetTimeWidthOptimization() const;
-   void                   SetTimeWidthOptimization(double timeWidth);
-   double                 GetInitialTrustRadiusOptimization() const;
-   void                   SetInitialTrustRadiusOptimization(double initialTrustRadius);
-   double                 GetMaxNormStepOptimization() const;
-   void                   SetMaxNormStepOptimization(double maxNormStep);
+   OptimizationMethodType GetMethodOptimization() const                  {return this->methodOptimization;}
+   void                   SetMethodOptimization(OptimizationMethodType m){this->methodOptimization = m;}
+   int                    GetTotalStepsOptimization() const              {return this->totalStepsOptimization;}
+   void                   SetTotalStepsOptimization(int steps)           {this->totalStepsOptimization = steps;}
+   int                    GetElectronicStateIndexOptimization() const    {return this->electronicStateIndexOptimization;}
+   void                   SetElectronicStateIndexOptimization(int i)     {this->electronicStateIndexOptimization = i;}
+   double                 GetMaxGradientOptimization() const             {return this->maxGradientOptimization;}
+   void                   SetMaxGradientOptimization(double m)           {this->maxGradientOptimization = m;}
+   double                 GetRmsGradientOptimization() const             {return this->rmsGradientOptimization;}
+   void                   SetRmsGradientOptimization(double r)           {this->rmsGradientOptimization = r;}
+   double                 GetTimeWidthOptimization() const               {return this->timeWidthOptimization;}
+   void                   SetTimeWidthOptimization(double dt)            {this->timeWidthOptimization = dt;}
+   double                 GetInitialTrustRadiusOptimization() const      {return this->initialTrustRadiusOptimization;}
+   void                   SetInitialTrustRadiusOptimization(double r)    {this->initialTrustRadiusOptimization = r;}
+   double                 GetMaxNormStepOptimization() const             {return this->maxNormStepOptimization;}
+   void                   SetMaxNormStepOptimization(double n)           {this->maxNormStepOptimization = n;}
    // Frequencies 
-   bool RequiresFrequencies() const;
-   void SetRequiresFrequencies(bool requiresFrequencies);
-   int  GetElectronicStateIndexFrequencies() const;
-   void SetElectronicStateIndexFrequencies(int electronicStateIndex);
+   bool RequiresFrequencies() const               {return this->requiresFrequencies;}
+   void SetRequiresFrequencies(bool b)            {this->requiresFrequencies = b;}
+   int  GetElectronicStateIndexFrequencies() const{return this->electronicStateIndexFrequencies;}
+   void SetElectronicStateIndexFrequencies(int i) {this->electronicStateIndexFrequencies = i;}
 
 private:
    static Parameters* parameters;

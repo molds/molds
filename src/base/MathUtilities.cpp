@@ -27,14 +27,14 @@
 #ifdef HAVE_BOOST_MATH_SPECIAL_FUNCTIONS_FACTORIALS_HPP
 #include<boost/math/special_functions/factorials.hpp>
 #endif
+#include"Enums.h"
 #include"Uncopyable.h"
-#include"../mpi/MpiProcess.h"
 #include"PrintController.h"
 #include"MolDSException.h"
-#include"../wrappers/Lapack.h"
-#include"Enums.h"
-#include"MathUtilities.h"
 #include"MallocerFreer.h"
+#include"../mpi/MpiProcess.h"
+#include"../wrappers/Lapack.h"
+#include"MathUtilities.h"
 using namespace std;
 
 namespace MolDS_base{
@@ -77,26 +77,6 @@ int Conbination(int n, int k){
    }
    else{
       return Factorial(n)/(Factorial(k)*Factorial(n-k));
-   }
-}
-
-// max
-template <typename T> T Max(T a, T b){
-   if(a<b){
-      return b;
-   }
-   else{
-      return a;
-   }
-}
-
-// min
-template <typename T> T min(T a, T b){
-   if(a<b){
-      return a;
-   }
-   else{
-      return b;
    }
 }
 

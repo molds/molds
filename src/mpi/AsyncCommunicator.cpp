@@ -1,6 +1,5 @@
 //************************************************************************//
 // Copyright (C) 2011-2012 Mikiya Fujii                                   // 
-// Copyright (C) 2012-2012 Katsuhiko Nishimra                             // 
 //                                                                        // 
 // This file is part of MolDS.                                            // 
 //                                                                        // 
@@ -17,21 +16,28 @@
 // You should have received a copy of the GNU General Public License      // 
 // along with MolDS.  If not, see <http://www.gnu.org/licenses/>.         // 
 //************************************************************************//
-#ifndef INCLUDED_PRINTCONTROLLER
-#define INCLUDED_PRINTCONTROLLER
-namespace MolDS_base{
-
-class PrintController{
-public:
-   PrintController();
-   virtual ~PrintController();
-   bool CanOutputLogs() const               {return this->canOutputLogs;}
-   void SetCanOutputLogs(bool canOutputLogs){this->canOutputLogs = canOutputLogs;}
-protected:
-   void OutputLog(const boost::format& log) const{this->OutputLog(log.str());}
-   void OutputLog(std::string log) const;
-private:
-   bool canOutputLogs;
-};
+#include<stdio.h>
+#include<stdlib.h>
+#include<iostream>
+#include<sstream>
+#include<math.h>
+#include<string>
+#include<stdexcept>
+#include<boost/format.hpp>
+#include"../base/Enums.h"
+#include"../base/Uncopyable.h"
+#include"../base/PrintController.h"
+#include"../base/MolDSException.h"
+#include"../base/containers/ThreadSafeQueue.h"
+#include"../base/MallocerFreer.h"
+#include"MpiProcess.h"
+#include"AsyncCommunicator.h"
+using namespace std;
+namespace MolDS_mpi{
+AsyncCommunicator::AsyncCommunicator(){}
+AsyncCommunicator::~AsyncCommunicator(){}
 }
-#endif
+
+
+
+
