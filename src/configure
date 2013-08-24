@@ -7690,6 +7690,11 @@ _ACEOF
 
 $as_echo "#define SIZEOF_LAPACKINT SIZEOF_BLASINT" >>confdefs.h
 
+if test x$molds_cv_sizeof_blasint = x64; then :
+
+$as_echo "#define MKL_ILP64 /**/" >>confdefs.h
+
+fi
 
 
 
@@ -8505,6 +8510,52 @@ fi
     	LDFLAGS="$LDFLAGS_SAVED"
 	fi
 
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether ld accepts -rpath option" >&5
+$as_echo_n "checking whether ld accepts -rpath option... " >&6; }
+if ${molds_cv_ld_accepts_rpath+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  LDFLAGS_save=$LDFLAGS
+               LIBS_save=$LIBS
+               LDFLAGS="-Wl,-rpath=$BOOST_LIBDIR"
+               LIBS=""
+               cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+#ifdef F77_DUMMY_MAIN
+
+#  ifdef __cplusplus
+     extern "C"
+#  endif
+   int F77_DUMMY_MAIN() { return 1; }
+
+#endif
+int
+main ()
+{
+return 0;
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  molds_cv_ld_accepts_rpath=yes
+else
+  molds_cv_ld_accepts_rpath=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+               LDFLAGS=$LDFLAGS_save
+               LIBS=$LIBS_save
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $molds_cv_ld_accepts_rpath" >&5
+$as_echo "$molds_cv_ld_accepts_rpath" >&6; }
+
+if test x$molds_cv_ld_accepts_rpath == xyes; then :
+  BOOST_LDFLAGS="$BOOST_LDFLAGS -Wl,-rpath=$BOOST_LIBDIR"
+fi
+
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler implements namespaces" >&5
 $as_echo_n "checking whether the compiler implements namespaces... " >&6; }
 if ${ac_cv_cxx_namespaces+:} false; then :
@@ -8568,7 +8619,7 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 CXXFLAGS_SAVE=$CXXFLAGS
 LIBS_SAVE=$LIBS
-CXXFLAGS="-pthread $CXXFLAGS"
+CXXFLAGS="$BOOST_CPPFLAGS -pthread $CXXFLAGS $BOOST_LDFLAGS"
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the Boost::Thread library is available" >&5
 $as_echo_n "checking whether the Boost::Thread library is available... " >&6; }
@@ -8718,8 +8769,7 @@ boost::thread_group thrds; return 0;
 
 _ACEOF
 if ac_fn_cxx_try_link "$LINENO"; then :
-  BOOST_THREAD_LIBS="$BOOST_THREAD_LIBS -lboost_system"
-                        ax_cv_boost_thread_system=yes
+  ax_cv_boost_thread_system=yes
 else
   as_fn_error $? "Cannot use Boost::Thread" "$LINENO" 5
 
@@ -8734,6 +8784,10 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ax_cv_boost_thread_system" >&5
 $as_echo "$ax_cv_boost_thread_system" >&6; }
 
+  if test "x$ax_cv_boost_thread_system" = "xyes"; then
+     BOOST_THREAD_LIBS="$BOOST_THREAD_LIBS -lboost_system"
+  fi
+
   CXXFLAGS=$CXXFLAGS_SAVE
   LIBS=$LIBS_SAVE
   ac_ext=cpp
@@ -8746,51 +8800,6 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 fi
 
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether ld accepts -rpath option" >&5
-$as_echo_n "checking whether ld accepts -rpath option... " >&6; }
-if ${molds_cv_ld_accepts_rpath+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  LDFLAGS_save=$LDFLAGS
-               LIBS_save=$LIBS
-               LDFLAGS="-Wl,-rpath=$BOOST_LIBDIR"
-               LIBS=""
-               cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-#ifdef F77_DUMMY_MAIN
-
-#  ifdef __cplusplus
-     extern "C"
-#  endif
-   int F77_DUMMY_MAIN() { return 1; }
-
-#endif
-int
-main ()
-{
-return 0;
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"; then :
-  molds_cv_ld_accepts_rpath=yes
-else
-  molds_cv_ld_accepts_rpath=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-               LDFLAGS=$LDFLAGS_save
-               LIBS=$LIBS_save
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $molds_cv_ld_accepts_rpath" >&5
-$as_echo "$molds_cv_ld_accepts_rpath" >&6; }
-
-if test x$molds_cv_ld_accepts_rpath == xyes; then :
-  BOOST_LDFLAGS="$BOOST_LDFLAGS -Wl,-rpath=$BOOST_LIBDIR"
-fi
 
 CPPFLAGS_save=$CPPFLAGS
 CPPFLAGS="$CPPFLAGS $BOOST_CPPFLAGS"
