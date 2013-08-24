@@ -59,12 +59,15 @@ break])
                     AC_LANG_PROGRAM([[#include <boost/thread/thread.hpp>]],
                         [[boost::thread_group thrds; return 0;]])
                     ],
-                    [BOOST_THREAD_LIBS="$BOOST_THREAD_LIBS -lboost_system"
-                        ax_cv_boost_thread_system=yes],
+                    [ax_cv_boost_thread_system=yes],
                     [AC_ERROR([Cannot use Boost::Thread])]
                     )])
   ])
-  
+
+  if test "x$ax_cv_boost_thread_system" = "xyes"; then
+     BOOST_THREAD_LIBS="$BOOST_THREAD_LIBS -lboost_system"
+  fi
+
   CXXFLAGS=$CXXFLAGS_SAVE
   LIBS=$LIBS_SAVE
   AC_LANG_RESTORE
