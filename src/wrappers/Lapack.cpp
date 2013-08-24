@@ -34,9 +34,6 @@
 #include"Lapack.h"
 
 #if defined(HAVE_MKL_H)
-#if SIZEOF_LAPACKINT == 64
-#define MKL_ILP64
-#endif
 #include"mkl.h"
 #elif defined(HAVE_LAPACKE_H)
 #if SIZEOF_LAPACKINT==64

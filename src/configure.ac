@@ -159,6 +159,9 @@ AC_DEFINE_UNQUOTED([SIZEOF_BLASINT], [($molds_cv_sizeof_blasint)], [The size of 
 
 dnl Size of BLAS int
 AC_DEFINE([SIZEOF_LAPACKINT], [SIZEOF_BLASINT], [The size of integer variables used by LAPACK library])
+AS_IF([test x$molds_cv_sizeof_blasint = x64],
+      [AC_DEFINE([MKL_ILP64], [],
+                 [Whether ILP64 version of Intel Math Kernel Library])])
 
 dnl Boost
 AX_BOOST_BASE([1.46],,[AC_MSG_FAILURE([boost library is too old!])])
