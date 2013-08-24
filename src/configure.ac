@@ -164,7 +164,6 @@ dnl Boost
 AX_BOOST_BASE([1.46],,[AC_MSG_FAILURE([boost library is too old!])])
 AX_BOOST_SERIALIZATION
 AX_BOOST_MPI
-AX_BOOST_THREAD
 
 dnl Check whether ld accepts -rpath option
 AC_CACHE_CHECK([whether ld accepts -rpath option],[molds_cv_ld_accepts_rpath],
@@ -180,6 +179,9 @@ AC_CACHE_CHECK([whether ld accepts -rpath option],[molds_cv_ld_accepts_rpath],
 
 AS_IF([test x$molds_cv_ld_accepts_rpath == xyes],
       [BOOST_LDFLAGS="$BOOST_LDFLAGS -Wl,-rpath=$BOOST_LIBDIR"])
+
+dnl Check for Boost.Thread compiled library
+AX_BOOST_THREAD
 
 dnl Check for boost headers
 CPPFLAGS_save=$CPPFLAGS

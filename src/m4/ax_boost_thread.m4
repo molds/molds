@@ -24,7 +24,7 @@ CXXFLAGS_SAVE=$CXXFLAGS
 LIBS_SAVE=$LIBS
 dnl FIXME: need to include a generic way to check for the flag
 dnl to turn on threading support.
-CXXFLAGS="-pthread $CXXFLAGS"
+CXXFLAGS="$BOOST_CPPFLAGS -pthread $CXXFLAGS $BOOST_LDFLAGS"
 
 AC_CACHE_CHECK(whether the Boost::Thread library is available,
 ax_cv_boost_thread,
