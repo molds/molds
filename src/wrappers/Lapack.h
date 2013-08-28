@@ -41,6 +41,9 @@ void descinit_(MKL_INT* desc,
                MKL_INT* ictxt, 
                MKL_INT* lld, 
                MKL_INT* info);
+void sl_init_(MKL_INT* iContext, 
+              MKL_INT* npRow, 
+              MKL_INT* npCol);
 }
 /*
 extern "C" {

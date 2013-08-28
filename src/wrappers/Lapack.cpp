@@ -126,7 +126,7 @@ molds_lapack_int Lapack::Dsyevd_sca(double** matrix, double* eigenValues, molds_
    char order='R';
    molds_lapack_int npRow=2;     // ToDo: change to dynamical setting
    molds_lapack_int npCol=2;     // ToDo: change to dynamical setting
-   molds_lapack_int blockSize=3; // ToDo: change to dynamical setting
+   molds_lapack_int blockSize=8; // ToDo: change to dynamical setting
 
    //tmporal values
    molds_lapack_int intOne=1;
@@ -143,10 +143,10 @@ molds_lapack_int Lapack::Dsyevd_sca(double** matrix, double* eigenValues, molds_
    molds_lapack_int mpiRank =intZero;
    molds_lapack_int mpiSize =intZero;
 
-   // initialize blacs for calling scalapack
+
+   // initialize blacs and scalapack 
    blacs_pinfo_(&mpiRank, &mpiSize);
-   blacs_get_(&iContext, &what, &val);
-   blacs_gridinit_(&iContext, &order, &npRow, &npCol);
+   sl_init_(&iContext, &npRow, &npCol); 
    blacs_gridinfo_(&iContext, &npRow, &npCol, &myRow, &myCol);
 
    // calculate size of local matrix on each node
@@ -180,6 +180,7 @@ molds_lapack_int Lapack::Dsyevd_sca(double** matrix, double* eigenValues, molds_
    molds_lapack_int ja=intOne;
    molds_lapack_int iz=intOne;
    molds_lapack_int jz=intOne;
+
    pdsyevd(&job, &uplo, &size, localMatrix, &ia, &ja, descA, tempEigenValues, localEigenVector, &iz, &jz ,descZ, tmpWork, &lwork, tmpIwork, &liwork, &info);
 
    // cll scalapack (pdsyevd)
@@ -329,11 +330,6 @@ molds_lapack_int Lapack::Dsyevd(double** matrix, double* eigenValues, molds_lapa
    molds_lapack_int mpiRank;
    molds_lapack_int mpiSize;
    blacs_pinfo_(&mpiRank, &mpiSize);
-   if(mpiRank==0){
-      for(molds_lapack_int i = 0; i < size; i++){
-         printf("eig:%ld %e\n",i,eigenValues[i]);
-      }
-   }
 
    //this->OutputLog(boost::format("size=%d lwork=%d liwork=%d k=%d info=%d\n") % size % lwork % liwork % k % info);
 
