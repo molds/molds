@@ -33,14 +33,16 @@
 #include"Lapack.h"
 
 #ifdef __INTEL_COMPILER
-#include"mkl.h"
+   #include"mkl.h"
+#elif defined __FCC_VERSION
+   #include"fj_lapack.h"
 #else
-#if ( __WORDSIZE == 32 )
-#else
-#define HAVE_LAPACK_CONFIG_H
-#define LAPACK_ILP64
-#endif
-#include"lapacke.h"
+   #if ( __WORDSIZE == 32 )
+   #else
+      #define HAVE_LAPACK_CONFIG_H
+      #define LAPACK_ILP64
+   #endif
+   #include"lapacke.h"
 #endif
 
 #ifdef __INTEL_COMPILER
@@ -160,6 +162,10 @@ molds_lapack_int Lapack::Dsyevd(double** matrix, double* eigenValues, molds_lapa
    // call Lapack
 #ifdef __INTEL_COMPILER
    dsyevd(&job, &uplo, &size, convertedMatrix, &lda, tempEigenValues, work, &lwork, iwork, &liwork, &info);
+#elif defined __FCC_VERSION
+   molds_lapack_int jobLen=1;
+   molds_lapack_int uploLen=1;
+   dsyevd_(&job, &uplo, &size, convertedMatrix, &lda, tempEigenValues, work, &lwork, iwork, &liwork, &info, jobLen, uploLen);
 #else
    info = LAPACKE_dsyevd_work(LAPACK_COL_MAJOR, job, uplo, size, convertedMatrix, lda, tempEigenValues, work, lwork, iwork, liwork);
 #endif
@@ -215,6 +221,9 @@ molds_lapack_int Lapack::Dsysv(double const* const* matrix, double* b, molds_lap
    molds_lapack_int info = 0;
    molds_lapack_int lwork;
    char uplo = 'U';
+#ifdef __FCC_VERSION
+   molds_lapack_int uploLen=1;
+#endif
    molds_lapack_int lda = size;
    molds_lapack_int ldb = size;
    molds_lapack_int nrhs = 1;
@@ -251,6 +260,8 @@ molds_lapack_int Lapack::Dsysv(double const* const* matrix, double* b, molds_lap
       double tempWork[3]={0.0, 0.0, 0.0};
 #ifdef __INTEL_COMPILER
          dsysv(&uplo, &size, &nrhs, convertedMatrix, &lda, ipiv, tempB, &ldb, tempWork, &lwork, &info);
+#elif defined __FCC_VERSION
+         dsysv_(&uplo, &size, &nrhs, convertedMatrix, &lda, ipiv, tempB, &ldb, tempWork, &lwork, &info, uploLen);
 #else
          info = LAPACKE_dsysv_work(LAPACK_COL_MAJOR, uplo, size, nrhs, convertedMatrix, lda, ipiv, tempB, ldb, tempWork, lwork);
 #endif
@@ -263,6 +274,8 @@ molds_lapack_int Lapack::Dsysv(double const* const* matrix, double* b, molds_lap
    // call Lapack
 #ifdef __INTEL_COMPILER
    dsysv(&uplo, &size, &nrhs, convertedMatrix, &lda, ipiv, tempB, &ldb, work, &lwork, &info);
+#elif defined __FCC_VERSION
+   dsysv_(&uplo, &size, &nrhs, convertedMatrix, &lda, ipiv, tempB, &ldb, work, &lwork, &info, uploLen);
 #else
    info = LAPACKE_dsysv_work(LAPACK_COL_MAJOR, uplo, size, nrhs, convertedMatrix, lda, ipiv, tempB, ldb, work, lwork);
 #endif
@@ -328,6 +341,9 @@ molds_lapack_int Lapack::Dgetrs(double const* const* matrix, double** b, molds_l
       this->Dgetrf(convertedMatrix, ipiv, size, size);
 #ifdef __INTEL_COMPILER
       dgetrs(&trans, &size, &nrhs, convertedMatrix, &lda, ipiv, convertedB, &ldb, &info);
+#elif defined __FCC_VERSION
+      molds_lapack_int transLen=1;
+      dgetrs_(&trans, &size, &nrhs, convertedMatrix, &lda, ipiv, convertedB, &ldb, &info, transLen);
 #else
       info = LAPACKE_dgetrs_work(LAPACK_COL_MAJOR, trans, size, nrhs, convertedMatrix, lda, ipiv, convertedB, ldb);
 #endif
@@ -395,6 +411,8 @@ molds_lapack_int Lapack::Dgetrf(double* matrix, molds_lapack_int* ipiv, molds_la
    molds_lapack_int lda = sizeM;
 #ifdef __INTEL_COMPILER
    dgetrf(&sizeM, &sizeN, matrix, &lda, ipiv, &info);
+#elif defined __FCC_VERSION
+   dgetrf_(&sizeM, &sizeN, matrix, &lda, ipiv, &info);
 #else
    info = LAPACKE_dgetrf_work(LAPACK_COL_MAJOR, sizeM, sizeN, matrix, lda, ipiv);
 #endif
