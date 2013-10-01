@@ -33,7 +33,9 @@
 #include"../base/PrintController.h"
 #include"../base/MolDSException.h"
 #include"../base/MallocerFreer.h"
+#include"../base/containers/ThreadSafeQueue.h"
 #include"../mpi/MpiProcess.h"
+#include"../mpi/AsyncCommunicator.h"
 #include"../wrappers/Blas.h"
 #include"../wrappers/Lapack.h"
 #include"../base/MathUtilities.h"
@@ -2347,62 +2349,75 @@ void ZindoS::DoCISDirect(){
 void ZindoS::CalcCISMatrix(double** matrixCIS) const{
    this->OutputLog(this->messageStartCalcCISMatrix);
    double ompStartTime = omp_get_wtime();
-   int mpiRank = MolDS_mpi::MpiProcess::GetInstance()->GetRank();
-   int mpiSize = MolDS_mpi::MpiProcess::GetInstance()->GetSize();
+   // MPI setting of each rank
+   int mpiRank     = MolDS_mpi::MpiProcess::GetInstance()->GetRank();
+   int mpiSize     = MolDS_mpi::MpiProcess::GetInstance()->GetSize();
+   int mpiHeadRank = MolDS_mpi::MpiProcess::GetInstance()->GetHeadRank();
+   int mPassingTimes = this->matrixCISdimension;
+   MolDS_mpi::AsyncCommunicator asyncCommunicator;
+   boost::thread communicationThread( boost::bind(&MolDS_mpi::AsyncCommunicator::Run<double>,
+                                                  &asyncCommunicator, 
+                                                  mPassingTimes) );
 
-   for(int k=0; k<this->matrixCISdimension; k++){
-      if(k%mpiSize != mpiRank){continue;}
-
-      // single excitation from I-th (occupied)MO to A-th (virtual)MO
-      int moI = this->GetActiveOccIndex(*this->molecule, k);
-      int moA = this->GetActiveVirIndex(*this->molecule, k);
-      stringstream ompErrors;
+   // this loop-a is MPI-parallelized
+   for(int k=this->matrixCISdimension-1; 0<=k; k--){
+      int calcRank = k%mpiSize;
+      if(calcRank == mpiRank){
+         // single excitation from I-th (occupied)MO to A-th (virtual)MO
+         int moI = this->GetActiveOccIndex(*this->molecule, k);
+         int moA = this->GetActiveVirIndex(*this->molecule, k);
+         stringstream ompErrors;
 #pragma omp parallel for schedule(auto)
-      for(int l=k; l<this->matrixCISdimension; l++){
-         try{
-            // single excitation from J-th (occupied)MO to B-th (virtual)MO
-            int moJ = this->GetActiveOccIndex(*this->molecule, l);
-            int moB = this->GetActiveVirIndex(*this->molecule, l);
-
-            // Fast algorithm, but this is not easy to read. Slow algorithm is also written below.
-            if(k<l){
-               // Off diagonal term (right upper)
-               matrixCIS[k][l] = this->GetCISOffDiagElement(this->nishimotoMatagaMatrix, *this->molecule, this->fockMatrix, moI, moA, moJ, moB);
+         for(int l=k; l<this->matrixCISdimension; l++){
+            try{
+               // single excitation from J-th (occupied)MO to B-th (virtual)MO
+               int moJ = this->GetActiveOccIndex(*this->molecule, l);
+               int moB = this->GetActiveVirIndex(*this->molecule, l);
+      
+               // Fast algorithm, but this is not easy to read. Slow algorithm is also written below.
+               if(k<l){
+                  // Off diagonal term (right upper)
+                  matrixCIS[k][l] = this->GetCISOffDiagElement(this->nishimotoMatagaMatrix, *this->molecule, this->fockMatrix, moI, moA, moJ, moB);
+               }
+               else if(k==l){
+                  // Diagonal term
+                  matrixCIS[k][l] = this->GetCISDiagElement(energiesMO, this->nishimotoMatagaMatrix, *this->molecule, this->fockMatrix, moI, moA);
+               } 
+               // End of the fast algorith.
+      
+               /*// Slow algorith, but this is easy to read. Fast altorithm is also written above.
+               double value=0.0;
+               value = 2.0*this->GetMolecularIntegralElement(moA, moI, moJ, moB, 
+                                                             *this->molecule, 
+                                                             this->fockMatrix, 
+                                                             NULL)
+                          -this->GetMolecularIntegralElement(moA, moB, moI, moJ, 
+                                                             *this->molecule, 
+                                                             this->fockMatrix, 
+                                                             NULL);
+               if(k==l){
+                  value += this->energiesMO[moA] - this->energiesMO[moI];
+               }
+               matrixCIS[k][l] = value;
+               // End of the slow algorith. */
             }
-            else if(k==l){
-               // Diagonal term
-               matrixCIS[k][l] = this->GetCISDiagElement(energiesMO, this->nishimotoMatagaMatrix, *this->molecule, this->fockMatrix, moI, moA);
-            } 
-            // End of the fast algorith.
-
-            /*// Slow algorith, but this is easy to read. Fast altorithm is also written above.
-            double value=0.0;
-            value = 2.0*this->GetMolecularIntegralElement(moA, moI, moJ, moB, 
-                                                          *this->molecule, 
-                                                          this->fockMatrix, 
-                                                          NULL)
-                       -this->GetMolecularIntegralElement(moA, moB, moI, moJ, 
-                                                          *this->molecule, 
-                                                          this->fockMatrix, 
-                                                          NULL);
-            if(k==l){
-               value += this->energiesMO[moA] - this->energiesMO[moI];
-            }
-            matrixCIS[k][l] = value;
-            // End of the slow algorith. */
-         }
-         catch(MolDSException ex){
+            catch(MolDSException ex){
 #pragma omp critical
-            ex.Serialize(ompErrors);
+               ex.Serialize(ompErrors);
+            }
+         } // end of l-loop
+         // Exception throwing for omp-region
+         if(!ompErrors.str().empty()){
+            throw MolDSException::Deserialize(ompErrors);
          }
-      } // end of l-loop
-      // Exception throwing for omp-region
-      if(!ompErrors.str().empty()){
-         throw MolDSException::Deserialize(ompErrors);
-      }
-   } // end of k-loop
+      } // end of if(calcRank == mpiRank)
+      // broadcast data to all rank
+      int num = this->matrixCISdimension - k;
+      asyncCommunicator.SetBroadcastedVector(&this->matrixCIS[k][k], num, calcRank);
+   } // end of k-loop which is MPI-parallelized
+   communicationThread.join();
 
-
+/*
    // communication to collect all matrix data on head-rank 
    int mpiHeadRank = MolDS_mpi::MpiProcess::GetInstance()->GetHeadRank();
    if(mpiRank == mpiHeadRank){
@@ -2427,7 +2442,7 @@ void ZindoS::CalcCISMatrix(double** matrixCIS) const{
    // broadcast all matrix data to all rank
    int root=mpiHeadRank;
    MolDS_mpi::MpiProcess::GetInstance()->Broadcast(&matrixCIS[0][0], this->matrixCISdimension*this->matrixCISdimension, root);
-
+*/
    double ompEndTime = omp_get_wtime();
    this->OutputLog(boost::format("%s%lf%s\n%s") % this->messageOmpElapsedTimeCalcCISMarix.c_str()
                                                 % (ompEndTime - ompStartTime)
@@ -3330,28 +3345,45 @@ void ZindoS::CalcAuxiliaryVector(double* y,
 // This method calculates "\Gamma_{NR} - K_{NR}" to solve (54) in [PT_1966]
 // Note taht K_{NR} is not calculated.
 void ZindoS::CalcGammaNRMinusKNRMatrix(double** gammaNRMinusKNR, const vector<MoIndexPair>& nonRedundantQIndeces) const{
-   stringstream ompErrors;
-#pragma omp parallel for schedule(auto)
-   for(int i=0; i<nonRedundantQIndeces.size(); i++){
-      try{
+   int nonRedundantQIndecesSize = nonRedundantQIndeces.size();
+   //MPI setting of each rank
+   int mpiRank       = MolDS_mpi::MpiProcess::GetInstance()->GetRank();
+   int mpiSize       = MolDS_mpi::MpiProcess::GetInstance()->GetSize();
+   int mPassingTimes = nonRedundantQIndecesSize;
+   MolDS_mpi::AsyncCommunicator asyncCommunicator;
+   boost::thread communicationThread( boost::bind(&MolDS_mpi::AsyncCommunicator::Run<double>,
+                                                  &asyncCommunicator,
+                                                  mPassingTimes) );
+   // this loop-i is MPI-parallelized
+   for(int i=nonRedundantQIndecesSize-1; 0<=i; i--){
+      int calcRank = i%mpiSize;
+      if(mpiRank == calcRank){
          int moI = nonRedundantQIndeces[i].moI;
          int moJ = nonRedundantQIndeces[i].moJ;
-         for(int j=i; j<nonRedundantQIndeces.size(); j++){
-            int moK = nonRedundantQIndeces[j].moI;
-            int moL = nonRedundantQIndeces[j].moJ;
-            gammaNRMinusKNR[i][j] = this->GetGammaNRElement(moI, moJ, moK, moL)
-                                   -this->GetKNRElement(moI, moJ, moK, moL);
-         }
-      }
-      catch(MolDSException ex){
+         stringstream ompErrors;
+#pragma omp parallel for schedule(auto)
+         for(int j=i; j<nonRedundantQIndecesSize; j++){
+            try{
+               int moK = nonRedundantQIndeces[j].moI;
+               int moL = nonRedundantQIndeces[j].moJ;
+               gammaNRMinusKNR[i][j] = this->GetGammaNRElement(moI, moJ, moK, moL)
+                                      -this->GetKNRElement(moI, moJ, moK, moL);
+            } // end of try
+            catch(MolDSException ex){
 #pragma omp critical
-         ex.Serialize(ompErrors);
-      }
-   }
-   // Exception throwing for omp-region
-   if(!ompErrors.str().empty()){
-      throw MolDSException::Deserialize(ompErrors);
-   }
+               ex.Serialize(ompErrors);
+            }
+         } //end of loop j parallelized with openMP
+         // Exception throwing for omp-region
+         if(!ompErrors.str().empty()){
+            throw MolDSException::Deserialize(ompErrors);
+         } 
+      } /// end of if(mpiRnak == calcRank)
+      // broadcast data to all rank
+      int num = nonRedundantQIndecesSize - i;
+      asyncCommunicator.SetBroadcastedVector(&gammaNRMinusKNR[i][i], num, calcRank);
+   } // end of loop-i parallelized with MPI
+   communicationThread.join();
 }
 
 // see (41), (42), and (46) in [PT_1996].
@@ -3360,28 +3392,45 @@ void ZindoS::CalcGammaNRMinusKNRMatrix(double** gammaNRMinusKNR, const vector<Mo
 void ZindoS::CalcKRDagerGammaRInvMatrix(double** kRDagerGammaRInv, 
                                       const vector<MoIndexPair>& nonRedundantQIndeces,
                                       const vector<MoIndexPair>& redundantQIndeces) const{
-   stringstream ompErrors;
-#pragma omp parallel for schedule(auto)
-   for(int i=0; i<nonRedundantQIndeces.size(); i++){
-      try{
+   int nonRedundantQIndecesSize = nonRedundantQIndeces.size();
+   int redundantQIndecesSize    = redundantQIndeces.size();
+   //MPI setting of each rank
+   int mpiRank       = MolDS_mpi::MpiProcess::GetInstance()->GetRank();
+   int mpiSize       = MolDS_mpi::MpiProcess::GetInstance()->GetSize();
+   int mPassingTimes = nonRedundantQIndecesSize;
+   MolDS_mpi::AsyncCommunicator asyncCommunicator;
+   boost::thread communicationThread( boost::bind(&MolDS_mpi::AsyncCommunicator::Run<double>,
+                                                  &asyncCommunicator,
+                                                  mPassingTimes) );
+   // this loop-i is MPI-parallelized
+   for(int i=0; i<nonRedundantQIndecesSize; i++){
+      int calcRank = i%mpiSize;
+      if(mpiRank == calcRank){
          int moI = nonRedundantQIndeces[i].moI;
          int moJ = nonRedundantQIndeces[i].moJ;
-         for(int j=0; j<redundantQIndeces.size(); j++){
-            int moK = redundantQIndeces[j].moI;
-            int moL = redundantQIndeces[j].moJ;
-            kRDagerGammaRInv[i][j] = this->GetKRDagerElement(moI, moJ, moK, moL)
-                                    /this->GetGammaRElement(moK, moL, moK, moL);
-         }
-      }
-      catch(MolDSException ex){
+         stringstream ompErrors;
+#pragma omp parallel for schedule(auto)
+         for(int j=0; j<redundantQIndecesSize; j++){
+            try{
+               int moK = redundantQIndeces[j].moI;
+               int moL = redundantQIndeces[j].moJ;
+               kRDagerGammaRInv[i][j] = this->GetKRDagerElement(moI, moJ, moK, moL)
+                                       /this->GetGammaRElement(moK, moL, moK, moL);
+            } // end of try
+            catch(MolDSException ex){
 #pragma omp critical
-         ex.Serialize(ompErrors);
-      }
-   }
-   // Exception throwing for omp-region
-   if(!ompErrors.str().empty()){
-      throw MolDSException::Deserialize(ompErrors);
-   }
+               ex.Serialize(ompErrors);
+            }
+         } // end of loop-j parallelized with openMP
+         // Exception throwing for omp-region
+         if(!ompErrors.str().empty()){
+            throw MolDSException::Deserialize(ompErrors);
+         }
+      } // // end of if(mpiRnak == calcRank)
+      int num = redundantQIndecesSize;
+      asyncCommunicator.SetBroadcastedVector(&kRDagerGammaRInv[i][0], num, calcRank);
+   } // end of loop-i parallelized with MPI
+   communicationThread.join();
 }
 
 // see (40) in [PT_1996]
