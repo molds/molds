@@ -114,7 +114,6 @@ public:
       MolDS_base::MallocerFreer::GetInstance()->Free<double>(&tmpValues, num);
    }
    void Barrier();
-   int  GetMessagePassingTimes(molds_mpi_int num) const;
 private:
    static MpiProcess* mpiProcess;
    MpiProcess();
@@ -142,25 +141,25 @@ private:
          int tagBase = origianlTag*numChunks;
          if(elementsLimit < 0){
             std::stringstream ss;
-            ss << this->errorMessageSplitMessageElemLimNegative << elementsLimit << endl;
+            ss << this->errorMessageSplitMessageElemLimNegative << elementsLimit << std::endl;
             MolDS_base::MolDSException ex(ss.str());
             throw ex;
          }
          if(numChunks < 0){
             std::stringstream ss;
-            ss << this->errorMessageSplitMessageNumChnkNegative << numChunks << endl;
+            ss << this->errorMessageSplitMessageNumChnkNegative << numChunks << std::endl;
             MolDS_base::MolDSException ex(ss.str());
             throw ex;
          }
          if(remaining < 0){
             std::stringstream ss;
-            ss << this->errorMessageSplitMessageRemainingNegative << remaining << endl;
+            ss << this->errorMessageSplitMessageRemainingNegative << remaining << std::endl;
             MolDS_base::MolDSException ex(ss.str());
             throw ex;
          }
          if(tagBase < 0){
             std::stringstream ss;
-            ss << this->errorMessageSplitMessageTagBaseNegative << tagBase << endl;
+            ss << this->errorMessageSplitMessageTagBaseNegative << tagBase << std::endl;
             MolDS_base::MolDSException ex(ss.str());
             throw ex;
          }

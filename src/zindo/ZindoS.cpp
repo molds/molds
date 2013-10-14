@@ -2353,11 +2353,9 @@ void ZindoS::CalcCISMatrix(double** matrixCIS) const{
    int mpiRank     = MolDS_mpi::MpiProcess::GetInstance()->GetRank();
    int mpiSize     = MolDS_mpi::MpiProcess::GetInstance()->GetSize();
    int mpiHeadRank = MolDS_mpi::MpiProcess::GetInstance()->GetHeadRank();
-   int mPassingTimes = MolDS_mpi::MpiProcess::GetInstance()->GetMessagePassingTimes(this->matrixCISdimension);
    MolDS_mpi::AsyncCommunicator asyncCommunicator;
    boost::thread communicationThread( boost::bind(&MolDS_mpi::AsyncCommunicator::Run<double>,
-                                                  &asyncCommunicator, 
-                                                  mPassingTimes) );
+                                                  &asyncCommunicator) );
 
    // this loop-a is MPI-parallelized
    for(int k=this->matrixCISdimension-1; 0<=k; k--){
@@ -2418,12 +2416,13 @@ void ZindoS::CalcCISMatrix(double** matrixCIS) const{
       int num      = this->matrixCISdimension - k;
       double* buff = &this->matrixCIS[k][k];
       if(mpiRank == mpiHeadRank && mpiRank != calcRank){
-         asyncCommunicator.SetRecvedVector(buff, num, source, tag);
+         asyncCommunicator.SetRecvedMessage(buff, num, source, tag);
       }
       if(mpiRank != mpiHeadRank && mpiRank == calcRank){
-         asyncCommunicator.SetSentVector(buff, num, dest, tag);
+         asyncCommunicator.SetSentMessage(buff, num, dest, tag);
       }
    } // end of k-loop which is MPI-parallelized
+   asyncCommunicator.Finalize();
    communicationThread.join();
    // Broadcast data to all rank
    for(int k=0; k<this->matrixCISdimension; k++){
@@ -3339,11 +3338,9 @@ void ZindoS::CalcGammaNRMinusKNRMatrix(double** gammaNRMinusKNR, const vector<Mo
    int mpiRank       = MolDS_mpi::MpiProcess::GetInstance()->GetRank();
    int mpiSize       = MolDS_mpi::MpiProcess::GetInstance()->GetSize();
    int mpiHeadRank   = MolDS_mpi::MpiProcess::GetInstance()->GetHeadRank();
-   int mPassingTimes = MolDS_mpi::MpiProcess::GetInstance()->GetMessagePassingTimes(nonRedundantQIndecesSize);
    MolDS_mpi::AsyncCommunicator asyncCommunicator;
    boost::thread communicationThread( boost::bind(&MolDS_mpi::AsyncCommunicator::Run<double>,
-                                                  &asyncCommunicator,
-                                                  mPassingTimes) );
+                                                  &asyncCommunicator) );
    // this loop-i is MPI-parallelized
    for(int i=nonRedundantQIndecesSize-1; 0<=i; i--){
       int calcRank = i%mpiSize;
@@ -3376,12 +3373,13 @@ void ZindoS::CalcGammaNRMinusKNRMatrix(double** gammaNRMinusKNR, const vector<Mo
       int num    = nonRedundantQIndecesSize - i;
       double* buff = &gammaNRMinusKNR[i][i];
       if(mpiRank == mpiHeadRank && mpiRank != calcRank){
-         asyncCommunicator.SetRecvedVector(buff, num, source, tag);
+         asyncCommunicator.SetRecvedMessage(buff, num, source, tag);
       }
       if(mpiRank != mpiHeadRank && mpiRank == calcRank){
-         asyncCommunicator.SetSentVector(buff, num, dest, tag);
+         asyncCommunicator.SetSentMessage(buff, num, dest, tag);
       }
    } // end of loop-i parallelized with MPI
+   asyncCommunicator.Finalize();
    communicationThread.join();
    // broadcast data to all rank
    for(int i=0; i<nonRedundantQIndecesSize; i++){
@@ -3403,11 +3401,9 @@ void ZindoS::CalcKRDagerGammaRInvMatrix(double** kRDagerGammaRInv,
    int mpiRank       = MolDS_mpi::MpiProcess::GetInstance()->GetRank();
    int mpiSize       = MolDS_mpi::MpiProcess::GetInstance()->GetSize();
    int mpiHeadRank   = MolDS_mpi::MpiProcess::GetInstance()->GetHeadRank();
-   int mPassingTimes = MolDS_mpi::MpiProcess::GetInstance()->GetMessagePassingTimes(nonRedundantQIndecesSize);
    MolDS_mpi::AsyncCommunicator asyncCommunicator;
    boost::thread communicationThread( boost::bind(&MolDS_mpi::AsyncCommunicator::Run<double>,
-                                                  &asyncCommunicator,
-                                                  mPassingTimes) );
+                                                  &asyncCommunicator) );
    // this loop-i is MPI-parallelized
    for(int i=0; i<nonRedundantQIndecesSize; i++){
       int calcRank = i%mpiSize;
@@ -3440,12 +3436,13 @@ void ZindoS::CalcKRDagerGammaRInvMatrix(double** kRDagerGammaRInv,
       int num      = redundantQIndecesSize;
       double* buff = &kRDagerGammaRInv[i][0];
       if(mpiRank == mpiHeadRank && mpiRank != calcRank){
-         asyncCommunicator.SetRecvedVector(buff, num, source, tag);
+         asyncCommunicator.SetRecvedMessage(buff, num, source, tag);
       }
       if(mpiRank != mpiHeadRank && mpiRank == calcRank){
-         asyncCommunicator.SetSentVector(buff, num, dest, tag);
+         asyncCommunicator.SetSentMessage(buff, num, dest, tag);
       }
    } // end of loop-i parallelized with MPI
+   asyncCommunicator.Finalize();
    communicationThread.join();
    // broadcast data to all rank
    for(int i=0; i<nonRedundantQIndecesSize; i++){

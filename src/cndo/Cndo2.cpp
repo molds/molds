@@ -514,6 +514,7 @@ void Cndo2::DoSCF(bool requiresGuess){
    double*** diisStoredDensityMatrix = NULL;
    double*** diisStoredErrorVect = NULL;
    double**  diisErrorProducts = NULL;
+   double**  tmpDiisErrorProducts = NULL;
    double*   diisErrorCoefficients = NULL;
 
    try{
@@ -521,6 +522,7 @@ void Cndo2::DoSCF(bool requiresGuess){
                                        &diisStoredDensityMatrix,
                                        &diisStoredErrorVect,
                                        &diisErrorProducts,
+                                       &tmpDiisErrorProducts,
                                        &diisErrorCoefficients);
       // calculate electron integral
       this->CalcGammaAB(this->gammaAB, *this->molecule);
@@ -590,6 +592,7 @@ void Cndo2::DoSCF(bool requiresGuess){
                             diisStoredDensityMatrix,
                             diisStoredErrorVect,
                             diisErrorProducts,
+                            tmpDiisErrorProducts,
                             diisErrorCoefficients,
                             diisError,
                             hasAppliedDIIS,
@@ -612,6 +615,7 @@ void Cndo2::DoSCF(bool requiresGuess){
                                      &diisStoredDensityMatrix,
                                      &diisStoredErrorVect,
                                      &diisErrorProducts,
+                                     &tmpDiisErrorProducts,
                                      &diisErrorCoefficients);
 
       throw ex;
@@ -620,6 +624,7 @@ void Cndo2::DoSCF(bool requiresGuess){
                                   &diisStoredDensityMatrix,
                                   &diisStoredErrorVect,
                                   &diisErrorProducts,
+                                  &tmpDiisErrorProducts,
                                   &diisErrorCoefficients);
 
    double ompEndTime = omp_get_wtime();
@@ -750,6 +755,7 @@ void Cndo2::FreeSCFTemporaryMatrices(double*** oldOrbitalElectronPopulation,
                                      double**** diisStoredDensityMatrix,
                                      double**** diisStoredErrorVect,
                                      double*** diisErrorProducts,
+                                     double*** tmpDiisErrorProducts,
                                      double** diisErrorCoefficients) const{
 
    int diisNumErrorVect = Parameters::GetInstance()->GetDiisNumErrorVectSCF();
@@ -767,6 +773,9 @@ void Cndo2::FreeSCFTemporaryMatrices(double*** oldOrbitalElectronPopulation,
    MallocerFreer::GetInstance()->Free<double>(diisErrorProducts, 
                                               diisNumErrorVect+1,
                                               diisNumErrorVect+1);
+   MallocerFreer::GetInstance()->Free<double>(tmpDiisErrorProducts, 
+                                              diisNumErrorVect+1,
+                                              diisNumErrorVect+1);
    MallocerFreer::GetInstance()->Free<double>(diisErrorCoefficients,
                                               diisNumErrorVect+1);
 }
@@ -775,6 +784,7 @@ void Cndo2::MallocSCFTemporaryMatrices(double*** oldOrbitalElectronPopulation,
                                        double**** diisStoredDensityMatrix,
                                        double**** diisStoredErrorVect,
                                        double*** diisErrorProducts,
+                                       double*** tmpDiisErrorProducts,
                                        double** diisErrorCoefficients){
 
    int diisNumErrorVect = Parameters::GetInstance()->GetDiisNumErrorVectSCF();
@@ -791,6 +801,7 @@ void Cndo2::MallocSCFTemporaryMatrices(double*** oldOrbitalElectronPopulation,
                                                    this->molecule->GetTotalNumberAOs(), 
                                                    this->molecule->GetTotalNumberAOs());
       MallocerFreer::GetInstance()->Malloc<double>(diisErrorProducts, diisNumErrorVect+1, diisNumErrorVect+1);
+      MallocerFreer::GetInstance()->Malloc<double>(tmpDiisErrorProducts, diisNumErrorVect+1, diisNumErrorVect+1);
       MallocerFreer::GetInstance()->Malloc<double>(diisErrorCoefficients, diisNumErrorVect+1);
    }
 }
@@ -805,6 +816,7 @@ void Cndo2::DoDIIS(double** orbitalElectronPopulation,
                    double*** diisStoredDensityMatrix,
                    double*** diisStoredErrorVect,
                    double**  diisErrorProducts,
+                   double**  tmpDiisErrorProducts,
                    double*   diisErrorCoefficients,
                    double&   diisError,
                    bool&     hasAppliedDIIS,
@@ -873,7 +885,13 @@ void Cndo2::DoDIIS(double** orbitalElectronPopulation,
       if(diisNumErrorVect <= step && diisEndError<diisError && diisError<diisStartError){
          hasAppliedDIIS = true;
          try{
-            MolDS_wrappers::Lapack::GetInstance()->Dsysv(diisErrorProducts, 
+#pragma omp parallel for schedule(auto)
+            for(int i=0; i<diisNumErrorVect+1; i++){
+               for(int j=0; j<diisNumErrorVect+1; j++){
+                  tmpDiisErrorProducts[i][j] = diisErrorProducts[i][j];
+               }
+            }
+            MolDS_wrappers::Lapack::GetInstance()->Dsysv(tmpDiisErrorProducts, 
                                                          diisErrorCoefficients, 
                                                          diisNumErrorVect+1);
          }catch(MolDSException ex){
@@ -1295,6 +1313,7 @@ double Cndo2::GetMolecularIntegralElement(int moI, int moJ, int moK, int moL,
 void Cndo2::UpdateOldOrbitalElectronPopulation(double** oldOrbitalElectronPopulation, 
                                                double const* const* orbitalElectronPopulation,
                                                int numberAOs) const{
+#pragma omp parallel for schedule(auto)
    for(int i=0; i<numberAOs; i++){
       for(int j=0; j<numberAOs; j++){
          oldOrbitalElectronPopulation[i][j] = orbitalElectronPopulation[i][j];
@@ -1371,11 +1390,9 @@ void Cndo2::CalcFockMatrix(double** fockMatrix,
    int mpiRank       = MolDS_mpi::MpiProcess::GetInstance()->GetRank();
    int mpiSize       = MolDS_mpi::MpiProcess::GetInstance()->GetSize();
    int mpiHeadRank   = MolDS_mpi::MpiProcess::GetInstance()->GetHeadRank();
-   int mPassingTimes = MolDS_mpi::MpiProcess::GetInstance()->GetMessagePassingTimes(totalNumberAOs);
    MolDS_mpi::AsyncCommunicator asyncCommunicator;
    boost::thread communicationThread( boost::bind(&MolDS_mpi::AsyncCommunicator::Run<double>, 
-                                                  &asyncCommunicator, 
-                                                  mPassingTimes) );
+                                                  &asyncCommunicator) );
 
    MallocerFreer::GetInstance()->Initialize<double>(fockMatrix, totalNumberAOs, totalNumberAOs);
    for(int A=totalNumberAtoms-1; 0<=A; A--){
@@ -1437,26 +1454,25 @@ void Cndo2::CalcFockMatrix(double** fockMatrix,
          }  // end of if(mpiRank == calcRank) 
 
          // set data to gather in mpiHeadRank with asynchronous MPI 
-         int tag = mu;
-         int source = calcRank;
-         int dest = mpiHeadRank;
+         int tag                      = mu;
+         int source                   = calcRank;
+         int dest                     = mpiHeadRank;
+         double* buff                 = &fockMatrix[mu][mu];
+         MolDS_mpi::molds_mpi_int num = totalNumberAOs-mu;
          if(mpiRank == mpiHeadRank && mpiRank != calcRank){
-            asyncCommunicator.SetRecvedVector(&fockMatrix[mu][mu], 
-                                              totalNumberAOs-mu, 
-                                              source,
-                                              tag);
+            asyncCommunicator.SetRecvedMessage(buff, num, source, tag);
          }
          if(mpiRank != mpiHeadRank && mpiRank == calcRank){
-            asyncCommunicator.SetSentVector(&fockMatrix[mu][mu], 
-                                            totalNumberAOs-mu, 
-                                            dest,
-                                            tag);
+            asyncCommunicator.SetSentMessage(buff, num, dest, tag);
          }
       }  // end of loop mu parallelized with MPI
    }  // end of loop A 
    // Delete the communication thread.
+   asyncCommunicator.Finalize();
    communicationThread.join();
-   MolDS_mpi::MpiProcess::GetInstance()->Broadcast(&fockMatrix[0][0], totalNumberAOs*totalNumberAOs, mpiHeadRank);
+   double* buff                 = &fockMatrix[0][0];
+   MolDS_mpi::molds_mpi_int num = totalNumberAOs*totalNumberAOs;
+   MolDS_mpi::MpiProcess::GetInstance()->Broadcast(buff, num, mpiHeadRank);
 
    /*  
    this->OutputLog("fock matrix\n");
@@ -1570,12 +1586,10 @@ void Cndo2::CalcAtomicElectronPopulation(double* atomicElectronPopulation,
                                          const Molecule& molecule) const{
    int totalNumberAtoms = molecule.GetNumberAtoms();
    MallocerFreer::GetInstance()->Initialize<double>(atomicElectronPopulation, totalNumberAtoms);
-
-   int firstAOIndex = 0;
-   int numberAOs = 0;
+#pragma omp parallel for schedule(auto)
    for(int A=0; A<totalNumberAtoms; A++){
-      firstAOIndex = molecule.GetAtom(A)->GetFirstAOIndex();
-      numberAOs = molecule.GetAtom(A)->GetValenceSize();
+      int firstAOIndex = molecule.GetAtom(A)->GetFirstAOIndex();
+      int numberAOs = molecule.GetAtom(A)->GetValenceSize();
       for(int i=firstAOIndex; i<firstAOIndex+numberAOs; i++){
          atomicElectronPopulation[A] += orbitalElectronPopulation[i][i];
       }
@@ -1591,11 +1605,9 @@ void Cndo2::CalcGammaAB(double** gammaAB, const Molecule& molecule) const{
    int mpiRank       = MolDS_mpi::MpiProcess::GetInstance()->GetRank();
    int mpiSize       = MolDS_mpi::MpiProcess::GetInstance()->GetSize();
    int mpiHeadRank   = MolDS_mpi::MpiProcess::GetInstance()->GetHeadRank();
-   int mPassingTimes = MolDS_mpi::MpiProcess::GetInstance()->GetMessagePassingTimes(totalAtomNumber);
    MolDS_mpi::AsyncCommunicator asyncCommunicator;
    boost::thread communicationThread( boost::bind(&MolDS_mpi::AsyncCommunicator::Run<double>, 
-                                                  &asyncCommunicator, 
-                                                  mPassingTimes) );
+                                                  &asyncCommunicator) );
 
    // This loop (A) is parallelized by MPI
    for(int A=0; A<totalAtomNumber; A++){
@@ -1669,24 +1681,23 @@ void Cndo2::CalcGammaAB(double** gammaAB, const Molecule& molecule) const{
       }  //  end of if(mpiRank==calcRank)
 
       // set data to gater in mpiHeadRank with asynchronous MPI 
-      int tag = A;
-      int source = calcRank;
-      int dest = mpiHeadRank;
+      int tag                      = A;
+      int source                   = calcRank;
+      int dest                     = mpiHeadRank;
+      double* buff                 = &gammaAB[A][A];
+      MolDS_mpi::molds_mpi_int num = totalAtomNumber-A;
       if(mpiRank == mpiHeadRank && mpiRank != calcRank){
-         asyncCommunicator.SetRecvedVector(&gammaAB[A][A], 
-                                           totalAtomNumber-A, 
-                                           source,
-                                           tag);
+         asyncCommunicator.SetRecvedMessage(buff, num, source, tag);
       }
       if(mpiRank != mpiHeadRank && mpiRank == calcRank){
-         asyncCommunicator.SetSentVector(&gammaAB[A][A], 
-                                         totalAtomNumber-A, 
-                                         dest,
-                                         tag);
+         asyncCommunicator.SetSentMessage(buff, num, dest, tag);
       }
    }  // end of loop A prallelized by MPI
+   asyncCommunicator.Finalize();
    communicationThread.join();
-   MolDS_mpi::MpiProcess::GetInstance()->Broadcast(&gammaAB[0][0], totalAtomNumber*totalAtomNumber, mpiHeadRank);
+   double* buff                 = &gammaAB[0][0];
+   MolDS_mpi::molds_mpi_int num = totalAtomNumber*totalAtomNumber;
+   MolDS_mpi::MpiProcess::GetInstance()->Broadcast(buff, num, mpiHeadRank);
 
 #pragma omp parallel for schedule(auto)
    for(int A=0; A<totalAtomNumber; A++){
@@ -1792,12 +1803,9 @@ void Cndo2::CalcCartesianMatrixByGTOExpansion(double*** cartesianMatrix,
    int mpiRank       = MolDS_mpi::MpiProcess::GetInstance()->GetRank();
    int mpiSize       = MolDS_mpi::MpiProcess::GetInstance()->GetSize();
    int mpiHeadRank   = MolDS_mpi::MpiProcess::GetInstance()->GetHeadRank();
-   int mPassingTimes = MolDS_mpi::MpiProcess::GetInstance()->GetMessagePassingTimes(totalAtomNumber);
-   mPassingTimes    *= CartesianType_end;
    MolDS_mpi::AsyncCommunicator asyncCommunicator;
    boost::thread communicationThread( boost::bind(&MolDS_mpi::AsyncCommunicator::Run<double>, 
-                                                  &asyncCommunicator, 
-                                                  mPassingTimes) );
+                                                  &asyncCommunicator) );
 
    // This loop (A and mu) is parallelized by MPI
    for(int A=0; A<totalAtomNumber; A++){
@@ -1836,43 +1844,32 @@ void Cndo2::CalcCartesianMatrixByGTOExpansion(double*** cartesianMatrix,
       } // end lof if(mpiRank == calcRank)
 
       // set data to gater in mpiHeadRank with asynchronous MPI 
-      int tagX = A* CartesianType_end + XAxis;
-      int tagY = A* CartesianType_end + YAxis;
-      int tagZ = A* CartesianType_end + ZAxis;
-      int source = calcRank;
-      int dest = mpiHeadRank;
+      int tagX                     = A* CartesianType_end + XAxis;
+      int tagY                     = A* CartesianType_end + YAxis;
+      int tagZ                     = A* CartesianType_end + ZAxis;
+      int source                   = calcRank;
+      int dest                     = mpiHeadRank;
+      double* buffX                = &cartesianMatrix[XAxis][firstAOIndexA][0];
+      double* buffY                = &cartesianMatrix[YAxis][firstAOIndexA][0];
+      double* buffZ                = &cartesianMatrix[ZAxis][firstAOIndexA][0];
+      MolDS_mpi::molds_mpi_int num = numValenceAOsA*totalAONumber;
       if(mpiRank == mpiHeadRank && mpiRank != calcRank){
-         asyncCommunicator.SetRecvedVector(&cartesianMatrix[XAxis][firstAOIndexA][0], 
-                                           numValenceAOsA*totalAONumber, 
-                                           source,
-                                           tagX);
-         asyncCommunicator.SetRecvedVector(&cartesianMatrix[YAxis][firstAOIndexA][0], 
-                                           numValenceAOsA*totalAONumber, 
-                                           source,
-                                           tagY);
-         asyncCommunicator.SetRecvedVector(&cartesianMatrix[ZAxis][firstAOIndexA][0], 
-                                           numValenceAOsA*totalAONumber, 
-                                           source,
-                                           tagZ);
+         asyncCommunicator.SetRecvedMessage(buffX, num, source, tagX);
+         asyncCommunicator.SetRecvedMessage(buffY, num, source, tagY);
+         asyncCommunicator.SetRecvedMessage(buffZ, num, source, tagZ);
       }
       if(mpiRank != mpiHeadRank && mpiRank == calcRank){
-         asyncCommunicator.SetSentVector(&cartesianMatrix[XAxis][firstAOIndexA][0], 
-                                         numValenceAOsA*totalAONumber, 
-                                         dest,
-                                         tagX);
-         asyncCommunicator.SetSentVector(&cartesianMatrix[YAxis][firstAOIndexA][0], 
-                                         numValenceAOsA*totalAONumber, 
-                                         dest,
-                                         tagY);
-         asyncCommunicator.SetSentVector(&cartesianMatrix[ZAxis][firstAOIndexA][0], 
-                                         numValenceAOsA*totalAONumber, 
-                                         dest,
-                                         tagZ);
+         asyncCommunicator.SetSentMessage(buffX, num, dest, tagX);
+         asyncCommunicator.SetSentMessage(buffY, num, dest, tagY);
+         asyncCommunicator.SetSentMessage(buffZ, num, dest, tagZ);
       }
    } // end of loop for int A with MPI
    // Delete the communication thread.
+   asyncCommunicator.Finalize();
    communicationThread.join();
-   MolDS_mpi::MpiProcess::GetInstance()->Broadcast(&cartesianMatrix[0][0][0], CartesianType_end*totalAONumber*totalAONumber, mpiHeadRank);
+   double* buff                 = &cartesianMatrix[0][0][0];
+   MolDS_mpi::molds_mpi_int num = CartesianType_end*totalAONumber*totalAONumber;
+   MolDS_mpi::MpiProcess::GetInstance()->Broadcast(buff, num, mpiHeadRank);
 
 /*
    // communication to collect all matrix data on head-rank
@@ -3908,11 +3905,9 @@ void Cndo2::CalcOverlapAOs(double** overlapAOs, const Molecule& molecule) const{
    int mpiRank       = MolDS_mpi::MpiProcess::GetInstance()->GetRank();
    int mpiSize       = MolDS_mpi::MpiProcess::GetInstance()->GetSize();
    int mpiHeadRank   = MolDS_mpi::MpiProcess::GetInstance()->GetHeadRank();
-   int mPassingTimes = MolDS_mpi::MpiProcess::GetInstance()->GetMessagePassingTimes(totalAtomNumber);
    MolDS_mpi::AsyncCommunicator asyncCommunicator;
    boost::thread communicationThread( boost::bind(&MolDS_mpi::AsyncCommunicator::Run<double>, 
-                                                  &asyncCommunicator, 
-                                                  mPassingTimes) );
+                                                  &asyncCommunicator) );
 
    MallocerFreer::GetInstance()->Initialize<double>(overlapAOs,
                                                     totalAONumber,
@@ -3976,24 +3971,23 @@ void Cndo2::CalcOverlapAOs(double** overlapAOs, const Molecule& molecule) const{
       } // end of if(mpiRank == calcRnak)
 
       // set data to gather in mpiHeadRank with asynchronous MPI 
-      int tag = A;
-      int source = calcRank;
-      int dest = mpiHeadRank;
+      int tag                      = A;
+      int source                   = calcRank;
+      int dest                     = mpiHeadRank;
+      double* buff                 = overlapAOs[firstAOIndexA];
+      MolDS_mpi::molds_mpi_int num = totalAONumber*numValenceAOs;
       if(mpiRank == mpiHeadRank && mpiRank != calcRank){
-         asyncCommunicator.SetRecvedVector(overlapAOs[firstAOIndexA], 
-                                           totalAONumber*numValenceAOs, 
-                                           source,
-                                           tag);
+         asyncCommunicator.SetRecvedMessage(buff, num, source, tag);
       }
       if(mpiRank != mpiHeadRank && mpiRank == calcRank){
-         asyncCommunicator.SetSentVector(overlapAOs[firstAOIndexA], 
-                                         totalAONumber*numValenceAOs, 
-                                         dest,
-                                         tag);
+         asyncCommunicator.SetSentMessage(buff, num, dest, tag);
       }
    }  // end of loop A parallelized with MPI
+   asyncCommunicator.Finalize();
    communicationThread.join();
-   MolDS_mpi::MpiProcess::GetInstance()->Broadcast(&overlapAOs[0][0], totalAONumber*totalAONumber, mpiHeadRank);
+   double* buff                 = &overlapAOs[0][0];
+   MolDS_mpi::molds_mpi_int num = totalAONumber*totalAONumber;
+   MolDS_mpi::MpiProcess::GetInstance()->Broadcast(buff, num, mpiHeadRank);
 
    #pragma omp parallel for schedule(auto)
    for(int mu=0; mu<totalAONumber; mu++){
