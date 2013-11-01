@@ -24,7 +24,7 @@ BOOST_INC_DIR = $(BOOST_TOP_DIR)include/
 BOOST_LIB_DIR = $(BOOST_TOP_DIR)lib/
 BOOST_LIBS    = -lboost
 LIBS = $(BOOST_LIBS) 
-EXENAME = MolDS.out
+EXENAME = molds
 DEPFILE = obj/objfile.dep
 LDFLAGS = -Kfast,openmp -SSL2BLAMP -Xg
 
