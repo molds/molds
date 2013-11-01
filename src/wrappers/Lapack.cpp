@@ -37,6 +37,7 @@
    #include"mkl.h"
 #elif defined __FCC_VERSION
    #include"lapacke.h"
+#include"mkl_lapacke.h"
 #else
    #if ( __WORDSIZE == 32 )
    #else
