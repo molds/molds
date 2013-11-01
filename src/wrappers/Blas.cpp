@@ -25,6 +25,7 @@
 #include<string>
 #include<stdexcept>
 #include<boost/format.hpp>
+#include"../config.h"
 #include"../base/Uncopyable.h"
 #include"../base/PrintController.h"
 #include"../base/MolDSException.h"
@@ -305,7 +306,7 @@ void Blas::Dsyr(molds_blas_int n, double alpha,
 #else
    CBLAS_UPLO uploA=CblasUpper;
    cblas_dsyr(CblasRowMajor, uploA, n, alpha, x, incrementX, a, lda);
-#pragma omp parallel for schedule(auto)
+#pragma omp parallel for schedule(dynamic, MOLDS_OMP_DYNAMIC_CHUNK_SIZE)
    for(molds_blas_int i=0;i<n;i++){
       for(molds_blas_int j=i+1;j<n;j++){
          matrixA[j][i] = matrixA[i][j]; // Note that output matrixA is row-major(C/C++ stype) 
@@ -690,7 +691,7 @@ void Blas::Dsyrk(molds_blas_int n, molds_blas_int k,
    CBLAS_UPLO uploC= isLowerTriangularPartMatrixCUsed ? CblasLower : CblasUpper;
    CBLAS_TRANSPOSE transA= isMatrixATransposed ? CblasTrans : CblasNoTrans;
    cblas_dsyrk(orderA, uploC, transA, n, k, alpha, a, lda, beta, c, ldc);
-#pragma omp parallel for schedule(auto)
+#pragma omp parallel for schedule(dynamic, MOLDS_OMP_DYNAMIC_CHUNK_SIZE)
    for(molds_blas_int i=0;i<n;i++){
       for(molds_blas_int j=i+1;j<n;j++){
          if(isLowerTriangularPartMatrixCUsed){
