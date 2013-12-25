@@ -45,8 +45,8 @@ class Tester
    @@command = "command: "
    @@mpiCommand = "mpirun -np "
    @@mpiProcesses = "2"
-   @@deleteDiff = " | gawk '{if(($2!=\"SCF\")&&($3!=\"iter\")){print $0}}' | gawk '{if(($4!=\"time:\")){print $0}}' | gawk '{if(($3!=\"Elapsed\")){print $0}}' | gawk '{if(($2!=\"Elapsed\")){print $0}}' | gawk '{if(($3!=\"Welcome\")){print $0}}' | gawk '{if(($7!=\"residual\")){print $0}}' | gawk '{if(($3!=\"mode(nmw):\") ){print $0}}' | gawk '{if( !(($3==\"mode(mw):\")&&($4<6)) ){print $0}}'" 
-	 @@printed_section = []
+   @@deleteDiff = " | gawk '{if(($2!=\"SCF\")&&($3!=\"iter\")){print $0}}' | gawk '{if(($4!=\"time:\")){print $0}}' | gawk '{if(($3!=\"Elapsed\")){print $0}}' | gawk '{if(($2!=\"Elapsed\")){print $0}}' | gawk '{if(($3!=\"Welcome\")){print $0}}' | gawk '{if(($7!=\"residual\")){print $0}}' | gawk '{if(($3!=\"mode(nmw):\") ){print $0}}' | gawk '{if( !(($3==\"mode(mw):\")&&($4<6)) ){print $0}}' | gawk '{if(($3!=\"Heap:\")){print $0}}'" 
+   @@printed_section = []
    def doesTestOmp(mklNumThreads, ompNumThreads)
       return unless should_run?
       ENV["MKL_NUM_THREADS"] = mklNumThreads
@@ -291,6 +291,20 @@ tester.doesTestMpi(mklNumThreads,ompNumThreads)
 prefix = "h2o_zindos_directCIS_singlet"
 tester = Tester.new(prefix, <<"TITLE")
 \t\t\t>>> H2O <<<
+TITLE
+mklNumThreads = "1"
+ompNumThreads = "1"
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
+mklNumThreads = "2"
+ompNumThreads = "2"
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
+mklNumThreads = "4"
+ompNumThreads = "2"
+tester.doesTestMpi(mklNumThreads,ompNumThreads)
+
+prefix = "c4h4s_zindos_directCIS_singlet"
+tester = Tester.new(prefix, <<"TITLE")
+\t\t\t>>> C4H4S(Thiophene) <<<
 TITLE
 mklNumThreads = "1"
 ompNumThreads = "1"

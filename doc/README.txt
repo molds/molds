@@ -22,9 +22,10 @@
 ==============================================================================
 
 
-   MolDS ("Mol"ecular "D"ynamics "S"imulation package) ver. 0.2.0
-      developed by Mikiya Fujii, Ph.D., Katsuhiko Nishimra, and Michihiro Okuyama, Ph.D..
-      For Questions and bug reports: molds-dev@lists.sourceforge.jp
+   MolDS ("Mol"ecular "D"ynamics "S"imulation package) ver. 0.4.0 (Under developement)
+      Developers: Mikiya Fujii, Ph.D.(project lead), Katsuhiko Nishimra, and Michihiro Okuyama, Ph.D..
+      Other contributors: Michael Banck 
+      Questions and bug reports: molds-dev@lists.sourceforge.jp
 
 
 ==============================================================================
@@ -42,6 +43,8 @@ REQUIREMENTS:
     The version of the boost would be no problem if 1.46.0 or later is used.
     Especially, the Boost should be builded with MPI 
     because MolDS needs boost_mpi-library(i.e. -lboost_mpi).
+    An example of manually building of the boost 1.48.0 by M.F. is shown in:
+    http://d.hatena.ne.jp/futofuji/20120320/p2
 
    -Linear Algebra Packages (i.e. BLAS and LAPACK)
     MolDS needs a linear algebra package. In the current implementation of MolDS, 
@@ -51,9 +54,9 @@ REQUIREMENTS:
     To get and install the OpenBLAS-libraries, see the HP:<http://xianyi.github.com/OpenBLAS/>.
     The version of the OpenBLAS would be no problem if 0.2.5 or later is used.
     Note that "USE_OPENMP = 1" should be set for the installation of the opneBLAS.
-    Furthermore, "BINARY=64" and "INTERFACE64 = 1" are also needed 
+    Furthermore, "BINARY = 64" and "INTERFACE64 = 1" are also needed 
     when you install the OpenBLAS into 64-bits machines.
-    An example of building the openBLAS-0.2.5 by M.F. is shown in:
+    An example of manually building of the openBLAS 0.2.5 by M.F. is shown in:
     http://d.hatena.ne.jp/futofuji/20130627/p1
 
 ==============================================================================

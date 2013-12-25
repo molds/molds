@@ -40,8 +40,8 @@ using namespace MolDS_base;
 int main(int argc, char *argv[]){
    string optionHelp="-h";
    string optionVersion="-v";
-   string messageHelp="See README.txt: \"http://sourceforge.jp/projects/molds/scm/svn/blobs/head/trunk/doc/README.txt\"\n";
-   string messageVersion="MolDS 0.3.0 (under development)\n";
+   string messageHelp="See README.txt: \"http://sourceforge.jp/projects/molds/scm/svn/tree/head/trunk/doc/\"\n";
+   string messageVersion="MolDS 0.4.0(Under development)\n";
    for(int i=0; i<argc; i++){
       if(optionHelp.compare(argv[i])==0){
          std::cout << messageHelp;
@@ -58,7 +58,7 @@ int main(int argc, char *argv[]){
       molds->Run(argc, argv);
       MolDS_mpi::MpiProcess::DeleteInstance();
    }
-   catch(exception ex){
+   catch(exception& ex){
       cout << ex.what();
    }
    return 0;

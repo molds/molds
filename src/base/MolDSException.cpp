@@ -162,7 +162,6 @@ void MolDSException::serialize(Archive& ar, const unsigned int ver){
 void MolDSException::Serialize(std::ostream& os){
 #ifndef __FCC_VERSION
    boost::archive::text_oarchive oa(os);
-   std::string what = domain_error::what();
    oa << this;
 #endif
 }
