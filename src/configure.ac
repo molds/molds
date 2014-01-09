@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2012 Katsuhiko Nishimra
+# Copyright (C) 2012-2014 Katsuhiko Nishimra
 #
 # This file is part of MolDS.
 #
@@ -106,9 +106,9 @@ AS_IF([test x$molds_blas_cinterface_found != xyes],
 dnl Check for LAPACK
 AX_LAPACK(,[AC_MSG_FAILURE([Cannot find LAPACK library!])])
 LIBS="$LAPACK_LIBS $LIBS"
-AC_CHECK_HEADERS([mkl.h lapacke.h],[molds_lapack_header_found=yes],)
+AC_CHECK_HEADERS([mkl_lapacke.h lapacke.h],[molds_lapack_header_found=yes],)
 AS_IF([test "x$molds_lapack_header_found" != "xyes"],
-      [AC_MSG_FAILURE([Cannot find mkl.h or lapacke.h!])])
+      [AC_MSG_FAILURE([Cannot find mkl_lapacke.h or lapacke.h!])])
 
 dnl Check for LAPACK C interface
 AC_CHECK_FUNCS([dgetrf dgetrs dsyevd dsysv],
