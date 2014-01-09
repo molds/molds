@@ -1,5 +1,5 @@
 //************************************************************************//
-// Copyright (C) 2011-2012 Mikiya Fujii                                   // 
+// Copyright (C) 2011-2014 Mikiya Fujii                                   // 
 //                                                                        // 
 // This file is part of MolDS.                                            // 
 //                                                                        // 
@@ -30,12 +30,20 @@
 #include"../base/MolDSException.h"
 #include"../base/containers/ThreadSafeQueue.h"
 #include"../base/MallocerFreer.h"
+#include"MpiInt.h"
 #include"MpiProcess.h"
 #include"AsyncCommunicator.h"
 using namespace std;
 namespace MolDS_mpi{
-AsyncCommunicator::AsyncCommunicator(){}
+AsyncCommunicator::AsyncCommunicator(){
+   this->hasAllMessagesSet=false;
+}
 AsyncCommunicator::~AsyncCommunicator(){}
+void AsyncCommunicator::Finalize(){
+   boost::mutex::scoped_lock lk(this->stateGuard);
+   this->hasAllMessagesSet = true;
+   this->stateChange.notify_all();
+}
 }
 
 

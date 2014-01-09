@@ -1,7 +1,7 @@
 //************************************************************************//
-// Copyright (C) 2011-2012 Mikiya Fujii                                   // 
-// Copyright (C) 2012-2012 Katsuhiko Nishimra                             // 
-// Copyright (C) 2012-2013 Michihiro Okuyama                              //
+// Copyright (C) 2011-2014 Mikiya Fujii                                   // 
+// Copyright (C) 2012-2014 Katsuhiko Nishimra                             // 
+// Copyright (C) 2012-2014 Michihiro Okuyama                              //
 //                                                                        // 
 // This file is part of MolDS.                                            // 
 //                                                                        // 
@@ -33,18 +33,13 @@
 #include"PrintController.h"
 #include"MolDSException.h"
 #include"MallocerFreer.h"
+#include"../mpi/MpiInt.h"
 #include"../mpi/MpiProcess.h"
 #include"Utilities.h"
 #include"EularAngle.h"
 #include"Parameters.h"
 #include"RealSphericalHarmonicsIndex.h"
 #include"atoms/Atom.h"
-#include"atoms/Hatom.h"
-#include"atoms/Liatom.h"
-#include"atoms/Catom.h"
-#include"atoms/Natom.h"
-#include"atoms/Oatom.h"
-#include"atoms/Satom.h"
 #include"factories/AtomFactory.h"
 #include"Molecule.h"
 #include"InputParser.h"
@@ -81,6 +76,8 @@ void InputParser::SetMessages(){
       = "Error in base::InputParser::GetInputTerms: Input file is empty.\n"; 
    this->errorMessageNotFoundInputFile
       = "Error in base::InputParser::StoreInputTermsFromFile: Not found.\n"; 
+   this->errorMessageNonValidTheoriesEpc
+      = "Error in base::InputParser::ValidateEpcConditions: Theory you set is not supported for EPC. The supported theories are MNDO-sefies(MNDO, AM1, AM1D, PM3, PM3D, PDDG/PM3) only.\n";
    this->errorMessageNonValidTheoriesMD
       = "Error in base::InputParser::ValidateMdConditions: Theory you set is not supported for MD.\n";
    this->errorMessageNonValidExcitedStatesMD
@@ -243,9 +240,18 @@ void InputParser::SetMessages(){
    this->stringTheory        = "theory";
    this->stringTheoryEnd     = "theory_end";
 
-   // geometry
+   // molecular configuratio
    this->stringGeometry    = "geometry";
    this->stringGeometryEnd = "geometry_end";
+
+   // Ghost (ghost) atoms
+   this->stringGhost       = "ghost";
+   this->stringGhostEnd    = "ghost_end";
+
+   // Environmental Point Charge
+   this->stringEpc       = "epc";
+   this->stringEpcEnd    = "epc_end";
+   this->stringEpcCharge = "charge";
 
    // SCF
    this->stringScf                 = "scf";
@@ -454,7 +460,7 @@ void InputParser::AddInputTermsFromString(vector<string>& inputTerms, string str
    }
 }
 
-int InputParser::ParseMolecularGeometry(Molecule* molecule, vector<string>* inputTerms, int parseIndex) const{
+int InputParser::ParseMolecularConfiguration(Molecule* molecule, vector<string>* inputTerms, int parseIndex) const{
    parseIndex++;
    while((*inputTerms)[parseIndex].compare(this->stringGeometryEnd) != 0){
       double x = atof((*inputTerms)[parseIndex+1].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
@@ -479,10 +485,69 @@ int InputParser::ParseMolecularGeometry(Molecule* molecule, vector<string>* inpu
       else if((*inputTerms)[parseIndex] == "s"){
          atomType = S;
       }
-      int index = molecule->GetNumberAtoms();
+      else if((*inputTerms)[parseIndex] == "zn"){
+         atomType = Zn;
+      }
+      int index = molecule->GetRealAtomVect().size() + molecule->GetGhostAtomVect().size();
       Atom* atom = AtomFactory::Create(atomType, index, x, y, z);
-      molecule->AddAtom(atom);
+      molecule->AddRealAtom(atom);
       parseIndex += 4;
+   }
+   return parseIndex;
+}
+
+int InputParser::ParseGhostsConfiguration(Molecule* molecule, vector<string>* inputTerms, int parseIndex) const{
+   parseIndex++;
+   while((*inputTerms)[parseIndex].compare(this->stringGhostEnd) != 0){
+      double x = atof((*inputTerms)[parseIndex+1].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
+      double y = atof((*inputTerms)[parseIndex+2].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
+      double z = atof((*inputTerms)[parseIndex+3].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
+      AtomType atomType = H;
+      if((*inputTerms)[parseIndex] == "h"){
+        atomType = ghostH;
+      }
+      else if((*inputTerms)[parseIndex] == "li"){
+         atomType = ghostLi;
+      }
+      else if((*inputTerms)[parseIndex] == "c"){
+         atomType = ghostC;
+      }
+      else if((*inputTerms)[parseIndex] == "n"){
+         atomType = ghostN;
+      }
+      else if((*inputTerms)[parseIndex] == "o"){
+         atomType = ghostO;
+      }
+      else if((*inputTerms)[parseIndex] == "s"){
+         atomType = ghostS;
+      }
+      else if((*inputTerms)[parseIndex] == "zn"){
+         atomType = ghostZn;
+      }
+      int index = molecule->GetRealAtomVect().size() + molecule->GetGhostAtomVect().size();
+      Atom* atom = AtomFactory::Create(atomType, index, x, y, z);
+      molecule->AddGhostAtom(atom);
+      parseIndex += 4;
+   }
+   return parseIndex;
+}
+
+int InputParser::ParseEpcsConfiguration(Molecule* molecule, vector<string>* inputTerms, int parseIndex) const{
+   parseIndex++;
+   while((*inputTerms)[parseIndex].compare(this->stringEpcEnd) != 0){
+      double x      = atof((*inputTerms)[parseIndex+0].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
+      double y      = atof((*inputTerms)[parseIndex+1].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
+      double z      = atof((*inputTerms)[parseIndex+2].c_str()) * Parameters::GetInstance()->GetAngstrom2AU();
+      parseIndex += 3;
+      double charge = 0.0;
+      if((*inputTerms)[parseIndex].compare(this->stringEpcCharge) == 0){
+         charge = atof((*inputTerms)[parseIndex+1].c_str());
+         parseIndex += 2;
+      }
+      AtomType atomType = EPC;
+      int index = molecule->GetEpcVect().size();
+      Atom* atom = AtomFactory::Create(atomType, index, x, y, z, charge);
+      molecule->AddEpc(atom);
    }
    return parseIndex;
 }
@@ -1163,9 +1228,19 @@ void InputParser::Parse(Molecule* molecule, int argc, char *argv[]) const{
          i = this->ParseTheory(&inputTerms, i);
       }
 
-      // molecular geometry
+      // molecular configuration
       if(inputTerms[i].compare(this->stringGeometry) == 0){
-         i = this->ParseMolecularGeometry(molecule, &inputTerms, i);
+         i = this->ParseMolecularConfiguration(molecule, &inputTerms, i);
+      }
+
+      // ghost atom configuration
+      if(inputTerms[i].compare(this->stringGhost) == 0){
+         i = this->ParseGhostsConfiguration(molecule, &inputTerms, i);
+      }
+
+      // Environmental Point Charges Configuration(EPC)
+      if(inputTerms[i].compare(this->stringEpc) == 0){
+         i = this->ParseEpcsConfiguration(molecule, &inputTerms, i);
       }
 
       // scf condition
@@ -1248,6 +1323,7 @@ void InputParser::Parse(Molecule* molecule, int argc, char *argv[]) const{
    // calculate basics and validate conditions
    this->CalcMolecularBasics(molecule);
    this->ValidateVdWConditions();
+   this->ValidateEpcConditions(*molecule);
    if(Parameters::GetInstance()->RequiresCIS()){
       this->ValidateCisConditions(*molecule);
    }
@@ -1322,6 +1398,25 @@ void InputParser::ValidateVdWConditions() const{
       Parameters::GetInstance()->SetRequiresVdWSCF(true);
       Parameters::GetInstance()->SetVdWScalingFactorSCF();
       Parameters::GetInstance()->SetVdWDampingFactorSCF();
+   }
+}
+
+void InputParser::ValidateEpcConditions(const Molecule& molecule) const{
+   if(molecule.GetEpcVect().empty()){return;}
+   TheoryType theory = Parameters::GetInstance()->GetCurrentTheory();
+   // Validate theory
+   if(theory == MNDO || 
+      theory == AM1  || 
+      theory == AM1D || 
+      theory == PM3  || 
+      theory == PM3D || 
+      theory == PM3PDDG ){
+   }
+   else{
+      stringstream ss;
+      ss << this->errorMessageNonValidTheoriesEpc;
+      ss << this->errorMessageTheory << TheoryTypeStr(theory) << endl;
+      throw MolDSException(ss.str());
    }
 }
 
@@ -1549,6 +1644,7 @@ void InputParser::OutputMolecularBasics(Molecule* molecule) const{
    molecule->OutputConfiguration();
    molecule->OutputXyzCOM();
    molecule->OutputXyzCOC();
+   molecule->OutputEpcs();
 }
 
 void InputParser::OutputScfConditions() const{

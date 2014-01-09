@@ -1,5 +1,5 @@
 //************************************************************************//
-// Copyright (C) 2011-2012 Mikiya Fujii                                   // 
+// Copyright (C) 2011-2014 Mikiya Fujii                                   // 
 //                                                                        // 
 // This file is part of MolDS.                                            // 
 //                                                                        // 
@@ -19,12 +19,14 @@
 #ifndef INCLUDED_NATOM
 #define INCLUDED_NATOM
 namespace MolDS_base_atoms{
-class Natom : public Atom {
+class Natom : virtual public Atom {
 public:
    Natom(int index);
+   virtual ~Natom();
+protected:
+   void virtual SetAtomicParameters();
 private:
    Natom();
-   void SetAtomicParameters();
 };
 }
 #endif

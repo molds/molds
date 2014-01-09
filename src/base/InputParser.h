@@ -1,7 +1,7 @@
 //************************************************************************//
-// Copyright (C) 2011-2012 Mikiya Fujii                                   // 
-// Copyright (C) 2012-2012 Katsuhiko Nishimra                             // 
-// Copyright (C) 2012-2013 Michihiro Okuyama                              //
+// Copyright (C) 2011-2014 Mikiya Fujii                                   // 
+// Copyright (C) 2012-2014 Katsuhiko Nishimra                             // 
+// Copyright (C) 2012-2014 Michihiro Okuyama                              //
 //                                                                        // 
 // This file is part of MolDS.                                            // 
 //                                                                        // 
@@ -35,6 +35,7 @@ private:
    void SetMessages();
    std::string errorMessageInputFileEmpty;
    std::string errorMessageNotFoundInputFile; 
+   std::string errorMessageNonValidTheoriesEpc;
    std::string errorMessageNonValidTheoriesMD;
    std::string errorMessageNonValidExcitedStatesMD;
    std::string errorMessageNonValidExcitedStatesMC;
@@ -151,7 +152,6 @@ private:
    std::string messageK;
    std::string messageAngst;
    std::string messageMB;
-
    // others
    std::string stringYES;
    std::string stringNO;
@@ -170,9 +170,16 @@ private:
    std::string stringTheoryPM3;
    std::string stringTheoryPM3D;
    std::string stringTheoryPM3PDDG;
-   // geometry
+   // molecular configuraion(geometry)
    std::string stringGeometry;
    std::string stringGeometryEnd;
+   // Ghost
+   std::string stringGhost;
+   std::string stringGhostEnd;
+   // EPC
+   std::string stringEpc;
+   std::string stringEpcEnd;
+   std::string stringEpcCharge;
    // SCF
    std::string stringScf;
    std::string stringScfEnd;
@@ -297,6 +304,7 @@ private:
    std::string stringFrequenciesElecState;
    void CalcMolecularBasics(Molecule* molecule) const;
    void ValidateVdWConditions() const;
+   void ValidateEpcConditions(const Molecule& molecule) const;
    void ValidateCisConditions(const Molecule& molecule) const;
    void ValidateMdConditions(const Molecule& molecule) const;
    void ValidateMcConditions(const Molecule& molecule) const;
@@ -323,7 +331,9 @@ private:
    void StoreInputTermsFromRedirect(std::vector<std::string>& inputTerms) const;
    void StoreInputTermsFromFile(std::vector<std::string>& inputTerms, char* fileName) const;
    void AddInputTermsFromString(std::vector<std::string>& inputTerms, std::string str) const;
-   int ParseMolecularGeometry(Molecule* molecule, std::vector<std::string>* inputTerms, int parseIndex) const;
+   int ParseMolecularConfiguration(Molecule* molecule, std::vector<std::string>* inputTerms, int parseIndex) const;
+   int ParseGhostsConfiguration(Molecule* molecule, std::vector<std::string>* inputTerms, int parseIndex) const;
+   int ParseEpcsConfiguration(Molecule* molecule, std::vector<std::string>* inputTerms, int parseIndex) const;
    int ParseTheory(std::vector<std::string>* inputTerms, int parseIndex) const;
    int ParseConditionsSCF(std::vector<std::string>* inputTerms, int parseIndex) const;
    int ParseConditionsPrincipalAxes(std::vector<std::string>* inputTerms, int parseIndex) const;

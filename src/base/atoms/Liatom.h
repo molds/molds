@@ -1,5 +1,5 @@
 //************************************************************************//
-// Copyright (C) 2011-2012 Mikiya Fujii                                   // 
+// Copyright (C) 2011-2014 Mikiya Fujii                                   // 
 //                                                                        // 
 // This file is part of MolDS.                                            // 
 //                                                                        // 
@@ -19,12 +19,14 @@
 #ifndef INCLUDED_LIATOM
 #define INCLUDED_LIATOM
 namespace MolDS_base_atoms{
-class Liatom : public Atom {
+class Liatom : virtual public Atom {
 public:
    Liatom(int index);
+   virtual ~Liatom();
+protected:
+   void virtual SetAtomicParameters();
 private:
    Liatom();
-   void SetAtomicParameters();
 };
 }
 #endif

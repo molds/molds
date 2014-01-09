@@ -1,7 +1,7 @@
 //************************************************************************//
-// Copyright (C) 2011-2012 Mikiya Fujii                                   // 
-// Copyright (C) 2012-2012 Katsuhiko Nishimra                             // 
-// Copyright (C) 2013-2013 Michihiro Okuyama                              // 
+// Copyright (C) 2011-2014 Mikiya Fujii                                   // 
+// Copyright (C) 2012-2014 Katsuhiko Nishimra                             // 
+// Copyright (C) 2013-2014 Michihiro Okuyama                              // 
 //                                                                        // 
 // This file is part of MolDS.                                            // 
 //                                                                        // 
@@ -22,9 +22,10 @@
 ==============================================================================
 
 
-   MolDS ("Mol"ecular "D"ynamics "S"imulation package) ver. 0.2.0
-      developed by Mikiya Fujii, Ph.D., Katsuhiko Nishimra, and Michihiro Okuyama, Ph.D..
-      For Questions and bug reports: molds-dev@lists.sourceforge.jp
+   MolDS ("Mol"ecular "D"ynamics "S"imulation package) ver. 0.4.0 (Under developement)
+      Developers: Mikiya Fujii, Ph.D.(project lead), Katsuhiko Nishimra, and Michihiro Okuyama, Ph.D..
+      Other contributors: Michael Banck 
+      Questions and bug reports: molds-dev@lists.sourceforge.jp
 
 
 ==============================================================================
@@ -42,6 +43,8 @@ REQUIREMENTS:
     The version of the boost would be no problem if 1.46.0 or later is used.
     Especially, the Boost should be builded with MPI 
     because MolDS needs boost_mpi-library(i.e. -lboost_mpi).
+    An example of manually building of the boost 1.48.0 by M.F. is shown in:
+    http://d.hatena.ne.jp/futofuji/20120320/p2
 
    -Linear Algebra Packages (i.e. BLAS and LAPACK)
     MolDS needs a linear algebra package. In the current implementation of MolDS, 
@@ -51,13 +54,17 @@ REQUIREMENTS:
     To get and install the OpenBLAS-libraries, see the HP:<http://xianyi.github.com/OpenBLAS/>.
     The version of the OpenBLAS would be no problem if 0.2.5 or later is used.
     Note that "USE_OPENMP = 1" should be set for the installation of the opneBLAS.
-    Furthermore, "INTERFACE64 = 1" is also needed when you install the OpenBLAS into 64-bits machines
+    Furthermore, "BINARY = 64" and "INTERFACE64 = 1" are also needed 
+    when you install the OpenBLAS into 64-bits machines.
+    An example of manually building of the openBLAS 0.2.5 by M.F. is shown in:
+    http://d.hatena.ne.jp/futofuji/20130627/p1
 
 ==============================================================================
-COMPILE(using GNUmake): 
-   In the "src" directory in the MolDS package.
+COMPILE:
+   GNUMake is used to compile the MolDS in the "src" directory of the MolDS package.
+   MolDS officially suport the following three cases.
 
-   Case i) The Intel mpi compiler (mpiicpc) which is wrapping the Intel c++ compiler (icpc)
+   Case i) The Intel mpi compiler (mpiicpc) wrapping the Intel c++ compiler (icpc)
       Change the "BOOST_TOP_DIR" in Makefile to the top directory of the 
       Boost C++ Libraries in your systems.
 
@@ -67,7 +74,7 @@ COMPILE(using GNUmake):
       To compile MolDS on 64 bits machine,
       $ make INTEL=64
    
-   Case ii) The openMPI compiler (mpicxx) which is wrapping the Intel c++ compiler (icpc)
+   Case ii) The openMPI compiler (mpicxx) wrapping the Intel c++ compiler (icpc)
       Change the "BOOST_TOP_DIR" in Makefile to the top directory of the 
       Boost C++ Libraries in your systems.
 
@@ -77,8 +84,7 @@ COMPILE(using GNUmake):
       To compile MolDS on 64 bits machine,
       $ make INTEL=64 CC=mpicxx
    
-
-   Case iii) The openMPI compiler (mpicxx) which is wrapping the GNU c++ compiler (g++) 
+   Case iii) The openMPI compiler (mpicxx) wrapping the GNU c++ compiler (g++):
       Change the "BOOST_TOP_DIR" in "Makefile_GNU" to the top directory of the 
       Boost C++ Libraries in your systems.
       Change the "OPENBLAS_TOP_DIR" in "Makefile_GNU" to the top directory of the 
@@ -87,7 +93,7 @@ COMPILE(using GNUmake):
       Then, just type: 
       $ make -f Makefile_GNU 
 
-   For all case, the compile succeeded if you could fine "MolDS.out" in the "src" directory. 
+   For all case, the compile succeeded if you could fine "molds" in the "src" directory. 
    If you want to clean the compilation, type 
    $ make clean
    If you want to compile MolDS in debug-mode, 
@@ -100,22 +106,22 @@ CARRY OUT MolDS:
    After the compile, in the "src" directory,
 
    For the calculations with single process:
-   $ ./MolDS.out < input.in
+   $ ./molds < input.in
    or
-   $ ./MolDS.out input.in
+   $ ./molds input.in
 
    For the calculations with muliple threads, type
    $ export OMP_NUM_THREADS=n1
-   $ ./MolDS.out input.in
+   $ ./molds input.in
    , where n1 is the number of threads.
 
    For the calculations with multiple processes by MPI:
-   $ mpirun -np n2 MolDS.out input.in
+   $ mpirun -np n2 molds input.in
    , where n2 after the "-np" is the number of process.
 
    For the calculations with muliple threads and muliple processes, type
    $ export OMP_NUM_THREADS=n1
-   $ mpirun -np n2 MolDS.out input.in
+   $ mpirun -np n2 molds input.in
    , where n1 is the number of cores of each node and n2 is the number of nodes.
 
    In the multiple processes calculations, process-0 can only output results.
@@ -126,7 +132,7 @@ CARRY OUT MolDS:
    namely, 
    $ make CFLAGS="-DMOLDS_DBG"
    $ export OMP_NUM_THREADS=n1
-   $ mpirun -np n2 MolDS.out input.in > /localFileSyste/output.dat
+   $ mpirun -np n2 molds input.in > /localFileSyste/output.dat
    , where n1 is the number of cores of each node and n2 is the number of nodes.
 
 ==============================================================================
@@ -176,15 +182,15 @@ CAPABILITIES:
       i.e., MD(gs) and MD(es) mean Born-Oppenheimer Molecular Dynamics on ground and excited states, respectively. 
 
    -Elements
-    CNDO2    | H, Li, C, N, O, and S
-    INDO     | H, Li, C, N, and O
-    ZINDO/S  | H, C, N, O, and S
-    MNDO     | H, C, N, O, and S 
-    AM1      | H, C, N, O, and S 
-    AM1-D    | H, C, N, O, and S 
-    PM3      | H, C, N, O, and S 
-    PM3-D    | H, C, N, O, and S 
-    PM3/PDDG | H, C, N, O, and S 
+    CNDO2    | H, Li, C, N, O, S
+    INDO     | H, Li, C, N, O
+    ZINDO/S  | H,     C, N, O, 
+    MNDO     | H,     C, N, O, S, Zn
+    AM1      | H,     C, N, O, S, Zn
+    AM1-D    | H,     C, N, O, S 
+    PM3      | H,     C, N, O, S, Zn
+    PM3-D    | H,     C, N, O, S 
+    PM3/PDDG | H,     C, N, O, S 
 
    -Parallelization
     Open MP parallelization: everywhere in MolDS
@@ -193,27 +199,39 @@ CAPABILITIES:
 ==============================================================================
 HOW TO WRITE INPUT:
 
+   <Terminiology>
+      "hoge-directive" means line block stating "hoge" and ending "hoge_end" in input files.
+      Uppercase and lowercase letters are treated as identical in input files.
+
    <Comment Out>
       Lines starting with "//" or "#" in input-files are treated as comments.
 
-   <SCF>
+   <Theory>
       Write "cndo/2", "indo", "zindo/s", "mndo", "am1", "am1-d",
       "pm3", "pm3-d", or "pm3/pddg" in theory-directive.
       This theory-directive indicate a electronic structure theory used in your simulations.
       MNDO only supports (can calculate) Heats of formation.
-      SCF module outputs also the dipole moment arrond the center of cores of the molecule.
-      To calculate the dipole moment, STO-6G [DY_1977] is used.
 
       E.g. 
          THEORY
             indo 
          THEORY_END
+
+   <SCF>
+      Write SCF-directive. In the SCF-directive, settings(options) of SCF should be written.
+
+      E.g.
+         SCF
+            (options)
+         SCf_END
    
       -options
        Write below options in SCF-directive.
        "max_iter", "rms_density", "damping_thresh", "damping_weight", 
        "diis_num_error_vect", "diis_start_error", "diis_end_error",
        "vdW", "vdW_s6", and "vdW_d" are prepared as options.
+       SCF module outputs also the dipole moment arrond the center of core's mass
+       To calculate the dipole moment, STO-6G [DY_1977] is used.
 
        The default value of the "max_iter" is 100.
        The default value of the "rms_density" is 10**(-8.0).
@@ -256,7 +274,27 @@ HOW TO WRITE INPUT:
             vdW_s6 0.75
             vdW_d 30
          SCF_END
-   
+
+   <GEOMETRY>
+      To set geometry(configurtion) of a system calculated by MolDS, 
+      the configuration should be written in geometry-directive.
+      Each line inside the geometry-directive indicates each atom of the system.  
+      Namely, each line should containe one character and three doubles.
+      The character indicates atomtype and three doubles indicate the cartesian coordinates of
+      each atom in angstrom unit.
+
+       E.g.
+         GEOMETRY
+            C -0.1000 0.1000 0.0000
+            C 1.6938 0.0000 -0.1000
+            H -0.381 1.1411 0.0000
+            H -0.2681 -0.5205 -0.9016
+            H -0.3681 -0.4725 0.8016
+            H 1.9519 0.5200 -0.9007
+            H 1.8519 0.5300 0.8007
+            H 1.7519 -1.0401 -0.1000
+         GEOMETRY_END
+         
    <MEMORY>
       For settings of memory usage, write options in memory-directive.
 
@@ -275,26 +313,6 @@ HOW TO WRITE INPUT:
          MEMORY
             limit_heap 512
          MEMORY_END
-
-   <Frequencies (Normal modes analysis)>
-      write frequencies-directive. Note taht not only the frequencies but also the normal modes are calculated.
-
-      E.g.
-         FREQUENCIES
-            (options)
-         FREQUENCIES_END
-
-      -options
-       "electronic_state" is only prepared.
-       "electronic_state" is index of the electronic state used for calculating the normal modes. 
-       electronic_state=0 means the electronic ground state.
-       electronic_state=1 means, then, first electornic excited state.
-       The default value of the "electronic_state" is 0.
-
-       E.g. 
-         FREQUENCIES
-            electronic_state 0
-         FREQUENCIES_END
 
    <MO Plot>
       write MO plot directive.
@@ -327,6 +345,66 @@ HOW TO WRITE INPUT:
             frame_length 10 10 10
             file_prefix MOPlot_
          MOPLOT_END
+
+   <Environmental Point Charge(EPC) method>
+      Environmental point charge method is a simplified method of the QM/MM,
+      namely the environmental point changes are treated as atoms in the MM region.
+      The differences between the QM/MM and EPC are summarized below:
+         - Electrostatic interaction between QM and MM region:
+            QM/MM: Electrostatic interaction may be mutually added to QM and MM atoms.
+            EPC  : Electrostatic field caused by the EPCs affects the QM region
+                   although the each EPC is not affected by electrostatic field 
+                   caused by the QM atoms and other EPCs. 
+                   Namely, each EPC is fixed at point of space.
+         - Van der Waals interaction between QM and MM region:
+            QM/MM: Included.
+            EPC  : Not included.
+      In this EPC method, core-core replustion between QM and MM atoms is implemented with
+      the method I (simple coulomb interaction: qq/r) of ref [LRCL_2000].
+      This EPC method can be used with MNDO-series (MNDO, AM1, AM1-D, PM3, PM3-D, and PDDG/PM3) only.
+      To use this environmental point charges method, write EPC-directive. 
+
+      E.g.
+         EPC
+            (options)
+         EPC_END
+      
+      -options
+       "the cartesian coordinates and charge" is only prepared.
+       Namely, each line should containe 4 doubles and a term. 
+       The first three doubles are the cartesian coordinates of 
+       each environmental point charge in angstrom unit.
+       The term is "charge". The last double following the term, "charge", 
+       is the charge in atomic unit, 
+       e.g. -1 and 1 mean charge of an electron and a proton, respectively.
+       Multiple setting of the environmental point charge is approvable, of course.
+
+       E.g. 
+         EPC 
+            0.0 0.0 0.0 charge -1   
+            2.2 1.5 3.0 charge -1.5
+            0.0 2.0 5.0 charge  0.3
+         EPC_END
+
+   <Frequencies (Normal modes analysis)>
+      write frequencies-directive. Note taht not only the frequencies but also the normal modes are calculated.
+
+      E.g.
+         FREQUENCIES
+            (options)
+         FREQUENCIES_END
+
+      -options
+       "electronic_state" is only prepared.
+       "electronic_state" is index of the electronic state used for calculating the normal modes. 
+       electronic_state=0 means the electronic ground state.
+       electronic_state=1 means, then, first electornic excited state.
+       The default value of the "electronic_state" is 0.
+
+       E.g. 
+         FREQUENCIES
+            electronic_state 0
+         FREQUENCIES_END
 
    <CIS>
       Write CIS-directive.
@@ -378,6 +456,8 @@ HOW TO WRITE INPUT:
        If user set this "all_transition_dipole" as "yes", all transition dipole moments 
        including between excited states would be calculated. 
        Otherwise "no", transition dipole moments from ground state to each excited state are calculated.
+       The center of the transition dipole moments is same with 
+       the center of the dipole moment of the ground state.
 
        "mulliken" is a option of mulliken popultaion analysis of the excited state.
        When "mulliken x" is included in CIS-directive, the mulliken popultaion of xth excited state is calculated.
@@ -481,15 +561,15 @@ HOW TO WRITE INPUT:
          PARTICLEPLOT_END
 
    <OPT (geometry optimization)>
-      Write OPT-directive. This module uses line search and steepest descent algorythms.
+      Write optimization-directive. This module uses line search and steepest descent algorythms.
       In the early stage the line search algorythm is used, 
       then the algorythm used in this module is switched to steepest descent algorythm.
       Note that ZINDO/S is not suitable for geometry optimizations.
 
       E.g.
-         OPTIMIZE
+         OPTIMIZATION
             (options)
-         OPTIMIZE_END
+         OPTIMIZATION_END
   
       -options
        "method", "total_steps", "electronic_state", "max_gradient", "rms_gradient", 
@@ -528,16 +608,14 @@ HOW TO WRITE INPUT:
       This parameter have no effect if method is "steepest_descent" or "conjugate_gradient".
 
       E.g.
-         OPTIMIZE
+         OPTIMIZATION
             method steepest_descent
             total_steps 50
             electronic_state 0
             max_gradient 0.00045
             rms_gradient 0.00030
             dt 50
-         OPTIMIZE_END
-  
-      
+         OPTIMIZATION_END
 
    <MD (Molecular dynamics)>
       Write MD-directive. Note that ZINDO/S is not suitable for molcular dynamics simulations.
@@ -708,7 +786,6 @@ HOW TO WRITE INPUT:
        "angles" indicates Euler angles for the rotation in degree unit.
        The default values of "angles" are 0, 0, and 0.
        This option is valid only for "type" set as Euler angles.
-   
 
        E.g. for "type" set as axis
          ROTATE
@@ -723,7 +800,6 @@ HOW TO WRITE INPUT:
             type eular_angle
             angles 15 25 35
          ROTATE_END
-
 
    <Translate Molecule>
       Write translate-directive.

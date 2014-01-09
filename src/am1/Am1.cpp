@@ -1,5 +1,5 @@
 //************************************************************************//
-// Copyright (C) 2011-2013 Mikiya Fujii                                   //
+// Copyright (C) 2011-2014 Mikiya Fujii                                   //
 //                                                                        // 
 // This file is part of MolDS.                                            // 
 //                                                                        // 
@@ -29,6 +29,7 @@
 #include"../base/PrintController.h"
 #include"../base/MolDSException.h"
 #include"../base/MallocerFreer.h"
+#include"../mpi/MpiInt.h"
 #include"../mpi/MpiProcess.h"
 #include"../base/EularAngle.h"
 #include"../base/Parameters.h"
@@ -80,31 +81,39 @@ void Am1::SetMessages(){
       = "Error in am1::Am1::CalcCISMatrix: Non available orbital is contained.\n";
    this->errorMessageDavidsonNotConverged =  "Error in am1::Am1::DoCISDavidson: Davidson did not met convergence criterion. \n";
    this->errorMessageGetSemiEmpiricalMultipoleInteractionBadMultipoles
-      = "Error in am1:: Am1::GetSemiEmpiricalMultipoleInteraction: Bad multipole combintaion is set\n";
+      = "Error in am1::Am1::GetSemiEmpiricalMultipoleInteraction: Bad multipole combintaion is set\n";
+   this->errorMessageGetSemiEmpiricalMultipoleInteractionBadAtomTypes
+      = "Error in am1::Am1::GetSemiEmpiricalMultipoleInteraction: Bad atom types are set\n";
    this->errorMessageGetSemiEmpiricalMultipoleInteraction1stDeriBadMultipoles
-      = "Error in am1:: Am1::GetSemiEmpiricalMultipoleInteraction1stDerivative: Bad multipole combintaion is set\n";
+      = "Error in am1::Am1::GetSemiEmpiricalMultipoleInteraction1stDerivative: Bad multipole combintaion is set\n";
    this->errorMessageGetSemiEmpiricalMultipoleInteraction2ndDeriBadMultipoles
-      = "Error in am1:: Am1::GetSemiEmpiricalMultipoleInteraction2ndDerivative: Bad multipole combintaion is set\n";
+      = "Error in am1::Am1::GetSemiEmpiricalMultipoleInteraction2ndDerivative: Bad multipole combintaion is set\n";
    this->errorMessageGetNddoRepulsionIntegral 
       = "Error in am1::Am1::GetNddoRepulsionIntegral: Bad orbital is set.\n";
+   this->errorMessageGetNddoRepulsionIntegralBadAtomTypes
+      = "Error in am1::Am1::GetNddoRepulsionIntegral: Bad atom types are set.\n";
    this->errorMessageGetNddoRepulsionIntegral1stDerivative 
       = "Error in am1::Am1::GetNddoRepulsionIntegral1stDerivative: Bad orbital is set.\n";
    this->errorMessageGetNddoRepulsionIntegral2ndDerivative 
       = "Error in am1::Am1::GetNddoRepulsionIntegral2ndDerivative: Bad orbital is set.\n";
-   this->errorMessageCalcTwoElecTwoCoreNullMatrix 
-      = "Error in am1::Am1::CalcTwoElecTwoCore: The two elec two core matrix is NULL.\n"; 
-   this->errorMessageCalcDiatomicTwoElecTwoCoreSameAtoms
-      = "Error in am1::Am1::CalcDiatomicTwoElecTwoCore: Atom A and B is same.\n"; 
-   this->errorMessageCalcDiatomicTwoElecTwoCore1stDerivativesSameAtoms
-      = "Error in am1::Am1::CalcDiatomicTwoElecTwoCore1stDerivatives: Atom A and B is same.\n"; 
-   this->errorMessageCalcDiatomicTwoElecTwoCore2ndDerivativesSameAtoms
-      = "Error in am1::Am1::CalcDiatomicTwoElecTwoCore2ndDerivatives: Atom A and B is same.\n"; 
-   this->errorMessageCalcDiatomicTwoElecTwoCoreNullMatrix 
-      = "Error in am1::Am1::CalcDiatomicTwoElecTwoCore: The two elec two core diatomic matrix is NULL.\n"; 
-   this->errorMessageCalcDiatomicTwoElecTwoCore1stDerivativesNullMatrix
-      = "Error in am1::Am1::CalcDiatomicTwoElecTwoCore1stDerivatives: The two elec two core diatomic matrix is NULL.\n"; 
-   this->errorMessageCalcDiatomicTwoElecTwoCore2ndDerivativesNullMatrix
-      = "Error in am1::Am1::CalcDiatomicTwoElecTwoCore2ndDerivatives: The two elec two core diatomic matrix is NULL.\n"; 
+   this->errorMessageCalcTwoElecsTwoAtomCoresNullMatrix 
+      = "Error in am1::Am1::CalcTwoElecsTwoAtomCores: The two elec two atom core matrix is NULL.\n"; 
+   this->errorMessageCalcTwoElecsAtomEpcCoresNullMatrix 
+      = "Error in am1::Am1::CalcTwoElecsAtomEpcCores: The two elec atom-epc core matrix is NULL.\n"; 
+   this->errorMessageCalcDiatomicTwoElecsTwoCoresSameAtoms
+      = "Error in am1::Am1::CalcDiatomicTwoElecsTwoCores: Atom A and B is same atom (not EPC).\n"; 
+   this->errorMessageCalcDiatomicTwoElecsTwoCoresSameEpcs
+      = "Error in am1::Am1::CalcDiatomicTwoElecsTwoCores: Atom A and B is same EPC.\n"; 
+   this->errorMessageCalcDiatomicTwoElecsTwoCores1stDerivativesSameAtoms
+      = "Error in am1::Am1::CalcDiatomicTwoElecsTwoCores1stDerivatives: Atom A and B is same.\n"; 
+   this->errorMessageCalcDiatomicTwoElecsTwoCores2ndDerivativesSameAtoms
+      = "Error in am1::Am1::CalcDiatomicTwoElecsTwoCores2ndDerivatives: Atom A and B is same.\n"; 
+   this->errorMessageCalcDiatomicTwoElecsTwoCoresNullMatrix 
+      = "Error in am1::Am1::CalcDiatomicTwoElecsTwoCores: The two elec two core diatomic matrix is NULL.\n"; 
+   this->errorMessageCalcDiatomicTwoElecsTwoCores1stDerivativesNullMatrix
+      = "Error in am1::Am1::CalcDiatomicTwoElecsTwoCores1stDerivatives: The two elec two core diatomic matrix is NULL.\n"; 
+   this->errorMessageCalcDiatomicTwoElecsTwoCores2ndDerivativesNullMatrix
+      = "Error in am1::Am1::CalcDiatomicTwoElecsTwoCores2ndDerivatives: The two elec two core diatomic matrix is NULL.\n"; 
    this->errorMessageGetElectronicEnergyEnergyNotCalculated
       = "Error in am1::Am1::GetElectronicEnergy: Set electronic state is not calculated by CIS.\n";
    this->errorMessageGetElectronicEnergyNULLCISEnergy 
@@ -124,16 +133,15 @@ void Am1::SetEnableAtomTypes(){
    this->enableAtomTypes.push_back(N);
    this->enableAtomTypes.push_back(O);
    this->enableAtomTypes.push_back(S);
+   this->enableAtomTypes.push_back(Zn);
 }
 
-double Am1::GetDiatomCoreRepulsionEnergy(int indexAtomA, int indexAtomB) const{
+double Am1::GetDiatomCoreRepulsionEnergy(const Atom& atomA, const Atom& atomB) const{
    // MNDO term
-   double mndoTerm = Mndo::GetDiatomCoreRepulsionEnergy(indexAtomA, indexAtomB);
+   double mndoTerm = Mndo::GetDiatomCoreRepulsionEnergy(atomA, atomB);
 
    // additional term, Eq. (4) in [S_1989].
-   const Atom& atomA = *this->molecule->GetAtom(indexAtomA);
-   const Atom& atomB = *this->molecule->GetAtom(indexAtomB);
-   double distance   = this->molecule->GetDistanceAtoms(indexAtomA, indexAtomB);
+   double distance   = this->molecule->GetDistanceAtoms(atomA, atomB);
    double ang2AU     = Parameters::GetInstance()->GetAngstrom2AU();
    double alphaA     = atomA.GetNddoAlpha(this->theory);
    double alphaB     = atomB.GetNddoAlpha(this->theory);
@@ -157,19 +165,16 @@ double Am1::GetDiatomCoreRepulsionEnergy(int indexAtomA, int indexAtomB) const{
 
 // First derivative of diatomic core repulsion energy.
 // This derivative is related to the coordinate of atomA.
-double Am1::GetDiatomCoreRepulsion1stDerivative(int indexAtomA,
-                                                  int indexAtomB, 
-                                                  CartesianType axisA) const{
+double Am1::GetDiatomCoreRepulsion1stDerivative(const Atom& atomA, const Atom& atomB, 
+                                                CartesianType axisA) const{
    // MNDO term
-   double mndoTerms = Mndo::GetDiatomCoreRepulsion1stDerivative(indexAtomA, indexAtomB, axisA);
+   double mndoTerms = Mndo::GetDiatomCoreRepulsion1stDerivative(atomA, atomB, axisA);
 
    // additional term, first derivative of eq. (4) in [S_1989]
    double ang2AU     = Parameters::GetInstance()->GetAngstrom2AU();
-   const Atom& atomA = *this->molecule->GetAtom(indexAtomA);
-   const Atom& atomB = *this->molecule->GetAtom(indexAtomB);
    double alphaA     = atomA.GetNddoAlpha(this->theory);
    double alphaB     = atomB.GetNddoAlpha(this->theory);
-   double distance   = this->molecule->GetDistanceAtoms(indexAtomA, indexAtomB);
+   double distance   = this->molecule->GetDistanceAtoms(atomA, atomB);
    double dCartesian = (atomA.GetXyz()[axisA] - atomB.GetXyz()[axisA]);
    double kA, lA, mA;
    double kB, lB, mB;
@@ -197,20 +202,18 @@ double Am1::GetDiatomCoreRepulsion1stDerivative(int indexAtomA,
 
 // Second derivative of diatomic core repulsion energy.
 // Both derivatives are related to the coordinate of atomA.
-double Am1::GetDiatomCoreRepulsion2ndDerivative(int indexAtomA,
-                                                   int indexAtomB, 
-                                                   CartesianType axisA1,
-                                                   CartesianType axisA2) const{
+double Am1::GetDiatomCoreRepulsion2ndDerivative(const Atom& atomA,
+                                                const Atom& atomB, 
+                                                CartesianType axisA1,
+                                                CartesianType axisA2) const{
    // MNDO term
-   double mndoTerm = Mndo::GetDiatomCoreRepulsion2ndDerivative(indexAtomA, indexAtomB, axisA1, axisA2);
+   double mndoTerm = Mndo::GetDiatomCoreRepulsion2ndDerivative(atomA, atomB, axisA1, axisA2);
 
    // additional term, first derivative of eq. (4) in [S_1989]
    double ang2AU     = Parameters::GetInstance()->GetAngstrom2AU();
-   const Atom& atomA = *this->molecule->GetAtom(indexAtomA);
-   const Atom& atomB = *this->molecule->GetAtom(indexAtomB);
    double alphaA     = atomA.GetNddoAlpha(this->theory);
    double alphaB     = atomB.GetNddoAlpha(this->theory);
-   double distance   = this->molecule->GetDistanceAtoms(indexAtomA, indexAtomB);
+   double distance   = this->molecule->GetDistanceAtoms(atomA, atomB);
    double kA, lA, mA;
    double kB, lB, mB;
    double temp1 = 0.0;

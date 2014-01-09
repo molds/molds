@@ -1,6 +1,6 @@
 //************************************************************************//
-// Copyright (C) 2011-2012 Mikiya Fujii                                   //
-// Copyright (C) 2012-2013 Katsuhiko Nishimra                             //
+// Copyright (C) 2011-2014 Mikiya Fujii                                   //
+// Copyright (C) 2012-2014 Katsuhiko Nishimra                             //
 //                                                                        //
 // This file is part of MolDS.                                            //
 //                                                                        //
@@ -28,11 +28,13 @@
 #include<stdexcept>
 #include<boost/shared_ptr.hpp>
 #include<boost/format.hpp>
+#include"../config.h"
 #include"../base/Enums.h"
 #include"../base/Uncopyable.h"
 #include"../base/PrintController.h"
 #include"../base/MolDSException.h"
 #include"../base/MallocerFreer.h"
+#include"../mpi/MpiInt.h"
 #include"../mpi/MpiProcess.h"
 #include"../wrappers/Blas.h"
 #include"../wrappers/Lapack.h"
@@ -87,7 +89,7 @@ void GEDIIS::SearchMinimum(boost::shared_ptr<ElectronicStructure> electronicStru
    double lineSearchInitialEnergy   = 0.0;
    double const* const* matrixForce = NULL;
    double const* vectorForce        = NULL;
-   const int dimension = molecule.GetNumberAtoms()*CartesianType_end;
+   const int dimension = molecule.GetAtomVect().size()*CartesianType_end;
    double** matrixHessian           = NULL;
    double*  vectorOldForce          = NULL;
    double*  vectorStep              = NULL;
@@ -135,8 +137,8 @@ void GEDIIS::SearchMinimum(boost::shared_ptr<ElectronicStructure> electronicStru
          lineSearchInitialEnergy = lineSearchCurrentEnergy;
          double preRFOEnergy = lineSearchInitialEnergy;
 
-         MallocerFreer::GetInstance()->Malloc(&matrixGEDIISCoordinates, molecule.GetNumberAtoms(), CartesianType_end);
-         MallocerFreer::GetInstance()->Malloc(&matrixGEDIISForce,       molecule.GetNumberAtoms(), CartesianType_end);
+         MallocerFreer::GetInstance()->Malloc(&matrixGEDIISCoordinates, molecule.GetAtomVect().size(), CartesianType_end);
+         MallocerFreer::GetInstance()->Malloc(&matrixGEDIISForce,       molecule.GetAtomVect().size(), CartesianType_end);
          try{
             history.SolveGEDIISEquation(&preRFOEnergy, matrixGEDIISCoordinates, matrixGEDIISForce);
 
@@ -174,7 +176,7 @@ void GEDIIS::SearchMinimum(boost::shared_ptr<ElectronicStructure> electronicStru
          this->ShiftHessianRedundantMode(matrixHessian, molecule);
 
          //Calculate RFO step
-         MallocerFreer::GetInstance()->Malloc(&matrixStep, molecule.GetNumberAtoms(), CartesianType_end);
+         MallocerFreer::GetInstance()->Malloc(&matrixStep, molecule.GetAtomVect().size(), CartesianType_end);
          vectorStep = &matrixStep[0][0];
          this->CalcRFOStep(vectorStep, matrixHessian, vectorForce, trustRadius, dimension);
 
@@ -235,20 +237,20 @@ void GEDIIS::SearchMinimum(boost::shared_ptr<ElectronicStructure> electronicStru
    catch(MolDSException ex){
       MallocerFreer::GetInstance()->Free(&matrixHessian, dimension, dimension);
       MallocerFreer::GetInstance()->Free(&vectorOldForce, dimension);
-      MallocerFreer::GetInstance()->Free(&matrixStep             , molecule.GetNumberAtoms(), CartesianType_end);
-      MallocerFreer::GetInstance()->Free(&matrixDisplacement     , molecule.GetNumberAtoms(), CartesianType_end);
-      MallocerFreer::GetInstance()->Free(&matrixOldCoordinates   , molecule.GetNumberAtoms(), CartesianType_end);
-      MallocerFreer::GetInstance()->Free(&matrixGEDIISCoordinates, molecule.GetNumberAtoms(), CartesianType_end);
-      MallocerFreer::GetInstance()->Free(&matrixGEDIISForce      , molecule.GetNumberAtoms(), CartesianType_end);
+      MallocerFreer::GetInstance()->Free(&matrixStep             , molecule.GetAtomVect().size(), CartesianType_end);
+      MallocerFreer::GetInstance()->Free(&matrixDisplacement     , molecule.GetAtomVect().size(), CartesianType_end);
+      MallocerFreer::GetInstance()->Free(&matrixOldCoordinates   , molecule.GetAtomVect().size(), CartesianType_end);
+      MallocerFreer::GetInstance()->Free(&matrixGEDIISCoordinates, molecule.GetAtomVect().size(), CartesianType_end);
+      MallocerFreer::GetInstance()->Free(&matrixGEDIISForce      , molecule.GetAtomVect().size(), CartesianType_end);
       throw ex;
    }
    MallocerFreer::GetInstance()->Free(&matrixHessian, dimension, dimension);
    MallocerFreer::GetInstance()->Free(&vectorOldForce, dimension);
-   MallocerFreer::GetInstance()->Free(&matrixStep             , molecule.GetNumberAtoms(), CartesianType_end);
-   MallocerFreer::GetInstance()->Free(&matrixDisplacement     , molecule.GetNumberAtoms(), CartesianType_end);
-   MallocerFreer::GetInstance()->Free(&matrixOldCoordinates   , molecule.GetNumberAtoms(), CartesianType_end);
-   MallocerFreer::GetInstance()->Free(&matrixGEDIISCoordinates, molecule.GetNumberAtoms(), CartesianType_end);
-   MallocerFreer::GetInstance()->Free(&matrixGEDIISForce      , molecule.GetNumberAtoms(), CartesianType_end);
+   MallocerFreer::GetInstance()->Free(&matrixStep             , molecule.GetAtomVect().size(), CartesianType_end);
+   MallocerFreer::GetInstance()->Free(&matrixDisplacement     , molecule.GetAtomVect().size(), CartesianType_end);
+   MallocerFreer::GetInstance()->Free(&matrixOldCoordinates   , molecule.GetAtomVect().size(), CartesianType_end);
+   MallocerFreer::GetInstance()->Free(&matrixGEDIISCoordinates, molecule.GetAtomVect().size(), CartesianType_end);
+   MallocerFreer::GetInstance()->Free(&matrixGEDIISForce      , molecule.GetAtomVect().size(), CartesianType_end);
 }
 
 GEDIIS::GEDIISHistory::GEDIISHistory():maxEntryCount(5){
@@ -285,12 +287,12 @@ void GEDIIS::GEDIISHistory::DiscardEntries(){
 GEDIIS::GEDIISHistory::Entry::Entry(double energy,
                                     const MolDS_base::Molecule& molecule,
                                     double const* const* matrixForce):
-   energy(energy),numAtoms(molecule.GetNumberAtoms()),matrixCoordinate(NULL),matrixForce(NULL) {
+   energy(energy),numAtoms(molecule.GetAtomVect().size()),matrixCoordinate(NULL),matrixForce(NULL) {
    MallocerFreer::GetInstance()->Malloc(&this->matrixCoordinate, this->numAtoms, CartesianType_end);
    MallocerFreer::GetInstance()->Malloc(&this->matrixForce,      this->numAtoms, CartesianType_end);
-#pragma omp parallel for schedule(auto)
+#pragma omp parallel for schedule(dynamic, MOLDS_OMP_DYNAMIC_CHUNK_SIZE)
    for(int i = 0; i < this->numAtoms; i++){
-      const Atom*   atom = molecule.GetAtom(i);
+      const Atom*   atom = molecule.GetAtomVect()[i];
       const double* xyz  = atom->GetXyz();
       for(int j = 0; j < CartesianType_end; j++){
          this->matrixCoordinate[i][j] = xyz[j];

@@ -1,5 +1,5 @@
 //************************************************************************//
-// Copyright (C) 2011-2012 Mikiya Fujii                                   // 
+// Copyright (C) 2011-2014 Mikiya Fujii                                   // 
 //                                                                        // 
 // This file is part of MolDS.                                            // 
 //                                                                        // 
@@ -20,12 +20,14 @@
 #define INCLUDED_HATOM
 namespace MolDS_base_atoms{
 
-class Hatom : public Atom {
+class Hatom : virtual public Atom {
 public:
    Hatom(int index);
+   virtual ~Hatom();
+protected:
+   void virtual SetAtomicParameters();
 private:
    Hatom();
-   void SetAtomicParameters();
 };
 
 }

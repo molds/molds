@@ -1,5 +1,5 @@
 //************************************************************************//
-// Copyright (C) 2011-2013 Mikiya Fujii                                   //
+// Copyright (C) 2011-2014 Mikiya Fujii                                   //
 //                                                                        // 
 // This file is part of MolDS.                                            // 
 //                                                                        // 
@@ -36,6 +36,7 @@
 #include"PrintController.h"
 #include"MolDSException.h"
 #include"MallocerFreer.h"
+#include"../mpi/MpiInt.h"
 #include"../mpi/MpiProcess.h"
 #include"../wrappers/Blas.h"
 #include"../wrappers/Lapack.h"

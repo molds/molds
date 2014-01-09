@@ -1,5 +1,5 @@
 //************************************************************************//
-// Copyright (C) 2011-2012 Mikiya Fujii                                   // 
+// Copyright (C) 2011-2014 Mikiya Fujii                                   // 
 //                                                                        // 
 // This file is part of MolDS.                                            // 
 //                                                                        // 
@@ -28,11 +28,13 @@
 #include<stdexcept>
 #include<omp.h>
 #include<boost/format.hpp>
+#include"../../config.h"
 #include"../Enums.h"
 #include"../Uncopyable.h"
 #include"../PrintController.h"
 #include"../MolDSException.h"
 #include"../MallocerFreer.h"
+#include"../../mpi/MpiInt.h"
 #include"../../mpi/MpiProcess.h"
 #include"../Utilities.h"
 #include"../MallocerFreer.h"
@@ -105,7 +107,7 @@ void DensityLogger::DrawDensity(vector<int> elecStateIndeces) const{
 
       // density output 
       stringstream ompErrors;
-#pragma omp parallel for schedule(auto) 
+#pragma omp parallel for schedule(dynamic, MOLDS_OMP_DYNAMIC_CHUNK_SIZE) 
       for(int n=0; n<elecStateIndeces.size(); n++){
          try{
             // validate electronic state
@@ -255,8 +257,8 @@ double DensityLogger::GetMOValue(int moIndex,
                                  double const* const* forckMatrix,
                                  double x, double y, double z) const{
    double moValue = 0.0;
-   for(int a=0; a<this->molecule->GetNumberAtoms(); a++){
-      Atom* atomA = this->molecule->GetAtom(a);
+   for(int a=0; a<this->molecule->GetAtomVect().size(); a++){
+      Atom* atomA = this->molecule->GetAtomVect()[a];
       int firstAOIndexA = atomA->GetFirstAOIndex();
       int numberAOsA = atomA->GetValenceSize();
       for(int mu=firstAOIndexA; mu<firstAOIndexA+numberAOsA; mu++){
@@ -279,10 +281,10 @@ void DensityLogger::OutputHeaderToFile(ofstream& ofs, double const* origin, doub
    // output header to the cube file
    ofs << this->messageCubeHeaderComment1;
    ofs << this->messageCubeHeaderComment2;
-   sprintf(data,"\t%d\t%e\t%e\t%e\n", this->molecule->GetNumberAtoms(),
-                                      origin[XAxis], 
-                                      origin[YAxis], 
-                                      origin[ZAxis]);
+   sprintf(data,"\t%ld\t%e\t%e\t%e\n", this->molecule->GetAtomVect().size(),
+                                       origin[XAxis], 
+                                       origin[YAxis], 
+                                       origin[ZAxis]);
    ofs << string(data);
    memset(data,0,sizeof(data));
    sprintf(data,"\t%d\t%e\t%e\t%e\n", gridNumber[XAxis], dx, 0.0, 0.0);
@@ -298,8 +300,8 @@ void DensityLogger::OutputHeaderToFile(ofstream& ofs, double const* origin, doub
 void DensityLogger::OutputMoleculeToFile(ofstream& ofs, const Molecule& molecule) const{
    char data[1000] = "";
    // output molecule to the cube file
-   for(int a=0; a<molecule.GetNumberAtoms(); a++){
-      const Atom& atomA = *molecule.GetAtom(a);
+   for(int a=0; a<molecule.GetAtomVect().size(); a++){
+      const Atom& atomA = *molecule.GetAtomVect()[a];
       memset(data,0,sizeof(data));
       sprintf(data,"\t%d\t%d\t%e\t%e\t%e\n", atomA.GetAtomType()+1, 
                                        atomA.GetNumberValenceElectrons(),

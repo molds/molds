@@ -1,5 +1,5 @@
 //************************************************************************//
-// Copyright (C) 2011-2012 Mikiya Fujii                                   // 
+// Copyright (C) 2011-2014 Mikiya Fujii                                   // 
 //                                                                        // 
 // This file is part of MolDS.                                            // 
 //                                                                        // 
@@ -25,11 +25,13 @@
 #include<vector>
 #include<stdexcept>
 #include<boost/format.hpp>
+#include"../config.h"
 #include"../base/Enums.h"
 #include"../base/Uncopyable.h"
 #include"../base/PrintController.h"
 #include"../base/MolDSException.h"
 #include"../base/MallocerFreer.h"
+#include"../mpi/MpiInt.h"
 #include"../mpi/MpiProcess.h"
 #include"../base/EularAngle.h"
 #include"../base/RealSphericalHarmonicsIndex.h"
@@ -111,7 +113,7 @@ double Indo::GetFockDiagElement(const Atom& atomA,
                                 double const* const* gammaAB,
                                 double const* const* orbitalElectronPopulation, 
                                 double const* atomicElectronPopulation,
-                                double const* const* const* const* const* const* twoElecTwoCore,
+                                double const* const* const* const* const* const* twoElecsTwoAtomCores,
                                 bool isGuess) const{
    double value;
    int firstAOIndexA = atomA.GetFirstAOIndex();
@@ -135,9 +137,9 @@ double Indo::GetFockDiagElement(const Atom& atomA,
       value += temp;
    
       temp = 0.0;
-      for(int B=0; B<molecule.GetNumberAtoms(); B++){
+      for(int B=0; B<molecule.GetAtomVect().size(); B++){
          if(B != indexAtomA){
-            const Atom& atomB = *molecule.GetAtom(B);
+            const Atom& atomB = *molecule.GetAtomVect()[B];
             temp += ( atomicElectronPopulation[B] - atomB.GetCoreCharge()  )
                      *gammaAB[indexAtomA][B];
          }
@@ -158,7 +160,7 @@ double Indo::GetFockOffDiagElement(const Atom& atomA,
                                    double const* const* gammaAB, 
                                    double const* const* overlapAOs,
                                    double const* const* orbitalElectronPopulation, 
-                                   double const* const* const* const* const* const* twoElecTwoCore,
+                                   double const* const* const* const* const* const* twoElecsTwoAtomCores,
                                    bool isGuess) const{
    double value;
    double K = this->GetBondingAdjustParameterK(atomA.GetValenceShellType(), atomB.GetValenceShellType());
@@ -205,8 +207,8 @@ double Indo::GetMolecularIntegralElement(int moI, int moJ, int moK, int moL,
    value = Cndo2::GetMolecularIntegralElement(moI, moJ, moK, moL, molecule, fockMatrix, gammaAB);
 
    // Aditional terms for INDO, see Eq. (10) in [RZ_1973]
-   for(int A=0; A<molecule.GetNumberAtoms(); A++){
-      const Atom& atomA = *molecule.GetAtom(A);
+   for(int A=0; A<molecule.GetAtomVect().size(); A++){
+      const Atom& atomA = *molecule.GetAtomVect()[A];
       firstAOIndexA = atomA.GetFirstAOIndex();
       numberAOsA = atomA.GetValenceSize();
 

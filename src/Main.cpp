@@ -1,5 +1,5 @@
 //************************************************************************//
-// Copyright (C) 2011-2013 Mikiya Fujii                                   //
+// Copyright (C) 2011-2014 Mikiya Fujii                                   //
 //                                                                        // 
 // This file is part of MolDS.                                            // 
 //                                                                        // 
@@ -28,6 +28,7 @@
 #include"base/PrintController.h"
 #include"base/MolDSException.h"
 #include"base/MallocerFreer.h"
+#include"mpi/MpiInt.h"
 #include"mpi/MpiProcess.h"
 #include"base/EularAngle.h"
 #include"base/RealSphericalHarmonicsIndex.h"
@@ -37,13 +38,27 @@
 using namespace std;
 using namespace MolDS_base;
 int main(int argc, char *argv[]){
+   string optionHelp="-h";
+   string optionVersion="-v";
+   string messageHelp="See README.txt: \"http://sourceforge.jp/projects/molds/scm/svn/tree/head/trunk/doc/\"\n";
+   string messageVersion="MolDS 0.4.0(Under development)\n";
+   for(int i=0; i<argc; i++){
+      if(optionHelp.compare(argv[i])==0){
+         std::cout << messageHelp;
+         return 0;
+      }
+      if(optionVersion.compare(argv[i])==0){
+         std::cout << messageVersion;
+         return 0;
+      }
+   }
    try{
       MolDS_mpi::MpiProcess::CreateInstance(argc, argv);
       boost::shared_ptr<MolDS_base::MolDS> molds(new MolDS_base::MolDS());
       molds->Run(argc, argv);
       MolDS_mpi::MpiProcess::DeleteInstance();
    }
-   catch(exception ex){
+   catch(exception& ex){
       cout << ex.what();
    }
    return 0;

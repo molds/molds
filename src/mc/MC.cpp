@@ -1,5 +1,5 @@
 //************************************************************************//
-// Copyright (C) 2011-2012 Mikiya Fujii                                   // 
+// Copyright (C) 2011-2014 Mikiya Fujii                                   // 
 //                                                                        // 
 // This file is part of MolDS.                                            // 
 //                                                                        // 
@@ -32,6 +32,7 @@
 #include"../base/PrintController.h"
 #include"../base/MolDSException.h"
 #include"../base/MallocerFreer.h"
+#include"../mpi/MpiInt.h"
 #include"../mpi/MpiProcess.h"
 #include"../base/EularAngle.h"
 #include"../base/Parameters.h"
@@ -160,9 +161,9 @@ void MC::CreateTrialConfiguration(Molecule* trial,
                                   > (*realRand),
                                   double stepWidth) const{
    // disturb an atom in trial molecule
-   int movedAtomIndex = static_cast<int>((*realRand)()*this->molecule->GetNumberAtoms());
-   const Atom& reffAtom = *current.GetAtom(movedAtomIndex);
-   Atom* trialAtom = trial->GetAtom(movedAtomIndex);
+   int movedAtomIndex = static_cast<int>((*realRand)()*this->molecule->GetAtomVect().size());
+   const Atom& reffAtom = *current.GetAtomVect()[movedAtomIndex];
+   Atom* trialAtom = trial->GetAtomVect()[movedAtomIndex];
    double dr[CartesianType_end] = {0.0, 0.0, 0.0};
    for(int i=0; i<CartesianType_end; i++){
       dr[i] = stepWidth*(2.0*(*realRand)() -1.0);
@@ -176,8 +177,8 @@ void MC::CreateTrialConfiguration(Molecule* trial,
    for(int i=0; i<CartesianType_end; i++){
       coreCenterShift[i] = dr[i]*trialAtomCoreMass/totalCoreMass;
    }
-   for(int a=0; a<current.GetNumberAtoms(); a++){
-      Atom* trialAtom = trial->GetAtom(a);
+   for(int a=0; a<current.GetAtomVect().size(); a++){
+      Atom* trialAtom = trial->GetAtomVect()[a];
       for(int i=0; i<CartesianType_end; i++){
          trialAtom->GetXyz()[i] -= coreCenterShift[i];
       }

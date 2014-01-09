@@ -1,6 +1,6 @@
 //************************************************************************//
-// Copyright (C) 2011-2013 Mikiya Fujii                                   //
-// Copyright (C) 2012-2013 Katsuhiko Nishimra                             //
+// Copyright (C) 2011-2014 Mikiya Fujii                                   //
+// Copyright (C) 2012-2014 Katsuhiko Nishimra                             //
 //                                                                        // 
 // This file is part of MolDS.                                            // 
 //                                                                        // 
@@ -115,6 +115,25 @@ public:
               double const* const* matrixB,
               double beta,
               double**             matrixC) const;
+   void Dgemm(bool isColumnMajorMatrixA, 
+              bool isColumnMajorMatrixB, 
+              molds_blas_int m, molds_blas_int n, molds_blas_int k, 
+              double alpha,
+              double const* const* matrixA,
+              double const* const* matrixB,
+              double beta,
+              double**             matrixC,
+              double*              tmpC) const;
+   void Dgemm(bool isColumnMajorMatrixA, 
+              bool isColumnMajorMatrixB, 
+              bool isColumnMajorMatrixC, 
+              molds_blas_int m, molds_blas_int n, molds_blas_int k, 
+              double alpha,
+              double const* const* matrixA,
+              double const* const* matrixB,
+              double beta,
+              double**             matrixC,
+              double*              tmpC) const;
    void Dgemmm(molds_blas_int m, molds_blas_int n, molds_blas_int k, molds_blas_int l,
                double const* const* matrixA, 
                double const* const* matrixB, 
@@ -141,6 +160,19 @@ public:
                double beta,
                double**             matrixD,
                double**             tmpMatrixBC) const;
+   void Dgemmm(bool isColumnMajorMatrixA, 
+               bool isColumnMajorMatrixB, 
+               bool isColumnMajorMatrixC, 
+               molds_blas_int m, molds_blas_int n, molds_blas_int k, molds_blas_int l,
+               double alpha,
+               double const* const* matrixA,
+               double const* const* matrixB,
+               double const* const* matrixC,
+               double beta,
+               double**             matrixD,
+               double*              tmpVectorD,
+               double**             tmpMatrixBC,
+               double*              tmpVectorBC) const;
   void Dsyrk(molds_blas_int n, molds_blas_int k,
              double const *const* matrixA,
              double**             matrixC)const;

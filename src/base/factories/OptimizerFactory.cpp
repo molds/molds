@@ -1,6 +1,6 @@
 //************************************************************************//
-// Copyright (C) 2011-2012 Mikiya Fujii                                   // 
-// Copyright (C) 2012-2012 Katsuhiko Nishimra                             // 
+// Copyright (C) 2011-2014 Mikiya Fujii                                   // 
+// Copyright (C) 2012-2014 Katsuhiko Nishimra                             // 
 //                                                                        // 
 // This file is part of MolDS.                                            // 
 //                                                                        // 
@@ -30,6 +30,7 @@
 #include"../PrintController.h"
 #include"../MolDSException.h"
 #include"../MallocerFreer.h"
+#include"../../mpi/MpiInt.h"
 #include"../../mpi/MpiProcess.h"
 #include"../EularAngle.h"
 #include"../Parameters.h"

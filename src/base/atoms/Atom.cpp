@@ -1,5 +1,5 @@
 //************************************************************************//
-// Copyright (C) 2011-2013 Mikiya Fujii                                   //
+// Copyright (C) 2011-2014 Mikiya Fujii                                   //
 //                                                                        // 
 // This file is part of MolDS.                                            // 
 //                                                                        // 
@@ -31,6 +31,7 @@
 #include"../PrintController.h"
 #include"../MolDSException.h"
 #include"../MallocerFreer.h"
+#include"../../mpi/MpiInt.h"
 #include"../../mpi/MpiProcess.h"
 #include"../MathUtilities.h"
 #include"../MallocerFreer.h"
@@ -160,7 +161,11 @@ double* Atom::GetPxyz() const{
 
 void Atom::SetXyz(double x, double y, double z) const{
 #ifdef MOLDS_DBG
-   if(this->xyz==NULL) throw MolDSException(this->errorMessageSetXyzCoordinatesNull);
+   if(this->xyz==NULL){
+      printf("xyz\n\n");
+      throw MolDSException("aaa");
+      //throw MolDSException(this->errorMessageSetXyzCoordinatesNull);
+   }
 #endif
    xyz[0]= x; xyz[1]= y; xyz[2]= z;
 }
@@ -334,15 +339,19 @@ double Atom::GetBondingParameter(TheoryType theory, OrbitalType orbital) const{
 
 }
 
+// Table 1.4 in J.A. Pople book
 int Atom::GetEffectivePrincipalQuantumNumber(ShellType shellType) const{
-   if(shellType == k){
+   if(shellType == kShell){
       return 1.0;
    }
-   else if(shellType == l){
+   else if(shellType == lShell){
       return 2.0;
    }
-   else if(shellType == m){
+   else if(shellType == mShell){
       return 3.0;
+   }
+   else if(shellType == nShell){
+      return 3.7;
    }
    else{
       stringstream ss;
@@ -358,30 +367,37 @@ double Atom::GetOrbitalExponent(ShellType shellType,
                                 OrbitalType orbitalType, 
                                 TheoryType theory) const{
    if(theory == CNDO2 || theory == INDO || theory == ZINDOS){
-      if(shellType == k && orbitalType == s){ 
+      if(shellType == kShell && orbitalType == s){ 
          return this->effectiveNuclearChargeK
                /this->GetEffectivePrincipalQuantumNumber(shellType);
       }   
-      else if(shellType == l && (orbitalType == s  || 
-                                 orbitalType == px || 
-                                 orbitalType == py || 
-                                 orbitalType == pz)){
+      else if(shellType == lShell && (orbitalType == s  || 
+                                      orbitalType == px || 
+                                      orbitalType == py || 
+                                      orbitalType == pz)){
          return this->effectiveNuclearChargeL
                /this->GetEffectivePrincipalQuantumNumber(shellType);
       }   
-      else if(shellType == m && (orbitalType == s  || 
-                                 orbitalType == px || 
-                                 orbitalType == py || 
-                                 orbitalType == pz )){
+      else if(shellType == mShell && (orbitalType == s  || 
+                                      orbitalType == px || 
+                                      orbitalType == py || 
+                                      orbitalType == pz )){
          return this->effectiveNuclearChargeMsp
                /this->GetEffectivePrincipalQuantumNumber(shellType);
       }   
-      else if(shellType == m && (orbitalType == dxy  || 
-                                 orbitalType == dyz ||
-                                 orbitalType == dzz ||
-                                 orbitalType == dzx ||
-                                 orbitalType == dxxyy)){
+      else if(shellType == mShell && (orbitalType == dxy  || 
+                                      orbitalType == dyz ||
+                                      orbitalType == dzz ||
+                                      orbitalType == dzx ||
+                                      orbitalType == dxxyy)){
          return this->effectiveNuclearChargeMd
+               /this->GetEffectivePrincipalQuantumNumber(shellType);
+      }   
+      else if(shellType == nShell && (orbitalType == s  || 
+                                      orbitalType == px || 
+                                      orbitalType == py || 
+                                      orbitalType == pz )){
+         return this->effectiveNuclearChargeNsp
                /this->GetEffectivePrincipalQuantumNumber(shellType);
       }   
       else{

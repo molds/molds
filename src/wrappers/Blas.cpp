@@ -1,6 +1,6 @@
 //************************************************************************//
-// Copyright (C) 2011-2013 Mikiya Fujii                                   //
-// Copyright (C) 2012-2013 Katsuhiko Nishimra                             //
+// Copyright (C) 2011-2014 Mikiya Fujii                                   //
+// Copyright (C) 2012-2014 Katsuhiko Nishimra                             //
 //                                                                        // 
 // This file is part of MolDS.                                            // 
 //                                                                        // 
@@ -25,11 +25,12 @@
 #include<string>
 #include<stdexcept>
 #include<boost/format.hpp>
-#include"config.h"
+#include"../config.h"
 #include"../base/Uncopyable.h"
 #include"../base/PrintController.h"
 #include"../base/MolDSException.h"
 #include"../base/MallocerFreer.h"
+#include"../mpi/MpiInt.h"
 #include"../mpi/MpiProcess.h"
 #include"Blas.h"
 
@@ -208,7 +209,7 @@ void Blas::Dsymv(molds_blas_int n,
 }
 
 // vectorY = alpha*matrixA*vectorX + beta*vectorY
-//    matrixA: n*n-matrix,symmetric (Use the upper triangular part)
+//    matrixA: n*n-matrix,symmetric (Use the upper triangular part in row-major(C/C++ style))
 //    vectorX: n-vector
 //    vectorY: n-vector
 void Blas::Dsymv(molds_blas_int n, double alpha,
@@ -241,10 +242,10 @@ void Blas::Dsyr(molds_blas_int n, double alpha,
    CBLAS_UPLO uploA=CblasUpper;
    molds_blas_int lda = n;
    cblas_dsyr(CblasRowMajor, uploA, n, alpha, x, incrementX, a, lda);
-#pragma omp parallel for schedule(auto)
+#pragma omp parallel for schedule(dynamic, MOLDS_OMP_DYNAMIC_CHUNK_SIZE)
    for(molds_blas_int i=0;i<n;i++){
       for(molds_blas_int j=i+1;j<n;j++){
-         matrixA[j][i] = matrixA[i][j];
+         matrixA[j][i] = matrixA[i][j]; // Note that output matrixA is row-major(C/C++ stype) 
       }
    }
 }
@@ -293,9 +294,65 @@ void Blas::Dgemm(bool isColumnMajorMatrixA,
                  double const* const* matrixB,
                  double beta,
                  double** matrixC) const{
+   double* tmpC;
+#ifdef __INTEL_COMPILER
+   tmpC = (double*)mkl_malloc( sizeof(double)*m*n, 16 );
+#else
+   tmpC = (double*)malloc( sizeof(double)*m*n);
+#endif
+   this->Dgemm(isColumnMajorMatrixA, 
+               isColumnMajorMatrixB, 
+               isColumnMajorMatrixC, 
+               m, n, k, 
+               alpha, 
+               matrixA, 
+               matrixB, 
+               beta,
+               matrixC, 
+               tmpC);
+
+#ifdef __INTEL_COMPILER
+   mkl_free(tmpC);
+#else
+   free(tmpC);
+#endif
+}
+
+// matrixC = alpha*matrixA*matrixB + beta*matrixC
+//    matrixA: m*k-matrix 
+//    matrixB: k*n-matrix
+//    matrixC: m*n-matrix (matrixC[m][n] in row-major (C/C++ style))
+//    tmpC:    temporary 1-dimensional m*n-array for matrixC
+void Blas::Dgemm(bool isColumnMajorMatrixA, 
+                 bool isColumnMajorMatrixB, 
+                 molds_blas_int m, molds_blas_int n, molds_blas_int k,  
+                 double alpha,
+                 double const* const* matrixA,
+                 double const* const* matrixB,
+                 double beta,
+                 double** matrixC,
+                 double*  tmpC) const{
+   bool isColumnMajorMatrixC = false;
+   this->Dgemm(isColumnMajorMatrixA, isColumnMajorMatrixB, isColumnMajorMatrixC,m, n, k, alpha, matrixA, matrixB, beta, matrixC, tmpC);
+}
+
+// matrixC = alpha*matrixA*matrixB + beta*matrixC
+//    matrixA: m*k-matrix 
+//    matrixB: k*n-matrix
+//    matrixC: m*n-matrix
+//    tmpC:    temporary 1-dimensional m*n-array for matrixC
+void Blas::Dgemm(bool isColumnMajorMatrixA, 
+                 bool isColumnMajorMatrixB, 
+                 bool isColumnMajorMatrixC, 
+                 molds_blas_int m, molds_blas_int n, molds_blas_int k,  
+                 double alpha,
+                 double const* const* matrixA,
+                 double const* const* matrixB,
+                 double beta,
+                 double** matrixC,
+                 double*  tmpC) const{
    double* a = const_cast<double*>(&matrixA[0][0]);
    double* b = const_cast<double*>(&matrixB[0][0]);
-   double*       c = &matrixC[0][0];
 
    molds_blas_int lda;
    CBLAS_TRANSPOSE transA;
@@ -319,12 +376,6 @@ void Blas::Dgemm(bool isColumnMajorMatrixA,
       ldb = n;
    }
 
-   double* tmpC;
-#ifdef HAVE_MKL_MALLOC
-   tmpC = (double*)mkl_malloc( sizeof(double)*m*n, 16 );
-#else
-   tmpC = (double*)malloc( sizeof(double)*m*n);
-#endif
    molds_blas_int ldc = m;
    if(isColumnMajorMatrixC){
       this->Dcopy(m*n, &matrixC[0][0], tmpC);
@@ -350,11 +401,6 @@ void Blas::Dgemm(bool isColumnMajorMatrixA,
          }
       }
    }
-#ifdef HAVE_MKL_FREE
-   mkl_free(tmpC);
-#else
-   free(tmpC);
-#endif
 }
 
 // matrixD = matrixA*matrixB*matrixC
@@ -437,6 +483,36 @@ void Blas::Dgemmm(bool isColumnMajorMatrixA,
    this->Dgemm(isColumnMajorMatrixA, isColumnMajorMatrixBC, m, n, k, alpha,   matrixA, tmpMatrixBC, beta,   matrixD );
 }
 
+// matrixD = alpha*matrixA*matrixB*matrixC + beta*matrixD
+//    matrixA: m*k-matrix 
+//    matrixB: k*l-matrix
+//    matrixC: l*n-matrix
+//    matrixD: m*n-matrix (matrixC[m][n] in row-major (C/C++ style))
+//       tmpMatrixBC is temporary calculated matrix in row-major, (C/C++ style) 
+//       tmpMatrixBC = matrixB*matrixC
+//       tmpVectorBC is temporary 1 dimensional k*n-array for matrixBC
+//       tmpVectorD  is temporary 1 dimensional m*n-array for matrixD
+void Blas::Dgemmm(bool isColumnMajorMatrixA,
+                  bool isColumnMajorMatrixB, 
+                  bool isColumnMajorMatrixC, 
+                  molds_blas_int m, molds_blas_int n, molds_blas_int k, molds_blas_int l,
+                  double alpha,
+                  double const* const* matrixA,
+                  double const* const* matrixB,
+                  double const* const* matrixC,
+                  double beta,
+                  double** matrixD,
+                  double*  tmpVectorD,
+                  double** tmpMatrixBC,
+                  double*  tmpVectorBC) const{
+   
+   double alphaBC = 1.0;
+   double betaBC  = 0.0;
+   bool isColumnMajorMatrixBC = false;
+   this->Dgemm(isColumnMajorMatrixB, isColumnMajorMatrixC,  k, n, l, alphaBC, matrixB, matrixC,     betaBC, tmpMatrixBC, tmpVectorBC);
+   this->Dgemm(isColumnMajorMatrixA, isColumnMajorMatrixBC, m, n, k, alpha,   matrixA, tmpMatrixBC, beta,   matrixD,     tmpVectorD);
+}
+
 // matrixC = matrixA*matrixA^T
 //    matrixA: n*k-matrix
 //    matrixC: n*n-matrix,symmetric (Use the upper triangular part, and copy it to the lower part.)
@@ -469,14 +545,24 @@ void Blas::Dsyrk(molds_blas_int n, molds_blas_int k,
    molds_blas_int lda = &matrixA[1][0] - &matrixA[0][0];
    molds_blas_int ldc = &matrixC[1][0] - &matrixC[0][0];
    cblas_dsyrk(orderA, uploC, transA, n, k, alpha, a, lda, beta, c, ldc);
-#pragma omp parallel for schedule(auto)
+#pragma omp parallel for schedule(dynamic, MOLDS_OMP_DYNAMIC_CHUNK_SIZE)
    for(molds_blas_int i=0;i<n;i++){
       for(molds_blas_int j=i+1;j<n;j++){
          if(isLowerTriangularPartMatrixCUsed){
-            matrixC[i][j] = matrixC[j][i];
+            if(orderA == CblasRowMajor){
+               matrixC[i][j] = matrixC[j][i]; // Note that output matrixC is row-major(C/C++ style) 
+            }
+            else{
+               matrixC[j][i] = matrixC[i][j]; // Note that output matrixC is column-major(Fortran style) 
+            }
          }
          else{
-            matrixC[j][i] = matrixC[i][j];
+            if(orderA == CblasRowMajor){
+               matrixC[j][i] = matrixC[i][j]; // Note that output matrixC is row-major(C/C++ style)
+            }
+            else{
+               matrixC[i][j] = matrixC[j][i]; // Note that output matrixC is column-major(Fortran style) 
+            }
          }
       }
    }

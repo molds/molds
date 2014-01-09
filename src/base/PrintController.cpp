@@ -1,6 +1,6 @@
 //************************************************************************//
-// Copyright (C) 2011-2013 Mikiya Fujii                                   // 
-// Copyright (C) 2011-2013 Katsuhiko Nishimra                             // 
+// Copyright (C) 2011-2014 Mikiya Fujii                                   // 
+// Copyright (C) 2011-2014 Katsuhiko Nishimra                             // 
 //                                                                        // 
 // This file is part of MolDS.                                            // 
 //                                                                        // 
@@ -26,6 +26,7 @@
 #include"PrintController.h"
 #include"MolDSException.h"
 #include"MallocerFreer.h"
+#include"../mpi/MpiInt.h"
 #include"../mpi/MpiProcess.h"
 using namespace std;
 namespace MolDS_base{

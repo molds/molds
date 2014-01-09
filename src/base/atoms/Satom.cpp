@@ -1,5 +1,5 @@
 //************************************************************************//
-// Copyright (C) 2011-2012 Mikiya Fujii                                   // 
+// Copyright (C) 2011-2014 Mikiya Fujii                                   // 
 //                                                                        // 
 // This file is part of MolDS.                                            // 
 //                                                                        // 
@@ -28,6 +28,7 @@
 #include"../PrintController.h"
 #include"../MolDSException.h"
 #include"../MallocerFreer.h"
+#include"../../mpi/MpiInt.h"
 #include"../../mpi/MpiProcess.h"
 #include"../EularAngle.h"
 #include"../Parameters.h"
@@ -41,12 +42,14 @@ Satom::Satom(int index) : Atom(index){
    this->SetAtomicParameters();
 }
 
+Satom::~Satom(){}
+
 void Satom::SetAtomicParameters(){
    this->atomType = S;
    this->atomicMass = 32.066*Parameters::GetInstance()->GetGMolin2AU();
    this->coreCharge = 6.0;
    this->numberValenceElectrons = 6;
-   this->valenceShellType = m;
+   this->valenceShellType = mShell;
    this->valence.push_back(s);
    this->valence.push_back(py);
    this->valence.push_back(pz);
@@ -88,15 +91,31 @@ void Satom::SetAtomicParameters(){
    this->indoG1CoefficientP = 0.0;
    this->indoF2CoefficientS = 0.0;
    this->indoF2CoefficientP = 0.0;
-   // the zindoBondingParameterS for sulfer atoms are set to be equal 
-   // to the one (10.09eV) in "ORCA 2.8"( http://www.thch.uni-bonn.de/tc/orca/ ).
-   //this->zindoBondingParameterS = -15.0*Parameters::GetInstance()->GetEV2AU();
+
+   // ORCA parameter 2.8 set
+   // see "ORCA 2.8"( http://www.thch.uni-bonn.de/tc/orca/ ).
+   this->zindoBondingParameterS = -15.0*Parameters::GetInstance()->GetEV2AU();
+   this->zindoBondingParameterD =   0.0*Parameters::GetInstance()->GetEV2AU();
+   this->zindoF0ss = 10.09 * Parameters::GetInstance()->GetEV2AU(); 
+   this->zindoF0sd = 0.0;                   
+   this->zindoF0dd = 0.0;                 
+   this->zindoG1sp = 3.0756 * Parameters::GetInstance()->GetEV2AU();                 
+   this->zindoF2pp = 4.5377 * Parameters::GetInstance()->GetEV2AU();
+   this->zindoG2sd = 0.0;
+   this->zindoG1pd = 0.0;        
+   this->zindoF2pd = 0.0;
+   this->zindoG3pd = 0.0;
+   this->zindoF2dd = 0.0;
+   this->zindoF4dd = 0.0;
+   // end (ORCA 2.8 parameter set)
+
+   /*
+   // Parameter set in [HKLWNZ_1982]
+   // Take care that F0s are not included in this paper.
+   // So, these parameters may be used as ones in [GD_1972]
    this->zindoBondingParameterS = -14.0*Parameters::GetInstance()->GetEV2AU();
    this->zindoBondingParameterD =   4.0*Parameters::GetInstance()->GetEV2AU();
-   // the zindoF0ss for sulfer atoms are set to be equal 
-   // to the one (10.09eV) in "ORCA 2.8"( http://www.thch.uni-bonn.de/tc/orca/ ).
-   //this->zindoF0ss = 10.09 * Parameters::GetInstance()->GetEV2AU(); 
-   this->zindoF0ss = 8.96 * Parameters::GetInstance()->GetEV2AU();                  
+   this->zindoF0ss = 8.96 * Parameters::GetInstance()->GetEV2AU(); // from [GD_1972]
    this->zindoF0sd = 0.0;                   
    this->zindoF0dd = 0.0;                 
    this->zindoG1sp = 3.10 * Parameters::GetInstance()->GetEV2AU();                 
@@ -107,14 +126,30 @@ void Satom::SetAtomicParameters(){
    this->zindoG3pd = 2.57 * Parameters::GetInstance()->GetEV2AU();
    this->zindoF2dd = 3.55 * Parameters::GetInstance()->GetEV2AU();
    this->zindoF4dd = 2.31 * Parameters::GetInstance()->GetEV2AU();
-   //this->zindoG1sp = 24807*Parameters::GetInstance()->GetKayser2AU();                 
-   //this->zindoF2pp = 36600*Parameters::GetInstance()->GetKayser2AU();                 
-   //this->zindoG2sd = 25972*Parameters::GetInstance()->GetKayser2AU();     
-   //this->zindoG1pd = 34486*Parameters::GetInstance()->GetKayser2AU();        
-   //this->zindoF2pd = 29173*Parameters::GetInstance()->GetKayser2AU();           
-   //this->zindoG3pd = 20587*Parameters::GetInstance()->GetKayser2AU();           
-   //this->zindoF2dd = 28411*Parameters::GetInstance()->GetKayser2AU();           
-   //this->zindoF4dd = 18529*Parameters::GetInstance()->GetKayser2AU();           
+   // end(Parameter set in [HKLWNZ_1982])
+   */
+
+   /*
+   // Parameter set in [BZ_1979]
+   // Take care that F0s and bondingParameters are not included in this paper.
+   // So, parameters for those in [HKLWNZ_1982] and [GD_1972] may be used.
+   // Furthermore, this parameter set are not suitable for spectroscopy.
+   this->zindoBondingParameterS = -14.0*Parameters::GetInstance()->GetEV2AU(); // from [HKLWNZ_1982]
+   this->zindoBondingParameterD =   4.0*Parameters::GetInstance()->GetEV2AU(); // from [HKLWNZ_1982]
+   this->zindoF0ss = 8.96 * Parameters::GetInstance()->GetEV2AU(); // from [GD_1972]
+   this->zindoF0sd = 0.0;                   
+   this->zindoF0dd = 0.0;                 
+   this->zindoG1sp = 24807*Parameters::GetInstance()->GetKayser2AU();                 
+   this->zindoF2pp = 36600*Parameters::GetInstance()->GetKayser2AU();                 
+   this->zindoG2sd = 25972*Parameters::GetInstance()->GetKayser2AU();     
+   this->zindoG1pd = 34486*Parameters::GetInstance()->GetKayser2AU();        
+   this->zindoF2pd = 29173*Parameters::GetInstance()->GetKayser2AU();           
+   this->zindoG3pd = 20587*Parameters::GetInstance()->GetKayser2AU();           
+   this->zindoF2dd = 28411*Parameters::GetInstance()->GetKayser2AU();           
+   this->zindoF4dd = 18529*Parameters::GetInstance()->GetKayser2AU();           
+   // end(Parameter set in [BZ_1979]) 
+   */
+
    this->zindoL = 2;
    this->zindoM = 4;
    this->zindoN = 0;

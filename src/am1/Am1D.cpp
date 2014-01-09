@@ -1,5 +1,5 @@
 //************************************************************************//
-// Copyright (C) 2011-2013 Mikiya Fujii                                   //
+// Copyright (C) 2011-2014 Mikiya Fujii                                   //
 //                                                                        // 
 // This file is part of MolDS.                                            // 
 //                                                                        // 
@@ -28,6 +28,7 @@
 #include"../base/PrintController.h"
 #include"../base/MolDSException.h"
 #include"../base/MallocerFreer.h"
+#include"../mpi/MpiInt.h"
 #include"../mpi/MpiProcess.h"
 #include"../base/Enums.h"
 #include"../base/EularAngle.h"
@@ -83,30 +84,38 @@ void Am1D::SetMessages(){
    this->errorMessageDavidsonNotConverged =  "Error in am1::Am1D::DoCISDavidson: Davidson did not met convergence criterion. \n";
    this->errorMessageGetSemiEmpiricalMultipoleInteractionBadMultipoles
       = "Error in am1::Am1D::GetSemiEmpiricalMultipoleInteraction: Bad multipole combintaion is set\n";
+   this->errorMessageGetSemiEmpiricalMultipoleInteractionBadAtomTypes
+      = "Error in am1::Am1D::GetSemiEmpiricalMultipoleInteraction: Bad atom types are set\n";
    this->errorMessageGetSemiEmpiricalMultipoleInteraction1stDeriBadMultipoles
       = "Error in am1::Am1D::GetSemiEmpiricalMultipoleInteraction1stDerivative: Bad multipole combintaion is set\n";
    this->errorMessageGetSemiEmpiricalMultipoleInteraction2ndDeriBadMultipoles
       = "Error in am1::Am1D::GetSemiEmpiricalMultipoleInteraction2ndDerivative: Bad multipole combintaion is set\n";
    this->errorMessageGetNddoRepulsionIntegral 
       = "Error in am1::Am1D::GetNddoRepulsionIntegral: Bad orbital is set.\n";
+   this->errorMessageGetNddoRepulsionIntegralBadAtomTypes
+      = "Error in am1::Am1D::GetNddoRepulsionIntegral: Bad atom types are set.\n";
    this->errorMessageGetNddoRepulsionIntegral1stDerivative 
       = "Error in am1::Am1D::GetNddoRepulsionIntegral1stDerivative: Bad orbital is set.\n";
    this->errorMessageGetNddoRepulsionIntegral2ndDerivative 
       = "Error in am1::Am1D::GetNddoRepulsionIntegral2ndDerivative: Bad orbital is set.\n";
-   this->errorMessageCalcTwoElecTwoCoreNullMatrix 
-      = "Error in am1::Am1D::CalcTwoElecTwoCore: The two elec two core matrix is NULL.\n"; 
-   this->errorMessageCalcDiatomicTwoElecTwoCoreSameAtoms
-      = "Error in am1::Am1D::CalcDiatomicTwoElecTwoCore: Atom A and B is same.\n"; 
-   this->errorMessageCalcDiatomicTwoElecTwoCore1stDerivativesSameAtoms
-      = "Error in am1::Am1D::CalcDiatomicTwoElecTwoCore1stDerivatives: Atom A and B is same.\n"; 
-   this->errorMessageCalcDiatomicTwoElecTwoCore2ndDerivativesSameAtoms
-      = "Error in am1::Am1D::CalcDiatomicTwoElecTwoCore2ndDerivatives: Atom A and B is same.\n"; 
-   this->errorMessageCalcDiatomicTwoElecTwoCoreNullMatrix 
-      = "Error in am1::Am1D::CalcDiatomicTwoElecTwoCore: The two elec two core diatomic matrix is NULL.\n"; 
-   this->errorMessageCalcDiatomicTwoElecTwoCore1stDerivativesNullMatrix
-      = "Error in am1::Am1D::CalcDiatomicTwoElecTwoCore1stDerivatives: The two elec two core diatomic matrix is NULL.\n"; 
-   this->errorMessageCalcDiatomicTwoElecTwoCore2ndDerivativesNullMatrix
-      = "Error in am1::Am1D::CalcDiatomicTwoElecTwoCore2ndDerivatives: The two elec two core diatomic matrix is NULL.\n"; 
+   this->errorMessageCalcTwoElecsTwoAtomCoresNullMatrix 
+      = "Error in am1::Am1D::CalcTwoElecsTwoAtomCores: The two elec two atom core matrix is NULL.\n"; 
+   this->errorMessageCalcTwoElecsAtomEpcCoresNullMatrix 
+      = "Error in am1::Am1D::CalcTwoElecsAtomEpcCores: The two elec atom-epc core matrix is NULL.\n"; 
+   this->errorMessageCalcDiatomicTwoElecsTwoCoresSameAtoms
+      = "Error in am1::Am1D::CalcDiatomicTwoElecsTwoCores: Atom A and B is same atom (not EPC).\n"; 
+   this->errorMessageCalcDiatomicTwoElecsTwoCoresSameEpcs
+      = "Error in am1::Am1D::CalcDiatomicTwoElecsTwoCores: Atom A and B is same EPC.\n"; 
+   this->errorMessageCalcDiatomicTwoElecsTwoCores1stDerivativesSameAtoms
+      = "Error in am1::Am1D::CalcDiatomicTwoElecsTwoCores1stDerivatives: Atom A and B is same.\n"; 
+   this->errorMessageCalcDiatomicTwoElecsTwoCores2ndDerivativesSameAtoms
+      = "Error in am1::Am1D::CalcDiatomicTwoElecsTwoCores2ndDerivatives: Atom A and B is same.\n"; 
+   this->errorMessageCalcDiatomicTwoElecsTwoCoresNullMatrix 
+      = "Error in am1::Am1D::CalcDiatomicTwoElecsTwoCores: The two elec two core diatomic matrix is NULL.\n"; 
+   this->errorMessageCalcDiatomicTwoElecsTwoCores1stDerivativesNullMatrix
+      = "Error in am1::Am1D::CalcDiatomicTwoElecsTwoCores1stDerivatives: The two elec two core diatomic matrix is NULL.\n"; 
+   this->errorMessageCalcDiatomicTwoElecsTwoCores2ndDerivativesNullMatrix
+      = "Error in am1::Am1D::CalcDiatomicTwoElecsTwoCores2ndDerivatives: The two elec two core diatomic matrix is NULL.\n"; 
    this->errorMessageGetElectronicEnergyEnergyNotCalculated
       = "Error in am1::Am1D::GetElectronicEnergy: Set electronic state is not calculated by CIS.\n";
    this->errorMessageGetElectronicEnergyNULLCISEnergy 

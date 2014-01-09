@@ -1,5 +1,5 @@
 //************************************************************************//
-// Copyright (C) 2011-2012 Mikiya Fujii                                   // 
+// Copyright (C) 2011-2014 Mikiya Fujii                                   // 
 //                                                                        // 
 // This file is part of MolDS.                                            // 
 //                                                                        // 
@@ -161,7 +161,6 @@ void MolDSException::serialize(Archive& ar, const unsigned int ver){
 
 void MolDSException::Serialize(std::ostream& os){
    boost::archive::text_oarchive oa(os);
-   std::string what = domain_error::what();
    oa << this;
 }
 

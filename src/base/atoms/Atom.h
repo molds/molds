@@ -1,5 +1,5 @@
 //************************************************************************//
-// Copyright (C) 2011-2013 Mikiya Fujii                                   //
+// Copyright (C) 2011-2014 Mikiya Fujii                                   //
 //                                                                        // 
 // This file is part of MolDS.                                            // 
 //                                                                        // 
@@ -47,6 +47,7 @@ public:
    double        GetBondingParameter(MolDS_base::TheoryType theory, 
                                      MolDS_base::OrbitalType orbital) const;
    inline double GetCoreCharge()           const{return this->coreCharge;}
+   inline void   SetCoreCharge(double charge)   {this->coreCharge=charge;}
    inline int  GetFirstAOIndex()           const{return this->firstAOIndex;}
    inline void SetFirstAOIndex(int firstAOIndex){this->firstAOIndex = firstAOIndex;}
    inline int  GetLastAOIndex()            const{return this->firstAOIndex + this->valence.size()-1;}
@@ -126,6 +127,7 @@ protected:
    double effectiveNuclearChargeL;      // Table 1.5 in J. A. Pople book or table 1 in [HKLWNZ_1982]
    double effectiveNuclearChargeMsp;    // Table 1.5 in J. A. Pople book
    double effectiveNuclearChargeMd;     // Table 1.5 in J. A. Pople book
+   double effectiveNuclearChargeNsp;    // Table 1.5 in J. A. Pople book
    double indoF2;                   // Table 3.6 in J. A. Pople book
    double indoG1;                   // Table 3.6 in J. A. Pople book
    double indoF0CoefficientS;       // (3.93-3.99) in J. A. Pople book
@@ -227,6 +229,7 @@ protected:
    double pm3DBondingParameterS; // Table II in ref. [MH_2007] for H, C, N, O, and Table IV in re. [MMHBV_2007] for S.
    double pm3DBondingParameterP; // Table II in ref. [MH_2007] for H, C, N, O, and Table IV in re. [MMHBV_2007] for S.
    double pm3DAlpha; // Table II in ref. [MH_2007] for H, C, N, O, and Table IV in re. [MMHBV_2007] for S.
+   virtual void SetAtomicParameters() = 0;
 private:
    Atom();
    std::string errorMessageIonPot;
@@ -305,8 +308,18 @@ private:
    double GetPm3CoreIntegral(MolDS_base::OrbitalType orbital) const; 
    double GetPm3DCoreIntegral(MolDS_base::OrbitalType orbital) const; 
    double GetPm3PddgCoreIntegral(MolDS_base::OrbitalType orbital) const; 
-   virtual void SetAtomicParameters() = 0;
 };
+
+struct LessAtomIndex
+{
+public:
+    bool operator ()(const MolDS_base_atoms::Atom* const left, 
+                     const MolDS_base_atoms::Atom* const right) const
+    {
+        return ( left->GetIndex() < right->GetIndex() );
+    };
+};
+
 }
 #endif
 

@@ -1,5 +1,5 @@
 //************************************************************************//
-// Copyright (C) 2011-2012 Mikiya Fujii                                   // 
+// Copyright (C) 2011-2014 Mikiya Fujii                                   // 
 //                                                                        // 
 // This file is part of MolDS.                                            // 
 //                                                                        // 
@@ -44,8 +44,8 @@ public:
    static Lapack* GetInstance();
    static void DeleteInstance();
    molds_lapack_int Dsyevd(double** matrix, double* eigenValues, molds_lapack_int size, bool calcEigenVectors);
-   molds_lapack_int Dsysv(double const* const* matrix, double* b, molds_lapack_int size);
-   molds_lapack_int Dgetrs(double const* const* matrix, double** b, molds_lapack_int size, molds_lapack_int nrhs) const;
+   molds_lapack_int Dsysv(double** matrix, double* b, molds_lapack_int size);
+   molds_lapack_int Dgetrs(double** matrix, double** b, molds_lapack_int size, molds_lapack_int nrhs) const;
    molds_lapack_int Dgetrf(double** matrix, molds_lapack_int sizeM, molds_lapack_int sizeN) const;
    molds_lapack_int Dgetrf(double** matrix, molds_lapack_int* ipiv, molds_lapack_int sizeM, molds_lapack_int sizeN) const;
 private:

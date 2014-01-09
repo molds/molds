@@ -1,5 +1,5 @@
 //************************************************************************//
-// Copyright (C) 2011-2013 Mikiya Fujii                                   //
+// Copyright (C) 2011-2014 Mikiya Fujii                                   //
 //                                                                        // 
 // This file is part of MolDS.                                            // 
 //                                                                        // 
@@ -26,13 +26,14 @@
 #include<stdexcept>
 #include<omp.h>
 #include<boost/format.hpp>
-#include"config.h"
+#include"../config.h"
 #include"../base/Enums.h"
 #include"../base/Uncopyable.h"
 #include"../base/PrintController.h"
 #include"../base/MolDSException.h"
 #include"../base/MallocerFreer.h"
 #include"../base/containers/ThreadSafeQueue.h"
+#include"../mpi/MpiInt.h"
 #include"../mpi/MpiProcess.h"
 #include"../mpi/AsyncCommunicator.h"
 #include"../wrappers/Blas.h"
@@ -48,6 +49,7 @@
 #include"../base/atoms/Natom.h"
 #include"../base/atoms/Oatom.h"
 #include"../base/atoms/Satom.h"
+#include"../base/atoms/mm/EnvironmentalPointCharge.h"
 #include"../base/Molecule.h"
 #include"../base/ElectronicStructure.h"
 #include"../cndo/Cndo2.h"
@@ -67,37 +69,79 @@ Mndo::Mndo() : MolDS_zindo::ZindoS(){
    this->SetMessages();
    this->SetEnableAtomTypes();
    // private variables
+   this->twoElecsTwoAtomCoresMpiBuff = NULL;
+   this->twoElecsAtomEpcCoresMpiBuff = NULL;
    this->heatsFormation = 0.0;
    //this->OutputLog("Mndo created\n");
 }
 
 Mndo::~Mndo(){
-   MallocerFreer::GetInstance()->Free<double>(
-                                 &this->twoElecTwoCore, 
-                                 this->molecule->GetNumberAtoms(),
-                                 this->molecule->GetNumberAtoms(),
-                                 dxy,
-                                 dxy,
-                                 dxy,
-                                 dxy);
+   OrbitalType twoElecLimit = dxy;
+   MallocerFreer::GetInstance()->Free<double>(&this->twoElecsTwoAtomCores, 
+                                              this->molecule->GetAtomVect().size(),
+                                              this->molecule->GetAtomVect().size(),
+                                              twoElecLimit,
+                                              twoElecLimit,
+                                              twoElecLimit,
+                                              twoElecLimit);
+   MallocerFreer::GetInstance()->Free<double>(&this->twoElecsAtomEpcCores, 
+                                              this->molecule->GetAtomVect().size(),
+                                              this->molecule->GetEpcVect().size(),
+                                              twoElecLimit,
+                                              twoElecLimit,
+                                              twoElecLimit,
+                                              twoElecLimit);
+   int numBuff = (twoElecLimit+1)*twoElecLimit/2;
+   MallocerFreer::GetInstance()->Free<double>(&this->twoElecsTwoAtomCoresMpiBuff, 
+                                              this->molecule->GetAtomVect().size(),
+                                              this->molecule->GetAtomVect().size(),
+                                              numBuff,
+                                              numBuff);
+   MallocerFreer::GetInstance()->Free<double>(&this->twoElecsAtomEpcCoresMpiBuff, 
+                                              this->molecule->GetAtomVect().size(),
+                                              this->molecule->GetEpcVect().size(),
+                                              numBuff,
+                                              numBuff);
    MallocerFreer::GetInstance()->Free<double>(&this->normalForceConstants,
-                                              CartesianType_end*molecule->GetNumberAtoms());
+                                              CartesianType_end*molecule->GetAtomVect().size());
    MallocerFreer::GetInstance()->Free<double>(&this->normalModes,
-                                              CartesianType_end*molecule->GetNumberAtoms(),
-                                              CartesianType_end*molecule->GetNumberAtoms());
+                                              CartesianType_end*molecule->GetAtomVect().size(),
+                                              CartesianType_end*molecule->GetAtomVect().size());
 }
 
 void Mndo::SetMolecule(Molecule* molecule){
    ZindoS::SetMolecule(molecule);
-   MallocerFreer::GetInstance()->Malloc<double>(&this->twoElecTwoCore,
-                                                molecule->GetNumberAtoms(),
-                                                molecule->GetNumberAtoms(),
-                                                dxy, dxy, dxy, dxy);
+   OrbitalType twoElecLimit = dxy;
+   MallocerFreer::GetInstance()->Malloc<double>(&this->twoElecsTwoAtomCores,
+                                                molecule->GetAtomVect().size(),
+                                                molecule->GetAtomVect().size(),
+                                                twoElecLimit,
+                                                twoElecLimit,
+                                                twoElecLimit,
+                                                twoElecLimit);
+   MallocerFreer::GetInstance()->Malloc<double>(&this->twoElecsAtomEpcCores,
+                                                molecule->GetAtomVect().size(),
+                                                molecule->GetEpcVect().size(),
+                                                twoElecLimit,
+                                                twoElecLimit,
+                                                twoElecLimit,
+                                                twoElecLimit);
+   int numBuff = (twoElecLimit+1)*twoElecLimit/2;
+   MallocerFreer::GetInstance()->Malloc<double>(&this->twoElecsTwoAtomCoresMpiBuff, 
+                                                this->molecule->GetAtomVect().size(),
+                                                this->molecule->GetAtomVect().size(),
+                                                numBuff,
+                                                numBuff);
+   MallocerFreer::GetInstance()->Malloc<double>(&this->twoElecsAtomEpcCoresMpiBuff, 
+                                                this->molecule->GetAtomVect().size(),
+                                                this->molecule->GetEpcVect().size(),
+                                                numBuff,
+                                                numBuff);
    MallocerFreer::GetInstance()->Malloc<double>(&this->normalForceConstants,
-                                                CartesianType_end*molecule->GetNumberAtoms());
+                                                CartesianType_end*molecule->GetAtomVect().size());
    MallocerFreer::GetInstance()->Malloc<double>(&this->normalModes,
-                                                CartesianType_end*molecule->GetNumberAtoms(),
-                                                CartesianType_end*molecule->GetNumberAtoms());
+                                                CartesianType_end*molecule->GetAtomVect().size(),
+                                                CartesianType_end*molecule->GetAtomVect().size());
 }
 void Mndo::SetMessages(){
    this->errorMessageSCFNotConverged 
@@ -113,34 +157,42 @@ void Mndo::SetMessages(){
    this->errorMessageCalcCISMatrix
       = "Error in mndo::Mndo::CalcCISMatrix: Non available orbital is contained.\n";
    this->errorMessageDavidsonNotConverged =  "Error in mndo::Mndo::DoCISDavidson: Davidson did not met convergence criterion. \n";
+   this->errorMessageGetSemiEmpiricalMultipoleInteractionBadAtomTypes
+      = "Error in mndo::Mndo::GetSemiEmpiricalMultipoleInteraction: Bad atom types are set\n";
    this->errorMessageGetSemiEmpiricalMultipoleInteractionBadMultipoles
-      = "Error in mndo:: Mndo::GetSemiEmpiricalMultipoleInteraction: Bad multipole combintaion is set\n";
+      = "Error in mndo::Mndo::GetSemiEmpiricalMultipoleInteraction: Bad multipole combintaion is set\n";
    this->errorMessageGetSemiEmpiricalMultipoleInteraction1stDeriBadMultipoles
-      = "Error in mndo:: Mndo::GetSemiEmpiricalMultipoleInteraction1stDerivative: Bad multipole combintaion is set\n";
+      = "Error in mndo::Mndo::GetSemiEmpiricalMultipoleInteraction1stDerivative: Bad multipole combintaion is set\n";
    this->errorMessageGetSemiEmpiricalMultipoleInteraction2ndDeriBadMultipoles
-      = "Error in mndo:: Mndo::GetSemiEmpiricalMultipoleInteraction2ndDerivative: Bad multipole combintaion is set\n";
+      = "Error in mndo::Mndo::GetSemiEmpiricalMultipoleInteraction2ndDerivative: Bad multipole combintaion is set\n";
    this->errorMessageMultipoleA = "Multipole A is: ";
    this->errorMessageMultipoleB = "Multipole B is: ";
    this->errorMessageGetNddoRepulsionIntegral 
       = "Error in mndo::Mndo::GetNddoRepulsionIntegral: Bad orbital is set.\n";
+   this->errorMessageGetNddoRepulsionIntegralBadAtomTypes
+      = "Error in mndo::Mndo::GetNddoRepulsionIntegral: Bad atom types are set.\n";
    this->errorMessageGetNddoRepulsionIntegral1stDerivative 
       = "Error in mndo::Mndo::GetNddoRepulsionIntegral1stDerivative: Bad orbital is set.\n";
    this->errorMessageGetNddoRepulsionIntegral2ndDerivative 
       = "Error in mndo::Mndo::GetNddoRepulsionIntegral2ndDerivative: Bad orbital is set.\n";
-   this->errorMessageCalcTwoElecTwoCoreNullMatrix 
-      = "Error in mndo::Mndo::CalcTwoElecTwoCore: The two elec two core matrix is NULL.\n"; 
-   this->errorMessageCalcDiatomicTwoElecTwoCoreSameAtoms
-      = "Error in mndo::Mndo::CalcDiatomicTwoElecTwoCore: Atom A and B is same.\n"; 
-   this->errorMessageCalcDiatomicTwoElecTwoCore1stDerivativesSameAtoms
-      = "Error in mndo::Mndo::CalcDiatomicTwoElecTwoCore1stDerivatives: Atom A and B is same.\n"; 
-   this->errorMessageCalcDiatomicTwoElecTwoCore2ndDerivativesSameAtoms
-      = "Error in mndo::Mndo::CalcDiatomicTwoElecTwoCore2ndDerivatives: Atom A and B is same.\n"; 
-   this->errorMessageCalcDiatomicTwoElecTwoCoreNullMatrix 
-      = "Error in mndo::Mndo::CalcDiatomicTwoElecTwoCore: The two elec two core diatomic matrix is NULL.\n"; 
-   this->errorMessageCalcDiatomicTwoElecTwoCore1stDerivativesNullMatrix
-      = "Error in mndo::Mndo::CalcDiatomicTwoElecTwoCore1stDerivatives: The two elec two core diatomic matrix is NULL.\n"; 
-   this->errorMessageCalcDiatomicTwoElecTwoCore2ndDerivativesNullMatrix
-      = "Error in mndo::Mndo::CalcDiatomicTwoElecTwoCore2ndDerivatives: The two elec two core diatomic matrix is NULL.\n"; 
+   this->errorMessageCalcTwoElecsTwoAtomCoresNullMatrix 
+      = "Error in mndo::Mndo::CalcTwoElecsTwoAtomCores: The two elec two atom cores matrix is NULL.\n"; 
+   this->errorMessageCalcTwoElecsAtomEpcCoresNullMatrix 
+      = "Error in mndo::Mndo::CalcTwoElecsAtomEpcCores: The two elec atom-epc cores matrix is NULL.\n"; 
+   this->errorMessageCalcDiatomicTwoElecsTwoCoresSameAtoms
+      = "Error in mndo::Mndo::CalcDiatomicTwoElecsTwoCores: Atom A and B is same atom (not EPC).\n"; 
+   this->errorMessageCalcDiatomicTwoElecsTwoCoresSameEpcs
+      = "Error in mndo::Mndo::CalcDiatomicTwoElecsTwoCores: Atom A and B is same EPC.\n"; 
+   this->errorMessageCalcDiatomicTwoElecsTwoCores1stDerivativesSameAtoms
+      = "Error in mndo::Mndo::CalcDiatomicTwoElecsTwoCores1stDerivatives: Atom A and B is same.\n"; 
+   this->errorMessageCalcDiatomicTwoElecsTwoCores2ndDerivativesSameAtoms
+      = "Error in mndo::Mndo::CalcDiatomicTwoElecsTwoCores2ndDerivatives: Atom A and B is same.\n"; 
+   this->errorMessageCalcDiatomicTwoElecsTwoCoresNullMatrix 
+      = "Error in mndo::Mndo::CalcDiatomicTwoElecsTwoCores: The two elec two core diatomic matrix is NULL.\n"; 
+   this->errorMessageCalcDiatomicTwoElecsTwoCores1stDerivativesNullMatrix
+      = "Error in mndo::Mndo::CalcDiatomicTwoElecsTwoCores1stDerivatives: The two elec two core diatomic matrix is NULL.\n"; 
+   this->errorMessageCalcDiatomicTwoElecsTwoCores2ndDerivativesNullMatrix
+      = "Error in mndo::Mndo::CalcDiatomicTwoElecsTwoCores2ndDerivatives: The two elec two core diatomic matrix is NULL.\n"; 
    this->errorMessageGetElectronicEnergyEnergyNotCalculated
       = "Error in mndo::Mndo::GetElectronicEnergy: Set electronic state is not calculated by CIS.\n";
    this->errorMessageGetElectronicEnergyNULLCISEnergy 
@@ -164,6 +216,7 @@ void Mndo::SetEnableAtomTypes(){
    this->enableAtomTypes.push_back(N);
    this->enableAtomTypes.push_back(O);
    this->enableAtomTypes.push_back(S);
+   this->enableAtomTypes.push_back(Zn);
 }
 
 double Mndo::GetAuxiliaryDiatomCoreRepulsionEnergy(const Atom& atomA, 
@@ -262,47 +315,46 @@ double Mndo::GetAuxiliaryDiatomCoreRepulsionEnergy2ndDerivative(const Atom& atom
    return value;
 }
 
-double Mndo::GetDiatomCoreRepulsionEnergy(int indexAtomA, int indexAtomB) const{
-   const Atom& atomA = *this->molecule->GetAtom(indexAtomA);
-   const Atom& atomB = *this->molecule->GetAtom(indexAtomB);
-   double temp = this->GetAuxiliaryDiatomCoreRepulsionEnergy(atomA,
-                                                             atomB,
-                                                             this->molecule->GetDistanceAtoms(atomA, atomB));
-   double twoElecInt = this->GetNddoRepulsionIntegral(atomA, s, s, atomB, s, s);
-   return  atomA.GetCoreCharge()*atomB.GetCoreCharge()*twoElecInt*temp; 
+double Mndo::GetDiatomCoreRepulsionEnergy(const Atom& atomA, const Atom& atomB) const{
+   double tmp = this->GetAuxiliaryDiatomCoreRepulsionEnergy(atomA,
+                                                            atomB,
+                                                            this->molecule->GetDistanceAtoms(atomA, atomB));
+   return atomA.GetCoreCharge()
+         *atomB.GetCoreCharge()
+         *this->twoElecsTwoAtomCores[atomA.GetIndex()][atomB.GetIndex()][s][s][s][s]
+         *tmp;
+}
+
+double Mndo::GetAtomCoreEpcCoulombEnergy(const Atom& atom, const Atom& epc) const{
+   double distance = this->molecule->GetDistanceAtomEpc(atom.GetIndex(), epc.GetIndex());
+   return atom.GetCoreCharge()*epc.GetCoreCharge()/distance; 
 }
 
 // First derivative of diatomic core repulsion energy.
 // This derivative is related to the coordinate of atomA.
-double Mndo::GetDiatomCoreRepulsion1stDerivative(int indexAtomA,
-                                                 int indexAtomB, 
+double Mndo::GetDiatomCoreRepulsion1stDerivative(const Atom& atomA, const Atom& atomB, 
                                                  CartesianType axisA) const{
    double value =0.0;
-   const Atom& atomA = *this->molecule->GetAtom(indexAtomA);
-   const Atom& atomB = *this->molecule->GetAtom(indexAtomB);
-   double distanceAB = this->molecule->GetDistanceAtoms(indexAtomA, indexAtomB);
-   double twoElecInt = this->GetNddoRepulsionIntegral(atomA, s, s, atomB, s, s);
+   double distanceAB = this->molecule->GetDistanceAtoms(atomA, atomB);
+   double twoElecInt = this->twoElecsTwoAtomCores[atomA.GetIndex()][atomB.GetIndex()][s][s][s][s];
    double twoElecInt1stDeriv = this->GetNddoRepulsionIntegral1stDerivative(
                                      atomA, s, s, atomB, s, s, axisA);
-   double temp = this->GetAuxiliaryDiatomCoreRepulsionEnergy(atomA, atomB, distanceAB);
-   double tempDeriv = this->GetAuxiliaryDiatomCoreRepulsionEnergy1stDerivative(atomA, atomB, distanceAB, axisA);
+   double tmp = this->GetAuxiliaryDiatomCoreRepulsionEnergy(atomA, atomB, distanceAB);
+   double tmpDeriv = this->GetAuxiliaryDiatomCoreRepulsionEnergy1stDerivative(atomA, atomB, distanceAB, axisA);
    value = atomA.GetCoreCharge()*atomB.GetCoreCharge()
-          *(twoElecInt1stDeriv*temp + twoElecInt*tempDeriv); 
+          *(twoElecInt1stDeriv*tmp + twoElecInt*tmpDeriv); 
    return value;
 }
 
 // Second derivative of diatomic core repulsion energy.
 // Both derivatives are related to the coordinate of atomA.
-double Mndo::GetDiatomCoreRepulsion2ndDerivative(int indexAtomA,
-                                                    int indexAtomB, 
-                                                    CartesianType axisA1,
-                                                    CartesianType axisA2) const{
+double Mndo::GetDiatomCoreRepulsion2ndDerivative(const Atom& atomA,
+                                                 const Atom& atomB, 
+                                                 CartesianType axisA1,
+                                                 CartesianType axisA2) const{
    double value =0.0;
-   const Atom& atomA = *this->molecule->GetAtom(indexAtomA);
-   const Atom& atomB = *this->molecule->GetAtom(indexAtomB);
-   double distanceAB = this->molecule->GetDistanceAtoms(indexAtomA, indexAtomB);
-   double twoElecInt = this->GetNddoRepulsionIntegral(atomA, s, s, 
-                                                      atomB, s, s);
+   double distanceAB = this->molecule->GetDistanceAtoms(atomA, atomB);
+   double twoElecInt = this->twoElecsTwoAtomCores[atomA.GetIndex()][atomB.GetIndex()][s][s][s][s];
    double twoElecInt1stDeriv1 = this->GetNddoRepulsionIntegral1stDerivative(atomA, s, s, 
                                                                             atomB, s, s, 
                                                                             axisA1);
@@ -314,28 +366,28 @@ double Mndo::GetDiatomCoreRepulsion2ndDerivative(int indexAtomA,
                                                                            axisA1, 
                                                                            axisA2);
 
-   double temp = this->GetAuxiliaryDiatomCoreRepulsionEnergy(atomA, 
-                                                             atomB, 
-                                                             distanceAB);
-   double temp1stDeriv1 = this->GetAuxiliaryDiatomCoreRepulsionEnergy1stDerivative(atomA, 
-                                                                                   atomB, 
-                                                                                   distanceAB, 
-                                                                                   axisA1);
-   double temp1stDeriv2 = this->GetAuxiliaryDiatomCoreRepulsionEnergy1stDerivative(atomA, 
-                                                                                   atomB, 
-                                                                                   distanceAB, 
-                                                                                   axisA2);
-   double temp2ndDeriv = this->GetAuxiliaryDiatomCoreRepulsionEnergy2ndDerivative(atomA, 
+   double tmp = this->GetAuxiliaryDiatomCoreRepulsionEnergy(atomA, 
+                                                            atomB, 
+                                                            distanceAB);
+   double tmp1stDeriv1 = this->GetAuxiliaryDiatomCoreRepulsionEnergy1stDerivative(atomA, 
                                                                                   atomB, 
                                                                                   distanceAB, 
-                                                                                  axisA1, 
+                                                                                  axisA1);
+   double tmp1stDeriv2 = this->GetAuxiliaryDiatomCoreRepulsionEnergy1stDerivative(atomA, 
+                                                                                  atomB, 
+                                                                                  distanceAB, 
                                                                                   axisA2);
+   double tmp2ndDeriv = this->GetAuxiliaryDiatomCoreRepulsionEnergy2ndDerivative(atomA, 
+                                                                                 atomB, 
+                                                                                 distanceAB, 
+                                                                                 axisA1, 
+                                                                                 axisA2);
 
    value = atomA.GetCoreCharge()*atomB.GetCoreCharge();
-   value *= twoElecInt*temp2ndDeriv 
-           +twoElecInt1stDeriv1*temp1stDeriv2 
-           +twoElecInt1stDeriv2*temp1stDeriv1
-           +twoElecInt2ndDeriv*temp;
+   value *= twoElecInt*tmp2ndDeriv 
+           +twoElecInt1stDeriv1*tmp1stDeriv2 
+           +twoElecInt1stDeriv2*tmp1stDeriv1
+           +twoElecInt2ndDeriv*tmp;
    return value;
 }
 
@@ -343,8 +395,8 @@ void Mndo::CalcHeatsFormation(double* heatsFormation,
                               const Molecule& molecule) const{
    int groundState = 0;
    *heatsFormation = this->GetElectronicEnergy(groundState);
-   for(int A=0; A<molecule.GetNumberAtoms(); A++){
-      const Atom& atom = *molecule.GetAtom(A);
+   for(int A=0; A<molecule.GetAtomVect().size(); A++){
+      const Atom& atom = *molecule.GetAtomVect()[A];
       *heatsFormation -= atom.GetMndoElecEnergyAtom();
       *heatsFormation += atom.GetMndoHeatsFormAtom();
    }
@@ -360,7 +412,7 @@ void Mndo::CalcNormalModes(double** normalModes, double* normalForceConstants, c
    bool isMassWeighted = true;
    this->CalcHessianSCF(normalModes, isMassWeighted);
    bool calcEigenVectors = true;
-   int hessianDim = CartesianType_end*molecule.GetNumberAtoms();
+   int hessianDim = CartesianType_end*molecule.GetAtomVect().size();
    MolDS_wrappers::Lapack::GetInstance()->Dsyevd(normalModes,
                                                  normalForceConstants,
                                                  hessianDim,
@@ -384,7 +436,7 @@ double Mndo::GetFockDiagElement(const Atom& atomA,
                                 double const* const* gammaAB,
                                 double const* const* orbitalElectronPopulation, 
                                 double const* atomicElectronPopulation,
-                                double const* const* const* const* const* const* twoElecTwoCore, 
+                                double const* const* const* const* const* const* twoElecsTwoAtomCores, 
                                 bool isGuess) const{
    double value=0.0;
    int firstAOIndexA = atomA.GetFirstAOIndex();
@@ -404,32 +456,43 @@ double Mndo::GetFockDiagElement(const Atom& atomA,
       value += temp;
 
       temp = 0.0;
-      int totalNumberAtoms=molecule.GetNumberAtoms();
+      int totalNumberAtoms=molecule.GetAtomVect().size();
       for(int B=0; B<totalNumberAtoms; B++){
          if(B != indexAtomA){
-            const Atom& atomB = *molecule.GetAtom(B);
+            const Atom& atomB = *molecule.GetAtomVect()[B];
             int firstAOIndexB = atomB.GetFirstAOIndex();
             int valenceSizeB = atomB.GetValenceSize();
             for(int lambda=0; lambda<valenceSizeB; lambda++){
                for(int sigma=0; sigma<valenceSizeB; sigma++){
                   temp += orbitalElectronPopulation[lambda+firstAOIndexB]
                                                    [sigma+firstAOIndexB]
-                         *twoElecTwoCore[indexAtomA][B][mu][mu][lambda][sigma];
+                         *twoElecsTwoAtomCores[indexAtomA][B][mu][mu][lambda][sigma];
                }
                /*
                temp += MolDS_wrappers::Blas::GetInstance()->Ddot(valenceSizeB, 
                                                                  &orbitalElectronPopulation[lambda+firstAOIndexB][firstAOIndexB],
-                                                                 &twoElecTwoCore[indexAtomA][B][mu][mu][lambda][0]);
+                                                                 &twoElecsTwoAtomCores[indexAtomA][B][mu][mu][lambda][0]);
                */
             }
             temp += this->GetElectronCoreAttraction(indexAtomA, 
                                                     B, 
                                                     mu, 
                                                     mu, 
-                                                    twoElecTwoCore);
+                                                    twoElecsTwoAtomCores);
          }
       }
       value += temp;
+      
+      // coulomb repulsion with point charge *
+      int numEpcs = molecule.GetEpcVect().size();
+      if(0<numEpcs){
+         double elecCharge = -1.0;
+         for(int i=0; i<numEpcs; i++){
+            double epcCharge = molecule.GetEpcVect()[i]->GetCoreCharge();
+            value += elecCharge*epcCharge*twoElecsAtomEpcCores[indexAtomA][i][mu][mu][s][s];
+         }
+      }
+       
    }
    return value;
 }
@@ -444,7 +507,7 @@ double Mndo::GetFockOffDiagElement(const Atom& atomA,
                                    double const* const* gammaAB, 
                                    double const* const* overlapAOs,
                                    double const* const* orbitalElectronPopulation, 
-                                   double const* const* const* const* const* const* twoElecTwoCore, 
+                                   double const* const* const* const* const* const* twoElecsTwoAtomCores, 
                                    bool isGuess) const{
    double value = 0.0;
    int firstAOIndexA = atomA.GetFirstAOIndex();
@@ -467,29 +530,38 @@ double Mndo::GetFockOffDiagElement(const Atom& atomA,
          exchange = this->GetExchangeInt(orbitalMu, orbitalNu, atomA); 
          temp = (1.5*exchange - 0.5*coulomb)
                *orbitalElectronPopulation[mu+firstAOIndexA][nu+firstAOIndexB];
-         int totalNumberAtoms = molecule.GetNumberAtoms();
+         int totalNumberAtoms = molecule.GetAtomVect().size();
          for(int BB=0; BB<totalNumberAtoms; BB++){
             if(BB != indexAtomA){
-               const Atom& atomBB = *molecule.GetAtom(BB);
+               const Atom& atomBB = *molecule.GetAtomVect()[BB];
                int firstAOIndexBB = atomBB.GetFirstAOIndex();
                int valenceSizeBB = atomBB.GetValenceSize();
                for(int lambda=0; lambda<valenceSizeBB; lambda++){
                   for(int sigma=0; sigma<valenceSizeBB; sigma++){
                      temp += orbitalElectronPopulation[lambda+firstAOIndexBB]
                                                       [sigma+firstAOIndexBB]
-                            *twoElecTwoCore[indexAtomA][BB][mu][nu][lambda][sigma];
+                            *twoElecsTwoAtomCores[indexAtomA][BB][mu][nu][lambda][sigma];
                   }
                   /*
                   temp += MolDS_wrappers::Blas::GetInstance()->Ddot(valenceSizeBB, 
                                                                     &orbitalElectronPopulation[lambda+firstAOIndexBB][firstAOIndexBB],
-                                                                    &twoElecTwoCore[indexAtomA][BB][mu][nu][lambda][0]);
+                                                                    &twoElecsTwoAtomCores[indexAtomA][BB][mu][nu][lambda][0]);
                   */
                }
                temp += this->GetElectronCoreAttraction(indexAtomA, 
                                                        BB, 
                                                        mu, 
                                                        nu, 
-                                                       twoElecTwoCore);
+                                                       twoElecsTwoAtomCores);
+            }
+         }
+         // coulomb repulsion with point charge *
+         int numEpcs = molecule.GetEpcVect().size();
+         if(0<numEpcs){
+            double elecCharge = -1.0;
+            for(int i=0; i<numEpcs; i++){
+               double epcCharge = molecule.GetEpcVect()[i]->GetCoreCharge();
+               value += elecCharge*epcCharge*twoElecsAtomEpcCores[indexAtomA][i][mu][nu][s][s];
             }
          }
       }
@@ -500,15 +572,15 @@ double Mndo::GetFockOffDiagElement(const Atom& atomA,
             for(int lambda=0; lambda<valenceSizeB; lambda++){
                //temp -= 0.5*orbitalElectronPopulation[lambda+firstAOIndexB]
                //                                     [sigma+firstAOIndexA]
-               //       *twoElecTwoCore[indexAtomA][indexAtomB][mu][sigma][nu][lambda];
+               //       *twoElecsTwoAtomCores[indexAtomA][indexAtomB][mu][sigma][nu][lambda];
                temp -= 0.5*orbitalElectronPopulation[sigma+firstAOIndexA]
                                                     [lambda+firstAOIndexB]
-                      *twoElecTwoCore[indexAtomA][indexAtomB][mu][sigma][nu][lambda];
+                      *twoElecsTwoAtomCores[indexAtomA][indexAtomB][mu][sigma][nu][lambda];
             }
             /*
             temp -= 0.5*MolDS_wrappers::Blas::GetInstance()->Ddot(valenceSizeB, 
                                                               &orbitalElectronPopulation[sigma+firstAOIndexA][firstAOIndexB],
-                                                              &twoElecTwoCore[indexAtomA][indexAtomB][mu][sigma][nu][0]);
+                                                              &twoElecsTwoAtomCores[indexAtomA][indexAtomB][mu][sigma][nu][0]);
             */
          }
       }
@@ -582,24 +654,24 @@ double Mndo::GetElectronCoreAttraction(int indexAtomA,
                                        int indexAtomB, 
                                        int mu, 
                                        int nu, 
-                                       double const* const* const* const* const* const* twoElecTwoCore) const{
-   const Atom& atomB = *this->molecule->GetAtom(indexAtomB);
-   return -1.0*atomB.GetCoreCharge()*twoElecTwoCore[indexAtomA][indexAtomB][mu][nu][s][s];
+                                       double const* const* const* const* const* const* twoElecsTwoAtomCores) const{
+   const Atom& atomB = *this->molecule->GetAtomVect()[indexAtomB];
+   return -1.0*atomB.GetCoreCharge()*twoElecsTwoAtomCores[indexAtomA][indexAtomB][mu][nu][s][s];
 }
 
 // First derivative of electron in atom A (mu and nu) and core (atom B) attraction. 
 // This derivative is related to the coordinate of atomA.
-// Note that diatomicTwoElecTwoCore1stDerivative is dioatomic one.
+// Note that diatomicTwoElecsTwoCores1stDerivative is dioatomic one.
 // see Eq. (16) in [DT_1977-2] with f_2 = 0.
 double Mndo::GetElectronCoreAttraction1stDerivative(int indexAtomA, 
                                                     int indexAtomB, 
                                                     int mu, 
                                                     int nu, 
-                                                    double const* const* const* const* const* diatomicTwoElecTwoCore1stDerivatives,
+                                                    double const* const* const* const* const* diatomicTwoElecsTwoCores1stDerivatives,
                                                     CartesianType axisA) const{
-   const Atom& atomB = *this->molecule->GetAtom(indexAtomB);
+   const Atom& atomB = *this->molecule->GetAtomVect()[indexAtomB];
    double value = -1.0*atomB.GetCoreCharge()
-                  *diatomicTwoElecTwoCore1stDerivatives[mu][nu][s][s][axisA];
+                  *diatomicTwoElecsTwoCores1stDerivatives[mu][nu][s][s][axisA];
    return value;
 }
 
@@ -631,13 +703,13 @@ double Mndo::GetMolecularIntegralElement(int moI, int moJ, int moK, int moL,
                                          double const* const* fockMatrix, 
                                          double const* const* gammaAB) const{
    double value = 0.0;
-   for(int A=0; A<molecule.GetNumberAtoms(); A++){
-      const Atom& atomA = *molecule.GetAtom(A);
+   for(int A=0; A<molecule.GetAtomVect().size(); A++){
+      const Atom& atomA = *molecule.GetAtomVect()[A];
       int firstAOIndexA = atomA.GetFirstAOIndex();
       int lastAOIndexA  = atomA.GetLastAOIndex();
 
-      for(int B=A; B<molecule.GetNumberAtoms(); B++){
-         const Atom& atomB = *molecule.GetAtom(B);
+      for(int B=A; B<molecule.GetAtomVect().size(); B++){
+         const Atom& atomB = *molecule.GetAtomVect()[B];
          int firstAOIndexB = atomB.GetFirstAOIndex();
          int lastAOIndexB  = atomB.GetLastAOIndex();
 
@@ -648,12 +720,12 @@ double Mndo::GetMolecularIntegralElement(int moI, int moJ, int moK, int moL,
                   for(int lambda=firstAOIndexB; lambda<=lastAOIndexB; lambda++){
                      for(int sigma=lambda; sigma<=lastAOIndexB; sigma++){
                         OrbitalType orbitalSigma = atomB.GetValence(sigma-firstAOIndexB);
-                        gamma = this->twoElecTwoCore[A]
-                                                    [B]
-                                                    [mu-firstAOIndexA]
-                                                    [nu-firstAOIndexA]
-                                                    [lambda-firstAOIndexB]
-                                                    [sigma-firstAOIndexB];
+                        gamma = this->twoElecsTwoAtomCores[A]
+                                                          [B]
+                                                          [mu-firstAOIndexA]
+                                                          [nu-firstAOIndexA]
+                                                          [lambda-firstAOIndexB]
+                                                          [sigma-firstAOIndexB];
 
                         value += gamma*fockMatrix[moI][mu]
                                       *fockMatrix[moJ][nu]
@@ -744,7 +816,7 @@ void Mndo::CalcCISMatrix(double** matrixCIS) const{
       int moI = this->GetActiveOccIndex(*this->molecule, k);
       int moA = this->GetActiveVirIndex(*this->molecule, k);
       stringstream ompErrors;
-#pragma omp parallel for schedule(auto) 
+#pragma omp parallel for schedule(dynamic, MOLDS_OMP_DYNAMIC_CHUNK_SIZE) 
       for(int l=k; l<this->matrixCISdimension; l++){
          try{
             // single excitation from J-th (occupied)MO to B-th (virtual)MO
@@ -754,13 +826,13 @@ void Mndo::CalcCISMatrix(double** matrixCIS) const{
              
             // Fast algorith, but this is not easy to read. 
             // Slow algorithm is alos written below.
-            for(int A=0; A<molecule->GetNumberAtoms(); A++){
-               const Atom& atomA = *molecule->GetAtom(A);
+            for(int A=0; A<molecule->GetAtomVect().size(); A++){
+               const Atom& atomA = *molecule->GetAtomVect()[A];
                int firstAOIndexA = atomA.GetFirstAOIndex();
                int lastAOIndexA  = atomA.GetLastAOIndex();
 
-               for(int B=A; B<molecule->GetNumberAtoms(); B++){
-                  const Atom& atomB = *molecule->GetAtom(B);
+               for(int B=A; B<molecule->GetAtomVect().size(); B++){
+                  const Atom& atomB = *molecule->GetAtomVect()[B];
                   int firstAOIndexB = atomB.GetFirstAOIndex();
                   int lastAOIndexB  = atomB.GetLastAOIndex();
 
@@ -803,12 +875,12 @@ void Mndo::CalcCISMatrix(double** matrixCIS) const{
                               double tmpMuNuLamda16 = tmpMuNu12*fockMatrix[moB][lambda];
                               for(int sigma=lambda; sigma<=lastAOIndexB; sigma++){
                                  OrbitalType orbitalSigma = atomB.GetValence(sigma-firstAOIndexB);
-                                 gamma = this->twoElecTwoCore[A]
-                                                             [B]
-                                                             [mu-firstAOIndexA]
-                                                             [nu-firstAOIndexA]
-                                                             [lambda-firstAOIndexB]
-                                                             [sigma-firstAOIndexB];
+                                 gamma = this->twoElecsTwoAtomCores[A]
+                                                                   [B]
+                                                                   [mu-firstAOIndexA]
+                                                                   [nu-firstAOIndexA]
+                                                                   [lambda-firstAOIndexB]
+                                                                   [sigma-firstAOIndexB];
    
                                  value += gamma*tmpMuNuLamda01*fockMatrix[moB][sigma];
                                  value += gamma*tmpMuNuLamda02*fockMatrix[moI][sigma];
@@ -975,41 +1047,43 @@ double Mndo::GetCISCoefficientTwoElecIntegral(int k,
 
 void Mndo::MallocTempMatricesEachThreadCalcHessianSCF(double*****    diatomicOverlapAOs1stDerivs,
                                                       double******   diatomicOverlapAOs2ndDerivs,
-                                                      double*******  diatomicTwoElecTwoCore1stDerivs,
-                                                      double******** diatomicTwoElecTwoCore2ndDerivs,
+                                                      double*******  diatomicTwoElecsTwoCores1stDerivs,
+                                                      double******** diatomicTwoElecsTwoCores2ndDerivs,
                                                       double***      tmpRotMat,
                                                       double***      tmpRotMat1stDeriv,
                                                       double****     tmpRotMat1stDerivs,
                                                       double*****    tmpRotMat2ndDerivs,
-                                                      double*****    tmpDiatomicTwoElecTwoCore,
-                                                      double******   tmpDiatomicTwoElecTwoCore1stDerivs,
+                                                      double*****    tmpDiatomicTwoElecsTwoCores,
+                                                      double******   tmpDiatomicTwoElecsTwoCores1stDerivs,
                                                       double***      tmpDiaOverlapAOsInDiaFrame,
                                                       double***      tmpDiaOverlapAOs1stDerivInDiaFrame,
                                                       double***      tmpDiaOverlapAOs2ndDerivInDiaFrame,
                                                       double****     tmpDiaOverlapAOs1stDerivs,
                                                       double*****    tmpDiaOverlapAOs2ndDerivs,
                                                       double***      tmpRotatedDiatomicOverlap,
-                                                      double***      tmpMatrix) const{
+                                                      double**       tmpRotatedDiatomicOverlapVec,
+                                                      double***      tmpMatrixBC,
+                                                      double**       tmpVectorBC) const{
    MallocerFreer::GetInstance()->Malloc<double>(diatomicOverlapAOs1stDerivs,
-                                                this->molecule->GetNumberAtoms(),
+                                                this->molecule->GetAtomVect().size(),
                                                 OrbitalType_end,
                                                 OrbitalType_end,
                                                 CartesianType_end);
    MallocerFreer::GetInstance()->Malloc<double>(diatomicOverlapAOs2ndDerivs,
-                                                this->molecule->GetNumberAtoms(),
+                                                this->molecule->GetAtomVect().size(),
                                                 OrbitalType_end,
                                                 OrbitalType_end,
                                                 CartesianType_end,
                                                 CartesianType_end);
-   MallocerFreer::GetInstance()->Malloc<double>(diatomicTwoElecTwoCore1stDerivs,
-                                                this->molecule->GetNumberAtoms(),
+   MallocerFreer::GetInstance()->Malloc<double>(diatomicTwoElecsTwoCores1stDerivs,
+                                                this->molecule->GetAtomVect().size(),
                                                 dxy,
                                                 dxy,
                                                 dxy,
                                                 dxy,
                                                 CartesianType_end);
-   MallocerFreer::GetInstance()->Malloc<double>(diatomicTwoElecTwoCore2ndDerivs,
-                                                this->molecule->GetNumberAtoms(),
+   MallocerFreer::GetInstance()->Malloc<double>(diatomicTwoElecsTwoCores2ndDerivs,
+                                                this->molecule->GetAtomVect().size(),
                                                 dxy,
                                                 dxy,
                                                 dxy,
@@ -1031,12 +1105,12 @@ void Mndo::MallocTempMatricesEachThreadCalcHessianSCF(double*****    diatomicOve
                                                 OrbitalType_end, 
                                                 CartesianType_end,
                                                 CartesianType_end);
-   MallocerFreer::GetInstance()->Malloc<double>(tmpDiatomicTwoElecTwoCore, 
+   MallocerFreer::GetInstance()->Malloc<double>(tmpDiatomicTwoElecsTwoCores, 
                                                 dxy, 
                                                 dxy, 
                                                 dxy, 
                                                 dxy);
-   MallocerFreer::GetInstance()->Malloc<double>(tmpDiatomicTwoElecTwoCore1stDerivs, 
+   MallocerFreer::GetInstance()->Malloc<double>(tmpDiatomicTwoElecsTwoCores1stDerivs, 
                                                 dxy, 
                                                 dxy, 
                                                 dxy, 
@@ -1062,48 +1136,54 @@ void Mndo::MallocTempMatricesEachThreadCalcHessianSCF(double*****    diatomicOve
                                                 CartesianType_end);
    MallocerFreer::GetInstance()->Malloc<double>(tmpRotatedDiatomicOverlap,          
                                                 OrbitalType_end, OrbitalType_end);
-   MallocerFreer::GetInstance()->Malloc<double>(tmpMatrix,                          
+   MallocerFreer::GetInstance()->Malloc<double>(tmpRotatedDiatomicOverlapVec,          
+                                                OrbitalType_end*OrbitalType_end);
+   MallocerFreer::GetInstance()->Malloc<double>(tmpMatrixBC,                          
                                                 OrbitalType_end, 
                                                 OrbitalType_end);
+   MallocerFreer::GetInstance()->Malloc<double>(tmpVectorBC,                          
+                                                OrbitalType_end*OrbitalType_end);
 }
 
 void Mndo::FreeTempMatricesEachThreadCalcHessianSCF(double*****    diatomicOverlapAOs1stDerivs,
                                                     double******   diatomicOverlapAOs2ndDerivs,
-                                                    double*******  diatomicTwoElecTwoCore1stDerivs,
-                                                    double******** diatomicTwoElecTwoCore2ndDerivs,
+                                                    double*******  diatomicTwoElecsTwoCores1stDerivs,
+                                                    double******** diatomicTwoElecsTwoCores2ndDerivs,
                                                     double***      tmpRotMat,
                                                     double***      tmpRotMat1stDeriv,
                                                     double****     tmpRotMat1stDerivs,
                                                     double*****    tmpRotMat2ndDerivs,
-                                                    double*****    tmpDiatomicTwoElecTwoCore,
-                                                    double******   tmpDiatomicTwoElecTwoCore1stDerivs,
+                                                    double*****    tmpDiatomicTwoElecsTwoCores,
+                                                    double******   tmpDiatomicTwoElecsTwoCores1stDerivs,
                                                     double***      tmpDiaOverlapAOsInDiaFrame,
                                                     double***      tmpDiaOverlapAOs1stDerivInDiaFrame,
                                                     double***      tmpDiaOverlapAOs2ndDerivInDiaFrame,
                                                     double****     tmpDiaOverlapAOs1stDerivs,
                                                     double*****    tmpDiaOverlapAOs2ndDerivs,
                                                     double***      tmpRotatedDiatomicOverlap,
-                                                    double***      tmpMatrix) const{
+                                                    double**       tmpRotatedDiatomicOverlapVec,
+                                                    double***      tmpMatrixBC,
+                                                    double**       tmpVectorBC) const{
    MallocerFreer::GetInstance()->Free<double>(diatomicOverlapAOs1stDerivs,
-                                              this->molecule->GetNumberAtoms(),
+                                              this->molecule->GetAtomVect().size(),
                                               OrbitalType_end,
                                               OrbitalType_end,
                                               CartesianType_end);
    MallocerFreer::GetInstance()->Free<double>(diatomicOverlapAOs2ndDerivs,
-                                              this->molecule->GetNumberAtoms(),
+                                              this->molecule->GetAtomVect().size(),
                                               OrbitalType_end,
                                               OrbitalType_end,
                                               CartesianType_end,
                                               CartesianType_end);
-   MallocerFreer::GetInstance()->Free<double>(diatomicTwoElecTwoCore1stDerivs,
-                                              this->molecule->GetNumberAtoms(),
+   MallocerFreer::GetInstance()->Free<double>(diatomicTwoElecsTwoCores1stDerivs,
+                                              this->molecule->GetAtomVect().size(),
                                               dxy,
                                               dxy,
                                               dxy,
                                               dxy,
                                               CartesianType_end);
-   MallocerFreer::GetInstance()->Free<double>(diatomicTwoElecTwoCore2ndDerivs,
-                                              this->molecule->GetNumberAtoms(),
+   MallocerFreer::GetInstance()->Free<double>(diatomicTwoElecsTwoCores2ndDerivs,
+                                              this->molecule->GetAtomVect().size(),
                                               dxy,
                                               dxy,
                                               dxy,
@@ -1125,12 +1205,12 @@ void Mndo::FreeTempMatricesEachThreadCalcHessianSCF(double*****    diatomicOverl
                                               OrbitalType_end, 
                                               CartesianType_end,
                                               CartesianType_end);
-   MallocerFreer::GetInstance()->Free<double>(tmpDiatomicTwoElecTwoCore, 
+   MallocerFreer::GetInstance()->Free<double>(tmpDiatomicTwoElecsTwoCores, 
                                               dxy, 
                                               dxy, 
                                               dxy, 
                                               dxy);
-   MallocerFreer::GetInstance()->Free<double>(tmpDiatomicTwoElecTwoCore1stDerivs, 
+   MallocerFreer::GetInstance()->Free<double>(tmpDiatomicTwoElecsTwoCores1stDerivs, 
                                               dxy, 
                                               dxy, 
                                               dxy, 
@@ -1157,9 +1237,13 @@ void Mndo::FreeTempMatricesEachThreadCalcHessianSCF(double*****    diatomicOverl
    MallocerFreer::GetInstance()->Free<double>(tmpRotatedDiatomicOverlap,          
                                               OrbitalType_end, 
                                               OrbitalType_end);
-   MallocerFreer::GetInstance()->Free<double>(tmpMatrix,                          
+   MallocerFreer::GetInstance()->Free<double>(tmpRotatedDiatomicOverlapVec,          
+                                              OrbitalType_end*OrbitalType_end);
+   MallocerFreer::GetInstance()->Free<double>(tmpMatrixBC,                          
                                               OrbitalType_end, 
                                               OrbitalType_end);
+   MallocerFreer::GetInstance()->Free<double>(tmpVectorBC,                          
+                                              OrbitalType_end*OrbitalType_end);
 }
 
 // mu and nu is included in atomA' AO. 
@@ -1172,18 +1256,18 @@ double Mndo::GetAuxiliaryHessianElement1(int mu,
                                          CartesianType axisA1,
                                          CartesianType axisA2,
                                          double const* const* orbitalElectronPopulation,
-                                         double const* const* const* const* const* const* diatomicTwoElecTwoCore2ndDerivs) const{
-   const Atom& atomA = *this->molecule->GetAtom(indexAtomA);
-   const Atom& atomC = *this->molecule->GetAtom(indexAtomC);
+                                         double const* const* const* const* const* const* diatomicTwoElecsTwoCores2ndDerivs) const{
+   const Atom& atomA = *this->molecule->GetAtomVect()[indexAtomA];
+   const Atom& atomC = *this->molecule->GetAtomVect()[indexAtomC];
    int firstAOIndexA = atomA.GetFirstAOIndex();
    double value = orbitalElectronPopulation[mu]
                                            [nu]
-                 *diatomicTwoElecTwoCore2ndDerivs[mu-firstAOIndexA]
-                                                    [nu-firstAOIndexA]
-                                                    [s]
-                                                    [s]
-                                                    [axisA1]
-                                                    [axisA2];
+                 *diatomicTwoElecsTwoCores2ndDerivs[mu-firstAOIndexA]
+                                                   [nu-firstAOIndexA]
+                                                   [s]
+                                                   [s]
+                                                   [axisA1]
+                                                   [axisA2];
    return value*atomC.GetCoreCharge();
 }
 
@@ -1198,19 +1282,19 @@ double Mndo::GetAuxiliaryHessianElement2(int mu,
                                          CartesianType axisA,
                                          CartesianType axisB,
                                          double const* const* const* const* orbitalElectronPopulation1stDerivs,
-                                         double const* const* const* const* const* diatomicTwoElecTwoCore1stDerivs) const{
-   const Atom& atomA = *this->molecule->GetAtom(indexAtomA);
-   const Atom& atomC = *this->molecule->GetAtom(indexAtomC);
+                                         double const* const* const* const* const* diatomicTwoElecsTwoCores1stDerivs) const{
+   const Atom& atomA = *this->molecule->GetAtomVect()[indexAtomA];
+   const Atom& atomC = *this->molecule->GetAtomVect()[indexAtomC];
    int firstAOIndexA = atomA.GetFirstAOIndex();
    double value = orbitalElectronPopulation1stDerivs[mu]
                                                     [nu]
                                                     [indexAtomB]
                                                     [axisB]
-                 *diatomicTwoElecTwoCore1stDerivs[mu-firstAOIndexA]
-                                                 [nu-firstAOIndexA]
-                                                 [s]
-                                                 [s]
-                                                 [axisA];
+                 *diatomicTwoElecsTwoCores1stDerivs[mu-firstAOIndexA]
+                                                   [nu-firstAOIndexA]
+                                                   [s]
+                                                   [s]
+                                                   [axisA];
    return value*atomC.GetCoreCharge();
 }
 
@@ -1224,18 +1308,18 @@ double Mndo::GetAuxiliaryHessianElement3(int lambda,
                                          CartesianType axisA1,
                                          CartesianType axisA2,
                                          double const* const* orbitalElectronPopulation,
-                                         double const* const* const* const* const* const* diatomicTwoElecTwoCore2ndDerivs) const{
-   const Atom& atomA = *this->molecule->GetAtom(indexAtomA);
-   const Atom& atomC = *this->molecule->GetAtom(indexAtomC);
+                                         double const* const* const* const* const* const* diatomicTwoElecsTwoCores2ndDerivs) const{
+   const Atom& atomA = *this->molecule->GetAtomVect()[indexAtomA];
+   const Atom& atomC = *this->molecule->GetAtomVect()[indexAtomC];
    int firstAOIndexC = atomC.GetFirstAOIndex();
    double value = orbitalElectronPopulation[lambda]
                                            [sigma]
-                 *diatomicTwoElecTwoCore2ndDerivs[s]
-                                                    [s]
-                                                    [lambda-firstAOIndexC]
-                                                    [sigma-firstAOIndexC]
-                                                    [axisA1]
-                                                    [axisA2];
+                 *diatomicTwoElecsTwoCores2ndDerivs[s]
+                                                   [s]
+                                                   [lambda-firstAOIndexC]
+                                                   [sigma-firstAOIndexC]
+                                                   [axisA1]
+                                                   [axisA2];
    return value*atomA.GetCoreCharge();
 }
 
@@ -1250,19 +1334,19 @@ double Mndo::GetAuxiliaryHessianElement4(int lambda,
                                          CartesianType axisA,
                                          CartesianType axisB,
                                          double const* const* const* const* orbitalElectronPopulation1stDerivs,
-                                         double const* const* const* const* const* diatomicTwoElecTwoCore1stDerivs) const{
-   const Atom& atomA = *this->molecule->GetAtom(indexAtomA);
-   const Atom& atomC = *this->molecule->GetAtom(indexAtomC);
+                                         double const* const* const* const* const* diatomicTwoElecsTwoCores1stDerivs) const{
+   const Atom& atomA = *this->molecule->GetAtomVect()[indexAtomA];
+   const Atom& atomC = *this->molecule->GetAtomVect()[indexAtomC];
    int firstAOIndexC = atomC.GetFirstAOIndex();
    double value = orbitalElectronPopulation1stDerivs[lambda]
                                                     [sigma]
                                                     [indexAtomB]
                                                     [axisB]
-                 *diatomicTwoElecTwoCore1stDerivs[s]
-                                                 [s]
-                                                 [lambda-firstAOIndexC]
-                                                 [sigma-firstAOIndexC]
-                                                 [axisA];
+                 *diatomicTwoElecsTwoCores1stDerivs[s]
+                                                   [s]
+                                                   [lambda-firstAOIndexC]
+                                                   [sigma-firstAOIndexC]
+                                                   [axisA];
    return value*atomA.GetCoreCharge();
 }
 
@@ -1277,8 +1361,8 @@ double Mndo::GetAuxiliaryHessianElement5(int mu,
                                          CartesianType axisA2,
                                          double const* const* orbitalElectronPopulation,
                                          double const* const* const* const* diatomicOverlapAOs2ndDerivs) const{
-   const Atom& atomA = *molecule->GetAtom(indexAtomA);
-   const Atom& atomC = *molecule->GetAtom(indexAtomC);
+   const Atom& atomA = *molecule->GetAtomVect()[indexAtomA];
+   const Atom& atomC = *molecule->GetAtomVect()[indexAtomC];
    int firstAOIndexA = atomA.GetFirstAOIndex();
    int firstAOIndexC = atomC.GetFirstAOIndex();
    double bondParameterA = atomA.GetBondingParameter(this->theory, atomA.GetValence(mu-firstAOIndexA));
@@ -1305,8 +1389,8 @@ double Mndo::GetAuxiliaryHessianElement6(int mu,
                                          CartesianType axisB,
                                          double const* const* const* const* orbitalElectronPopulation1stDerivs,
                                          double const* const* const* diatomicOverlapAOs1stDerivs) const{
-   const Atom& atomA = *molecule->GetAtom(indexAtomA);
-   const Atom& atomC = *molecule->GetAtom(indexAtomC);
+   const Atom& atomA = *molecule->GetAtomVect()[indexAtomA];
+   const Atom& atomC = *molecule->GetAtomVect()[indexAtomC];
    int firstAOIndexA = atomA.GetFirstAOIndex();
    int firstAOIndexC = atomC.GetFirstAOIndex();
    double bondParameterA = atomA.GetBondingParameter(this->theory, atomA.GetValence(mu-firstAOIndexA));
@@ -1335,20 +1419,20 @@ double Mndo::GetAuxiliaryHessianElement7(int mu,
                                          CartesianType axisA1,
                                          CartesianType axisA2,
                                          double const* const* orbitalElectronPopulation,
-                                         double const* const* const* const* const* const* diatomicTwoElecTwoCore2ndDerivs) const{
-   const Atom& atomA = *molecule->GetAtom(indexAtomA);
-   const Atom& atomC = *molecule->GetAtom(indexAtomC);
+                                         double const* const* const* const* const* const* diatomicTwoElecsTwoCores2ndDerivs) const{
+   const Atom& atomA = *molecule->GetAtomVect()[indexAtomA];
+   const Atom& atomC = *molecule->GetAtomVect()[indexAtomC];
    int firstAOIndexA = atomA.GetFirstAOIndex();
    int firstAOIndexC = atomC.GetFirstAOIndex();
    double temp1 = orbitalElectronPopulation[mu][nu]*orbitalElectronPopulation[lambda][sigma];
    double temp2 = orbitalElectronPopulation[mu][lambda]*orbitalElectronPopulation[nu][sigma];
    double value = (temp1 - 0.5*temp2)
-                 *diatomicTwoElecTwoCore2ndDerivs[mu-firstAOIndexA]
-                                                    [nu-firstAOIndexA]
-                                                    [lambda-firstAOIndexC]
-                                                    [sigma-firstAOIndexC]
-                                                    [axisA1]
-                                                    [axisA2];
+                 *diatomicTwoElecsTwoCores2ndDerivs[mu-firstAOIndexA]
+                                                   [nu-firstAOIndexA]
+                                                   [lambda-firstAOIndexC]
+                                                   [sigma-firstAOIndexC]
+                                                   [axisA1]
+                                                   [axisA2];
    return value;
 }
 
@@ -1366,9 +1450,9 @@ double Mndo::GetAuxiliaryHessianElement8(int mu,
                                          CartesianType axisB,
                                          double const* const* orbitalElectronPopulation,
                                          double const* const* const* const* orbitalElectronPopulation1stDerivs,
-                                         double const* const* const* const* const* diatomicTwoElecTwoCore1stDerivs) const{
-   const Atom& atomA = *molecule->GetAtom(indexAtomA);
-   const Atom& atomC = *molecule->GetAtom(indexAtomC);
+                                         double const* const* const* const* const* diatomicTwoElecsTwoCores1stDerivs) const{
+   const Atom& atomA = *molecule->GetAtomVect()[indexAtomA];
+   const Atom& atomC = *molecule->GetAtomVect()[indexAtomC];
    int firstAOIndexA = atomA.GetFirstAOIndex();
    int firstAOIndexC = atomC.GetFirstAOIndex();
    double temp1 = orbitalElectronPopulation1stDerivs[mu][nu]       [indexAtomB][axisB]
@@ -1380,11 +1464,11 @@ double Mndo::GetAuxiliaryHessianElement8(int mu,
    double temp4 = orbitalElectronPopulation         [mu][lambda]
                  *orbitalElectronPopulation1stDerivs[nu][sigma]    [indexAtomB][axisB];
    double value = ((temp1 + temp2) - 0.5*(temp3 + temp4))
-                 *diatomicTwoElecTwoCore1stDerivs[mu-firstAOIndexA]
-                                                 [nu-firstAOIndexA]
-                                                 [lambda-firstAOIndexC]
-                                                 [sigma-firstAOIndexC]
-                                                 [axisA];
+                 *diatomicTwoElecsTwoCores1stDerivs[mu-firstAOIndexA]
+                                                   [nu-firstAOIndexA]
+                                                   [lambda-firstAOIndexC]
+                                                   [sigma-firstAOIndexC]
+                                                   [axisA];
    return value;
 }
 
@@ -1398,16 +1482,16 @@ double Mndo::GetHessianElementSameAtomsSCF(int indexAtomA,
                                            double const* const* const* const* orbitalElectronPopulation1stDerivs,
                                            double const* const* const* const*        diatomicOverlapAOs1stDerivs,
                                            double const* const* const* const* const* diatomicOverlapAOs2ndDerivs,
-                                           double const* const* const* const* const* const*        diatomicTwoElecTwoCore1stDerivs,
-                                           double const* const* const* const* const* const* const* diatomicTwoElecTwoCore2ndDerivs) const{
+                                           double const* const* const* const* const* const*        diatomicTwoElecsTwoCores1stDerivs,
+                                           double const* const* const* const* const* const* const* diatomicTwoElecsTwoCores2ndDerivs) const{
    double value=0.0;
    int indexAtomB = indexAtomA;
-   const Atom& atomA = *this->molecule->GetAtom(indexAtomA);
+   const Atom& atomA = *this->molecule->GetAtomVect()[indexAtomA];
    int firstAOIndexA = atomA.GetFirstAOIndex();
    int lastAOIndexA  = atomA.GetLastAOIndex();
-   for(int indexAtomC=0; indexAtomC<this->molecule->GetNumberAtoms(); indexAtomC++){
+   for(int indexAtomC=0; indexAtomC<this->molecule->GetAtomVect().size(); indexAtomC++){
       if(indexAtomA != indexAtomC){
-         const Atom& atomC = *this->molecule->GetAtom(indexAtomC);
+         const Atom& atomC = *this->molecule->GetAtomVect()[indexAtomC];
          int firstAOIndexC = atomC.GetFirstAOIndex();
          int numberAOsC = atomC.GetValenceSize();
 
@@ -1421,7 +1505,7 @@ double Mndo::GetHessianElementSameAtomsSCF(int indexAtomA,
                                                           static_cast<CartesianType>(axisA1), 
                                                           static_cast<CartesianType>(axisA2), 
                                                           orbitalElectronPopulation,
-                                                          diatomicTwoElecTwoCore2ndDerivs[indexAtomC]);
+                                                          diatomicTwoElecsTwoCores2ndDerivs[indexAtomC]);
                value -= this->GetAuxiliaryHessianElement2(mu, 
                                                           nu, 
                                                           indexAtomA,
@@ -1430,7 +1514,7 @@ double Mndo::GetHessianElementSameAtomsSCF(int indexAtomA,
                                                           static_cast<CartesianType>(axisA1), 
                                                           static_cast<CartesianType>(axisA2), 
                                                           orbitalElectronPopulation1stDerivs,
-                                                          diatomicTwoElecTwoCore1stDerivs[indexAtomC]);
+                                                          diatomicTwoElecsTwoCores1stDerivs[indexAtomC]);
             }
          }
          for(int lambda=firstAOIndexC; lambda<firstAOIndexC+numberAOsC; lambda++){
@@ -1442,7 +1526,7 @@ double Mndo::GetHessianElementSameAtomsSCF(int indexAtomA,
                                                           static_cast<CartesianType>(axisA1), 
                                                           static_cast<CartesianType>(axisA2), 
                                                           orbitalElectronPopulation,
-                                                          diatomicTwoElecTwoCore2ndDerivs[indexAtomC]);
+                                                          diatomicTwoElecsTwoCores2ndDerivs[indexAtomC]);
                value -= this->GetAuxiliaryHessianElement4(lambda, 
                                                           sigma, 
                                                           indexAtomA,
@@ -1451,7 +1535,7 @@ double Mndo::GetHessianElementSameAtomsSCF(int indexAtomA,
                                                           static_cast<CartesianType>(axisA1), 
                                                           static_cast<CartesianType>(axisA2), 
                                                           orbitalElectronPopulation1stDerivs,
-                                                          diatomicTwoElecTwoCore1stDerivs[indexAtomC]);
+                                                          diatomicTwoElecsTwoCores1stDerivs[indexAtomC]);
             }
          }
          for(int mu=firstAOIndexA; mu<=lastAOIndexA; mu++){
@@ -1488,7 +1572,7 @@ double Mndo::GetHessianElementSameAtomsSCF(int indexAtomA,
                                                                 static_cast<CartesianType>(axisA1), 
                                                                 static_cast<CartesianType>(axisA2), 
                                                                 orbitalElectronPopulation,
-                                                                diatomicTwoElecTwoCore2ndDerivs[indexAtomC]);
+                                                                diatomicTwoElecsTwoCores2ndDerivs[indexAtomC]);
                      value += this->GetAuxiliaryHessianElement8(mu, 
                                                                 nu, 
                                                                 lambda, 
@@ -1500,21 +1584,21 @@ double Mndo::GetHessianElementSameAtomsSCF(int indexAtomA,
                                                                 static_cast<CartesianType>(axisA2), 
                                                                 orbitalElectronPopulation,
                                                                 orbitalElectronPopulation1stDerivs,
-                                                                diatomicTwoElecTwoCore1stDerivs[indexAtomC]);
+                                                                diatomicTwoElecsTwoCores1stDerivs[indexAtomC]);
                   }
                }
             }
          }
 
          // second derivatives of the nuclear repulsions
-         value += this->GetDiatomCoreRepulsion2ndDerivative(indexAtomA, 
-                                                            indexAtomC, 
+         value += this->GetDiatomCoreRepulsion2ndDerivative(atomA, 
+                                                            atomC, 
                                                             static_cast<CartesianType>(axisA1), 
                                                             static_cast<CartesianType>(axisA2));
          // second derivatives of the van der waals corrections
          if(Parameters::GetInstance()->RequiresVdWSCF()){
-            value += this->GetDiatomVdWCorrection2ndDerivative(indexAtomA, 
-                                                               indexAtomC, 
+            value += this->GetDiatomVdWCorrection2ndDerivative(atomA, 
+                                                               atomC, 
                                                                static_cast<CartesianType>(axisA1), 
                                                                static_cast<CartesianType>(axisA2));
          }
@@ -1535,11 +1619,11 @@ double Mndo::GetHessianElementDifferentAtomsSCF(int indexAtomA,
                                                 double const* const* const* const* orbitalElectronPopulation1stDerivs,
                                                 double const* const* const* const*        diatomicOverlapAOs1stDerivs,
                                                 double const* const* const* const* const* diatomicOverlapAOs2ndDerivs,
-                                                double const* const* const* const* const* const*        diatomicTwoElecTwoCore1stDerivs,
-                                                double const* const* const* const* const* const* const* diatomicTwoElecTwoCore2ndDerivs) const{
+                                                double const* const* const* const* const* const*        diatomicTwoElecsTwoCores1stDerivs,
+                                                double const* const* const* const* const* const* const* diatomicTwoElecsTwoCores2ndDerivs) const{
    double value=0.0;
-   const Atom& atomA = *this->molecule->GetAtom(indexAtomA);
-   const Atom& atomB = *this->molecule->GetAtom(indexAtomB);
+   const Atom& atomA = *this->molecule->GetAtomVect()[indexAtomA];
+   const Atom& atomB = *this->molecule->GetAtomVect()[indexAtomB];
    int firstAOIndexA = atomA.GetFirstAOIndex();
    int firstAOIndexB = atomB.GetFirstAOIndex();
    int lastAOIndexA  = atomA.GetLastAOIndex();
@@ -1555,7 +1639,7 @@ double Mndo::GetHessianElementDifferentAtomsSCF(int indexAtomA,
                                                     static_cast<CartesianType>(axisA), 
                                                     static_cast<CartesianType>(axisB), 
                                                     orbitalElectronPopulation,
-                                                    diatomicTwoElecTwoCore2ndDerivs[indexAtomB]);
+                                                    diatomicTwoElecsTwoCores2ndDerivs[indexAtomB]);
       }
    }
    for(int lambda=firstAOIndexB; lambda<=lastAOIndexB; lambda++){
@@ -1567,7 +1651,7 @@ double Mndo::GetHessianElementDifferentAtomsSCF(int indexAtomA,
                                                     static_cast<CartesianType>(axisA), 
                                                     static_cast<CartesianType>(axisB), 
                                                     orbitalElectronPopulation,
-                                                    diatomicTwoElecTwoCore2ndDerivs[indexAtomB]);
+                                                    diatomicTwoElecsTwoCores2ndDerivs[indexAtomB]);
       }
    }
    for(int mu=firstAOIndexA; mu<=lastAOIndexA; mu++){
@@ -1595,15 +1679,15 @@ double Mndo::GetHessianElementDifferentAtomsSCF(int indexAtomA,
                                                           static_cast<CartesianType>(axisA), 
                                                           static_cast<CartesianType>(axisB), 
                                                           orbitalElectronPopulation,
-                                                          diatomicTwoElecTwoCore2ndDerivs[indexAtomB]);
+                                                          diatomicTwoElecsTwoCores2ndDerivs[indexAtomB]);
             }
          }
       }
    }
 
-   for(int indexAtomC=0; indexAtomC<this->molecule->GetNumberAtoms(); indexAtomC++){
+   for(int indexAtomC=0; indexAtomC<this->molecule->GetAtomVect().size(); indexAtomC++){
       if(indexAtomA != indexAtomC){
-         const Atom& atomC = *this->molecule->GetAtom(indexAtomC);
+         const Atom& atomC = *this->molecule->GetAtomVect()[indexAtomC];
          int firstAOIndexC = atomC.GetFirstAOIndex();
          int numberAOsC = atomC.GetValenceSize();
 
@@ -1618,7 +1702,7 @@ double Mndo::GetHessianElementDifferentAtomsSCF(int indexAtomA,
                                                           static_cast<CartesianType>(axisA), 
                                                           static_cast<CartesianType>(axisB), 
                                                           orbitalElectronPopulation1stDerivs,
-                                                          diatomicTwoElecTwoCore1stDerivs[indexAtomC]);
+                                                          diatomicTwoElecsTwoCores1stDerivs[indexAtomC]);
             }
          }
          for(int lambda=firstAOIndexC; lambda<firstAOIndexC+numberAOsC; lambda++){
@@ -1631,7 +1715,7 @@ double Mndo::GetHessianElementDifferentAtomsSCF(int indexAtomA,
                                                           static_cast<CartesianType>(axisA), 
                                                           static_cast<CartesianType>(axisB), 
                                                           orbitalElectronPopulation1stDerivs,
-                                                          diatomicTwoElecTwoCore1stDerivs[indexAtomC]);
+                                                          diatomicTwoElecsTwoCores1stDerivs[indexAtomC]);
             }
          }
          for(int mu=firstAOIndexA; mu<=lastAOIndexA; mu++){
@@ -1662,7 +1746,7 @@ double Mndo::GetHessianElementDifferentAtomsSCF(int indexAtomA,
                                                                 static_cast<CartesianType>(axisB), 
                                                                 orbitalElectronPopulation,
                                                                 orbitalElectronPopulation1stDerivs,
-                                                                diatomicTwoElecTwoCore1stDerivs[indexAtomC]);
+                                                                diatomicTwoElecsTwoCores1stDerivs[indexAtomC]);
                   }
                }
             }
@@ -1671,14 +1755,14 @@ double Mndo::GetHessianElementDifferentAtomsSCF(int indexAtomA,
    }
 
    // second derivatives of the nuclear repulsions
-   value -= this->GetDiatomCoreRepulsion2ndDerivative(indexAtomA, 
-                                                      indexAtomB, 
+   value -= this->GetDiatomCoreRepulsion2ndDerivative(atomA, 
+                                                      atomB, 
                                                       static_cast<CartesianType>(axisA), 
                                                       static_cast<CartesianType>(axisB));
    // second derivatives of the van der waals corrections
    if(Parameters::GetInstance()->RequiresVdWSCF()){
-      value -= this->GetDiatomVdWCorrection2ndDerivative(indexAtomA, 
-                                                         indexAtomB, 
+      value -= this->GetDiatomVdWCorrection2ndDerivative(atomA, 
+                                                         atomB, 
                                                          static_cast<CartesianType>(axisA), 
                                                          static_cast<CartesianType>(axisB));
    }
@@ -1694,58 +1778,62 @@ void Mndo::CalcHessianSCF(double** hessianSCF, bool isMassWeighted) const{
       MallocerFreer::GetInstance()->Malloc<double>(&orbitalElectronPopulation1stDerivs, 
                                                    totalNumberAOs,
                                                    totalNumberAOs,
-                                                   this->molecule->GetNumberAtoms(),
+                                                   this->molecule->GetAtomVect().size(),
                                                    CartesianType_end);
       this->CalcOrbitalElectronPopulation1stDerivatives(orbitalElectronPopulation1stDerivs);
 
       stringstream ompErrors;
 #pragma omp parallel
       {
-         double****    diatomicOverlapAOs1stDerivs        = NULL;
-         double*****   diatomicOverlapAOs2ndDerivs        = NULL;
-         double******  diatomicTwoElecTwoCore1stDerivs    = NULL;
-         double******* diatomicTwoElecTwoCore2ndDerivs    = NULL;
-         double**      tmpRotMat                          = NULL;
-         double***     tmpRotMat1stDerivs                 = NULL;
-         double****    tmpRotMat2ndDerivs                 = NULL;
-         double****    tmpDiatomicTwoElecTwoCore          = NULL;
-         double*****   tmpDiatomicTwoElecTwoCore1stDerivs = NULL;
-         double**      tmpDiaOverlapAOsInDiaFrame         = NULL; // diatomic overlapAOs in diatomic frame
-         double**      tmpDiaOverlapAOs1stDerivInDiaFrame = NULL; // first derivative of the diaOverlapAOs. This derivative is related to the distance between two atoms.
-         double**      tmpDiaOverlapAOs2ndDerivInDiaFrame = NULL; // second derivative of the diaOverlapAOs. This derivative is related to the distance between two atoms.
-         double***     tmpDiaOverlapAOs1stDerivs          = NULL; // first derivatives of the diaOverlapAOs. This derivatives are related to the all Cartesian coordinates.
-         double****    tmpDiaOverlapAOs2ndDerivs          = NULL; //sedond derivatives of the diaOverlapAOs. This derivatives are related to the all Cartesian coordinates.
-         double**      tmpRotMat1stDeriv                  = NULL;
-         double**      tmpRotatedDiatomicOverlap          = NULL;
-         double**      tmpMatrix                          = NULL;
+         double****    diatomicOverlapAOs1stDerivs          = NULL;
+         double*****   diatomicOverlapAOs2ndDerivs          = NULL;
+         double******  diatomicTwoElecsTwoCores1stDerivs    = NULL;
+         double******* diatomicTwoElecsTwoCores2ndDerivs    = NULL;
+         double**      tmpRotMat                            = NULL;
+         double***     tmpRotMat1stDerivs                   = NULL;
+         double****    tmpRotMat2ndDerivs                   = NULL;
+         double****    tmpDiatomicTwoElecsTwoCores          = NULL;
+         double*****   tmpDiatomicTwoElecsTwoCores1stDerivs = NULL;
+         double**      tmpDiaOverlapAOsInDiaFrame           = NULL; // diatomic overlapAOs in diatomic frame
+         double**      tmpDiaOverlapAOs1stDerivInDiaFrame   = NULL; // first derivative of the diaOverlapAOs. This derivative is related to the distance between two atoms.
+         double**      tmpDiaOverlapAOs2ndDerivInDiaFrame   = NULL; // second derivative of the diaOverlapAOs. This derivative is related to the distance between two atoms.
+         double***     tmpDiaOverlapAOs1stDerivs            = NULL; // first derivatives of the diaOverlapAOs. This derivatives are related to the all Cartesian coordinates.
+         double****    tmpDiaOverlapAOs2ndDerivs            = NULL; //sedond derivatives of the diaOverlapAOs. This derivatives are related to the all Cartesian coordinates.
+         double**      tmpRotMat1stDeriv                    = NULL;
+         double**      tmpRotatedDiatomicOverlap            = NULL;
+         double*       tmpRotatedDiatomicOverlapVec         = NULL; // used in dgemmm
+         double**      tmpMatrixBC                          = NULL; // used in dgemmm
+         double*       tmpVectorBC                          = NULL; // used in dgemmm
 
          try{
             this->MallocTempMatricesEachThreadCalcHessianSCF(&diatomicOverlapAOs1stDerivs,
                                                              &diatomicOverlapAOs2ndDerivs,
-                                                             &diatomicTwoElecTwoCore1stDerivs, 
-                                                             &diatomicTwoElecTwoCore2ndDerivs,
+                                                             &diatomicTwoElecsTwoCores1stDerivs, 
+                                                             &diatomicTwoElecsTwoCores2ndDerivs,
                                                              &tmpRotMat,
                                                              &tmpRotMat1stDeriv,                 
                                                              &tmpRotMat1stDerivs,
                                                              &tmpRotMat2ndDerivs,
-                                                             &tmpDiatomicTwoElecTwoCore,
-                                                             &tmpDiatomicTwoElecTwoCore1stDerivs,
+                                                             &tmpDiatomicTwoElecsTwoCores,
+                                                             &tmpDiatomicTwoElecsTwoCores1stDerivs,
                                                              &tmpDiaOverlapAOsInDiaFrame,        
                                                              &tmpDiaOverlapAOs1stDerivInDiaFrame,
                                                              &tmpDiaOverlapAOs2ndDerivInDiaFrame,
                                                              &tmpDiaOverlapAOs1stDerivs,
                                                              &tmpDiaOverlapAOs2ndDerivs,
                                                              &tmpRotatedDiatomicOverlap,         
-                                                             &tmpMatrix);
-#pragma omp for schedule(auto)                                                 
-            for(int indexAtomA=0; indexAtomA<this->molecule->GetNumberAtoms(); indexAtomA++){
-               const Atom& atomA = *this->molecule->GetAtom(indexAtomA);
+                                                             &tmpRotatedDiatomicOverlapVec,         
+                                                             &tmpMatrixBC,
+                                                             &tmpVectorBC);
+#pragma omp for schedule(dynamic, MOLDS_OMP_DYNAMIC_CHUNK_SIZE)                                                 
+            for(int indexAtomA=0; indexAtomA<this->molecule->GetAtomVect().size(); indexAtomA++){
+               const Atom& atomA = *this->molecule->GetAtomVect()[indexAtomA];
                int firstAOIndexA = atomA.GetFirstAOIndex();
                int lastAOIndexA  = atomA.GetLastAOIndex();
                for(int axisA = XAxis; axisA<CartesianType_end; axisA++){
             
                   // calculation of derivatives of the overlapAOss and two electron integrals
-                  for(int indexAtomB=0; indexAtomB<this->molecule->GetNumberAtoms(); indexAtomB++){
+                  for(int indexAtomB=0; indexAtomB<this->molecule->GetAtomVect().size(); indexAtomB++){
                      if(indexAtomA != indexAtomB){
                         this->CalcDiatomicOverlapAOs1stDerivatives(diatomicOverlapAOs1stDerivs[indexAtomB], 
                                                                    tmpDiaOverlapAOsInDiaFrame,        
@@ -1754,7 +1842,9 @@ void Mndo::CalcHessianSCF(double** hessianSCF, bool isMassWeighted) const{
                                                                    tmpRotMat1stDeriv,                 
                                                                    tmpRotMat1stDerivs,                
                                                                    tmpRotatedDiatomicOverlap,         
-                                                                   tmpMatrix,                         
+                                                                   tmpRotatedDiatomicOverlapVec,         
+                                                                   tmpMatrixBC,                         
+                                                                   tmpVectorBC,                         
                                                                    indexAtomA, 
                                                                    indexAtomB);
                         this->CalcDiatomicOverlapAOs2ndDerivatives(diatomicOverlapAOs2ndDerivs[indexAtomB], 
@@ -1768,29 +1858,29 @@ void Mndo::CalcHessianSCF(double** hessianSCF, bool isMassWeighted) const{
                                                                    tmpRotMat2ndDerivs,
                                                                    indexAtomA, 
                                                                    indexAtomB);
-                        this->CalcDiatomicTwoElecTwoCore1stDerivatives(diatomicTwoElecTwoCore1stDerivs[indexAtomB], 
-                                                                       tmpRotMat,
-                                                                       tmpRotMat1stDerivs,
-                                                                       tmpDiatomicTwoElecTwoCore,
-                                                                       indexAtomA, 
-                                                                       indexAtomB);
-                        this->CalcDiatomicTwoElecTwoCore2ndDerivatives(diatomicTwoElecTwoCore2ndDerivs[indexAtomB], 
-                                                                       tmpRotMat,
-                                                                       tmpRotMat1stDerivs,
-                                                                       tmpRotMat2ndDerivs,
-                                                                       tmpDiatomicTwoElecTwoCore,
-                                                                       tmpDiatomicTwoElecTwoCore1stDerivs,
-                                                                       indexAtomA, 
-                                                                       indexAtomB);
+                        this->CalcDiatomicTwoElecsTwoCores1stDerivatives(diatomicTwoElecsTwoCores1stDerivs[indexAtomB], 
+                                                                         tmpRotMat,
+                                                                         tmpRotMat1stDerivs,
+                                                                         tmpDiatomicTwoElecsTwoCores,
+                                                                         indexAtomA, 
+                                                                         indexAtomB);
+                        this->CalcDiatomicTwoElecsTwoCores2ndDerivatives(diatomicTwoElecsTwoCores2ndDerivs[indexAtomB], 
+                                                                         tmpRotMat,
+                                                                         tmpRotMat1stDerivs,
+                                                                         tmpRotMat2ndDerivs,
+                                                                         tmpDiatomicTwoElecsTwoCores,
+                                                                         tmpDiatomicTwoElecsTwoCores1stDerivs,
+                                                                         indexAtomA, 
+                                                                         indexAtomB);
                      }
                   }
             
                   // calculation of each hessian element
                   int k = indexAtomA*CartesianType_end + axisA; // hessian index, i.e. hessian[k][l]
-                  for(int indexAtomB=indexAtomA; indexAtomB<this->molecule->GetNumberAtoms(); indexAtomB++){
+                  for(int indexAtomB=indexAtomA; indexAtomB<this->molecule->GetAtomVect().size(); indexAtomB++){
                      // hessian element (atomA != atomB)
                      if(indexAtomA!=indexAtomB){
-                        const Atom& atomB = *this->molecule->GetAtom(indexAtomB);
+                        const Atom& atomB = *this->molecule->GetAtomVect()[indexAtomB];
                         for(int axisB = XAxis; axisB<CartesianType_end; axisB++){
                            int l = indexAtomB*CartesianType_end + axisB; // hessian index, i.e. hessian[k][l]
                            hessianSCF[k][l] = this->GetHessianElementDifferentAtomsSCF(indexAtomA, 
@@ -1801,8 +1891,8 @@ void Mndo::CalcHessianSCF(double** hessianSCF, bool isMassWeighted) const{
                                                                                        orbitalElectronPopulation1stDerivs,
                                                                                        diatomicOverlapAOs1stDerivs,
                                                                                        diatomicOverlapAOs2ndDerivs,
-                                                                                       diatomicTwoElecTwoCore1stDerivs,
-                                                                                       diatomicTwoElecTwoCore2ndDerivs);
+                                                                                       diatomicTwoElecsTwoCores1stDerivs,
+                                                                                       diatomicTwoElecsTwoCores2ndDerivs);
                            if(isMassWeighted){
                               hessianSCF[k][l] /= sqrt(atomA.GetCoreMass()*atomB.GetCoreMass());
                            }
@@ -1819,8 +1909,8 @@ void Mndo::CalcHessianSCF(double** hessianSCF, bool isMassWeighted) const{
                                                                                   orbitalElectronPopulation1stDerivs,
                                                                                   diatomicOverlapAOs1stDerivs,
                                                                                   diatomicOverlapAOs2ndDerivs,
-                                                                                  diatomicTwoElecTwoCore1stDerivs,
-                                                                                  diatomicTwoElecTwoCore2ndDerivs);
+                                                                                  diatomicTwoElecsTwoCores1stDerivs,
+                                                                                  diatomicTwoElecsTwoCores2ndDerivs);
                            if(isMassWeighted){
                               hessianSCF[k][l] /= atomA.GetCoreMass();
                            }
@@ -1837,21 +1927,23 @@ void Mndo::CalcHessianSCF(double** hessianSCF, bool isMassWeighted) const{
          }
          this->FreeTempMatricesEachThreadCalcHessianSCF(&diatomicOverlapAOs1stDerivs,
                                                         &diatomicOverlapAOs2ndDerivs,
-                                                        &diatomicTwoElecTwoCore1stDerivs, 
-                                                        &diatomicTwoElecTwoCore2ndDerivs,
+                                                        &diatomicTwoElecsTwoCores1stDerivs, 
+                                                        &diatomicTwoElecsTwoCores2ndDerivs,
                                                         &tmpRotMat,
                                                         &tmpRotMat1stDeriv,                 
                                                         &tmpRotMat1stDerivs,
                                                         &tmpRotMat2ndDerivs,
-                                                        &tmpDiatomicTwoElecTwoCore,
-                                                        &tmpDiatomicTwoElecTwoCore1stDerivs,
+                                                        &tmpDiatomicTwoElecsTwoCores,
+                                                        &tmpDiatomicTwoElecsTwoCores1stDerivs,
                                                         &tmpDiaOverlapAOsInDiaFrame,        
                                                         &tmpDiaOverlapAOs1stDerivInDiaFrame,
                                                         &tmpDiaOverlapAOs2ndDerivInDiaFrame,
                                                         &tmpDiaOverlapAOs1stDerivs,
                                                         &tmpDiaOverlapAOs2ndDerivs,
                                                         &tmpRotatedDiatomicOverlap,         
-                                                        &tmpMatrix);
+                                                        &tmpRotatedDiatomicOverlapVec,         
+                                                        &tmpMatrixBC,
+                                                        &tmpVectorBC);
       }// end of omp-region
       // Exception throwing for omp-region
       if(!ompErrors.str().empty()){
@@ -1863,23 +1955,23 @@ void Mndo::CalcHessianSCF(double** hessianSCF, bool isMassWeighted) const{
       MallocerFreer::GetInstance()->Free<double>(&orbitalElectronPopulation1stDerivs, 
                                                  totalNumberAOs,
                                                  totalNumberAOs,
-                                                 this->molecule->GetNumberAtoms(),
+                                                 this->molecule->GetAtomVect().size(),
                                                  CartesianType_end);
       throw ex;
    }
    MallocerFreer::GetInstance()->Free<double>(&orbitalElectronPopulation1stDerivs, 
                                               totalNumberAOs,
                                               totalNumberAOs,
-                                              this->molecule->GetNumberAtoms(),
+                                              this->molecule->GetAtomVect().size(),
                                               CartesianType_end);
-   int hessianDim = this->molecule->GetNumberAtoms()*CartesianType_end;
+   int hessianDim = this->molecule->GetAtomVect().size()*CartesianType_end;
    for(int k=0; k<hessianDim; k++){
       for(int l=k; l<hessianDim; l++){
          hessianSCF[l][k] = hessianSCF[k][l];
       }
    }
    /*
-   int hessianDim = this->molecule->GetNumberAtoms()*CartesianType_end;
+   int hessianDim = this->molecule->GetAtomVect().size()*CartesianType_end;
    for(int i=0; i<hessianDim; i++){
       for(int j=0; j<hessianDim; j++){
          printf("hess elem: %d %d %e\n",i,j,hessianSCF[i][j]);
@@ -1899,7 +1991,7 @@ void Mndo::CalcOrbitalElectronPopulation1stDerivatives(double**** orbitalElectro
    vector<MoIndexPair> redundantQIndeces;
    this->CalcActiveSetVariablesQ(&nonRedundantQIndeces, &redundantQIndeces, numberOcc, numberVir);
    int dimensionCPHF = nonRedundantQIndeces.size() + redundantQIndeces.size();
-   int numberCPHFs = this->molecule->GetNumberAtoms()*CartesianType_end;
+   int numberCPHFs = this->molecule->GetAtomVect().size()*CartesianType_end;
    double** solutionsCPHF = NULL; // solutions of CPHF
    double** transposedFockMatrix = NULL; // transposed Fock matrix
    try{
@@ -1908,11 +2000,11 @@ void Mndo::CalcOrbitalElectronPopulation1stDerivatives(double**** orbitalElectro
       this->SolveCPHF(solutionsCPHF, nonRedundantQIndeces, redundantQIndeces);
       this->TransposeFockMatrixMatrix(transposedFockMatrix);
       stringstream ompErrors;
-#pragma omp parallel for schedule(auto)
+#pragma omp parallel for schedule(dynamic, MOLDS_OMP_DYNAMIC_CHUNK_SIZE)
       for(int mu=0; mu<totalNumberAOs; mu++){
          try{
             for(int nu=0; nu<totalNumberAOs; nu++){
-               for(int indexAtomA=0; indexAtomA<this->molecule->GetNumberAtoms(); indexAtomA++){
+               for(int indexAtomA=0; indexAtomA<this->molecule->GetAtomVect().size(); indexAtomA++){
                   for(int axis=XAxis; axis<CartesianType_end; axis++){
          
                      int moI, moJ;
@@ -1947,15 +2039,15 @@ void Mndo::CalcOrbitalElectronPopulation1stDerivatives(double**** orbitalElectro
 
       /*
       // check the CPHF's solutions 
-      for(int indexAtomA=0; indexAtomA<this->molecule->GetNumberAtoms(); indexAtomA++){
+      for(int indexAtomA=0; indexAtomA<this->molecule->GetAtomVect().size(); indexAtomA++){
          for(int axis=XAxis; axis<CartesianType_end; axis++){
             double temp=0.0;
-            printf("hoge-cphf: atom:%d axis:%s start\n ",indexAtomA,CartesianTypeStr(axis));
+            printf("cphf: atom:%d axis:%s start\n ",indexAtomA,CartesianTypeStr(axis));
             for(int mu=0; mu<totalNumberAOs; mu++){
                temp += orbitalElectronPopulation1stDerivs[mu][mu][indexAtomA][axis];
                printf("%e\n",orbitalElectronPopulation1stDerivs[mu][mu][indexAtomA][axis]);
             }
-            printf("hoge-cphf: atom:%d axis:%s %e\n\n",indexAtomA,CartesianTypeStr(axis),temp);
+            printf("cphf: atom:%d axis:%s %e\n\n",indexAtomA,CartesianTypeStr(axis),temp);
          }
       }
       */
@@ -1977,7 +2069,7 @@ void Mndo::SolveCPHF(double** solutionsCPHF,
                      const vector<MoIndexPair>& nonRedundantQIndeces,
                      const vector<MoIndexPair>& redundantQIndeces) const{
    int dimensionCPHF = nonRedundantQIndeces.size() + redundantQIndeces.size();
-   int numberCPHFs = this->molecule->GetNumberAtoms()*CartesianType_end;
+   int numberCPHFs = this->molecule->GetAtomVect().size()*CartesianType_end;
    double** matrixCPHF = NULL; // (Gmamma - K matrix)N, see (40) - (46) to slove (34) in [PT_1996].
    try{
       this->MallocTempMatricesSolveCPHF(&matrixCPHF, dimensionCPHF);
@@ -1999,8 +2091,8 @@ void Mndo::CalcStaticFirstOrderFocks(double** staticFirstOrderFocks,
                                      const vector<MoIndexPair>& nonRedundantQIndeces,
                                      const vector<MoIndexPair>& redundantQIndeces) const{
    stringstream ompErrors;
-#pragma omp parallel for schedule(auto)
-   for(int indexAtomA=0; indexAtomA<this->molecule->GetNumberAtoms(); indexAtomA++){
+#pragma omp parallel for schedule(dynamic, MOLDS_OMP_DYNAMIC_CHUNK_SIZE)
+   for(int indexAtomA=0; indexAtomA<this->molecule->GetAtomVect().size(); indexAtomA++){
       try{
          for(int axisA=XAxis; axisA<CartesianType_end; axisA++){
             int k=indexAtomA*CartesianType_end + axisA;
@@ -2032,45 +2124,49 @@ void Mndo::CalcStaticFirstOrderFock(double* staticFirstOrderFock,
                                     CartesianType axisA) const{
    MallocerFreer::GetInstance()->Initialize<double>(staticFirstOrderFock,
                                                     nonRedundantQIndeces.size()+redundantQIndeces.size());
-   double***** diatomicTwoElecTwoCore1stDerivs = NULL;
-   double***   diatomicOverlapAOs1stDerivs     = NULL;
-   double**    tmpRotMat                       = NULL;
-   double***   tmpRotMat1stDerivs              = NULL;
-   double****  tmpDiatomicTwoElecTwoCore       = NULL;
+   double***** diatomicTwoElecsTwoCores1stDerivs = NULL;
+   double***   diatomicOverlapAOs1stDerivs       = NULL;
+   double**    tmpRotMat                         = NULL;
+   double***   tmpRotMat1stDerivs                = NULL;
+   double****  tmpDiatomicTwoElecsTwoCores       = NULL;
    
    double**  tmpDiaOverlapAOsInDiaFrame         = NULL; // diatomic overlapAOs in diatomic frame
    double**  tmpDiaOverlapAOs1stDerivInDiaFrame = NULL; // first derivative of the diaOverlapAOs. This derivative is related to the distance between two atoms.
    double**  tmpRotMat1stDeriv                  = NULL;
    double**  tmpRotatedDiatomicOverlap          = NULL;
-   double**  tmpMatrix                          = NULL;
+   double*   tmpRotatedDiatomicOverlapVec       = NULL;
+   double**  tmpMatrixBC                        = NULL;
+   double*   tmpVectorBC                        = NULL;
    try{
-      this->MallocTempMatricesStaticFirstOrderFock(&diatomicTwoElecTwoCore1stDerivs, 
+      this->MallocTempMatricesStaticFirstOrderFock(&diatomicTwoElecsTwoCores1stDerivs, 
                                                    &diatomicOverlapAOs1stDerivs,
                                                    &tmpRotMat,
                                                    &tmpRotMat1stDerivs,
-                                                   &tmpDiatomicTwoElecTwoCore);
+                                                   &tmpDiatomicTwoElecsTwoCores);
       MallocerFreer::GetInstance()->Malloc<double>(&tmpDiaOverlapAOsInDiaFrame,         OrbitalType_end, OrbitalType_end);
       MallocerFreer::GetInstance()->Malloc<double>(&tmpDiaOverlapAOs1stDerivInDiaFrame, OrbitalType_end, OrbitalType_end);
       MallocerFreer::GetInstance()->Malloc<double>(&tmpRotMat1stDeriv,                  OrbitalType_end, OrbitalType_end);
       MallocerFreer::GetInstance()->Malloc<double>(&tmpRotatedDiatomicOverlap,          OrbitalType_end, OrbitalType_end);
-      MallocerFreer::GetInstance()->Malloc<double>(&tmpMatrix,                          OrbitalType_end, OrbitalType_end);
-      const Atom& atomA = *molecule->GetAtom(indexAtomA);
+      MallocerFreer::GetInstance()->Malloc<double>(&tmpRotatedDiatomicOverlapVec,       OrbitalType_end*OrbitalType_end);
+      MallocerFreer::GetInstance()->Malloc<double>(&tmpMatrixBC,                        OrbitalType_end, OrbitalType_end);
+      MallocerFreer::GetInstance()->Malloc<double>(&tmpVectorBC,                        OrbitalType_end*OrbitalType_end);
+      const Atom& atomA = *molecule->GetAtomVect()[indexAtomA];
       int firstAOIndexA = atomA.GetFirstAOIndex();
       int lastAOIndexA  = atomA.GetLastAOIndex();
       int coreChargeA   = atomA.GetCoreCharge();
-      for(int indexAtomB=0; indexAtomB<this->molecule->GetNumberAtoms(); indexAtomB++){
+      for(int indexAtomB=0; indexAtomB<this->molecule->GetAtomVect().size(); indexAtomB++){
          if(indexAtomA != indexAtomB){
-            const Atom& atomB = *molecule->GetAtom(indexAtomB);
+            const Atom& atomB = *molecule->GetAtomVect()[indexAtomB];
             int firstAOIndexB = atomB.GetFirstAOIndex();
             int lastAOIndexB  = atomB.GetLastAOIndex();
             int coreChargeB   = atomB.GetCoreCharge();
 
             // calc. first derivative of two elec two core interaction
-            this->CalcDiatomicTwoElecTwoCore1stDerivatives(diatomicTwoElecTwoCore1stDerivs, 
-                                                           tmpRotMat,
-                                                           tmpRotMat1stDerivs,
-                                                           tmpDiatomicTwoElecTwoCore,
-                                                           indexAtomA, indexAtomB);
+            this->CalcDiatomicTwoElecsTwoCores1stDerivatives(diatomicTwoElecsTwoCores1stDerivs, 
+                                                             tmpRotMat,
+                                                             tmpRotMat1stDerivs,
+                                                             tmpDiatomicTwoElecsTwoCores,
+                                                             indexAtomA, indexAtomB);
             // calc. first derivative of overlapAOs.
             this->CalcDiatomicOverlapAOs1stDerivatives(diatomicOverlapAOs1stDerivs, 
                                                        tmpDiaOverlapAOsInDiaFrame,        
@@ -2079,7 +2175,9 @@ void Mndo::CalcStaticFirstOrderFock(double* staticFirstOrderFock,
                                                        tmpRotMat1stDeriv,                 
                                                        tmpRotMat1stDerivs,                
                                                        tmpRotatedDiatomicOverlap,         
-                                                       tmpMatrix,                         
+                                                       tmpRotatedDiatomicOverlapVec,         
+                                                       tmpMatrixBC,                         
+                                                       tmpVectorBC,                         
                                                        atomA, 
                                                        atomB);
 
@@ -2113,22 +2211,22 @@ void Mndo::CalcStaticFirstOrderFock(double* staticFirstOrderFock,
                                          *this->fockMatrix[moI][lambda]
                                          *this->fockMatrix[moJ][mu]
                                          *this->orbitalElectronPopulation[nu][sigma];
-                           staticFirstOrderFock[i] += temp1*diatomicTwoElecTwoCore1stDerivs[mu-firstAOIndexA]
-                                                                                           [nu-firstAOIndexA]
-                                                                                           [lambda-firstAOIndexB]
-                                                                                           [sigma-firstAOIndexB]
-                                                                                           [axisA];
+                           staticFirstOrderFock[i] += temp1*diatomicTwoElecsTwoCores1stDerivs[mu-firstAOIndexA]
+                                                                                             [nu-firstAOIndexA]
+                                                                                             [lambda-firstAOIndexB]
+                                                                                             [sigma-firstAOIndexB]
+                                                                                             [axisA];
                         } //sigma-loop
                      } // lambda-loop
 
                      double temp2 = this->fockMatrix[moI][mu]
                                    *this->fockMatrix[moJ][nu]
                                    *coreChargeB
-                                   *diatomicTwoElecTwoCore1stDerivs[mu-firstAOIndexA]
-                                                                   [nu-firstAOIndexA]
-                                                                   [s]
-                                                                   [s]
-                                                                   [axisA];
+                                   *diatomicTwoElecsTwoCores1stDerivs[mu-firstAOIndexA]
+                                                                     [nu-firstAOIndexA]
+                                                                     [s]
+                                                                     [s]
+                                                                     [axisA];
                      staticFirstOrderFock[i] -= temp2;
 
                   } // nu-loop
@@ -2140,11 +2238,11 @@ void Mndo::CalcStaticFirstOrderFock(double* staticFirstOrderFock,
                      double temp3 = this->fockMatrix[moI][lambda]
                                    *this->fockMatrix[moJ][sigma]
                                    *coreChargeA
-                                   *diatomicTwoElecTwoCore1stDerivs[s]
-                                                                   [s]
-                                                                   [lambda-firstAOIndexB]
-                                                                   [sigma-firstAOIndexB]
-                                                                   [axisA];
+                                   *diatomicTwoElecsTwoCores1stDerivs[s]
+                                                                     [s]
+                                                                     [lambda-firstAOIndexB]
+                                                                     [sigma-firstAOIndexB]
+                                                                     [axisA];
                      staticFirstOrderFock[i] -= temp3;
             
                   } //sigma-loop
@@ -2172,32 +2270,36 @@ void Mndo::CalcStaticFirstOrderFock(double* staticFirstOrderFock,
       }
    }
    catch(MolDSException ex){
-      this->FreeTempMatricesStaticFirstOrderFock(&diatomicTwoElecTwoCore1stDerivs, 
+      this->FreeTempMatricesStaticFirstOrderFock(&diatomicTwoElecsTwoCores1stDerivs, 
                                                  &diatomicOverlapAOs1stDerivs,
                                                  &tmpRotMat,
                                                  &tmpRotMat1stDerivs,
-                                                 &tmpDiatomicTwoElecTwoCore);
+                                                 &tmpDiatomicTwoElecsTwoCores);
       MallocerFreer::GetInstance()->Free<double>(&tmpDiaOverlapAOsInDiaFrame,         OrbitalType_end, OrbitalType_end);
       MallocerFreer::GetInstance()->Free<double>(&tmpDiaOverlapAOs1stDerivInDiaFrame, OrbitalType_end, OrbitalType_end);
       //MallocerFreer::GetInstance()->Free<double>(&tmpRotMat,                          OrbitalType_end, OrbitalType_end);
       MallocerFreer::GetInstance()->Free<double>(&tmpRotMat1stDeriv,                  OrbitalType_end, OrbitalType_end);
       //MallocerFreer::GetInstance()->Free<double>(&tmpRotMat1stDerivs,                 OrbitalType_end, OrbitalType_end, CartesianType_end);
       MallocerFreer::GetInstance()->Free<double>(&tmpRotatedDiatomicOverlap,          OrbitalType_end, OrbitalType_end);
-      MallocerFreer::GetInstance()->Free<double>(&tmpMatrix,                          OrbitalType_end, OrbitalType_end);
+      MallocerFreer::GetInstance()->Free<double>(&tmpRotatedDiatomicOverlapVec,       OrbitalType_end*OrbitalType_end);
+      MallocerFreer::GetInstance()->Free<double>(&tmpMatrixBC,                        OrbitalType_end, OrbitalType_end);
+      MallocerFreer::GetInstance()->Free<double>(&tmpVectorBC,                        OrbitalType_end*OrbitalType_end);
       throw ex;
    }
-   this->FreeTempMatricesStaticFirstOrderFock(&diatomicTwoElecTwoCore1stDerivs, 
+   this->FreeTempMatricesStaticFirstOrderFock(&diatomicTwoElecsTwoCores1stDerivs, 
                                               &diatomicOverlapAOs1stDerivs,
                                               &tmpRotMat,
                                               &tmpRotMat1stDerivs,
-                                              &tmpDiatomicTwoElecTwoCore);
+                                              &tmpDiatomicTwoElecsTwoCores);
    MallocerFreer::GetInstance()->Free<double>(&tmpDiaOverlapAOsInDiaFrame,         OrbitalType_end, OrbitalType_end);
    MallocerFreer::GetInstance()->Free<double>(&tmpDiaOverlapAOs1stDerivInDiaFrame, OrbitalType_end, OrbitalType_end);
    //MallocerFreer::GetInstance()->Free<double>(&tmpRotMat,                          OrbitalType_end, OrbitalType_end);
    MallocerFreer::GetInstance()->Free<double>(&tmpRotMat1stDeriv,                  OrbitalType_end, OrbitalType_end);
    //MallocerFreer::GetInstance()->Free<double>(&tmpRotMat1stDerivs,                 OrbitalType_end, OrbitalType_end, CartesianType_end);
    MallocerFreer::GetInstance()->Free<double>(&tmpRotatedDiatomicOverlap,          OrbitalType_end, OrbitalType_end);
-   MallocerFreer::GetInstance()->Free<double>(&tmpMatrix,                          OrbitalType_end, OrbitalType_end);
+   MallocerFreer::GetInstance()->Free<double>(&tmpRotatedDiatomicOverlapVec,       OrbitalType_end*OrbitalType_end);
+   MallocerFreer::GetInstance()->Free<double>(&tmpMatrixBC,                        OrbitalType_end, OrbitalType_end);
+   MallocerFreer::GetInstance()->Free<double>(&tmpVectorBC,                        OrbitalType_end*OrbitalType_end);
 
    /*
    printf("staticFirstOrderFock(atomA:%d axis:%s)\n",indexAtomA,CartesianTypeStr(axisA));
@@ -2207,12 +2309,12 @@ void Mndo::CalcStaticFirstOrderFock(double* staticFirstOrderFock,
    */
 }
 
-void Mndo::MallocTempMatricesStaticFirstOrderFock(double****** diatomicTwoElecTwoCore1stDeriv,
+void Mndo::MallocTempMatricesStaticFirstOrderFock(double****** diatomicTwoElecsTwoCores1stDeriv,
                                                   double****   diatomicOverlapAOs1stDeriv,
                                                   double***    tmpRotMat,
                                                   double****   tmpRotMat1stDerivs,
-                                                  double*****  tmpDiatomicTwoElecTwoCore)const{
-   MallocerFreer::GetInstance()->Malloc<double>(diatomicTwoElecTwoCore1stDeriv,
+                                                  double*****  tmpDiatomicTwoElecsTwoCores)const{
+   MallocerFreer::GetInstance()->Malloc<double>(diatomicTwoElecsTwoCores1stDeriv,
                                                 dxy,
                                                 dxy,
                                                 dxy,
@@ -2229,19 +2331,19 @@ void Mndo::MallocTempMatricesStaticFirstOrderFock(double****** diatomicTwoElecTw
                                                 OrbitalType_end, 
                                                 OrbitalType_end, 
                                                 CartesianType_end);
-   MallocerFreer::GetInstance()->Malloc<double>(tmpDiatomicTwoElecTwoCore, 
+   MallocerFreer::GetInstance()->Malloc<double>(tmpDiatomicTwoElecsTwoCores, 
                                                 dxy, 
                                                 dxy, 
                                                 dxy, 
                                                 dxy);
 }
 
-void Mndo::FreeTempMatricesStaticFirstOrderFock(double****** diatomicTwoElecTwoCore1stDeriv,
+void Mndo::FreeTempMatricesStaticFirstOrderFock(double****** diatomicTwoElecsTwoCores1stDeriv,
                                                 double****   diatomicOverlapAOs1stDeriv,
                                                 double***    tmpRotMat,
                                                 double****   tmpRotMat1stDerivs,
-                                                double*****  tmpDiatomicTwoElecTwoCore)const{
-   MallocerFreer::GetInstance()->Free<double>(diatomicTwoElecTwoCore1stDeriv,
+                                                double*****  tmpDiatomicTwoElecsTwoCores)const{
+   MallocerFreer::GetInstance()->Free<double>(diatomicTwoElecsTwoCores1stDeriv,
                                               dxy,
                                               dxy,
                                               dxy,
@@ -2258,7 +2360,7 @@ void Mndo::FreeTempMatricesStaticFirstOrderFock(double****** diatomicTwoElecTwoC
                                               OrbitalType_end, 
                                               OrbitalType_end, 
                                               CartesianType_end);
-   MallocerFreer::GetInstance()->Free<double>(tmpDiatomicTwoElecTwoCore, 
+   MallocerFreer::GetInstance()->Free<double>(tmpDiatomicTwoElecsTwoCores, 
                                               dxy, 
                                               dxy, 
                                               dxy, 
@@ -2278,7 +2380,7 @@ void Mndo::CalcMatrixCPHF(double** matrixCPHF,
    {
       try{
          // calc diagonal part of N
-#pragma omp for schedule(auto)
+#pragma omp for schedule(dynamic, MOLDS_OMP_DYNAMIC_CHUNK_SIZE)
          for(int i=0; i<dimensionCPHF; i++){
             if(i<nonRedundantQIndeces.size()){
                int moI = nonRedundantQIndeces[i].moI;
@@ -2293,7 +2395,7 @@ void Mndo::CalcMatrixCPHF(double** matrixCPHF,
          }
 
          // calc (\Gamma - K)N
-#pragma omp for schedule(auto)
+#pragma omp for schedule(dynamic, MOLDS_OMP_DYNAMIC_CHUNK_SIZE)
          for(int i=0; i<nonRedundantQIndeces.size(); i++){
             int moI = nonRedundantQIndeces[i].moI;
             int moJ = nonRedundantQIndeces[i].moJ;
@@ -2305,7 +2407,7 @@ void Mndo::CalcMatrixCPHF(double** matrixCPHF,
             }    
          }  
    
-#pragma omp for schedule(auto)
+#pragma omp for schedule(dynamic, MOLDS_OMP_DYNAMIC_CHUNK_SIZE)
          for(int i=nonRedundantQIndeces.size(); i<dimensionCPHF; i++){
             int moI = redundantQIndeces[i-nonRedundantQIndeces.size()].moI;
             int moJ = redundantQIndeces[i-nonRedundantQIndeces.size()].moJ;
@@ -2316,7 +2418,7 @@ void Mndo::CalcMatrixCPHF(double** matrixCPHF,
             }
          }
    
-#pragma omp for schedule(auto)
+#pragma omp for schedule(dynamic, MOLDS_OMP_DYNAMIC_CHUNK_SIZE)
          for(int i=nonRedundantQIndeces.size(); i<dimensionCPHF; i++){
             int moI = redundantQIndeces[i-nonRedundantQIndeces.size()].moI;
             int moJ = redundantQIndeces[i-nonRedundantQIndeces.size()].moJ;
@@ -2357,8 +2459,8 @@ void Mndo::FreeTempMatricesSolveCPHF(double*** matrixCPHF,
 void Mndo::CalcForceSCFElecCoreAttractionPart(double* force, 
                                              int indexAtomA, 
                                              int indexAtomB,
-                                             double const* const* const* const* const* diatomicTwoElecTwoCore1stDerivs) const{
-   const Atom& atomA = *this->molecule->GetAtom(indexAtomA);
+                                             double const* const* const* const* const* diatomicTwoElecsTwoCores1stDerivs) const{
+   const Atom& atomA = *this->molecule->GetAtomVect()[indexAtomA];
    int firstAOIndexA = atomA.GetFirstAOIndex();
    int lastAOIndexA  = atomA.GetLastAOIndex();
    for(int mu=firstAOIndexA; mu<=lastAOIndexA; mu++){
@@ -2370,7 +2472,7 @@ void Mndo::CalcForceSCFElecCoreAttractionPart(double* force,
                                                                      indexAtomB, 
                                                                      mu-firstAOIndexA, 
                                                                      nu-firstAOIndexA,
-                                                                     diatomicTwoElecTwoCore1stDerivs,
+                                                                     diatomicTwoElecsTwoCores1stDerivs,
                                                                      (CartesianType)i);
          }
       }
@@ -2381,8 +2483,8 @@ void Mndo::CalcForceSCFOverlapAOsPart(double* force,
                                      int indexAtomA, 
                                      int indexAtomB,
                                      double const* const* const* diatomicOverlapAOs1stDerivs) const{
-   const Atom& atomA = *this->molecule->GetAtom(indexAtomA);
-   const Atom& atomB = *this->molecule->GetAtom(indexAtomB);
+   const Atom& atomA = *this->molecule->GetAtomVect()[indexAtomA];
+   const Atom& atomB = *this->molecule->GetAtomVect()[indexAtomB];
    int firstAOIndexA = atomA.GetFirstAOIndex();
    int firstAOIndexB = atomB.GetFirstAOIndex();
    int lastAOIndexA  = atomA.GetLastAOIndex();
@@ -2409,9 +2511,9 @@ void Mndo::CalcForceSCFOverlapAOsPart(double* force,
 void Mndo::CalcForceSCFTwoElecPart(double* force, 
                                   int indexAtomA, 
                                   int indexAtomB,
-                                  double const* const* const* const* const* diatomicTwoElecTwoCore1stDerivs) const{
-   const Atom& atomA = *this->molecule->GetAtom(indexAtomA);
-   const Atom& atomB = *this->molecule->GetAtom(indexAtomB);
+                                  double const* const* const* const* const* diatomicTwoElecsTwoCores1stDerivs) const{
+   const Atom& atomA = *this->molecule->GetAtomVect()[indexAtomA];
+   const Atom& atomB = *this->molecule->GetAtomVect()[indexAtomB];
    int firstAOIndexA = atomA.GetFirstAOIndex();
    int firstAOIndexB = atomB.GetFirstAOIndex();
    int lastAOIndexA  = atomA.GetLastAOIndex();
@@ -2424,19 +2526,19 @@ void Mndo::CalcForceSCFTwoElecPart(double* force,
                   force[i] -= 0.5
                              *this->orbitalElectronPopulation[mu][nu]
                              *this->orbitalElectronPopulation[lambda][sigma]
-                             *diatomicTwoElecTwoCore1stDerivs[mu-firstAOIndexA]
-                                                             [nu-firstAOIndexA]
-                                                             [lambda-firstAOIndexB]
-                                                             [sigma-firstAOIndexB]
-                                                             [(CartesianType)i];
+                             *diatomicTwoElecsTwoCores1stDerivs[mu-firstAOIndexA]
+                                                               [nu-firstAOIndexA]
+                                                               [lambda-firstAOIndexB]
+                                                               [sigma-firstAOIndexB]
+                                                               [(CartesianType)i];
                   force[i] += 0.25
                              *this->orbitalElectronPopulation[mu][lambda]
                              *this->orbitalElectronPopulation[nu][sigma]
-                             *diatomicTwoElecTwoCore1stDerivs[mu-firstAOIndexA]
-                                                             [nu-firstAOIndexA]
-                                                             [lambda-firstAOIndexB]
-                                                             [sigma-firstAOIndexB]
-                                                             [(CartesianType)i];
+                             *diatomicTwoElecsTwoCores1stDerivs[mu-firstAOIndexA]
+                                                               [nu-firstAOIndexA]
+                                                               [lambda-firstAOIndexB]
+                                                               [sigma-firstAOIndexB]
+                                                               [(CartesianType)i];
                }
             }
          }
@@ -2448,9 +2550,9 @@ void Mndo::CalcForceExcitedStaticPart(double* force,
                                       int elecStateIndex,
                                       int indexAtomA, 
                                       int indexAtomB,
-                                      double const* const* const* const* const* diatomicTwoElecTwoCore1stDerivs) const{
-   const Atom& atomA = *this->molecule->GetAtom(indexAtomA);
-   const Atom& atomB = *this->molecule->GetAtom(indexAtomB);
+                                      double const* const* const* const* const* diatomicTwoElecsTwoCores1stDerivs) const{
+   const Atom& atomA = *this->molecule->GetAtomVect()[indexAtomA];
+   const Atom& atomB = *this->molecule->GetAtomVect()[indexAtomB];
    int firstAOIndexA = atomA.GetFirstAOIndex();
    int firstAOIndexB = atomB.GetFirstAOIndex();
    int lastAOIndexA  = atomA.GetLastAOIndex();
@@ -2465,11 +2567,11 @@ void Mndo::CalcForceExcitedStaticPart(double* force,
                               -1.0*this->etaMatrixForce[elecStateIndex][mu][lambda]
                                   *this->etaMatrixForce[elecStateIndex][nu][sigma];
                   force[i] += temp
-                             *diatomicTwoElecTwoCore1stDerivs[mu-firstAOIndexA]
-                                                             [nu-firstAOIndexA]
-                                                             [lambda-firstAOIndexB]
-                                                             [sigma-firstAOIndexB]
-                                                             [i];
+                             *diatomicTwoElecsTwoCores1stDerivs[mu-firstAOIndexA]
+                                                               [nu-firstAOIndexA]
+                                                               [lambda-firstAOIndexB]
+                                                               [sigma-firstAOIndexB]
+                                                               [i];
                }
             }
          }
@@ -2481,8 +2583,8 @@ void Mndo::CalcForceExcitedElecCoreAttractionPart(double* force,
                                                   int elecStateIndex,
                                                   int indexAtomA, 
                                                   int indexAtomB,
-                                                  double const* const* const* const* const* diatomicTwoElecTwoCore1stDerivs) const{
-   const Atom& atomA = *this->molecule->GetAtom(indexAtomA);
+                                                  double const* const* const* const* const* diatomicTwoElecsTwoCores1stDerivs) const{
+   const Atom& atomA = *this->molecule->GetAtomVect()[indexAtomA];
    int firstAOIndexA = atomA.GetFirstAOIndex();
    int lastAOIndexA  = atomA.GetLastAOIndex();
    for(int mu=firstAOIndexA; mu<=lastAOIndexA; mu++){
@@ -2494,7 +2596,7 @@ void Mndo::CalcForceExcitedElecCoreAttractionPart(double* force,
                                                                      indexAtomB, 
                                                                      mu-firstAOIndexA, 
                                                                      nu-firstAOIndexA,
-                                                                     diatomicTwoElecTwoCore1stDerivs,
+                                                                     diatomicTwoElecsTwoCores1stDerivs,
                                                                      (CartesianType)i);
          }
       }
@@ -2505,9 +2607,9 @@ void Mndo::CalcForceExcitedTwoElecPart(double* force,
                                        int elecStateIndex,
                                        int indexAtomA, 
                                        int indexAtomB,
-                                       double const* const* const* const* const* diatomicTwoElecTwoCore1stDerivs) const{
-   const Atom& atomA = *this->molecule->GetAtom(indexAtomA);
-   const Atom& atomB = *this->molecule->GetAtom(indexAtomB);
+                                       double const* const* const* const* const* diatomicTwoElecsTwoCores1stDerivs) const{
+   const Atom& atomA = *this->molecule->GetAtomVect()[indexAtomA];
+   const Atom& atomB = *this->molecule->GetAtomVect()[indexAtomB];
    int firstAOIndexA = atomA.GetFirstAOIndex();
    int firstAOIndexB = atomB.GetFirstAOIndex();
    int lastAOIndexA  = atomA.GetLastAOIndex();
@@ -2519,19 +2621,19 @@ void Mndo::CalcForceExcitedTwoElecPart(double* force,
                for(int i=0; i<CartesianType_end; i++){
                   force[i] -= this->zMatrixForce[elecStateIndex][mu][nu]
                              *this->orbitalElectronPopulation[lambda][sigma]
-                             *diatomicTwoElecTwoCore1stDerivs[mu-firstAOIndexA]
-                                                             [nu-firstAOIndexA]
-                                                             [lambda-firstAOIndexB]
-                                                             [sigma-firstAOIndexB]
-                                                             [i];
+                             *diatomicTwoElecsTwoCores1stDerivs[mu-firstAOIndexA]
+                                                               [nu-firstAOIndexA]
+                                                               [lambda-firstAOIndexB]
+                                                               [sigma-firstAOIndexB]
+                                                               [i];
                   force[i] += 0.50
                              *this->zMatrixForce[elecStateIndex][mu][lambda]
                              *this->orbitalElectronPopulation[nu][sigma]
-                             *diatomicTwoElecTwoCore1stDerivs[mu-firstAOIndexA]
-                                                             [nu-firstAOIndexA]
-                                                             [lambda-firstAOIndexB]
-                                                             [sigma-firstAOIndexB]
-                                                             [(CartesianType)i];
+                             *diatomicTwoElecsTwoCores1stDerivs[mu-firstAOIndexA]
+                                                               [nu-firstAOIndexA]
+                                                               [lambda-firstAOIndexB]
+                                                               [sigma-firstAOIndexB]
+                                                               [(CartesianType)i];
                }
             }
          }
@@ -2551,41 +2653,45 @@ void Mndo::CalcForce(const vector<int>& elecStates){
    }
 
    // this loop is MPI-parallelized
-   for(int a=0; a<this->molecule->GetNumberAtoms(); a++){
+   for(int a=0; a<this->molecule->GetAtomVect().size(); a++){
       if(a%mpiSize != mpiRank){continue;}
-      const Atom& atomA = *molecule->GetAtom(a);
+      const Atom& atomA = *molecule->GetAtomVect()[a];
       int firstAOIndexA = atomA.GetFirstAOIndex();
       int lastAOIndexA  = atomA.GetLastAOIndex();
       stringstream ompErrors;
 #pragma omp parallel
       {
          double***   diatomicOverlapAOs1stDerivs = NULL;
-         double***** diatomicTwoElecTwoCore1stDerivs = NULL;
-         double**    tmpRotMat                       = NULL;
-         double***   tmpRotMat1stDerivs              = NULL;
-         double****  tmpDiatomicTwoElecTwoCore       = NULL;
+         double***** diatomicTwoElecsTwoCores1stDerivs = NULL;
+         double**    tmpRotMat                         = NULL;
+         double***   tmpRotMat1stDerivs                = NULL;
+         double****  tmpDiatomicTwoElecsTwoCores       = NULL;
 
          double**  tmpDiaOverlapAOsInDiaFrame         = NULL; // diatomic overlapAOs in diatomic frame
          double**  tmpDiaOverlapAOs1stDerivInDiaFrame = NULL; // first derivative of the diaOverlapAOs. This derivative is related to the distance between two atoms.
          double**  tmpRotMat1stDeriv                  = NULL;
-         double**  tmpRotatedDiatomicOverlap          = NULL;
-         double**  tmpMatrix                          = NULL;
+         double**  tmpRotatedDiatomicOverlap          = NULL; // used in dgemmm
+         double*   tmpRotatedDiatomicOverlapVec       = NULL; // used in dgemmm
+         double**  tmpMatrixBC                        = NULL; // used in dgemmm
+         double*   tmpVectorBC                        = NULL; // used in dgemmm
          try{
             this->MallocTempMatricesCalcForce(&diatomicOverlapAOs1stDerivs, 
-                                              &diatomicTwoElecTwoCore1stDerivs,
+                                              &diatomicTwoElecsTwoCores1stDerivs,
                                               &tmpDiaOverlapAOsInDiaFrame,
                                               &tmpDiaOverlapAOs1stDerivInDiaFrame,
                                               &tmpRotMat,
                                               &tmpRotMat1stDeriv,
                                               &tmpRotMat1stDerivs,
                                               &tmpRotatedDiatomicOverlap,
-                                              &tmpMatrix,
-                                              &tmpDiatomicTwoElecTwoCore);
+                                              &tmpRotatedDiatomicOverlapVec,
+                                              &tmpMatrixBC,
+                                              &tmpVectorBC,
+                                              &tmpDiatomicTwoElecsTwoCores);
 
-#pragma omp for schedule(auto)
-            for(int b=0; b<this->molecule->GetNumberAtoms(); b++){
+#pragma omp for schedule(dynamic, MOLDS_OMP_DYNAMIC_CHUNK_SIZE)
+            for(int b=0; b<this->molecule->GetAtomVect().size(); b++){
                if(a == b){continue;}
-               const Atom& atomB = *molecule->GetAtom(b);
+               const Atom& atomB = *molecule->GetAtomVect()[b];
                int firstAOIndexB = atomB.GetFirstAOIndex();
                int lastAOIndexB  = atomB.GetLastAOIndex();
 
@@ -2597,24 +2703,26 @@ void Mndo::CalcForce(const vector<int>& elecStates){
                                                           tmpRotMat1stDeriv,                 
                                                           tmpRotMat1stDerivs,                
                                                           tmpRotatedDiatomicOverlap,         
-                                                          tmpMatrix,                         
+                                                          tmpRotatedDiatomicOverlapVec,         
+                                                          tmpMatrixBC,                         
+                                                          tmpVectorBC,                         
                                                           atomA, 
                                                           atomB);
                // calc. first derivative of two elec two core interaction
-               this->CalcDiatomicTwoElecTwoCore1stDerivatives(diatomicTwoElecTwoCore1stDerivs, 
-                                                              tmpRotMat,
-                                                              tmpRotMat1stDerivs,
-                                                              tmpDiatomicTwoElecTwoCore,
-                                                              a, b);
+               this->CalcDiatomicTwoElecsTwoCores1stDerivatives(diatomicTwoElecsTwoCores1stDerivs, 
+                                                                tmpRotMat,
+                                                                tmpRotMat1stDerivs,
+                                                                tmpDiatomicTwoElecsTwoCores,
+                                                                a, b);
 
                // core repulsion part
                double coreRepulsion[CartesianType_end] = {0.0,0.0,0.0};
                for(int i=0; i<CartesianType_end; i++){
                   coreRepulsion[i] += this->GetDiatomCoreRepulsion1stDerivative(
-                                            a, b, (CartesianType)i);
+                                            atomA, atomB, (CartesianType)i);
                   if(Parameters::GetInstance()->RequiresVdWSCF()){
                      coreRepulsion[i] += this->GetDiatomVdWCorrection1stDerivative(
-                                               a, b, (CartesianType)i);
+                                               atomA, atomB, (CartesianType)i);
                   }
                }  
                // electron core attraction part (ground state)
@@ -2622,7 +2730,7 @@ void Mndo::CalcForce(const vector<int>& elecStates){
                this->CalcForceSCFElecCoreAttractionPart(forceElecCoreAttPart,
                                                         a,
                                                         b,
-                                                        diatomicTwoElecTwoCore1stDerivs);
+                                                        diatomicTwoElecsTwoCores1stDerivs);
                // overlapAOs part (ground state)
                double forceOverlapAOsPart[CartesianType_end] = {0.0,0.0,0.0};
                this->CalcForceSCFOverlapAOsPart(forceOverlapAOsPart, 
@@ -2634,7 +2742,7 @@ void Mndo::CalcForce(const vector<int>& elecStates){
                this->CalcForceSCFTwoElecPart(forceTwoElecPart,
                                              a,
                                              b,
-                                             diatomicTwoElecTwoCore1stDerivs);
+                                             diatomicTwoElecsTwoCores1stDerivs);
                // sum up contributions from each part (ground state)
 #pragma omp critical
                {
@@ -2659,7 +2767,7 @@ void Mndo::CalcForce(const vector<int>& elecStates){
                                                    n,
                                                    a,
                                                    b,
-                                                   diatomicTwoElecTwoCore1stDerivs);
+                                                   diatomicTwoElecsTwoCores1stDerivs);
                   // sum up contributions from static part (excited state)
 #pragma omp critical
                   {
@@ -2677,7 +2785,7 @@ void Mndo::CalcForce(const vector<int>& elecStates){
                                              n,
                                              a,
                                              b,
-                                             diatomicTwoElecTwoCore1stDerivs);
+                                             diatomicTwoElecsTwoCores1stDerivs);
                   // overlapAOs part (excited states)
                   double forceExcitedOverlapAOsPart[CartesianType_end] = {0.0,0.0,0.0};
                   this->CalcForceExcitedOverlapAOsPart(forceExcitedOverlapAOsPart, 
@@ -2691,7 +2799,7 @@ void Mndo::CalcForce(const vector<int>& elecStates){
                                                        n,
                                                        a,
                                                        b,
-                                                       diatomicTwoElecTwoCore1stDerivs);
+                                                       diatomicTwoElecsTwoCores1stDerivs);
                   // sum up contributions from response part (excited state)
 #pragma omp critical
                   {
@@ -2713,15 +2821,17 @@ void Mndo::CalcForce(const vector<int>& elecStates){
             ex.Serialize(ompErrors);
          }
          this->FreeTempMatricesCalcForce(&diatomicOverlapAOs1stDerivs, 
-                                         &diatomicTwoElecTwoCore1stDerivs,
+                                         &diatomicTwoElecsTwoCores1stDerivs,
                                          &tmpDiaOverlapAOsInDiaFrame,
                                          &tmpDiaOverlapAOs1stDerivInDiaFrame,
                                          &tmpRotMat,
                                          &tmpRotMat1stDeriv,
                                          &tmpRotMat1stDerivs,
                                          &tmpRotatedDiatomicOverlap,
-                                         &tmpMatrix,
-                                         &tmpDiatomicTwoElecTwoCore);
+                                         &tmpRotatedDiatomicOverlapVec,
+                                         &tmpMatrixBC,
+                                         &tmpVectorBC,
+                                         &tmpDiatomicTwoElecsTwoCores);
       } // end of omp-parallelized region
       // Exception throwing for omp-region
       if(!ompErrors.str().empty()){
@@ -2730,25 +2840,27 @@ void Mndo::CalcForce(const vector<int>& elecStates){
    }// end of for(int a) with MPI parallelization
 
    // communication to reduce thsi->matrixForce on all node (namely, all_reduce)
-   int numTransported = elecStates.size()*this->molecule->GetNumberAtoms()*CartesianType_end;
+   int numTransported = elecStates.size()*this->molecule->GetAtomVect().size()*CartesianType_end;
    MolDS_mpi::MpiProcess::GetInstance()->AllReduce(&this->matrixForce[0][0][0], numTransported, std::plus<double>());
 }
 
 void Mndo::MallocTempMatricesCalcForce(double****   diatomicOverlapAOs1stDerivs, 
-                                       double****** diatomicTwoElecTwoCore1stDerivs,
+                                       double****** diatomicTwoElecsTwoCores1stDerivs,
                                        double***    tmpDiaOverlapAOsInDiaFrame,
                                        double***    tmpDiaOverlapAOs1stDerivInDiaFrame,
                                        double***    tmpRotMat,
                                        double***    tmpRotMat1stDeriv,
                                        double****   tmpRotMat1stDerivs,
                                        double***    tmpRotatedDiatomicOverlap,
-                                       double***    tmpMatrix,
-                                       double*****  tmpDiatomicTwoElecTwoCore) const{
+                                       double**     tmpRotatedDiatomicOverlapVec,
+                                       double***    tmpMatrixBC,
+                                       double**     tmpVectorBC,
+                                       double*****  tmpDiatomicTwoElecsTwoCores) const{
    MallocerFreer::GetInstance()->Malloc<double>(diatomicOverlapAOs1stDerivs, 
                                                 OrbitalType_end,
                                                 OrbitalType_end,
                                                 CartesianType_end);
-   MallocerFreer::GetInstance()->Malloc<double>(diatomicTwoElecTwoCore1stDerivs,
+   MallocerFreer::GetInstance()->Malloc<double>(diatomicTwoElecsTwoCores1stDerivs,
                                                 dxy,
                                                 dxy,
                                                 dxy,
@@ -2773,10 +2885,14 @@ void Mndo::MallocTempMatricesCalcForce(double****   diatomicOverlapAOs1stDerivs,
    MallocerFreer::GetInstance()->Malloc<double>(tmpRotatedDiatomicOverlap,          
                                                 OrbitalType_end, 
                                                 OrbitalType_end);
-   MallocerFreer::GetInstance()->Malloc<double>(tmpMatrix,                          
+   MallocerFreer::GetInstance()->Malloc<double>(tmpRotatedDiatomicOverlapVec,          
+                                                OrbitalType_end*OrbitalType_end);
+   MallocerFreer::GetInstance()->Malloc<double>(tmpMatrixBC,                          
                                                 OrbitalType_end, 
                                                 OrbitalType_end);
-   MallocerFreer::GetInstance()->Malloc<double>(tmpDiatomicTwoElecTwoCore, 
+   MallocerFreer::GetInstance()->Malloc<double>(tmpVectorBC,                          
+                                                OrbitalType_end*OrbitalType_end);
+   MallocerFreer::GetInstance()->Malloc<double>(tmpDiatomicTwoElecsTwoCores, 
                                                 dxy, 
                                                 dxy, 
                                                 dxy, 
@@ -2784,20 +2900,22 @@ void Mndo::MallocTempMatricesCalcForce(double****   diatomicOverlapAOs1stDerivs,
 }
 
 void Mndo::FreeTempMatricesCalcForce(double****   diatomicOverlapAOs1stDerivs, 
-                                     double****** diatomicTwoElecTwoCore1stDerivs,
+                                     double****** diatomicTwoElecsTwoCores1stDerivs,
                                      double***    tmpDiaOverlapAOsInDiaFrame,
                                      double***    tmpDiaOverlapAOs1stDerivInDiaFrame,
                                      double***    tmpRotMat,
                                      double***    tmpRotMat1stDeriv,
                                      double****   tmpRotMat1stDerivs,
                                      double***    tmpRotatedDiatomicOverlap,
-                                     double***    tmpMatrix,
-                                     double*****  tmpDiatomicTwoElecTwoCore) const{
+                                     double**     tmpRotatedDiatomicOverlapVec,
+                                     double***    tmpMatrixBC,
+                                     double**     tmpVectorBC,
+                                     double*****  tmpDiatomicTwoElecsTwoCores) const{
    MallocerFreer::GetInstance()->Free<double>(diatomicOverlapAOs1stDerivs, 
                                               OrbitalType_end,
                                               OrbitalType_end,
                                               CartesianType_end);
-   MallocerFreer::GetInstance()->Free<double>(diatomicTwoElecTwoCore1stDerivs,
+   MallocerFreer::GetInstance()->Free<double>(diatomicTwoElecsTwoCores1stDerivs,
                                               dxy,
                                               dxy,
                                               dxy,
@@ -2822,10 +2940,14 @@ void Mndo::FreeTempMatricesCalcForce(double****   diatomicOverlapAOs1stDerivs,
    MallocerFreer::GetInstance()->Free<double>(tmpRotatedDiatomicOverlap,          
                                               OrbitalType_end, 
                                               OrbitalType_end);
-   MallocerFreer::GetInstance()->Free<double>(tmpMatrix,                          
+   MallocerFreer::GetInstance()->Free<double>(tmpRotatedDiatomicOverlapVec,          
+                                              OrbitalType_end*OrbitalType_end);
+   MallocerFreer::GetInstance()->Free<double>(tmpMatrixBC,                          
                                               OrbitalType_end, 
                                               OrbitalType_end);
-   MallocerFreer::GetInstance()->Free<double>(tmpDiatomicTwoElecTwoCore, 
+   MallocerFreer::GetInstance()->Free<double>(tmpVectorBC,                          
+                                              OrbitalType_end*OrbitalType_end);
+   MallocerFreer::GetInstance()->Free<double>(tmpDiatomicTwoElecsTwoCores, 
                                               dxy, 
                                               dxy, 
                                               dxy, 
@@ -2842,13 +2964,13 @@ double Mndo::GetSmallQElement(int moI,
    int numberOcc = this->molecule->GetTotalNumberValenceElectrons()/2;
    bool isMoPOcc = moP<numberOcc ? true : false;
    
-   for(int A=0; A<molecule->GetNumberAtoms(); A++){
-      const Atom& atomA = *molecule->GetAtom(A);
+   for(int A=0; A<molecule->GetAtomVect().size(); A++){
+      const Atom& atomA = *molecule->GetAtomVect()[A];
       int firstAOIndexA = atomA.GetFirstAOIndex();
       int lastAOIndexA  = atomA.GetLastAOIndex();
 
-      for(int B=A; B<molecule->GetNumberAtoms(); B++){
-         const Atom& atomB = *molecule->GetAtom(B);
+      for(int B=A; B<molecule->GetAtomVect().size(); B++){
+         const Atom& atomB = *molecule->GetAtomVect()[B];
          int firstAOIndexB = atomB.GetFirstAOIndex();
          int lastAOIndexB  = atomB.GetLastAOIndex();
 
@@ -2858,12 +2980,12 @@ double Mndo::GetSmallQElement(int moI,
                   for(int lambda=firstAOIndexB; lambda<=lastAOIndexB; lambda++){
                      for(int sigma=lambda; sigma<=lastAOIndexB; sigma++){
                         double twoElecInt = 0.0;
-                        twoElecInt = this->twoElecTwoCore[A]
-                                                         [B]
-                                                         [mu-firstAOIndexA]
-                                                         [nu-firstAOIndexA]
-                                                         [lambda-firstAOIndexB]
-                                                         [sigma-firstAOIndexB];
+                        twoElecInt = this->twoElecsTwoAtomCores[A]
+                                                               [B]
+                                                               [mu-firstAOIndexA]
+                                                               [nu-firstAOIndexA]
+                                                               [lambda-firstAOIndexB]
+                                                               [sigma-firstAOIndexB];
                         double temp = 0.0;
                         if(isMoPOcc){
                            int p = numberOcc - (moP+1);
@@ -3023,8 +3145,8 @@ double Mndo::GetAuxiliaryKNRKRElement(int moI, int moJ, int moK, int moL) const{
 
    // Fast algorith, but this is not easy to read. 
    // Slow algorithm is alos written below.
-   for(int A=0; A<this->molecule->GetNumberAtoms(); A++){
-      const Atom& atomA = *this->molecule->GetAtom(A);
+   for(int A=0; A<this->molecule->GetAtomVect().size(); A++){
+      const Atom& atomA = *this->molecule->GetAtomVect()[A];
       int firstAOIndexA = atomA.GetFirstAOIndex();
       int lastAOIndexA  = atomA.GetLastAOIndex();
 
@@ -3067,8 +3189,8 @@ double Mndo::GetAuxiliaryKNRKRElement(int moI, int moJ, int moK, int moL) const{
                         *this->fockMatrix[moK][mu];
             }
 
-            for(int B=A; B<this->molecule->GetNumberAtoms(); B++){
-               const Atom& atomB = *this->molecule->GetAtom(B);
+            for(int B=A; B<this->molecule->GetAtomVect().size(); B++){
+               const Atom& atomB = *this->molecule->GetAtomVect()[B];
                int firstAOIndexB = atomB.GetFirstAOIndex();
                int lastAOIndexB  = atomB.GetLastAOIndex();
 
@@ -3133,7 +3255,7 @@ double Mndo::GetAuxiliaryKNRKRElement(int moI, int moJ, int moK, int moL) const{
                      }
                      double gamma = 0.0;
                      if(A!=B){
-                        gamma = this->twoElecTwoCore[A][B][muOffSet][nuOffSet][lambdaOffSet][sigmaOffSet];
+                        gamma = this->twoElecsTwoAtomCores[A][B][muOffSet][nuOffSet][lambdaOffSet][sigmaOffSet];
                      }
                      else{
                         if(mu==nu && lambda==sigma){
@@ -3171,16 +3293,16 @@ double Mndo::GetAuxiliaryKNRKRElement(int moI, int moJ, int moK, int moL) const{
    double*  twiceMoJK = NULL;
    double*  tmpVector = NULL;
    int numAOs = this->molecule->GetTotalNumberAOs();
-   MallocerFreer::GetInstance()->Malloc<double>(&twoElec,   this->molecule->GetNumberAtoms()*dxy*dxy, this->molecule->GetNumberAtoms()*dxy*dxy);
-   MallocerFreer::GetInstance()->Malloc<double>(&twiceMoIJ, this->molecule->GetNumberAtoms()*dxy*dxy);
-   MallocerFreer::GetInstance()->Malloc<double>(&twiceMoIK, this->molecule->GetNumberAtoms()*dxy*dxy);
-   MallocerFreer::GetInstance()->Malloc<double>(&twiceMoIL, this->molecule->GetNumberAtoms()*dxy*dxy);
-   MallocerFreer::GetInstance()->Malloc<double>(&twiceMoKL, this->molecule->GetNumberAtoms()*dxy*dxy);
-   MallocerFreer::GetInstance()->Malloc<double>(&twiceMoJL, this->molecule->GetNumberAtoms()*dxy*dxy);
-   MallocerFreer::GetInstance()->Malloc<double>(&twiceMoJK, this->molecule->GetNumberAtoms()*dxy*dxy);
-   MallocerFreer::GetInstance()->Malloc<double>(&tmpVector, this->molecule->GetNumberAtoms()*dxy*dxy);
-   for(int A=0; A<this->molecule->GetNumberAtoms(); A++){
-      const Atom& atomA = *this->molecule->GetAtom(A);
+   MallocerFreer::GetInstance()->Malloc<double>(&twoElec,   this->molecule->GetAtomVect().size()*dxy*dxy, this->molecule->GetAtomVect().size()*dxy*dxy);
+   MallocerFreer::GetInstance()->Malloc<double>(&twiceMoIJ, this->molecule->GetAtomVect().size()*dxy*dxy);
+   MallocerFreer::GetInstance()->Malloc<double>(&twiceMoIK, this->molecule->GetAtomVect().size()*dxy*dxy);
+   MallocerFreer::GetInstance()->Malloc<double>(&twiceMoIL, this->molecule->GetAtomVect().size()*dxy*dxy);
+   MallocerFreer::GetInstance()->Malloc<double>(&twiceMoKL, this->molecule->GetAtomVect().size()*dxy*dxy);
+   MallocerFreer::GetInstance()->Malloc<double>(&twiceMoJL, this->molecule->GetAtomVect().size()*dxy*dxy);
+   MallocerFreer::GetInstance()->Malloc<double>(&twiceMoJK, this->molecule->GetAtomVect().size()*dxy*dxy);
+   MallocerFreer::GetInstance()->Malloc<double>(&tmpVector, this->molecule->GetAtomVect().size()*dxy*dxy);
+   for(int A=0; A<this->molecule->GetAtomVect().size(); A++){
+      const Atom& atomA = *this->molecule->GetAtomVect()[A];
       int firstAOIndexA = atomA.GetFirstAOIndex();
       int lastAOIndexA  = atomA.GetLastAOIndex();
       for(int mu=firstAOIndexA; mu<=lastAOIndexA; mu++){
@@ -3192,8 +3314,8 @@ double Mndo::GetAuxiliaryKNRKRElement(int moI, int moJ, int moK, int moL) const{
       }
    }
 
-   for(int B=0; B<this->molecule->GetNumberAtoms(); B++){
-      const Atom& atomB = *this->molecule->GetAtom(B);
+   for(int B=0; B<this->molecule->GetAtomVect().size(); B++){
+      const Atom& atomB = *this->molecule->GetAtomVect()[B];
       int firstAOIndexB = atomB.GetFirstAOIndex();
       int lastAOIndexB  = atomB.GetLastAOIndex();
       for(int lambda=firstAOIndexB; lambda<=lastAOIndexB; lambda++){
@@ -3205,12 +3327,12 @@ double Mndo::GetAuxiliaryKNRKRElement(int moI, int moJ, int moK, int moL) const{
       }
    }
 
-   for(int A=0; A<this->molecule->GetNumberAtoms(); A++){
-      const Atom& atomA = *this->molecule->GetAtom(A);
+   for(int A=0; A<this->molecule->GetAtomVect().size(); A++){
+      const Atom& atomA = *this->molecule->GetAtomVect()[A];
       int firstAOIndexA = atomA.GetFirstAOIndex();
       int lastAOIndexA  = atomA.GetLastAOIndex();
-      for(int B=A; B<this->molecule->GetNumberAtoms(); B++){
-         const Atom& atomB = *this->molecule->GetAtom(B);
+      for(int B=A; B<this->molecule->GetAtomVect().size(); B++){
+         const Atom& atomB = *this->molecule->GetAtomVect()[B];
          int firstAOIndexB = atomB.GetFirstAOIndex();
          int lastAOIndexB  = atomB.GetLastAOIndex();
          double gamma = 0.0;
@@ -3221,12 +3343,12 @@ double Mndo::GetAuxiliaryKNRKRElement(int moI, int moJ, int moK, int moL) const{
                      for(int sigma=firstAOIndexB; sigma<=lastAOIndexB; sigma++){
                         twoElec[A*dxy*dxy+(mu-firstAOIndexA)*dxy+(nu-firstAOIndexA)]
                                [B*dxy*dxy+(lambda-firstAOIndexB)*dxy+(sigma-firstAOIndexB)] = 
-                            this->twoElecTwoCore[A]
-                                                [B]
-                                                [mu-firstAOIndexA]
-                                                [nu-firstAOIndexA]
-                                                [lambda-firstAOIndexB]
-                                                [sigma-firstAOIndexB];
+                            this->twoElecsTwoAtomCores[A]
+                                                      [B]
+                                                      [mu-firstAOIndexA]
+                                                      [nu-firstAOIndexA]
+                                                      [lambda-firstAOIndexB]
+                                                      [sigma-firstAOIndexB];
                      }
                   }
                }
@@ -3259,29 +3381,29 @@ double Mndo::GetAuxiliaryKNRKRElement(int moI, int moJ, int moK, int moL) const{
          }
       }
    }
-   MolDS_wrappers::Blas::GetInstance()->Dsymv(this->molecule->GetNumberAtoms()*dxy*dxy, 
+   MolDS_wrappers::Blas::GetInstance()->Dsymv(this->molecule->GetAtomVect().size()*dxy*dxy, 
                                               twoElec, 
                                               twiceMoKL,
                                               tmpVector);
-   value = 4.0*MolDS_wrappers::Blas::GetInstance()->Ddot(this->molecule->GetNumberAtoms()*dxy*dxy,twiceMoIJ, tmpVector);
-   MolDS_wrappers::Blas::GetInstance()->Dsymv(this->molecule->GetNumberAtoms()*dxy*dxy, 
+   value = 4.0*MolDS_wrappers::Blas::GetInstance()->Ddot(this->molecule->GetAtomVect().size()*dxy*dxy,twiceMoIJ, tmpVector);
+   MolDS_wrappers::Blas::GetInstance()->Dsymv(this->molecule->GetAtomVect().size()*dxy*dxy, 
                                               twoElec, 
                                               twiceMoJL,
                                               tmpVector);
-   value -= MolDS_wrappers::Blas::GetInstance()->Ddot(this->molecule->GetNumberAtoms()*dxy*dxy,twiceMoIK, tmpVector);
-   MolDS_wrappers::Blas::GetInstance()->Dsymv(this->molecule->GetNumberAtoms()*dxy*dxy, 
+   value -= MolDS_wrappers::Blas::GetInstance()->Ddot(this->molecule->GetAtomVect().size()*dxy*dxy,twiceMoIK, tmpVector);
+   MolDS_wrappers::Blas::GetInstance()->Dsymv(this->molecule->GetAtomVect().size()*dxy*dxy, 
                                               twoElec, 
                                               twiceMoJK,
                                               tmpVector);
-   value -= MolDS_wrappers::Blas::GetInstance()->Ddot(this->molecule->GetNumberAtoms()*dxy*dxy,twiceMoIL, tmpVector);
-   MallocerFreer::GetInstance()->Free<double>(&twoElec,   this->molecule->GetNumberAtoms()*dxy*dxy, this->molecule->GetNumberAtoms()*dxy*dxy);
-   MallocerFreer::GetInstance()->Free<double>(&twiceMoIJ, this->molecule->GetNumberAtoms()*dxy*dxy);
-   MallocerFreer::GetInstance()->Free<double>(&twiceMoIK, this->molecule->GetNumberAtoms()*dxy*dxy);
-   MallocerFreer::GetInstance()->Free<double>(&twiceMoIL, this->molecule->GetNumberAtoms()*dxy*dxy);
-   MallocerFreer::GetInstance()->Free<double>(&twiceMoKL, this->molecule->GetNumberAtoms()*dxy*dxy);
-   MallocerFreer::GetInstance()->Free<double>(&twiceMoJL, this->molecule->GetNumberAtoms()*dxy*dxy);
-   MallocerFreer::GetInstance()->Free<double>(&twiceMoJK, this->molecule->GetNumberAtoms()*dxy*dxy);
-   MallocerFreer::GetInstance()->Free<double>(&tmpVector, this->molecule->GetNumberAtoms()*dxy*dxy);
+   value -= MolDS_wrappers::Blas::GetInstance()->Ddot(this->molecule->GetAtomVect().size()*dxy*dxy,twiceMoIL, tmpVector);
+   MallocerFreer::GetInstance()->Free<double>(&twoElec,   this->molecule->GetAtomVect().size()*dxy*dxy, this->molecule->GetAtomVect().size()*dxy*dxy);
+   MallocerFreer::GetInstance()->Free<double>(&twiceMoIJ, this->molecule->GetAtomVect().size()*dxy*dxy);
+   MallocerFreer::GetInstance()->Free<double>(&twiceMoIK, this->molecule->GetAtomVect().size()*dxy*dxy);
+   MallocerFreer::GetInstance()->Free<double>(&twiceMoIL, this->molecule->GetAtomVect().size()*dxy*dxy);
+   MallocerFreer::GetInstance()->Free<double>(&twiceMoKL, this->molecule->GetAtomVect().size()*dxy*dxy);
+   MallocerFreer::GetInstance()->Free<double>(&twiceMoJL, this->molecule->GetAtomVect().size()*dxy*dxy);
+   MallocerFreer::GetInstance()->Free<double>(&twiceMoJK, this->molecule->GetAtomVect().size()*dxy*dxy);
+   MallocerFreer::GetInstance()->Free<double>(&tmpVector, this->molecule->GetAtomVect().size()*dxy*dxy);
    // End of algorithm using blas
    */
 
@@ -3295,14 +3417,14 @@ double Mndo::GetAuxiliaryKNRKRElement(int moI, int moJ, int moK, int moL) const{
    double** twiceMoB  = NULL;
    double** tmpMatrix = NULL;
    int numAOs = this->molecule->GetTotalNumberAOs();
-   MallocerFreer::GetInstance()->Malloc<double>(&twoElec,   this->molecule->GetNumberAtoms()*dxy*dxy, this->molecule->GetNumberAtoms()*dxy*dxy);
-   MallocerFreer::GetInstance()->Malloc<double>(&twiceMoIJ, this->molecule->GetNumberAtoms()*dxy*dxy);
-   MallocerFreer::GetInstance()->Malloc<double>(&twiceMoIK, this->molecule->GetNumberAtoms()*dxy*dxy);
-   MallocerFreer::GetInstance()->Malloc<double>(&twiceMoIL, this->molecule->GetNumberAtoms()*dxy*dxy);
-   MallocerFreer::GetInstance()->Malloc<double>(&twiceMoB, 3, this->molecule->GetNumberAtoms()*dxy*dxy);
-   MallocerFreer::GetInstance()->Malloc<double>(&tmpMatrix,3, this->molecule->GetNumberAtoms()*dxy*dxy);
-   for(int A=0; A<this->molecule->GetNumberAtoms(); A++){
-      const Atom& atomA = *this->molecule->GetAtom(A);
+   MallocerFreer::GetInstance()->Malloc<double>(&twoElec,   this->molecule->GetAtomVect().size()*dxy*dxy, this->molecule->GetAtomVect().size()*dxy*dxy);
+   MallocerFreer::GetInstance()->Malloc<double>(&twiceMoIJ, this->molecule->GetAtomVect().size()*dxy*dxy);
+   MallocerFreer::GetInstance()->Malloc<double>(&twiceMoIK, this->molecule->GetAtomVect().size()*dxy*dxy);
+   MallocerFreer::GetInstance()->Malloc<double>(&twiceMoIL, this->molecule->GetAtomVect().size()*dxy*dxy);
+   MallocerFreer::GetInstance()->Malloc<double>(&twiceMoB, 3, this->molecule->GetAtomVect().size()*dxy*dxy);
+   MallocerFreer::GetInstance()->Malloc<double>(&tmpMatrix,3, this->molecule->GetAtomVect().size()*dxy*dxy);
+   for(int A=0; A<this->molecule->GetAtomVect().size(); A++){
+      const Atom& atomA = *this->molecule->GetAtomVect()[A];
       int firstAOIndexA = atomA.GetFirstAOIndex();
       int lastAOIndexA  = atomA.GetLastAOIndex();
       for(int mu=firstAOIndexA; mu<=lastAOIndexA; mu++){
@@ -3314,8 +3436,8 @@ double Mndo::GetAuxiliaryKNRKRElement(int moI, int moJ, int moK, int moL) const{
       }
    }
 
-   for(int B=0; B<this->molecule->GetNumberAtoms(); B++){
-      const Atom& atomB = *this->molecule->GetAtom(B);
+   for(int B=0; B<this->molecule->GetAtomVect().size(); B++){
+      const Atom& atomB = *this->molecule->GetAtomVect()[B];
       int firstAOIndexB = atomB.GetFirstAOIndex();
       int lastAOIndexB  = atomB.GetLastAOIndex();
       for(int lambda=firstAOIndexB; lambda<=lastAOIndexB; lambda++){
@@ -3327,12 +3449,12 @@ double Mndo::GetAuxiliaryKNRKRElement(int moI, int moJ, int moK, int moL) const{
       }
    }
 
-   for(int A=0; A<this->molecule->GetNumberAtoms(); A++){
-      const Atom& atomA = *this->molecule->GetAtom(A);
+   for(int A=0; A<this->molecule->GetAtomVect().size(); A++){
+      const Atom& atomA = *this->molecule->GetAtomVect()[A];
       int firstAOIndexA = atomA.GetFirstAOIndex();
       int lastAOIndexA  = atomA.GetLastAOIndex();
-      for(int B=0; B<this->molecule->GetNumberAtoms(); B++){
-         const Atom& atomB = *this->molecule->GetAtom(B);
+      for(int B=0; B<this->molecule->GetAtomVect().size(); B++){
+         const Atom& atomB = *this->molecule->GetAtomVect()[B];
          int firstAOIndexB = atomB.GetFirstAOIndex();
          int lastAOIndexB  = atomB.GetLastAOIndex();
          double gamma = 0.0;
@@ -3343,12 +3465,12 @@ double Mndo::GetAuxiliaryKNRKRElement(int moI, int moJ, int moK, int moL) const{
                      for(int sigma=firstAOIndexB; sigma<=lastAOIndexB; sigma++){
                         twoElec[A*dxy*dxy+(mu-firstAOIndexA)*dxy+(nu-firstAOIndexA)]
                                [B*dxy*dxy+(lambda-firstAOIndexB)*dxy+(sigma-firstAOIndexB)] = 
-                            this->twoElecTwoCore[A]
-                                                [B]
-                                                [mu-firstAOIndexA]
-                                                [nu-firstAOIndexA]
-                                                [lambda-firstAOIndexB]
-                                                [sigma-firstAOIndexB];
+                            this->twoElecsTwoAtomCores[A]
+                                                      [B]
+                                                      [mu-firstAOIndexA]
+                                                      [nu-firstAOIndexA]
+                                                      [lambda-firstAOIndexB]
+                                                      [sigma-firstAOIndexB];
                      }
                   }
                }
@@ -3383,23 +3505,23 @@ double Mndo::GetAuxiliaryKNRKRElement(int moI, int moJ, int moK, int moL) const{
    }
 
    MolDS_wrappers::Blas::GetInstance()->Dgemm(false, true, true,
-                                              this->molecule->GetNumberAtoms()*dxy*dxy,
+                                              this->molecule->GetAtomVect().size()*dxy*dxy,
                                               3,
-                                              this->molecule->GetNumberAtoms()*dxy*dxy,
+                                              this->molecule->GetAtomVect().size()*dxy*dxy,
                                               1.0,
                                               twoElec,
                                               twiceMoB,
                                               0.0,
                                               tmpMatrix);
-   value = 4.0*MolDS_wrappers::Blas::GetInstance()->Ddot(this->molecule->GetNumberAtoms()*dxy*dxy,twiceMoIJ, &tmpMatrix[0][0]);
-   value -=    MolDS_wrappers::Blas::GetInstance()->Ddot(this->molecule->GetNumberAtoms()*dxy*dxy,twiceMoIK, &tmpMatrix[1][0]);
-   value -=    MolDS_wrappers::Blas::GetInstance()->Ddot(this->molecule->GetNumberAtoms()*dxy*dxy,twiceMoIL, &tmpMatrix[2][0]);
-   MallocerFreer::GetInstance()->Free<double>(&twoElec,   this->molecule->GetNumberAtoms()*dxy*dxy, this->molecule->GetNumberAtoms()*dxy*dxy);
-   MallocerFreer::GetInstance()->Free<double>(&twiceMoIJ, this->molecule->GetNumberAtoms()*dxy*dxy);
-   MallocerFreer::GetInstance()->Free<double>(&twiceMoIK, this->molecule->GetNumberAtoms()*dxy*dxy);
-   MallocerFreer::GetInstance()->Free<double>(&twiceMoIL, this->molecule->GetNumberAtoms()*dxy*dxy);
-   MallocerFreer::GetInstance()->Free<double>(&twiceMoB, 3, this->molecule->GetNumberAtoms()*dxy*dxy);
-   MallocerFreer::GetInstance()->Free<double>(&tmpMatrix,3, this->molecule->GetNumberAtoms()*dxy*dxy);
+   value = 4.0*MolDS_wrappers::Blas::GetInstance()->Ddot(this->molecule->GetAtomVect().size()*dxy*dxy,twiceMoIJ, &tmpMatrix[0][0]);
+   value -=    MolDS_wrappers::Blas::GetInstance()->Ddot(this->molecule->GetAtomVect().size()*dxy*dxy,twiceMoIK, &tmpMatrix[1][0]);
+   value -=    MolDS_wrappers::Blas::GetInstance()->Ddot(this->molecule->GetAtomVect().size()*dxy*dxy,twiceMoIL, &tmpMatrix[2][0]);
+   MallocerFreer::GetInstance()->Free<double>(&twoElec,   this->molecule->GetAtomVect().size()*dxy*dxy, this->molecule->GetAtomVect().size()*dxy*dxy);
+   MallocerFreer::GetInstance()->Free<double>(&twiceMoIJ, this->molecule->GetAtomVect().size()*dxy*dxy);
+   MallocerFreer::GetInstance()->Free<double>(&twiceMoIK, this->molecule->GetAtomVect().size()*dxy*dxy);
+   MallocerFreer::GetInstance()->Free<double>(&twiceMoIL, this->molecule->GetAtomVect().size()*dxy*dxy);
+   MallocerFreer::GetInstance()->Free<double>(&twiceMoB, 3, this->molecule->GetAtomVect().size()*dxy*dxy);
+   MallocerFreer::GetInstance()->Free<double>(&tmpMatrix,3, this->molecule->GetAtomVect().size()*dxy*dxy);
    // End of second algorithm using blas
    */
 
@@ -3418,113 +3540,242 @@ double Mndo::GetAuxiliaryKNRKRElement(int moI, int moJ, int moK, int moL) const{
    return value;
 }
 
-void Mndo::CalcTwoElecTwoCore(double****** twoElecTwoCore, 
-                              const Molecule& molecule) const{
-   int totalNumberAtoms = molecule.GetNumberAtoms();
+void Mndo::CalcTwoElecsTwoCores(double****** twoElecsTwoAtomCores, 
+                                double****** twoElecsAtomEpcCores,
+                                const Molecule& molecule) const{
+   this->CalcTwoElecsTwoAtomCores(twoElecsTwoAtomCores, molecule);
+   this->CalcTwoElecsAtomEpcCores(twoElecsAtomEpcCores, molecule);
+}
+
+void Mndo::CalcTwoElecsTwoAtomCores(double****** twoElecsTwoAtomCores, 
+                                    const Molecule& molecule) const{
+#ifdef MOLDS_DBG
+   if(twoElecsTwoAtomCores == NULL){
+      throw MolDSException(this->errorMessageCalcTwoElecsTwoAtomCoresNullMatrix);
+   }
+#endif
+   int totalNumberAtoms = molecule.GetAtomVect().size();
+   MallocerFreer::GetInstance()->Initialize<double>(twoElecsTwoAtomCores, 
+                                                    totalNumberAtoms,
+                                                    totalNumberAtoms,
+                                                    dxy, dxy, dxy, dxy);
 
    // MPI setting of each rank
    int mpiRank       = MolDS_mpi::MpiProcess::GetInstance()->GetRank();
    int mpiSize       = MolDS_mpi::MpiProcess::GetInstance()->GetSize();
    int mpiHeadRank   = MolDS_mpi::MpiProcess::GetInstance()->GetHeadRank();
-   int mPassingTimes = MolDS_mpi::MpiProcess::GetInstance()->GetMessagePassingTimes(totalNumberAtoms);
+   stringstream errorStream;
    MolDS_mpi::AsyncCommunicator asyncCommunicator;
-   boost::thread communicationThread( boost::bind(&MolDS_mpi::AsyncCommunicator::Run<double>, 
-                                                  &asyncCommunicator, 
-                                                  mPassingTimes) );
-#ifdef MOLDS_DBG
-   if(twoElecTwoCore == NULL){
-      throw MolDSException(this->errorMessageCalcTwoElecTwoCoreNullMatrix);
-   }
-#endif
-   MallocerFreer::GetInstance()->Initialize<double>(twoElecTwoCore, 
-                                                    totalNumberAtoms,
-                                                    totalNumberAtoms,
-                                                    dxy, dxy, dxy, dxy);
+   boost::thread communicationThread( boost::bind(&MolDS_mpi::AsyncCommunicator::Run<double>, &asyncCommunicator) );
 
-   // this loop-a is MPI-parallelized
    for(int a=0; a<totalNumberAtoms; a++){
       int calcRank = a%mpiSize;
       if(mpiRank == calcRank){
-         stringstream ompErrors;
 #pragma omp parallel 
          {
-            double**** diatomicTwoElecTwoCore = NULL;
-            double**   tmpRotMat              = NULL;
-            double**   tmpMatrixBC            = NULL;
+            double**** diatomicTwoElecsTwoCores    = NULL;
+            double*    tmpDiatomicTwoElecsTwoCores = NULL;
+            double**   tmpRotMat                   = NULL;
+            double**   tmpMatrixBC                 = NULL;
+            double*    tmpVectorBC                 = NULL;
             try{
-               MallocerFreer::GetInstance()->Malloc<double>(&diatomicTwoElecTwoCore, dxy, dxy, dxy, dxy);
-               MallocerFreer::GetInstance()->Malloc<double>(&tmpRotMat, OrbitalType_end, OrbitalType_end);
-               MallocerFreer::GetInstance()->Malloc<double>(&tmpMatrixBC, dxy*dxy, dxy*dxy);
+               MallocerFreer::GetInstance()->Malloc<double>(&diatomicTwoElecsTwoCores,    dxy, dxy, dxy, dxy);
+               MallocerFreer::GetInstance()->Malloc<double>(&tmpDiatomicTwoElecsTwoCores, dxy*dxy*dxy*dxy);
+               MallocerFreer::GetInstance()->Malloc<double>(&tmpRotMat,                   OrbitalType_end, OrbitalType_end);
+               MallocerFreer::GetInstance()->Malloc<double>(&tmpMatrixBC,                 dxy*dxy, dxy*dxy);
+               MallocerFreer::GetInstance()->Malloc<double>(&tmpVectorBC,                 dxy*dxy*dxy*dxy);
                // note that terms with condition a==b are not needed to calculate. 
-#pragma omp for schedule(auto)
+#pragma omp for schedule(dynamic, MOLDS_OMP_DYNAMIC_CHUNK_SIZE)
                for(int b=a+1; b<totalNumberAtoms; b++){
-                  this->CalcDiatomicTwoElecTwoCore(diatomicTwoElecTwoCore, tmpRotMat, tmpMatrixBC, a, b);
-
+                  this->CalcDiatomicTwoElecsTwoCores(diatomicTwoElecsTwoCores, 
+                                                     tmpDiatomicTwoElecsTwoCores,
+                                                     tmpRotMat, 
+                                                     tmpMatrixBC, 
+                                                     tmpVectorBC, 
+                                                     a, b);
+                  int i=0;
                   for(int mu=0; mu<dxy; mu++){
                      for(int nu=mu; nu<dxy; nu++){
+                        int j=0;
                         for(int lambda=0; lambda<dxy; lambda++){
                            for(int sigma=lambda; sigma<dxy; sigma++){
-                              double value = diatomicTwoElecTwoCore[mu][nu][lambda][sigma];
-                              twoElecTwoCore[a][b][mu][nu][lambda][sigma] = value;
-                              twoElecTwoCore[a][b][mu][nu][sigma][lambda] = value;
-                              twoElecTwoCore[a][b][nu][mu][lambda][sigma] = value;
-                              twoElecTwoCore[a][b][nu][mu][sigma][lambda] = value;
+                              this->twoElecsTwoAtomCoresMpiBuff[a][b][i][j] 
+                                 = diatomicTwoElecsTwoCores[mu][nu][lambda][sigma];
+                              j++;
                            }
                         }
+                        i++;
                      }
                   }
-
-               }  // end of loop b parallelized with MPI
-
-            }  // end of try
+               }
+            }
             catch(MolDSException ex){
 #pragma omp critical
-               ex.Serialize(ompErrors);
+               ex.Serialize(errorStream);
             }
-            MallocerFreer::GetInstance()->Free<double>(&diatomicTwoElecTwoCore, dxy, dxy, dxy, dxy);
-            MallocerFreer::GetInstance()->Free<double>(&tmpRotMat, OrbitalType_end, OrbitalType_end);
-            MallocerFreer::GetInstance()->Free<double>(&tmpMatrixBC, dxy*dxy, dxy*dxy);
-         }  // end of omp-parallelized region
-         // Exception throwing for omp-region
-         if(!ompErrors.str().empty()){
-            throw MolDSException::Deserialize(ompErrors);
+            MallocerFreer::GetInstance()->Free<double>(&diatomicTwoElecsTwoCores,    dxy, dxy, dxy, dxy);
+            MallocerFreer::GetInstance()->Free<double>(&tmpDiatomicTwoElecsTwoCores, dxy*dxy*dxy*dxy);
+            MallocerFreer::GetInstance()->Free<double>(&tmpRotMat,                   OrbitalType_end, OrbitalType_end);
+            MallocerFreer::GetInstance()->Free<double>(&tmpMatrixBC,                 dxy*dxy, dxy*dxy);
+            MallocerFreer::GetInstance()->Free<double>(&tmpVectorBC,                 dxy*dxy*dxy*dxy);
          }
-      } // end of if(mpiRnak == calcRank)
-      // set data to gater in mpiHeadRank with asynchronous MPI 
-      int tag            = a;
-      int source         = calcRank;
-      int dest           = mpiHeadRank;
-      int numTransported = totalNumberAtoms*dxy*dxy*dxy*dxy;
-      if(mpiRank == mpiHeadRank && mpiRank != calcRank){
-         asyncCommunicator.SetRecvedVector(&twoElecTwoCore[a][0][0][0][0][0], 
-                                           numTransported, 
-                                           source,
-                                           tag);
       }
-      if(mpiRank != mpiHeadRank && mpiRank == calcRank){
-         asyncCommunicator.SetSentVector(&twoElecTwoCore[a][0][0][0][0][0], 
-                                         numTransported, 
-                                         dest,
-                                         tag);
+      if(errorStream.str().empty()){
+         if(a<totalNumberAtoms-1){
+            int b = a+1;
+            OrbitalType twoElecLimit = dxy;
+            int numBuff = (twoElecLimit+1)*twoElecLimit/2;
+            int num = (totalNumberAtoms-b)*numBuff*numBuff;
+            asyncCommunicator.SetBroadcastedMessage(&this->twoElecsTwoAtomCoresMpiBuff[a][b][0][0], num, calcRank);
+         }
       }
-   } // end of loop a parallelized with MPI
+   }
+   asyncCommunicator.Finalize();
    communicationThread.join();
-   int numTransported = totalNumberAtoms*totalNumberAtoms*dxy*dxy*dxy*dxy;
-   MolDS_mpi::MpiProcess::GetInstance()->Broadcast(&twoElecTwoCore[0][0][0][0][0][0], numTransported, mpiHeadRank);
+   if(!errorStream.str().empty()){
+      throw MolDSException::Deserialize(errorStream);
+   }
 
+#pragma omp parallel for schedule(dynamic, MOLDS_OMP_DYNAMIC_CHUNK_SIZE)
    for(int a=0; a<totalNumberAtoms; a++){
       for(int b=a+1; b<totalNumberAtoms; b++){
+         int i=0;
          for(int mu=0; mu<dxy; mu++){
             for(int nu=mu; nu<dxy; nu++){
+               int j=0;
                for(int lambda=0; lambda<dxy; lambda++){
                   for(int sigma=lambda; sigma<dxy; sigma++){
-                     double value = twoElecTwoCore[a][b][mu][nu][lambda][sigma];
-                     twoElecTwoCore[b][a][lambda][sigma][mu][nu] = value;
-                     twoElecTwoCore[b][a][lambda][sigma][nu][mu] = value;
-                     twoElecTwoCore[b][a][sigma][lambda][mu][nu] = value;
-                     twoElecTwoCore[b][a][sigma][lambda][nu][mu] = value;
+                     double value = this->twoElecsTwoAtomCoresMpiBuff[a][b][i][j];
+                     twoElecsTwoAtomCores[a][b][mu][nu][lambda][sigma] = value;
+                     twoElecsTwoAtomCores[a][b][mu][nu][sigma][lambda] = value;
+                     twoElecsTwoAtomCores[a][b][nu][mu][lambda][sigma] = value;
+                     twoElecsTwoAtomCores[a][b][nu][mu][sigma][lambda] = value;
+                     twoElecsTwoAtomCores[b][a][lambda][sigma][mu][nu] = value;
+                     twoElecsTwoAtomCores[b][a][lambda][sigma][nu][mu] = value;
+                     twoElecsTwoAtomCores[b][a][sigma][lambda][mu][nu] = value;
+                     twoElecsTwoAtomCores[b][a][sigma][lambda][nu][mu] = value;
+                     j++;
                   }
                }
+               i++;
+            }
+         }
+      }
+   }
+}
+
+void Mndo::CalcTwoElecsAtomEpcCores(double****** twoElecsAtomEpcCores, 
+                                    const Molecule& molecule) const{
+   if(molecule.GetEpcVect().empty()){return;}
+#ifdef MOLDS_DBG
+   if(twoElecsAtomEpcCores == NULL){
+      throw MolDSException(this->errorMessageCalcTwoElecsAtomEpcCoresNullMatrix);
+   }
+#endif
+   int totalNumberAtoms = molecule.GetAtomVect().size();
+   int totalNumberEpcs  = molecule.GetEpcVect().size();
+   MallocerFreer::GetInstance()->Initialize<double>(twoElecsAtomEpcCores, 
+                                                    totalNumberAtoms,
+                                                    totalNumberEpcs,
+                                                    dxy, dxy, dxy, dxy);
+
+   // MPI setting of each rank
+   int mpiRank       = MolDS_mpi::MpiProcess::GetInstance()->GetRank();
+   int mpiSize       = MolDS_mpi::MpiProcess::GetInstance()->GetSize();
+   int mpiHeadRank   = MolDS_mpi::MpiProcess::GetInstance()->GetHeadRank();
+   stringstream errorStream;
+   MolDS_mpi::AsyncCommunicator asyncCommunicator;
+   boost::thread communicationThread( boost::bind(&MolDS_mpi::AsyncCommunicator::Run<double>, &asyncCommunicator) );
+
+   for(int a=0; a<totalNumberAtoms; a++){
+      int calcRank = a%mpiSize;
+      if(mpiRank == calcRank){
+//#pragma omp parallel 
+         {
+            double**** diatomicTwoElecsTwoCores    = NULL;
+            double*    tmpDiatomicTwoElecsTwoCores = NULL;
+            double**   tmpRotMat                   = NULL;
+            double**   tmpMatrixBC                 = NULL;
+            double*    tmpVectorBC                 = NULL;
+            const Atom& atom = *molecule.GetAtomVect()[a];
+            try{
+               MallocerFreer::GetInstance()->Malloc<double>(&diatomicTwoElecsTwoCores,    dxy, dxy, dxy, dxy);
+               MallocerFreer::GetInstance()->Malloc<double>(&tmpDiatomicTwoElecsTwoCores, dxy*dxy*dxy*dxy);
+               MallocerFreer::GetInstance()->Malloc<double>(&tmpRotMat,                   OrbitalType_end, OrbitalType_end);
+               MallocerFreer::GetInstance()->Malloc<double>(&tmpMatrixBC,                 dxy*dxy, dxy*dxy);
+               MallocerFreer::GetInstance()->Malloc<double>(&tmpVectorBC,                 dxy*dxy*dxy*dxy);
+               // note that terms with condition a==b are not needed to calculate. 
+//#pragma omp for schedule(dynamic, MOLDS_OMP_DYNAMIC_CHUNK_SIZE)
+               for(int b=0; b<totalNumberEpcs; b++){
+                  const Atom& epc  = *molecule.GetEpcVect()[b];
+                  this->CalcDiatomicTwoElecsTwoCores(diatomicTwoElecsTwoCores, 
+                                                     tmpDiatomicTwoElecsTwoCores,
+                                                     tmpRotMat, 
+                                                     tmpMatrixBC, 
+                                                     tmpVectorBC, 
+                                                     atom,
+                                                     epc);
+                  int i=0;
+                  for(int mu=0; mu<dxy; mu++){
+                     for(int nu=mu; nu<dxy; nu++){
+                        int j=0;
+                        for(int lambda=0; lambda<dxy; lambda++){
+                           for(int sigma=lambda; sigma<dxy; sigma++){
+                              this->twoElecsAtomEpcCoresMpiBuff[a][b][i][j] 
+                                 = diatomicTwoElecsTwoCores[mu][nu][lambda][sigma];
+                              j++;
+                           }
+                        }
+                        i++;
+                     }
+                  }
+               }
+            }
+            catch(MolDSException ex){
+#pragma omp critical
+               ex.Serialize(errorStream);
+            }
+            MallocerFreer::GetInstance()->Free<double>(&diatomicTwoElecsTwoCores,    dxy, dxy, dxy, dxy);
+            MallocerFreer::GetInstance()->Free<double>(&tmpDiatomicTwoElecsTwoCores, dxy*dxy*dxy*dxy);
+            MallocerFreer::GetInstance()->Free<double>(&tmpRotMat,                   OrbitalType_end, OrbitalType_end);
+            MallocerFreer::GetInstance()->Free<double>(&tmpMatrixBC,                 dxy*dxy, dxy*dxy);
+            MallocerFreer::GetInstance()->Free<double>(&tmpVectorBC,                 dxy*dxy*dxy*dxy);
+         }
+      }
+      if(errorStream.str().empty()){
+         if(a<totalNumberAtoms-1){
+            int b = 0;
+            OrbitalType twoElecLimit = dxy;
+            int numBuff = (twoElecLimit+1)*twoElecLimit/2;
+            int num = totalNumberEpcs*numBuff*numBuff;
+            asyncCommunicator.SetBroadcastedMessage(&this->twoElecsAtomEpcCoresMpiBuff[a][b][0][0], num, calcRank);
+         }
+      }
+   }
+   asyncCommunicator.Finalize();
+   communicationThread.join();
+   if(!errorStream.str().empty()){
+      throw MolDSException::Deserialize(errorStream);
+   }
+
+#pragma omp parallel for schedule(dynamic, MOLDS_OMP_DYNAMIC_CHUNK_SIZE)
+   for(int a=0; a<totalNumberAtoms; a++){
+      for(int b=0; b<totalNumberEpcs; b++){
+         int i=0;
+         for(int mu=0; mu<dxy; mu++){
+            for(int nu=mu; nu<dxy; nu++){
+               int j=0;
+               for(int lambda=0; lambda<dxy; lambda++){
+                  for(int sigma=lambda; sigma<dxy; sigma++){
+                     double value = this->twoElecsAtomEpcCoresMpiBuff[a][b][i][j];
+                     twoElecsAtomEpcCores[a][b][mu][nu][lambda][sigma] = value;
+                     twoElecsAtomEpcCores[a][b][mu][nu][sigma][lambda] = value;
+                     twoElecsAtomEpcCores[a][b][nu][mu][lambda][sigma] = value;
+                     twoElecsAtomEpcCores[a][b][nu][mu][sigma][lambda] = value;
+                     j++;
+                  }
+               }
+               i++;
             }
          }
       }
@@ -3538,50 +3789,66 @@ void Mndo::CalcTwoElecTwoCore(double****** twoElecTwoCore,
 // Note that atomA != atomB.
 // Note taht d-orbital cannot be treated, 
 // that is, matrix[dxy][dxy][dxy][dxy] cannot be treatable.
-void Mndo::CalcDiatomicTwoElecTwoCore(double**** matrix, 
-                                      double** tmpRotMat, 
-                                      double** tmpMatrixBC,
-                                      int indexAtomA, 
-                                      int indexAtomB) const{
-   const Atom& atomA = *this->molecule->GetAtom(indexAtomA);
-   const Atom& atomB = *this->molecule->GetAtom(indexAtomB);
-   if(indexAtomA == indexAtomB){
-      stringstream ss;
-      ss << this->errorMessageCalcDiatomicTwoElecTwoCoreSameAtoms;
-      ss << this->errorMessageAtomA << indexAtomA 
-                                    << AtomTypeStr(atomA.GetAtomType()) << endl;
-      ss << this->errorMessageAtomB << indexAtomB 
-                                    << AtomTypeStr(atomB.GetAtomType()) << endl;
-      throw MolDSException(ss.str());
+void Mndo::CalcDiatomicTwoElecsTwoCores(double**** matrix, 
+                                        double*    tmpVec,
+                                        double**   tmpRotMat, 
+                                        double**   tmpMatrixBC,
+                                        double*    tmpVectorBC,
+                                        const Atom& atomA, 
+                                        const Atom& atomB) const{
+   if(atomA.GetAtomType() != EPC && atomB.GetAtomType() != EPC){
+      if(atomA.GetIndex() == atomB.GetIndex()){
+         stringstream ss;
+         ss << this->errorMessageCalcDiatomicTwoElecsTwoCoresSameAtoms;
+         ss << this->errorMessageAtomA << atomA.GetIndex() 
+                                       << AtomTypeStr(atomA.GetAtomType()) << endl;
+         ss << this->errorMessageAtomB << atomB.GetIndex()
+                                       << AtomTypeStr(atomB.GetAtomType()) << endl;
+         throw MolDSException(ss.str());
+      }
+   }
+   if(atomA.GetAtomType() == EPC && atomB.GetAtomType() == EPC){
+      if(atomA.GetIndex() == atomB.GetIndex()){
+         stringstream ss;
+         ss << this->errorMessageCalcDiatomicTwoElecsTwoCoresSameEpcs;
+         ss << this->errorMessageAtomA << atomA.GetIndex()
+                                       << AtomTypeStr(atomA.GetAtomType()) << endl;
+         ss << this->errorMessageAtomB << atomB.GetIndex()
+                                       << AtomTypeStr(atomB.GetAtomType()) << endl;
+         throw MolDSException(ss.str());
+      }
    }
 
 #ifdef MOLDS_DBG
    if(matrix == NULL){
-      throw MolDSException(this->errorMessageCalcDiatomicTwoElecTwoCoreNullMatrix);
+      throw MolDSException(this->errorMessageCalcDiatomicTwoElecsTwoCoresNullMatrix);
    }
 #endif
    MallocerFreer::GetInstance()->Initialize<double>(matrix, dxy, dxy, dxy, dxy);
 
    // calclation in diatomic frame
    for(int mu=0; mu<atomA.GetValenceSize(); mu++){
-      for(int nu=0; nu<atomA.GetValenceSize(); nu++){
+      for(int nu=mu; nu<atomA.GetValenceSize(); nu++){
          for(int lambda=0; lambda<atomB.GetValenceSize(); lambda++){
-            for(int sigma=0; sigma<atomB.GetValenceSize(); sigma++){
-               matrix[mu][nu][lambda][sigma] = this->GetNddoRepulsionIntegral(
-                                                     atomA, 
-                                                     atomA.GetValence(mu),
-                                                     atomA.GetValence(nu),
-                                                     atomB, 
-                                                     atomB.GetValence(lambda),
-                                                     atomB.GetValence(sigma));
-                     
+            for(int sigma=lambda; sigma<atomB.GetValenceSize(); sigma++){
+               double value = this->GetNddoRepulsionIntegral(
+                                    atomA, 
+                                    atomA.GetValence(mu),
+                                    atomA.GetValence(nu),
+                                    atomB, 
+                                    atomB.GetValence(lambda),
+                                    atomB. GetValence(sigma));
+               matrix[mu][nu][lambda][sigma] = value;
+               matrix[mu][nu][sigma][lambda] = value;
+               matrix[nu][mu][lambda][sigma] = value;
+               matrix[nu][mu][sigma][lambda] = value;
             }
          }
       }
    }
    // rotate matirix into the space frame
    this->CalcRotatingMatrix(tmpRotMat, atomA, atomB);
-   this->RotateDiatomicTwoElecTwoCoreToSpaceFrame(matrix, tmpRotMat, tmpMatrixBC);
+   this->RotateDiatomicTwoElecsTwoCoresToSpaceFrame(matrix, tmpVec, tmpRotMat, tmpMatrixBC, tmpVectorBC);
 
    /* 
    this->OutputLog("(mu, nu | lambda, sigma) matrix\n");
@@ -3601,6 +3868,24 @@ void Mndo::CalcDiatomicTwoElecTwoCore(double**** matrix,
    */
 }
 
+void Mndo::CalcDiatomicTwoElecsTwoCores(double**** matrix, 
+                                        double*    tmpVec,
+                                        double**   tmpRotMat, 
+                                        double**   tmpMatrixBC,
+                                        double*    tmpVectorBC,
+                                        int indexAtomA, 
+                                        int indexAtomB) const{
+   const Atom& atomA = *this->molecule->GetAtomVect()[indexAtomA];
+   const Atom& atomB = *this->molecule->GetAtomVect()[indexAtomB];
+   this->CalcDiatomicTwoElecsTwoCores(matrix, 
+                                      tmpVec,
+                                      tmpRotMat, 
+                                      tmpMatrixBC,
+                                      tmpVectorBC,
+                                      atomA, 
+                                      atomB);
+}
+
 // Calculation of first derivatives of the two electrons two cores integral in space fixed frame,
 // (mu, nu | lambda, sigma), taht is, Eq. (9) in ref. [DT_1977-2].
 // mu and nu are included in atomA's AOs. 
@@ -3609,17 +3894,17 @@ void Mndo::CalcDiatomicTwoElecTwoCore(double**** matrix,
 // Note that atomA != atomB.
 // Note taht d-orbital cannot be treated, 
 // that is, matrix[dxy][dxy][dxy][dxy][CartesianType_end] cannot be treatable.
-void Mndo::CalcDiatomicTwoElecTwoCore1stDerivatives(double***** matrix, 
-                                                    double**    tmpRotMat,
-                                                    double***   tmpRotMat1stDerivs,
-                                                    double****  tmpDiatomicTwoElecTwoCore,
-                                                    int indexAtomA, 
-                                                    int indexAtomB) const{
-   const Atom& atomA = *this->molecule->GetAtom(indexAtomA);
-   const Atom& atomB = *this->molecule->GetAtom(indexAtomB);
+void Mndo::CalcDiatomicTwoElecsTwoCores1stDerivatives(double***** matrix, 
+                                                      double**    tmpRotMat,
+                                                      double***   tmpRotMat1stDerivs,
+                                                      double****  tmpDiatomicTwoElecsTwoCores,
+                                                      int indexAtomA, 
+                                                      int indexAtomB) const{
+   const Atom& atomA = *this->molecule->GetAtomVect()[indexAtomA];
+   const Atom& atomB = *this->molecule->GetAtomVect()[indexAtomB];
    if(indexAtomA == indexAtomB){
       stringstream ss;
-      ss << this->errorMessageCalcDiatomicTwoElecTwoCore1stDerivativesSameAtoms;
+      ss << this->errorMessageCalcDiatomicTwoElecsTwoCores1stDerivativesSameAtoms;
       ss << this->errorMessageAtomA << indexAtomA 
                                     << AtomTypeStr(atomA.GetAtomType()) << endl;
       ss << this->errorMessageAtomB << indexAtomB 
@@ -3629,7 +3914,7 @@ void Mndo::CalcDiatomicTwoElecTwoCore1stDerivatives(double***** matrix,
 
 #ifdef MOLDS_DBG
    if(matrix == NULL){
-      throw MolDSException(this->errorMessageCalcDiatomicTwoElecTwoCore1stDerivativesNullMatrix);
+      throw MolDSException(this->errorMessageCalcDiatomicTwoElecsTwoCores1stDerivativesNullMatrix);
    }
 #endif
    MallocerFreer::GetInstance()->Initialize<double>(matrix, 
@@ -3658,7 +3943,7 @@ void Mndo::CalcDiatomicTwoElecTwoCore1stDerivatives(double***** matrix,
                   matrix[nu][mu][sigma][lambda][dimA] = matrix[mu][nu][lambda][sigma][dimA];
                   matrix[mu][nu][sigma][lambda][dimA] = matrix[mu][nu][lambda][sigma][dimA];
                }  
-               tmpDiatomicTwoElecTwoCore[mu][nu][lambda][sigma] 
+               tmpDiatomicTwoElecsTwoCores[mu][nu][lambda][sigma] 
                   = this->GetNddoRepulsionIntegral(
                           atomA, 
                           atomA.GetValence(mu),
@@ -3666,9 +3951,9 @@ void Mndo::CalcDiatomicTwoElecTwoCore1stDerivatives(double***** matrix,
                           atomB, 
                           atomB.GetValence(lambda),
                           atomB.GetValence(sigma));
-               tmpDiatomicTwoElecTwoCore[nu][mu][lambda][sigma] = tmpDiatomicTwoElecTwoCore[mu][nu][lambda][sigma];
-               tmpDiatomicTwoElecTwoCore[nu][mu][sigma][lambda] = tmpDiatomicTwoElecTwoCore[mu][nu][lambda][sigma];
-               tmpDiatomicTwoElecTwoCore[mu][nu][sigma][lambda] = tmpDiatomicTwoElecTwoCore[mu][nu][lambda][sigma];
+               tmpDiatomicTwoElecsTwoCores[nu][mu][lambda][sigma] = tmpDiatomicTwoElecsTwoCores[mu][nu][lambda][sigma];
+               tmpDiatomicTwoElecsTwoCores[nu][mu][sigma][lambda] = tmpDiatomicTwoElecsTwoCores[mu][nu][lambda][sigma];
+               tmpDiatomicTwoElecsTwoCores[mu][nu][sigma][lambda] = tmpDiatomicTwoElecsTwoCores[mu][nu][lambda][sigma];
             }
          }
       }
@@ -3677,10 +3962,10 @@ void Mndo::CalcDiatomicTwoElecTwoCore1stDerivatives(double***** matrix,
    // rotate matirix into the space frame
    this->CalcRotatingMatrix(tmpRotMat, atomA, atomB);
    this->CalcRotatingMatrix1stDerivatives(tmpRotMat1stDerivs, atomA, atomB);
-   this->RotateDiatomicTwoElecTwoCore1stDerivativesToSpaceFrame(matrix, 
-                                                                tmpDiatomicTwoElecTwoCore,
-                                                                tmpRotMat,
-                                                                tmpRotMat1stDerivs);
+   this->RotateDiatomicTwoElecsTwoCores1stDerivativesToSpaceFrame(matrix, 
+                                                                  tmpDiatomicTwoElecsTwoCores,
+                                                                  tmpRotMat,
+                                                                  tmpRotMat1stDerivs);
 }
 
 // Calculation of second derivatives of the two electrons two cores integral in space fixed frame,
@@ -3691,19 +3976,19 @@ void Mndo::CalcDiatomicTwoElecTwoCore1stDerivatives(double***** matrix,
 // Note that atomA != atomB.
 // Note taht d-orbital cannot be treated, 
 // that is, matrix[dxy][dxy][dxy][dxy][CartesianType_end][CartesianType_end] cannot be treatable.
-void Mndo::CalcDiatomicTwoElecTwoCore2ndDerivatives(double****** matrix, 
-                                                    double**     tmpRotMat,
-                                                    double***    tmpRotMat1stDerivs,
-                                                    double****   tmpRotMat2ndDerivs,
-                                                    double****   tmpDiatomicTwoElecTwoCore,
-                                                    double*****  tmpDiatomicTwoElecTwoCore1stDerivs,
-                                                    int indexAtomA, 
-                                                    int indexAtomB) const{
-   const Atom& atomA = *this->molecule->GetAtom(indexAtomA);
-   const Atom& atomB = *this->molecule->GetAtom(indexAtomB);
+void Mndo::CalcDiatomicTwoElecsTwoCores2ndDerivatives(double****** matrix, 
+                                                      double**     tmpRotMat,
+                                                      double***    tmpRotMat1stDerivs,
+                                                      double****   tmpRotMat2ndDerivs,
+                                                      double****   tmpDiatomicTwoElecsTwoCores,
+                                                      double*****  tmpDiatomicTwoElecsTwoCores1stDerivs,
+                                                      int indexAtomA, 
+                                                      int indexAtomB) const{
+   const Atom& atomA = *this->molecule->GetAtomVect()[indexAtomA];
+   const Atom& atomB = *this->molecule->GetAtomVect()[indexAtomB];
    if(indexAtomA == indexAtomB){
       stringstream ss;
-      ss << this->errorMessageCalcDiatomicTwoElecTwoCore2ndDerivativesSameAtoms;
+      ss << this->errorMessageCalcDiatomicTwoElecsTwoCores2ndDerivativesSameAtoms;
       ss << this->errorMessageAtomA << indexAtomA 
                                     << AtomTypeStr(atomA.GetAtomType()) << endl;
       ss << this->errorMessageAtomB << indexAtomB 
@@ -3713,7 +3998,7 @@ void Mndo::CalcDiatomicTwoElecTwoCore2ndDerivatives(double****** matrix,
 
 #ifdef MOLDS_DBG
    if(matrix == NULL){
-      throw MolDSException(this->errorMessageCalcDiatomicTwoElecTwoCore2ndDerivativesNullMatrix);
+      throw MolDSException(this->errorMessageCalcDiatomicTwoElecsTwoCores2ndDerivativesNullMatrix);
    }
 #endif
    MallocerFreer::GetInstance()->Initialize<double>(matrix, 
@@ -3742,7 +4027,7 @@ void Mndo::CalcDiatomicTwoElecTwoCore2ndDerivatives(double****** matrix,
                                 static_cast<CartesianType>(dimA1),
                                 static_cast<CartesianType>(dimA2));
                   }
-                  tmpDiatomicTwoElecTwoCore1stDerivs[mu][nu][lambda][sigma][dimA1] 
+                  tmpDiatomicTwoElecsTwoCores1stDerivs[mu][nu][lambda][sigma][dimA1] 
                      = this->GetNddoRepulsionIntegral1stDerivative(
                              atomA, 
                              atomA.GetValence(mu),
@@ -3752,7 +4037,7 @@ void Mndo::CalcDiatomicTwoElecTwoCore2ndDerivatives(double****** matrix,
                              atomB.GetValence(sigma),
                              static_cast<CartesianType>(dimA1));
                }  
-               tmpDiatomicTwoElecTwoCore[mu][nu][lambda][sigma] 
+               tmpDiatomicTwoElecsTwoCores[mu][nu][lambda][sigma] 
                   = this->GetNddoRepulsionIntegral(
                           atomA, 
                           atomA.GetValence(mu),
@@ -3769,19 +4054,21 @@ void Mndo::CalcDiatomicTwoElecTwoCore2ndDerivatives(double****** matrix,
    this->CalcRotatingMatrix(tmpRotMat, atomA, atomB);
    this->CalcRotatingMatrix1stDerivatives(tmpRotMat1stDerivs, atomA, atomB);
    this->CalcRotatingMatrix2ndDerivatives(tmpRotMat2ndDerivs, atomA, atomB);
-   this->RotateDiatomicTwoElecTwoCore2ndDerivativesToSpaceFrame(matrix, 
-                                                                tmpDiatomicTwoElecTwoCore,
-                                                                tmpDiatomicTwoElecTwoCore1stDerivs,
-                                                                tmpRotMat,
-                                                                tmpRotMat1stDerivs,
-                                                                tmpRotMat2ndDerivs);
+   this->RotateDiatomicTwoElecsTwoCores2ndDerivativesToSpaceFrame(matrix, 
+                                                                  tmpDiatomicTwoElecsTwoCores,
+                                                                  tmpDiatomicTwoElecsTwoCores1stDerivs,
+                                                                  tmpRotMat,
+                                                                  tmpRotMat1stDerivs,
+                                                                  tmpRotMat2ndDerivs);
 }
 
 // Rotate 4-dimensional matrix from diatomic frame to space frame
 // Note tha in this method d-orbitals can not be treatable.
-void Mndo::RotateDiatomicTwoElecTwoCoreToSpaceFrame(double****           matrix, 
-                                                    double const* const* rotatingMatrix,
-                                                    double**             tmpMatrixBC) const{
+void Mndo::RotateDiatomicTwoElecsTwoCoresToSpaceFrame(double****           matrix, 
+                                                      double*              tmpVec,
+                                                      double const* const* rotatingMatrix,
+                                                      double**             tmpMatrixBC,
+                                                      double*              tmpVectorBC) const{
    double oldMatrix[dxy][dxy][dxy][dxy];
    MolDS_wrappers::Blas::GetInstance()->Dcopy(dxy*dxy*dxy*dxy, &matrix[0][0][0][0], &oldMatrix[0][0][0][0]);
 
@@ -3818,7 +4105,9 @@ void Mndo::RotateDiatomicTwoElecTwoCoreToSpaceFrame(double****           matrix,
                                                &ptrTwiceRotatingMatrix[0],
                                                beta, 
                                                &ptrMatrix[0],
-                                               tmpMatrixBC);
+                                               tmpVec,
+                                               tmpMatrixBC,
+                                               tmpVectorBC);
 
    /*
    // rotate (slow algorithm)
@@ -3849,9 +4138,9 @@ void Mndo::RotateDiatomicTwoElecTwoCoreToSpaceFrame(double****           matrix,
 
 // Rotate 5-dimensional matrix from diatomic frame to space frame
 // Note tha in this method d-orbitals can not be treatable.
-void Mndo::RotateDiatomicTwoElecTwoCore1stDerivativesToSpaceFrame(
+void Mndo::RotateDiatomicTwoElecsTwoCores1stDerivativesToSpaceFrame(
            double***** matrix, 
-           double const* const*const* const* diatomicTwoElecTwoCore,
+           double const* const*const* const* diatomicTwoElecsTwoCores,
            double const* const* rotatingMatrix,
            double const* const* const* rotMat1stDerivatives) const{
 
@@ -3866,16 +4155,20 @@ void Mndo::RotateDiatomicTwoElecTwoCore1stDerivativesToSpaceFrame(
    double** twiceRotatingMatrixDerivB = NULL;
    double** oldMatrix                 = NULL;
    double** rotatedMatrix             = NULL;
+   double*  tmpRotatedVec             = NULL;
    double** tmpMatrix                 = NULL;
+   double*  tmpVector                 = NULL;
    double** ptrDiatomic               = NULL;
    try{
-      this->MallocTempMatricesRotateDiatomicTwoElecTwoCore1stDerivs(&twiceRotatingMatrix,
-                                                                    &twiceRotatingMatrixDerivA,
-                                                                    &twiceRotatingMatrixDerivB,
-                                                                    &oldMatrix,
-                                                                    &rotatedMatrix,
-                                                                    &tmpMatrix,                
-                                                                    &ptrDiatomic);
+      this->MallocTempMatricesRotateDiatomicTwoElecsTwoCores1stDerivs(&twiceRotatingMatrix,
+                                                                      &twiceRotatingMatrixDerivA,
+                                                                      &twiceRotatingMatrixDerivB,
+                                                                      &oldMatrix,
+                                                                      &rotatedMatrix,
+                                                                      &tmpRotatedVec,
+                                                                      &tmpMatrix,                
+                                                                      &tmpVector,                
+                                                                      &ptrDiatomic);
       for(int mu=0; mu<dxy; mu++){
          for(int nu=0; nu<dxy; nu++){
             int i=mu*dxy+nu;
@@ -3886,7 +4179,7 @@ void Mndo::RotateDiatomicTwoElecTwoCore1stDerivativesToSpaceFrame(
                                              *rotatingMatrix[nu][sigma ];
                }
             }
-            ptrDiatomic[i] = const_cast<double*>(&diatomicTwoElecTwoCore[mu][nu][0][0]);
+            ptrDiatomic[i] = const_cast<double*>(&diatomicTwoElecsTwoCores[mu][nu][0][0]);
          }
       }
       for(int axis=0; axis<CartesianType_end; axis++){
@@ -3917,7 +4210,9 @@ void Mndo::RotateDiatomicTwoElecTwoCore1stDerivativesToSpaceFrame(
                                                      twiceRotatingMatrix,
                                                      beta, 
                                                      rotatedMatrix,
-                                                     tmpMatrix);
+                                                     tmpRotatedVec,
+                                                     tmpMatrix,
+                                                     tmpVector);
          alpha = 1.0;
          beta  = 1.0;
          MolDS_wrappers::Blas::GetInstance()->Dgemmm(isColumnMajorTwiceRotatingMatrix,
@@ -3930,7 +4225,9 @@ void Mndo::RotateDiatomicTwoElecTwoCore1stDerivativesToSpaceFrame(
                                                      twiceRotatingMatrix,
                                                      beta, 
                                                      rotatedMatrix,
-                                                     tmpMatrix);
+                                                     tmpRotatedVec,
+                                                     tmpMatrix,
+                                                     tmpVector);
          MolDS_wrappers::Blas::GetInstance()->Dgemmm(isColumnMajorTwiceRotatingMatrix,
                                                      isColumnMajorOldMatrix,
                                                      !isColumnMajorTwiceRotatingMatrix,
@@ -3941,7 +4238,9 @@ void Mndo::RotateDiatomicTwoElecTwoCore1stDerivativesToSpaceFrame(
                                                      twiceRotatingMatrix,
                                                      beta, 
                                                      rotatedMatrix,
-                                                     tmpMatrix);
+                                                     tmpRotatedVec,
+                                                     tmpMatrix,
+                                                     tmpVector);
          MolDS_wrappers::Blas::GetInstance()->Dgemmm(isColumnMajorTwiceRotatingMatrix,
                                                      isColumnMajorOldMatrix,
                                                      !isColumnMajorTwiceRotatingMatrix,
@@ -3952,7 +4251,9 @@ void Mndo::RotateDiatomicTwoElecTwoCore1stDerivativesToSpaceFrame(
                                                      twiceRotatingMatrixDerivA,
                                                      beta, 
                                                      rotatedMatrix,
-                                                     tmpMatrix);
+                                                     tmpRotatedVec,
+                                                     tmpMatrix,
+                                                     tmpVector);
          MolDS_wrappers::Blas::GetInstance()->Dgemmm(isColumnMajorTwiceRotatingMatrix,
                                                      isColumnMajorOldMatrix,
                                                      !isColumnMajorTwiceRotatingMatrix,
@@ -3963,7 +4264,9 @@ void Mndo::RotateDiatomicTwoElecTwoCore1stDerivativesToSpaceFrame(
                                                      twiceRotatingMatrixDerivB,
                                                      beta, 
                                                      rotatedMatrix,
-                                                     tmpMatrix);
+                                                     tmpRotatedVec,
+                                                     tmpMatrix,
+                                                     tmpVector);
 
          MolDS_wrappers::Blas::GetInstance()->Dcopy(dxy*dxy*dxy*dxy, 
                                                     &rotatedMatrix[0][0]     , incrementOne,
@@ -3971,22 +4274,26 @@ void Mndo::RotateDiatomicTwoElecTwoCore1stDerivativesToSpaceFrame(
       }
    }
    catch(MolDSException ex){
-      this->FreeTempMatricesRotateDiatomicTwoElecTwoCore1stDerivs(&twiceRotatingMatrix,
-                                                                  &twiceRotatingMatrixDerivA,
-                                                                  &twiceRotatingMatrixDerivB,
-                                                                  &oldMatrix,
-                                                                  &rotatedMatrix,
-                                                                  &tmpMatrix,                
-                                                                  &ptrDiatomic);
+      this->FreeTempMatricesRotateDiatomicTwoElecsTwoCores1stDerivs(&twiceRotatingMatrix,
+                                                                    &twiceRotatingMatrixDerivA,
+                                                                    &twiceRotatingMatrixDerivB,
+                                                                    &oldMatrix,
+                                                                    &rotatedMatrix,
+                                                                    &tmpRotatedVec,
+                                                                    &tmpMatrix,                
+                                                                    &tmpVector,                
+                                                                    &ptrDiatomic);
       throw ex;
    }
-   this->FreeTempMatricesRotateDiatomicTwoElecTwoCore1stDerivs(&twiceRotatingMatrix,
-                                                               &twiceRotatingMatrixDerivA,
-                                                               &twiceRotatingMatrixDerivB,
-                                                               &oldMatrix,
-                                                               &rotatedMatrix,
-                                                               &tmpMatrix,                
-                                                               &ptrDiatomic);
+   this->FreeTempMatricesRotateDiatomicTwoElecsTwoCores1stDerivs(&twiceRotatingMatrix,
+                                                                 &twiceRotatingMatrixDerivA,
+                                                                 &twiceRotatingMatrixDerivB,
+                                                                 &oldMatrix,
+                                                                 &rotatedMatrix,
+                                                                 &tmpRotatedVec,
+                                                                 &tmpMatrix,                
+                                                                 &tmpVector,                
+                                                                 &ptrDiatomic);
 
    /*
    // rotate (slow algorithm)
@@ -4007,25 +4314,25 @@ void Mndo::RotateDiatomicTwoElecTwoCore1stDerivativesToSpaceFrame(
                                    *rotatingMatrix[lambda][k] 
                                    *rotatingMatrix[sigma][l];
                               matrix[mu][nu][lambda][sigma][c] 
-                                 += diatomicTwoElecTwoCore[i][j][k][l]
+                                 += diatomicTwoElecsTwoCores[i][j][k][l]
                                    *rotMat1stDerivatives[mu][i][c]
                                    *rotatingMatrix[nu][j] 
                                    *rotatingMatrix[lambda][k] 
                                    *rotatingMatrix[sigma][l];
                               matrix[mu][nu][lambda][sigma][c] 
-                                 += diatomicTwoElecTwoCore[i][j][k][l]
+                                 += diatomicTwoElecsTwoCores[i][j][k][l]
                                    *rotatingMatrix[mu][i] 
                                    *rotMat1stDerivatives[nu][j][c]
                                    *rotatingMatrix[lambda][k] 
                                    *rotatingMatrix[sigma][l];
                               matrix[mu][nu][lambda][sigma][c] 
-                                 += diatomicTwoElecTwoCore[i][j][k][l]
+                                 += diatomicTwoElecsTwoCores[i][j][k][l]
                                    *rotatingMatrix[mu][i] 
                                    *rotatingMatrix[nu][j] 
                                    *rotMat1stDerivatives[lambda][k][c]
                                    *rotatingMatrix[sigma][l];
                               matrix[mu][nu][lambda][sigma][c] 
-                                 += diatomicTwoElecTwoCore[i][j][k][l]
+                                 += diatomicTwoElecsTwoCores[i][j][k][l]
                                    *rotatingMatrix[mu][i] 
                                    *rotatingMatrix[nu][j] 
                                    *rotatingMatrix[lambda][k] 
@@ -4042,44 +4349,52 @@ void Mndo::RotateDiatomicTwoElecTwoCore1stDerivativesToSpaceFrame(
    */
 }
 
-void Mndo::MallocTempMatricesRotateDiatomicTwoElecTwoCore1stDerivs(double*** twiceRotatingMatrix,
-                                                                   double*** twiceRotatingMatrixDerivA,
-                                                                   double*** twiceRotatingMatrixDerivB,
-                                                                   double*** oldMatrix,
-                                                                   double*** rotatedMatrix,
-                                                                   double*** tmpMatrix,                
-                                                                   double*** ptrDiatomic) const{
+void Mndo::MallocTempMatricesRotateDiatomicTwoElecsTwoCores1stDerivs(double*** twiceRotatingMatrix,
+                                                                     double*** twiceRotatingMatrixDerivA,
+                                                                     double*** twiceRotatingMatrixDerivB,
+                                                                     double*** oldMatrix,
+                                                                     double*** rotatedMatrix,
+                                                                     double**  tmpRotatedVec,
+                                                                     double*** tmpMatrix,                
+                                                                     double**  tmpVector,                
+                                                                     double*** ptrDiatomic) const{
    MallocerFreer::GetInstance()->Malloc<double>(twiceRotatingMatrix,       dxy*dxy, dxy*dxy);
    MallocerFreer::GetInstance()->Malloc<double>(twiceRotatingMatrixDerivA, dxy*dxy, dxy*dxy);
    MallocerFreer::GetInstance()->Malloc<double>(twiceRotatingMatrixDerivB, dxy*dxy, dxy*dxy);
    MallocerFreer::GetInstance()->Malloc<double>(oldMatrix,                 dxy*dxy, dxy*dxy);
    MallocerFreer::GetInstance()->Malloc<double>(rotatedMatrix,             dxy*dxy, dxy*dxy);
+   MallocerFreer::GetInstance()->Malloc<double>(tmpRotatedVec,             dxy*dxy*dxy*dxy);
    MallocerFreer::GetInstance()->Malloc<double>(tmpMatrix,                 dxy*dxy, dxy*dxy);
+   MallocerFreer::GetInstance()->Malloc<double>(tmpVector,                 dxy*dxy*dxy*dxy);
    MallocerFreer::GetInstance()->Malloc<double*>(ptrDiatomic,              dxy*dxy);
 }
 
-void Mndo::FreeTempMatricesRotateDiatomicTwoElecTwoCore1stDerivs(double*** twiceRotatingMatrix,
-                                                                 double*** twiceRotatingMatrixDerivA,
-                                                                 double*** twiceRotatingMatrixDerivB,
-                                                                 double*** oldMatrix,
-                                                                 double*** rotatedMatrix,
-                                                                 double*** tmpMatrix,                
-                                                                 double*** ptrDiatomic) const{
+void Mndo::FreeTempMatricesRotateDiatomicTwoElecsTwoCores1stDerivs(double*** twiceRotatingMatrix,
+                                                                   double*** twiceRotatingMatrixDerivA,
+                                                                   double*** twiceRotatingMatrixDerivB,
+                                                                   double*** oldMatrix,
+                                                                   double*** rotatedMatrix,
+                                                                   double**  tmpRotatedVec,
+                                                                   double*** tmpMatrix,                
+                                                                   double**  tmpVector,                
+                                                                   double*** ptrDiatomic) const{
    MallocerFreer::GetInstance()->Free<double>(twiceRotatingMatrix,       dxy*dxy, dxy*dxy);
    MallocerFreer::GetInstance()->Free<double>(twiceRotatingMatrixDerivA, dxy*dxy, dxy*dxy);
    MallocerFreer::GetInstance()->Free<double>(twiceRotatingMatrixDerivB, dxy*dxy, dxy*dxy);
    MallocerFreer::GetInstance()->Free<double>(oldMatrix,                 dxy*dxy, dxy*dxy);
-   MallocerFreer::GetInstance()->Free<double>(rotatedMatrix,                 dxy*dxy, dxy*dxy);
+   MallocerFreer::GetInstance()->Free<double>(rotatedMatrix,             dxy*dxy, dxy*dxy);
+   MallocerFreer::GetInstance()->Free<double>(tmpRotatedVec,             dxy*dxy*dxy*dxy);
    MallocerFreer::GetInstance()->Free<double>(tmpMatrix,                 dxy*dxy, dxy*dxy);
+   MallocerFreer::GetInstance()->Free<double>(tmpVector,                 dxy*dxy*dxy*dxy);
    MallocerFreer::GetInstance()->Free<double*>(ptrDiatomic,              dxy*dxy);
 }
 
 // Rotate 6-dimensional matrix from diatomic frame to space frame
 // Note tha in this method d-orbitals can not be treatable.
-void Mndo::RotateDiatomicTwoElecTwoCore2ndDerivativesToSpaceFrame(
+void Mndo::RotateDiatomicTwoElecsTwoCores2ndDerivativesToSpaceFrame(
            double****** matrix, 
-           double const* const* const* const* diatomicTwoElecTwoCore,
-           double const* const* const* const* const* diatomicTwoElecTwoCore1stDerivatives,
+           double const* const* const* const* diatomicTwoElecsTwoCores,
+           double const* const* const* const* const* diatomicTwoElecsTwoCores1stDerivatives,
            double const* const* rotatingMatrix,
            double const* const* const* rotMat1stDerivatives,
            double const* const* const* const* rotMat2ndDerivatives) const{
@@ -4123,18 +4438,18 @@ void Mndo::RotateDiatomicTwoElecTwoCore2ndDerivativesToSpaceFrame(
                                  MallocerFreer::GetInstance()->Initialize<double>(tempIJK, numberTerms);
                                  for(int l=s; l<dxy; l++){
                                     
-                                    tempIJK[0]  += oldMatrix             [i][j][k][l][dimA1][dimA2]*rotatingMatrix      [sigma][l];
-                                    tempIJK[1]  += diatomicTwoElecTwoCore[i][j][k][l]              *rotatingMatrix      [sigma][l];
-                                    tempIJK[4]  += diatomicTwoElecTwoCore[i][j][k][l]              *rotMat2ndDerivatives[sigma][l][dimA1][dimA2];
+                                    tempIJK[0]  += oldMatrix               [i][j][k][l][dimA1][dimA2]*rotatingMatrix      [sigma][l];
+                                    tempIJK[1]  += diatomicTwoElecsTwoCores[i][j][k][l]              *rotatingMatrix      [sigma][l];
+                                    tempIJK[4]  += diatomicTwoElecsTwoCores[i][j][k][l]              *rotMat2ndDerivatives[sigma][l][dimA1][dimA2];
 
-                                    tempIJK[5]  += diatomicTwoElecTwoCore1stDerivatives[i][j][k][l][dimA1]*rotatingMatrix      [sigma][l];
-                                    tempIJK[8]  += diatomicTwoElecTwoCore1stDerivatives[i][j][k][l][dimA1]*rotMat1stDerivatives[sigma][l][dimA2];
+                                    tempIJK[5]  += diatomicTwoElecsTwoCores1stDerivatives[i][j][k][l][dimA1]*rotatingMatrix      [sigma][l];
+                                    tempIJK[8]  += diatomicTwoElecsTwoCores1stDerivatives[i][j][k][l][dimA1]*rotMat1stDerivatives[sigma][l][dimA2];
 
-                                    tempIJK[9]  += diatomicTwoElecTwoCore1stDerivatives[i][j][k][l][dimA2]*rotatingMatrix      [sigma][l];
-                                    tempIJK[12] += diatomicTwoElecTwoCore              [i][j][k][l]       *rotMat1stDerivatives[sigma][l][dimA2];
+                                    tempIJK[9]  += diatomicTwoElecsTwoCores1stDerivatives[i][j][k][l][dimA2]*rotatingMatrix      [sigma][l];
+                                    tempIJK[12] += diatomicTwoElecsTwoCores              [i][j][k][l]       *rotMat1stDerivatives[sigma][l][dimA2];
 
-                                    tempIJK[21] += diatomicTwoElecTwoCore1stDerivatives[i][j][k][l][dimA2]*rotMat1stDerivatives[sigma][l][dimA1];
-                                    tempIJK[22] += diatomicTwoElecTwoCore              [i][j][k][l]       *rotMat1stDerivatives[sigma][l][dimA1];
+                                    tempIJK[21] += diatomicTwoElecsTwoCores1stDerivatives[i][j][k][l][dimA2]*rotMat1stDerivatives[sigma][l][dimA1];
+                                    tempIJK[22] += diatomicTwoElecsTwoCores              [i][j][k][l]       *rotMat1stDerivatives[sigma][l][dimA1];
                                  }
                                  tempIJ[0]  += tempIJK[0] *rotatingMatrix      [lambda][k];
                                  tempIJ[1]  += tempIJK[1] *rotatingMatrix      [lambda][k];
@@ -4245,154 +4560,154 @@ void Mndo::RotateDiatomicTwoElecTwoCore2ndDerivativesToSpaceFrame(
                                          *rotatingMatrix         [lambda][k] 
                                          *rotatingMatrix         [sigma ][l];
                                  // term1
-                                 value += diatomicTwoElecTwoCore[i][j][k][l]
-                                         *rotMat2ndDerivatives[mu    ][i][dimA1][dimA2]
+                                 value += diatomicTwoElecsTwoCores[i][j][k][l]
+                                         *rotMat2ndDerivatives   [mu    ][i][dimA1][dimA2]
                                          *rotatingMatrix         [nu    ][j] 
                                          *rotatingMatrix         [lambda][k] 
                                          *rotatingMatrix         [sigma ][l];
                                  // term2
-                                 value += diatomicTwoElecTwoCore[i][j][k][l]
+                                 value += diatomicTwoElecsTwoCores[i][j][k][l]
                                          *rotatingMatrix         [mu    ][i] 
-                                         *rotMat2ndDerivatives[nu    ][j][dimA1][dimA2]
+                                         *rotMat2ndDerivatives   [nu    ][j][dimA1][dimA2]
                                          *rotatingMatrix         [lambda][k] 
                                          *rotatingMatrix         [sigma ][l];
                                  // term3
-                                 value += diatomicTwoElecTwoCore[i][j][k][l]
+                                 value += diatomicTwoElecsTwoCores[i][j][k][l]
                                          *rotatingMatrix         [mu    ][i] 
                                          *rotatingMatrix         [nu    ][j] 
-                                         *rotMat2ndDerivatives[lambda][k][dimA1][dimA2]
+                                         *rotMat2ndDerivatives   [lambda][k][dimA1][dimA2]
                                          *rotatingMatrix         [sigma ][l];
                                  // term4
-                                 value += diatomicTwoElecTwoCore[i][j][k][l]
+                                 value += diatomicTwoElecsTwoCores[i][j][k][l]
                                          *rotatingMatrix         [mu    ][i] 
                                          *rotatingMatrix         [nu    ][j] 
                                          *rotatingMatrix         [lambda][k] 
-                                         *rotMat2ndDerivatives[sigma ][l][dimA1][dimA2];
+                                         *rotMat2ndDerivatives   [sigma ][l][dimA1][dimA2];
                                  
                                  // term5
-                                 value += diatomicTwoElecTwoCore1stDerivatives[i][j][k][l][dimA1]
-                                         *rotMat1stDerivatives[mu    ][i][dimA2]
-                                         *rotatingMatrix        [nu    ][j] 
-                                         *rotatingMatrix        [lambda][k] 
-                                         *rotatingMatrix        [sigma ][l];
+                                 value += diatomicTwoElecsTwoCores1stDerivatives[i][j][k][l][dimA1]
+                                         *rotMat1stDerivatives   [mu    ][i][dimA2]
+                                         *rotatingMatrix         [nu    ][j] 
+                                         *rotatingMatrix         [lambda][k] 
+                                         *rotatingMatrix         [sigma ][l];
                                  // term6
-                                 value += diatomicTwoElecTwoCore1stDerivatives[i][j][k][l][dimA1]
-                                         *rotatingMatrix        [mu    ][i] 
-                                         *rotMat1stDerivatives[nu    ][j][dimA2]
-                                         *rotatingMatrix        [lambda][k] 
-                                         *rotatingMatrix        [sigma ][l];
+                                 value += diatomicTwoElecsTwoCores1stDerivatives[i][j][k][l][dimA1]
+                                         *rotatingMatrix         [mu    ][i] 
+                                         *rotMat1stDerivatives   [nu    ][j][dimA2]
+                                         *rotatingMatrix         [lambda][k] 
+                                         *rotatingMatrix         [sigma ][l];
                                  // term7
-                                 value += diatomicTwoElecTwoCore1stDerivatives[i][j][k][l][dimA1]
-                                         *rotatingMatrix        [mu    ][i] 
-                                         *rotatingMatrix        [nu    ][j] 
-                                         *rotMat1stDerivatives[lambda][k][dimA2]
-                                         *rotatingMatrix        [sigma ][l];
+                                 value += diatomicTwoElecsTwoCores1stDerivatives[i][j][k][l][dimA1]
+                                         *rotatingMatrix         [mu    ][i] 
+                                         *rotatingMatrix         [nu    ][j] 
+                                         *rotMat1stDerivatives   [lambda][k][dimA2]
+                                         *rotatingMatrix         [sigma ][l];
                                  // term8
-                                 value += diatomicTwoElecTwoCore1stDerivatives[i][j][k][l][dimA1]
-                                         *rotatingMatrix        [mu    ][i]
-                                         *rotatingMatrix        [nu    ][j]
-                                         *rotatingMatrix        [lambda][k] 
-                                         *rotMat1stDerivatives[sigma ][l][dimA2];
+                                 value += diatomicTwoElecsTwoCores1stDerivatives[i][j][k][l][dimA1]
+                                         *rotatingMatrix         [mu    ][i]
+                                         *rotatingMatrix         [nu    ][j]
+                                         *rotatingMatrix         [lambda][k] 
+                                         *rotMat1stDerivatives   [sigma ][l][dimA2];
 
                                  // term9
-                                 value += diatomicTwoElecTwoCore1stDerivatives[i][j][k][l][dimA2]
-                                         *rotMat1stDerivatives[mu    ][i][dimA1]
-                                         *rotatingMatrix        [nu    ][j] 
-                                         *rotatingMatrix        [lambda][k] 
-                                         *rotatingMatrix        [sigma ][l];
+                                 value += diatomicTwoElecsTwoCores1stDerivatives[i][j][k][l][dimA2]
+                                         *rotMat1stDerivatives   [mu    ][i][dimA1]
+                                         *rotatingMatrix         [nu    ][j] 
+                                         *rotatingMatrix         [lambda][k] 
+                                         *rotatingMatrix         [sigma ][l];
                                  // term10
-                                 value += diatomicTwoElecTwoCore[i][j][k][l]
-                                         *rotMat1stDerivatives[mu    ][i][dimA1]
-                                         *rotMat1stDerivatives[nu    ][j][dimA2]
-                                         *rotatingMatrix        [lambda][k] 
-                                         *rotatingMatrix        [sigma ][l];
+                                 value += diatomicTwoElecsTwoCores[i][j][k][l]
+                                         *rotMat1stDerivatives   [mu    ][i][dimA1]
+                                         *rotMat1stDerivatives   [nu    ][j][dimA2]
+                                         *rotatingMatrix         [lambda][k] 
+                                         *rotatingMatrix         [sigma ][l];
                                  // term11
-                                 value += diatomicTwoElecTwoCore[i][j][k][l]
-                                         *rotMat1stDerivatives[mu    ][i][dimA1]
-                                         *rotatingMatrix        [nu    ][j] 
-                                         *rotMat1stDerivatives[lambda][k][dimA2]
-                                         *rotatingMatrix        [sigma ][l];
+                                 value += diatomicTwoElecsTwoCores[i][j][k][l]
+                                         *rotMat1stDerivatives   [mu    ][i][dimA1]
+                                         *rotatingMatrix         [nu    ][j] 
+                                         *rotMat1stDerivatives   [lambda][k][dimA2]
+                                         *rotatingMatrix         [sigma ][l];
                                  // term12
-                                 value += diatomicTwoElecTwoCore[i][j][k][l]
-                                         *rotMat1stDerivatives[mu    ][i][dimA1]
-                                         *rotatingMatrix        [nu    ][j]
-                                         *rotatingMatrix        [lambda][k] 
-                                         *rotMat1stDerivatives[sigma ][l][dimA2];
+                                 value += diatomicTwoElecsTwoCores[i][j][k][l]
+                                         *rotMat1stDerivatives   [mu    ][i][dimA1]
+                                         *rotatingMatrix         [nu    ][j]
+                                         *rotatingMatrix         [lambda][k] 
+                                         *rotMat1stDerivatives   [sigma ][l][dimA2];
 
                                  // term13
-                                 value += diatomicTwoElecTwoCore1stDerivatives[i][j][k][l][dimA2]
-                                         *rotatingMatrix        [mu    ][i] 
-                                         *rotMat1stDerivatives[nu    ][j][dimA1]
-                                         *rotatingMatrix        [lambda][k] 
-                                         *rotatingMatrix        [sigma ][l];
+                                 value += diatomicTwoElecsTwoCores1stDerivatives[i][j][k][l][dimA2]
+                                         *rotatingMatrix         [mu    ][i] 
+                                         *rotMat1stDerivatives   [nu    ][j][dimA1]
+                                         *rotatingMatrix         [lambda][k] 
+                                         *rotatingMatrix         [sigma ][l];
                                  // term14
-                                 value += diatomicTwoElecTwoCore[i][j][k][l]
-                                         *rotMat1stDerivatives[mu    ][i][dimA2]
-                                         *rotMat1stDerivatives[nu    ][j][dimA1]
-                                         *rotatingMatrix        [lambda][k] 
-                                         *rotatingMatrix        [sigma ][l];
+                                 value += diatomicTwoElecsTwoCores[i][j][k][l]
+                                         *rotMat1stDerivatives   [mu    ][i][dimA2]
+                                         *rotMat1stDerivatives   [nu    ][j][dimA1]
+                                         *rotatingMatrix         [lambda][k] 
+                                         *rotatingMatrix         [sigma ][l];
                                  // term15
-                                 value += diatomicTwoElecTwoCore[i][j][k][l]
-                                         *rotatingMatrix        [mu    ][i] 
-                                         *rotMat1stDerivatives[nu    ][j][dimA1]
-                                         *rotMat1stDerivatives[lambda][k][dimA2]
-                                         *rotatingMatrix        [sigma ][l];
+                                 value += diatomicTwoElecsTwoCores[i][j][k][l]
+                                         *rotatingMatrix         [mu    ][i] 
+                                         *rotMat1stDerivatives   [nu    ][j][dimA1]
+                                         *rotMat1stDerivatives   [lambda][k][dimA2]
+                                         *rotatingMatrix         [sigma ][l];
                                  // term16
-                                 value += diatomicTwoElecTwoCore[i][j][k][l]
-                                         *rotatingMatrix        [mu    ][i] 
-                                         *rotMat1stDerivatives[nu    ][j][dimA1]
-                                         *rotatingMatrix        [lambda][k] 
-                                         *rotMat1stDerivatives[sigma ][l][dimA2];
+                                 value += diatomicTwoElecsTwoCores[i][j][k][l]
+                                         *rotatingMatrix         [mu    ][i] 
+                                         *rotMat1stDerivatives   [nu    ][j][dimA1]
+                                         *rotatingMatrix         [lambda][k] 
+                                         *rotMat1stDerivatives   [sigma ][l][dimA2];
 
                                  // term17
-                                 value += diatomicTwoElecTwoCore1stDerivatives[i][j][k][l][dimA2]
-                                         *rotatingMatrix        [mu    ][i] 
-                                         *rotatingMatrix        [nu    ][j] 
-                                         *rotMat1stDerivatives[lambda][k][dimA1]
-                                         *rotatingMatrix        [sigma ][l];
+                                 value += diatomicTwoElecsTwoCores1stDerivatives[i][j][k][l][dimA2]
+                                         *rotatingMatrix         [mu    ][i] 
+                                         *rotatingMatrix         [nu    ][j] 
+                                         *rotMat1stDerivatives   [lambda][k][dimA1]
+                                         *rotatingMatrix         [sigma ][l];
                                  // term18
-                                 value += diatomicTwoElecTwoCore[i][j][k][l]
-                                         *rotMat1stDerivatives[mu    ][i][dimA2]
-                                         *rotatingMatrix        [nu    ][j] 
-                                         *rotMat1stDerivatives[lambda][k][dimA1]
-                                         *rotatingMatrix        [sigma ][l];
+                                 value += diatomicTwoElecsTwoCores[i][j][k][l]
+                                         *rotMat1stDerivatives   [mu    ][i][dimA2]
+                                         *rotatingMatrix         [nu    ][j] 
+                                         *rotMat1stDerivatives   [lambda][k][dimA1]
+                                         *rotatingMatrix         [sigma ][l];
                                  // term19
-                                 value += diatomicTwoElecTwoCore[i][j][k][l]
-                                         *rotatingMatrix        [mu    ][i] 
-                                         *rotMat1stDerivatives[nu    ][j][dimA2]
-                                         *rotMat1stDerivatives[lambda][k][dimA1]
-                                         *rotatingMatrix        [sigma ][l];
+                                 value += diatomicTwoElecsTwoCores[i][j][k][l]
+                                         *rotatingMatrix         [mu    ][i] 
+                                         *rotMat1stDerivatives   [nu    ][j][dimA2]
+                                         *rotMat1stDerivatives   [lambda][k][dimA1]
+                                         *rotatingMatrix         [sigma ][l];
                                  // term20
-                                 value += diatomicTwoElecTwoCore[i][j][k][l]
-                                         *rotatingMatrix        [mu    ][i] 
-                                         *rotatingMatrix        [nu    ][j] 
-                                         *rotMat1stDerivatives[lambda][k][dimA1]
-                                         *rotMat1stDerivatives[sigma ][l][dimA2];
+                                 value += diatomicTwoElecsTwoCores[i][j][k][l]
+                                         *rotatingMatrix         [mu    ][i] 
+                                         *rotatingMatrix         [nu    ][j] 
+                                         *rotMat1stDerivatives   [lambda][k][dimA1]
+                                         *rotMat1stDerivatives   [sigma ][l][dimA2];
                                  
                                  // term21
-                                 value += diatomicTwoElecTwoCore1stDerivatives[i][j][k][l][dimA2]
-                                         *rotatingMatrix        [mu    ][i] 
-                                         *rotatingMatrix        [nu    ][j] 
-                                         *rotatingMatrix        [lambda][k] 
-                                         *rotMat1stDerivatives[sigma ][l][dimA1];
+                                 value += diatomicTwoElecsTwoCores1stDerivatives[i][j][k][l][dimA2]
+                                         *rotatingMatrix         [mu    ][i] 
+                                         *rotatingMatrix         [nu    ][j] 
+                                         *rotatingMatrix         [lambda][k] 
+                                         *rotMat1stDerivatives   [sigma ][l][dimA1];
                                  // term22
-                                 value += diatomicTwoElecTwoCore[i][j][k][l]
-                                         *rotMat1stDerivatives[mu    ][i][dimA2]
-                                         *rotatingMatrix        [nu    ][j] 
-                                         *rotatingMatrix        [lambda][k] 
-                                         *rotMat1stDerivatives[sigma ][l][dimA1];
+                                 value += diatomicTwoElecsTwoCores[i][j][k][l]
+                                         *rotMat1stDerivatives   [mu    ][i][dimA2]
+                                         *rotatingMatrix         [nu    ][j] 
+                                         *rotatingMatrix         [lambda][k] 
+                                         *rotMat1stDerivatives   [sigma ][l][dimA1];
                                  // term23
-                                 value += diatomicTwoElecTwoCore[i][j][k][l]
-                                         *rotatingMatrix        [mu    ][i] 
-                                         *rotMat1stDerivatives[nu    ][j][dimA2]
-                                         *rotatingMatrix        [lambda][k] 
-                                         *rotMat1stDerivatives[sigma ][l][dimA1];
+                                 value += diatomicTwoElecsTwoCores[i][j][k][l]
+                                         *rotatingMatrix         [mu    ][i] 
+                                         *rotMat1stDerivatives   [nu    ][j][dimA2]
+                                         *rotatingMatrix         [lambda][k] 
+                                         *rotMat1stDerivatives   [sigma ][l][dimA1];
                                  // term24
-                                 value += diatomicTwoElecTwoCore[i][j][k][l]
-                                         *rotatingMatrix        [mu    ][i] 
-                                         *rotatingMatrix        [nu    ][j] 
-                                         *rotMat1stDerivatives[lambda][k][dimA2]
-                                         *rotMat1stDerivatives[sigma ][l][dimA1];
+                                 value += diatomicTwoElecsTwoCores[i][j][k][l]
+                                         *rotatingMatrix         [mu    ][i] 
+                                         *rotatingMatrix         [nu    ][j] 
+                                         *rotMat1stDerivatives   [lambda][k][dimA2]
+                                         *rotMat1stDerivatives   [sigma ][l][dimA1];
                               }
                            }
                         }
@@ -4418,14 +4733,24 @@ double Mndo::GetNddoRepulsionIntegral(const Atom& atomA,
                                       OrbitalType lambda, 
                                       OrbitalType sigma) const{
    double value = 0.0;
-   double DA=0.0;
-   double DB=0.0;
-   double rhoA = 0.0;
-   double rhoB = 0.0;
-   double rAB = this->molecule->GetDistanceAtoms(atomA, atomB);
-   int lA = 0;
-   int lB = 0;
-   // (28) in [DT_1977]
+   double rAB = 0.0;
+   if(atomA.GetAtomType() != EPC && atomB.GetAtomType() != EPC){
+      rAB = this->molecule->GetDistanceAtoms(atomA, atomB);
+   }
+   else if(atomA.GetAtomType() != EPC && atomB.GetAtomType() == EPC){
+      rAB = this->molecule->GetDistanceAtomEpc(atomA, atomB);
+   }
+   else if(atomA.GetAtomType() == EPC && atomB.GetAtomType() != EPC){
+      rAB = this->molecule->GetDistanceAtomEpc(atomB, atomA);
+   }
+   else{
+      stringstream ss;
+      ss << this->errorMessageGetNddoRepulsionIntegralBadAtomTypes;
+      ss << this->errorMessageAtomA << AtomTypeStr(atomA.GetAtomType()) << endl;
+      ss << this->errorMessageAtomB << AtomTypeStr(atomB.GetAtomType()) << endl;
+      throw MolDSException(ss.str());
+   }
+
    if(mu == s && nu == s && lambda == s && sigma == s){
       value = this->GetSemiEmpiricalMultipoleInteraction(atomA, atomB, sQ, sQ, rAB);
    }
@@ -4765,14 +5090,8 @@ double Mndo::GetNddoRepulsionIntegral1stDerivative(
                                        const Atom& atomB, OrbitalType lambda, OrbitalType sigma,
                                        CartesianType axisA) const{
    double value = 0.0;
-   double DA=0.0;
-   double DB=0.0;
-   double rhoA = 0.0;
-   double rhoB = 0.0;
    double rAB = this->molecule->GetDistanceAtoms(atomA, atomB);
    double drABDa = (atomA.GetXyz()[axisA] - atomB.GetXyz()[axisA])/rAB;
-   int lA = 0;
-   int lB = 0;
    // (28) in [DT_1977]
    if(mu == s && nu == s && lambda == s && sigma == s){
       value = this->GetSemiEmpiricalMultipoleInteraction1stDerivative(atomA, atomB, sQ, sQ, rAB);
@@ -5189,18 +5508,12 @@ double Mndo::GetNddoRepulsionIntegral2ndDerivative(
                                        CartesianType axisA1,
                                        CartesianType axisA2) const{
    double value = 0.0;
-   double DA=0.0;
-   double DB=0.0;
-   double rhoA = 0.0;
-   double rhoB = 0.0;
    double rAB = this->molecule->GetDistanceAtoms(atomA, atomB);
    double cartesian[CartesianType_end] = {atomA.GetXyz()[XAxis] - atomB.GetXyz()[XAxis], 
                                           atomA.GetXyz()[YAxis] - atomB.GetXyz()[YAxis],
                                           atomA.GetXyz()[ZAxis] - atomB.GetXyz()[ZAxis]};
    double deriv1st=0.0; // first derivative of semi empirical multipole interaction
    double deriv2nd=0.0; // second derivative of semi empirical multipole interaction
-   int lA = 0;
-   int lB = 0;
    // (28) in [DT_1977]
    if(mu == s && nu == s && lambda == s && sigma == s){
       deriv1st = this->GetSemiEmpiricalMultipoleInteraction1stDerivative(atomA, atomB, sQ, sQ, rAB);
@@ -6119,7 +6432,6 @@ double Mndo::GetNddoRepulsionIntegral2ndDerivative(
    return value;
 }
 
-// See Apendix in [DT_1977]
 double Mndo::GetSemiEmpiricalMultipoleInteraction(const Atom& atomA,
                                                   const Atom& atomB,
                                                   MultipoleType multipoleA,
@@ -6128,8 +6440,27 @@ double Mndo::GetSemiEmpiricalMultipoleInteraction(const Atom& atomA,
    double value = 0.0;
    double DA = atomA.GetNddoDerivedParameterD(this->theory, multipoleA);
    double DB = atomB.GetNddoDerivedParameterD(this->theory, multipoleB);
-   double rhoA = atomA.GetNddoDerivedParameterRho(this->theory, multipoleA);
-   double rhoB = atomB.GetNddoDerivedParameterRho(this->theory, multipoleB);
+   double rhoA = 0.0; 
+   double rhoB = 0.0; 
+   if(atomA.GetAtomType() != EPC && atomB.GetAtomType() != EPC){
+      rhoA = atomA.GetNddoDerivedParameterRho(this->theory, multipoleA);
+      rhoB = atomB.GetNddoDerivedParameterRho(this->theory, multipoleB);
+   }
+   else if(atomA.GetAtomType() != EPC && atomB.GetAtomType() == EPC){
+      rhoA = 0.0;
+      rhoB = 0.0;
+   }
+   else if(atomA.GetAtomType() == EPC && atomB.GetAtomType() != EPC){
+      rhoA = 0.0;
+      rhoB = 0.0;
+   }
+   else{
+      stringstream ss;
+      ss << this->errorMessageGetSemiEmpiricalMultipoleInteractionBadAtomTypes;
+      ss << this->errorMessageAtomA << AtomTypeStr(atomA.GetAtomType()) << endl;
+      ss << this->errorMessageAtomB << AtomTypeStr(atomB.GetAtomType()) << endl;
+      throw MolDSException(ss.str());
+   }
    double a = rhoA + rhoB;
 
    // Eq. (52) in [DT_1977]
