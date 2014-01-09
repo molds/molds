@@ -110,6 +110,9 @@
 /* Define to 1 if you have the <mkl.h> header file. */
 #undef HAVE_MKL_H
 
+/* Define to 1 if you have the <mkl_lapacke.h> header file. */
+#undef HAVE_MKL_LAPACKE_H
+
 /* Define if you have the MPI library. */
 #undef HAVE_MPI
 

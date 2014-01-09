@@ -7477,7 +7477,7 @@ See \`config.log' for more details" "$LINENO" 5; }
 fi
 
 LIBS="$LAPACK_LIBS $LIBS"
-for ac_header in mkl.h lapacke.h
+for ac_header in mkl_lapacke.h lapacke.h
 do :
   as_ac_Header=`$as_echo "ac_cv_header_$ac_header" | $as_tr_sh`
 ac_fn_cxx_check_header_mongrel "$LINENO" "$ac_header" "$as_ac_Header" "$ac_includes_default"
@@ -7493,7 +7493,7 @@ done
 if test "x$molds_lapack_header_found" != "xyes"; then :
   { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
 $as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
-as_fn_error $? "Cannot find mkl.h or lapacke.h!
+as_fn_error $? "Cannot find mkl_lapacke.h or lapacke.h!
 See \`config.log' for more details" "$LINENO" 5; }
 fi
 
