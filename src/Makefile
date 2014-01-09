@@ -1,5 +1,5 @@
 #//************************************************************************//
-#// Copyright (C) 2012-2012 Katsuhiko Nishimra                             // 
+#// Copyright (C) 2012-2014 Katsuhiko Nishimra                             // 
 #//                                                                        // 
 #// This file is part of MolDS.                                            // 
 #//                                                                        // 
@@ -36,18 +36,20 @@ else
    override CONFIGURE_OPTIONS += --with-boost=$(BOOSTDIR)
 endif
 
-all: MolDS.out
+OUTPUT=molds
+
+all: $(OUTPUT)
 
 build/Makefile:
 	mkdir -p build
 	cd build; \
 	../configure $(CONFIGURE_OPTIONS) CXXFLAGS='$(CXXFLAGS)' LDFLAGS='$(LDFLAGS)'
 
-build/MolDS: build/Makefile $(wildcard *.cpp) $(wildcard */*.cpp) $(wildcard */*.h)
+build/$(OUTPUT): build/Makefile $(wildcard *.cpp) $(wildcard */*.cpp) $(wildcard */*.h)
 	+make -C build
 
-MolDS.out: build/MolDS
+$(OUTPUT): build/$(OUTPUT)
 	install $< $@
 
 clean:
-	rm -rf build MolDS.out
+	rm -rf build $(OUTPUT)
