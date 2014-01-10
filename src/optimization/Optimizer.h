@@ -48,6 +48,7 @@ public:
 protected:
    std::string errorMessageNotEnebleTheoryType;
    std::string errorMessageGeometyrOptimizationNotConverged;
+   std::string errorMessageFailedToDowncastState;
    std::string messageLineSearchSteps;
    virtual void SetMessages();
    void UpdateMolecularCoordinates(MolDS_base::Molecule& molecule, double const* const* matrixForce, double dt) const;

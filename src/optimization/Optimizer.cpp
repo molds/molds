@@ -89,6 +89,8 @@ void Optimizer::Optimize(Molecule& molecule){
 void Optimizer::SetMessages(){
    this->errorMessageTheoryType = "\ttheory type = ";
    this->errorMessageTotalSteps = "\tTotal steps = ";
+   this->errorMessageFailedToDowncastState
+      = "Failed to downcast Optimizer::OptimizerState!";
    this->messageGeometyrOptimizationMetConvergence 
       = "\t\tGeometry otimization met convergence criterion(^^b\n\n\n";
    this->messageStartGeometryOptimization = "**********  START: Geometry optimization  **********\n";

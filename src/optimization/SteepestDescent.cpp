@@ -90,8 +90,7 @@ void SteepestDescent::SearchMinimum(boost::shared_ptr<ElectronicStructure> elect
       // do line search
       this->LineSearch(electronicStructure, molecule, state.GetCurrentEnergyRef(), state.GetMatrixForce(), elecState, dt);
 
-      // update force
-      state.SetMatrixForce(electronicStructure->GetForce(elecState));
+      this->UpdateSearchDirection(state, electronicStructure, molecule, elecState);
 
       // check convergence
       if(this->SatisfiesConvergenceCriterion(state.GetMatrixForce(),
@@ -103,11 +102,16 @@ void SteepestDescent::SearchMinimum(boost::shared_ptr<ElectronicStructure> elect
          *obtainesOptimizedStructure = true;
          break;
       }
-
    }
+
    *lineSearchedEnergy = state.GetCurrentEnergy();
 }
+
+void SteepestDescent::UpdateSearchDirection(OptimizerState& state,
+                                            boost::shared_ptr<ElectronicStructure> electronicStructure,
+                                            const MolDS_base::Molecule& molecule,
+                                            int elecState) const{
+      // update force
+      state.SetMatrixForce(electronicStructure->GetForce(elecState));
 }
-
-
-
+}
