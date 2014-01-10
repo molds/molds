@@ -35,7 +35,8 @@ protected:
       double& GetCurrentEnergyRef(){return this->currentEnergy;}
       double GetCurrentEnergy(){return this->currentEnergy;}
       double GetInitialEnergy(){return this->initialEnergy;}
-      double const* const* GetMatrixForce(){return this->matrixForce;}
+      double const* const*  GetMatrixForce(){return this->matrixForce;}
+      double const* const** GetMatrixForcePtr(){return &this->matrixForce;}
       void SetCurrentEnergy(double currentEnergy){this->currentEnergy = currentEnergy;}
       void SetInitialEnergy(double initialEnergy){this->initialEnergy = initialEnergy;}
       void SetMatrixForce(double const* const* matrixForce){this->matrixForce = matrixForce;}

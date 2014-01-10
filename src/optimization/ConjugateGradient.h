@@ -22,6 +22,18 @@
 namespace MolDS_optimization{
 
 class ConjugateGradient : public MolDS_optimization::Optimizer{
+private:
+   class ConjugateGradientState: public OptimizerState{
+   private:
+      double** oldMatrixForce;
+      double** matrixSearchDirection;
+      size_t numAtoms;
+   public:
+      ConjugateGradientState(MolDS_base::Molecule& molecule);
+      virtual ~ConjugateGradientState();
+      double** GetOldMatrixForce(){return this->oldMatrixForce;}
+      double** GetMatrixSearchDirection(){return this->matrixSearchDirection;}
+   };
 public:
    ConjugateGradient();
    ~ConjugateGradient();
