@@ -24,7 +24,7 @@ namespace MolDS_optimization{
 class Optimizer : public MolDS_base::PrintController{
 protected:
    class OptimizerState{
-   private:
+   protected:
       double currentEnergy;
       double initialEnergy;
       double const* const* matrixForce;

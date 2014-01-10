@@ -22,6 +22,33 @@
 namespace MolDS_optimization{
 
 class BFGS : public MolDS_optimization::Optimizer{
+private:
+   class BFGSState: public OptimizerState{
+   protected:
+      double** matrixHessian;
+      double** matrixOldForce;
+      double** matrixStep;
+      double** matrixOldCoordinates;
+      double*  vectorOldCoordinates;
+      double** matrixDisplacement;
+      size_t numAtoms;
+   private:
+      template<class vector>
+      vector Matrix2Vector(vector const* matrix){return matrix == NULL ? NULL : &matrix[0][0];}
+   public:
+      BFGSState(MolDS_base::Molecule& molecule);
+      virtual ~BFGSState();
+      double const* GetVectorForce         (){return this->Matrix2Vector(this->matrixForce);}
+      double*       GetVectorOldForce      (){return this->Matrix2Vector(this->matrixOldForce);}
+      double*       GetVectorStep          (){return this->Matrix2Vector(this->matrixStep);}
+      double const* GetVectorOldCoordinates(){return this->Matrix2Vector(this->matrixOldCoordinates);}
+      double**  GetMatrixHessian()          {return this->matrixHessian;}
+      double**  GetMatrixOldForce()         {return this->matrixOldForce;}
+      double**  GetMatrixStep()             {return this->matrixStep;}
+      double**  GetMatrixOldCoordinates()   {return this->matrixOldCoordinates;}
+      double**& GetMatrixOldCoordinatesRef(){return this->matrixOldCoordinates;}
+      double**  GetMatrixDisplacement()     {return this->matrixDisplacement;}
+   };
 public:
    BFGS();
    ~BFGS();
@@ -56,8 +83,8 @@ protected:
                     double const* vectorForce,
                     const double maxNormStep,
                     const int dimension) const;
-   void CalcDisplacement(double      *      *& matrixDisplacement,
-                         double const* const*  matrixOldCoordinates,
+   void CalcDisplacement(double      *      * matrixDisplacement,
+                         double const* const* matrixOldCoordinates,
                          const MolDS_base::Molecule& molecule)const;
    void UpdateHessian(double**      matrixHessian,
                       const int     dimension,
