@@ -74,32 +74,30 @@ void SteepestDescent::SearchMinimum(boost::shared_ptr<ElectronicStructure> elect
    int    totalSteps           = Parameters::GetInstance()->GetTotalStepsOptimization();
    double maxGradientThreshold = Parameters::GetInstance()->GetMaxGradientOptimization();
    double rmsGradientThreshold = Parameters::GetInstance()->GetRmsGradientOptimization();
-   double lineSearchCurrentEnergy   = 0.0;
-   double lineSearchInitialEnergy   = 0.0;
-   double const* const* matrixForce = NULL;
+   OptimizerState state;
 
    // initial calculation
    bool requireGuess = true;
    this->UpdateElectronicStructure(electronicStructure, molecule, requireGuess, this->CanOutputLogs());
 
    requireGuess = false;
-   matrixForce = electronicStructure->GetForce(elecState);
-   lineSearchCurrentEnergy = electronicStructure->GetElectronicEnergy(elecState);
+   state.SetMatrixForce(electronicStructure->GetForce(elecState));
+   state.SetCurrentEnergy(electronicStructure->GetElectronicEnergy(elecState));
    for(int s=0; s<totalSteps; s++){
       this->OutputLog(boost::format("%s%d\n\n") % this->messageStartSteepestDescentStep.c_str() % (s+1));
-      lineSearchInitialEnergy = lineSearchCurrentEnergy;
+      state.SetInitialEnergy(state.GetCurrentEnergy());
 
       // do line search
-      this->LineSearch(electronicStructure, molecule, lineSearchCurrentEnergy, matrixForce, elecState, dt);
+      this->LineSearch(electronicStructure, molecule, state.GetCurrentEnergyRef(), state.GetMatrixForce(), elecState, dt);
 
       // update force
-      matrixForce = electronicStructure->GetForce(elecState);
+      state.SetMatrixForce(electronicStructure->GetForce(elecState));
 
       // check convergence
-      if(this->SatisfiesConvergenceCriterion(matrixForce, 
+      if(this->SatisfiesConvergenceCriterion(state.GetMatrixForce(),
                                              molecule,
-                                             lineSearchInitialEnergy, 
-                                             lineSearchCurrentEnergy,
+                                             state.GetInitialEnergy(),
+                                             state.GetCurrentEnergy(),
                                              maxGradientThreshold, 
                                              rmsGradientThreshold)){
          *obtainesOptimizedStructure = true;
@@ -107,7 +105,7 @@ void SteepestDescent::SearchMinimum(boost::shared_ptr<ElectronicStructure> elect
       }
 
    }
-   *lineSearchedEnergy = lineSearchCurrentEnergy;
+   *lineSearchedEnergy = state.GetCurrentEnergy();
 }
 }
 

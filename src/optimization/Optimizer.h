@@ -22,6 +22,24 @@
 namespace MolDS_optimization{
 
 class Optimizer : public MolDS_base::PrintController{
+protected:
+   class OptimizerState{
+   private:
+      double currentEnergy;
+      double initialEnergy;
+      double const* const* matrixForce;
+   public:
+      OptimizerState():
+         currentEnergy(0.0), initialEnergy(0.0), matrixForce(NULL){}
+      virtual ~OptimizerState(){}
+      double& GetCurrentEnergyRef(){return this->currentEnergy;}
+      double GetCurrentEnergy(){return this->currentEnergy;}
+      double GetInitialEnergy(){return this->initialEnergy;}
+      double const* const* GetMatrixForce(){return this->matrixForce;}
+      void SetCurrentEnergy(double currentEnergy){this->currentEnergy = currentEnergy;}
+      void SetInitialEnergy(double initialEnergy){this->initialEnergy = initialEnergy;}
+      void SetMatrixForce(double const* const* matrixForce){this->matrixForce = matrixForce;}
+   };
 public:
    Optimizer();
    virtual ~Optimizer();
