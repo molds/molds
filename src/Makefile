@@ -17,7 +17,7 @@
 #// along with MolDS.  If not, see <http://www.gnu.org/licenses/>.         // 
 #//************************************************************************//
 
-.PHONY: all clean
+.PHONY: all clean distclean
 CONFIGURE_OPTIONS =
 CFLAGS =
 CXXFLAGS =
@@ -52,4 +52,7 @@ $(OUTPUT): build/$(OUTPUT)
 	install $< $@
 
 clean:
+	+make -C build clean
+
+distclean:
 	rm -rf build $(OUTPUT)
