@@ -102,6 +102,7 @@ private:
                               MolDS_base::Molecule& molecule,
                               double* lineSearchedEnergy,
                               bool* obainesOptimizedStructure) const = 0;
+   virtual void InitializeState(OptimizerState &state, const MolDS_base::Molecule& molecule) const = 0;
 };
 
 }

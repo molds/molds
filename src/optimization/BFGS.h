@@ -78,6 +78,7 @@ private:
                               bool* obainesOptimizedStructure) const;
 
 protected:
+   void InitializeState(OptimizerState &state, const MolDS_base::Molecule& molecule) const;
    void CalcRFOStep(double* vectorStep,
                     double const* const* matrixHessian,
                     double const* vectorForce,

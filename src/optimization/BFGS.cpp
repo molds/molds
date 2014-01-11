@@ -139,10 +139,6 @@ void BFGS::SearchMinimum(boost::shared_ptr<ElectronicStructure> electronicStruct
    const double maxNormStep      = Parameters::GetInstance()->GetMaxNormStepOptimization();
    BFGSState state(molecule);
 
-   // initialize Hessian with unit matrix
-   const double one = 1;
-   MolDS_wrappers::Blas::GetInstance()->Dcopy(dimension, &one, 0, &state.GetMatrixHessian()[0][0], dimension+1);
-
    // initial calculation
    bool requireGuess = true;
    this->UpdateElectronicStructure(electronicStructure, molecule, requireGuess, this->CanOutputLogs());
@@ -150,6 +146,8 @@ void BFGS::SearchMinimum(boost::shared_ptr<ElectronicStructure> electronicStruct
 
    requireGuess = false;
    state.SetMatrixForce(electronicStructure->GetForce(elecState));
+
+   this->InitializeState(state, molecule);
 
    for(int s=0; s<totalSteps; s++){
       this->OutputLog(boost::format("%s%d\n\n") % this->messageStartBFGSStep % (s+1));
@@ -226,6 +224,14 @@ void BFGS::SearchMinimum(boost::shared_ptr<ElectronicStructure> electronicStruct
       }
    }
    *lineSearchedEnergy = state.GetCurrentEnergy();
+}
+
+void BFGS::InitializeState(OptimizerState &stateOrig, const Molecule& molecule) const{
+   const MolDS_wrappers::molds_blas_int dimension = molecule.GetAtomVect().size()*CartesianType_end;
+   const double one = 1;
+   BFGSState& state = stateOrig.CastRef<BFGSState>();
+   // initialize Hessian with unit matrix
+   MolDS_wrappers::Blas::GetInstance()->Dcopy(dimension, &one, 0, &state.GetMatrixHessian()[0][0], dimension+1);
 }
 
 void BFGS::CalcRFOStep(double* vectorStep,
