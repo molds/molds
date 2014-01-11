@@ -49,6 +49,12 @@ using namespace MolDS_base_atoms;
 using namespace MolDS_base_factories;
 
 namespace MolDS_optimization{
+
+void Optimizer::OptimizerState::SetMessages(){
+   this->errorMessageFailedToDowncastState
+      = "Failed to downcast Optimizer::OptimizerState!";
+}
+
 Optimizer::Optimizer(){
    this->SetEnableTheoryTypes();
    //this->OutputLog("Optimizer created\n");
@@ -89,8 +95,6 @@ void Optimizer::Optimize(Molecule& molecule){
 void Optimizer::SetMessages(){
    this->errorMessageTheoryType = "\ttheory type = ";
    this->errorMessageTotalSteps = "\tTotal steps = ";
-   this->errorMessageFailedToDowncastState
-      = "Failed to downcast Optimizer::OptimizerState!";
    this->messageGeometyrOptimizationMetConvergence 
       = "\t\tGeometry otimization met convergence criterion(^^b\n\n\n";
    this->messageStartGeometryOptimization = "**********  START: Geometry optimization  **********\n";

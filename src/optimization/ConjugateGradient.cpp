@@ -131,32 +131,27 @@ void ConjugateGradient::UpdateSearchDirection(OptimizerState& stateOrig,
                                               boost::shared_ptr<ElectronicStructure> electronicStructure, 
                                               const MolDS_base::Molecule& molecule,
                                               int elecState) const{
-   try{
-      ConjugateGradientState& state = dynamic_cast<ConjugateGradientState&>(stateOrig);
-      for(int a=0;a<molecule.GetAtomVect().size();a++){
-         for(int i=0; i<CartesianType_end; i++){
-            state.GetOldMatrixForce()[a][i] = state.GetMatrixForce()[a][i];
-         }
-      }
-      state.SetMatrixForce(electronicStructure->GetForce(elecState));
-      double beta=0.0;
-      double temp=0.0;
-      for(int a=0;a<molecule.GetAtomVect().size();a++){
-         for(int i=0; i<CartesianType_end; i++){
-            temp += pow(state.GetOldMatrixForce()[a][i],2.0);
-            beta += (state.GetMatrixForce()[a][i] - state.GetOldMatrixForce()[a][i])*state.GetMatrixForce()[a][i];
-         }
-      }
-      beta /= temp;
-      for(int a=0;a<molecule.GetAtomVect().size();a++){
-         for(int i=0; i<CartesianType_end; i++){
-            state.GetMatrixSearchDirection()[a][i] *= beta;
-            state.GetMatrixSearchDirection()[a][i] += state.GetMatrixForce()[a][i];
-         }
+   ConjugateGradientState& state = stateOrig.CastRef<ConjugateGradientState>();
+   for(int a=0;a<molecule.GetAtomVect().size();a++){
+      for(int i=0; i<CartesianType_end; i++){
+         state.GetOldMatrixForce()[a][i] = state.GetMatrixForce()[a][i];
       }
    }
-   catch(std::bad_cast& ex){
-      throw MolDSException(this->errorMessageFailedToDowncastState);
+   state.SetMatrixForce(electronicStructure->GetForce(elecState));
+   double beta=0.0;
+   double temp=0.0;
+   for(int a=0;a<molecule.GetAtomVect().size();a++){
+      for(int i=0; i<CartesianType_end; i++){
+         temp += pow(state.GetOldMatrixForce()[a][i],2.0);
+         beta += (state.GetMatrixForce()[a][i] - state.GetOldMatrixForce()[a][i])*state.GetMatrixForce()[a][i];
+      }
+   }
+   beta /= temp;
+   for(int a=0;a<molecule.GetAtomVect().size();a++){
+      for(int i=0; i<CartesianType_end; i++){
+         state.GetMatrixSearchDirection()[a][i] *= beta;
+         state.GetMatrixSearchDirection()[a][i] += state.GetMatrixForce()[a][i];
+      }
    }
 }
 

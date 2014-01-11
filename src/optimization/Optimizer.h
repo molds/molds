@@ -28,9 +28,11 @@ protected:
       double currentEnergy;
       double initialEnergy;
       double const* const* matrixForce;
+      std::string errorMessageFailedToDowncastState;
+      virtual void SetMessages();
    public:
       OptimizerState():
-         currentEnergy(0.0), initialEnergy(0.0), matrixForce(NULL){}
+         currentEnergy(0.0), initialEnergy(0.0), matrixForce(NULL){this->SetMessages();}
       virtual ~OptimizerState(){}
       double& GetCurrentEnergyRef(){return this->currentEnergy;}
       double GetCurrentEnergy(){return this->currentEnergy;}
@@ -40,6 +42,15 @@ protected:
       void SetCurrentEnergy(double currentEnergy){this->currentEnergy = currentEnergy;}
       void SetInitialEnergy(double initialEnergy){this->initialEnergy = initialEnergy;}
       void SetMatrixForce(double const* const* matrixForce){this->matrixForce = matrixForce;}
+      template<class State>
+      State& CastRef(){
+         try{
+            return dynamic_cast<State&>(*this);
+         }
+         catch(std::bad_cast& ex){
+            throw MolDS_base::MolDSException(this->errorMessageFailedToDowncastState);
+         }
+      }
    };
 public:
    Optimizer();
@@ -48,7 +59,6 @@ public:
 protected:
    std::string errorMessageNotEnebleTheoryType;
    std::string errorMessageGeometyrOptimizationNotConverged;
-   std::string errorMessageFailedToDowncastState;
    std::string messageLineSearchSteps;
    virtual void SetMessages();
    void UpdateMolecularCoordinates(MolDS_base::Molecule& molecule, double const* const* matrixForce, double dt) const;
