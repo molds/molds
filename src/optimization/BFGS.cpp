@@ -135,9 +135,9 @@ void BFGS::SearchMinimum(boost::shared_ptr<ElectronicStructure> electronicStruct
    double maxGradientThreshold = Parameters::GetInstance()->GetMaxGradientOptimization();
    double rmsGradientThreshold = Parameters::GetInstance()->GetRmsGradientOptimization();
    const int dimension = molecule.GetAtomVect().size()*CartesianType_end;
-   double       trustRadius      = Parameters::GetInstance()->GetInitialTrustRadiusOptimization();
-   const double maxNormStep      = Parameters::GetInstance()->GetMaxNormStepOptimization();
    BFGSState state(molecule);
+   state.SetTrustRadius(Parameters::GetInstance()->GetInitialTrustRadiusOptimization());
+   state.SetMaxNormStep(Parameters::GetInstance()->GetMaxNormStepOptimization());
 
    // initial calculation
    bool requireGuess = true;
@@ -152,23 +152,7 @@ void BFGS::SearchMinimum(boost::shared_ptr<ElectronicStructure> electronicStruct
    for(int s=0; s<totalSteps; s++){
       this->OutputOptimizationStepMessage(s);
 
-      // Store old Force data
-      MolDS_wrappers::Blas::GetInstance()->Dcopy(dimension,
-                                                 static_cast<double const*>(state.GetVectorForce()),
-                                                 state.GetVectorOldForce());
-
-      this->StoreMolecularGeometry(state.GetMatrixOldCoordinatesRef(), molecule);
-
-      // Level shift Hessian redundant modes
-      this->ShiftHessianRedundantMode(state.GetMatrixHessian(), molecule);
-
-      // Limit the trustRadius to maxNormStep
-      trustRadius=min(trustRadius,maxNormStep);
-
-      //Calculate RFO step
-      this->CalcRFOStep(state.GetVectorStep(), state.GetMatrixHessian(), state.GetVectorForce(), trustRadius, dimension);
-
-      double approximateChange = this->ApproximateEnergyChange(dimension, state.GetMatrixHessian(), state.GetVectorForce(), state.GetVectorStep());
+      this->PrepareState(state, molecule, electronicStructure, elecState);
 
       // Take a RFO step
       bool doLineSearch = false;
@@ -189,7 +173,7 @@ void BFGS::SearchMinimum(boost::shared_ptr<ElectronicStructure> electronicStruct
       }
       this->OutputMoleculeElectronicStructure(electronicStructure, molecule, this->CanOutputLogs());
 
-      this->UpdateTrustRadius(trustRadius, approximateChange, state.GetInitialEnergy(), state.GetCurrentEnergy());
+      this->UpdateTrustRadius(state.GetTrustRadiusRef(), state.GetApproximateChange(), state.GetInitialEnergy(), state.GetCurrentEnergy());
 
       // check convergence
       if(this->SatisfiesConvergenceCriterion(state.GetMatrixForce(),
@@ -232,6 +216,35 @@ void BFGS::InitializeState(OptimizerState &stateOrig, const Molecule& molecule) 
    BFGSState& state = stateOrig.CastRef<BFGSState>();
    // initialize Hessian with unit matrix
    MolDS_wrappers::Blas::GetInstance()->Dcopy(dimension, &one, 0, &state.GetMatrixHessian()[0][0], dimension+1);
+}
+
+void BFGS::PrepareState(OptimizerState& stateOrig,
+                        const MolDS_base::Molecule& molecule,
+                        const boost::shared_ptr<MolDS_base::ElectronicStructure> electronicStructure,
+                        const int elecState) const{
+   BFGSState& state = stateOrig.CastRef<BFGSState>();
+   const MolDS_wrappers::molds_blas_int dimension = molecule.GetAtomVect().size()*CartesianType_end;
+   // Store old Force data
+   MolDS_wrappers::Blas::GetInstance()->Dcopy(dimension,
+         static_cast<double const*>(state.GetVectorForce()),
+         state.GetVectorOldForce());
+
+   this->StoreMolecularGeometry(state.GetMatrixOldCoordinatesRef(), molecule);
+
+   // Level shift Hessian redundant modes
+   this->ShiftHessianRedundantMode(state.GetMatrixHessian(), molecule);
+
+   // Limit the trustRadius to maxNormStep
+   state.SetTrustRadius(min(state.GetTrustRadius(),state.GetMaxNormStep()));
+
+   //Calculate RFO step
+   this->CalcRFOStep(state.GetVectorStep(), state.GetMatrixHessian(), state.GetVectorForce(), state.GetTrustRadius(), dimension);
+
+   state.SetApproximateChange(this->ApproximateEnergyChange(dimension,
+                                                            state.GetMatrixHessian(),
+                                                            state.GetVectorForce(),
+                                                            state.GetVectorStep())
+                             );
 }
 
 void BFGS::CalcRFOStep(double* vectorStep,

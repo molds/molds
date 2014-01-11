@@ -31,6 +31,9 @@ private:
       double** matrixOldCoordinates;
       double*  vectorOldCoordinates;
       double** matrixDisplacement;
+      double   approximateChange;
+      double   trustRadius;
+      double   maxNormStep;
       size_t numAtoms;
    private:
       template<class vector>
@@ -48,6 +51,13 @@ private:
       double**  GetMatrixOldCoordinates()   {return this->matrixOldCoordinates;}
       double**& GetMatrixOldCoordinatesRef(){return this->matrixOldCoordinates;}
       double**  GetMatrixDisplacement()     {return this->matrixDisplacement;}
+      double    GetApproximateChange()      {return this->approximateChange;}
+      double    GetTrustRadius()            {return this->trustRadius;}
+      double&   GetTrustRadiusRef()         {return this->trustRadius;}
+      double    GetMaxNormStep()            {return this->maxNormStep;}
+      void      SetApproximateChange(double approximateChange){this->approximateChange = approximateChange;}
+      void      SetTrustRadius(double trustRadius)            {this->trustRadius       = trustRadius;}
+      void      SetMaxNormStep(double maxNormStep)            {this->maxNormStep       = maxNormStep;}
    };
 public:
    BFGS();
@@ -82,6 +92,10 @@ private:
 
 protected:
    void InitializeState(OptimizerState &state, const MolDS_base::Molecule& molecule) const;
+   void PrepareState(OptimizerState& state,
+                             const MolDS_base::Molecule& molecule,
+                             const boost::shared_ptr<MolDS_base::ElectronicStructure> electronicStructure,
+                             const int elecState) const;
    void CalcRFOStep(double* vectorStep,
                     double const* const* matrixHessian,
                     double const* vectorForce,

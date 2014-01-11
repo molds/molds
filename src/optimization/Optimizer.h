@@ -104,6 +104,10 @@ private:
                               double* lineSearchedEnergy,
                               bool* obainesOptimizedStructure) const = 0;
    virtual void InitializeState(OptimizerState &state, const MolDS_base::Molecule& molecule) const = 0;
+   virtual void PrepareState(OptimizerState& state,
+                             const MolDS_base::Molecule& molecule,
+                             const boost::shared_ptr<MolDS_base::ElectronicStructure> electronicStructure,
+                             const int elecState) const = 0;
    virtual const std::string& OptimizationStepMessage() const = 0;
 };
 

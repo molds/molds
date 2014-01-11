@@ -101,6 +101,9 @@ void ConjugateGradient::SearchMinimum(boost::shared_ptr<ElectronicStructure> ele
    // conugate gradient loop
    for(int s=0; s<totalSteps; s++){
       this->OutputOptimizationStepMessage(s);
+
+      this->PrepareState(state, molecule, electronicStructure, elecState);
+
       state.SetInitialEnergy(state.GetCurrentEnergy());
 
       // do line search
