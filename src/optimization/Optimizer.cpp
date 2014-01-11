@@ -195,6 +195,10 @@ void Optimizer::OutputMoleculeElectronicStructure(boost::shared_ptr<ElectronicSt
    }
 }
 
+void Optimizer::OutputOptimizationStepMessage(int nthStep) const{
+   this->OutputLog(boost::format("%s%d\n\n") % this->OptimizationStepMessage() % (nthStep+1));
+}
+
 void Optimizer::LineSearch(boost::shared_ptr<ElectronicStructure> electronicStructure,
                            MolDS_base::Molecule& molecule,
                            double& lineSearchCurrentEnergy,

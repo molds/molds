@@ -150,7 +150,7 @@ void BFGS::SearchMinimum(boost::shared_ptr<ElectronicStructure> electronicStruct
    this->InitializeState(state, molecule);
 
    for(int s=0; s<totalSteps; s++){
-      this->OutputLog(boost::format("%s%d\n\n") % this->messageStartBFGSStep % (s+1));
+      this->OutputOptimizationStepMessage(s);
 
       // Store old Force data
       MolDS_wrappers::Blas::GetInstance()->Dcopy(dimension,

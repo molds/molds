@@ -72,6 +72,9 @@ protected:
    std::string formatIncreaseScalingFactor;
 
 private:
+   const std::string& OptimizationStepMessage() const{
+      return this->messageStartBFGSStep;
+   }
    virtual void SearchMinimum(boost::shared_ptr<MolDS_base::ElectronicStructure> electronicStructure,
                               MolDS_base::Molecule& molecule,
                               double* lineSearchedEnergy,

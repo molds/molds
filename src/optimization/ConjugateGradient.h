@@ -41,6 +41,9 @@ protected:
    void SetMessages();
 private:
    std::string messageStartConjugateGradientStep;
+   const std::string& OptimizationStepMessage() const{
+      return this->messageStartConjugateGradientStep;
+   }
    void SearchMinimum(boost::shared_ptr<MolDS_base::ElectronicStructure> electronicStructure,
                       MolDS_base::Molecule& molecule,
                       double* lineSearchedEnergy,

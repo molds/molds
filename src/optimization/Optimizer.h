@@ -76,6 +76,7 @@ protected:
    void OutputMoleculeElectronicStructure(boost::shared_ptr<MolDS_base::ElectronicStructure> electronicStructure, 
                                           MolDS_base::Molecule& molecule,
                                           bool printsLogs) const;
+   void OutputOptimizationStepMessage(int nthStep) const;
    void LineSearch(boost::shared_ptr<MolDS_base::ElectronicStructure> electronicStructure,
                    MolDS_base::Molecule& molecule,
                    double &lineSearchCurrentEnergy,
@@ -103,6 +104,7 @@ private:
                               double* lineSearchedEnergy,
                               bool* obainesOptimizedStructure) const = 0;
    virtual void InitializeState(OptimizerState &state, const MolDS_base::Molecule& molecule) const = 0;
+   virtual const std::string& OptimizationStepMessage() const = 0;
 };
 
 }

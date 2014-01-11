@@ -29,6 +29,9 @@ protected:
    void SetMessages();
 private:
    std::string messageStartSteepestDescentStep;
+   const std::string& OptimizationStepMessage() const{
+      return this->messageStartSteepestDescentStep;
+   }
    void SearchMinimum(boost::shared_ptr<MolDS_base::ElectronicStructure> electronicStructure,
                       MolDS_base::Molecule& molecule,
                       double* lineSearchedEnergy,
