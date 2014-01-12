@@ -175,6 +175,8 @@ void BFGS::SearchMinimum(boost::shared_ptr<ElectronicStructure> electronicStruct
 
       this->UpdateTrustRadius(state.GetTrustRadiusRef(), state.GetApproximateChange(), state.GetInitialEnergy(), state.GetCurrentEnergy());
 
+      state.SetMatrixForce(electronicStructure->GetForce(elecState));
+
       // check convergence
       if(this->SatisfiesConvergenceCriterion(state.GetMatrixForce(),
                molecule,
@@ -196,8 +198,6 @@ void BFGS::SearchMinimum(boost::shared_ptr<ElectronicStructure> electronicStruct
          this->RollbackMolecularGeometry(molecule, state.GetMatrixOldCoordinates());
          state.SetCurrentEnergy(state.GetInitialEnergy());
       }
-
-      state.SetMatrixForce(electronicStructure->GetForce(elecState));
 
       // Update Hessian
       this->UpdateHessian(state.GetMatrixHessian(), dimension, state.GetVectorForce(), state.GetVectorOldForce(), &state.GetMatrixDisplacement()[0][0]);
