@@ -59,7 +59,7 @@ protected:
       void SetInitialEnergy(double initialEnergy){this->initialEnergy = initialEnergy;}
       void SetMatrixForce(double const* const* matrixForce){this->matrixForce = matrixForce;}
       template<class State>
-      State& CastRef(){
+      State& CastRef() throw(MolDS_base::MolDSException){
          try{
             return dynamic_cast<State&>(*this);
          }
