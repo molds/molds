@@ -35,8 +35,8 @@
 #
 # LICENSE
 #
-#   Copyright (c) 2008 Steven G. Johnson <stevenj@alum.mit.edu>
-#   Copyright (c) 2012 Katsuhiko Nishimra <ktns.87@gmail.com>
+#   Copyright (c) 2008       Steven G. Johnson <stevenj@alum.mit.edu>
+#   Copyright (c) 2012-2014  Katsuhiko Nishimra <ktns.87@gmail.com>
 #
 #   This program is free software: you can redistribute it and/or modify it
 #   under the terms of the GNU General Public License as published by the
@@ -82,6 +82,16 @@ case $with_blas in
 	*) BLAS_LIBS="-l$with_blas" ;;
 esac
 
+AC_ARG_WITH(mkl,
+              [AS_HELP_STRING([--with-mkl=<lib>], [use Intel MKL. you can specify --with-mkl=sequential/parallel to select parallelism. Default is sequential.])])
+case $with_mkl_thread in
+	yes | sequential | "")                ax_blas_mkl=-lmkl_sequential ;;
+	parallel | thread)                    ax_blas_mkl=-lmkl_intel_thread ;;
+	no)                                   ax_blas_mkl=no ;;
+	-* | */* | *.a | *.so | *.so.* | *.o) ax_blas_mkl="$with_mkl_thread" ;;
+	*)                                    ax_blas_mkl="-l$with_blas" ;;
+esac
+
 # Get fortran linker names of BLAS functions to check for.
 AC_F77_FUNC(sgemm)
 AC_F77_FUNC(dgemm)
@@ -110,37 +120,37 @@ if test $ax_blas_ok = no; then
 fi
 
 # BLAS in Intel MKL library?
-if test $ax_blas_ok = no; then
+if test $ax_blas_ok = no && test x$ax_blas_mkl != xno ; then
 	# MKL for gfortran
 	if test x"$ac_cv_fc_compiler_gnu" = xyes; then
 		# 64 bit
 		if test $host_cpu = x86_64; then
 			AC_CHECK_LIB(mkl_gf_ilp64, $sgemm,
-			[ax_blas_ok=yes;BLAS_LIBS="-lmkl_gf_ilp64 -lmkl_sequential -lmkl_core -lpthread"],,
-			[-lmkl_gf_ilp64 -lmkl_sequential -lmkl_core -lpthread])
+			[ax_blas_ok=yes;BLAS_LIBS="-lmkl_gf_ilp64 $ax_blas_mkl -lmkl_core -lpthread"],,
+			[-lmkl_gf_ilp64 $ax_blas_mkl -lmkl_core -lpthread])
 		# 32 bit
 		elif test $host_cpu = i686; then
 			AC_CHECK_LIB(mkl_gf, $sgemm,
-				[ax_blas_ok=yes;BLAS_LIBS="-lmkl_gf -lmkl_sequential -lmkl_core -lpthread"],,
-				[-lmkl_gf -lmkl_sequential -lmkl_core -lpthread])
+				[ax_blas_ok=yes;BLAS_LIBS="-lmkl_gf $ax_blas_mkl -lmkl_core -lpthread"],,
+				[-lmkl_gf $ax_blas_mkl -lmkl_core -lpthread])
 		fi
 	# MKL for other compilers (Intel, PGI, ...?)
 	else
 		# 64-bit
 		if test $host_cpu = x86_64; then
 			AC_CHECK_LIB(mkl_intel_ilp64, $sgemm,
-				[ax_blas_ok=yes;BLAS_LIBS="-lmkl_intel_ilp64 -lmkl_sequential -lmkl_core -lpthread"],,
-				[-lmkl_intel_ilp64 -lmkl_sequential -lmkl_core -lpthread])
+				[ax_blas_ok=yes;BLAS_LIBS="-lmkl_intel_ilp64 $ax_blas_mkl -lmkl_core -lpthread"],,
+				[-lmkl_intel_ilp64 $ax_blas_mkl -lmkl_core -lpthread])
 		# 32-bit
 		elif test $host_cpu = i686; then
 			AC_CHECK_LIB(mkl_intel, $sgemm,
-				[ax_blas_ok=yes;BLAS_LIBS="-lmkl_intel -lmkl_sequential -lmkl_core -lpthread"],,
-				[-lmkl_intel -lmkl_sequential -lmkl_core -lpthread])
+				[ax_blas_ok=yes;BLAS_LIBS="-lmkl_intel $ax_blas_mkl -lmkl_core -lpthread"],,
+				[-lmkl_intel $ax_blas_mkl -lmkl_core -lpthread])
 		fi
 	fi
 fi
 # Old versions of MKL
-if test $ax_blas_ok = no; then
+if test $ax_blas_ok = no && test x$ax_blas_mkl != xno ; then
 	AC_CHECK_LIB(mkl, $sgemm, [ax_blas_ok=yes;BLAS_LIBS="-lmkl -lguide -lpthread"],,[-lguide -lpthread])
 fi
 
