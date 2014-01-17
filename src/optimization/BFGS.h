@@ -102,6 +102,7 @@ protected:
                              boost::shared_ptr<MolDS_base::ElectronicStructure> electronicStructure,
                              const int elecState,
                              const double dt) const;
+   void UpdateState(OptimizerState& state) const;
    void CalcRFOStep(double* vectorStep,
                     double const* const* matrixHessian,
                     double const* vectorForce,

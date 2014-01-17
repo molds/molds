@@ -46,6 +46,7 @@ private:
                              boost::shared_ptr<MolDS_base::ElectronicStructure> electronicStructure,
                              const int elecState,
                              const double dt) const;
+   void UpdateState(OptimizerState& state) const;
    void UpdateSearchDirection(OptimizerState& state,
                               boost::shared_ptr<MolDS_base::ElectronicStructure> electronicStructure,
                               const MolDS_base::Molecule& molecule,

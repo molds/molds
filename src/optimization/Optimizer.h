@@ -129,6 +129,7 @@ private:
                                      boost::shared_ptr<MolDS_base::ElectronicStructure> electronicStructure,
                                      const int elecState,
                                      const double dt) const= 0;
+   virtual void UpdateState(OptimizerState& state) const = 0;
    virtual const std::string& OptimizationStepMessage() const = 0;
 };
 

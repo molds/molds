@@ -133,14 +133,12 @@ void BFGS::SearchMinimum(boost::shared_ptr<ElectronicStructure> electronicStruct
                          Molecule& molecule,
                          double* lineSearchedEnergy,
                          bool* obtainesOptimizedStructure) const {
-   const int dimension = molecule.GetAtomVect().size()*CartesianType_end;
    BFGSState state(molecule, electronicStructure);
 
    // initial calculation
    bool requireGuess = true;
    this->UpdateElectronicStructure(electronicStructure, molecule, requireGuess, this->CanOutputLogs());
    state.SetCurrentEnergy(electronicStructure->GetElectronicEnergy(state.GetElecState()));
-
    state.SetMatrixForce(electronicStructure->GetForce(state.GetElecState()));
 
    this->InitializeState(state, molecule);
@@ -152,9 +150,10 @@ void BFGS::SearchMinimum(boost::shared_ptr<ElectronicStructure> electronicStruct
 
       this->CalcNextStepGeometry(molecule, state, electronicStructure, state.GetElecState(), state.GetDeltaT());
 
-      this->UpdateTrustRadius(state.GetTrustRadiusRef(), state.GetApproximateChange(), state.GetInitialEnergy(), state.GetCurrentEnergy());
-
+      state.SetCurrentEnergy(electronicStructure->GetElectronicEnergy(state.GetElecState()));
       state.SetMatrixForce(electronicStructure->GetForce(state.GetElecState()));
+
+      this->UpdateState(state);
 
       // check convergence
       if(this->SatisfiesConvergenceCriterion(state.GetMatrixForce(),
@@ -165,25 +164,6 @@ void BFGS::SearchMinimum(boost::shared_ptr<ElectronicStructure> electronicStruct
                state.GetRmsGradientThreshold())){
          *obtainesOptimizedStructure = true;
          break;
-      }
-
-      //Calculate displacement (K_k at Eq. (15) in [SJTO_1983])
-      this->CalcDisplacement(state.GetMatrixDisplacement(), state.GetMatrixOldCoordinates(), molecule);
-
-      //Rollback geometry and energy if energy increases
-      bool isHillClimbing = state.GetCurrentEnergy() > state.GetInitialEnergy();
-      if(isHillClimbing){
-         this->OutputLog(this->messageHillClimbing);
-         this->RollbackMolecularGeometry(molecule, state.GetMatrixOldCoordinates());
-         state.SetCurrentEnergy(state.GetInitialEnergy());
-      }
-
-      // Update Hessian
-      this->UpdateHessian(state.GetMatrixHessian(), dimension, state.GetVectorForce(), state.GetVectorOldForce(), &state.GetMatrixDisplacement()[0][0]);
-
-      //Rollback gradient if energy increases
-      if(isHillClimbing){
-         state.SetMatrixForce(state.GetMatrixOldForce());
       }
    }
    *lineSearchedEnergy = state.GetCurrentEnergy();
@@ -255,6 +235,33 @@ void BFGS::CalcNextStepGeometry(Molecule &molecule,
    this->OutputMoleculeElectronicStructure(electronicStructure, molecule, this->CanOutputLogs());
 }
 
+void BFGS::UpdateState(OptimizerState& stateOrig) const{
+   BFGSState& state = stateOrig.CastRef<BFGSState>();
+   const MolDS_wrappers::molds_blas_int dimension = state.GetMolecule().GetAtomVect().size() * CartesianType_end;
+
+   this->UpdateTrustRadius(state.GetTrustRadiusRef(), state.GetApproximateChange(), state.GetInitialEnergy(), state.GetCurrentEnergy());
+
+   //Calculate displacement (K_k at Eq. (15) in [SJTO_1983])
+   this->CalcDisplacement(state.GetMatrixDisplacement(), state.GetMatrixOldCoordinates(), state.GetMolecule());
+
+   //Rollback geometry and energy if energy increases
+   bool isHillClimbing = state.GetCurrentEnergy() > state.GetInitialEnergy();
+   if(isHillClimbing){
+      this->OutputLog(this->messageHillClimbing);
+      this->RollbackMolecularGeometry(state.GetMolecule(), state.GetMatrixOldCoordinates());
+      state.SetCurrentEnergy(state.GetInitialEnergy());
+   }
+
+   state.SetMatrixForce(state.GetElectronicStructure()->GetForce(state.GetElecState()));
+
+   // Update Hessian
+   this->UpdateHessian(state.GetMatrixHessian(), dimension, state.GetVectorForce(), state.GetVectorOldForce(), &state.GetMatrixDisplacement()[0][0]);
+
+   //Rollback gradient if energy increases
+   if(isHillClimbing){
+      state.SetMatrixForce(state.GetMatrixOldForce());
+   }
+}
 void BFGS::CalcRFOStep(double* vectorStep,
                        double const* const* matrixHessian,
                        double const* vectorForce,
