@@ -37,6 +37,8 @@ protected:
       double const* const* matrixForce;
       std::string errorMessageFailedToDowncastState;
       virtual void SetMessages();
+   private:
+      OptimizerState(const OptimizerState&); // delete default copy constructor
    public:
       OptimizerState(MolDS_base::Molecule& molecule,
                      boost::shared_ptr<MolDS_base::ElectronicStructure>& electronicStructure);

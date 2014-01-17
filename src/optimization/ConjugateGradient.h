@@ -28,6 +28,7 @@ private:
       double** oldMatrixForce;
       double** matrixSearchDirection;
       size_t numAtoms;
+      ConjugateGradientState(const ConjugateGradientState&); // delete default copy constructor
    public:
       ConjugateGradientState(MolDS_base::Molecule& molecule,
                              boost::shared_ptr<MolDS_base::ElectronicStructure>& electronicStructure);
