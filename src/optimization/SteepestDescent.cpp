@@ -69,35 +69,30 @@ void SteepestDescent::SearchMinimum(boost::shared_ptr<ElectronicStructure> elect
                                     Molecule& molecule,
                                     double* lineSearchedEnergy,
                                     bool* obtainesOptimizedStructure) const{
-   int    elecState            = Parameters::GetInstance()->GetElectronicStateIndexOptimization();
-   double dt                   = Parameters::GetInstance()->GetTimeWidthOptimization();
-   int    totalSteps           = Parameters::GetInstance()->GetTotalStepsOptimization();
-   double maxGradientThreshold = Parameters::GetInstance()->GetMaxGradientOptimization();
-   double rmsGradientThreshold = Parameters::GetInstance()->GetRmsGradientOptimization();
-   OptimizerState state;
+   OptimizerState state(molecule, electronicStructure);
 
    // initial calculation
    bool requireGuess = true;
    this->UpdateElectronicStructure(electronicStructure, molecule, requireGuess, this->CanOutputLogs());
 
    requireGuess = false;
-   state.SetMatrixForce(electronicStructure->GetForce(elecState));
-   state.SetCurrentEnergy(electronicStructure->GetElectronicEnergy(elecState));
-   for(int s=0; s<totalSteps; s++){
+   state.SetMatrixForce(electronicStructure->GetForce(state.GetElecState()));
+   state.SetCurrentEnergy(electronicStructure->GetElectronicEnergy(state.GetElecState()));
+   for(int s=0; s<state.GetTotalSteps(); s++){
       this->OutputLog(boost::format("%s%d\n\n") % this->messageStartSteepestDescentStep.c_str() % (s+1));
       state.SetInitialEnergy(state.GetCurrentEnergy());
 
-      this->CalcNextStepGeometry(molecule, state, electronicStructure, elecState, dt);
+      this->CalcNextStepGeometry(molecule, state, electronicStructure, state.GetElecState(), state.GetDeltaT());
 
-      this->UpdateSearchDirection(state, electronicStructure, molecule, elecState);
+      this->UpdateSearchDirection(state, electronicStructure, molecule, state.GetElecState());
 
       // check convergence
       if(this->SatisfiesConvergenceCriterion(state.GetMatrixForce(),
                                              molecule,
                                              state.GetInitialEnergy(),
                                              state.GetCurrentEnergy(),
-                                             maxGradientThreshold, 
-                                             rmsGradientThreshold)){
+                                             state.GetMaxGradientThreshold(), 
+                                             state.GetRmsGradientThreshold())){
          *obtainesOptimizedStructure = true;
          break;
       }

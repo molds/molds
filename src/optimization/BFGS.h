@@ -39,7 +39,8 @@ private:
       template<class vector>
       vector Matrix2Vector(vector const* matrix){return matrix == NULL ? NULL : &matrix[0][0];}
    public:
-      BFGSState(MolDS_base::Molecule& molecule);
+      BFGSState(MolDS_base::Molecule& molecule,
+                boost::shared_ptr<MolDS_base::ElectronicStructure>& electronicStructure);
       virtual ~BFGSState();
       double const* GetVectorForce         (){return this->Matrix2Vector(this->matrixForce);}
       double*       GetVectorOldForce      (){return this->Matrix2Vector(this->matrixOldForce);}

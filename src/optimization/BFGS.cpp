@@ -53,13 +53,17 @@ using namespace MolDS_base_atoms;
 
 namespace MolDS_optimization{
 
-BFGS::BFGSState::BFGSState(Molecule& molecule):
-      matrixHessian(NULL),
-      matrixOldForce(NULL),
-      matrixStep(NULL),
-      matrixOldCoordinates(NULL),
-      matrixDisplacement(NULL),
-      numAtoms(molecule.GetAtomVect().size())
+BFGS::BFGSState::BFGSState(Molecule& molecule,
+                           boost::shared_ptr<ElectronicStructure>& electronicStructure):
+   OptimizerState(molecule, electronicStructure),
+   matrixHessian(NULL),
+   matrixOldForce(NULL),
+   matrixStep(NULL),
+   matrixOldCoordinates(NULL),
+   matrixDisplacement(NULL),
+   trustRadius(Parameters::GetInstance()->GetInitialTrustRadiusOptimization()),
+   maxNormStep(Parameters::GetInstance()->GetMaxNormStepOptimization()),
+   numAtoms(molecule.GetAtomVect().size())
 {
    const int dimension = numAtoms * CartesianType_end;
    MallocerFreer::GetInstance()->Malloc(&this->matrixHessian,        dimension,      dimension);
@@ -129,43 +133,36 @@ void BFGS::SearchMinimum(boost::shared_ptr<ElectronicStructure> electronicStruct
                          Molecule& molecule,
                          double* lineSearchedEnergy,
                          bool* obtainesOptimizedStructure) const {
-   int elecState = Parameters::GetInstance()->GetElectronicStateIndexOptimization();
-   double dt = Parameters::GetInstance()->GetTimeWidthOptimization();
-   int totalSteps = Parameters::GetInstance()->GetTotalStepsOptimization();
-   double maxGradientThreshold = Parameters::GetInstance()->GetMaxGradientOptimization();
-   double rmsGradientThreshold = Parameters::GetInstance()->GetRmsGradientOptimization();
    const int dimension = molecule.GetAtomVect().size()*CartesianType_end;
-   BFGSState state(molecule);
-   state.SetTrustRadius(Parameters::GetInstance()->GetInitialTrustRadiusOptimization());
-   state.SetMaxNormStep(Parameters::GetInstance()->GetMaxNormStepOptimization());
+   BFGSState state(molecule, electronicStructure);
 
    // initial calculation
    bool requireGuess = true;
    this->UpdateElectronicStructure(electronicStructure, molecule, requireGuess, this->CanOutputLogs());
-   state.SetCurrentEnergy(electronicStructure->GetElectronicEnergy(elecState));
+   state.SetCurrentEnergy(electronicStructure->GetElectronicEnergy(state.GetElecState()));
 
-   state.SetMatrixForce(electronicStructure->GetForce(elecState));
+   state.SetMatrixForce(electronicStructure->GetForce(state.GetElecState()));
 
    this->InitializeState(state, molecule);
 
-   for(int s=0; s<totalSteps; s++){
+   for(int s=0; s<state.GetTotalSteps(); s++){
       this->OutputOptimizationStepMessage(s);
 
-      this->PrepareState(state, molecule, electronicStructure, elecState);
+      this->PrepareState(state, molecule, electronicStructure, state.GetElecState());
 
-      this->CalcNextStepGeometry(molecule, state, electronicStructure, elecState, dt);
+      this->CalcNextStepGeometry(molecule, state, electronicStructure, state.GetElecState(), state.GetDeltaT());
 
       this->UpdateTrustRadius(state.GetTrustRadiusRef(), state.GetApproximateChange(), state.GetInitialEnergy(), state.GetCurrentEnergy());
 
-      state.SetMatrixForce(electronicStructure->GetForce(elecState));
+      state.SetMatrixForce(electronicStructure->GetForce(state.GetElecState()));
 
       // check convergence
       if(this->SatisfiesConvergenceCriterion(state.GetMatrixForce(),
                molecule,
                state.GetInitialEnergy(),
                state.GetCurrentEnergy(),
-               maxGradientThreshold,
-               rmsGradientThreshold)){
+               state.GetMaxGradientThreshold(),
+               state.GetRmsGradientThreshold())){
          *obtainesOptimizedStructure = true;
          break;
       }

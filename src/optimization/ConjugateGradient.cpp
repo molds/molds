@@ -48,8 +48,12 @@ using namespace MolDS_base_atoms;
 
 namespace MolDS_optimization{
 
-ConjugateGradient::ConjugateGradientState::ConjugateGradientState(Molecule& molecule):
-   OptimizerState(), oldMatrixForce(NULL), matrixSearchDirection(NULL), numAtoms(molecule.GetAtomVect().size()){
+ConjugateGradient::ConjugateGradientState::ConjugateGradientState(Molecule& molecule,
+                                                                  boost::shared_ptr<ElectronicStructure>& electronicStructure):
+   OptimizerState(molecule, electronicStructure),
+   oldMatrixForce(NULL),
+   matrixSearchDirection(NULL),
+   numAtoms(molecule.GetAtomVect().size()){
    MallocerFreer::GetInstance()->Malloc<double>(&this->oldMatrixForce       , this->numAtoms, CartesianType_end);
    MallocerFreer::GetInstance()->Malloc<double>(&this->matrixSearchDirection, this->numAtoms, CartesianType_end);
 }
@@ -81,40 +85,35 @@ void ConjugateGradient::SearchMinimum(boost::shared_ptr<ElectronicStructure> ele
                                       Molecule& molecule,
                                       double* lineSearchedEnergy,
                                       bool* obtainesOptimizedStructure) const{
-   int    elecState            = Parameters::GetInstance()->GetElectronicStateIndexOptimization();
-   double dt                   = Parameters::GetInstance()->GetTimeWidthOptimization();
-   int    totalSteps           = Parameters::GetInstance()->GetTotalStepsOptimization();
-   double maxGradientThreshold = Parameters::GetInstance()->GetMaxGradientOptimization();
-   double rmsGradientThreshold = Parameters::GetInstance()->GetRmsGradientOptimization();
-   ConjugateGradientState state(molecule);
+   ConjugateGradientState state(molecule,electronicStructure);
 
    // initial calculation
    bool requireGuess = true;
    this->UpdateElectronicStructure(electronicStructure, molecule, requireGuess, this->CanOutputLogs());
-   state.SetCurrentEnergy(electronicStructure->GetElectronicEnergy(elecState));
+   state.SetCurrentEnergy(electronicStructure->GetElectronicEnergy(state.GetElecState()));
 
    requireGuess = false;
-   state.SetMatrixForce(electronicStructure->GetForce(elecState));
+   state.SetMatrixForce(electronicStructure->GetForce(state.GetElecState()));
 
    this->InitializeState(state, molecule);
 
    // conugate gradient loop
-   for(int s=0; s<totalSteps; s++){
+   for(int s=0; s<state.GetTotalSteps(); s++){
       this->OutputOptimizationStepMessage(s);
 
-      this->PrepareState(state, molecule, electronicStructure, elecState);
+      this->PrepareState(state, molecule, electronicStructure, state.GetElecState());
 
-      this->CalcNextStepGeometry(molecule, state, electronicStructure, elecState, dt);
+      this->CalcNextStepGeometry(molecule, state, electronicStructure, state.GetElecState(), state.GetDeltaT());
 
-      this->UpdateSearchDirection(state, electronicStructure, molecule, elecState);
+      this->UpdateSearchDirection(state, electronicStructure, molecule, state.GetElecState());
 
       // check convergence
       if(this->SatisfiesConvergenceCriterion(state.GetMatrixForce(),
                                              molecule,
                                              state.GetInitialEnergy(),
                                              state.GetCurrentEnergy(),
-                                             maxGradientThreshold,
-                                             rmsGradientThreshold)){
+                                             state.GetMaxGradientThreshold(),
+                                             state.GetRmsGradientThreshold())){
          *obtainesOptimizedStructure = true;
          break;
       }

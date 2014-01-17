@@ -29,7 +29,8 @@ private:
       double** matrixSearchDirection;
       size_t numAtoms;
    public:
-      ConjugateGradientState(MolDS_base::Molecule& molecule);
+      ConjugateGradientState(MolDS_base::Molecule& molecule,
+                             boost::shared_ptr<MolDS_base::ElectronicStructure>& electronicStructure);
       virtual ~ConjugateGradientState();
       double** GetOldMatrixForce(){return this->oldMatrixForce;}
       double** GetMatrixSearchDirection(){return this->matrixSearchDirection;}

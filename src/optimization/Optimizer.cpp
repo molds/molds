@@ -50,6 +50,21 @@ using namespace MolDS_base_factories;
 
 namespace MolDS_optimization{
 
+Optimizer::OptimizerState::OptimizerState(Molecule& molecule,
+                                          boost::shared_ptr<ElectronicStructure>& electronicStructure):
+   molecule(molecule),
+   electronicStructure(electronicStructure),
+   elecState(Parameters::GetInstance()->GetElectronicStateIndexOptimization()),
+   dt(Parameters::GetInstance()->GetTimeWidthOptimization()),
+   totalSteps(Parameters::GetInstance()->GetTotalStepsOptimization()),
+   maxGradientThreshold(Parameters::GetInstance()->GetMaxGradientOptimization()),
+   rmsGradientThreshold(Parameters::GetInstance()->GetRmsGradientOptimization()),
+   currentEnergy(0.0),
+   initialEnergy(0.0),
+   matrixForce(NULL){
+   this->SetMessages();
+}
+
 void Optimizer::OptimizerState::SetMessages(){
    this->errorMessageFailedToDowncastState
       = "Failed to downcast Optimizer::OptimizerState!";

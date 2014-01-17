@@ -25,17 +25,33 @@ class Optimizer : public MolDS_base::PrintController{
 protected:
    class OptimizerState{
    protected:
+      MolDS_base::Molecule& molecule;
+      const boost::shared_ptr<MolDS_base::ElectronicStructure> electronicStructure;
+      const int elecState;
+      const double dt;
+      const int totalSteps;
+      const double maxGradientThreshold;
+      const double rmsGradientThreshold;
       double currentEnergy;
       double initialEnergy;
       double const* const* matrixForce;
       std::string errorMessageFailedToDowncastState;
       virtual void SetMessages();
    public:
-      OptimizerState():
-         currentEnergy(0.0), initialEnergy(0.0), matrixForce(NULL){this->SetMessages();}
+      OptimizerState(MolDS_base::Molecule& molecule,
+                     boost::shared_ptr<MolDS_base::ElectronicStructure>& electronicStructure);
       virtual ~OptimizerState(){}
       double& GetCurrentEnergyRef(){return this->currentEnergy;}
       double GetCurrentEnergy(){return this->currentEnergy;}
+      MolDS_base::Molecule& GetMolecule(){return this->molecule;}
+      const boost::shared_ptr<MolDS_base::ElectronicStructure> GetElectronicStructure(){
+         return this->electronicStructure;
+      }
+      int GetElecState(){return this->elecState;}
+      double GetDeltaT(){return this->dt;}
+      int GetTotalSteps(){return this->totalSteps;}
+      double GetMaxGradientThreshold(){return this->maxGradientThreshold;}
+      double GetRmsGradientThreshold(){return this->rmsGradientThreshold;}
       double GetInitialEnergy(){return this->initialEnergy;}
       double const* const*  GetMatrixForce(){return this->matrixForce;}
       double const* const** GetMatrixForcePtr(){return &this->matrixForce;}
