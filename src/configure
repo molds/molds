@@ -742,6 +742,7 @@ enable_release
 enable_dependency_tracking
 with_openblas
 with_blas
+with_mkl
 with_lapack
 with_boost
 with_boost_libdir
@@ -1392,6 +1393,9 @@ Optional Packages:
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
   --with-openblas=DIR     Use OpenBLAS library.
   --with-blas=<lib>       use BLAS library <lib>
+  --with-mkl=<lib>        use Intel MKL. you can specify
+                          --with-mkl=sequential/parallel to select
+                          parallelism. Default is sequential.
   --with-lapack=<lib>     use LAPACK library <lib>
   --with-boost[=ARG]      use Boost library from a standard location
                           (ARG=yes), from the specified location (ARG=<path>),
@@ -5964,6 +5968,20 @@ case $with_blas in
 	*) BLAS_LIBS="-l$with_blas" ;;
 esac
 
+
+# Check whether --with-mkl was given.
+if test "${with_mkl+set}" = set; then :
+  withval=$with_mkl;
+fi
+
+case $with_mkl_thread in
+	yes | sequential | "")                ax_blas_mkl=-lmkl_sequential ;;
+	parallel | thread)                    ax_blas_mkl=-lmkl_intel_thread ;;
+	no)                                   ax_blas_mkl=no ;;
+	-* | */* | *.a | *.so | *.so.* | *.o) ax_blas_mkl="$with_mkl_thread" ;;
+	*)                                    ax_blas_mkl="-l$with_blas" ;;
+esac
+
 # Get fortran linker names of BLAS functions to check for.
 ac_ext=f
 ac_compile='$F77 -c $FFLAGS conftest.$ac_ext >&5'
@@ -6094,7 +6112,7 @@ $as_echo "$ax_blas_ok" >&6; }
 fi
 
 # BLAS in Intel MKL library?
-if test $ax_blas_ok = no; then
+if test $ax_blas_ok = no && test x$ax_blas_mkl != xno ; then
 	# MKL for gfortran
 	if test x"$ac_cv_fc_compiler_gnu" = xyes; then
 		# 64 bit
@@ -6106,7 +6124,7 @@ if eval \${$as_ac_Lib+:} false; then :
   $as_echo_n "(cached) " >&6
 else
   ac_check_lib_save_LIBS=$LIBS
-LIBS="-lmkl_gf_ilp64 -lmkl_gf_ilp64 -lmkl_sequential -lmkl_core -lpthread $LIBS"
+LIBS="-lmkl_gf_ilp64 -lmkl_gf_ilp64 $ax_blas_mkl -lmkl_core -lpthread $LIBS"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -6146,7 +6164,7 @@ eval ac_res=\$$as_ac_Lib
 	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
 $as_echo "$ac_res" >&6; }
 if eval test \"x\$"$as_ac_Lib"\" = x"yes"; then :
-  ax_blas_ok=yes;BLAS_LIBS="-lmkl_gf_ilp64 -lmkl_sequential -lmkl_core -lpthread"
+  ax_blas_ok=yes;BLAS_LIBS="-lmkl_gf_ilp64 $ax_blas_mkl -lmkl_core -lpthread"
 fi
 
 		# 32 bit
@@ -6158,7 +6176,7 @@ if eval \${$as_ac_Lib+:} false; then :
   $as_echo_n "(cached) " >&6
 else
   ac_check_lib_save_LIBS=$LIBS
-LIBS="-lmkl_gf -lmkl_gf -lmkl_sequential -lmkl_core -lpthread $LIBS"
+LIBS="-lmkl_gf -lmkl_gf $ax_blas_mkl -lmkl_core -lpthread $LIBS"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -6198,7 +6216,7 @@ eval ac_res=\$$as_ac_Lib
 	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
 $as_echo "$ac_res" >&6; }
 if eval test \"x\$"$as_ac_Lib"\" = x"yes"; then :
-  ax_blas_ok=yes;BLAS_LIBS="-lmkl_gf -lmkl_sequential -lmkl_core -lpthread"
+  ax_blas_ok=yes;BLAS_LIBS="-lmkl_gf $ax_blas_mkl -lmkl_core -lpthread"
 fi
 
 		fi
@@ -6213,7 +6231,7 @@ if eval \${$as_ac_Lib+:} false; then :
   $as_echo_n "(cached) " >&6
 else
   ac_check_lib_save_LIBS=$LIBS
-LIBS="-lmkl_intel_ilp64 -lmkl_intel_ilp64 -lmkl_sequential -lmkl_core -lpthread $LIBS"
+LIBS="-lmkl_intel_ilp64 -lmkl_intel_ilp64 $ax_blas_mkl -lmkl_core -lpthread $LIBS"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -6253,7 +6271,7 @@ eval ac_res=\$$as_ac_Lib
 	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
 $as_echo "$ac_res" >&6; }
 if eval test \"x\$"$as_ac_Lib"\" = x"yes"; then :
-  ax_blas_ok=yes;BLAS_LIBS="-lmkl_intel_ilp64 -lmkl_sequential -lmkl_core -lpthread"
+  ax_blas_ok=yes;BLAS_LIBS="-lmkl_intel_ilp64 $ax_blas_mkl -lmkl_core -lpthread"
 fi
 
 		# 32-bit
@@ -6265,7 +6283,7 @@ if eval \${$as_ac_Lib+:} false; then :
   $as_echo_n "(cached) " >&6
 else
   ac_check_lib_save_LIBS=$LIBS
-LIBS="-lmkl_intel -lmkl_intel -lmkl_sequential -lmkl_core -lpthread $LIBS"
+LIBS="-lmkl_intel -lmkl_intel $ax_blas_mkl -lmkl_core -lpthread $LIBS"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -6305,14 +6323,14 @@ eval ac_res=\$$as_ac_Lib
 	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
 $as_echo "$ac_res" >&6; }
 if eval test \"x\$"$as_ac_Lib"\" = x"yes"; then :
-  ax_blas_ok=yes;BLAS_LIBS="-lmkl_intel -lmkl_sequential -lmkl_core -lpthread"
+  ax_blas_ok=yes;BLAS_LIBS="-lmkl_intel $ax_blas_mkl -lmkl_core -lpthread"
 fi
 
 		fi
 	fi
 fi
 # Old versions of MKL
-if test $ax_blas_ok = no; then
+if test $ax_blas_ok = no && test x$ax_blas_mkl != xno ; then
 	as_ac_Lib=`$as_echo "ac_cv_lib_mkl_$sgemm" | $as_tr_sh`
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $sgemm in -lmkl" >&5
 $as_echo_n "checking for $sgemm in -lmkl... " >&6; }
