@@ -144,7 +144,6 @@ void BFGS::SearchMinimum(boost::shared_ptr<ElectronicStructure> electronicStruct
    this->UpdateElectronicStructure(electronicStructure, molecule, requireGuess, this->CanOutputLogs());
    state.SetCurrentEnergy(electronicStructure->GetElectronicEnergy(elecState));
 
-   requireGuess = false;
    state.SetMatrixForce(electronicStructure->GetForce(elecState));
 
    this->InitializeState(state, molecule);
@@ -154,24 +153,7 @@ void BFGS::SearchMinimum(boost::shared_ptr<ElectronicStructure> electronicStruct
 
       this->PrepareState(state, molecule, electronicStructure, elecState);
 
-      // Take a RFO step
-      bool doLineSearch = false;
-      bool tempCanOutputLogs = false;
-      state.SetInitialEnergy(state.GetCurrentEnergy());
-      if(doLineSearch){
-         this->LineSearch(electronicStructure, molecule, state.GetCurrentEnergyRef(), state.GetMatrixStep(), elecState, dt);
-      }
-      else{
-         this->UpdateMolecularCoordinates(molecule, state.GetMatrixStep());
-
-         // Broadcast to all processes
-         int root = MolDS_mpi::MpiProcess::GetInstance()->GetHeadRank();
-         molecule.BroadcastConfigurationToAllProcesses(root);
-
-         this->UpdateElectronicStructure(electronicStructure, molecule, requireGuess, tempCanOutputLogs);
-         state.SetCurrentEnergy(electronicStructure->GetElectronicEnergy(elecState));
-      }
-      this->OutputMoleculeElectronicStructure(electronicStructure, molecule, this->CanOutputLogs());
+      this->CalcNextStepGeometry(molecule, state, electronicStructure, elecState, dt);
 
       this->UpdateTrustRadius(state.GetTrustRadiusRef(), state.GetApproximateChange(), state.GetInitialEnergy(), state.GetCurrentEnergy());
 
@@ -245,6 +227,35 @@ void BFGS::PrepareState(OptimizerState& stateOrig,
                                                             state.GetVectorForce(),
                                                             state.GetVectorStep())
                              );
+}
+      
+void BFGS::CalcNextStepGeometry(Molecule &molecule,
+                                OptimizerState& stateOrig,
+                                boost::shared_ptr<ElectronicStructure> electronicStructure,
+                                const int elecState,
+                                const double dt) const{
+   BFGSState& state = stateOrig.CastRef<BFGSState>();
+
+   // Take a RFO step
+   bool doLineSearch = false;
+   bool tempCanOutputLogs = false;
+   bool requireGuess = false;
+   state.SetInitialEnergy(state.GetCurrentEnergy());
+   if(doLineSearch){
+      this->LineSearch(electronicStructure, molecule, state.GetCurrentEnergyRef(), state.GetMatrixStep(), elecState, dt);
+   }
+   else{
+      this->UpdateMolecularCoordinates(molecule, state.GetMatrixStep());
+
+      // Broadcast to all processes
+      int root = MolDS_mpi::MpiProcess::GetInstance()->GetHeadRank();
+      molecule.BroadcastConfigurationToAllProcesses(root);
+
+      this->UpdateElectronicStructure(electronicStructure, molecule, requireGuess, tempCanOutputLogs);
+      state.SetCurrentEnergy(electronicStructure->GetElectronicEnergy(elecState));
+   }
+
+   this->OutputMoleculeElectronicStructure(electronicStructure, molecule, this->CanOutputLogs());
 }
 
 void BFGS::CalcRFOStep(double* vectorStep,

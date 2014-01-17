@@ -104,10 +104,7 @@ void ConjugateGradient::SearchMinimum(boost::shared_ptr<ElectronicStructure> ele
 
       this->PrepareState(state, molecule, electronicStructure, elecState);
 
-      state.SetInitialEnergy(state.GetCurrentEnergy());
-
-      // do line search
-      this->LineSearch(electronicStructure, molecule, state.GetCurrentEnergyRef(), state.GetMatrixSearchDirection(), elecState, dt);
+      this->CalcNextStepGeometry(molecule, state, electronicStructure, elecState, dt);
 
       this->UpdateSearchDirection(state, electronicStructure, molecule, elecState);
 
@@ -133,6 +130,18 @@ void ConjugateGradient::InitializeState(OptimizerState &stateOrig, const Molecul
          state.GetMatrixSearchDirection()[a][i] = state.GetMatrixForce()[a][i];
       }
    }
+}
+
+void ConjugateGradient::CalcNextStepGeometry(Molecule &molecule,
+                                             OptimizerState& stateOrig,
+                                             boost::shared_ptr<ElectronicStructure> electronicStructure,
+                                             const int elecState,
+                                             const double dt) const{
+   ConjugateGradientState& state = stateOrig.CastRef<ConjugateGradientState>();
+
+   state.SetInitialEnergy(state.GetCurrentEnergy());
+
+   this->LineSearch(electronicStructure, molecule, state.GetCurrentEnergyRef(), state.GetMatrixSearchDirection(), elecState, dt);
 }
 
 void ConjugateGradient::UpdateSearchDirection(OptimizerState& stateOrig,

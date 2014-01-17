@@ -87,8 +87,7 @@ void SteepestDescent::SearchMinimum(boost::shared_ptr<ElectronicStructure> elect
       this->OutputLog(boost::format("%s%d\n\n") % this->messageStartSteepestDescentStep.c_str() % (s+1));
       state.SetInitialEnergy(state.GetCurrentEnergy());
 
-      // do line search
-      this->LineSearch(electronicStructure, molecule, state.GetCurrentEnergyRef(), state.GetMatrixForce(), elecState, dt);
+      this->CalcNextStepGeometry(molecule, state, electronicStructure, elecState, dt);
 
       this->UpdateSearchDirection(state, electronicStructure, molecule, elecState);
 
@@ -105,6 +104,16 @@ void SteepestDescent::SearchMinimum(boost::shared_ptr<ElectronicStructure> elect
    }
 
    *lineSearchedEnergy = state.GetCurrentEnergy();
+}
+
+void SteepestDescent::CalcNextStepGeometry(Molecule &molecule,
+                                             OptimizerState& state,
+                                             boost::shared_ptr<ElectronicStructure> electronicStructure,
+                                             const int elecState,
+                                             const double dt) const{
+   state.SetInitialEnergy(state.GetCurrentEnergy());
+
+   this->LineSearch(electronicStructure, molecule, state.GetCurrentEnergyRef(), state.GetMatrixForce(), elecState, dt);
 }
 
 void SteepestDescent::UpdateSearchDirection(OptimizerState& state,
