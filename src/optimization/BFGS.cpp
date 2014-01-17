@@ -185,6 +185,9 @@ void BFGS::SearchMinimum(boost::shared_ptr<ElectronicStructure> electronicStruct
 
          this->UpdateTrustRadius(trustRadius, approximateChange, lineSearchInitialEnergy, lineSearchCurrentEnergy);
 
+         matrixForce = electronicStructure->GetForce(elecState);
+         vectorForce = &matrixForce[0][0];
+
          // check convergence
          if(this->SatisfiesConvergenceCriterion(matrixForce,
                   molecule,
@@ -206,9 +209,6 @@ void BFGS::SearchMinimum(boost::shared_ptr<ElectronicStructure> electronicStruct
             this->RollbackMolecularGeometry(molecule, matrixOldCoordinates);
             lineSearchCurrentEnergy = lineSearchInitialEnergy;
          }
-
-         matrixForce = electronicStructure->GetForce(elecState);
-         vectorForce = &matrixForce[0][0];
 
          // Update Hessian
          this->UpdateHessian(matrixHessian, dimension, vectorForce, vectorOldForce, &matrixDisplacement[0][0]);
@@ -287,11 +287,7 @@ void BFGS::CalcRFOStep(double* vectorStep,
          }
          //
          // Calculate size of the RFO step
-         normStep = 0;
-         for(int i=0;i<dimension;i++){
-            normStep += vectorStep[i] * vectorStep[i];
-         }
-         normStep = sqrt(normStep);
+         normStep = MolDS_wrappers::Blas::GetInstance()->Dnrm2(dimension, vectorStep);
 
          this->OutputLog(boost::format(this->formatLowestHessianEigenvalue)    % vectorEigenValues[0]);
          this->OutputLog(boost::format(this->format2ndLowestHessianEigenvalue) % vectorEigenValues[1]);

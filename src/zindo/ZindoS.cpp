@@ -203,7 +203,7 @@ void ZindoS::SetMessages(){
    this->messageTotalDipoleMoment = "Total dipole moment:";
    this->messageElectronicDipoleMomentsTitle = "\t\t\t\t\t| i-th eigenstate |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |\t\t|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |\n";
    this->messageElectronicDipoleMoment = "Electronic dipole moment:";
-   this->messageTransitionDipoleMomentsTitle = "\t\t\t\t\t| from and to eigenstates |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |\t\t|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |\n";
+   this->messageTransitionDipoleMomentsTitle = "\t\t\t\t\t| from and to eigenstates |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |\t\t|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |  oscillator strength[a.u.]  |\n";
    this->messageTransitionDipoleMoment = "Transition dipole moment:";
 
 }
@@ -610,6 +610,7 @@ double ZindoS::GetNishimotoMatagaTwoEleInt(const Atom& atomA, OrbitalType orbita
       gammaAA = atomA.GetZindoF0ss();
    }
    /*
+   // ToDo: d-orbitals.
    else if(orbitalA == dxy ||
            orbitalA == dyz ||
            orbitalA == dzz ||
@@ -634,6 +635,7 @@ double ZindoS::GetNishimotoMatagaTwoEleInt(const Atom& atomA, OrbitalType orbita
       gammaBB = atomB.GetZindoF0ss();
    }
    /*
+   // ToDo: d-orbitals.
    else if(orbitalB == dxy ||
            orbitalB == dyz ||
            orbitalB == dzz ||
@@ -684,6 +686,7 @@ double ZindoS::GetNishimotoMatagaTwoEleInt1stDerivative(const Atom& atomA,
       gammaAA = atomA.GetZindoF0ss();
    }
    /*
+   // ToDo: d-orbitals.
    else if(orbitalA == dxy ||
            orbitalA == dyz ||
            orbitalA == dzz ||
@@ -708,6 +711,7 @@ double ZindoS::GetNishimotoMatagaTwoEleInt1stDerivative(const Atom& atomA,
       gammaBB = atomB.GetZindoF0ss();
    }
    /*
+   // ToDo: d-orbitals.
    else if(orbitalB == dxy ||
            orbitalB == dyz ||
            orbitalB == dzz ||
@@ -1935,7 +1939,12 @@ void ZindoS::OutputCISTransitionDipole() const{
             temp += pow(this->electronicTransitionDipoleMoments[to][from][YAxis],2.0);
             temp += pow(this->electronicTransitionDipoleMoments[to][from][ZAxis],2.0);
             magnitude = sqrt(temp);
-            this->OutputLog(boost::format("\t%s\t%d -> %d\t\t%e\t%e\t%e\t%e\t\t%e\t%e\t%e\t%e\n") 
+            double dE = this->excitedEnergies[to-1];
+            if(from != groundState){
+               dE -= this->excitedEnergies[from-1];
+            }
+            double oscillatorStrength = 2.0*dE*magnitude*magnitude/3.0;
+            this->OutputLog(boost::format("\t%s\t%d -> %d\t\t%e\t%e\t%e\t%e\t\t%e\t%e\t%e\t%e\t%e\n") 
                % this->messageTransitionDipoleMoment
                % from
                % to
@@ -1946,7 +1955,8 @@ void ZindoS::OutputCISTransitionDipole() const{
                % (this->electronicTransitionDipoleMoments[to][from][XAxis]/debye2AU)
                % (this->electronicTransitionDipoleMoments[to][from][YAxis]/debye2AU)
                % (this->electronicTransitionDipoleMoments[to][from][ZAxis]/debye2AU)
-               % (magnitude/debye2AU));
+               % (magnitude/debye2AU)
+               % oscillatorStrength);
          }
       }
    }
