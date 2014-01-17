@@ -41,7 +41,7 @@ private:
       BFGSState(const BFGSState&); // delete default copy constructor
    public:
       BFGSState(MolDS_base::Molecule& molecule,
-                boost::shared_ptr<MolDS_base::ElectronicStructure>& electronicStructure);
+                const boost::shared_ptr<MolDS_base::ElectronicStructure>& electronicStructure);
       virtual ~BFGSState();
       double const* GetVectorForce         (){return this->Matrix2Vector(this->matrixForce);}
       double*       GetVectorOldForce      (){return this->Matrix2Vector(this->matrixOldForce);}
@@ -87,12 +87,11 @@ private:
    const std::string& OptimizationStepMessage() const{
       return this->messageStartBFGSStep;
    }
-   virtual void SearchMinimum(boost::shared_ptr<MolDS_base::ElectronicStructure> electronicStructure,
-                              MolDS_base::Molecule& molecule,
-                              double* lineSearchedEnergy,
-                              bool* obainesOptimizedStructure) const;
-
 protected:
+   virtual OptimizerState* CreateState(MolDS_base::Molecule& molecule,
+                                       const boost::shared_ptr<MolDS_base::ElectronicStructure> electronicStructure) const{
+      return new BFGSState(molecule, electronicStructure);
+   }
    void InitializeState(OptimizerState &state, const MolDS_base::Molecule& molecule) const;
    void PrepareState(OptimizerState& state,
                              const MolDS_base::Molecule& molecule,

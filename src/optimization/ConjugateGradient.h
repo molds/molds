@@ -31,7 +31,7 @@ private:
       ConjugateGradientState(const ConjugateGradientState&); // delete default copy constructor
    public:
       ConjugateGradientState(MolDS_base::Molecule& molecule,
-                             boost::shared_ptr<MolDS_base::ElectronicStructure>& electronicStructure);
+                             const boost::shared_ptr<MolDS_base::ElectronicStructure>& electronicStructure);
       virtual ~ConjugateGradientState();
       double** GetOldMatrixForce(){return this->oldMatrixForce;}
       double** GetMatrixSearchDirection(){return this->matrixSearchDirection;}
@@ -46,10 +46,10 @@ private:
    const std::string& OptimizationStepMessage() const{
       return this->messageStartConjugateGradientStep;
    }
-   void SearchMinimum(boost::shared_ptr<MolDS_base::ElectronicStructure> electronicStructure,
-                      MolDS_base::Molecule& molecule,
-                      double* lineSearchedEnergy,
-                      bool* obainesOptimizedStructure) const;
+   OptimizerState* CreateState(MolDS_base::Molecule& molecule,
+                                       const boost::shared_ptr<MolDS_base::ElectronicStructure> electronicStructure) const{
+      return new ConjugateGradientState(molecule, electronicStructure);
+   }
    void InitializeState(OptimizerState &state, const MolDS_base::Molecule& molecule) const;
    virtual void PrepareState(OptimizerState& state,
                              const MolDS_base::Molecule& molecule,

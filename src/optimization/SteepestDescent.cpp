@@ -65,45 +65,6 @@ void SteepestDescent::SetMessages(){
    this->messageStartSteepestDescentStep = "\n==========  START: Steepest Descent step ";
 }
 
-void SteepestDescent::SearchMinimum(boost::shared_ptr<ElectronicStructure> electronicStructure,
-                                    Molecule& molecule,
-                                    double* lineSearchedEnergy,
-                                    bool* obtainesOptimizedStructure) const{
-   OptimizerState state(molecule, electronicStructure);
-
-   // initial calculation
-   bool requireGuess = true;
-   this->UpdateElectronicStructure(electronicStructure, molecule, requireGuess, this->CanOutputLogs());
-   state.SetCurrentEnergy(electronicStructure->GetElectronicEnergy(state.GetElecState()));
-   state.SetMatrixForce(electronicStructure->GetForce(state.GetElecState()));
-
-   this->InitializeState(state, molecule);
-
-   for(int s=0; s<state.GetTotalSteps(); s++){
-      this->OutputLog(boost::format("%s%d\n\n") % this->messageStartSteepestDescentStep.c_str() % (s+1));
-      state.SetInitialEnergy(state.GetCurrentEnergy());
-
-      this->CalcNextStepGeometry(molecule, state, electronicStructure, state.GetElecState(), state.GetDeltaT());
-
-      state.SetCurrentEnergy(electronicStructure->GetElectronicEnergy(state.GetElecState()));
-      state.SetMatrixForce(electronicStructure->GetForce(state.GetElecState()));
-
-      this->UpdateState(state);
-
-      // check convergence
-      if(this->SatisfiesConvergenceCriterion(state.GetMatrixForce(),
-                                             molecule,
-                                             state.GetInitialEnergy(),
-                                             state.GetCurrentEnergy(),
-                                             state.GetMaxGradientThreshold(), 
-                                             state.GetRmsGradientThreshold())){
-         *obtainesOptimizedStructure = true;
-         break;
-      }
-   }
-   *lineSearchedEnergy = state.GetCurrentEnergy();
-}
-
 void SteepestDescent::CalcNextStepGeometry(Molecule &molecule,
                                              OptimizerState& state,
                                              boost::shared_ptr<ElectronicStructure> electronicStructure,

@@ -54,7 +54,7 @@ using namespace MolDS_base_atoms;
 namespace MolDS_optimization{
 
 BFGS::BFGSState::BFGSState(Molecule& molecule,
-                           boost::shared_ptr<ElectronicStructure>& electronicStructure):
+                           const boost::shared_ptr<ElectronicStructure>& electronicStructure):
    OptimizerState(molecule, electronicStructure),
    matrixHessian(NULL),
    matrixOldForce(NULL),
@@ -127,46 +127,6 @@ void BFGS::SetMessages(){
       = "Trust radius is %f\n";
    this->formatIncreaseScalingFactor
       = "Scaling factor is increased to %e.\n";
-}
-
-void BFGS::SearchMinimum(boost::shared_ptr<ElectronicStructure> electronicStructure,
-                         Molecule& molecule,
-                         double* lineSearchedEnergy,
-                         bool* obtainesOptimizedStructure) const {
-   BFGSState state(molecule, electronicStructure);
-
-   // initial calculation
-   bool requireGuess = true;
-   this->UpdateElectronicStructure(electronicStructure, molecule, requireGuess, this->CanOutputLogs());
-   state.SetCurrentEnergy(electronicStructure->GetElectronicEnergy(state.GetElecState()));
-   state.SetMatrixForce(electronicStructure->GetForce(state.GetElecState()));
-
-   this->InitializeState(state, molecule);
-
-   for(int s=0; s<state.GetTotalSteps(); s++){
-      this->OutputOptimizationStepMessage(s);
-
-      this->PrepareState(state, molecule, electronicStructure, state.GetElecState());
-
-      this->CalcNextStepGeometry(molecule, state, electronicStructure, state.GetElecState(), state.GetDeltaT());
-
-      state.SetCurrentEnergy(electronicStructure->GetElectronicEnergy(state.GetElecState()));
-      state.SetMatrixForce(electronicStructure->GetForce(state.GetElecState()));
-
-      this->UpdateState(state);
-
-      // check convergence
-      if(this->SatisfiesConvergenceCriterion(state.GetMatrixForce(),
-               molecule,
-               state.GetInitialEnergy(),
-               state.GetCurrentEnergy(),
-               state.GetMaxGradientThreshold(),
-               state.GetRmsGradientThreshold())){
-         *obtainesOptimizedStructure = true;
-         break;
-      }
-   }
-   *lineSearchedEnergy = state.GetCurrentEnergy();
 }
 
 void BFGS::InitializeState(OptimizerState &stateOrig, const Molecule& molecule) const{

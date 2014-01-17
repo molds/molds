@@ -24,8 +24,10 @@
 #include<math.h>
 #include<string>
 #include<vector>
+#include<memory>
 #include<stdexcept>
 #include<boost/shared_ptr.hpp>
+#include<boost/scoped_ptr.hpp>
 #include<boost/format.hpp>
 #include"../config.h"
 #include"../base/Enums.h"
@@ -51,7 +53,7 @@ using namespace MolDS_base_factories;
 namespace MolDS_optimization{
 
 Optimizer::OptimizerState::OptimizerState(Molecule& molecule,
-                                          boost::shared_ptr<ElectronicStructure>& electronicStructure):
+                                          const boost::shared_ptr<ElectronicStructure>& electronicStructure):
    molecule(molecule),
    electronicStructure(electronicStructure),
    elecState(Parameters::GetInstance()->GetElectronicStateIndexOptimization()),
@@ -105,6 +107,48 @@ void Optimizer::Optimize(Molecule& molecule){
       throw MolDSException(ss.str());
    }
    this->OutputLog(this->messageEndGeometryOptimization);
+}
+
+void Optimizer::SearchMinimum(boost::shared_ptr<ElectronicStructure> electronicStructure,
+                                    Molecule& molecule,
+                                    double* lineSearchedEnergy,
+                                    bool* obtainesOptimizedStructure) const{
+   boost::scoped_ptr<OptimizerState> statePtr(this->CreateState(molecule, electronicStructure));
+   OptimizerState& state = *statePtr.get();
+
+   // initial calculation
+   bool requireGuess = true;
+   this->UpdateElectronicStructure(electronicStructure, molecule, requireGuess, this->CanOutputLogs());
+   state.SetCurrentEnergy(electronicStructure->GetElectronicEnergy(state.GetElecState()));
+   state.SetMatrixForce(electronicStructure->GetForce(state.GetElecState()));
+
+   this->InitializeState(state, molecule);
+
+   for(int s=0; s<state.GetTotalSteps(); s++){
+      this->OutputOptimizationStepMessage(s);
+      state.SetInitialEnergy(state.GetCurrentEnergy());
+
+      this->PrepareState(state, molecule, electronicStructure, state.GetElecState());
+
+      this->CalcNextStepGeometry(molecule, state, electronicStructure, state.GetElecState(), state.GetDeltaT());
+
+      state.SetCurrentEnergy(electronicStructure->GetElectronicEnergy(state.GetElecState()));
+      state.SetMatrixForce(electronicStructure->GetForce(state.GetElecState()));
+
+      this->UpdateState(state);
+
+      // check convergence
+      if(this->SatisfiesConvergenceCriterion(state.GetMatrixForce(),
+                                             molecule,
+                                             state.GetInitialEnergy(),
+                                             state.GetCurrentEnergy(),
+                                             state.GetMaxGradientThreshold(), 
+                                             state.GetRmsGradientThreshold())){
+         *obtainesOptimizedStructure = true;
+         break;
+      }
+   }
+   *lineSearchedEnergy = state.GetCurrentEnergy();
 }
 
 void Optimizer::SetMessages(){

@@ -26,6 +26,7 @@
 #include<vector>
 #include<stdexcept>
 #include<boost/shared_ptr.hpp>
+#include<boost/scoped_ptr.hpp>
 #include<boost/format.hpp>
 #include"../base/Enums.h"
 #include"../base/Uncopyable.h"
@@ -49,7 +50,7 @@ using namespace MolDS_base_atoms;
 namespace MolDS_optimization{
 
 ConjugateGradient::ConjugateGradientState::ConjugateGradientState(Molecule& molecule,
-                                                                  boost::shared_ptr<ElectronicStructure>& electronicStructure):
+                                                                  const boost::shared_ptr<ElectronicStructure>& electronicStructure):
    OptimizerState(molecule, electronicStructure),
    oldMatrixForce(NULL),
    matrixSearchDirection(NULL),
@@ -79,46 +80,6 @@ void ConjugateGradient::SetMessages(){
    this->errorMessageGeometyrOptimizationNotConverged 
       = "Error in optimization::ConjugateGradient::Optimize: Optimization did not met convergence criterion.\n";
    this->messageStartConjugateGradientStep = "\n==========  START: Conjugate gradient step ";
-}
-
-void ConjugateGradient::SearchMinimum(boost::shared_ptr<ElectronicStructure> electronicStructure,
-                                      Molecule& molecule,
-                                      double* lineSearchedEnergy,
-                                      bool* obtainesOptimizedStructure) const{
-   ConjugateGradientState state(molecule,electronicStructure);
-
-   // initial calculation
-   bool requireGuess = true;
-   this->UpdateElectronicStructure(electronicStructure, molecule, requireGuess, this->CanOutputLogs());
-   state.SetCurrentEnergy(electronicStructure->GetElectronicEnergy(state.GetElecState()));
-   state.SetMatrixForce(electronicStructure->GetForce(state.GetElecState()));
-
-   this->InitializeState(state, molecule);
-
-   for(int s=0; s<state.GetTotalSteps(); s++){
-      this->OutputOptimizationStepMessage(s);
-
-      this->PrepareState(state, molecule, electronicStructure, state.GetElecState());
-
-      this->CalcNextStepGeometry(molecule, state, electronicStructure, state.GetElecState(), state.GetDeltaT());
-
-      state.SetCurrentEnergy(electronicStructure->GetElectronicEnergy(state.GetElecState()));
-      state.SetMatrixForce(electronicStructure->GetForce(state.GetElecState()));
-
-      this->UpdateState(state);
-
-      // check convergence
-      if(this->SatisfiesConvergenceCriterion(state.GetMatrixForce(),
-                                             molecule,
-                                             state.GetInitialEnergy(),
-                                             state.GetCurrentEnergy(),
-                                             state.GetMaxGradientThreshold(),
-                                             state.GetRmsGradientThreshold())){
-         *obtainesOptimizedStructure = true;
-         break;
-      }
-   }
-   *lineSearchedEnergy = state.GetCurrentEnergy();
 }
 
 void ConjugateGradient::InitializeState(OptimizerState &stateOrig, const Molecule& molecule) const{

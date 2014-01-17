@@ -41,7 +41,7 @@ protected:
       OptimizerState(const OptimizerState&); // delete default copy constructor
    public:
       OptimizerState(MolDS_base::Molecule& molecule,
-                     boost::shared_ptr<MolDS_base::ElectronicStructure>& electronicStructure);
+                     const boost::shared_ptr<MolDS_base::ElectronicStructure>& electronicStructure);
       virtual ~OptimizerState(){}
       double& GetCurrentEnergyRef(){return this->currentEnergy;}
       double GetCurrentEnergy(){return this->currentEnergy;}
@@ -117,10 +117,14 @@ private:
    void SetEnableTheoryTypes();
    void CheckEnableTheoryType(MolDS_base::TheoryType theoryType) const;
    void ClearMolecularMomenta(MolDS_base::Molecule& molecule) const;
-   virtual void SearchMinimum(boost::shared_ptr<MolDS_base::ElectronicStructure> electronicStructure,
-                              MolDS_base::Molecule& molecule,
-                              double* lineSearchedEnergy,
-                              bool* obainesOptimizedStructure) const = 0;
+   void SearchMinimum(boost::shared_ptr<MolDS_base::ElectronicStructure> electronicStructure,
+                      MolDS_base::Molecule& molecule,
+                      double* lineSearchedEnergy,
+                      bool* obainesOptimizedStructure) const;
+   virtual OptimizerState* CreateState(MolDS_base::Molecule& molecule,
+                                       const boost::shared_ptr<MolDS_base::ElectronicStructure> electronicStructure) const{
+      return new OptimizerState(molecule, electronicStructure);
+   }
    virtual void InitializeState(OptimizerState &state, const MolDS_base::Molecule& molecule) const = 0;
    virtual void PrepareState(OptimizerState& state,
                              const MolDS_base::Molecule& molecule,
