@@ -63,6 +63,7 @@ protected:
    std::string errorMessageMoleculeNotSet;
    std::string errorMessageOddTotalValenceElectrions;
    std::string errorMessageNotEnebleAtomType;
+   std::string errorMessageNotEnebleAtomTypeVdW;
    std::string errorMessageCoulombInt;
    std::string errorMessageExchangeInt;
    std::string errorMessageMolecularIntegralElement;
@@ -89,6 +90,9 @@ protected:
    std::string messageMullikenAtomsTitle;
    std::string messageUnpairedAtoms;
    std::string messageUnpairedAtomsTitle;
+   std::string messageSumCharges;
+   std::string messageSumChargesUEP;
+   std::string messageSumChargesTitle;
    std::string messageUnitSec; 
    std::vector<MolDS_base::AtomType> enableAtomTypes;
    MolDS_base::Molecule* molecule;
@@ -328,6 +332,7 @@ private:
    std::string messageTotalDipoleMomentTitle;
    std::string messageTotalDipoleMoment;
    std::string messageMullikenAtomsSCF;
+   std::string messageSumChargesSCF;
    std::string messageNormalModesTitle;
    std::string messageNormalModesUnitsMassWeighted;
    std::string messageNormalModesUnitsNonMassWeighted;
@@ -337,6 +342,7 @@ private:
    double elecSCFEnergy;
    double bondingAdjustParameterK[2]; //see (3.79) in J. A. Pople book
    double** gammaAB;
+   std::vector<MolDS_base::AtomType> enableAtomTypesVdW;
    class ReducedOverlapAOsParameters : private MolDS_base::Uncopyable{
    public:
       // use Y[na][nb][la][lb][m][i][j] 
@@ -364,10 +370,12 @@ private:
                           double const* normalForceConstants, 
                           const MolDS_base::Molecule& molecule) const;
    void CalcCoreRepulsionEnergy();
+   void SetEnableAtomTypesVdW();
+   void CheckEnableAtomTypeVdW(const MolDS_base::Molecule& molecule) const;
    void CalcVdWCorrectionEnergy();
-   double GetVdwDampingValue(double vdWDistance, double distance) const;
-   double GetVdwDampingValue1stDerivative(double vdWDistance, double distance) const;
-   double GetVdwDampingValue2ndDerivative(double vdWDistance, double distance) const;
+   double GetVdWDampingValue(double vdWDistance, double distance) const;
+   double GetVdWDampingValue1stDerivative(double vdWDistance, double distance) const;
+   double GetVdWDampingValue2ndDerivative(double vdWDistance, double distance) const;
    void CalcElectronicDipoleMomentGroundState(double*** electronicTransitionDipoleMoments,
                                               double const* const* const* cartesianMatrix,
                                               const MolDS_base::Molecule& molecule, 

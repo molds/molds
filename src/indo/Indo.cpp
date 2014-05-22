@@ -41,6 +41,7 @@
 #include"../base/atoms/Catom.h"
 #include"../base/atoms/Natom.h"
 #include"../base/atoms/Oatom.h"
+#include"../base/atoms/Fatom.h"
 #include"../base/atoms/Satom.h"
 #include"../base/Molecule.h"
 #include"../base/ElectronicStructure.h"
@@ -71,6 +72,8 @@ void Indo::SetMessages(){
       = "Error in indo::Indo::SetMolecule: Total number of valence electrons is odd. totalNumberValenceElectrons=";
    this->errorMessageNotEnebleAtomType  
       = "Error in indo::Indo::CheckEnableAtomType: Non available atom is contained.\n";
+   this->errorMessageNotEnebleAtomTypeVdW
+      = "Error in indo::Indo::CheckEnableAtomTypeVdW: Non available atom to add VdW correction is contained.\n";
    this->errorMessageCoulombInt = "Error in base_indo::Indo::GetCoulombInt: Invalid orbitalType.\n";
    this->errorMessageExchangeInt = "Error in base_indo::Indo::GetExchangeInt: Invalid orbitalType.\n";
    this->errorMessageMolecularIntegralElement
@@ -103,7 +106,7 @@ void Indo::SetEnableAtomTypes(){
    this->enableAtomTypes.push_back(C);
    this->enableAtomTypes.push_back(N);
    this->enableAtomTypes.push_back(O);
-   //this->enableAtomTypes.push_back(F);
+   this->enableAtomTypes.push_back(F);
 }
 
 double Indo::GetFockDiagElement(const Atom& atomA, 

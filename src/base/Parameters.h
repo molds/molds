@@ -22,6 +22,7 @@
 #define INCLUDED_PARAMETERS
 
 namespace MolDS_base{
+struct AtomIndexPair{int firstAtomIndex; int lastAtomIndex;};
 
 // Parameters is singleton
 class Parameters: public PrintController, private Uncopyable{
@@ -39,6 +40,7 @@ public:
    inline double GetAngstrom2AU() const  {return this->angstrom2AU;}
    inline double GetNm2AU() const        {return this->nm2AU;}
    inline double GetKayser2AU() const    {return this->kayser2AU;}
+   inline double GetNmin2AU() const      {return this->nmin2AU;}
    inline double GetGMolin2AU() const    {return this->gMolin2AU;}
    inline double GetDegree2Radian() const{return this->degree2Radian;}
    inline double GetFs2AU() const        {return this->fs2AU;}
@@ -60,6 +62,9 @@ public:
    inline void   SetDiisStartErrorSCF(double sError)   {this->diisStartErrorSCF = sError;}
    inline double GetDiisEndErrorSCF() const            {return this->diisEndErrorSCF;}
    inline void   SetDiisEndErrorSCF(double eError)     {this->diisEndErrorSCF = eError;}
+   bool          RequiresSumChargesSCF() const;
+   const std::vector<AtomIndexPair>* GetSumChargesIndexPairsSCF() const;
+   void          AddSumChargesIndexPairsSCF(int fistAtomIndex, int lastAtomIndex);
    inline bool   RequiresVdWSCF() const                {return this->requiresVdWSCF;}
    inline void   SetRequiresVdWSCF(bool requires)      {this->requiresVdWSCF = requires;}
    inline double GetVdWScalingFactorSCF() const        {return this->vdWScalingFactorSCF;}
@@ -142,6 +147,9 @@ public:
    void              AddElectronicStateIndexMullikenCIS(int electronicStateIndex);
    bool              RequiresMullikenCIS() const;
    inline bool       RequiresUnpairedPopCIS() const                         {return this->requiresUnpairedPopCIS;}
+   bool              RequiresSumChargesCIS() const;
+   const std::vector<AtomIndexPair>* GetSumChargesIndexPairsCIS() const;
+   void              AddSumChargesIndexPairsCIS(int fistAtomIndex, int lastAtomIndex);
    inline void       SetRequiresUnpairedPopCIS(bool requires)               {this->requiresUnpairedPopCIS = requires;}
    // Memory
    double GetLimitHeapMemory() const          {return this->limitHeapMemory;}
@@ -218,6 +226,8 @@ private:
    Parameters();
    ~Parameters();
    std::string errorMessageGetIndecesMOPlotNull;
+   std::string errorMessageGetSumChargesIndexPairsSCFNull;
+   std::string errorMessageGetSumChargesIndexPairsCISNull;
    std::string errorMessageGetIndecesHolePlotNull;
    std::string errorMessageGetIndecesParticlePlotNull;
    std::string errorMessageGetElectronicStateIndecesMullikenCISNull;
@@ -230,6 +240,7 @@ private:
    static const double angstrom2AU;
    static const double nm2AU;
    static const double kayser2AU;
+   static const double nmin2AU;
    static const double gMolin2AU;
    static const double degree2Radian;
    static const double fs2AU;
@@ -245,6 +256,7 @@ private:
    double diisStartErrorSCF;
    double diisEndErrorSCF;
    bool   requiresVdWSCF;
+   std::vector<AtomIndexPair>* sumChargesIndexPairsSCF;
    double vdWScalingFactorSCF;
    double vdWDampingFactorSCF;
    static const double vdWScalingFactorSCFPM3DAM1D;
@@ -288,6 +300,7 @@ private:
    bool              requiresAllTransitionDipoleMomentsCIS;
    std::vector<int>* electronicStateIndecesMullikenCIS;
    bool              requiresUnpairedPopCIS;
+   std::vector<AtomIndexPair>* sumChargesIndexPairsCIS;
    // Memory
    double limitHeapMemory; // in [MB]
    // MD

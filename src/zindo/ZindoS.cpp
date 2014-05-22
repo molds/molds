@@ -50,7 +50,9 @@
 #include"../base/atoms/Catom.h"
 #include"../base/atoms/Natom.h"
 #include"../base/atoms/Oatom.h"
+#include"../base/atoms/Fatom.h"
 #include"../base/atoms/Satom.h"
+#include"../base/atoms/Clatom.h"
 #include"../base/Molecule.h"
 #include"../base/ElectronicStructure.h"
 #include"../base/loggers/DensityLogger.h"
@@ -153,6 +155,8 @@ void ZindoS::SetMessages(){
       = "Error in zindo::ZindoS::SetMolecule: Total number of valence electrons is odd. totalNumberValenceElectrons=";
    this->errorMessageNotEnebleAtomType  
       = "Error in zindo::ZindoS::CheckEnableAtomType: Non available atom is contained.\n";
+   this->errorMessageNotEnebleAtomTypeVdW
+      = "Error in zindo::ZindoS::CheckEnableAtomTypeVdW: Non available atom to add VdW correction is contained.\n";
    this->errorMessageCoulombInt = "Error in zindo::ZindoS::GetCoulombInt: Invalid orbitalType.\n";
    this->errorMessageExchangeInt = "Error in zindo::ZindoS::GetExchangeInt: Invalid orbitalType.\n";
    this->errorMessageNishimotoMataga = "Error in zindo::ZindoS::GetNishimotoMatagaTwoEleInt: Invalid orbitalType.\n";
@@ -195,7 +199,7 @@ void ZindoS::SetMessages(){
    this->messageDavidsonReachCISMatrix = "\n\t\tDimension of the expansion vectors reaches to the dimension of the CIS-matrix.\n";
    this->messageDavidsonGoToDirect = "\t\tHence, we go to the Direct-CIS.\n\n";
    this->messageExcitedStatesEnergies = "\tExcitation energies:";
-   this->messageExcitedStatesEnergiesTitle = "\t\t\t\t|   i-th   |   e[a.u.]   |   e[eV]   | dominant eigenvector coefficients (occ. -> vir.) |\n";
+   this->messageExcitedStatesEnergiesTitle = "\t\t\t\t|   i-th   |   e[a.u.]   |   e[eV]   |   e[nm]   | dominant eigenvector coefficients (occ. -> vir.) |\n";
    this->messageExcitonEnergiesCIS = "\tFree exciton (Ef) and exciton binding (Eb) energies:\n";
    this->messageExcitonEnergiesShortCIS = "\tEf and Eb:";
    this->messageExcitonEnergiesCISTitle = "\t\t\t|   i-th   |   Ef[a.u.]   |   Ef[eV]   |   Eb[a.u.]   |   Eb[eV]   |\n";
@@ -214,7 +218,9 @@ void ZindoS::SetEnableAtomTypes(){
    this->enableAtomTypes.push_back(C);
    this->enableAtomTypes.push_back(N);
    this->enableAtomTypes.push_back(O);
+   this->enableAtomTypes.push_back(F);
    this->enableAtomTypes.push_back(S);
+   this->enableAtomTypes.push_back(Cl);
 }
 
 double ZindoS::GetFockDiagElement(const Atom& atomA, 
@@ -610,6 +616,7 @@ double ZindoS::GetNishimotoMatagaTwoEleInt(const Atom& atomA, OrbitalType orbita
       gammaAA = atomA.GetZindoF0ss();
    }
    /*
+   // ToDo: d-orbitals.
    else if(orbitalA == dxy ||
            orbitalA == dyz ||
            orbitalA == dzz ||
@@ -634,6 +641,7 @@ double ZindoS::GetNishimotoMatagaTwoEleInt(const Atom& atomA, OrbitalType orbita
       gammaBB = atomB.GetZindoF0ss();
    }
    /*
+   // ToDo: d-orbitals.
    else if(orbitalB == dxy ||
            orbitalB == dyz ||
            orbitalB == dzz ||
@@ -684,6 +692,7 @@ double ZindoS::GetNishimotoMatagaTwoEleInt1stDerivative(const Atom& atomA,
       gammaAA = atomA.GetZindoF0ss();
    }
    /*
+   // ToDo: d-orbitals.
    else if(orbitalA == dxy ||
            orbitalA == dyz ||
            orbitalA == dzz ||
@@ -708,6 +717,7 @@ double ZindoS::GetNishimotoMatagaTwoEleInt1stDerivative(const Atom& atomA,
       gammaBB = atomB.GetZindoF0ss();
    }
    /*
+   // ToDo: d-orbitals.
    else if(orbitalB == dxy ||
            orbitalB == dyz ||
            orbitalB == dzz ||
@@ -1795,13 +1805,17 @@ void ZindoS::OutputCISResults() const{
 
    // output cis eigen energies
    this->OutputLog(this->messageExcitedStatesEnergiesTitle);
-   double eV2AU = Parameters::GetInstance()->GetEV2AU();
+   double eV2AU   = Parameters::GetInstance()->GetEV2AU();
+   double nmin2AU = Parameters::GetInstance()->GetNmin2AU();
    for(int k=0; k<Parameters::GetInstance()->GetNumberExcitedStatesCIS(); k++){
-      this->OutputLog(boost::format("%s\t%d\t%e\t%e\t") 
+      double eneEv = this->excitedEnergies[k]/eV2AU;
+      double eneNm = 1.0/(this->excitedEnergies[k]/nmin2AU);
+      this->OutputLog(boost::format("%s\t%d\t%e\t%e\t%e\t") 
          % this->messageExcitedStatesEnergies
          % (k+1) 
          % this->excitedEnergies[k]
-         % (this->excitedEnergies[k]/eV2AU));
+         % eneEv
+         % eneNm);
 
       // sort eigen vector coefficeits of CIS and output
       vector<CISEigenVectorCoefficient> cisEigenVectorCoefficients;
@@ -1963,6 +1977,7 @@ void ZindoS::OutputCISMulliken() const{
    if(!Parameters::GetInstance()->RequiresMullikenCIS()){
       return;
    }
+   // Mulliken charge
    int totalNumberAtoms = this->molecule->GetAtomVect().size();
    this->OutputLog(this->messageMullikenAtomsTitle);
    vector<int>* elecStates = Parameters::GetInstance()->GetElectronicStateIndecesMullikenCIS();
@@ -1977,6 +1992,28 @@ void ZindoS::OutputCISMulliken() const{
                                                                    % (atom.GetCoreCharge()-this->atomicElectronPopulationCIS[k][a]));
       }
       this->OutputLog("\n");
+   }
+   // Sum of Mulliken charges
+   if(Parameters::GetInstance()->RequiresSumChargesCIS()){
+      this->OutputLog(this->messageSumChargesTitle);
+      const vector<AtomIndexPair>* atomPairs = Parameters::GetInstance()->GetSumChargesIndexPairsCIS();
+      for(int k=0; k<elecStates->size(); k++){
+         for(int i=0; i<atomPairs->size(); i++){
+            int firstAtomIndex = (*atomPairs)[i].firstAtomIndex;
+            int lastAtomIndex  = (*atomPairs)[i].lastAtomIndex;
+            double sum=0.0;
+            for(int a=firstAtomIndex; a<=lastAtomIndex; a++){
+               Atom* atom = this->molecule->GetAtomVect()[a];
+               sum += atom->GetCoreCharge()-this->atomicElectronPopulationCIS[k][a];
+            }
+            this->OutputLog(boost::format("%s\t%d\t%d\t%d\t%e\n") % this->messageSumCharges
+                                                                  % (*elecStates)[k]
+                                                                  % firstAtomIndex
+                                                                  % lastAtomIndex
+                                                                  % sum);
+         }
+         this->OutputLog("\n");
+      }
    }
 }
 
@@ -2000,6 +2037,28 @@ void ZindoS::OutputCISUnpairedPop() const{
                                                                % this->atomicUnpairedPopulationCIS[k][a]);
       }
       this->OutputLog("\n");
+   }
+   // Sum of Mulliken Unpaired electron population
+   if(Parameters::GetInstance()->RequiresSumChargesCIS()){
+      this->OutputLog(this->messageSumChargesTitle);
+      const vector<AtomIndexPair>* atomPairs = Parameters::GetInstance()->GetSumChargesIndexPairsCIS();
+      for(int k=0; k<elecStates->size(); k++){
+         for(int i=0; i<atomPairs->size(); i++){
+            int firstAtomIndex = (*atomPairs)[i].firstAtomIndex;
+            int lastAtomIndex  = (*atomPairs)[i].lastAtomIndex;
+            double sum=0.0;
+            for(int a=firstAtomIndex; a<=lastAtomIndex; a++){
+               Atom* atom = this->molecule->GetAtomVect()[a];
+               sum += this->atomicUnpairedPopulationCIS[k][a];
+            }
+            this->OutputLog(boost::format("%s\t%d\t%d\t%d\t%e\n") % this->messageSumChargesUEP
+                                                                  % (*elecStates)[k]
+                                                                  % firstAtomIndex
+                                                                  % lastAtomIndex
+                                                                  % sum);
+         }
+         this->OutputLog("\n");
+      }
    }
 }
 

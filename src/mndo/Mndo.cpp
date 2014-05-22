@@ -48,7 +48,9 @@
 #include"../base/atoms/Catom.h"
 #include"../base/atoms/Natom.h"
 #include"../base/atoms/Oatom.h"
+#include"../base/atoms/Fatom.h"
 #include"../base/atoms/Satom.h"
+#include"../base/atoms/Clatom.h"
 #include"../base/atoms/mm/EnvironmentalPointCharge.h"
 #include"../base/Molecule.h"
 #include"../base/ElectronicStructure.h"
@@ -152,6 +154,8 @@ void Mndo::SetMessages(){
       = "Error in mndo::Mndo::SetMolecule: Total number of valence electrons is odd. totalNumberValenceElectrons=";
    this->errorMessageNotEnebleAtomType  
       = "Error in mndo::Mndo::CheckEnableAtomType: Non available atom is contained.\n";
+   this->errorMessageNotEnebleAtomTypeVdW
+      = "Error in mndo::Mndo::CheckEnableAtomTypeVdW: Non available atom to add VdW correction is contained.\n";
    this->errorMessageCoulombInt = "Error in base_mndo::Mndo::GetCoulombInt: Invalid orbitalType.\n";
    this->errorMessageExchangeInt = "Error in base_mndo::Mndo::GetExchangeInt: Invalid orbitalType.\n";
    this->errorMessageCalcCISMatrix
@@ -215,7 +219,9 @@ void Mndo::SetEnableAtomTypes(){
    this->enableAtomTypes.push_back(C);
    this->enableAtomTypes.push_back(N);
    this->enableAtomTypes.push_back(O);
+   this->enableAtomTypes.push_back(F);
    this->enableAtomTypes.push_back(S);
+   this->enableAtomTypes.push_back(Cl);
    this->enableAtomTypes.push_back(Zn);
 }
 
@@ -3554,6 +3560,7 @@ void Mndo::CalcTwoElecsTwoAtomCores(double****** twoElecsTwoAtomCores,
       throw MolDSException(this->errorMessageCalcTwoElecsTwoAtomCoresNullMatrix);
    }
 #endif
+   OrbitalType twoElecLimit = dxy;
    int totalNumberAtoms = molecule.GetAtomVect().size();
    MallocerFreer::GetInstance()->Initialize<double>(twoElecsTwoAtomCores, 
                                                     totalNumberAtoms,
@@ -3623,7 +3630,6 @@ void Mndo::CalcTwoElecsTwoAtomCores(double****** twoElecsTwoAtomCores,
       if(errorStream.str().empty()){
          if(a<totalNumberAtoms-1){
             int b = a+1;
-            OrbitalType twoElecLimit = dxy;
             int numBuff = (twoElecLimit+1)*twoElecLimit/2;
             int num = (totalNumberAtoms-b)*numBuff*numBuff;
             asyncCommunicator.SetBroadcastedMessage(&this->twoElecsTwoAtomCoresMpiBuff[a][b][0][0], num, calcRank);
@@ -3674,6 +3680,7 @@ void Mndo::CalcTwoElecsAtomEpcCores(double****** twoElecsAtomEpcCores,
 #endif
    int totalNumberAtoms = molecule.GetAtomVect().size();
    int totalNumberEpcs  = molecule.GetEpcVect().size();
+   OrbitalType twoElecLimit = dxy;
    MallocerFreer::GetInstance()->Initialize<double>(twoElecsAtomEpcCores, 
                                                     totalNumberAtoms,
                                                     totalNumberEpcs,
@@ -3690,7 +3697,7 @@ void Mndo::CalcTwoElecsAtomEpcCores(double****** twoElecsAtomEpcCores,
    for(int a=0; a<totalNumberAtoms; a++){
       int calcRank = a%mpiSize;
       if(mpiRank == calcRank){
-//#pragma omp parallel 
+#pragma omp parallel 
          {
             double**** diatomicTwoElecsTwoCores    = NULL;
             double*    tmpDiatomicTwoElecsTwoCores = NULL;
@@ -3705,7 +3712,7 @@ void Mndo::CalcTwoElecsAtomEpcCores(double****** twoElecsAtomEpcCores,
                MallocerFreer::GetInstance()->Malloc<double>(&tmpMatrixBC,                 dxy*dxy, dxy*dxy);
                MallocerFreer::GetInstance()->Malloc<double>(&tmpVectorBC,                 dxy*dxy*dxy*dxy);
                // note that terms with condition a==b are not needed to calculate. 
-//#pragma omp for schedule(dynamic, MOLDS_OMP_DYNAMIC_CHUNK_SIZE)
+#pragma omp for schedule(dynamic, MOLDS_OMP_DYNAMIC_CHUNK_SIZE)
                for(int b=0; b<totalNumberEpcs; b++){
                   const Atom& epc  = *molecule.GetEpcVect()[b];
                   this->CalcDiatomicTwoElecsTwoCores(diatomicTwoElecsTwoCores, 
@@ -3745,7 +3752,6 @@ void Mndo::CalcTwoElecsAtomEpcCores(double****** twoElecsAtomEpcCores,
       if(errorStream.str().empty()){
          if(a<totalNumberAtoms-1){
             int b = 0;
-            OrbitalType twoElecLimit = dxy;
             int numBuff = (twoElecLimit+1)*twoElecLimit/2;
             int num = totalNumberEpcs*numBuff*numBuff;
             asyncCommunicator.SetBroadcastedMessage(&this->twoElecsAtomEpcCoresMpiBuff[a][b][0][0], num, calcRank);
@@ -4726,6 +4732,7 @@ void Mndo::RotateDiatomicTwoElecsTwoCores2ndDerivativesToSpaceFrame(
 // See Apendix in [DT_1977]
 // Orbital mu and nu belong atom A, 
 // orbital lambda and sigma belong atomB.
+// d-orbital can not be calculated.
 double Mndo::GetNddoRepulsionIntegral(const Atom& atomA, 
                                       OrbitalType mu, 
                                       OrbitalType nu,

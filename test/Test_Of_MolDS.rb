@@ -260,7 +260,7 @@ mklNumThreads = "4"
 ompNumThreads = "2"
 tester.doesTestMpi(mklNumThreads,ompNumThreads)
 
-prefix = "c2h6_zindos_directCIS_singlet"
+prefix = "c2h6_zindos_directCIS_singlet_allTrans"
 tester = Tester.new(prefix, <<"TITLE")
 \t\t\t>>> C2H6 <<<
 TITLE
@@ -335,7 +335,7 @@ mklNumThreads = "4"
 ompNumThreads = "2"
 tester.doesTestMpi(mklNumThreads,ompNumThreads)
 
-prefix = "c2h6_zindos_davidsonCIS_singlet"
+prefix = "c2h6_zindos_davidsonCIS_singlet_allTrans"
 tester = Tester.new(prefix, <<"TITLE")
 \t\t\t>>> C2H6 <<<
 TITLE
@@ -421,6 +421,34 @@ tester.doesTestMpi(mklNumThreads,ompNumThreads)
 prefix = "c2h6_mndo"
 tester = Tester.new(prefix, <<"TITLE")
 \t\t\t>>> C2H6 <<<
+TITLE
+mklNumThreads = "1"
+ompNumThreads = "1"
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
+mklNumThreads = "2"
+ompNumThreads = "2"
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
+mklNumThreads = "4"
+ompNumThreads = "2"
+tester.doesTestMpi(mklNumThreads,ompNumThreads)
+
+prefix = "ch3f_mndo"
+tester = Tester.new(prefix, <<"TITLE")
+\t\t\t>>> CH3F <<<
+TITLE
+mklNumThreads = "1"
+ompNumThreads = "1"
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
+mklNumThreads = "2"
+ompNumThreads = "2"
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
+mklNumThreads = "4"
+ompNumThreads = "2"
+tester.doesTestMpi(mklNumThreads,ompNumThreads)
+
+prefix = "ch3cl_mndo"
+tester = Tester.new(prefix, <<"TITLE")
+\t\t\t>>> CH3F <<<
 TITLE
 mklNumThreads = "1"
 ompNumThreads = "1"
@@ -586,6 +614,34 @@ mklNumThreads = "4"
 ompNumThreads = "2"
 tester.doesTestMpi(mklNumThreads,ompNumThreads)
 
+prefix = "ch3f_am1"
+tester = Tester.new(prefix, <<"TITLE")
+\t\t\t>>> CH3F <<<
+TITLE
+mklNumThreads = "1"
+ompNumThreads = "1"
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
+mklNumThreads = "2"
+ompNumThreads = "2"
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
+mklNumThreads = "4"
+ompNumThreads = "2"
+tester.doesTestMpi(mklNumThreads,ompNumThreads)
+
+prefix = "ch3cl_am1"
+tester = Tester.new(prefix, <<"TITLE")
+\t\t\t>>> CH3F <<<
+TITLE
+mklNumThreads = "1"
+ompNumThreads = "1"
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
+mklNumThreads = "2"
+ompNumThreads = "2"
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
+mklNumThreads = "4"
+ompNumThreads = "2"
+tester.doesTestMpi(mklNumThreads,ompNumThreads)
+
 prefix = "ch4_am1_directCIS_singlet"
 tester = Tester.new(prefix, <<"SECTION", <<"TITLE")
 ---------------------------------------------------
@@ -740,6 +796,34 @@ mklNumThreads = "4"
 ompNumThreads = "2"
 tester.doesTestMpi(mklNumThreads,ompNumThreads)
 
+prefix = "ch3f_pm3"
+tester = Tester.new(prefix, <<"TITLE")
+\t\t\t>>> CH3F <<<
+TITLE
+mklNumThreads = "1"
+ompNumThreads = "1"
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
+mklNumThreads = "2"
+ompNumThreads = "2"
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
+mklNumThreads = "4"
+ompNumThreads = "2"
+tester.doesTestMpi(mklNumThreads,ompNumThreads)
+
+prefix = "ch3cl_pm3"
+tester = Tester.new(prefix, <<"TITLE")
+\t\t\t>>> CH3F <<<
+TITLE
+mklNumThreads = "1"
+ompNumThreads = "1"
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
+mklNumThreads = "2"
+ompNumThreads = "2"
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
+mklNumThreads = "4"
+ompNumThreads = "2"
+tester.doesTestMpi(mklNumThreads,ompNumThreads)
+
 prefix = "ch4_pm3_directCIS_singlet"
 tester = Tester.new(prefix, <<"SECTION", <<"TITLE")
 ---------------------------------------------------
@@ -759,7 +843,21 @@ mklNumThreads = "4"
 ompNumThreads = "2"
 tester.doesTestMpi(mklNumThreads,ompNumThreads)
 
-prefix = "c2h6_pm3_directCIS_singlet"
+prefix = "c2h6_pm3_directCIS_singlet_UEP"
+tester = Tester.new(prefix, <<"TITLE")
+\t\t\t>>> C2H6 <<<
+TITLE
+mklNumThreads = "1"
+ompNumThreads = "1"
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
+mklNumThreads = "2"
+ompNumThreads = "2"
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
+mklNumThreads = "4"
+ompNumThreads = "2"
+tester.doesTestMpi(mklNumThreads,ompNumThreads)
+
+prefix = "c2h6_pm3_directCIS_singlet_UEP_sumCharges"
 tester = Tester.new(prefix, <<"TITLE")
 \t\t\t>>> C2H6 <<<
 TITLE
