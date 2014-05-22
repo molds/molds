@@ -52,7 +52,9 @@
 #include"../base/atoms/Catom.h"
 #include"../base/atoms/Natom.h"
 #include"../base/atoms/Oatom.h"
+#include"../base/atoms/Fatom.h"
 #include"../base/atoms/Satom.h"
+#include"../base/atoms/Clatom.h"
 #include"../base/Molecule.h"
 #include"../base/GTOExpansionSTO.h"
 #include"../base/loggers/MOLogger.h"
@@ -99,6 +101,7 @@ Cndo2::Cndo2(){
    //protected methods
    this->SetMessages();
    this->SetEnableAtomTypes();
+   this->SetEnableAtomTypesVdW();
 
    //private variables
    this->elecSCFEnergy = 0.0;
@@ -150,7 +153,9 @@ void Cndo2::SetMessages(){
    this->errorMessageOddTotalValenceElectrions 
       = "Error in cndo::Cndo2::SetMolecule: Total number of valence electrons is odd. totalNumberValenceElectrons=";
    this->errorMessageNotEnebleAtomType  
-      = "Error in cndo::Cndo2::ChecEnableAtomType: Non available atom is contained.\n";
+      = "Error in cndo::Cndo2::CheckEnableAtomType: Non available atom is contained.\n";
+   this->errorMessageNotEnebleAtomTypeVdW
+      = "Error in cndo::Cndo2::CheckEnableAtomTypeVdW: Non available atom to add VdW correction is contained.\n";
    this->errorMessageAtomA = "Atom A is:\n";
    this->errorMessageAtomB = "Atom B is:\n";
    this->errorMessageAtomType = "\tatom type = ";
@@ -227,8 +232,12 @@ void Cndo2::SetMessages(){
    this->messageMullikenAtomsSCF   = "\tMulliken charge(SCF):";
    this->messageMullikenAtoms      = "\tMulliken charge:";
    this->messageMullikenAtomsTitle = "\t\t\t\t| k-th eigenstate | i-th atom | atom type | core charge[a.u.] | Mulliken charge[a.u.]| \n";
-   this->messageUnpairedAtoms      = "\tUnpaired electron population:";
-   this->messageUnpairedAtomsTitle = "\t\t\t\t| k-th eigenstate | i-th atom | atom type | Unpaired electron population[a.u.]| \n";
+   this->messageUnpairedAtoms      = "\tUnpaired electron population(UEP):";
+   this->messageUnpairedAtomsTitle = "\t\t\t\t| k-th eigenstate | i-th atom | atom type | Unpaired electron population[a.u.] | \n";
+   this->messageSumChargesSCF      = "\tSummation of Mulliken(SCF):";
+   this->messageSumCharges         = "\tSummation of Mulliken:";
+   this->messageSumChargesUEP      = "\tSummation of UEP:";
+   this->messageSumChargesTitle    = "\t\t\t\t| k-th eigenstate | first atom | last atom | sum[a.u.] | \n";
    this->messageElecEnergy = "\tElectronic energy(SCF):";
    this->messageNoteElecEnergy       = "\tNote that this electronic energy includes core-repulsions.\n\n";
    this->messageNoteElecEnergyVdW    = "\tNote that this electronic energy includes core-repulsions and vdW correction.\n\n";
@@ -265,14 +274,25 @@ void Cndo2::SetEnableAtomTypes(){
    this->enableAtomTypes.push_back(C);
    this->enableAtomTypes.push_back(N);
    this->enableAtomTypes.push_back(O);
-   //this->enableAtomTypes.push_back(F);
+   this->enableAtomTypes.push_back(F);
    //this->enableAtomTypes.push_back(Na);
    //this->enableAtomTypes.push_back(Mg);
    //this->enableAtomTypes.push_back(Al);
    //this->enableAtomTypes.push_back(Si);
    //this->enableAtomTypes.push_back(P);
    this->enableAtomTypes.push_back(S);
-   //this->enableAtomTypes.push_back(Cl);
+   this->enableAtomTypes.push_back(Cl);
+}
+
+void Cndo2::SetEnableAtomTypesVdW(){
+   this->enableAtomTypesVdW.clear();
+   this->enableAtomTypesVdW.push_back(H);
+   this->enableAtomTypesVdW.push_back(C);
+   this->enableAtomTypesVdW.push_back(N);
+   this->enableAtomTypesVdW.push_back(O);
+   this->enableAtomTypesVdW.push_back(F);
+   this->enableAtomTypesVdW.push_back(S);
+   this->enableAtomTypesVdW.push_back(Cl);
 }
 
 TheoryType Cndo2::GetTheoryType() const{
@@ -283,6 +303,7 @@ void Cndo2::SetMolecule(Molecule* molecule){
    this->molecule = molecule;
    this->CheckNumberValenceElectrons(*molecule);
    this->CheckEnableAtomType(*molecule);
+   this->CheckEnableAtomTypeVdW(*molecule);
 
    // malloc
    MallocerFreer::GetInstance()->Malloc<double>(&this->fockMatrix,
@@ -340,6 +361,34 @@ void Cndo2::CheckEnableAtomType(const Molecule& molecule) const{
       if(!enable){
          stringstream ss;
          ss << this->errorMessageNotEnebleAtomType;
+         ss << this->errorMessageAtomType << AtomTypeStr(atomType) << endl;
+         throw MolDSException(ss.str());
+      }
+   }
+}
+
+void Cndo2::CheckEnableAtomTypeVdW(const Molecule& molecule) const{
+   if(Parameters::GetInstance()->RequiresVdWSCF()){
+      if(this->theory == AM1D || this->theory == PM3D){
+         return;
+      }
+   }
+   else{
+      return;
+   }
+   
+   for(int i=0; i<molecule.GetAtomVect().size(); i++){
+      AtomType atomType = molecule.GetAtomVect()[i]->GetAtomType();
+      bool enable = false;
+      for(int j=0; j<this->enableAtomTypesVdW.size(); j++){
+         if(atomType == this->enableAtomTypesVdW[j]){
+            enable = true;
+            break;
+         }
+      }
+      if(!enable){
+         stringstream ss;
+         ss << this->errorMessageNotEnebleAtomTypeVdW;
          ss << this->errorMessageAtomType << AtomTypeStr(atomType) << endl;
          throw MolDSException(ss.str());
       }
@@ -417,13 +466,13 @@ void Cndo2::CalcVdWCorrectionEnergy(){
 }
 
 // See damping function in (2) in [G_2004] ((11) in [G_2006])
-double Cndo2::GetVdwDampingValue(double vdWDistance, double distance) const{
+double Cndo2::GetVdWDampingValue(double vdWDistance, double distance) const{
    double dampingFactor = Parameters::GetInstance()->GetVdWDampingFactorSCF();
    return 1.0/(1.0+exp(-1.0*dampingFactor*(distance/vdWDistance - 1.0)));
 }
 
 // See damping function in (2) in [G_2004] ((11) in [G_2006])
-double Cndo2::GetVdwDampingValue1stDerivative(double vdWDistance, double distance) const{
+double Cndo2::GetVdWDampingValue1stDerivative(double vdWDistance, double distance) const{
    double dampingFactor = Parameters::GetInstance()->GetVdWDampingFactorSCF();
    return (dampingFactor/vdWDistance)
          *exp(-1.0*dampingFactor*(distance/vdWDistance - 1.0))
@@ -432,7 +481,7 @@ double Cndo2::GetVdwDampingValue1stDerivative(double vdWDistance, double distanc
 }
 
 // See damping function in (2) in [G_2004] ((11) in [G_2006])
-double Cndo2::GetVdwDampingValue2ndDerivative(double vdWDistance, double distance) const{
+double Cndo2::GetVdWDampingValue2ndDerivative(double vdWDistance, double distance) const{
    double dampingFactor = Parameters::GetInstance()->GetVdWDampingFactorSCF();
    double exponent = -1.0*dampingFactor*(distance/vdWDistance - 1.0);
    double pre = dampingFactor/vdWDistance;
@@ -448,7 +497,7 @@ double Cndo2::GetDiatomVdWCorrectionEnergy(const Atom& atomA, const Atom& atomB)
    double tmpSum = atomA.GetVdWCoefficient()+atomB.GetVdWCoefficient();
    if(tmpSum<=0e0){return 0e0;}
    double vdWCoefficients = 2.0*atomA.GetVdWCoefficient()*atomB.GetVdWCoefficient()/tmpSum;
-   double damping = this->GetVdwDampingValue(vdWDistance, distance);
+   double damping = this->GetVdWDampingValue(vdWDistance, distance);
    double scalingFactor = Parameters::GetInstance()->GetVdWScalingFactorSCF();
    return -1.0*scalingFactor*vdWCoefficients*damping
          /(distance*distance*distance*distance*distance*distance);
@@ -464,8 +513,8 @@ double Cndo2::GetDiatomVdWCorrection1stDerivative(const Atom& atomA, const Atom&
    if(tmpSum<=0e0){return 0e0;}
    double vdWCoefficients = 2.0*atomA.GetVdWCoefficient()*atomB.GetVdWCoefficient()/tmpSum;
    double dampingFactor = Parameters::GetInstance()->GetVdWDampingFactorSCF();
-   double damping = this->GetVdwDampingValue(vdWDistance, distance);
-   double damping1stDerivative = this->GetVdwDampingValue1stDerivative(vdWDistance, distance);
+   double damping = this->GetVdWDampingValue(vdWDistance, distance);
+   double damping1stDerivative = this->GetVdWDampingValue1stDerivative(vdWDistance, distance);
    double value=0.0;
    double tmp = distance*distance*distance*distance*distance*distance;
    value += 6.0*damping/(tmp*distance) 
@@ -492,9 +541,9 @@ double Cndo2::GetDiatomVdWCorrection2ndDerivative(const Atom& atomA,
    if(tmpSum<=0e0){return 0e0;}
    double vdWCoefficients = 2.0*atomA.GetVdWCoefficient()*atomB.GetVdWCoefficient()/tmpSum;
    double dampingFactor = Parameters::GetInstance()->GetVdWDampingFactorSCF();
-   double damping = this->GetVdwDampingValue(vdWDistance, distance);
-   double damping1stDerivative = this->GetVdwDampingValue1stDerivative(vdWDistance, distance);
-   double damping2ndDerivative = this->GetVdwDampingValue2ndDerivative(vdWDistance, distance);
+   double damping = this->GetVdWDampingValue(vdWDistance, distance);
+   double damping1stDerivative = this->GetVdWDampingValue1stDerivative(vdWDistance, distance);
+   double damping2ndDerivative = this->GetVdWDampingValue2ndDerivative(vdWDistance, distance);
 
    double dis6 = distance*distance*distance*distance*distance*distance;
    double tmp1 = -6.0*damping             /(dis6*distance) 
@@ -1110,6 +1159,7 @@ void Cndo2::OutputSCFDipole() const{
 
 void Cndo2::OutputSCFMulliken() const{
    int groundState = 0;
+   // Mulliken charge
    this->OutputLog(this->messageMullikenAtomsTitle);
    for(int a=0; a<this->molecule->GetAtomVect().size(); a++){
       Atom* atom = this->molecule->GetAtomVect()[a];
@@ -1121,6 +1171,26 @@ void Cndo2::OutputSCFMulliken() const{
                                                                 % (atom->GetCoreCharge()-atomicElectronPopulation[a]));
    }
    this->OutputLog("\n");
+   // Sum of Mulliken charges
+   if(Parameters::GetInstance()->RequiresSumChargesSCF()){
+      this->OutputLog(this->messageSumChargesTitle);
+      const vector<AtomIndexPair>* atomPairs = Parameters::GetInstance()->GetSumChargesIndexPairsSCF();
+      for(int i=0; i<atomPairs->size(); i++){
+         int firstAtomIndex = (*atomPairs)[i].firstAtomIndex;
+         int lastAtomIndex  = (*atomPairs)[i].lastAtomIndex;
+         double sum=0.0;
+         for(int a=firstAtomIndex; a<=lastAtomIndex; a++){
+            Atom* atom = this->molecule->GetAtomVect()[a];
+            sum += atom->GetCoreCharge()-this->atomicElectronPopulation[a];
+         }
+         this->OutputLog(boost::format("%s\t%d\t%d\t%d\t%e\n") % this->messageSumChargesSCF
+                                                               % groundState
+                                                               % firstAtomIndex
+                                                               % lastAtomIndex
+                                                               % sum);
+      }
+      this->OutputLog("\n");
+   }
 }
 
 void Cndo2::OutputNormalModes(double const* const* normalModes, 
@@ -1444,12 +1514,12 @@ void Cndo2::CalcFockMatrix(double** fockMatrix,
    boost::thread communicationThread( boost::bind(&MolDS_mpi::AsyncCommunicator::Run<double>, &asyncCommunicator) );
 
    for(int A=0; A<totalNumberAtoms; A++){
+      int calcRank = A%mpiSize;
       const Atom& atomA = *molecule.GetAtomVect()[A];
       int firstAOIndexA = atomA.GetFirstAOIndex();
       int lastAOIndexA  = atomA.GetLastAOIndex();
-      for(int mu=firstAOIndexA; mu<=lastAOIndexA; mu++){
-         int calcRank = mu%mpiSize;
-         if(mpiRank == calcRank){
+      if(mpiRank == calcRank){
+         for(int mu=firstAOIndexA; mu<=lastAOIndexA; mu++){
 #pragma omp parallel for schedule(dynamic, MOLDS_OMP_DYNAMIC_CHUNK_SIZE)
             for(int B=A; B<totalNumberAtoms; B++){
                try{
@@ -1494,22 +1564,22 @@ void Cndo2::CalcFockMatrix(double** fockMatrix,
                   ex.Serialize(errorStream);
                }
             }
+         } // end of loop mu
+      } // end of "mpiRank == calcRank"
+      if(errorStream.str().empty()){
+         int tag                      = A;
+         int source                   = calcRank;
+         int dest                     = mpiHeadRank;
+         double* buff                 = &fockMatrix[firstAOIndexA][0];
+         MolDS_mpi::molds_mpi_int num = totalNumberAOs*(lastAOIndexA-firstAOIndexA+1);
+         if(mpiRank == mpiHeadRank && mpiRank != calcRank){
+            asyncCommunicator.SetRecvedMessage(buff, num, source, tag);
          }
-         if(errorStream.str().empty()){
-            int tag                      = mu;
-            int source                   = calcRank;
-            int dest                     = mpiHeadRank;
-            double* buff                 = &fockMatrix[mu][mu];
-            MolDS_mpi::molds_mpi_int num = totalNumberAOs-mu;
-            if(mpiRank == mpiHeadRank && mpiRank != calcRank){
-               asyncCommunicator.SetRecvedMessage(buff, num, source, tag);
-            }
-            if(mpiRank != mpiHeadRank && mpiRank == calcRank){
-               asyncCommunicator.SetSentMessage(buff, num, dest, tag);
-            }
+         if(mpiRank != mpiHeadRank && mpiRank == calcRank){
+            asyncCommunicator.SetSentMessage(buff, num, dest, tag);
          }
       }
-   }
+   } // end of loop A
    asyncCommunicator.Finalize();
    communicationThread.join();
    if(!errorStream.str().empty()){

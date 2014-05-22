@@ -83,12 +83,13 @@ am__objects_1 = Enums.$(OBJEXT) PrintController.$(OBJEXT) \
 	Parameters.$(OBJEXT) RealSphericalHarmonicsIndex.$(OBJEXT) \
 	Atom.$(OBJEXT) Hatom.$(OBJEXT) Liatom.$(OBJEXT) \
 	Catom.$(OBJEXT) Natom.$(OBJEXT) Oatom.$(OBJEXT) \
-	Satom.$(OBJEXT) Znatom.$(OBJEXT) Ghost.$(OBJEXT) \
-	GhostHatom.$(OBJEXT) GhostLiatom.$(OBJEXT) \
-	GhostCatom.$(OBJEXT) GhostNatom.$(OBJEXT) GhostOatom.$(OBJEXT) \
-	GhostSatom.$(OBJEXT) GhostZnatom.$(OBJEXT) \
-	EnvironmentalPointCharge.$(OBJEXT) AtomFactory.$(OBJEXT) \
-	Molecule.$(OBJEXT) InputParser.$(OBJEXT) \
+	Fatom.$(OBJEXT) Satom.$(OBJEXT) Clatom.$(OBJEXT) \
+	Znatom.$(OBJEXT) Ghost.$(OBJEXT) GhostHatom.$(OBJEXT) \
+	GhostLiatom.$(OBJEXT) GhostCatom.$(OBJEXT) \
+	GhostNatom.$(OBJEXT) GhostOatom.$(OBJEXT) GhostFatom.$(OBJEXT) \
+	GhostSatom.$(OBJEXT) GhostClatom.$(OBJEXT) \
+	GhostZnatom.$(OBJEXT) EnvironmentalPointCharge.$(OBJEXT) \
+	AtomFactory.$(OBJEXT) Molecule.$(OBJEXT) InputParser.$(OBJEXT) \
 	GTOExpansionSTO.$(OBJEXT) MOLogger.$(OBJEXT) \
 	DensityLogger.$(OBJEXT) HoleDensityLogger.$(OBJEXT) \
 	ParticleDensityLogger.$(OBJEXT) Cndo2.$(OBJEXT) Indo.$(OBJEXT) \
@@ -261,13 +262,16 @@ ALL_CPP_FILES = base/Enums.cpp base/PrintController.cpp \
 	base/RealSphericalHarmonicsIndex.cpp base/atoms/Atom.cpp \
 	base/atoms/Hatom.cpp base/atoms/Liatom.cpp \
 	base/atoms/Catom.cpp base/atoms/Natom.cpp base/atoms/Oatom.cpp \
-	base/atoms/Satom.cpp base/atoms/Znatom.cpp \
+	base/atoms/Fatom.cpp base/atoms/Satom.cpp \
+	base/atoms/Clatom.cpp base/atoms/Znatom.cpp \
 	base/atoms/ghost/Ghost.cpp base/atoms/ghost/GhostHatom.cpp \
 	base/atoms/ghost/GhostLiatom.cpp \
 	base/atoms/ghost/GhostCatom.cpp \
 	base/atoms/ghost/GhostNatom.cpp \
 	base/atoms/ghost/GhostOatom.cpp \
+	base/atoms/ghost/GhostFatom.cpp \
 	base/atoms/ghost/GhostSatom.cpp \
+	base/atoms/ghost/GhostClatom.cpp \
 	base/atoms/ghost/GhostZnatom.cpp \
 	base/atoms/mm/EnvironmentalPointCharge.cpp \
 	base/factories/AtomFactory.cpp base/Molecule.cpp \
@@ -291,12 +295,13 @@ ALL_HEAD_FILES = config.h base/Enums.h base/Uncopyable.h \
 	base/MathUtilities.h base/EularAngle.h base/Parameters.h \
 	base/RealSphericalHarmonicsIndex.h base/atoms/Atom.h \
 	base/atoms/Hatom.h base/atoms/Liatom.h base/atoms/Catom.h \
-	base/atoms/Natom.h base/atoms/Oatom.h base/atoms/Satom.h \
-	base/atoms/Znatom.h base/atoms/ghost/Ghost.h \
-	base/atoms/ghost/GhostHatom.h base/atoms/ghost/GhostLiatom.h \
-	base/atoms/ghost/GhostCatom.h base/atoms/ghost/GhostNatom.h \
-	base/atoms/ghost/GhostOatom.h base/atoms/ghost/GhostSatom.h \
-	base/atoms/ghost/GhostZnatom.h \
+	base/atoms/Natom.h base/atoms/Oatom.h base/atoms/Fatom.h \
+	base/atoms/Satom.h base/atoms/Clatom.h base/atoms/Znatom.h \
+	base/atoms/ghost/Ghost.h base/atoms/ghost/GhostHatom.h \
+	base/atoms/ghost/GhostLiatom.h base/atoms/ghost/GhostCatom.h \
+	base/atoms/ghost/GhostNatom.h base/atoms/ghost/GhostOatom.h \
+	base/atoms/ghost/GhostFatom.h base/atoms/ghost/GhostSatom.h \
+	base/atoms/ghost/GhostClatom.h base/atoms/ghost/GhostZnatom.h \
 	base/atoms/mm/EnvironmentalPointCharge.h \
 	base/factories/AtomFactory.h base/Molecule.h \
 	base/InputParser.h base/GTOExpansionSTO.h \
@@ -429,6 +434,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BFGS.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Blas.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Catom.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Clatom.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Cndo2.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ConjugateGradient.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DensityLogger.Po@am__quote@
@@ -436,10 +442,13 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Enums.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/EnvironmentalPointCharge.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/EularAngle.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Fatom.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GEDIIS.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GTOExpansionSTO.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Ghost.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GhostCatom.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GhostClatom.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GhostFatom.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GhostHatom.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GhostLiatom.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GhostNatom.Po@am__quote@
@@ -762,6 +771,20 @@ Oatom.obj: base/atoms/Oatom.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o Oatom.obj `if test -f 'base/atoms/Oatom.cpp'; then $(CYGPATH_W) 'base/atoms/Oatom.cpp'; else $(CYGPATH_W) '$(srcdir)/base/atoms/Oatom.cpp'; fi`
 
+Fatom.o: base/atoms/Fatom.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT Fatom.o -MD -MP -MF $(DEPDIR)/Fatom.Tpo -c -o Fatom.o `test -f 'base/atoms/Fatom.cpp' || echo '$(srcdir)/'`base/atoms/Fatom.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/Fatom.Tpo $(DEPDIR)/Fatom.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='base/atoms/Fatom.cpp' object='Fatom.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o Fatom.o `test -f 'base/atoms/Fatom.cpp' || echo '$(srcdir)/'`base/atoms/Fatom.cpp
+
+Fatom.obj: base/atoms/Fatom.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT Fatom.obj -MD -MP -MF $(DEPDIR)/Fatom.Tpo -c -o Fatom.obj `if test -f 'base/atoms/Fatom.cpp'; then $(CYGPATH_W) 'base/atoms/Fatom.cpp'; else $(CYGPATH_W) '$(srcdir)/base/atoms/Fatom.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/Fatom.Tpo $(DEPDIR)/Fatom.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='base/atoms/Fatom.cpp' object='Fatom.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o Fatom.obj `if test -f 'base/atoms/Fatom.cpp'; then $(CYGPATH_W) 'base/atoms/Fatom.cpp'; else $(CYGPATH_W) '$(srcdir)/base/atoms/Fatom.cpp'; fi`
+
 Satom.o: base/atoms/Satom.cpp
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT Satom.o -MD -MP -MF $(DEPDIR)/Satom.Tpo -c -o Satom.o `test -f 'base/atoms/Satom.cpp' || echo '$(srcdir)/'`base/atoms/Satom.cpp
 @am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/Satom.Tpo $(DEPDIR)/Satom.Po
@@ -775,6 +798,20 @@ Satom.obj: base/atoms/Satom.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='base/atoms/Satom.cpp' object='Satom.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o Satom.obj `if test -f 'base/atoms/Satom.cpp'; then $(CYGPATH_W) 'base/atoms/Satom.cpp'; else $(CYGPATH_W) '$(srcdir)/base/atoms/Satom.cpp'; fi`
+
+Clatom.o: base/atoms/Clatom.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT Clatom.o -MD -MP -MF $(DEPDIR)/Clatom.Tpo -c -o Clatom.o `test -f 'base/atoms/Clatom.cpp' || echo '$(srcdir)/'`base/atoms/Clatom.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/Clatom.Tpo $(DEPDIR)/Clatom.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='base/atoms/Clatom.cpp' object='Clatom.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o Clatom.o `test -f 'base/atoms/Clatom.cpp' || echo '$(srcdir)/'`base/atoms/Clatom.cpp
+
+Clatom.obj: base/atoms/Clatom.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT Clatom.obj -MD -MP -MF $(DEPDIR)/Clatom.Tpo -c -o Clatom.obj `if test -f 'base/atoms/Clatom.cpp'; then $(CYGPATH_W) 'base/atoms/Clatom.cpp'; else $(CYGPATH_W) '$(srcdir)/base/atoms/Clatom.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/Clatom.Tpo $(DEPDIR)/Clatom.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='base/atoms/Clatom.cpp' object='Clatom.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o Clatom.obj `if test -f 'base/atoms/Clatom.cpp'; then $(CYGPATH_W) 'base/atoms/Clatom.cpp'; else $(CYGPATH_W) '$(srcdir)/base/atoms/Clatom.cpp'; fi`
 
 Znatom.o: base/atoms/Znatom.cpp
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT Znatom.o -MD -MP -MF $(DEPDIR)/Znatom.Tpo -c -o Znatom.o `test -f 'base/atoms/Znatom.cpp' || echo '$(srcdir)/'`base/atoms/Znatom.cpp
@@ -874,6 +911,20 @@ GhostOatom.obj: base/atoms/ghost/GhostOatom.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o GhostOatom.obj `if test -f 'base/atoms/ghost/GhostOatom.cpp'; then $(CYGPATH_W) 'base/atoms/ghost/GhostOatom.cpp'; else $(CYGPATH_W) '$(srcdir)/base/atoms/ghost/GhostOatom.cpp'; fi`
 
+GhostFatom.o: base/atoms/ghost/GhostFatom.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT GhostFatom.o -MD -MP -MF $(DEPDIR)/GhostFatom.Tpo -c -o GhostFatom.o `test -f 'base/atoms/ghost/GhostFatom.cpp' || echo '$(srcdir)/'`base/atoms/ghost/GhostFatom.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/GhostFatom.Tpo $(DEPDIR)/GhostFatom.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='base/atoms/ghost/GhostFatom.cpp' object='GhostFatom.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o GhostFatom.o `test -f 'base/atoms/ghost/GhostFatom.cpp' || echo '$(srcdir)/'`base/atoms/ghost/GhostFatom.cpp
+
+GhostFatom.obj: base/atoms/ghost/GhostFatom.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT GhostFatom.obj -MD -MP -MF $(DEPDIR)/GhostFatom.Tpo -c -o GhostFatom.obj `if test -f 'base/atoms/ghost/GhostFatom.cpp'; then $(CYGPATH_W) 'base/atoms/ghost/GhostFatom.cpp'; else $(CYGPATH_W) '$(srcdir)/base/atoms/ghost/GhostFatom.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/GhostFatom.Tpo $(DEPDIR)/GhostFatom.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='base/atoms/ghost/GhostFatom.cpp' object='GhostFatom.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o GhostFatom.obj `if test -f 'base/atoms/ghost/GhostFatom.cpp'; then $(CYGPATH_W) 'base/atoms/ghost/GhostFatom.cpp'; else $(CYGPATH_W) '$(srcdir)/base/atoms/ghost/GhostFatom.cpp'; fi`
+
 GhostSatom.o: base/atoms/ghost/GhostSatom.cpp
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT GhostSatom.o -MD -MP -MF $(DEPDIR)/GhostSatom.Tpo -c -o GhostSatom.o `test -f 'base/atoms/ghost/GhostSatom.cpp' || echo '$(srcdir)/'`base/atoms/ghost/GhostSatom.cpp
 @am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/GhostSatom.Tpo $(DEPDIR)/GhostSatom.Po
@@ -887,6 +938,20 @@ GhostSatom.obj: base/atoms/ghost/GhostSatom.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='base/atoms/ghost/GhostSatom.cpp' object='GhostSatom.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o GhostSatom.obj `if test -f 'base/atoms/ghost/GhostSatom.cpp'; then $(CYGPATH_W) 'base/atoms/ghost/GhostSatom.cpp'; else $(CYGPATH_W) '$(srcdir)/base/atoms/ghost/GhostSatom.cpp'; fi`
+
+GhostClatom.o: base/atoms/ghost/GhostClatom.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT GhostClatom.o -MD -MP -MF $(DEPDIR)/GhostClatom.Tpo -c -o GhostClatom.o `test -f 'base/atoms/ghost/GhostClatom.cpp' || echo '$(srcdir)/'`base/atoms/ghost/GhostClatom.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/GhostClatom.Tpo $(DEPDIR)/GhostClatom.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='base/atoms/ghost/GhostClatom.cpp' object='GhostClatom.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o GhostClatom.o `test -f 'base/atoms/ghost/GhostClatom.cpp' || echo '$(srcdir)/'`base/atoms/ghost/GhostClatom.cpp
+
+GhostClatom.obj: base/atoms/ghost/GhostClatom.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT GhostClatom.obj -MD -MP -MF $(DEPDIR)/GhostClatom.Tpo -c -o GhostClatom.obj `if test -f 'base/atoms/ghost/GhostClatom.cpp'; then $(CYGPATH_W) 'base/atoms/ghost/GhostClatom.cpp'; else $(CYGPATH_W) '$(srcdir)/base/atoms/ghost/GhostClatom.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/GhostClatom.Tpo $(DEPDIR)/GhostClatom.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='base/atoms/ghost/GhostClatom.cpp' object='GhostClatom.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o GhostClatom.obj `if test -f 'base/atoms/ghost/GhostClatom.cpp'; then $(CYGPATH_W) 'base/atoms/ghost/GhostClatom.cpp'; else $(CYGPATH_W) '$(srcdir)/base/atoms/ghost/GhostClatom.cpp'; fi`
 
 GhostZnatom.o: base/atoms/ghost/GhostZnatom.cpp
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT GhostZnatom.o -MD -MP -MF $(DEPDIR)/GhostZnatom.Tpo -c -o GhostZnatom.o `test -f 'base/atoms/ghost/GhostZnatom.cpp' || echo '$(srcdir)/'`base/atoms/ghost/GhostZnatom.cpp

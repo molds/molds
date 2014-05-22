@@ -40,7 +40,9 @@
 #include"../base/atoms/Catom.h"
 #include"../base/atoms/Natom.h"
 #include"../base/atoms/Oatom.h"
+#include"../base/atoms/Fatom.h"
 #include"../base/atoms/Satom.h"
+#include"../base/atoms/Clatom.h"
 #include"../base/Molecule.h"
 #include"../base/ElectronicStructure.h"
 #include"../cndo/Cndo2.h"
@@ -77,6 +79,8 @@ void Am1D::SetMessages(){
       = "Error in am1::Am1D::SetMolecule: Total number of valence electrons is odd. totalNumberValenceElectrons=";
    this->errorMessageNotEnebleAtomType  
       = "Error in am1::Am1D::CheckEnableAtomType: Non available atom is contained.\n";
+   this->errorMessageNotEnebleAtomTypeVdW
+      = "Error in am1::Am1D::CheckEnableAtomTypeVdW: Non available atom to add VdW correction is contained.\n";
    this->errorMessageCoulombInt = "Error in am1::Am1D::GetCoulombInt: Invalid orbitalType.\n";
    this->errorMessageExchangeInt = "Error in am1::Am1D::GetExchangeInt: Invalid orbitalType.\n";
    this->errorMessageCalcCISMatrix
@@ -134,7 +138,9 @@ void Am1D::SetEnableAtomTypes(){
    this->enableAtomTypes.push_back(C);
    this->enableAtomTypes.push_back(N);
    this->enableAtomTypes.push_back(O);
+   this->enableAtomTypes.push_back(F);
    this->enableAtomTypes.push_back(S);
+   this->enableAtomTypes.push_back(Cl);
 }
 
 

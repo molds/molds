@@ -37,7 +37,9 @@
 #include"../atoms/Catom.h"
 #include"../atoms/Natom.h"
 #include"../atoms/Oatom.h"
+#include"../atoms/Fatom.h"
 #include"../atoms/Satom.h"
+#include"../atoms/Clatom.h"
 #include"../atoms/Znatom.h"
 #include"../atoms/ghost/Ghost.h"
 #include"../atoms/ghost/GhostHatom.h"
@@ -45,7 +47,9 @@
 #include"../atoms/ghost/GhostCatom.h"
 #include"../atoms/ghost/GhostNatom.h"
 #include"../atoms/ghost/GhostOatom.h"
+#include"../atoms/ghost/GhostFatom.h"
 #include"../atoms/ghost/GhostSatom.h"
+#include"../atoms/ghost/GhostClatom.h"
 #include"../atoms/ghost/GhostZnatom.h"
 #include"../atoms/mm/EnvironmentalPointCharge.h"
 #include"AtomFactory.h"
@@ -77,8 +81,14 @@ Atom* AtomFactory::Create(AtomType atomType, int index, double x, double y, doub
    else if(atomType == O){
       atom = new Oatom(index);
    }
+   else if(atomType == F){
+      atom = new Fatom(index);
+   }
    else if(atomType == S){
       atom = new Satom(index);
+   }
+   else if(atomType == Cl){
+      atom = new Clatom(index);
    }
    else if(atomType == Zn){
       atom = new Znatom(index);
@@ -98,8 +108,14 @@ Atom* AtomFactory::Create(AtomType atomType, int index, double x, double y, doub
    else if(atomType == ghostO){
       atom = new GhostOatom(index);
    }
+   else if(atomType == ghostF){
+      atom = new GhostFatom(index);
+   }
    else if(atomType == ghostS){
       atom = new GhostSatom(index);
+   }
+   else if(atomType == ghostCl){
+      atom = new GhostClatom(index);
    }
    else if(atomType == ghostZn){
       atom = new GhostZnatom(index);

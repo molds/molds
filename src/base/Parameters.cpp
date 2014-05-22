@@ -48,6 +48,7 @@ const double Parameters::kcalMolin2AU  = 0.00159360175;
 const double Parameters::angstrom2AU   = 1.0/0.5291772;
 const double Parameters::nm2AU         = 10.0*Parameters::angstrom2AU;
 const double Parameters::kayser2AU     = 4.556336e-6;
+const double Parameters::nmin2AU       = 4.556336e01;
 const double Parameters::fs2AU         = 1.0/(2.418884326505e-2);
 const double Parameters::gMolin2AU     = 1.0e5/(6.0221415*9.1095);
 const double Parameters::degree2Radian = M_PI / 180.0;
@@ -67,6 +68,8 @@ Parameters::Parameters(){
    this->elecIndecesHolePlot     = NULL;
    this->elecIndecesParticlePlot = NULL;
    this->electronicStateIndecesMullikenCIS = NULL;
+   this->sumChargesIndexPairsSCF = NULL;
+   this->sumChargesIndexPairsCIS = NULL;
 }
 
 Parameters::~Parameters(){
@@ -93,6 +96,14 @@ Parameters::~Parameters(){
       delete this->electronicStateIndecesMullikenCIS;
       this->electronicStateIndecesMullikenCIS= NULL;
       //this->OutputLog("electronicStateIndecesMullikenCIS deleted\n");
+   }
+   if(this->sumChargesIndexPairsSCF != NULL){
+      delete this->sumChargesIndexPairsSCF;
+      //this->OutputLog("sumChargesIndexPairsSCF deleted\n");
+   }
+   if(this->sumChargesIndexPairsCIS != NULL){
+      delete this->sumChargesIndexPairsCIS;
+      //this->OutputLog("sumChargesIndexPairsCIS deleted\n");
    }
 }
 
@@ -219,6 +230,10 @@ void Parameters::SetDefaultValues(){
 void Parameters::SetMessages(){
    this->errorMessageGetIndecesMOPlotNull
       = "Error in base::Parameters::GetIndecesMOPlot: indecesMOPlot is NULL.\n";
+   this->errorMessageGetSumChargesIndexPairsSCFNull
+      = "Error in base::Parameters::GetSumChargesIndexPairsSCF: sumChargesIndexPairsSCF is NULL.\n";
+   this->errorMessageGetSumChargesIndexPairsCISNull
+      = "Error in base::Parameters::GetSumChargesIndexPairsCIS: sumChargesIndexPairsCIS is NULL.\n";
    this->errorMessageGetIndecesHolePlotNull
       = "Error in base::Parameters::GetIndecesHolePlot: elecIndecesHolePlot is NULL.\n";
    this->errorMessageGetIndecesParticlePlotNull
@@ -260,6 +275,27 @@ void Parameters::SetRotatingEularAngles(double alpha, double beta, double gamma)
    this->rotatingEularAngles.SetAlpha(alpha);
    this->rotatingEularAngles.SetBeta(beta);
    this->rotatingEularAngles.SetGamma(gamma);
+}
+
+// methods for SCF
+bool Parameters::RequiresSumChargesSCF() const{
+   return (this->sumChargesIndexPairsSCF!=NULL && 
+           0<this->sumChargesIndexPairsSCF->size());
+}
+
+const vector<AtomIndexPair>* Parameters::GetSumChargesIndexPairsSCF() const{
+#ifdef MOLDS_DBG
+   if(this->sumChargesIndexPairsSCF==NULL) throw MolDSException(this->errorMessageGetSumChargesIndexPairsSCFNull);
+#endif
+   return this->sumChargesIndexPairsSCF;
+}
+
+void Parameters::AddSumChargesIndexPairsSCF(int firstAtomIndex, int lastAtomIndex){
+   if(this->sumChargesIndexPairsSCF==NULL){
+      this->sumChargesIndexPairsSCF = new vector<AtomIndexPair>;
+   }
+   AtomIndexPair atomIndexPair = {firstAtomIndex, lastAtomIndex};
+   this->sumChargesIndexPairsSCF->push_back(atomIndexPair);
 }
 
 // methods for MOPlot
@@ -361,6 +397,26 @@ void Parameters::AddElectronicStateIndexMullikenCIS(int electronicStateIndex){
 bool Parameters::RequiresMullikenCIS() const{
    return (this->electronicStateIndecesMullikenCIS!=NULL && 
            0<this->electronicStateIndecesMullikenCIS->size());
+}
+
+bool Parameters::RequiresSumChargesCIS() const{
+   return (this->sumChargesIndexPairsCIS!=NULL && 
+           0<this->sumChargesIndexPairsCIS->size());
+}
+
+const vector<AtomIndexPair>* Parameters::GetSumChargesIndexPairsCIS() const{
+#ifdef MOLDS_DBG
+   if(this->sumChargesIndexPairsCIS==NULL) throw MolDSException(this->errorMessageGetSumChargesIndexPairsCISNull);
+#endif
+   return this->sumChargesIndexPairsCIS;
+}
+
+void Parameters::AddSumChargesIndexPairsCIS(int firstAtomIndex, int lastAtomIndex){
+   if(this->sumChargesIndexPairsCIS==NULL){
+      this->sumChargesIndexPairsCIS = new vector<AtomIndexPair>;
+   }
+   AtomIndexPair atomIndexPair = {firstAtomIndex, lastAtomIndex};
+   this->sumChargesIndexPairsCIS->push_back(atomIndexPair);
 }
 
 }
