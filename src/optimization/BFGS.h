@@ -22,7 +22,7 @@
 namespace MolDS_optimization{
 
 class BFGS : public MolDS_optimization::Optimizer{
-private:
+protected:
    class BFGSState: public OptimizerState{
    protected:
       double** matrixHessian;
@@ -87,11 +87,11 @@ private:
    const std::string& OptimizationStepMessage() const{
       return this->messageStartBFGSStep;
    }
-protected:
    virtual OptimizerState* CreateState(MolDS_base::Molecule& molecule,
                                        const boost::shared_ptr<MolDS_base::ElectronicStructure> electronicStructure) const{
       return new BFGSState(molecule, electronicStructure);
    }
+protected:
    void InitializeState(OptimizerState &state, const MolDS_base::Molecule& molecule) const;
    void PrepareState(OptimizerState& state,
                              const MolDS_base::Molecule& molecule,

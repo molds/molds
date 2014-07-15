@@ -155,15 +155,6 @@ void BFGS::PrepareState(OptimizerState& stateOrig,
 
    // Limit the trustRadius to maxNormStep
    state.SetTrustRadius(min(state.GetTrustRadius(),state.GetMaxNormStep()));
-
-   //Calculate RFO step
-   this->CalcRFOStep(state.GetVectorStep(), state.GetMatrixHessian(), state.GetVectorForce(), state.GetTrustRadius(), dimension);
-
-   state.SetApproximateChange(this->ApproximateEnergyChange(dimension,
-                                                            state.GetMatrixHessian(),
-                                                            state.GetVectorForce(),
-                                                            state.GetVectorStep())
-                             );
 }
       
 void BFGS::CalcNextStepGeometry(Molecule &molecule,
@@ -171,6 +162,7 @@ void BFGS::CalcNextStepGeometry(Molecule &molecule,
                                 boost::shared_ptr<ElectronicStructure> electronicStructure,
                                 const int elecState,
                                 const double dt) const{
+   const MolDS_wrappers::molds_blas_int dimension = molecule.GetAtomVect().size()*CartesianType_end;
    BFGSState& state = stateOrig.CastRef<BFGSState>();
 
    // Take a RFO step
@@ -178,6 +170,14 @@ void BFGS::CalcNextStepGeometry(Molecule &molecule,
    bool tempCanOutputLogs = false;
    bool requireGuess = false;
    state.SetInitialEnergy(state.GetCurrentEnergy());
+
+   //Calculate RFO step
+   this->CalcRFOStep(state.GetVectorStep(), state.GetMatrixHessian(), state.GetVectorForce(), state.GetTrustRadius(), dimension);
+
+   state.SetApproximateChange(this->ApproximateEnergyChange(dimension,
+                                                            state.GetMatrixHessian(),
+                                                            state.GetVectorForce(),
+                                                            state.GetVectorStep()));
    if(doLineSearch){
       this->LineSearch(electronicStructure, molecule, state.GetCurrentEnergyRef(), state.GetMatrixStep(), elecState, dt);
    }
