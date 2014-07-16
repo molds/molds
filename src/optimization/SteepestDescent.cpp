@@ -67,10 +67,10 @@ void SteepestDescent::SetMessages(){
 }
 
 void SteepestDescent::CalcNextStepGeometry(Molecule &molecule,
-                                             OptimizerState& state,
-                                             boost::shared_ptr<ElectronicStructure> electronicStructure,
-                                             const int elecState,
-                                             const double dt) const{
+                                           OptimizerState& state,
+                                           boost::shared_ptr<ElectronicStructure> electronicStructure,
+                                           const int elecState,
+                                           const double dt) const{
    state.SetInitialEnergy(state.GetCurrentEnergy());
 
    this->LineSearch(electronicStructure, molecule, state.GetCurrentEnergyRef(), state.GetMatrixForce(), elecState, dt);

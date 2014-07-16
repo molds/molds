@@ -95,9 +95,9 @@ void ConjugateGradient::InitializeState(OptimizerState &stateOrig, const Molecul
 }
 
 void ConjugateGradient::PrepareState(OptimizerState& stateOrig,
-                        const MolDS_base::Molecule& molecule,
-                        const boost::shared_ptr<MolDS_base::ElectronicStructure> electronicStructure,
-                        const int elecState) const{
+                                     const MolDS_base::Molecule& molecule,
+                                     const boost::shared_ptr<MolDS_base::ElectronicStructure> electronicStructure,
+                                     const int elecState) const{
    ConjugateGradientState& state = stateOrig.CastRef<ConjugateGradientState>();
 
    for(int a=0;a<molecule.GetAtomVect().size();a++){

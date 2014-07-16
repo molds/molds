@@ -96,9 +96,9 @@ private:
 protected:
    void InitializeState(OptimizerState &state, const MolDS_base::Molecule& molecule) const;
    void PrepareState(OptimizerState& state,
-                             const MolDS_base::Molecule& molecule,
-                             const boost::shared_ptr<MolDS_base::ElectronicStructure> electronicStructure,
-                             const int elecState) const;
+                     const MolDS_base::Molecule& molecule,
+                     const boost::shared_ptr<MolDS_base::ElectronicStructure> electronicStructure,
+                     const int elecState) const;
    void CalcNextStepGeometry(MolDS_base::Molecule &molecule,
                              OptimizerState& state,
                              boost::shared_ptr<MolDS_base::ElectronicStructure> electronicStructure,

@@ -100,10 +100,10 @@ void GEDIIS::InitializeState(OptimizerState &stateOrig, const Molecule& molecule
 }
 
 void GEDIIS::CalcNextStepGeometry(Molecule &molecule,
-                                OptimizerState& stateOrig,
-                                boost::shared_ptr<ElectronicStructure> electronicStructure,
-                                const int elecState,
-                                const double dt) const{
+                                  OptimizerState& stateOrig,
+                                  boost::shared_ptr<ElectronicStructure> electronicStructure,
+                                  const int elecState,
+                                  const double dt) const{
    GEDIISState& state = stateOrig.CastRef<GEDIISState>();
 
    try{
@@ -159,7 +159,7 @@ GEDIIS::GEDIISHistory::GEDIISHistory():maxEntryCount(5){
 
 GEDIIS::GEDIISHistory::~GEDIISHistory(){
    for(entryList_t::iterator i = this->entryList.begin(); i != this->entryList.end(); i++){
-     delete *i;
+      delete *i;
    }
 }
 

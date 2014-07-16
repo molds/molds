@@ -118,10 +118,10 @@ void Optimizer::Optimize(Molecule& molecule){
 }
 
 void Optimizer::SearchMinimum(boost::shared_ptr<ElectronicStructure> electronicStructure,
-                                    Molecule& molecule,
-                                    boost::shared_ptr<MolDS_base_constraints::Constraint> constraint,
-                                    double* lineSearchedEnergy,
-                                    bool* obtainesOptimizedStructure) const{
+                              Molecule& molecule,
+                              boost::shared_ptr<MolDS_base_constraints::Constraint> constraint,
+                              double* lineSearchedEnergy,
+                              bool* obtainesOptimizedStructure) const{
    boost::scoped_ptr<OptimizerState> statePtr(this->CreateState(molecule, electronicStructure, constraint));
    OptimizerState& state = *statePtr.get();
 
