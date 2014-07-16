@@ -44,18 +44,23 @@
 #include"../base/Molecule.h"
 #include"../base/ElectronicStructure.h"
 #include"../base/factories/ElectronicStructureFactory.h"
+#include"../base/constraints/Constraint.h"
+#include"../base/factories/ConstraintFactory.h"
 #include"Optimizer.h"
 using namespace std;
 using namespace MolDS_base;
 using namespace MolDS_base_atoms;
+using namespace MolDS_base_constraints;
 using namespace MolDS_base_factories;
 
 namespace MolDS_optimization{
 
 Optimizer::OptimizerState::OptimizerState(Molecule& molecule,
-                                          const boost::shared_ptr<ElectronicStructure>& electronicStructure):
+                                          const boost::shared_ptr<ElectronicStructure>& electronicStructure,
+                                          const boost::shared_ptr<Constraint>& constraint):
    molecule(molecule),
    electronicStructure(electronicStructure),
+   constraint(constraint),
    elecState(Parameters::GetInstance()->GetElectronicStateIndexOptimization()),
    dt(Parameters::GetInstance()->GetTimeWidthOptimization()),
    totalSteps(Parameters::GetInstance()->GetTotalStepsOptimization()),
@@ -93,10 +98,13 @@ void Optimizer::Optimize(Molecule& molecule){
    electronicStructure->SetCanOutputLogs(this->CanOutputLogs());
    molecule.SetCanOutputLogs(this->CanOutputLogs());
 
+   // create constraint
+   boost::shared_ptr<MolDS_base_constraints::Constraint> constraint(ConstraintFactory::Create(molecule, electronicStructure));
+
    // Search Minimum
    double lineSearchedEnergy = 0.0;
    bool obtainesOptimizedStructure = false;
-   this->SearchMinimum(electronicStructure, molecule, &lineSearchedEnergy, &obtainesOptimizedStructure);
+   this->SearchMinimum(electronicStructure, molecule, constraint, &lineSearchedEnergy, &obtainesOptimizedStructure);
   
    // Not converged
    if(!obtainesOptimizedStructure){
@@ -111,16 +119,17 @@ void Optimizer::Optimize(Molecule& molecule){
 
 void Optimizer::SearchMinimum(boost::shared_ptr<ElectronicStructure> electronicStructure,
                                     Molecule& molecule,
+                                    boost::shared_ptr<MolDS_base_constraints::Constraint> constraint,
                                     double* lineSearchedEnergy,
                                     bool* obtainesOptimizedStructure) const{
-   boost::scoped_ptr<OptimizerState> statePtr(this->CreateState(molecule, electronicStructure));
+   boost::scoped_ptr<OptimizerState> statePtr(this->CreateState(molecule, electronicStructure, constraint));
    OptimizerState& state = *statePtr.get();
 
    // initial calculation
    bool requireGuess = true;
    this->UpdateElectronicStructure(electronicStructure, molecule, requireGuess, this->CanOutputLogs());
    state.SetCurrentEnergy(electronicStructure->GetElectronicEnergy(state.GetElecState()));
-   state.SetMatrixForce(electronicStructure->GetForce(state.GetElecState()));
+   state.SetMatrixForce(constraint->GetForce(state.GetElecState()));
 
    this->InitializeState(state, molecule);
 
@@ -133,7 +142,7 @@ void Optimizer::SearchMinimum(boost::shared_ptr<ElectronicStructure> electronicS
       this->CalcNextStepGeometry(molecule, state, electronicStructure, state.GetElecState(), state.GetDeltaT());
 
       state.SetCurrentEnergy(electronicStructure->GetElectronicEnergy(state.GetElecState()));
-      state.SetMatrixForce(electronicStructure->GetForce(state.GetElecState()));
+      state.SetMatrixForce(constraint->GetForce(state.GetElecState()));
 
       this->UpdateState(state);
 
@@ -334,7 +343,6 @@ bool Optimizer::SatisfiesConvergenceCriterion(double const* const* matrixForce,
    }
    return satisfies;
 }
-
 }
 
 

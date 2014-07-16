@@ -40,6 +40,7 @@
 #include"../base/atoms/Atom.h"
 #include"../base/Molecule.h"
 #include"../base/ElectronicStructure.h"
+#include"../base/constraints/Constraint.h"
 #include"Optimizer.h"
 #include"SteepestDescent.h"
 using namespace std;
@@ -76,14 +77,15 @@ void SteepestDescent::CalcNextStepGeometry(Molecule &molecule,
 }
 
 void SteepestDescent::UpdateState(OptimizerState& state) const{
-   this->UpdateSearchDirection(state, state.GetElectronicStructure(), state.GetMolecule(), state.GetElecState());
+   this->UpdateSearchDirection(state, state.GetElectronicStructure(), state.GetMolecule(), state.GetConstraint(), state.GetElecState());
 }
 
 void SteepestDescent::UpdateSearchDirection(OptimizerState& state,
                                             boost::shared_ptr<ElectronicStructure> electronicStructure,
                                             const MolDS_base::Molecule& molecule,
+                                            boost::shared_ptr<MolDS_base_constraints::Constraint> constraint,
                                             int elecState) const{
       // update force
-      state.SetMatrixForce(electronicStructure->GetForce(elecState));
+      state.SetMatrixForce(constraint->GetForce(elecState));
 }
 }

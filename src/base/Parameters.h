@@ -73,6 +73,8 @@ public:
    inline double GetVdWDampingFactorSCF() const        {return this->vdWDampingFactorSCF;}
    inline void   SetVdWDampingFactorSCF()              {this->vdWDampingFactorSCF = this->vdWDampingFactorSCFPM3DAM1D;}
    inline void   SetVdWDampingFactorSCF(double vdWDamp){this->vdWDampingFactorSCF = vdWDamp;}
+   inline bool   RequiresMpiSCF() const                {return this->requiresMpiSCF;}
+   inline void   SetRequiresMpiSCF(bool requires)      {this->requiresMpiSCF = requires;}
    // MOPlot
    inline bool          RequiresMOPlot() const                     {return (this->indecesMOPlot!=NULL && 0<this->indecesMOPlot->size());}
    inline std::string   GetFileNamePrefixMOPlot() const            {return this->fileNamePrefixMOPlot;}
@@ -215,6 +217,9 @@ public:
    void                   SetInitialTrustRadiusOptimization(double r)    {this->initialTrustRadiusOptimization = r;}
    double                 GetMaxNormStepOptimization() const             {return this->maxNormStepOptimization;}
    void                   SetMaxNormStepOptimization(double n)           {this->maxNormStepOptimization = n;}
+   bool                   RequiresSpaceFixedAtomsOptimization() const;
+   const std::vector<AtomIndexPair>* GetSpaceFixedAtomIndexPairsOptimization() const;
+   void                   AddSpaceFixedAtomsIndexPairOptimization(int fistAtomIndex, int lastAtomIndex);
    // Frequencies 
    bool RequiresFrequencies() const               {return this->requiresFrequencies;}
    void SetRequiresFrequencies(bool b)            {this->requiresFrequencies = b;}
@@ -231,6 +236,7 @@ private:
    std::string errorMessageGetIndecesHolePlotNull;
    std::string errorMessageGetIndecesParticlePlotNull;
    std::string errorMessageGetElectronicStateIndecesMullikenCISNull;
+   std::string errorMessageGetSpaceFixedAtomIndexPairsOptimizationNull;
    SimulationType currentSimulation;
    TheoryType currentTheory;
    // Physical constants
@@ -261,6 +267,7 @@ private:
    double vdWDampingFactorSCF;
    static const double vdWScalingFactorSCFPM3DAM1D;
    static const double vdWDampingFactorSCFPM3DAM1D;
+   bool   requiresMpiSCF;
    // MOPlot
    std::string       fileNamePrefixMOPlot;
    int               gridNumberMOPlot[CartesianType_end];
@@ -336,6 +343,7 @@ private:
    double                 timeWidthOptimization;
    double                 initialTrustRadiusOptimization;
    double                 maxNormStepOptimization;
+   std::vector<AtomIndexPair>* spaceFixedAtomsIndexPairsOptimization;
    // Frequencies
    bool requiresFrequencies;
    int  electronicStateIndexFrequencies;

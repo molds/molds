@@ -69,7 +69,8 @@ private:
       bool     isGEDIISStepTaken;
    public:
       GEDIISState(MolDS_base::Molecule& molecule,
-                  const boost::shared_ptr<MolDS_base::ElectronicStructure>& electronicStructure);
+                  const boost::shared_ptr<MolDS_base::ElectronicStructure>& electronicStructure,
+                  const boost::shared_ptr<MolDS_base_constraints::Constraint>& constraint);
       virtual ~GEDIISState();
       GEDIISHistory& GetHistory(){return this->history;}
       double** GetMatrixGEDIISCoordinates(){return this->matrixGEDIISCoordinates;}
@@ -95,8 +96,9 @@ private:
       return this->messageStartGEDIISStep;
    }
    virtual OptimizerState* CreateState(MolDS_base::Molecule& molecule,
-                                       const boost::shared_ptr<MolDS_base::ElectronicStructure> electronicStructure) const{
-      return new GEDIISState(molecule, electronicStructure);
+                                       const boost::shared_ptr<MolDS_base::ElectronicStructure> electronicStructure,
+                                       const boost::shared_ptr<MolDS_base_constraints::Constraint> constraint) const{
+      return new GEDIISState(molecule, electronicStructure, constraint);
    }
 protected:
    void InitializeState(OptimizerState &state, const MolDS_base::Molecule& molecule) const;

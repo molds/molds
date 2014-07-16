@@ -45,7 +45,7 @@ class Tester
    @@command = "command: "
    @@mpiCommand = "mpirun -np "
    @@mpiProcesses = "2"
-   @@deleteDiff = " | gawk '{if(($2!=\"SCF\")&&($3!=\"iter\")){print $0}}' | gawk '{if(($4!=\"time:\")){print $0}}' | gawk '{if(($3!=\"Elapsed\")){print $0}}' | gawk '{if(($2!=\"Elapsed\")){print $0}}' | gawk '{if(($3!=\"Welcome\")){print $0}}' | gawk '{if(($7!=\"residual\")){print $0}}' | gawk '{if(($3!=\"mode(nmw):\") ){print $0}}' | gawk '{if( !(($3==\"mode(mw):\")&&($4<6)) ){print $0}}' | gawk '{if(($3!=\"Heap:\")){print $0}}'" 
+   @@deleteDiff = " | gawk '{if(($2!=\"SCF\")&&($3!=\"iter\")){print $0}}' | gawk '{if(($4!=\"time:\")){print $0}}' | gawk '{if(($3!=\"Elapsed\")){print $0}}' | gawk '{if(($2!=\"Elapsed\")){print $0}}' | gawk '{if(($3!=\"Welcome\")){print $0}}' | gawk '{if(($7!=\"residual\")){print $0}}' | gawk '{if(($3!=\"mode(nmw):\") ){print $0}}' | gawk '{if( !(($3==\"mode(mw):\")&&($4<6)) ){print $0}}' | gawk '{if(($3!=\"Heap:\")){print $0}}' | gawk '{if(($2!=\"MPI\")){print $0}}' | gawk '{if(($4!=\"processes:\")){print $0}}' | gawk '{if(($2!=\"OpenMP\")){print $0}}' | gawk '{if(($2!=\"omp_get_num_procs:\")){print $0}}' | gawk '{if(($2!=\"omp_get_max_threads:\")){print $0}}' | gawk '{if(($2!=\"mkl_get_max_threads:\")){print $0}}'" 
    @@printed_section = []
    def doesTestOmp(mklNumThreads, ompNumThreads)
       return unless should_run?
@@ -1090,6 +1090,25 @@ mklNumThreads = "4"
 ompNumThreads = "2"
 tester.doesTestMpi(mklNumThreads,ompNumThreads)
 
+prefix = "h2o-dimer_pm3d_opt_steepest_space_fixed"
+tester = Tester.new(prefix, <<"SECTION", <<"TITLE")
+------------------------------------------------
+-----  Test of PM3/PM3-D/Steepest Descent ------
+---------    With Space Fixed Atoms     --------
+------------------------------------------------
+SECTION
+\t\t\t>>> H2O Dimer <<<\n
+TITLE
+mklNumThreads = "1"
+ompNumThreads = "1"
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
+mklNumThreads = "2"
+ompNumThreads = "2"
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
+mklNumThreads = "4"
+ompNumThreads = "2"
+tester.doesTestMpi(mklNumThreads,ompNumThreads)
+
 prefix = "c2h6_pm3pddg_opt_conjugate"
 tester = Tester.new(prefix, <<"SECTION", <<"TITLE")
 ------------------------------------------------
@@ -1097,6 +1116,25 @@ tester = Tester.new(prefix, <<"SECTION", <<"TITLE")
 ------------------------------------------------
 SECTION
 \t\t\t>>> C2H6 <<<
+TITLE
+mklNumThreads = "1"
+ompNumThreads = "1"
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
+mklNumThreads = "2"
+ompNumThreads = "2"
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
+mklNumThreads = "4"
+ompNumThreads = "2"
+tester.doesTestMpi(mklNumThreads,ompNumThreads)
+
+prefix = "h2o-dimer_pm3d_opt_conjugate_space_fixed"
+tester = Tester.new(prefix, <<"SECTION", <<"TITLE")
+------------------------------------------------
+-----  Test of PM3-D/Conjugate gradient --------
+---------    With Space Fixed Atoms     --------
+------------------------------------------------
+SECTION
+\t\t\t>>> H2O Dimer <<<\n
 TITLE
 mklNumThreads = "1"
 ompNumThreads = "1"
@@ -1126,6 +1164,25 @@ mklNumThreads = "4"
 ompNumThreads = "2"
 tester.doesTestMpi(mklNumThreads,ompNumThreads)
 
+prefix = "h2o-dimer_pm3d_opt_bfgs_space_fixed"
+tester = Tester.new(prefix, <<"SECTION", <<"TITLE")
+------------------------------------------------
+-------------  Test of PM3-D/BFGS --------------
+---------    With Space Fixed Atoms     --------
+------------------------------------------------
+SECTION
+\t\t\t>>> H2O Dimer <<<\n
+TITLE
+mklNumThreads = "1"
+ompNumThreads = "1"
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
+mklNumThreads = "2"
+ompNumThreads = "2"
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
+mklNumThreads = "4"
+ompNumThreads = "2"
+tester.doesTestMpi(mklNumThreads,ompNumThreads)
+
 prefix = "c2h6_pm3pddg_opt_gediis"
 tester = Tester.new(prefix, <<"SECTION", <<"TITLE")
 ------------------------------------------------
@@ -1140,6 +1197,25 @@ tester.doesTestOmp(mklNumThreads,ompNumThreads)
 mklNumThreads = "2"
 ompNumThreads = "2"
 tester.doesTestOmp(mklNumThreads,ompNumThreads)
+
+prefix = "h2o-dimer_pm3d_opt_gediis_space_fixed"
+tester = Tester.new(prefix, <<"SECTION", <<"TITLE")
+------------------------------------------------
+------------  Test of PM3-D/GEDIIS -------------
+---------    With Space Fixed Atoms     --------
+------------------------------------------------
+SECTION
+\t\t\t>>> H2O Dimer <<<\n
+TITLE
+mklNumThreads = "1"
+ompNumThreads = "1"
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
+mklNumThreads = "2"
+ompNumThreads = "2"
+tester.doesTestOmp(mklNumThreads,ompNumThreads)
+mklNumThreads = "4"
+ompNumThreads = "2"
+tester.doesTestMpi(mklNumThreads,ompNumThreads)
 
 prefix = "c2h6_pm3_MC"
 tester = Tester.new(prefix, <<"SECTION", <<"TITLE")

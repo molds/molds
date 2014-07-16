@@ -31,7 +31,8 @@ private:
       ConjugateGradientState(const ConjugateGradientState&); // delete default copy constructor
    public:
       ConjugateGradientState(MolDS_base::Molecule& molecule,
-                             const boost::shared_ptr<MolDS_base::ElectronicStructure>& electronicStructure);
+                             const boost::shared_ptr<MolDS_base::ElectronicStructure>& electronicStructure,
+                             const boost::shared_ptr<MolDS_base_constraints::Constraint>& constraint);
       virtual ~ConjugateGradientState();
       double** GetOldMatrixForce(){return this->oldMatrixForce;}
       double** GetMatrixSearchDirection(){return this->matrixSearchDirection;}
@@ -47,8 +48,9 @@ private:
       return this->messageStartConjugateGradientStep;
    }
    OptimizerState* CreateState(MolDS_base::Molecule& molecule,
-                                       const boost::shared_ptr<MolDS_base::ElectronicStructure> electronicStructure) const{
-      return new ConjugateGradientState(molecule, electronicStructure);
+                                       const boost::shared_ptr<MolDS_base::ElectronicStructure> electronicStructure,
+                                       const boost::shared_ptr<MolDS_base_constraints::Constraint> constraint) const{
+      return new ConjugateGradientState(molecule, electronicStructure, constraint);
    }
    void InitializeState(OptimizerState &state, const MolDS_base::Molecule& molecule) const;
    virtual void PrepareState(OptimizerState& state,
@@ -64,6 +66,7 @@ private:
    void UpdateSearchDirection(OptimizerState& state,
                               boost::shared_ptr<MolDS_base::ElectronicStructure> electronicStructure,
                               const MolDS_base::Molecule& molecule,
+                              boost::shared_ptr<MolDS_base_constraints::Constraint> constraint,
                               int elecState) const;
 };
 

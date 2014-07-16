@@ -45,17 +45,20 @@
 #include"../base/atoms/Atom.h"
 #include"../base/Molecule.h"
 #include"../base/ElectronicStructure.h"
+#include"../base/constraints/Constraint.h"
 #include"Optimizer.h"
 #include"BFGS.h"
 using namespace std;
 using namespace MolDS_base;
 using namespace MolDS_base_atoms;
+using namespace MolDS_base_constraints;
 
 namespace MolDS_optimization{
 
 BFGS::BFGSState::BFGSState(Molecule& molecule,
-                           const boost::shared_ptr<ElectronicStructure>& electronicStructure):
-   OptimizerState(molecule, electronicStructure),
+                           const boost::shared_ptr<ElectronicStructure>& electronicStructure,
+                           const boost::shared_ptr<Constraint>& constraint):
+   OptimizerState(molecule, electronicStructure, constraint),
    matrixHessian(NULL),
    matrixOldForce(NULL),
    matrixStep(NULL),
@@ -151,7 +154,9 @@ void BFGS::PrepareState(OptimizerState& stateOrig,
    this->StoreMolecularGeometry(state.GetMatrixOldCoordinatesRef(), molecule);
 
    // Level shift Hessian redundant modes
-   this->ShiftHessianRedundantMode(state.GetMatrixHessian(), molecule);
+   if(state.GetConstraint()->GetType()==Non){
+      this->ShiftHessianRedundantMode(state.GetMatrixHessian(), molecule);
+   }
 
    // Limit the trustRadius to maxNormStep
    state.SetTrustRadius(min(state.GetTrustRadius(),state.GetMaxNormStep()));
@@ -212,7 +217,7 @@ void BFGS::UpdateState(OptimizerState& stateOrig) const{
       state.SetCurrentEnergy(state.GetInitialEnergy());
    }
 
-   state.SetMatrixForce(state.GetElectronicStructure()->GetForce(state.GetElecState()));
+   state.SetMatrixForce(state.GetConstraint()->GetForce(state.GetElecState()));
 
    // Update Hessian
    this->UpdateHessian(state.GetMatrixHessian(), dimension, state.GetVectorForce(), state.GetVectorOldForce(), &state.GetMatrixDisplacement()[0][0]);

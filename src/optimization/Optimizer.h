@@ -27,6 +27,7 @@ protected:
    protected:
       MolDS_base::Molecule& molecule;
       const boost::shared_ptr<MolDS_base::ElectronicStructure> electronicStructure;
+      const boost::shared_ptr<MolDS_base_constraints::Constraint> constraint;
       const int elecState;
       const double dt;
       const int totalSteps;
@@ -41,11 +42,13 @@ protected:
       OptimizerState(const OptimizerState&); // delete default copy constructor
    public:
       OptimizerState(MolDS_base::Molecule& molecule,
-                     const boost::shared_ptr<MolDS_base::ElectronicStructure>& electronicStructure);
+                     const boost::shared_ptr<MolDS_base::ElectronicStructure>& electronicStructure,
+                     const boost::shared_ptr<MolDS_base_constraints::Constraint>& constraint);
       virtual ~OptimizerState(){}
       double& GetCurrentEnergyRef(){return this->currentEnergy;}
       double GetCurrentEnergy(){return this->currentEnergy;}
       MolDS_base::Molecule& GetMolecule(){return this->molecule;}
+      const boost::shared_ptr<MolDS_base_constraints::Constraint> GetConstraint(){return this->constraint;}
       const boost::shared_ptr<MolDS_base::ElectronicStructure> GetElectronicStructure(){
          return this->electronicStructure;
       }
@@ -119,11 +122,13 @@ private:
    void ClearMolecularMomenta(MolDS_base::Molecule& molecule) const;
    void SearchMinimum(boost::shared_ptr<MolDS_base::ElectronicStructure> electronicStructure,
                       MolDS_base::Molecule& molecule,
+                      boost::shared_ptr<MolDS_base_constraints::Constraint> constraint,
                       double* lineSearchedEnergy,
                       bool* obainesOptimizedStructure) const;
    virtual OptimizerState* CreateState(MolDS_base::Molecule& molecule,
-                                       const boost::shared_ptr<MolDS_base::ElectronicStructure> electronicStructure) const{
-      return new OptimizerState(molecule, electronicStructure);
+                                       const boost::shared_ptr<MolDS_base::ElectronicStructure> electronicStructure,
+                                       const boost::shared_ptr<MolDS_base_constraints::Constraint> constraint) const{
+      return new OptimizerState(molecule, electronicStructure, constraint);
    }
    virtual void InitializeState(OptimizerState &state, const MolDS_base::Molecule& molecule) const = 0;
    virtual void PrepareState(OptimizerState& state,

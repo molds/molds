@@ -44,6 +44,7 @@
 #include"../base/atoms/Atom.h"
 #include"../base/Molecule.h"
 #include"../base/ElectronicStructure.h"
+#include"../base/constraints/Constraint.h"
 #include"Optimizer.h"
 #include"BFGS.h"
 #include"GEDIIS.h"
@@ -53,8 +54,9 @@ using namespace MolDS_base_atoms;
 
 namespace MolDS_optimization{
 GEDIIS::GEDIISState::GEDIISState(MolDS_base::Molecule& molecule,
-                                 const boost::shared_ptr<MolDS_base::ElectronicStructure>& electronicStructure):
-   BFGSState(molecule, electronicStructure),
+                                 const boost::shared_ptr<MolDS_base::ElectronicStructure>& electronicStructure,
+                                 const boost::shared_ptr<MolDS_base_constraints::Constraint>& constraint):
+   BFGSState(molecule, electronicStructure, constraint),
    matrixGEDIISCoordinates(NULL),
    matrixGEDIISForce(NULL){
    MallocerFreer::GetInstance()->Malloc(&this->matrixGEDIISCoordinates, molecule.GetAtomVect().size(), CartesianType_end);

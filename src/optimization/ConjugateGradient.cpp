@@ -41,17 +41,20 @@
 #include"../base/atoms/Atom.h"
 #include"../base/Molecule.h"
 #include"../base/ElectronicStructure.h"
+#include"../base/constraints/Constraint.h"
 #include"Optimizer.h"
 #include"ConjugateGradient.h"
 using namespace std;
 using namespace MolDS_base;
 using namespace MolDS_base_atoms;
+using namespace MolDS_base_constraints;
 
 namespace MolDS_optimization{
 
 ConjugateGradient::ConjugateGradientState::ConjugateGradientState(Molecule& molecule,
-                                                                  const boost::shared_ptr<ElectronicStructure>& electronicStructure):
-   OptimizerState(molecule, electronicStructure),
+                                                                  const boost::shared_ptr<ElectronicStructure>& electronicStructure,
+                                                                  const boost::shared_ptr<Constraint>& constraint):
+   OptimizerState(molecule, electronicStructure, constraint),
    oldMatrixForce(NULL),
    matrixSearchDirection(NULL),
    numAtoms(molecule.GetAtomVect().size()){
@@ -117,13 +120,14 @@ void ConjugateGradient::CalcNextStepGeometry(Molecule &molecule,
 }
 
 void ConjugateGradient::UpdateState(OptimizerState& state) const{
-   this->UpdateSearchDirection(state, state.GetElectronicStructure(), state.GetMolecule(), state.GetElecState());
+   this->UpdateSearchDirection(state, state.GetElectronicStructure(), state.GetMolecule(), state.GetConstraint(), state.GetElecState());
 }
 
 
 void ConjugateGradient::UpdateSearchDirection(OptimizerState& stateOrig,
                                               boost::shared_ptr<ElectronicStructure> electronicStructure, 
                                               const MolDS_base::Molecule& molecule,
+                                              boost::shared_ptr<MolDS_base_constraints::Constraint> constraint,
                                               int elecState) const{
    ConjugateGradientState& state = stateOrig.CastRef<ConjugateGradientState>();
    double beta=0.0;
