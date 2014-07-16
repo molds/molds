@@ -16,22 +16,31 @@
 // You should have received a copy of the GNU General Public License      // 
 // along with MolDS.  If not, see <http://www.gnu.org/licenses/>.         // 
 //************************************************************************//
-#ifndef INCLUDED_SPACE_FIXED_ATOMS
-#define INCLUDED_SPACE_FIXED_ATOMS
-namespace MolDS_base_constrains{
+#ifndef INCLUDED_CONSTRAIN
+#define INCLUDED_CONSTRAIN
+namespace MolDS_base_constraints{
 
-class SpaceFixedAtoms: public Constrain{
+class Constraint : public MolDS_base::PrintController{
 public:
-   SpaceFixedAtoms(const MolDS_base::Molecule* molecule, 
-                   const boost::shared_ptr<MolDS_base::ElectronicStructure> electronicStructure);
-   ~SpaceFixedAtoms();
-   void SetConstrainCondition();
-   double const* const* GetForce(int elecState);
+   Constraint(const MolDS_base::Molecule* molecule,
+              const boost::shared_ptr<MolDS_base::ElectronicStructure> electronicStructure);
+   virtual ~Constraint(){};
+   virtual void                 SetConstraintCondition() = 0;
+   virtual double const* const* GetForce(int elecState) = 0;
+   inline MolDS_base::ConstraintType GetType() const{return this->type;}
 protected:
+   Constraint(){};
+   MolDS_base::ConstraintType type;
+   const MolDS_base::Molecule* molecule;
+   const MolDS_base::Molecule* refMolecule;
+   double** constrainedMatrixForce;
+   const boost::shared_ptr<MolDS_base::ElectronicStructure> electronicStructure;
 private:
-   SpaceFixedAtoms(){};
-   std::vector<int> fixedAtomIndeces;
+   
 };
 
 }
 #endif
+
+
+

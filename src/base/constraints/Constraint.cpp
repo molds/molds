@@ -22,6 +22,7 @@
 #include<sstream>
 #include<fstream>
 #include<string>
+#include<string.h>
 #include<math.h>
 #include<vector>
 #include<stdexcept>
@@ -37,32 +38,26 @@
 #include"../../mpi/MpiInt.h"
 #include"../../mpi/MpiProcess.h"
 #include"../Utilities.h"
+#include"../MallocerFreer.h"
 #include"../EularAngle.h"
 #include"../Parameters.h"
 #include"../RealSphericalHarmonicsIndex.h"
 #include"../atoms/Atom.h"
 #include"../Molecule.h"
 #include"../ElectronicStructure.h"
-#include"Constrain.h"
-#include"NonConstrain.h"
+#include"Constraint.h"
 using namespace std;
 using namespace MolDS_base;
 using namespace MolDS_base_atoms;
-namespace MolDS_base_constrains{
+namespace MolDS_base_constraints{
 
-NonConstrain::NonConstrain(const MolDS_base::Molecule* molecule,
-                           const boost::shared_ptr<MolDS_base::ElectronicStructure> electronicStructure)
-                           : Constrain(molecule, electronicStructure){
-}
-
-NonConstrain::~NonConstrain(){
-}
-
-void NonConstrain::SetConstrainCondition(){
-}
-
-double const* const* NonConstrain::GetForce(int elecState){
-   return this->electronicStructure->GetForce(elecState);
+Constraint::Constraint(const MolDS_base::Molecule* molecule,
+                      const boost::shared_ptr<MolDS_base::ElectronicStructure> electronicStructure):
+                      molecule(molecule),
+                      electronicStructure(electronicStructure){
+   this->constrainedMatrixForce=NULL;
+   this->refMolecule=NULL;
+   //this->OutputLog("Constraint created\n");
 }
 
 }

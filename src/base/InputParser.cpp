@@ -43,6 +43,11 @@
 #include"factories/AtomFactory.h"
 #include"Molecule.h"
 #include"InputParser.h"
+
+#ifdef __INTEL_COMPILER
+#include"mkl.h"
+#endif
+
 using namespace std;
 using namespace MolDS_base_atoms;
 using namespace MolDS_base_factories;
@@ -114,11 +119,15 @@ void InputParser::SetMessages(){
    this->errorMessageNumberExcitedStateCIS = "Number of CIS excited states: ";
    this->errorMessageNumberElectronicStatesNASCO = "Number of electronic states for NASCO: ";
    this->errorMessageInitialElectronicStateNASCO = "Initial electronic state for NASCO: ";
-   this->messageStartParseInput = "**********  START: Parse input  **********\n";
-   this->messageDoneParseInput =  "**********  DONE: Parse input  ***********\n\n\n";
-   this->messageTotalNumberAOs = "\tTotal number of valence AOs: ";
-   this->messageTotalNumberAtoms = "\tTotal number of atoms: ";
-   this->messageTotalNumberValenceElectrons = "\tTotal number of valence electrons: ";
+   this->messageStartParseInput  = "**********  START: Parse input  **********\n";
+   this->messageDoneParseInput   = "**********  DONE: Parse input  ***********\n\n\n";
+   this->messageMpiConditions    = "\tMPI conditions:\n";
+   this->messageMpiSize          = "\t\tNumber of processes: ";
+   this->messageOmpConditions    = "\tOpenMP conditions:\n";
+   this->messageOmpNumProcs = "\t\tomp_get_num_procs: ";
+   this->messageOmpMaxThreads = "\t\tomp_get_max_threads: ";
+   this->messageMklMaxThreads = "\t\tmkl_get_max_threads: ";
+   this->messageSystemConditions = "\tSystem conditions:\n";
    this->messageInputTerms = "Input terms:\n";
 
    // SCF
@@ -136,6 +145,7 @@ void InputParser::SetMessages(){
    this->messageScfVdW              = "\t\tvan der Waals (vdW) correction: ";
    this->messageScfVdWScalingFactor = "\t\tvdW corr. scaling factor (s6): ";
    this->messageScfVdWDampingFactor = "\t\tvdW corr. damping factor (d): ";
+   this->messageScfMpi              = "\t\tMPI in SCF: ";
 
    // CIS
    this->messageCisConditions                 = "\tCIS conditions:\n";
@@ -200,7 +210,8 @@ void InputParser::SetMessages(){
    this->messageOptimizationTimeWidth   = "\t\tFictious time width: ";
    this->messageOptimizationInitialTrustRadius = "\t\tInitial trust radius: ";
    this->messageOptimizationMaxNormStep        = "\t\tMax size of the optimization step: ";
-   this->messageOptimizationSpaceFixedAtoms = "\t\tAtoms fixed in space: from ";
+   this->messageOptimizationSpaceFixedAtom   = "\t\tAtom fixed in space: ";
+   this->messageOptimizationSpaceFixedAtoms  = "\t\tAtoms fixed in space: from ";
    this->messageOptimizationSpaceFixedAtoms2 = " to ";
    this->messageOptimizationSpaceFixedAtoms3 = " atoms.";
 
@@ -282,6 +293,7 @@ void InputParser::SetMessages(){
    this->stringScfVdW              = "vdw";
    this->stringScfVdWScalingFactor = "vdw_s6";
    this->stringScfVdWDampingFactor = "vdw_d";
+   this->stringScfMpi              = "mpi";
 
    // MO plot
    this->stringMO                = "mo";
@@ -401,6 +413,7 @@ void InputParser::SetMessages(){
    this->stringOptimizationTimeWidth         = "dt";
    this->stringOptimizationInitialTrustRadius = "initial_trust_radius";
    this->stringOptimizationMaxNormStep        = "max_norm_step";
+   this->stringOptimizationSpaceFixedAtom     = "space_fixed_atom";
    this->stringOptimizationSpaceFixedAtoms    = "space_fixed_atoms";
 
    // Frequencies (Normal modes)
@@ -645,6 +658,16 @@ int InputParser::ParseConditionsSCF(vector<string>* inputTerms, int parseIndex) 
       // van der Waals (damping factor) 
       if((*inputTerms)[parseIndex].compare(this->stringScfVdWDampingFactor) == 0){
          Parameters::GetInstance()->SetVdWDampingFactorSCF(atof((*inputTerms)[parseIndex+1].c_str()));
+         parseIndex++;
+      }
+      // using MPI
+      if((*inputTerms)[parseIndex].compare(this->stringScfMpi) == 0){
+         if((*inputTerms)[parseIndex+1].compare(this->stringYES) == 0){
+            Parameters::GetInstance()->SetRequiresMpiSCF(true);
+         }
+         else{
+            Parameters::GetInstance()->SetRequiresMpiSCF(false);
+         }
          parseIndex++;
       }
       parseIndex++;   
@@ -1180,6 +1203,11 @@ int InputParser::ParseConditionsOptimization(vector<string>* inputTerms, int par
          parseIndex++;
       }
       // Atoms fixed in space (space_fixed_atoms)
+      if((*inputTerms)[parseIndex].compare(this->stringOptimizationSpaceFixedAtom) == 0){
+         int firstAtom = atoi((*inputTerms)[parseIndex+1].c_str());
+         Parameters::GetInstance()->AddSpaceFixedAtomsIndexPairOptimization(firstAtom, firstAtom);
+         parseIndex++;
+      }
       if((*inputTerms)[parseIndex].compare(this->stringOptimizationSpaceFixedAtoms) == 0){
          int firstAtom = atoi((*inputTerms)[parseIndex+1].c_str());
          int lastAtom  = atoi((*inputTerms)[parseIndex+2].c_str());
@@ -1373,6 +1401,7 @@ void InputParser::Parse(Molecule* molecule, int argc, char *argv[]) const{
 
    // calculate basics and validate conditions
    this->CalcMolecularBasics(molecule);
+   this->ValidateScfConditions();
    this->ValidateVdWConditions();
    this->ValidateEpcConditions(*molecule);
    if(Parameters::GetInstance()->RequiresCIS()){
@@ -1398,6 +1427,8 @@ void InputParser::Parse(Molecule* molecule, int argc, char *argv[]) const{
    }
 
    // output conditions
+   this->OutputMpiConditions();
+   this->OutputOmpConditions();
    this->OutputMolecularBasics(molecule);
    this->OutputScfConditions();
    this->OutputMemoryConditions();
@@ -1440,6 +1471,13 @@ void InputParser::Parse(Molecule* molecule, int argc, char *argv[]) const{
 
 void InputParser::CalcMolecularBasics(Molecule* molecule) const{
    molecule->CalcBasics();
+}
+
+void InputParser::ValidateScfConditions() const{
+   int  mpiSize     = MolDS_mpi::MpiProcess::GetInstance()->GetSize();
+   if(1==mpiSize){
+      Parameters::GetInstance()->SetRequiresMpiSCF(false);
+   } 
 }
 
 void InputParser::ValidateVdWConditions() const{
@@ -1671,12 +1709,6 @@ void InputParser::ValidateOptimizationConditions(const Molecule& molecule) const
    // validate space fixed atoms conditions
    if(Parameters::GetInstance()->RequiresSpaceFixedAtomsOptimization()){
       OptimizationMethodType optMethod = Parameters::GetInstance()->GetMethodOptimization();
-      if(optMethod == BFGSMethod || optMethod == GEDIISMethod){
-         stringstream ss;
-         ss << "Error: opt method for space_fixed_atoms is bad.\n";
-         ss << OptimizationMethodTypeStr(optMethod);
-         throw MolDSException(ss.str());
-      }
       const int totalNumberAtoms = molecule.GetAtomVect().size();
       const vector<AtomIndexPair>* atomPairs = Parameters::GetInstance()->GetSpaceFixedAtomIndexPairsOptimization();
       for(int i=0; i<atomPairs->size(); i++){
@@ -1689,13 +1721,6 @@ void InputParser::ValidateOptimizationConditions(const Molecule& molecule) const
             ss << this->errorMessageNonValidSpaceFixedLastAtomOptimization  << lastAtom  << endl;
             throw MolDSException(ss.str());
          }
-         /*
-         this->OutputLog(boost::format("%s%d%s%d%s\n") % this->messageOptimizationSpaceFixedAtoms.c_str()
-                                                       % (*atomPairs)[i].firstAtomIndex
-                                                       % this->messageOptimizationSpaceFixedAtoms2.c_str()
-                                                       % (*atomPairs)[i].lastAtomIndex
-                                                       % this->messageOptimizationSpaceFixedAtoms3.c_str());
-         */
       }
    }
 }
@@ -1720,7 +1745,28 @@ void InputParser::ValidateFrequenciesConditions() const{
    } 
 }
 
+void InputParser::OutputMpiConditions() const{
+   this->OutputLog(this->messageMpiConditions);
+   this->OutputLog(boost::format("%s%d\n") % this->messageMpiSize.c_str() 
+                                           % MolDS_mpi::MpiProcess::GetInstance()->GetSize());
+   this->OutputLog("\n");
+}
+
+void InputParser::OutputOmpConditions() const{
+   this->OutputLog(this->messageOmpConditions);
+   this->OutputLog(boost::format("%s%d\n") % this->messageOmpNumProcs.c_str() 
+                                           % omp_get_num_procs());
+   this->OutputLog(boost::format("%s%d\n") % this->messageOmpMaxThreads.c_str() 
+                                           % omp_get_max_threads());
+#ifdef __INTEL_COMPILER
+   this->OutputLog(boost::format("%s%d\n") % this->messageMklMaxThreads.c_str() 
+                                           % mkl_get_max_threads());
+#endif
+   this->OutputLog("\n");
+}
+
 void InputParser::OutputMolecularBasics(Molecule* molecule) const{
+   this->OutputLog(this->messageSystemConditions);
    molecule->OutputTotalNumberAtomsAOsValenceelectrons();
    molecule->OutputConfiguration();
    molecule->OutputXyzCOM();
@@ -1765,6 +1811,14 @@ void InputParser::OutputScfConditions() const{
    else{
       this->OutputLog(boost::format("%s\n") % this->stringNO.c_str());
    }
+   this->OutputLog(this->messageScfMpi);
+   if(Parameters::GetInstance()->RequiresMpiSCF()){
+      this->OutputLog(boost::format("%s\n") % this->stringYES.c_str());
+   }
+   else{
+      this->OutputLog(boost::format("%s\n") % this->stringNO.c_str());
+   }
+
    this->OutputLog("\n");
 }
 
@@ -1933,11 +1987,19 @@ void InputParser::OutputOptimizationConditions() const{
    if(Parameters::GetInstance()->RequiresSpaceFixedAtomsOptimization()){
       const vector<AtomIndexPair>* atomPairs = Parameters::GetInstance()->GetSpaceFixedAtomIndexPairsOptimization();
       for(int i=0; i<atomPairs->size(); i++){
-         this->OutputLog(boost::format("%s%d%s%d%s\n") % this->messageOptimizationSpaceFixedAtoms.c_str()
-                                                       % (*atomPairs)[i].firstAtomIndex
-                                                       % this->messageOptimizationSpaceFixedAtoms2.c_str()
-                                                       % (*atomPairs)[i].lastAtomIndex
-                                                       % this->messageOptimizationSpaceFixedAtoms3.c_str());
+         int fIndex = (*atomPairs)[i].firstAtomIndex;
+         int lIndex = (*atomPairs)[i].lastAtomIndex;
+         if(fIndex != lIndex){
+            this->OutputLog(boost::format("%s%d%s%d%s\n") % this->messageOptimizationSpaceFixedAtoms.c_str()
+                                                          % fIndex
+                                                          % this->messageOptimizationSpaceFixedAtoms2.c_str()
+                                                          % lIndex
+                                                          % this->messageOptimizationSpaceFixedAtoms3.c_str());
+         }
+         else{
+            this->OutputLog(boost::format("%s%d\n") % this->messageOptimizationSpaceFixedAtom.c_str()
+                                                    % fIndex);
+         }
       }
    }
    switch(Parameters::GetInstance()->GetMethodOptimization()){

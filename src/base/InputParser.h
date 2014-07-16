@@ -59,9 +59,13 @@ private:
    std::string errorMessageInitialElectronicStateNASCO;
    std::string messageStartParseInput;
    std::string messageDoneParseInput;
-   std::string messageTotalNumberAOs;
-   std::string messageTotalNumberAtoms;
-   std::string messageTotalNumberValenceElectrons;
+   std::string messageMpiConditions;
+   std::string messageMpiSize;
+   std::string messageOmpConditions;
+   std::string messageOmpNumProcs;
+   std::string messageOmpMaxThreads;
+   std::string messageMklMaxThreads;
+   std::string messageSystemConditions;
    std::string messageInputTerms;
    // SCF
    std::string messageScfConditions;
@@ -78,6 +82,7 @@ private:
    std::string messageScfVdW;
    std::string messageScfVdWScalingFactor;
    std::string messageScfVdWDampingFactor;
+   std::string messageScfMpi;
    // CIS
    std::string messageCisConditions;
    std::string messageCisNumberActiveOcc;
@@ -135,6 +140,7 @@ private:
    std::string messageOptimizationMaxGradient;
    std::string messageOptimizationInitialTrustRadius;
    std::string messageOptimizationMaxNormStep;
+   std::string messageOptimizationSpaceFixedAtom;
    std::string messageOptimizationSpaceFixedAtoms;
    std::string messageOptimizationSpaceFixedAtoms2;
    std::string messageOptimizationSpaceFixedAtoms3;
@@ -206,6 +212,7 @@ private:
    std::string stringScfVdW;
    std::string stringScfVdWScalingFactor;
    std::string stringScfVdWDampingFactor;
+   std::string stringScfMpi;
    // MOPlot
    std::string stringMO;
    std::string stringMOPlot;
@@ -312,12 +319,14 @@ private:
    std::string stringOptimizationTimeWidth;
    std::string stringOptimizationInitialTrustRadius;
    std::string stringOptimizationMaxNormStep;
+   std::string stringOptimizationSpaceFixedAtom;
    std::string stringOptimizationSpaceFixedAtoms;
    // Frequencies (Normal modes)
    std::string stringFrequencies;
    std::string stringFrequenciesEnd;
    std::string stringFrequenciesElecState;
    void CalcMolecularBasics(Molecule* molecule) const;
+   void ValidateScfConditions() const;
    void ValidateVdWConditions() const;
    void ValidateEpcConditions(const Molecule& molecule) const;
    void ValidateCisConditions(const Molecule& molecule) const;
@@ -327,6 +336,8 @@ private:
    void ValidateNascoConditions(const Molecule& molecule) const;
    void ValidateOptimizationConditions(const Molecule& molecule) const;
    void ValidateFrequenciesConditions() const;
+   void OutputMpiConditions() const;
+   void OutputOmpConditions() const;
    void OutputMolecularBasics(Molecule* molecule) const;
    void OutputScfConditions() const;
    void OutputMemoryConditions() const;
