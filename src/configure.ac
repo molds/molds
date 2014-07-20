@@ -24,7 +24,7 @@ AS_IF([test -x ./configure],
 
 AC_CONFIG_SRCDIR([Main.cpp])
 AC_CONFIG_HEADERS([config.h])
-AM_INIT_AUTOMAKE([no-define])
+AM_INIT_AUTOMAKE([no-define subdir-objects])
 
 dnl Setup CXXFLAGS
 AC_MSG_CHECKING([release mode])
