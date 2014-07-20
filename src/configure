@@ -7768,16 +7768,26 @@ $as_echo_n "checking for boostlib >= $boost_lib_version_req... " >&6; }
 
                         libsubdirs="lib"
     ax_arch=`uname -m`
-    if test $ax_arch = x86_64 -o $ax_arch = ppc64 -o $ax_arch = s390x -o $ax_arch = sparc64; then
+    case $ax_arch in
+      x86_64|ppc64|s390x|sparc64|aarch64)
         libsubdirs="lib64 lib lib64"
-    fi
+        ;;
+    esac
+
+
+    libsubdirs="lib/${host_cpu}-${host_os} $libsubdirs"
+
+    case ${host_cpu} in
+      i?86)
+        libsubdirs="lib/i386-${host_os} $libsubdirs"
+        ;;
+    esac
 
                 if test "$ac_boost_path" != ""; then
         BOOST_CPPFLAGS="-I$ac_boost_path/include"
         for ac_boost_path_tmp in $libsubdirs; do
                 if test -d "$ac_boost_path"/"$ac_boost_path_tmp" ; then
                         BOOST_LDFLAGS="-L$ac_boost_path/$ac_boost_path_tmp"
-                        BOOST_LIBDIR="$ac_boost_path/$ac_boost_path_tmp"
                         break
                 fi
         done
@@ -7788,7 +7798,6 @@ $as_echo_n "checking for boostlib >= $boost_lib_version_req... " >&6; }
                     if ls "$ac_boost_path_tmp/$libsubdir/libboost_"* >/dev/null 2>&1 ; then break; fi
                 done
                 BOOST_LDFLAGS="-L$ac_boost_path_tmp/$libsubdir"
-                BOOST_LIBDIR="$ac_boost_path_tmp/$libsubdir"
                 BOOST_CPPFLAGS="-I$ac_boost_path_tmp/include"
                 break;
             fi
@@ -7797,7 +7806,6 @@ $as_echo_n "checking for boostlib >= $boost_lib_version_req... " >&6; }
 
             if test "$ac_boost_lib_path" != ""; then
        BOOST_LDFLAGS="-L$ac_boost_lib_path"
-       BOOST_LIBDIR="$ac_boost_lib_path"
     fi
 
     CPPFLAGS_SAVED="$CPPFLAGS"
@@ -7896,7 +7904,6 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
                         if ls "$best_path/$libsubdir/libboost_"* >/dev/null 2>&1 ; then break; fi
                     done
                     BOOST_LDFLAGS="-L$best_path/$libsubdir"
-                    BOOST_LIBDIR="$best_path/$libsubdir"
                 fi
             fi
 
@@ -7914,7 +7921,6 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 $as_echo "$as_me: We will use a staged boost library from $BOOST_ROOT" >&6;}
                         BOOST_CPPFLAGS="-I$BOOST_ROOT"
                         BOOST_LDFLAGS="-L$BOOST_ROOT/stage/$libsubdir"
-                        BOOST_LIBDIR="$BOOST_ROOT/stage/$libsubdir"
                     fi
                 fi
             fi
