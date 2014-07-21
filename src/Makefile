@@ -46,7 +46,7 @@ $(BUILDDIR)/Makefile:
 	cd $(BUILDDIR); \
 	../configure $(CONFIGURE_OPTIONS) CXXFLAGS='$(CXXFLAGS)' LDFLAGS='$(LDFLAGS)'
 
-build/$(OUTPUT): build/Makefile $(wildcard *.cpp) $(wildcard */*.cpp) $(wildcard */*.h)
+$(BUILDDIR)/$(OUTPUT): $(BUILDDIR)/Makefile $(wildcard *.cpp) $(wildcard */*.cpp) $(wildcard */*.h)
 	+make -C $(BUILDDIR)
 
 $(OUTPUT): $(BUILDDIR)/$(OUTPUT)
