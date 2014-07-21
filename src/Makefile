@@ -22,6 +22,7 @@ CONFIGURE_OPTIONS =
 CFLAGS =
 CXXFLAGS =
 LDFLAGS =
+BUILDDIR = build
 override CXXFLAGS += $(CFLAGS)
 ifeq ($(OPENBLASDIR),)
    ifeq ($(BLASLIB),openblas)
@@ -40,19 +41,19 @@ OUTPUT=molds
 
 all: $(OUTPUT)
 
-build/Makefile:
-	mkdir -p build
-	cd build; \
+$(BUILDDIR)/Makefile:
+	mkdir -p $(BUILDDIR)
+	cd $(BUILDDIR); \
 	../configure $(CONFIGURE_OPTIONS) CXXFLAGS='$(CXXFLAGS)' LDFLAGS='$(LDFLAGS)'
 
 build/$(OUTPUT): build/Makefile $(wildcard *.cpp) $(wildcard */*.cpp) $(wildcard */*.h)
-	+make -C build
+	+make -C $(BUILDDIR)
 
-$(OUTPUT): build/$(OUTPUT)
+$(OUTPUT): $(BUILDDIR)/$(OUTPUT)
 	install $< $@
 
 clean:
-	+make -C build clean
+	+make -C $(BUILDDIR) clean
 
 distclean:
-	rm -rf build $(OUTPUT)
+	rm -rf $(BUILDDIR) $(OUTPUT)
