@@ -180,8 +180,8 @@ AC_CACHE_CHECK([whether ld accepts -rpath option],[molds_cv_ld_accepts_rpath],
                [LDFLAGS=$LDFLAGS_save]
                [LIBS=$LIBS_save])
 
-AS_IF([test x$molds_cv_ld_accepts_rpath == xyes],
-      [BOOST_LDFLAGS="$BOOST_LDFLAGS -Wl,-rpath=$BOOST_LIBDIR"])
+dnl Switch BOOST_RPATH_LDFLAGS in Makefile.am
+AM_CONDITIONAL([RPATH], [test x$molds_cv_ld_accepts_rpath == xyes])
 
 dnl Check for Boost.Thread compiled library
 AX_BOOST_THREAD

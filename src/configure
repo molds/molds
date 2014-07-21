@@ -627,6 +627,8 @@ am__EXEEXT_TRUE
 LTLIBOBJS
 LIBOBJS
 BOOST_THREAD_LIBS
+RPATH_FALSE
+RPATH_TRUE
 BOOST_MPI_LIB
 BOOST_SERIALIZATION_LIB
 BOOST_LDFLAGS
@@ -8576,9 +8578,14 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $molds_cv_ld_accepts_rpath" >&5
 $as_echo "$molds_cv_ld_accepts_rpath" >&6; }
 
-if test x$molds_cv_ld_accepts_rpath == xyes; then :
-  BOOST_LDFLAGS="$BOOST_LDFLAGS -Wl,-rpath=$BOOST_LIBDIR"
+ if test x$molds_cv_ld_accepts_rpath == xyes; then
+  RPATH_TRUE=
+  RPATH_FALSE='#'
+else
+  RPATH_TRUE='#'
+  RPATH_FALSE=
 fi
+
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler implements namespaces" >&5
 $as_echo_n "checking whether the compiler implements namespaces... " >&6; }
@@ -9151,6 +9158,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${am__fastdepCXX_TRUE}" && test -z "${am__fastdepCXX_FALSE}"; then
   as_fn_error $? "conditional \"am__fastdepCXX\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${RPATH_TRUE}" && test -z "${RPATH_FALSE}"; then
+  as_fn_error $? "conditional \"RPATH\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 

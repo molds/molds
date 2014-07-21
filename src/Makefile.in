@@ -347,10 +347,13 @@ ALL_HEAD_FILES = config.h base/Enums.h base/Uncopyable.h \
 	optimization/GEDIIS.h base/factories/OptimizerFactory.h \
 	base/MolDS.h
 molds_SOURCES = $(ALL_CPP_FILES) $(ALL_HEAD_FILES)
+@RPATH_TRUE@BOOST_LIBDIR = $(BOOST_LDFLAGS:-L%=%)
+@RPATH_FALSE@BOOST_RPATH = 
+@RPATH_TRUE@BOOST_RPATH = -Wl,-rpath=$(BOOST_LIBDIR)
 ACLOCAL_AMFLAGS = -I m4
 AM_CXXFLAGS = $(OPENMP_CXXFLAGS)
 AM_CPPFLAGS = $(BOOST_CPPFLAGS)
-AM_LDFLAGS = $(BOOST_LDFLAGS)
+AM_LDFLAGS = $(BOOST_LDFLAGS) $(BOOST_RPATH)
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 

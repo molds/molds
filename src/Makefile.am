@@ -3,8 +3,16 @@ ALL_CPP_FILES  =          base/Enums.cpp                   base/PrintController.
 ALL_HEAD_FILES = config.h base/Enums.h   base/Uncopyable.h base/PrintController.h   base/MolDSException.h   base/containers/ThreadSafeQueue.h   base/MallocerFreer.h   mpi/MpiInt.h mpi/MpiProcess.h   mpi/AsyncCommunicator.h   wrappers/Blas.h   wrappers/Lapack.h   base/Utilities.h   base/MathUtilities.h   base/EularAngle.h   base/Parameters.h   base/RealSphericalHarmonicsIndex.h   base/atoms/Atom.h   base/atoms/Hatom.h   base/atoms/Liatom.h   base/atoms/Catom.h   base/atoms/Natom.h   base/atoms/Oatom.h   base/atoms/Fatom.h   base/atoms/Satom.h   base/atoms/Clatom.h   base/atoms/Znatom.h   base/atoms/ghost/Ghost.h   base/atoms/ghost/GhostHatom.h   base/atoms/ghost/GhostLiatom.h   base/atoms/ghost/GhostCatom.h   base/atoms/ghost/GhostNatom.h   base/atoms/ghost/GhostOatom.h   base/atoms/ghost/GhostFatom.h   base/atoms/ghost/GhostSatom.h   base/atoms/ghost/GhostClatom.h   base/atoms/ghost/GhostZnatom.h   base/atoms/mm/EnvironmentalPointCharge.h   base/factories/AtomFactory.h   base/Molecule.h   base/InputParser.h   base/GTOExpansionSTO.h   base/loggers/MOLogger.h   base/loggers/DensityLogger.h   base/loggers/HoleDensityLogger.h   base/loggers/ParticleDensityLogger.h   base/ElectronicStructure.h cndo/Cndo2.h   cndo/ReducedOverlapAOsParameters.h indo/Indo.h   zindo/ZindoS.h   mndo/Mndo.h   am1/Am1.h   am1/Am1D.h   pm3/Pm3.h   pm3/Pm3D.h   pm3/Pm3Pddg.h   base/factories/ElectronicStructureFactory.h   base/constraints/Constraint.h   base/constraints/SpaceFixedAtoms.h   base/constraints/NonConstraint.h   base/factories/ConstraintFactory.h    md/MD.h   mc/MC.h   rpmd/RPMD.h   nasco/NASCO.h   optimization/Optimizer.h   optimization/ConjugateGradient.h   optimization/SteepestDescent.h   optimization/BFGS.h   optimization/GEDIIS.h   base/factories/OptimizerFactory.h    base/MolDS.h
 molds_SOURCES = $(ALL_CPP_FILES) $(ALL_HEAD_FILES)
 
+if RPATH
+BOOST_LIBDIR = $(BOOST_LDFLAGS:-L%=%)
+BOOST_RPATH = -Wl,-rpath=$(BOOST_LIBDIR)
+else
+BOOST_RPATH = 
+endif
+
 ACLOCAL_AMFLAGS = -I m4
 AM_CXXFLAGS = $(OPENMP_CXXFLAGS)
 AM_CPPFLAGS = $(BOOST_CPPFLAGS)
-AM_LDFLAGS = $(BOOST_LDFLAGS)
+AM_LDFLAGS = $(BOOST_LDFLAGS) $(BOOST_RPATH)
 LIBS += $(BOOST_MPI_LIB) $(BOOST_SERIALIZATION_LIB) $(BOOST_THREAD_LIBS)
+
