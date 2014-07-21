@@ -111,6 +111,7 @@ void GEDIIS::CalcNextStepGeometry(Molecule &molecule,
       state.GetHistory().SolveGEDIISEquation(&energyGEDIIS,
                                              state.GetMatrixGEDIISCoordinates(),
                                              state.GetMatrixGEDIISForce());
+      state.SetPreRFOEnergy(energyGEDIIS);
 
       this->OutputLog(this->messageTakingGEDIISStep);
       this->RollbackMolecularGeometry(molecule, state.GetMatrixGEDIISCoordinates());
@@ -118,7 +119,6 @@ void GEDIIS::CalcNextStepGeometry(Molecule &molecule,
       bool tempCanOutputLogs = false;
       bool requireGuess = false;
       this->UpdateElectronicStructure(electronicStructure, molecule, requireGuess, tempCanOutputLogs);
-      state.SetCurrentEnergy(electronicStructure->GetElectronicEnergy(elecState));
       state.SetIsGEDIISStepTaken(true);
    }
    catch(MolDSException ex){

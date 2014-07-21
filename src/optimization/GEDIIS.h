@@ -64,6 +64,7 @@ private:
    class GEDIISState: public BFGSState{
    protected:
       GEDIISHistory history;
+      double   preRFOEnergy;
       double** matrixGEDIISCoordinates;
       double** matrixGEDIISForce;
       bool     isGEDIISStepTaken;
@@ -78,6 +79,13 @@ private:
       bool     GetIsGEDIISStepTaken()const {return this->isGEDIISStepTaken;}
       void SetIsGEDIISStepTaken(bool isGEDIISStepTaken){
          this->isGEDIISStepTaken = isGEDIISStepTaken;
+      }
+      void SetPreRFOEnergy(double preRFOEnergy){this->preRFOEnergy = preRFOEnergy;}
+      double GetPreRFOEnergy() const{
+         return GetIsGEDIISStepTaken() ? this->preRFOEnergy : this->GetInitialEnergy();
+      }
+      double const* GetVectorForceForRFO()const{
+         return GetIsGEDIISStepTaken() ? &this->matrixGEDIISForce[0][0] : this->GetVectorForce();
       }
    };
 public:

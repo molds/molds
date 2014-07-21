@@ -153,11 +153,6 @@ void BFGS::PrepareState(OptimizerState& stateOrig,
 
    this->StoreMolecularGeometry(state.GetMatrixOldCoordinatesRef(), molecule);
 
-   // Level shift Hessian redundant modes
-   if(state.GetConstraint()->GetType()==Non){
-      this->ShiftHessianRedundantMode(state.GetMatrixHessian(), molecule);
-   }
-
    // Limit the trustRadius to maxNormStep
    state.SetTrustRadius(min(state.GetTrustRadius(),state.GetMaxNormStep()));
 }
@@ -176,12 +171,17 @@ void BFGS::CalcNextStepGeometry(Molecule &molecule,
    bool requireGuess = false;
    state.SetInitialEnergy(state.GetCurrentEnergy());
 
+   // Level shift Hessian redundant modes
+   if(state.GetConstraint()->GetType()==Non){
+      this->ShiftHessianRedundantMode(state.GetMatrixHessian(), molecule);
+   }
+
    //Calculate RFO step
    this->CalcRFOStep(state.GetVectorStep(), state.GetMatrixHessian(), state.GetVectorForce(), state.GetTrustRadius(), dimension);
 
    state.SetApproximateChange(this->ApproximateEnergyChange(dimension,
                                                             state.GetMatrixHessian(),
-                                                            state.GetVectorForce(),
+                                                            state.GetVectorForceForRFO(),
                                                             state.GetVectorStep()));
    if(doLineSearch){
       this->LineSearch(electronicStructure, molecule, state.GetCurrentEnergyRef(), state.GetMatrixStep(), elecState, dt);
@@ -204,7 +204,7 @@ void BFGS::UpdateState(OptimizerState& stateOrig) const{
    BFGSState& state = stateOrig.CastRef<BFGSState>();
    const MolDS_wrappers::molds_blas_int dimension = state.GetMolecule().GetAtomVect().size() * CartesianType_end;
 
-   this->UpdateTrustRadius(state.GetTrustRadiusRef(), state.GetApproximateChange(), state.GetInitialEnergy(), state.GetCurrentEnergy());
+   this->UpdateTrustRadius(state.GetTrustRadiusRef(), state.GetApproximateChange(), state.GetPreRFOEnergy(), state.GetCurrentEnergy());
 
    //Calculate displacement (K_k at Eq. (15) in [SJTO_1983])
    this->CalcDisplacement(state.GetMatrixDisplacement(), state.GetMatrixOldCoordinates(), state.GetMolecule());
@@ -510,15 +510,15 @@ double BFGS::ApproximateEnergyChange(int dimension,
 }
 
 void BFGS::UpdateTrustRadius(double &trustRadius,
-                       double approximateEnergyChange,
-                       double initialEnergy,
-                       double currentEnergy)const{
+                             double approximateEnergyChange,
+                             double preRFOEnergy,
+                             double postRFOEnergy)const{
    // Calculate the correctness of the approximation
-   double r = (currentEnergy - initialEnergy)
+   double r = (postRFOEnergy - preRFOEnergy)
             / approximateEnergyChange;
 
    this->OutputLog(boost::format(this->formatEnergyChangeComparison)
-                   % (currentEnergy-initialEnergy) % approximateEnergyChange % r);
+                   % (postRFOEnergy-preRFOEnergy) % approximateEnergyChange % r);
 
    if(r < 0)
    {

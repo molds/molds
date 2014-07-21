@@ -61,6 +61,8 @@ protected:
       void      SetApproximateChange(double approximateChange){this->approximateChange = approximateChange;}
       void      SetTrustRadius(double trustRadius)            {this->trustRadius       = trustRadius;}
       void      SetMaxNormStep(double maxNormStep)            {this->maxNormStep       = maxNormStep;}
+      virtual double GetPreRFOEnergy()const{return this->GetInitialEnergy();}
+      virtual double const* GetVectorForceForRFO()const{return this->GetVectorForce();}
    };
 public:
    BFGS();
