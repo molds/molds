@@ -46,19 +46,19 @@ protected:
                      const boost::shared_ptr<MolDS_base_constraints::Constraint>& constraint);
       virtual ~OptimizerState(){}
       double& GetCurrentEnergyRef(){return this->currentEnergy;}
-      double GetCurrentEnergy(){return this->currentEnergy;}
+      double GetCurrentEnergy()const{return this->currentEnergy;}
       MolDS_base::Molecule& GetMolecule(){return this->molecule;}
       const boost::shared_ptr<MolDS_base_constraints::Constraint> GetConstraint(){return this->constraint;}
       const boost::shared_ptr<MolDS_base::ElectronicStructure> GetElectronicStructure(){
          return this->electronicStructure;
       }
-      int GetElecState(){return this->elecState;}
-      double GetDeltaT(){return this->dt;}
-      int GetTotalSteps(){return this->totalSteps;}
-      double GetMaxGradientThreshold(){return this->maxGradientThreshold;}
-      double GetRmsGradientThreshold(){return this->rmsGradientThreshold;}
-      double GetInitialEnergy(){return this->initialEnergy;}
-      double const* const*  GetMatrixForce(){return this->matrixForce;}
+      int GetElecState()const{return this->elecState;}
+      double GetDeltaT()const{return this->dt;}
+      int GetTotalSteps()const{return this->totalSteps;}
+      double GetMaxGradientThreshold()const{return this->maxGradientThreshold;}
+      double GetRmsGradientThreshold()const{return this->rmsGradientThreshold;}
+      double GetInitialEnergy()const{return this->initialEnergy;}
+      double const* const*  GetMatrixForce()const{return this->matrixForce;}
       double const* const** GetMatrixForcePtr(){return &this->matrixForce;}
       void SetCurrentEnergy(double currentEnergy){this->currentEnergy = currentEnergy;}
       void SetInitialEnergy(double initialEnergy){this->initialEnergy = initialEnergy;}

@@ -37,14 +37,14 @@ protected:
       size_t numAtoms;
    private:
       template<class vector>
-      vector Matrix2Vector(vector const* matrix){return matrix == NULL ? NULL : &matrix[0][0];}
+      vector Matrix2Vector(vector const* matrix)const{return matrix == NULL ? NULL : &matrix[0][0];}
       BFGSState(const BFGSState&); // delete default copy constructor
    public:
       BFGSState(MolDS_base::Molecule& molecule,
                 const boost::shared_ptr<MolDS_base::ElectronicStructure>& electronicStructure,
                 const boost::shared_ptr<MolDS_base_constraints::Constraint>& constraint);
       virtual ~BFGSState();
-      double const* GetVectorForce         (){return this->Matrix2Vector(this->matrixForce);}
+      double const* GetVectorForce()const    {return this->Matrix2Vector(this->matrixForce);}
       double*       GetVectorOldForce      (){return this->Matrix2Vector(this->matrixOldForce);}
       double*       GetVectorStep          (){return this->Matrix2Vector(this->matrixStep);}
       double const* GetVectorOldCoordinates(){return this->Matrix2Vector(this->matrixOldCoordinates);}
