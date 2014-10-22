@@ -162,7 +162,11 @@ double Blas::Dnrm2(molds_blas_int n,
       return 0.0;
    }
    double* x=const_cast<double*>(vectorX);
+#ifdef __FCC_VERSION
+   return dnrm2_(&n,x,&incrementX);
+#else
    return cblas_dnrm2(n,x,incrementX);
+#endif
 }
 
 // returns max(abs(vectorX[i]))
