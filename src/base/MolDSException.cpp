@@ -1,5 +1,5 @@
 //************************************************************************//
-// Copyright (C) 2011-2012 Mikiya Fujii                                   // 
+// Copyright (C) 2011-2014 Mikiya Fujii                                   // 
 //                                                                        // 
 // This file is part of MolDS.                                            // 
 //                                                                        // 
@@ -162,7 +162,7 @@ void MolDSException::serialize(Archive& ar, const unsigned int ver){
 void MolDSException::Serialize(std::ostream& os){
 #ifndef __FCC_VERSION
    boost::archive::text_oarchive oa(os);
-   oa << this;
+   oa << (*this);
 #endif
 }
 

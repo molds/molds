@@ -1,5 +1,5 @@
 //************************************************************************//
-// Copyright (C) 2011-2013 Mikiya Fujii                                   //
+// Copyright (C) 2011-2014 Mikiya Fujii                                   //
 //                                                                        // 
 // This file is part of MolDS.                                            // 
 //                                                                        // 
@@ -52,13 +52,15 @@ protected:
    virtual void CalcSCFProperties();
    virtual void CalcNormalModes(double** normalModes, double* normalForceConstants, const MolDS_base::Molecule& molecule) const;
    virtual void CalcForce(const std::vector<int>& elecStates);
-   virtual double GetDiatomCoreRepulsionEnergy(int indexAtomA, int indexAtomB) const;
-   virtual double GetAtomCoreEpcCoulombEnergy (int indexAtom,  int indexEpc  ) const;
-   virtual double GetDiatomCoreRepulsion1stDerivative(int indexAtomA,
-                                                      int indexAtomB, 
+   virtual double GetAtomCoreEpcCoulombEnergy (const MolDS_base_atoms::Atom& atom, 
+                                               const MolDS_base_atoms::Atom& epc) const;
+   virtual double GetDiatomCoreRepulsionEnergy(const MolDS_base_atoms::Atom& atomA,
+                                               const MolDS_base_atoms::Atom& atomB) const;
+   virtual double GetDiatomCoreRepulsion1stDerivative(const MolDS_base_atoms::Atom& atomA, 
+                                                      const MolDS_base_atoms::Atom& atomB, 
                                                       MolDS_base::CartesianType axisA) const;
-   virtual double GetDiatomCoreRepulsion2ndDerivative(int indexAtomA,
-                                                      int indexAtomB, 
+   virtual double GetDiatomCoreRepulsion2ndDerivative(const MolDS_base_atoms::Atom& atomA, 
+                                                      const MolDS_base_atoms::Atom& atomB, 
                                                       MolDS_base::CartesianType axisA1,
                                                       MolDS_base::CartesianType axisA2) const;
    virtual double GetFockDiagElement(const MolDS_base_atoms::Atom& atomA, 
@@ -98,7 +100,8 @@ protected:
                                  const MolDS_base_atoms::Atom& atom) const; 
    virtual void CalcTwoElecsTwoCores(double****** twoElecsTwoAtomCores, 
                                      double****** twoElecsAtomEpcCores,
-                                     const MolDS_base::Molecule& molecule) const;
+                                     const MolDS_base::Molecule& molecule,
+                                     bool requiresMpi) const;
    virtual double GetMolecularIntegralElement(int moI, 
                                               int moJ, 
                                               int moK, 
@@ -122,9 +125,11 @@ private:
    double**** twoElecsAtomEpcCoresMpiBuff;
    double heatsFormation;
    void CalcTwoElecsTwoAtomCores(double****** twoElecsTwoAtomCores, 
-                                 const MolDS_base::Molecule& molecule) const;
+                                 const MolDS_base::Molecule& molecule,
+                                 bool requiresMpi) const;
    void CalcTwoElecsAtomEpcCores(double****** twoElecsAtomEpcCores, 
-                                 const MolDS_base::Molecule& molecule) const;
+                                 const MolDS_base::Molecule& molecule,
+                                 bool requiresMpi) const;
    double GetAuxiliaryDiatomCoreRepulsionEnergy(const MolDS_base_atoms::Atom& atomA,
                                                 const MolDS_base_atoms::Atom& atomB,
                                                 double distanceAB) const;

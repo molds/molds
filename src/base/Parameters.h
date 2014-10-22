@@ -1,7 +1,7 @@
 //************************************************************************//
-// Copyright (C) 2011-2012 Mikiya Fujii                                   // 
-// Copyright (C) 2012-2012 Katsuhiko Nishimra                             // 
-// Copyright (C) 2012-2013 Michihiro Okuyama
+// Copyright (C) 2011-2014 Mikiya Fujii                                   // 
+// Copyright (C) 2012-2014 Katsuhiko Nishimra                             // 
+// Copyright (C) 2012-2014 Michihiro Okuyama
 //                                                                        // 
 // This file is part of MolDS.                                            // 
 //                                                                        // 
@@ -22,6 +22,7 @@
 #define INCLUDED_PARAMETERS
 
 namespace MolDS_base{
+struct AtomIndexPair{int firstAtomIndex; int lastAtomIndex;};
 
 // Parameters is singleton
 class Parameters: public PrintController, private Uncopyable{
@@ -39,6 +40,7 @@ public:
    inline double GetAngstrom2AU() const  {return this->angstrom2AU;}
    inline double GetNm2AU() const        {return this->nm2AU;}
    inline double GetKayser2AU() const    {return this->kayser2AU;}
+   inline double GetNmin2AU() const      {return this->nmin2AU;}
    inline double GetGMolin2AU() const    {return this->gMolin2AU;}
    inline double GetDegree2Radian() const{return this->degree2Radian;}
    inline double GetFs2AU() const        {return this->fs2AU;}
@@ -60,6 +62,9 @@ public:
    inline void   SetDiisStartErrorSCF(double sError)   {this->diisStartErrorSCF = sError;}
    inline double GetDiisEndErrorSCF() const            {return this->diisEndErrorSCF;}
    inline void   SetDiisEndErrorSCF(double eError)     {this->diisEndErrorSCF = eError;}
+   bool          RequiresSumChargesSCF() const;
+   const std::vector<AtomIndexPair>* GetSumChargesIndexPairsSCF() const;
+   void          AddSumChargesIndexPairsSCF(int fistAtomIndex, int lastAtomIndex);
    inline bool   RequiresVdWSCF() const                {return this->requiresVdWSCF;}
    inline void   SetRequiresVdWSCF(bool requires)      {this->requiresVdWSCF = requires;}
    inline double GetVdWScalingFactorSCF() const        {return this->vdWScalingFactorSCF;}
@@ -68,6 +73,8 @@ public:
    inline double GetVdWDampingFactorSCF() const        {return this->vdWDampingFactorSCF;}
    inline void   SetVdWDampingFactorSCF()              {this->vdWDampingFactorSCF = this->vdWDampingFactorSCFPM3DAM1D;}
    inline void   SetVdWDampingFactorSCF(double vdWDamp){this->vdWDampingFactorSCF = vdWDamp;}
+   inline bool   RequiresMpiSCF() const                {return this->requiresMpiSCF;}
+   inline void   SetRequiresMpiSCF(bool requires)      {this->requiresMpiSCF = requires;}
    // MOPlot
    inline bool          RequiresMOPlot() const                     {return (this->indecesMOPlot!=NULL && 0<this->indecesMOPlot->size());}
    inline std::string   GetFileNamePrefixMOPlot() const            {return this->fileNamePrefixMOPlot;}
@@ -142,6 +149,9 @@ public:
    void              AddElectronicStateIndexMullikenCIS(int electronicStateIndex);
    bool              RequiresMullikenCIS() const;
    inline bool       RequiresUnpairedPopCIS() const                         {return this->requiresUnpairedPopCIS;}
+   bool              RequiresSumChargesCIS() const;
+   const std::vector<AtomIndexPair>* GetSumChargesIndexPairsCIS() const;
+   void              AddSumChargesIndexPairsCIS(int fistAtomIndex, int lastAtomIndex);
    inline void       SetRequiresUnpairedPopCIS(bool requires)               {this->requiresUnpairedPopCIS = requires;}
    // Memory
    double GetLimitHeapMemory() const          {return this->limitHeapMemory;}
@@ -207,6 +217,9 @@ public:
    void                   SetInitialTrustRadiusOptimization(double r)    {this->initialTrustRadiusOptimization = r;}
    double                 GetMaxNormStepOptimization() const             {return this->maxNormStepOptimization;}
    void                   SetMaxNormStepOptimization(double n)           {this->maxNormStepOptimization = n;}
+   bool                   RequiresSpaceFixedAtomsOptimization() const;
+   const std::vector<AtomIndexPair>* GetSpaceFixedAtomIndexPairsOptimization() const;
+   void                   AddSpaceFixedAtomsIndexPairOptimization(int fistAtomIndex, int lastAtomIndex);
    // Frequencies 
    bool RequiresFrequencies() const               {return this->requiresFrequencies;}
    void SetRequiresFrequencies(bool b)            {this->requiresFrequencies = b;}
@@ -218,9 +231,12 @@ private:
    Parameters();
    ~Parameters();
    std::string errorMessageGetIndecesMOPlotNull;
+   std::string errorMessageGetSumChargesIndexPairsSCFNull;
+   std::string errorMessageGetSumChargesIndexPairsCISNull;
    std::string errorMessageGetIndecesHolePlotNull;
    std::string errorMessageGetIndecesParticlePlotNull;
    std::string errorMessageGetElectronicStateIndecesMullikenCISNull;
+   std::string errorMessageGetSpaceFixedAtomIndexPairsOptimizationNull;
    SimulationType currentSimulation;
    TheoryType currentTheory;
    // Physical constants
@@ -230,6 +246,7 @@ private:
    static const double angstrom2AU;
    static const double nm2AU;
    static const double kayser2AU;
+   static const double nmin2AU;
    static const double gMolin2AU;
    static const double degree2Radian;
    static const double fs2AU;
@@ -245,10 +262,12 @@ private:
    double diisStartErrorSCF;
    double diisEndErrorSCF;
    bool   requiresVdWSCF;
+   std::vector<AtomIndexPair>* sumChargesIndexPairsSCF;
    double vdWScalingFactorSCF;
    double vdWDampingFactorSCF;
    static const double vdWScalingFactorSCFPM3DAM1D;
    static const double vdWDampingFactorSCFPM3DAM1D;
+   bool   requiresMpiSCF;
    // MOPlot
    std::string       fileNamePrefixMOPlot;
    int               gridNumberMOPlot[CartesianType_end];
@@ -288,6 +307,7 @@ private:
    bool              requiresAllTransitionDipoleMomentsCIS;
    std::vector<int>* electronicStateIndecesMullikenCIS;
    bool              requiresUnpairedPopCIS;
+   std::vector<AtomIndexPair>* sumChargesIndexPairsCIS;
    // Memory
    double limitHeapMemory; // in [MB]
    // MD
@@ -323,6 +343,7 @@ private:
    double                 timeWidthOptimization;
    double                 initialTrustRadiusOptimization;
    double                 maxNormStepOptimization;
+   std::vector<AtomIndexPair>* spaceFixedAtomsIndexPairsOptimization;
    // Frequencies
    bool requiresFrequencies;
    int  electronicStateIndexFrequencies;

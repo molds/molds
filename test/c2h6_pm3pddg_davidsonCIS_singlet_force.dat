@@ -1,28 +1,29 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2013/2/12(Thu.) 4:54:37  <<<<<
+     >>>>>  Welcome to the MolDS world at 2014/7/16(Wed.) 11:43:31  <<<<<
 
 
 **********  START: Parse input  **********
-	Total number of atoms: 8
-	Total number of valence AOs: 14
-	Total number of valence electrons: 14
+	System conditions:
+		Total number of atoms: 8
+		Total number of valence AOs: 14
+		Total number of valence electrons: 14
 
-				| i-th | atom type |   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
-	Atom coordinates:	0	C	0.000000e+00	3.779452e-02	0.000000e+00		0.000000e+00	2.000000e-02	0.000000e+00
-	Atom coordinates:	1	C	2.822873e+00	-2.834589e-02	3.779452e-03		1.493800e+00	-1.500000e-02	2.000000e-03
-	Atom coordinates:	2	H	-6.614042e-01	1.967394e+00	1.889726e-03		-3.500000e-01	1.041100e+00	1.000000e-03
-	Atom coordinates:	3	H	-6.956082e-01	-9.836025e-01	-1.738548e+00		-3.681000e-01	-5.205000e-01	-9.200000e-01
-	Atom coordinates:	4	H	-6.991987e-01	-9.841694e-01	1.703777e+00		-3.700000e-01	-5.208000e-01	9.016000e-01
-	Atom coordinates:	5	H	3.499584e+00	9.826576e-01	-1.702076e+00		1.851900e+00	5.200000e-01	-9.007000e-01
-	Atom coordinates:	6	H	3.458199e+00	9.902165e-01	1.719651e+00		1.830000e+00	5.240000e-01	9.100000e-01
-	Atom coordinates:	7	H	3.514891e+00	-1.965504e+00	0.000000e+00		1.860000e+00	-1.040100e+00	0.000000e+00
+					| i-th | atom type |   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
+		Atom coordinates:	0	C	0.000000e+00	3.779452e-02	0.000000e+00		0.000000e+00	2.000000e-02	0.000000e+00
+		Atom coordinates:	1	C	2.822873e+00	-2.834589e-02	3.779452e-03		1.493800e+00	-1.500000e-02	2.000000e-03
+		Atom coordinates:	2	H	-6.614042e-01	1.967394e+00	1.889726e-03		-3.500000e-01	1.041100e+00	1.000000e-03
+		Atom coordinates:	3	H	-6.956082e-01	-9.836025e-01	-1.738548e+00		-3.681000e-01	-5.205000e-01	-9.200000e-01
+		Atom coordinates:	4	H	-6.991987e-01	-9.841694e-01	1.703777e+00		-3.700000e-01	-5.208000e-01	9.016000e-01
+		Atom coordinates:	5	H	3.499584e+00	9.826576e-01	-1.702076e+00		1.851900e+00	5.200000e-01	-9.007000e-01
+		Atom coordinates:	6	H	3.458199e+00	9.902165e-01	1.719651e+00		1.830000e+00	5.240000e-01	9.100000e-01
+		Atom coordinates:	7	H	3.514891e+00	-1.965504e+00	0.000000e+00		1.860000e+00	-1.040100e+00	0.000000e+00
 
-			|   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
-	Center of Mass:	1.409688e+00	4.008514e-03	9.965583e-04		7.459748e-01	2.121214e-03	5.273559e-04
+				|   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
+		Center of Mass:	1.409688e+00	4.008514e-03	9.965583e-04		7.459748e-01	2.121214e-03	5.273559e-04
 
-			|   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
-	Center of Core:	1.409689e+00	4.008721e-03	9.968163e-04		7.459751e-01	2.121324e-03	5.274925e-04
+				|   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
+		Center of Core:	1.409689e+00	4.008721e-03	9.968163e-04		7.459751e-01	2.121324e-03	5.274925e-04
 
 	SCF conditions:
 		Max iterations: 50
@@ -33,6 +34,7 @@
 		DIIS starting error: 1.000000e-01
 		DIIS ending error: 2.000000e-08
 		van der Waals (vdW) correction: no
+		MPI in SCF: no
 
 	Memory conditions:
 		Heap limit: 2.560000e+02[MB]
@@ -129,13 +131,13 @@ h | -0.3700 | -0.5208 | 0.9016 | h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 |
 	Mulliken charge(SCF):	0	6	H	1.000000e+00	8.849500e-02
 	Mulliken charge(SCF):	0	7	H	1.000000e+00	9.338696e-02
 
-	Elapsed time(omp) for the SCF = 0.038915[s].
+	Elapsed time(omp) for the SCF = 0.008859[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.046082[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.006776[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -213,11 +215,11 @@ h | -0.3700 | -0.5208 | 0.9016 | h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 |
 	======  DONE: Davidson-CIS  =====
 
 
-				|   i-th   |   e[a.u.]   |   e[eV]   | dominant eigenvector coefficients (occ. -> vir.) |
-	Excitation energies:	1	2.785983e-01	7.581107e+00	-6.392040e-01 (6 -> 9)	
-	Excitation energies:	2	2.791917e-01	7.597252e+00	9.099852e-01 (6 -> 7)	
-	Excitation energies:	3	2.837531e-01	7.721375e+00	9.016325e-01 (5 -> 7)	
-	Excitation energies:	4	2.901090e-01	7.894332e+00	8.681947e-01 (6 -> 8)	
+				|   i-th   |   e[a.u.]   |   e[eV]   |   e[nm]   | dominant eigenvector coefficients (occ. -> vir.) |
+	Excitation energies:	1	2.785983e-01	7.581107e+00	1.635450e+02	-6.392040e-01 (6 -> 9)	
+	Excitation energies:	2	2.791917e-01	7.597252e+00	1.631974e+02	9.099852e-01 (6 -> 7)	
+	Excitation energies:	3	2.837531e-01	7.721375e+00	1.605740e+02	9.016325e-01 (5 -> 7)	
+	Excitation energies:	4	2.901090e-01	7.894332e+00	1.570560e+02	8.681947e-01 (6 -> 8)	
 
 				| i-th eigenstate |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
 	Total dipole moment:	0	-1.966020e-02	-3.375670e-02	-1.470642e-02	4.174107e-02		-4.997125e-02	-8.580099e-02	-3.738000e-02	1.060952e-01
@@ -233,14 +235,14 @@ h | -0.3700 | -0.5208 | 0.9016 | h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 |
 	Electronic dipole moment:	3	-4.072180e-02	-2.816316e-02	-6.526805e-03	4.994024e-02		-1.035045e-01	-7.158362e-02	-1.658949e-02	1.269354e-01
 	Electronic dipole moment:	4	7.010148e-02	-4.890953e-02	-2.544430e-02	8.918392e-02		1.781802e-01	-1.243157e-01	-6.467298e-02	2.266830e-01
 
-					| from and to eigenstates |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
-	Transition dipole moment:	0 -> 1		-1.336806e-01	-2.101380e-01	-7.249835e-02	2.593926e-01		-3.397824e-01	-5.341176e-01	-1.842725e-01	6.593103e-01
-	Transition dipole moment:	0 -> 2		-3.073845e-02	-4.927661e-02	-1.306558e+00	1.307848e+00		-7.812935e-02	-1.252487e-01	-3.320939e+00	3.324218e+00
-	Transition dipole moment:	0 -> 3		1.624994e-01	1.296140e+00	-6.162610e-02	1.307739e+00		4.130324e-01	3.294459e+00	-1.566380e-01	3.323942e+00
-	Transition dipole moment:	0 -> 4		-4.556120e-03	-4.980080e-02	-8.575460e-02	9.927099e-02		-1.158051e-02	-1.265810e-01	-2.179665e-01	2.523217e-01
+					| from and to eigenstates |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |  oscillator strength[a.u.]  |
+	Transition dipole moment:	0 -> 1		-1.336806e-01	-2.101380e-01	-7.249835e-02	2.593926e-01		-3.397824e-01	-5.341176e-01	-1.842725e-01	6.593103e-01	1.249690e-02
+	Transition dipole moment:	0 -> 2		-3.073845e-02	-4.927661e-02	-1.306558e+00	1.307848e+00		-7.812935e-02	-1.252487e-01	-3.320939e+00	3.324218e+00	3.183652e-01
+	Transition dipole moment:	0 -> 3		1.624994e-01	1.296140e+00	-6.162610e-02	1.307739e+00		4.130324e-01	3.294459e+00	-1.566380e-01	3.323942e+00	3.235129e-01
+	Transition dipole moment:	0 -> 4		-4.556120e-03	-4.980080e-02	-8.575460e-02	9.927099e-02		-1.158051e-02	-1.265810e-01	-2.179665e-01	2.523217e-01	1.905964e-03
 
 
-	Elapsed time(omp) for the CIS = 0.186192[s].
+	Elapsed time(omp) for the CIS = 0.035615[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
@@ -254,31 +256,31 @@ h | -0.3700 | -0.5208 | 0.9016 | h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 |
 		(inc. core rep.):	-1.202047e+01	-3.270963e+02
 		Total:            	-1.202047e+01	-3.270963e+02
 
-				| i-th | atom type |   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
-	Atom coordinates:	0	C	0.000000e+00	3.779452e-02	0.000000e+00		0.000000e+00	2.000000e-02	0.000000e+00
-	Atom coordinates:	1	C	2.822873e+00	-2.834589e-02	3.779452e-03		1.493800e+00	-1.500000e-02	2.000000e-03
-	Atom coordinates:	2	H	-6.614042e-01	1.967394e+00	1.889726e-03		-3.500000e-01	1.041100e+00	1.000000e-03
-	Atom coordinates:	3	H	-6.956082e-01	-9.836025e-01	-1.738548e+00		-3.681000e-01	-5.205000e-01	-9.200000e-01
-	Atom coordinates:	4	H	-6.991987e-01	-9.841694e-01	1.703777e+00		-3.700000e-01	-5.208000e-01	9.016000e-01
-	Atom coordinates:	5	H	3.499584e+00	9.826576e-01	-1.702076e+00		1.851900e+00	5.200000e-01	-9.007000e-01
-	Atom coordinates:	6	H	3.458199e+00	9.902165e-01	1.719651e+00		1.830000e+00	5.240000e-01	9.100000e-01
-	Atom coordinates:	7	H	3.514891e+00	-1.965504e+00	0.000000e+00		1.860000e+00	-1.040100e+00	0.000000e+00
+					| i-th | atom type |   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
+		Atom coordinates:	0	C	0.000000e+00	3.779452e-02	0.000000e+00		0.000000e+00	2.000000e-02	0.000000e+00
+		Atom coordinates:	1	C	2.822873e+00	-2.834589e-02	3.779452e-03		1.493800e+00	-1.500000e-02	2.000000e-03
+		Atom coordinates:	2	H	-6.614042e-01	1.967394e+00	1.889726e-03		-3.500000e-01	1.041100e+00	1.000000e-03
+		Atom coordinates:	3	H	-6.956082e-01	-9.836025e-01	-1.738548e+00		-3.681000e-01	-5.205000e-01	-9.200000e-01
+		Atom coordinates:	4	H	-6.991987e-01	-9.841694e-01	1.703777e+00		-3.700000e-01	-5.208000e-01	9.016000e-01
+		Atom coordinates:	5	H	3.499584e+00	9.826576e-01	-1.702076e+00		1.851900e+00	5.200000e-01	-9.007000e-01
+		Atom coordinates:	6	H	3.458199e+00	9.902165e-01	1.719651e+00		1.830000e+00	5.240000e-01	9.100000e-01
+		Atom coordinates:	7	H	3.514891e+00	-1.965504e+00	0.000000e+00		1.860000e+00	-1.040100e+00	0.000000e+00
 
-			|   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
-	Center of Mass:	1.409688e+00	4.008514e-03	9.965583e-04		7.459748e-01	2.121214e-03	5.273559e-04
+				|   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
+		Center of Mass:	1.409688e+00	4.008514e-03	9.965583e-04		7.459748e-01	2.121214e-03	5.273559e-04
 
-			|   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
-	Center of Core:	1.409689e+00	4.008721e-03	9.968163e-04		7.459751e-01	2.121324e-03	5.274925e-04
+				|   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
+		Center of Core:	1.409689e+00	4.008721e-03	9.968163e-04		7.459751e-01	2.121324e-03	5.274925e-04
 
-			| i-th | atom type |   px[a.u.]   |   py[a.u.]   |   pz[a.u.]   |		|   px[u]   |   py[u]   |   pz[u]   | [u] = [(g/Mol)*(angst/fs)]
-	Atom momenta:	0	C	0.000000e+00	0.000000e+00	0.000000e+00		0.000000e+00	0.000000e+00	0.000000e+00
-	Atom momenta:	1	C	0.000000e+00	0.000000e+00	0.000000e+00		0.000000e+00	0.000000e+00	0.000000e+00
-	Atom momenta:	2	H	0.000000e+00	0.000000e+00	0.000000e+00		0.000000e+00	0.000000e+00	0.000000e+00
-	Atom momenta:	3	H	0.000000e+00	0.000000e+00	0.000000e+00		0.000000e+00	0.000000e+00	0.000000e+00
-	Atom momenta:	4	H	0.000000e+00	0.000000e+00	0.000000e+00		0.000000e+00	0.000000e+00	0.000000e+00
-	Atom momenta:	5	H	0.000000e+00	0.000000e+00	0.000000e+00		0.000000e+00	0.000000e+00	0.000000e+00
-	Atom momenta:	6	H	0.000000e+00	0.000000e+00	0.000000e+00		0.000000e+00	0.000000e+00	0.000000e+00
-	Atom momenta:	7	H	0.000000e+00	0.000000e+00	0.000000e+00		0.000000e+00	0.000000e+00	0.000000e+00
+				| i-th | atom type |   px[a.u.]   |   py[a.u.]   |   pz[a.u.]   |		|   px[u]   |   py[u]   |   pz[u]   | [u] = [(g/Mol)*(angst/fs)]
+		Atom momenta:	0	C	0.000000e+00	0.000000e+00	0.000000e+00		0.000000e+00	0.000000e+00	0.000000e+00
+		Atom momenta:	1	C	0.000000e+00	0.000000e+00	0.000000e+00		0.000000e+00	0.000000e+00	0.000000e+00
+		Atom momenta:	2	H	0.000000e+00	0.000000e+00	0.000000e+00		0.000000e+00	0.000000e+00	0.000000e+00
+		Atom momenta:	3	H	0.000000e+00	0.000000e+00	0.000000e+00		0.000000e+00	0.000000e+00	0.000000e+00
+		Atom momenta:	4	H	0.000000e+00	0.000000e+00	0.000000e+00		0.000000e+00	0.000000e+00	0.000000e+00
+		Atom momenta:	5	H	0.000000e+00	0.000000e+00	0.000000e+00		0.000000e+00	0.000000e+00	0.000000e+00
+		Atom momenta:	6	H	0.000000e+00	0.000000e+00	0.000000e+00		0.000000e+00	0.000000e+00	0.000000e+00
+		Atom momenta:	7	H	0.000000e+00	0.000000e+00	0.000000e+00		0.000000e+00	0.000000e+00	0.000000e+00
 
 
 	========== START: MD step 1
@@ -333,13 +335,13 @@ h | -0.3700 | -0.5208 | 0.9016 | h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 |
 	Mulliken charge(SCF):	0	6	H	1.000000e+00	8.849456e-02
 	Mulliken charge(SCF):	0	7	H	1.000000e+00	9.338653e-02
 
-	Elapsed time(omp) for the SCF = 0.027745[s].
+	Elapsed time(omp) for the SCF = 0.002179[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.047657[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.006584[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -417,11 +419,11 @@ h | -0.3700 | -0.5208 | 0.9016 | h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 |
 	======  DONE: Davidson-CIS  =====
 
 
-				|   i-th   |   e[a.u.]   |   e[eV]   | dominant eigenvector coefficients (occ. -> vir.) |
-	Excitation energies:	1	2.785977e-01	7.581090e+00	-6.391997e-01 (6 -> 9)	
-	Excitation energies:	2	2.791911e-01	7.597237e+00	9.099848e-01 (6 -> 7)	
-	Excitation energies:	3	2.837519e-01	7.721343e+00	9.016391e-01 (5 -> 7)	
-	Excitation energies:	4	2.901088e-01	7.894327e+00	8.681948e-01 (6 -> 8)	
+				|   i-th   |   e[a.u.]   |   e[eV]   |   e[nm]   | dominant eigenvector coefficients (occ. -> vir.) |
+	Excitation energies:	1	2.785977e-01	7.581090e+00	1.635454e+02	-6.391997e-01 (6 -> 9)	
+	Excitation energies:	2	2.791911e-01	7.597237e+00	1.631978e+02	9.099848e-01 (6 -> 7)	
+	Excitation energies:	3	2.837519e-01	7.721343e+00	1.605747e+02	9.016391e-01 (5 -> 7)	
+	Excitation energies:	4	2.901088e-01	7.894327e+00	1.570561e+02	8.681948e-01 (6 -> 8)	
 
 				| i-th eigenstate |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
 	Total dipole moment:	0	-1.965222e-02	-3.374675e-02	-1.470258e-02	4.172791e-02		-4.995097e-02	-8.577569e-02	-3.737023e-02	1.060618e-01
@@ -437,14 +439,14 @@ h | -0.3700 | -0.5208 | 0.9016 | h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 |
 	Electronic dipole moment:	3	-4.070314e-02	-2.815780e-02	-6.521825e-03	4.992135e-02		-1.034571e-01	-7.157000e-02	-1.657683e-02	1.268874e-01
 	Electronic dipole moment:	4	7.010021e-02	-4.889956e-02	-2.543511e-02	8.917483e-02		1.781770e-01	-1.242903e-01	-6.464961e-02	2.266599e-01
 
-					| from and to eigenstates |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
-	Transition dipole moment:	0 -> 1		-1.337156e-01	-2.100726e-01	-7.242105e-02	2.593360e-01		-3.398713e-01	-5.339514e-01	-1.840760e-01	6.591665e-01
-	Transition dipole moment:	0 -> 2		-3.073793e-02	-4.928706e-02	-1.306564e+00	1.307855e+00		-7.812804e-02	-1.252752e-01	-3.320956e+00	3.324237e+00
-	Transition dipole moment:	0 -> 3		1.624670e-01	1.296163e+00	-6.161899e-02	1.307758e+00		4.129499e-01	3.294518e+00	-1.566199e-01	3.323989e+00
-	Transition dipole moment:	0 -> 4		-4.555508e-03	-4.979237e-02	-8.573911e-02	9.925335e-02		-1.157895e-02	-1.265596e-01	-2.179271e-01	2.522769e-01
+					| from and to eigenstates |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |  oscillator strength[a.u.]  |
+	Transition dipole moment:	0 -> 1		-1.337156e-01	-2.100726e-01	-7.242105e-02	2.593360e-01		-3.398713e-01	-5.339514e-01	-1.840760e-01	6.591665e-01	1.249142e-02
+	Transition dipole moment:	0 -> 2		-3.073793e-02	-4.928706e-02	-1.306564e+00	1.307855e+00		-7.812804e-02	-1.252752e-01	-3.320956e+00	3.324237e+00	3.183681e-01
+	Transition dipole moment:	0 -> 3		1.624670e-01	1.296163e+00	-6.161899e-02	1.307758e+00		4.129499e-01	3.294518e+00	-1.566199e-01	3.323989e+00	3.235206e-01
+	Transition dipole moment:	0 -> 4		-4.555508e-03	-4.979237e-02	-8.573911e-02	9.925335e-02		-1.157895e-02	-1.265596e-01	-2.179271e-01	2.522769e-01	1.905285e-03
 
 
-	Elapsed time(omp) for the CIS = 0.172581[s].
+	Elapsed time(omp) for the CIS = 0.035206[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
@@ -455,33 +457,33 @@ h | -0.3700 | -0.5208 | 0.9016 | h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 |
 		Electronic
 		(inc. core rep.):	-1.202047e+01	-3.270963e+02
 		Total:            	-1.202047e+01	-3.270963e+02
-		Error:            	-1.381869e-07	-3.760287e-06
+		Error:            	-1.381869e-07	-3.760288e-06
 
-				| i-th | atom type |   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
-	Atom coordinates:	0	C	4.190872e-06	3.779228e-02	-2.719618e-07		2.217714e-06	1.999882e-02	-1.439160e-07
-	Atom coordinates:	1	C	2.822868e+00	-2.834451e-02	3.779516e-03		1.493798e+00	-1.499927e-02	2.000034e-03
-	Atom coordinates:	2	H	-6.614174e-01	1.967409e+00	1.889012e-03		-3.500070e-01	1.041108e+00	9.996223e-04
-	Atom coordinates:	3	H	-6.956151e-01	-9.835981e-01	-1.738542e+00		-3.681036e-01	-5.204977e-01	-9.199968e-01
-	Atom coordinates:	4	H	-6.992069e-01	-9.841676e-01	1.703774e+00		-3.700043e-01	-5.207990e-01	9.015983e-01
-	Atom coordinates:	5	H	3.499594e+00	9.826569e-01	-1.702077e+00		1.851905e+00	5.199997e-01	-9.007004e-01
-	Atom coordinates:	6	H	3.458211e+00	9.902160e-01	1.719652e+00		1.830006e+00	5.239997e-01	9.100005e-01
-	Atom coordinates:	7	H	3.514901e+00	-1.965514e+00	4.054235e-08		1.860006e+00	-1.040105e+00	2.145409e-08
+					| i-th | atom type |   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
+		Atom coordinates:	0	C	4.190872e-06	3.779228e-02	-2.719618e-07		2.217714e-06	1.999882e-02	-1.439160e-07
+		Atom coordinates:	1	C	2.822868e+00	-2.834451e-02	3.779516e-03		1.493798e+00	-1.499927e-02	2.000034e-03
+		Atom coordinates:	2	H	-6.614174e-01	1.967409e+00	1.889012e-03		-3.500070e-01	1.041108e+00	9.996223e-04
+		Atom coordinates:	3	H	-6.956151e-01	-9.835981e-01	-1.738542e+00		-3.681036e-01	-5.204977e-01	-9.199968e-01
+		Atom coordinates:	4	H	-6.992069e-01	-9.841676e-01	1.703774e+00		-3.700043e-01	-5.207990e-01	9.015983e-01
+		Atom coordinates:	5	H	3.499594e+00	9.826569e-01	-1.702077e+00		1.851905e+00	5.199997e-01	-9.007004e-01
+		Atom coordinates:	6	H	3.458211e+00	9.902160e-01	1.719652e+00		1.830006e+00	5.239997e-01	9.100005e-01
+		Atom coordinates:	7	H	3.514901e+00	-1.965514e+00	4.054235e-08		1.860006e+00	-1.040105e+00	2.145409e-08
 
-			|   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
-	Center of Mass:	1.409688e+00	4.008514e-03	9.965583e-04		7.459748e-01	2.121214e-03	5.273559e-04
+				|   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
+		Center of Mass:	1.409688e+00	4.008514e-03	9.965583e-04		7.459748e-01	2.121214e-03	5.273559e-04
 
-			|   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
-	Center of Core:	1.409689e+00	4.008721e-03	9.968163e-04		7.459751e-01	2.121324e-03	5.274925e-04
+				|   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
+		Center of Core:	1.409689e+00	4.008721e-03	9.968163e-04		7.459751e-01	2.121324e-03	5.274925e-04
 
-			| i-th | atom type |   px[a.u.]   |   py[a.u.]   |   pz[a.u.]   |		|   px[u]   |   py[u]   |   pz[u]   | [u] = [(g/Mol)*(angst/fs)]
-	Atom momenta:	0	C	1.065189e-03	-5.691126e-04	-6.914109e-05		8.875550e-02	-4.742056e-02	-5.761091e-03
-	Atom momenta:	1	C	-1.153312e-03	3.515914e-04	1.631255e-05		-9.609822e-02	2.929589e-02	1.359222e-03
-	Atom momenta:	2	H	-2.814228e-04	3.214692e-04	-1.521317e-05		-2.344918e-02	2.678600e-02	-1.267618e-03
-	Atom momenta:	3	H	-1.470000e-04	9.399101e-05	1.305983e-04		-1.224858e-02	7.831677e-03	1.088193e-02
-	Atom momenta:	4	H	-1.746908e-04	3.852551e-05	-6.793843e-05		-1.455588e-02	3.210087e-03	-5.660881e-03
-	Atom momenta:	5	H	2.122389e-04	-1.406589e-05	-1.740592e-05		1.768452e-02	-1.172022e-03	-1.450325e-03
-	Atom momenta:	6	H	2.552336e-04	-1.150902e-05	2.192710e-05		2.126700e-02	-9.589737e-04	1.827046e-03
-	Atom momenta:	7	H	2.237639e-04	-2.108896e-04	8.606623e-07		1.864483e-02	-1.757210e-02	7.171356e-05
+				| i-th | atom type |   px[a.u.]   |   py[a.u.]   |   pz[a.u.]   |		|   px[u]   |   py[u]   |   pz[u]   | [u] = [(g/Mol)*(angst/fs)]
+		Atom momenta:	0	C	1.065189e-03	-5.691126e-04	-6.914109e-05		8.875550e-02	-4.742056e-02	-5.761091e-03
+		Atom momenta:	1	C	-1.153312e-03	3.515914e-04	1.631255e-05		-9.609822e-02	2.929589e-02	1.359222e-03
+		Atom momenta:	2	H	-2.814228e-04	3.214692e-04	-1.521317e-05		-2.344918e-02	2.678600e-02	-1.267618e-03
+		Atom momenta:	3	H	-1.470000e-04	9.399101e-05	1.305983e-04		-1.224858e-02	7.831677e-03	1.088193e-02
+		Atom momenta:	4	H	-1.746908e-04	3.852551e-05	-6.793843e-05		-1.455588e-02	3.210087e-03	-5.660881e-03
+		Atom momenta:	5	H	2.122389e-04	-1.406589e-05	-1.740592e-05		1.768452e-02	-1.172022e-03	-1.450325e-03
+		Atom momenta:	6	H	2.552336e-04	-1.150902e-05	2.192710e-05		2.126700e-02	-9.589737e-04	1.827046e-03
+		Atom momenta:	7	H	2.237639e-04	-2.108896e-04	8.606623e-07		1.864483e-02	-1.757210e-02	7.171356e-05
 
 	Time in [fs]: 0.050000
 	========== DONE: MD step 1
@@ -539,13 +541,13 @@ h | -0.3700 | -0.5208 | 0.9016 | h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 |
 	Mulliken charge(SCF):	0	6	H	1.000000e+00	8.849340e-02
 	Mulliken charge(SCF):	0	7	H	1.000000e+00	9.338510e-02
 
-	Elapsed time(omp) for the SCF = 0.024431[s].
+	Elapsed time(omp) for the SCF = 0.002302[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.040435[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.007351[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -623,11 +625,11 @@ h | -0.3700 | -0.5208 | 0.9016 | h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 |
 	======  DONE: Davidson-CIS  =====
 
 
-				|   i-th   |   e[a.u.]   |   e[eV]   | dominant eigenvector coefficients (occ. -> vir.) |
-	Excitation energies:	1	2.785955e-01	7.581029e+00	-6.391876e-01 (6 -> 9)	
-	Excitation energies:	2	2.791892e-01	7.597184e+00	9.099833e-01 (6 -> 7)	
-	Excitation energies:	3	2.837478e-01	7.721232e+00	9.016581e-01 (5 -> 7)	
-	Excitation energies:	4	2.901079e-01	7.894302e+00	8.681947e-01 (6 -> 8)	
+				|   i-th   |   e[a.u.]   |   e[eV]   |   e[nm]   | dominant eigenvector coefficients (occ. -> vir.) |
+	Excitation energies:	1	2.785955e-01	7.581029e+00	1.635467e+02	-6.391876e-01 (6 -> 9)	
+	Excitation energies:	2	2.791892e-01	7.597184e+00	1.631989e+02	9.099833e-01 (6 -> 7)	
+	Excitation energies:	3	2.837478e-01	7.721232e+00	1.605770e+02	9.016581e-01 (5 -> 7)	
+	Excitation energies:	4	2.901079e-01	7.894302e+00	1.570566e+02	8.681947e-01 (6 -> 8)	
 
 				| i-th eigenstate |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
 	Total dipole moment:	0	-1.962932e-02	-3.371912e-02	-1.469213e-02	4.169110e-02		-4.989277e-02	-8.570546e-02	-3.734369e-02	1.059682e-01
@@ -643,14 +645,14 @@ h | -0.3700 | -0.5208 | 0.9016 | h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 |
 	Electronic dipole moment:	3	-4.065216e-02	-2.814785e-02	-6.509564e-03	4.987258e-02		-1.033275e-01	-7.154471e-02	-1.654566e-02	1.267635e-01
 	Electronic dipole moment:	4	7.009290e-02	-4.887548e-02	-2.541228e-02	8.914937e-02		1.781584e-01	-1.242291e-01	-6.459158e-02	2.265952e-01
 
-					| from and to eigenstates |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
-	Transition dipole moment:	0 -> 1		-1.338347e-01	-2.098789e-01	-7.220112e-02	2.591792e-01		-3.401740e-01	-5.334590e-01	-1.835170e-01	6.587680e-01
-	Transition dipole moment:	0 -> 2		-3.073315e-02	-4.931483e-02	-1.306584e+00	1.307875e+00		-7.811589e-02	-1.253458e-01	-3.321006e+00	3.324288e+00
-	Transition dipole moment:	0 -> 3		1.623619e-01	1.296230e+00	-6.159593e-02	1.307810e+00		4.126827e-01	3.294688e+00	-1.565613e-01	3.324122e+00
-	Transition dipole moment:	0 -> 4		-4.553352e-03	-4.976708e-02	-8.569588e-02	9.920323e-02		-1.157347e-02	-1.264953e-01	-2.178173e-01	2.521495e-01
+					| from and to eigenstates |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |  oscillator strength[a.u.]  |
+	Transition dipole moment:	0 -> 1		-1.338347e-01	-2.098789e-01	-7.220112e-02	2.591792e-01		-3.401740e-01	-5.334590e-01	-1.835170e-01	6.587680e-01	1.247622e-02
+	Transition dipole moment:	0 -> 2		-3.073315e-02	-4.931483e-02	-1.306584e+00	1.307875e+00		-7.811589e-02	-1.253458e-01	-3.321006e+00	3.324288e+00	3.183758e-01
+	Transition dipole moment:	0 -> 3		1.623619e-01	1.296230e+00	-6.159593e-02	1.307810e+00		4.126827e-01	3.294688e+00	-1.565613e-01	3.324122e+00	3.235420e-01
+	Transition dipole moment:	0 -> 4		-4.553352e-03	-4.976708e-02	-8.569588e-02	9.920323e-02		-1.157347e-02	-1.264953e-01	-2.178173e-01	2.521495e-01	1.903356e-03
 
 
-	Elapsed time(omp) for the CIS = 0.159483[s].
+	Elapsed time(omp) for the CIS = 0.037325[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
@@ -661,33 +663,33 @@ h | -0.3700 | -0.5208 | 0.9016 | h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 |
 		Electronic
 		(inc. core rep.):	-1.202048e+01	-3.270964e+02
 		Total:            	-1.202047e+01	-3.270963e+02
-		Error:            	-1.536696e-07	-4.181595e-06
+		Error:            	-1.536695e-07	-4.181593e-06
 
-				| i-th | atom type |   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
-	Atom coordinates:	0	C	1.676242e-05	3.778557e-02	-1.088043e-06		8.870290e-06	1.999526e-02	-5.757677e-07
-	Atom coordinates:	1	C	2.822855e+00	-2.834036e-02	3.779709e-03		1.493790e+00	-1.499707e-02	2.000136e-03
-	Atom coordinates:	2	H	-6.614569e-01	1.967454e+00	1.886872e-03		-3.500279e-01	1.041132e+00	9.984898e-04
-	Atom coordinates:	3	H	-6.956358e-01	-9.835848e-01	-1.738524e+00		-3.681146e-01	-5.204907e-01	-9.199870e-01
-	Atom coordinates:	4	H	-6.992315e-01	-9.841622e-01	1.703764e+00		-3.700173e-01	-5.207962e-01	9.015933e-01
-	Atom coordinates:	5	H	3.499624e+00	9.826550e-01	-1.702080e+00		1.851921e+00	5.199986e-01	-9.007017e-01
-	Atom coordinates:	6	H	3.458247e+00	9.902144e-01	1.719655e+00		1.830025e+00	5.239989e-01	9.100022e-01
-	Atom coordinates:	7	H	3.514933e+00	-1.965544e+00	1.614483e-07		1.860022e+00	-1.040121e+00	8.543475e-08
+					| i-th | atom type |   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
+		Atom coordinates:	0	C	1.676242e-05	3.778557e-02	-1.088043e-06		8.870290e-06	1.999526e-02	-5.757677e-07
+		Atom coordinates:	1	C	2.822855e+00	-2.834036e-02	3.779709e-03		1.493790e+00	-1.499707e-02	2.000136e-03
+		Atom coordinates:	2	H	-6.614569e-01	1.967454e+00	1.886872e-03		-3.500279e-01	1.041132e+00	9.984898e-04
+		Atom coordinates:	3	H	-6.956358e-01	-9.835848e-01	-1.738524e+00		-3.681146e-01	-5.204907e-01	-9.199870e-01
+		Atom coordinates:	4	H	-6.992315e-01	-9.841622e-01	1.703764e+00		-3.700173e-01	-5.207962e-01	9.015933e-01
+		Atom coordinates:	5	H	3.499624e+00	9.826550e-01	-1.702080e+00		1.851921e+00	5.199986e-01	-9.007017e-01
+		Atom coordinates:	6	H	3.458247e+00	9.902144e-01	1.719655e+00		1.830025e+00	5.239989e-01	9.100022e-01
+		Atom coordinates:	7	H	3.514933e+00	-1.965544e+00	1.614483e-07		1.860022e+00	-1.040121e+00	8.543475e-08
 
-			|   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
-	Center of Mass:	1.409688e+00	4.008515e-03	9.965584e-04		7.459748e-01	2.121215e-03	5.273560e-04
+				|   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
+		Center of Mass:	1.409688e+00	4.008515e-03	9.965584e-04		7.459748e-01	2.121215e-03	5.273560e-04
 
-			|   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
-	Center of Core:	1.409689e+00	4.008721e-03	9.968163e-04		7.459751e-01	2.121324e-03	5.274925e-04
+				|   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
+		Center of Core:	1.409689e+00	4.008721e-03	9.968163e-04		7.459751e-01	2.121324e-03	5.274925e-04
 
-			| i-th | atom type |   px[a.u.]   |   py[a.u.]   |   pz[a.u.]   |		|   px[u]   |   py[u]   |   pz[u]   | [u] = [(g/Mol)*(angst/fs)]
-	Atom momenta:	0	C	2.130140e-03	-1.137910e-03	-1.383296e-04		1.774911e-01	-9.481486e-02	-1.152614e-02
-	Atom momenta:	1	C	-2.306380e-03	7.030028e-04	3.263848e-05		-1.921761e-01	5.857679e-02	2.719558e-03
-	Atom momenta:	2	H	-5.627277e-04	6.426548e-04	-3.039345e-05		-4.688855e-02	5.354837e-02	-2.532495e-03
-	Atom momenta:	3	H	-2.939305e-04	1.879861e-04	2.612114e-04		-2.449138e-02	1.566369e-02	2.176510e-02
-	Atom momenta:	4	H	-3.493806e-04	7.705512e-05	-1.358240e-04		-2.911168e-02	6.420516e-03	-1.131735e-02
-	Atom momenta:	5	H	4.244584e-04	-2.815192e-05	-3.479471e-05		3.536744e-02	-2.345722e-03	-2.899223e-03
-	Atom momenta:	6	H	5.103640e-04	-2.305295e-05	4.378517e-05		4.252541e-02	-1.920857e-03	3.648342e-03
-	Atom momenta:	7	H	4.474566e-04	-4.215839e-04	1.706703e-06		3.728373e-02	-3.512793e-02	1.422088e-04
+				| i-th | atom type |   px[a.u.]   |   py[a.u.]   |   pz[a.u.]   |		|   px[u]   |   py[u]   |   pz[u]   | [u] = [(g/Mol)*(angst/fs)]
+		Atom momenta:	0	C	2.130140e-03	-1.137910e-03	-1.383296e-04		1.774911e-01	-9.481486e-02	-1.152614e-02
+		Atom momenta:	1	C	-2.306380e-03	7.030028e-04	3.263848e-05		-1.921761e-01	5.857679e-02	2.719558e-03
+		Atom momenta:	2	H	-5.627277e-04	6.426548e-04	-3.039345e-05		-4.688855e-02	5.354837e-02	-2.532495e-03
+		Atom momenta:	3	H	-2.939305e-04	1.879861e-04	2.612114e-04		-2.449138e-02	1.566369e-02	2.176510e-02
+		Atom momenta:	4	H	-3.493806e-04	7.705512e-05	-1.358240e-04		-2.911168e-02	6.420516e-03	-1.131735e-02
+		Atom momenta:	5	H	4.244584e-04	-2.815192e-05	-3.479471e-05		3.536744e-02	-2.345722e-03	-2.899223e-03
+		Atom momenta:	6	H	5.103640e-04	-2.305295e-05	4.378517e-05		4.252541e-02	-1.920857e-03	3.648342e-03
+		Atom momenta:	7	H	4.474566e-04	-4.215839e-04	1.706703e-06		3.728373e-02	-3.512793e-02	1.422088e-04
 
 	Time in [fs]: 0.100000
 	========== DONE: MD step 2
@@ -746,13 +748,13 @@ h | -0.3700 | -0.5208 | 0.9016 | h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 |
 	Mulliken charge(SCF):	0	6	H	1.000000e+00	8.849120e-02
 	Mulliken charge(SCF):	0	7	H	1.000000e+00	9.338194e-02
 
-	Elapsed time(omp) for the SCF = 0.022981[s].
+	Elapsed time(omp) for the SCF = 0.002504[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.041878[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.006590[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -830,11 +832,11 @@ h | -0.3700 | -0.5208 | 0.9016 | h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 |
 	======  DONE: Davidson-CIS  =====
 
 
-				|   i-th   |   e[a.u.]   |   e[eV]   | dominant eigenvector coefficients (occ. -> vir.) |
-	Excitation energies:	1	2.785916e-01	7.580925e+00	-6.391677e-01 (6 -> 9)	
-	Excitation energies:	2	2.791859e-01	7.597095e+00	9.099807e-01 (6 -> 7)	
-	Excitation energies:	3	2.837410e-01	7.721046e+00	9.016895e-01 (5 -> 7)	
-	Excitation energies:	4	2.901064e-01	7.894259e+00	8.681946e-01 (6 -> 8)	
+				|   i-th   |   e[a.u.]   |   e[eV]   |   e[nm]   | dominant eigenvector coefficients (occ. -> vir.) |
+	Excitation energies:	1	2.785916e-01	7.580925e+00	1.635489e+02	-6.391677e-01 (6 -> 9)	
+	Excitation energies:	2	2.791859e-01	7.597095e+00	1.632008e+02	9.099807e-01 (6 -> 7)	
+	Excitation energies:	3	2.837410e-01	7.721046e+00	1.605808e+02	9.016895e-01 (5 -> 7)	
+	Excitation energies:	4	2.901064e-01	7.894259e+00	1.570574e+02	8.681946e-01 (6 -> 8)	
 
 				| i-th eigenstate |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
 	Total dipole moment:	0	-1.959213e-02	-3.367418e-02	-1.467523e-02	4.163129e-02		-4.979823e-02	-8.559124e-02	-3.730072e-02	1.058162e-01
@@ -850,14 +852,14 @@ h | -0.3700 | -0.5208 | 0.9016 | h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 |
 	Electronic dipole moment:	3	-4.057024e-02	-2.813325e-02	-6.490009e-03	4.979502e-02		-1.031193e-01	-7.150760e-02	-1.649596e-02	1.265663e-01
 	Electronic dipole moment:	4	7.007962e-02	-4.883644e-02	-2.537519e-02	8.910697e-02		1.781247e-01	-1.241299e-01	-6.449731e-02	2.264874e-01
 
-					| from and to eigenstates |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
-	Transition dipole moment:	0 -> 1		-1.340353e-01	-2.095581e-01	-7.183812e-02	2.589223e-01		-3.406837e-01	-5.326436e-01	-1.825943e-01	6.581150e-01
-	Transition dipole moment:	0 -> 2		-3.072466e-02	-4.936006e-02	-1.306616e+00	1.307909e+00		-7.809430e-02	-1.254608e-01	-3.321088e+00	3.324374e+00
-	Transition dipole moment:	0 -> 3		1.621862e-01	1.296341e+00	-6.155721e-02	1.307896e+00		4.122363e-01	3.294970e+00	-1.564629e-01	3.324342e+00
-	Transition dipole moment:	0 -> 4		-4.549619e-03	-4.972462e-02	-8.562463e-02	9.912020e-02		-1.156398e-02	-1.263874e-01	-2.176361e-01	2.519385e-01
+					| from and to eigenstates |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |  oscillator strength[a.u.]  |
+	Transition dipole moment:	0 -> 1		-1.340353e-01	-2.095581e-01	-7.183812e-02	2.589223e-01		-3.406837e-01	-5.326436e-01	-1.825943e-01	6.581150e-01	1.245133e-02
+	Transition dipole moment:	0 -> 2		-3.072466e-02	-4.936006e-02	-1.306616e+00	1.307909e+00		-7.809430e-02	-1.254608e-01	-3.321088e+00	3.324374e+00	3.183885e-01
+	Transition dipole moment:	0 -> 3		1.621862e-01	1.296341e+00	-6.155721e-02	1.307896e+00		4.122363e-01	3.294970e+00	-1.564629e-01	3.324342e+00	3.235769e-01
+	Transition dipole moment:	0 -> 4		-4.549619e-03	-4.972462e-02	-8.562463e-02	9.912020e-02		-1.156398e-02	-1.263874e-01	-2.176361e-01	2.519385e-01	1.900161e-03
 
 
-	Elapsed time(omp) for the CIS = 0.155733[s].
+	Elapsed time(omp) for the CIS = 0.035254[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
@@ -868,33 +870,33 @@ h | -0.3700 | -0.5208 | 0.9016 | h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 |
 		Electronic
 		(inc. core rep.):	-1.202048e+01	-3.270966e+02
 		Total:            	-1.202047e+01	-3.270963e+02
-		Error:            	-1.159960e-07	-3.156437e-06
+		Error:            	-1.159960e-07	-3.156436e-06
 
-				| i-th | atom type |   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
-	Atom coordinates:	0	C	3.771196e-05	3.777438e-02	-2.448795e-06		1.995631e-05	1.998934e-02	-1.295847e-06
-	Atom coordinates:	1	C	2.822832e+00	-2.833345e-02	3.780030e-03		1.493778e+00	-1.499341e-02	2.000306e-03
-	Atom coordinates:	2	H	-6.615229e-01	1.967530e+00	1.883311e-03		-3.500628e-01	1.041172e+00	9.966052e-04
-	Atom coordinates:	3	H	-6.956702e-01	-9.835628e-01	-1.738493e+00		-3.681328e-01	-5.204790e-01	-9.199708e-01
-	Atom coordinates:	4	H	-6.992724e-01	-9.841531e-01	1.703748e+00		-3.700390e-01	-5.207914e-01	9.015848e-01
-	Atom coordinates:	5	H	3.499673e+00	9.826517e-01	-1.702084e+00		1.851947e+00	5.199969e-01	-9.007039e-01
-	Atom coordinates:	6	H	3.458307e+00	9.902116e-01	1.719660e+00		1.830057e+00	5.239974e-01	9.100049e-01
-	Atom coordinates:	7	H	3.514985e+00	-1.965593e+00	3.606960e-07		1.860050e+00	-1.040147e+00	1.908721e-07
+					| i-th | atom type |   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
+		Atom coordinates:	0	C	3.771196e-05	3.777438e-02	-2.448795e-06		1.995631e-05	1.998934e-02	-1.295847e-06
+		Atom coordinates:	1	C	2.822832e+00	-2.833345e-02	3.780030e-03		1.493778e+00	-1.499341e-02	2.000306e-03
+		Atom coordinates:	2	H	-6.615229e-01	1.967530e+00	1.883311e-03		-3.500628e-01	1.041172e+00	9.966052e-04
+		Atom coordinates:	3	H	-6.956702e-01	-9.835628e-01	-1.738493e+00		-3.681328e-01	-5.204790e-01	-9.199708e-01
+		Atom coordinates:	4	H	-6.992724e-01	-9.841531e-01	1.703748e+00		-3.700390e-01	-5.207914e-01	9.015848e-01
+		Atom coordinates:	5	H	3.499673e+00	9.826517e-01	-1.702084e+00		1.851947e+00	5.199969e-01	-9.007039e-01
+		Atom coordinates:	6	H	3.458307e+00	9.902116e-01	1.719660e+00		1.830057e+00	5.239974e-01	9.100049e-01
+		Atom coordinates:	7	H	3.514985e+00	-1.965593e+00	3.606960e-07		1.860050e+00	-1.040147e+00	1.908721e-07
 
-			|   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
-	Center of Mass:	1.409688e+00	4.008515e-03	9.965585e-04		7.459748e-01	2.121215e-03	5.273561e-04
+				|   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
+		Center of Mass:	1.409688e+00	4.008515e-03	9.965585e-04		7.459748e-01	2.121215e-03	5.273561e-04
 
-			|   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
-	Center of Core:	1.409689e+00	4.008721e-03	9.968163e-04		7.459751e-01	2.121324e-03	5.274925e-04
+				|   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
+		Center of Core:	1.409689e+00	4.008721e-03	9.968163e-04		7.459751e-01	2.121324e-03	5.274925e-04
 
-			| i-th | atom type |   px[a.u.]   |   py[a.u.]   |   pz[a.u.]   |		|   px[u]   |   py[u]   |   pz[u]   | [u] = [(g/Mol)*(angst/fs)]
-	Atom momenta:	0	C	3.194645e-03	-1.706087e-03	-2.076106e-04		2.661896e-01	-1.421574e-01	-1.729888e-02
-	Atom momenta:	1	C	-3.458994e-03	1.054061e-03	4.899030e-05		-2.882162e-01	8.782827e-02	4.082053e-03
-	Atom momenta:	2	H	-8.438008e-04	9.632759e-04	-4.550889e-05		-7.030859e-02	8.026370e-02	-3.791969e-03
-	Atom momenta:	3	H	-4.407284e-04	2.819904e-04	3.918512e-04		-3.672311e-02	2.349648e-02	3.265048e-02
-	Atom momenta:	4	H	-5.240715e-04	1.155952e-04	-2.036044e-04		-4.366757e-02	9.631814e-03	-1.696507e-02
-	Atom momenta:	5	H	6.366433e-04	-4.227927e-05	-5.214901e-05		5.304746e-02	-3.522865e-03	-4.345248e-03
-	Atom momenta:	6	H	7.652963e-04	-3.466719e-05	6.550717e-05		6.376731e-02	-2.888598e-03	5.458299e-03
-	Atom momenta:	7	H	6.710104e-04	-6.318894e-04	2.524251e-06		5.591106e-02	-5.265136e-02	2.103299e-04
+				| i-th | atom type |   px[a.u.]   |   py[a.u.]   |   pz[a.u.]   |		|   px[u]   |   py[u]   |   pz[u]   | [u] = [(g/Mol)*(angst/fs)]
+		Atom momenta:	0	C	3.194645e-03	-1.706087e-03	-2.076106e-04		2.661896e-01	-1.421574e-01	-1.729888e-02
+		Atom momenta:	1	C	-3.458994e-03	1.054061e-03	4.899030e-05		-2.882162e-01	8.782827e-02	4.082053e-03
+		Atom momenta:	2	H	-8.438008e-04	9.632759e-04	-4.550889e-05		-7.030859e-02	8.026370e-02	-3.791969e-03
+		Atom momenta:	3	H	-4.407284e-04	2.819904e-04	3.918512e-04		-3.672311e-02	2.349648e-02	3.265048e-02
+		Atom momenta:	4	H	-5.240715e-04	1.155952e-04	-2.036044e-04		-4.366757e-02	9.631814e-03	-1.696507e-02
+		Atom momenta:	5	H	6.366433e-04	-4.227927e-05	-5.214901e-05		5.304746e-02	-3.522865e-03	-4.345248e-03
+		Atom momenta:	6	H	7.652963e-04	-3.466719e-05	6.550717e-05		6.376731e-02	-2.888598e-03	5.458299e-03
+		Atom momenta:	7	H	6.710104e-04	-6.318894e-04	2.524251e-06		5.591106e-02	-5.265136e-02	2.103299e-04
 
 	Time in [fs]: 0.150000
 	========== DONE: MD step 3
@@ -953,13 +955,13 @@ h | -0.3700 | -0.5208 | 0.9016 | h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 |
 	Mulliken charge(SCF):	0	6	H	1.000000e+00	8.848852e-02
 	Mulliken charge(SCF):	0	7	H	1.000000e+00	9.337816e-02
 
-	Elapsed time(omp) for the SCF = 0.025242[s].
+	Elapsed time(omp) for the SCF = 0.002662[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.038853[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.007220[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -1037,11 +1039,11 @@ h | -0.3700 | -0.5208 | 0.9016 | h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 |
 	======  DONE: Davidson-CIS  =====
 
 
-				|   i-th   |   e[a.u.]   |   e[eV]   | dominant eigenvector coefficients (occ. -> vir.) |
-	Excitation energies:	1	2.785864e-01	7.580782e+00	-6.391395e-01 (6 -> 9)	
-	Excitation energies:	2	2.791813e-01	7.596971e+00	9.099770e-01 (6 -> 7)	
-	Excitation energies:	3	2.837315e-01	7.720788e+00	9.017335e-01 (5 -> 7)	
-	Excitation energies:	4	2.901042e-01	7.894201e+00	8.681945e-01 (6 -> 8)	
+				|   i-th   |   e[a.u.]   |   e[eV]   |   e[nm]   | dominant eigenvector coefficients (occ. -> vir.) |
+	Excitation energies:	1	2.785864e-01	7.580782e+00	1.635520e+02	-6.391395e-01 (6 -> 9)	
+	Excitation energies:	2	2.791813e-01	7.596971e+00	1.632035e+02	9.099770e-01 (6 -> 7)	
+	Excitation energies:	3	2.837315e-01	7.720788e+00	1.605862e+02	9.017335e-01 (5 -> 7)	
+	Excitation energies:	4	2.901042e-01	7.894201e+00	1.570586e+02	8.681945e-01 (6 -> 8)	
 
 				| i-th eigenstate |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
 	Total dipole moment:	0	-1.954015e-02	-3.361142e-02	-1.465172e-02	4.154778e-02		-4.966612e-02	-8.543172e-02	-3.724097e-02	1.056039e-01
@@ -1057,14 +1059,14 @@ h | -0.3700 | -0.5208 | 0.9016 | h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 |
 	Electronic dipole moment:	3	-4.045555e-02	-2.811275e-02	-6.462667e-03	4.968646e-02		-1.028278e-01	-7.145549e-02	-1.642646e-02	1.262904e-01
 	Electronic dipole moment:	4	7.006144e-02	-4.878131e-02	-2.532316e-02	8.904765e-02		1.780785e-01	-1.239897e-01	-6.436507e-02	2.263366e-01
 
-					| from and to eigenstates |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
-	Transition dipole moment:	0 -> 1		-1.343122e-01	-2.091090e-01	-7.132938e-02	2.585618e-01		-3.413875e-01	-5.315022e-01	-1.813012e-01	6.571987e-01
-	Transition dipole moment:	0 -> 2		-3.071364e-02	-4.942324e-02	-1.306661e+00	1.307956e+00		-7.806631e-02	-1.256214e-01	-3.321203e+00	3.324494e+00
-	Transition dipole moment:	0 -> 3		1.619430e-01	1.296496e+00	-6.150325e-02	1.308018e+00		4.116181e-01	3.295365e+00	-1.563257e-01	3.324650e+00
-	Transition dipole moment:	0 -> 4		-4.544408e-03	-4.966529e-02	-8.552528e-02	9.900437e-02		-1.155073e-02	-1.262366e-01	-2.173836e-01	2.516441e-01
+					| from and to eigenstates |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |  oscillator strength[a.u.]  |
+	Transition dipole moment:	0 -> 1		-1.343122e-01	-2.091090e-01	-7.132938e-02	2.585618e-01		-3.413875e-01	-5.315022e-01	-1.813012e-01	6.571987e-01	1.241645e-02
+	Transition dipole moment:	0 -> 2		-3.071364e-02	-4.942324e-02	-1.306661e+00	1.307956e+00		-7.806631e-02	-1.256214e-01	-3.321203e+00	3.324494e+00	3.184062e-01
+	Transition dipole moment:	0 -> 3		1.619430e-01	1.296496e+00	-6.150325e-02	1.308018e+00		4.116181e-01	3.295365e+00	-1.563257e-01	3.324650e+00	3.236261e-01
+	Transition dipole moment:	0 -> 4		-4.544408e-03	-4.966529e-02	-8.552528e-02	9.900437e-02		-1.155073e-02	-1.262366e-01	-2.173836e-01	2.516441e-01	1.895708e-03
 
 
-	Elapsed time(omp) for the CIS = 0.148746[s].
+	Elapsed time(omp) for the CIS = 0.036610[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
@@ -1077,31 +1079,31 @@ h | -0.3700 | -0.5208 | 0.9016 | h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 |
 		Total:            	-1.202047e+01	-3.270963e+02
 		Error:            	-1.324459e-07	-3.604065e-06
 
-				| i-th | atom type |   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
-	Atom coordinates:	0	C	6.703516e-05	3.775872e-02	-4.355121e-06		3.547348e-05	1.998105e-02	-2.304631e-06
-	Atom coordinates:	1	C	2.822800e+00	-2.832377e-02	3.780480e-03		1.493762e+00	-1.498829e-02	2.000544e-03
-	Atom coordinates:	2	H	-6.616152e-01	1.967635e+00	1.878336e-03		-3.501117e-01	1.041228e+00	9.939723e-04
-	Atom coordinates:	3	H	-6.957185e-01	-9.835319e-01	-1.738450e+00		-3.681583e-01	-5.204627e-01	-9.199481e-01
-	Atom coordinates:	4	H	-6.993298e-01	-9.841405e-01	1.703726e+00		-3.700694e-01	-5.207847e-01	9.015730e-01
-	Atom coordinates:	5	H	3.499743e+00	9.826470e-01	-1.702089e+00		1.851984e+00	5.199944e-01	-9.007069e-01
-	Atom coordinates:	6	H	3.458390e+00	9.902078e-01	1.719667e+00		1.830101e+00	5.239954e-01	9.100087e-01
-	Atom coordinates:	7	H	3.515059e+00	-1.965662e+00	6.349627e-07		1.860089e+00	-1.040184e+00	3.360078e-07
+					| i-th | atom type |   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
+		Atom coordinates:	0	C	6.703516e-05	3.775872e-02	-4.355121e-06		3.547348e-05	1.998105e-02	-2.304631e-06
+		Atom coordinates:	1	C	2.822800e+00	-2.832377e-02	3.780480e-03		1.493762e+00	-1.498829e-02	2.000544e-03
+		Atom coordinates:	2	H	-6.616152e-01	1.967635e+00	1.878336e-03		-3.501117e-01	1.041228e+00	9.939723e-04
+		Atom coordinates:	3	H	-6.957185e-01	-9.835319e-01	-1.738450e+00		-3.681583e-01	-5.204627e-01	-9.199481e-01
+		Atom coordinates:	4	H	-6.993298e-01	-9.841405e-01	1.703726e+00		-3.700694e-01	-5.207847e-01	9.015730e-01
+		Atom coordinates:	5	H	3.499743e+00	9.826470e-01	-1.702089e+00		1.851984e+00	5.199944e-01	-9.007069e-01
+		Atom coordinates:	6	H	3.458390e+00	9.902078e-01	1.719667e+00		1.830101e+00	5.239954e-01	9.100087e-01
+		Atom coordinates:	7	H	3.515059e+00	-1.965662e+00	6.349627e-07		1.860089e+00	-1.040184e+00	3.360078e-07
 
-			|   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
-	Center of Mass:	1.409688e+00	4.008516e-03	9.965587e-04		7.459748e-01	2.121215e-03	5.273562e-04
+				|   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
+		Center of Mass:	1.409688e+00	4.008516e-03	9.965587e-04		7.459748e-01	2.121215e-03	5.273562e-04
 
-			|   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
-	Center of Core:	1.409689e+00	4.008721e-03	9.968163e-04		7.459751e-01	2.121324e-03	5.274925e-04
+				|   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
+		Center of Core:	1.409689e+00	4.008721e-03	9.968163e-04		7.459751e-01	2.121324e-03	5.274925e-04
 
-			| i-th | atom type |   px[a.u.]   |   py[a.u.]   |   pz[a.u.]   |		|   px[u]   |   py[u]   |   pz[u]   | [u] = [(g/Mol)*(angst/fs)]
-	Atom momenta:	0	C	4.258478e-03	-2.273332e-03	-2.770292e-04		3.548321e-01	-1.894224e-01	-2.308309e-02
-	Atom momenta:	1	C	-4.610924e-03	1.404590e-03	6.538062e-05		-3.841992e-01	1.170356e-01	5.447754e-03
-	Atom momenta:	2	H	-1.124525e-03	1.283050e-03	-6.052734e-05		-9.369960e-02	1.069085e-01	-5.043361e-03
-	Atom momenta:	3	H	-5.873276e-04	3.760082e-04	5.225300e-04		-4.893830e-02	3.133039e-02	4.353912e-02
-	Atom momenta:	4	H	-6.987637e-04	1.541510e-04	-2.712274e-04		-5.822357e-02	1.284443e-02	-2.259967e-02
-	Atom momenta:	5	H	8.487758e-04	-5.646865e-05	-6.945111e-05		7.072313e-02	-4.705176e-03	-5.786923e-03
-	Atom momenta:	6	H	1.019932e-03	-4.638685e-05	8.702515e-05		8.498450e-02	-3.865124e-03	7.251257e-03
-	Atom momenta:	7	H	8.943551e-04	-8.416114e-04	3.299320e-06		7.452096e-02	-7.012616e-02	2.749115e-04
+				| i-th | atom type |   px[a.u.]   |   py[a.u.]   |   pz[a.u.]   |		|   px[u]   |   py[u]   |   pz[u]   | [u] = [(g/Mol)*(angst/fs)]
+		Atom momenta:	0	C	4.258478e-03	-2.273332e-03	-2.770292e-04		3.548321e-01	-1.894224e-01	-2.308309e-02
+		Atom momenta:	1	C	-4.610924e-03	1.404590e-03	6.538062e-05		-3.841992e-01	1.170356e-01	5.447754e-03
+		Atom momenta:	2	H	-1.124525e-03	1.283050e-03	-6.052734e-05		-9.369960e-02	1.069085e-01	-5.043361e-03
+		Atom momenta:	3	H	-5.873276e-04	3.760082e-04	5.225300e-04		-4.893830e-02	3.133039e-02	4.353912e-02
+		Atom momenta:	4	H	-6.987637e-04	1.541510e-04	-2.712274e-04		-5.822357e-02	1.284443e-02	-2.259967e-02
+		Atom momenta:	5	H	8.487758e-04	-5.646865e-05	-6.945111e-05		7.072313e-02	-4.705176e-03	-5.786923e-03
+		Atom momenta:	6	H	1.019932e-03	-4.638685e-05	8.702515e-05		8.498450e-02	-3.865124e-03	7.251257e-03
+		Atom momenta:	7	H	8.943551e-04	-8.416114e-04	3.299320e-06		7.452096e-02	-7.012616e-02	2.749115e-04
 
 	Time in [fs]: 0.200000
 	========== DONE: MD step 4
@@ -1160,13 +1162,13 @@ h | -0.3700 | -0.5208 | 0.9016 | h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 |
 	Mulliken charge(SCF):	0	6	H	1.000000e+00	8.848509e-02
 	Mulliken charge(SCF):	0	7	H	1.000000e+00	9.337331e-02
 
-	Elapsed time(omp) for the SCF = 0.025149[s].
+	Elapsed time(omp) for the SCF = 0.002518[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.038030[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.006567[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -1244,11 +1246,11 @@ h | -0.3700 | -0.5208 | 0.9016 | h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 |
 	======  DONE: Davidson-CIS  =====
 
 
-				|   i-th   |   e[a.u.]   |   e[eV]   | dominant eigenvector coefficients (occ. -> vir.) |
-	Excitation energies:	1	2.785796e-01	7.580597e+00	-6.391030e-01 (6 -> 9)	
-	Excitation energies:	2	2.791754e-01	7.596811e+00	9.099720e-01 (6 -> 7)	
-	Excitation energies:	3	2.837193e-01	7.720457e+00	9.017899e-01 (5 -> 7)	
-	Excitation energies:	4	2.901015e-01	7.894126e+00	8.681942e-01 (6 -> 8)	
+				|   i-th   |   e[a.u.]   |   e[eV]   |   e[nm]   | dominant eigenvector coefficients (occ. -> vir.) |
+	Excitation energies:	1	2.785796e-01	7.580597e+00	1.635560e+02	-6.391030e-01 (6 -> 9)	
+	Excitation energies:	2	2.791754e-01	7.596811e+00	1.632069e+02	9.099720e-01 (6 -> 7)	
+	Excitation energies:	3	2.837193e-01	7.720457e+00	1.605931e+02	9.017899e-01 (5 -> 7)	
+	Excitation energies:	4	2.901015e-01	7.894126e+00	1.570601e+02	8.681942e-01 (6 -> 8)	
 
 				| i-th eigenstate |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
 	Total dipole moment:	0	-1.947338e-02	-3.353082e-02	-1.462152e-02	4.144052e-02		-4.949641e-02	-8.522686e-02	-3.716419e-02	1.053313e-01
@@ -1264,14 +1266,14 @@ h | -0.3700 | -0.5208 | 0.9016 | h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 |
 	Electronic dipole moment:	3	-4.030832e-02	-2.808653e-02	-6.427566e-03	4.954722e-02		-1.024535e-01	-7.138886e-02	-1.633725e-02	1.259365e-01
 	Electronic dipole moment:	4	7.003798e-02	-4.871030e-02	-2.525631e-02	8.897130e-02		1.780188e-01	-1.238093e-01	-6.419514e-02	2.261425e-01
 
-					| from and to eigenstates |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
-	Transition dipole moment:	0 -> 1		-1.346680e-01	-2.085309e-01	-7.067457e-02	2.580998e-01		-3.422920e-01	-5.300328e-01	-1.796369e-01	6.560244e-01
-	Transition dipole moment:	0 -> 2		-3.069992e-02	-4.950372e-02	-1.306719e+00	1.308017e+00		-7.803142e-02	-1.258259e-01	-3.321349e+00	3.324647e+00
-	Transition dipole moment:	0 -> 3		1.616310e-01	1.296695e+00	-6.143354e-02	1.308173e+00		4.108252e-01	3.295872e+00	-1.561485e-01	3.325046e+00
-	Transition dipole moment:	0 -> 4		-4.537740e-03	-4.958913e-02	-8.539774e-02	9.885569e-02		-1.153379e-02	-1.260430e-01	-2.170594e-01	2.512661e-01
+					| from and to eigenstates |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |  oscillator strength[a.u.]  |
+	Transition dipole moment:	0 -> 1		-1.346680e-01	-2.085309e-01	-7.067457e-02	2.580998e-01		-3.422920e-01	-5.300328e-01	-1.796369e-01	6.560244e-01	1.237181e-02
+	Transition dipole moment:	0 -> 2		-3.069992e-02	-4.950372e-02	-1.306719e+00	1.308017e+00		-7.803142e-02	-1.258259e-01	-3.321349e+00	3.324647e+00	3.184289e-01
+	Transition dipole moment:	0 -> 3		1.616310e-01	1.296695e+00	-6.143354e-02	1.308173e+00		4.108252e-01	3.295872e+00	-1.561485e-01	3.325046e+00	3.236892e-01
+	Transition dipole moment:	0 -> 4		-4.537740e-03	-4.958913e-02	-8.539774e-02	9.885569e-02		-1.153379e-02	-1.260430e-01	-2.170594e-01	2.512661e-01	1.890001e-03
 
 
-	Elapsed time(omp) for the CIS = 0.154011[s].
+	Elapsed time(omp) for the CIS = 0.035206[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
@@ -1282,46 +1284,46 @@ h | -0.3700 | -0.5208 | 0.9016 | h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 |
 		Electronic
 		(inc. core rep.):	-1.202050e+01	-3.270972e+02
 		Total:            	-1.202047e+01	-3.270963e+02
-		Error:            	-1.510680e-07	-4.110801e-06
+		Error:            	-1.510679e-07	-4.110799e-06
 
-				| i-th | atom type |   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
-	Atom coordinates:	0	C	1.047258e-04	3.773860e-02	-6.808283e-06		5.541849e-05	1.997041e-02	-3.602788e-06
-	Atom coordinates:	1	C	2.822760e+00	-2.831134e-02	3.781059e-03		1.493740e+00	-1.498172e-02	2.000850e-03
-	Atom coordinates:	2	H	-6.617339e-01	1.967770e+00	1.871957e-03		-3.501745e-01	1.041299e+00	9.905969e-04
-	Atom coordinates:	3	H	-6.957804e-01	-9.834923e-01	-1.738395e+00		-3.681911e-01	-5.204417e-01	-9.199190e-01
-	Atom coordinates:	4	H	-6.994035e-01	-9.841242e-01	1.703698e+00		-3.701084e-01	-5.207761e-01	9.015579e-01
-	Atom coordinates:	5	H	3.499833e+00	9.826411e-01	-1.702097e+00		1.852032e+00	5.199913e-01	-9.007108e-01
-	Atom coordinates:	6	H	3.458498e+00	9.902029e-01	1.719676e+00		1.830158e+00	5.239928e-01	9.100135e-01
-	Atom coordinates:	7	H	3.515153e+00	-1.965751e+00	9.796026e-07		1.860139e+00	-1.040231e+00	5.183833e-07
+					| i-th | atom type |   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
+		Atom coordinates:	0	C	1.047258e-04	3.773860e-02	-6.808283e-06		5.541849e-05	1.997041e-02	-3.602788e-06
+		Atom coordinates:	1	C	2.822760e+00	-2.831134e-02	3.781059e-03		1.493740e+00	-1.498172e-02	2.000850e-03
+		Atom coordinates:	2	H	-6.617339e-01	1.967770e+00	1.871957e-03		-3.501745e-01	1.041299e+00	9.905969e-04
+		Atom coordinates:	3	H	-6.957804e-01	-9.834923e-01	-1.738395e+00		-3.681911e-01	-5.204417e-01	-9.199190e-01
+		Atom coordinates:	4	H	-6.994035e-01	-9.841242e-01	1.703698e+00		-3.701084e-01	-5.207761e-01	9.015579e-01
+		Atom coordinates:	5	H	3.499833e+00	9.826411e-01	-1.702097e+00		1.852032e+00	5.199913e-01	-9.007108e-01
+		Atom coordinates:	6	H	3.458498e+00	9.902029e-01	1.719676e+00		1.830158e+00	5.239928e-01	9.100135e-01
+		Atom coordinates:	7	H	3.515153e+00	-1.965751e+00	9.796026e-07		1.860139e+00	-1.040231e+00	5.183833e-07
 
-			|   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
-	Center of Mass:	1.409688e+00	4.008517e-03	9.965590e-04		7.459748e-01	2.121216e-03	5.273563e-04
+				|   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
+		Center of Mass:	1.409688e+00	4.008517e-03	9.965590e-04		7.459748e-01	2.121216e-03	5.273563e-04
 
-			|   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
-	Center of Core:	1.409689e+00	4.008721e-03	9.968163e-04		7.459751e-01	2.121324e-03	5.274925e-04
+				|   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
+		Center of Core:	1.409689e+00	4.008721e-03	9.968163e-04		7.459751e-01	2.121324e-03	5.274925e-04
 
-			| i-th | atom type |   px[a.u.]   |   py[a.u.]   |   pz[a.u.]   |		|   px[u]   |   py[u]   |   pz[u]   | [u] = [(g/Mol)*(angst/fs)]
-	Atom momenta:	0	C	5.321407e-03	-2.839336e-03	-3.466308e-04		4.433992e-01	-2.365839e-01	-2.888255e-02
-	Atom momenta:	1	C	-5.761933e-03	1.754411e-03	8.182216e-05		-4.801055e-01	1.461840e-01	6.817724e-03
-	Atom momenta:	2	H	-1.404785e-03	1.601697e-03	-7.541656e-05		-1.170519e-01	1.334593e-01	-6.283986e-03
-	Atom momenta:	3	H	-7.336608e-04	4.700437e-04	6.532610e-04		-6.113132e-02	3.916578e-02	5.443212e-02
-	Atom momenta:	4	H	-8.734563e-04	1.927275e-04	-3.386410e-04		-7.277960e-02	1.605877e-02	-2.821682e-02
-	Atom momenta:	5	H	1.060837e-03	-7.074039e-05	-8.668343e-05		8.839286e-02	-5.894350e-03	-7.222783e-03
-	Atom momenta:	6	H	1.274171e-03	-5.824688e-05	1.082708e-04		1.061686e-01	-4.853345e-03	9.021520e-03
-	Atom momenta:	7	H	1.117420e-03	-1.050556e-03	4.017797e-06		9.310758e-02	-8.753619e-02	3.347777e-04
+				| i-th | atom type |   px[a.u.]   |   py[a.u.]   |   pz[a.u.]   |		|   px[u]   |   py[u]   |   pz[u]   | [u] = [(g/Mol)*(angst/fs)]
+		Atom momenta:	0	C	5.321407e-03	-2.839336e-03	-3.466308e-04		4.433992e-01	-2.365839e-01	-2.888255e-02
+		Atom momenta:	1	C	-5.761933e-03	1.754411e-03	8.182216e-05		-4.801055e-01	1.461840e-01	6.817724e-03
+		Atom momenta:	2	H	-1.404785e-03	1.601697e-03	-7.541656e-05		-1.170519e-01	1.334593e-01	-6.283986e-03
+		Atom momenta:	3	H	-7.336608e-04	4.700437e-04	6.532610e-04		-6.113132e-02	3.916578e-02	5.443212e-02
+		Atom momenta:	4	H	-8.734563e-04	1.927275e-04	-3.386410e-04		-7.277960e-02	1.605877e-02	-2.821682e-02
+		Atom momenta:	5	H	1.060837e-03	-7.074039e-05	-8.668343e-05		8.839286e-02	-5.894350e-03	-7.222783e-03
+		Atom momenta:	6	H	1.274171e-03	-5.824688e-05	1.082708e-04		1.061686e-01	-4.853345e-03	9.021520e-03
+		Atom momenta:	7	H	1.117420e-03	-1.050556e-03	4.017797e-06		9.310758e-02	-8.753619e-02	3.347777e-04
 
 	Time in [fs]: 0.250000
 	========== DONE: MD step 5
 **********  DONE: Molecular dynamics  **********
 	Summary for memory usage:
-		Max Heap: 0.261504[MB].
+		Max Heap: 0.320592[MB].
 		Current Heap(Leaked): 0.000000[MB].
 
 
      >>>>>  The MolDS finished normally!  <<<<<
-     >>>>>  CPU time: 3.31[s].  <<<<<
-     >>>>>  Elapsed time: 3[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 3.32597[s].  <<<<<
+     >>>>>  CPU time: 0.402316[s].  <<<<<
+     >>>>>  Elapsed time: 0[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 0.399645[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

@@ -1,6 +1,6 @@
 //************************************************************************//
-// Copyright (C) 2011-2012 Mikiya Fujii                                   // 
-// Copyright (C) 2012-2012 Katsuhiko Nishimra                             // 
+// Copyright (C) 2011-2014 Mikiya Fujii                                   // 
+// Copyright (C) 2012-2014 Katsuhiko Nishimra                             // 
 //                                                                        // 
 // This file is part of MolDS.                                            // 
 //                                                                        // 
@@ -24,8 +24,10 @@
 #include<math.h>
 #include<string>
 #include<vector>
+#include<memory>
 #include<stdexcept>
 #include<boost/shared_ptr.hpp>
+#include<boost/scoped_ptr.hpp>
 #include<boost/format.hpp>
 #include"../config.h"
 #include"../base/Enums.h"
@@ -42,13 +44,39 @@
 #include"../base/Molecule.h"
 #include"../base/ElectronicStructure.h"
 #include"../base/factories/ElectronicStructureFactory.h"
+#include"../base/constraints/Constraint.h"
+#include"../base/factories/ConstraintFactory.h"
 #include"Optimizer.h"
 using namespace std;
 using namespace MolDS_base;
 using namespace MolDS_base_atoms;
+using namespace MolDS_base_constraints;
 using namespace MolDS_base_factories;
 
 namespace MolDS_optimization{
+
+Optimizer::OptimizerState::OptimizerState(Molecule& molecule,
+                                          const boost::shared_ptr<ElectronicStructure>& electronicStructure,
+                                          const boost::shared_ptr<Constraint>& constraint):
+   molecule(molecule),
+   electronicStructure(electronicStructure),
+   constraint(constraint),
+   elecState(Parameters::GetInstance()->GetElectronicStateIndexOptimization()),
+   dt(Parameters::GetInstance()->GetTimeWidthOptimization()),
+   totalSteps(Parameters::GetInstance()->GetTotalStepsOptimization()),
+   maxGradientThreshold(Parameters::GetInstance()->GetMaxGradientOptimization()),
+   rmsGradientThreshold(Parameters::GetInstance()->GetRmsGradientOptimization()),
+   currentEnergy(0.0),
+   initialEnergy(0.0),
+   matrixForce(NULL){
+   this->SetMessages();
+}
+
+void Optimizer::OptimizerState::SetMessages(){
+   this->errorMessageFailedToDowncastState
+      = "Failed to downcast Optimizer::OptimizerState!";
+}
+
 Optimizer::Optimizer(){
    this->SetEnableTheoryTypes();
    //this->OutputLog("Optimizer created\n");
@@ -70,10 +98,13 @@ void Optimizer::Optimize(Molecule& molecule){
    electronicStructure->SetCanOutputLogs(this->CanOutputLogs());
    molecule.SetCanOutputLogs(this->CanOutputLogs());
 
+   // create constraint
+   boost::shared_ptr<MolDS_base_constraints::Constraint> constraint(ConstraintFactory::Create(molecule, electronicStructure));
+
    // Search Minimum
    double lineSearchedEnergy = 0.0;
    bool obtainesOptimizedStructure = false;
-   this->SearchMinimum(electronicStructure, molecule, &lineSearchedEnergy, &obtainesOptimizedStructure);
+   this->SearchMinimum(electronicStructure, molecule, constraint, &lineSearchedEnergy, &obtainesOptimizedStructure);
   
    // Not converged
    if(!obtainesOptimizedStructure){
@@ -84,6 +115,49 @@ void Optimizer::Optimize(Molecule& molecule){
       throw MolDSException(ss.str());
    }
    this->OutputLog(this->messageEndGeometryOptimization);
+}
+
+void Optimizer::SearchMinimum(boost::shared_ptr<ElectronicStructure> electronicStructure,
+                              Molecule& molecule,
+                              boost::shared_ptr<MolDS_base_constraints::Constraint> constraint,
+                              double* lineSearchedEnergy,
+                              bool* obtainesOptimizedStructure) const{
+   boost::scoped_ptr<OptimizerState> statePtr(this->CreateState(molecule, electronicStructure, constraint));
+   OptimizerState& state = *statePtr.get();
+
+   // initial calculation
+   bool requireGuess = true;
+   this->UpdateElectronicStructure(electronicStructure, molecule, requireGuess, this->CanOutputLogs());
+   state.SetCurrentEnergy(electronicStructure->GetElectronicEnergy(state.GetElecState()));
+   state.SetMatrixForce(constraint->GetForce(state.GetElecState()));
+
+   this->InitializeState(state, molecule);
+
+   for(int s=0; s<state.GetTotalSteps(); s++){
+      this->OutputOptimizationStepMessage(s);
+      state.SetInitialEnergy(state.GetCurrentEnergy());
+
+      this->PrepareState(state, molecule, electronicStructure, state.GetElecState());
+
+      this->CalcNextStepGeometry(molecule, state, electronicStructure, state.GetElecState(), state.GetDeltaT());
+
+      state.SetCurrentEnergy(electronicStructure->GetElectronicEnergy(state.GetElecState()));
+      state.SetMatrixForce(constraint->GetForce(state.GetElecState()));
+
+      this->UpdateState(state);
+
+      // check convergence
+      if(this->SatisfiesConvergenceCriterion(state.GetMatrixForce(),
+                                             molecule,
+                                             state.GetInitialEnergy(),
+                                             state.GetCurrentEnergy(),
+                                             state.GetMaxGradientThreshold(), 
+                                             state.GetRmsGradientThreshold())){
+         *obtainesOptimizedStructure = true;
+         break;
+      }
+   }
+   *lineSearchedEnergy = state.GetCurrentEnergy();
 }
 
 void Optimizer::SetMessages(){
@@ -131,17 +205,17 @@ void Optimizer::CheckEnableTheoryType(TheoryType theoryType) const{
 
 void Optimizer::ClearMolecularMomenta(Molecule& molecule) const{
 #pragma omp parallel for schedule(dynamic, MOLDS_OMP_DYNAMIC_CHUNK_SIZE) 
-   for(int a=0; a<molecule.GetNumberAtoms(); a++){
-      const Atom* atom = molecule.GetAtom(a);
+   for(int a=0; a<molecule.GetAtomVect().size(); a++){
+      const Atom* atom = molecule.GetAtomVect()[a];
       atom->SetPxyz(0.0, 0.0, 0.0);
    }
 }
 
 void Optimizer::UpdateMolecularCoordinates(Molecule& molecule, double const* const* matrixForce, double dt) const{
 #pragma omp parallel for schedule(dynamic, MOLDS_OMP_DYNAMIC_CHUNK_SIZE) 
-   for(int a=0; a<molecule.GetNumberAtoms(); a++){
-      const Atom* atom = molecule.GetAtom(a);
-      double coreMass = atom->GetAtomicMass() - static_cast<double>(atom->GetNumberValenceElectrons());
+   for(int a=0; a<molecule.GetAtomVect().size(); a++){
+      const Atom* atom = molecule.GetAtomVect()[a];
+      double coreMass = atom->GetCoreMass();
       for(int i=0; i<CartesianType_end; i++){
          atom->GetXyz()[i] += dt*matrixForce[a][i]/coreMass;
       }
@@ -151,8 +225,8 @@ void Optimizer::UpdateMolecularCoordinates(Molecule& molecule, double const* con
 
 void Optimizer::UpdateMolecularCoordinates(Molecule& molecule, double const* const* matrixForce) const{
 #pragma omp parallel for schedule(dynamic, MOLDS_OMP_DYNAMIC_CHUNK_SIZE)
-   for(int a=0; a<molecule.GetNumberAtoms(); a++){
-      const Atom* atom = molecule.GetAtom(a);
+   for(int a=0; a<molecule.GetAtomVect().size(); a++){
+      const Atom* atom = molecule.GetAtomVect()[a];
       for(int i=0; i<CartesianType_end; i++){
          atom->GetXyz()[i] += matrixForce[a][i];
       }
@@ -187,6 +261,10 @@ void Optimizer::OutputMoleculeElectronicStructure(boost::shared_ptr<ElectronicSt
    if(Parameters::GetInstance()->RequiresCIS()){
       electronicStructure->OutputCISResults();
    }
+}
+
+void Optimizer::OutputOptimizationStepMessage(int nthStep) const{
+   this->OutputLog(boost::format("%s%d\n\n") % this->OptimizationStepMessage() % (nthStep+1));
 }
 
 void Optimizer::LineSearch(boost::shared_ptr<ElectronicStructure> electronicStructure,
@@ -233,7 +311,7 @@ bool Optimizer::SatisfiesConvergenceCriterion(double const* const* matrixForce,
    double maxGradient = 0.0;
    double sumSqureGradient = 0.0;
    double energyDifference = currentEnergy - oldEnergy;
-   for(int a=0; a<molecule.GetNumberAtoms(); a++){
+   for(int a=0; a<molecule.GetAtomVect().size(); a++){
       for(int i=0; i<CartesianType_end; i++){
          if(maxGradient<fabs(matrixForce[a][i])){
             maxGradient = fabs(matrixForce[a][i]);
@@ -241,7 +319,7 @@ bool Optimizer::SatisfiesConvergenceCriterion(double const* const* matrixForce,
          sumSqureGradient += pow(matrixForce[a][i],2.0);
       }
    }
-   sumSqureGradient /= static_cast<double>(molecule.GetNumberAtoms()*CartesianType_end);
+   sumSqureGradient /= static_cast<double>(molecule.GetAtomVect().size()*CartesianType_end);
    double rmsGradient = sqrt(sumSqureGradient);
 
    // output logs
@@ -265,7 +343,6 @@ bool Optimizer::SatisfiesConvergenceCriterion(double const* const* matrixForce,
    }
    return satisfies;
 }
-
 }
 
 

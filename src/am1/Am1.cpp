@@ -1,5 +1,5 @@
 //************************************************************************//
-// Copyright (C) 2011-2013 Mikiya Fujii                                   //
+// Copyright (C) 2011-2014 Mikiya Fujii                                   //
 //                                                                        // 
 // This file is part of MolDS.                                            // 
 //                                                                        // 
@@ -40,7 +40,9 @@
 #include"../base/atoms/Catom.h"
 #include"../base/atoms/Natom.h"
 #include"../base/atoms/Oatom.h"
+#include"../base/atoms/Fatom.h"
 #include"../base/atoms/Satom.h"
+#include"../base/atoms/Clatom.h"
 #include"../base/Molecule.h"
 #include"../base/ElectronicStructure.h"
 #include"../cndo/Cndo2.h"
@@ -75,6 +77,8 @@ void Am1::SetMessages(){
       = "Error in am1::Am1::SetMolecule: Total number of valence electrons is odd. totalNumberValenceElectrons=";
    this->errorMessageNotEnebleAtomType  
       = "Error in am1::Am1::CheckEnableAtomType: Non available atom is contained.\n";
+   this->errorMessageNotEnebleAtomTypeVdW
+      = "Error in am1::Am1::CheckEnableAtomTypeVdW: Non available atom to add VdW correction is contained.\n";
    this->errorMessageCoulombInt = "Error in base_am1::Am1::GetCoulombInt: Invalid orbitalType.\n";
    this->errorMessageExchangeInt = "Error in base_am1::Am1::GetExchangeInt: Invalid orbitalType.\n";
    this->errorMessageCalcCISMatrix
@@ -132,17 +136,18 @@ void Am1::SetEnableAtomTypes(){
    this->enableAtomTypes.push_back(C);
    this->enableAtomTypes.push_back(N);
    this->enableAtomTypes.push_back(O);
+   this->enableAtomTypes.push_back(F);
    this->enableAtomTypes.push_back(S);
+   this->enableAtomTypes.push_back(Cl);
+   this->enableAtomTypes.push_back(Zn);
 }
 
-double Am1::GetDiatomCoreRepulsionEnergy(int indexAtomA, int indexAtomB) const{
+double Am1::GetDiatomCoreRepulsionEnergy(const Atom& atomA, const Atom& atomB) const{
    // MNDO term
-   double mndoTerm = Mndo::GetDiatomCoreRepulsionEnergy(indexAtomA, indexAtomB);
+   double mndoTerm = Mndo::GetDiatomCoreRepulsionEnergy(atomA, atomB);
 
    // additional term, Eq. (4) in [S_1989].
-   const Atom& atomA = *this->molecule->GetAtom(indexAtomA);
-   const Atom& atomB = *this->molecule->GetAtom(indexAtomB);
-   double distance   = this->molecule->GetDistanceAtoms(indexAtomA, indexAtomB);
+   double distance   = this->molecule->GetDistanceAtoms(atomA, atomB);
    double ang2AU     = Parameters::GetInstance()->GetAngstrom2AU();
    double alphaA     = atomA.GetNddoAlpha(this->theory);
    double alphaB     = atomB.GetNddoAlpha(this->theory);
@@ -166,19 +171,16 @@ double Am1::GetDiatomCoreRepulsionEnergy(int indexAtomA, int indexAtomB) const{
 
 // First derivative of diatomic core repulsion energy.
 // This derivative is related to the coordinate of atomA.
-double Am1::GetDiatomCoreRepulsion1stDerivative(int indexAtomA,
-                                                  int indexAtomB, 
-                                                  CartesianType axisA) const{
+double Am1::GetDiatomCoreRepulsion1stDerivative(const Atom& atomA, const Atom& atomB, 
+                                                CartesianType axisA) const{
    // MNDO term
-   double mndoTerms = Mndo::GetDiatomCoreRepulsion1stDerivative(indexAtomA, indexAtomB, axisA);
+   double mndoTerms = Mndo::GetDiatomCoreRepulsion1stDerivative(atomA, atomB, axisA);
 
    // additional term, first derivative of eq. (4) in [S_1989]
    double ang2AU     = Parameters::GetInstance()->GetAngstrom2AU();
-   const Atom& atomA = *this->molecule->GetAtom(indexAtomA);
-   const Atom& atomB = *this->molecule->GetAtom(indexAtomB);
    double alphaA     = atomA.GetNddoAlpha(this->theory);
    double alphaB     = atomB.GetNddoAlpha(this->theory);
-   double distance   = this->molecule->GetDistanceAtoms(indexAtomA, indexAtomB);
+   double distance   = this->molecule->GetDistanceAtoms(atomA, atomB);
    double dCartesian = (atomA.GetXyz()[axisA] - atomB.GetXyz()[axisA]);
    double kA, lA, mA;
    double kB, lB, mB;
@@ -206,20 +208,18 @@ double Am1::GetDiatomCoreRepulsion1stDerivative(int indexAtomA,
 
 // Second derivative of diatomic core repulsion energy.
 // Both derivatives are related to the coordinate of atomA.
-double Am1::GetDiatomCoreRepulsion2ndDerivative(int indexAtomA,
-                                                   int indexAtomB, 
-                                                   CartesianType axisA1,
-                                                   CartesianType axisA2) const{
+double Am1::GetDiatomCoreRepulsion2ndDerivative(const Atom& atomA,
+                                                const Atom& atomB, 
+                                                CartesianType axisA1,
+                                                CartesianType axisA2) const{
    // MNDO term
-   double mndoTerm = Mndo::GetDiatomCoreRepulsion2ndDerivative(indexAtomA, indexAtomB, axisA1, axisA2);
+   double mndoTerm = Mndo::GetDiatomCoreRepulsion2ndDerivative(atomA, atomB, axisA1, axisA2);
 
    // additional term, first derivative of eq. (4) in [S_1989]
    double ang2AU     = Parameters::GetInstance()->GetAngstrom2AU();
-   const Atom& atomA = *this->molecule->GetAtom(indexAtomA);
-   const Atom& atomB = *this->molecule->GetAtom(indexAtomB);
    double alphaA     = atomA.GetNddoAlpha(this->theory);
    double alphaB     = atomB.GetNddoAlpha(this->theory);
-   double distance   = this->molecule->GetDistanceAtoms(indexAtomA, indexAtomB);
+   double distance   = this->molecule->GetDistanceAtoms(atomA, atomB);
    double kA, lA, mA;
    double kB, lB, mB;
    double temp1 = 0.0;

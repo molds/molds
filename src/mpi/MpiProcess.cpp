@@ -1,5 +1,5 @@
 //************************************************************************//
-// Copyright (C) 2011-2012 Mikiya Fujii                                   // 
+// Copyright (C) 2011-2014 Mikiya Fujii                                   // 
 //                                                                        // 
 // This file is part of MolDS.                                            // 
 //                                                                        // 
@@ -56,8 +56,8 @@ MpiProcess::MpiProcess(int argc, char *argv[]){
 }
 
 MpiProcess::~MpiProcess(){
-   /*
    int rank = this->GetRank();
+   /*
    printf("\nrnk:%d mpiconsumingtime          = %e [s]\n",rank, this->mpiConsumingTime);
    printf("\nrnk:%d mpiconsumingtimeSend      = %e [s]\n",rank, this->mpiConsumingTimeSend);
    printf("\nrnk:%d mpiconsumingtimeRecv      = %e [s]\n",rank, this->mpiConsumingTimeRecv);

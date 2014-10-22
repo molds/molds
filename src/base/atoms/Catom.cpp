@@ -1,5 +1,5 @@
 //************************************************************************//
-// Copyright (C) 2011-2012 Mikiya Fujii                                   // 
+// Copyright (C) 2011-2014 Mikiya Fujii                                   // 
 //                                                                        // 
 // This file is part of MolDS.                                            // 
 //                                                                        // 
@@ -42,12 +42,14 @@ Catom::Catom(int index) : Atom(index){
    this->SetAtomicParameters();
 }
 
+Catom::~Catom(){}
+
 void Catom::SetAtomicParameters(){
    this->atomType = C;
    this->atomicMass = 12.0107*Parameters::GetInstance()->GetGMolin2AU();
    this->coreCharge = 4.0;
    this->numberValenceElectrons = 4;
-   this->valenceShellType = l;
+   this->valenceShellType = lShell;
    this->valence.push_back(s);
    this->valence.push_back(py);
    this->valence.push_back(pz);

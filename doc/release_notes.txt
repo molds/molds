@@ -1,5 +1,5 @@
 //************************************************************************//
-// Copyright (C) 2011-2013 Mikiya Fujii                                   // 
+// Copyright (C) 2011-2014 Mikiya Fujii                                   // 
 //                                                                        // 
 // This file is part of MolDS.                                            // 
 //                                                                        // 
@@ -16,6 +16,13 @@
 // You should have received a copy of the GNU General Public License      // 
 // along with MolDS.  If not, see <http://www.gnu.org/licenses/>.         // 
 //************************************************************************//
+
+**************************************************************************
+                             Version 0.3.1                     2013/Dec/25
+**************************************************************************
+ - Bug in Makefile is fixed
+ - Diff related to "Max heap" in the test suite is disappeared
+
 
 **************************************************************************
                              Version 0.3.0                     2013/Dec/20

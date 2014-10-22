@@ -1,6 +1,6 @@
 //************************************************************************//
-// Copyright (C) 2011-2013 Mikiya Fujii                                   //
-// Copyright (C) 2012-2013 Katsuhiko Nishimra                             //
+// Copyright (C) 2011-2014 Mikiya Fujii                                   //
+// Copyright (C) 2012-2014 Katsuhiko Nishimra                             //
 //                                                                        // 
 // This file is part of MolDS.                                            // 
 //                                                                        // 
@@ -49,6 +49,11 @@ public:
    double Ddot(molds_blas_int n,
                double const* vectorX, molds_blas_int incrementX,
                double const* vectorY, molds_blas_int incrementY)const;
+   double Dnrm2(molds_blas_int n,
+                double const* vectorX) const;
+   double Dnrm2(molds_blas_int n,
+                double const* vectorX,
+                molds_blas_int incrementX) const;
    double Damax(molds_blas_int n,
                       double const* vectorX) const;
    double Damax(molds_blas_int n,

@@ -1,6 +1,6 @@
 //************************************************************************//
-// Copyright (C) 2011-2012 Mikiya Fujii                                   //
-// Copyright (C) 2012-2013 Katsuhiko Nishimra                             //
+// Copyright (C) 2011-2014 Mikiya Fujii                                   //
+// Copyright (C) 2012-2014 Katsuhiko Nishimra                             //
 //                                                                        //
 // This file is part of MolDS.                                            //
 //                                                                        //
@@ -44,6 +44,7 @@
 #include"../base/atoms/Atom.h"
 #include"../base/Molecule.h"
 #include"../base/ElectronicStructure.h"
+#include"../base/constraints/Constraint.h"
 #include"Optimizer.h"
 #include"BFGS.h"
 #include"GEDIIS.h"
@@ -52,6 +53,21 @@ using namespace MolDS_base;
 using namespace MolDS_base_atoms;
 
 namespace MolDS_optimization{
+GEDIIS::GEDIISState::GEDIISState(MolDS_base::Molecule& molecule,
+                                 const boost::shared_ptr<MolDS_base::ElectronicStructure>& electronicStructure,
+                                 const boost::shared_ptr<MolDS_base_constraints::Constraint>& constraint):
+   BFGSState(molecule, electronicStructure, constraint),
+   matrixGEDIISCoordinates(NULL),
+   matrixGEDIISForce(NULL){
+   MallocerFreer::GetInstance()->Malloc(&this->matrixGEDIISCoordinates, molecule.GetAtomVect().size(), CartesianType_end);
+   MallocerFreer::GetInstance()->Malloc(&this->matrixGEDIISForce,       molecule.GetAtomVect().size(), CartesianType_end);
+}
+
+GEDIIS::GEDIISState::~GEDIISState(){
+   MallocerFreer::GetInstance()->Free(&this->matrixGEDIISCoordinates, molecule.GetAtomVect().size(), CartesianType_end);
+   MallocerFreer::GetInstance()->Free(&this->matrixGEDIISForce,       molecule.GetAtomVect().size(), CartesianType_end);
+}
+
 GEDIIS::GEDIIS(){
    this->SetMessages();
    //this->OutputLog("BFGS created\n");
@@ -76,182 +92,66 @@ void GEDIIS::SetMessages(){
       = "GDIIS: Discarding all entries from history.\n";
 }
 
-void GEDIIS::SearchMinimum(boost::shared_ptr<ElectronicStructure> electronicStructure,
-                           Molecule& molecule,
-                           double* lineSearchedEnergy,
-                           bool* obtainesOptimizedStructure) const {
-   int elecState = Parameters::GetInstance()->GetElectronicStateIndexOptimization();
-   double dt = Parameters::GetInstance()->GetTimeWidthOptimization();
-   int totalSteps = Parameters::GetInstance()->GetTotalStepsOptimization();
-   double maxGradientThreshold = Parameters::GetInstance()->GetMaxGradientOptimization();
-   double rmsGradientThreshold = Parameters::GetInstance()->GetRmsGradientOptimization();
-   double lineSearchCurrentEnergy   = 0.0;
-   double lineSearchInitialEnergy   = 0.0;
-   double const* const* matrixForce = NULL;
-   double const* vectorForce        = NULL;
-   const int dimension = molecule.GetNumberAtoms()*CartesianType_end;
-   double** matrixHessian           = NULL;
-   double*  vectorOldForce          = NULL;
-   double*  vectorStep              = NULL;
-   double** matrixStep              = NULL;
-   double** matrixOldCoordinates    = NULL;
-   double*  vectorOldCoordinates    = NULL;
-   double** matrixDisplacement      = NULL;
-   double** matrixGEDIISCoordinates = NULL;
-   double** matrixGEDIISForce       = NULL;
-   double*  vectorGEDIISForce       = NULL;
-   double       trustRadius      = Parameters::GetInstance()->GetInitialTrustRadiusOptimization();
-   const double maxNormStep      = Parameters::GetInstance()->GetMaxNormStepOptimization();
-   GEDIISHistory history;
+void GEDIIS::InitializeState(OptimizerState &stateOrig, const Molecule& molecule) const{
+   this->BFGS::InitializeState(stateOrig, molecule);
+   GEDIISState& state = stateOrig.CastRef<GEDIISState>();
+
+   state.GetHistory().AddEntry(state.GetCurrentEnergy(), molecule, state.GetMatrixForce());
+}
+
+void GEDIIS::CalcNextStepGeometry(Molecule &molecule,
+                                  OptimizerState& stateOrig,
+                                  boost::shared_ptr<ElectronicStructure> electronicStructure,
+                                  const int elecState,
+                                  const double dt) const{
+   GEDIISState& state = stateOrig.CastRef<GEDIISState>();
 
    try{
-      // initialize Hessian with unit matrix
-      MallocerFreer::GetInstance()->Malloc(&matrixHessian, dimension, dimension);
-      const double one = 1;
-      MolDS_wrappers::Blas::GetInstance()->Dcopy(dimension, &one, 0, &matrixHessian[0][0], dimension+1);
+      double energyGEDIIS = state.GetInitialEnergy();
+      state.GetHistory().SolveGEDIISEquation(&energyGEDIIS,
+                                             state.GetMatrixGEDIISCoordinates(),
+                                             state.GetMatrixGEDIISForce());
+      state.SetPreRFOEnergy(energyGEDIIS);
 
-      // initial calculation
-      bool requireGuess = true;
-      this->UpdateElectronicStructure(electronicStructure, molecule, requireGuess, this->CanOutputLogs());
-      lineSearchCurrentEnergy = electronicStructure->GetElectronicEnergy(elecState);
+      this->OutputLog(this->messageTakingGEDIISStep);
+      this->RollbackMolecularGeometry(molecule, state.GetMatrixGEDIISCoordinates());
 
-      requireGuess = false;
-      matrixForce = electronicStructure->GetForce(elecState);
-      vectorForce = &matrixForce[0][0];
-
-      // Add initial entry into GEDIIS history
-      history.AddEntry(lineSearchCurrentEnergy, molecule, matrixForce);
-
-      for(int s=0; s<totalSteps; s++){
-         this->OutputLog(boost::format("%s%d\n\n") % this->messageStartGEDIISStep % (s+1));
-
-         // Store old Force data
-         MallocerFreer::GetInstance()->Malloc(&vectorOldForce, dimension);
-         MolDS_wrappers::Blas::GetInstance()->Dcopy(dimension, vectorForce, vectorOldForce);
-
-         this->StoreMolecularGeometry(matrixOldCoordinates, molecule);
-
-         // Limit the trustRadius to maxNormStep
-         trustRadius=min(trustRadius,maxNormStep);
-
-         lineSearchInitialEnergy = lineSearchCurrentEnergy;
-         double preRFOEnergy = lineSearchInitialEnergy;
-
-         MallocerFreer::GetInstance()->Malloc(&matrixGEDIISCoordinates, molecule.GetNumberAtoms(), CartesianType_end);
-         MallocerFreer::GetInstance()->Malloc(&matrixGEDIISForce,       molecule.GetNumberAtoms(), CartesianType_end);
-         try{
-            history.SolveGEDIISEquation(&preRFOEnergy, matrixGEDIISCoordinates, matrixGEDIISForce);
-
-            this->OutputLog(this->messageTakingGEDIISStep);
-            this->RollbackMolecularGeometry(molecule, matrixGEDIISCoordinates);
-
-            bool tempCanOutputLogs = false;
-            this->UpdateElectronicStructure(electronicStructure, molecule, requireGuess, tempCanOutputLogs);
-            lineSearchCurrentEnergy = electronicStructure->GetElectronicEnergy(elecState);
-            vectorGEDIISForce = &matrixGEDIISForce[0][0];
-         }
-         catch(MolDSException ex){
-            //Check whether the exception is from GEDIIS routine
-            if(!ex.HasKey(GEDIISErrorID)){
-               throw ex;
-            }
-            else{
-               // Show GEDIIS error message
-               this->OutputLog(ex.What());
-               this->OutputLog("\n");
-
-               // If the error is not about insufficient history
-               if(ex.GetKeyValue<int>(GEDIISErrorID) != GEDIISNotSufficientHistory){
-                  history.DiscardEntries();
-               }
-
-               // Skip GEDIIS step and proceed to RFO step
-               preRFOEnergy = lineSearchCurrentEnergy;
-               vectorGEDIISForce = vectorOldForce;
-            }
-         }
-         this->OutputLog(messageTakingRFOStep);
-
-         // Level shift Hessian redundant modes
-         this->ShiftHessianRedundantMode(matrixHessian, molecule);
-
-         //Calculate RFO step
-         MallocerFreer::GetInstance()->Malloc(&matrixStep, molecule.GetNumberAtoms(), CartesianType_end);
-         vectorStep = &matrixStep[0][0];
-         this->CalcRFOStep(vectorStep, matrixHessian, vectorForce, trustRadius, dimension);
-
-         double approximateChange = this->ApproximateEnergyChange(dimension, matrixHessian, vectorGEDIISForce, vectorStep);
-
-         // Take a RFO step
-         bool doLineSearch = false;
-         bool tempCanOutputLogs = false;
-         if(doLineSearch){
-            this->LineSearch(electronicStructure, molecule, lineSearchCurrentEnergy, matrixStep, elecState, dt);
-         }
-         else{
-            this->UpdateMolecularCoordinates(molecule, matrixStep);
-
-            // Broadcast to all processes
-            int root = MolDS_mpi::MpiProcess::GetInstance()->GetHeadRank();
-            molecule.BroadcastConfigurationToAllProcesses(root);
-
-            this->UpdateElectronicStructure(electronicStructure, molecule, requireGuess, tempCanOutputLogs);
-            lineSearchCurrentEnergy = electronicStructure->GetElectronicEnergy(elecState);
-         }
-         this->UpdateTrustRadius(trustRadius, approximateChange, preRFOEnergy, lineSearchCurrentEnergy);
-
-         this->OutputMoleculeElectronicStructure(electronicStructure, molecule, this->CanOutputLogs());
-
-         // check convergence
-         if(this->SatisfiesConvergenceCriterion(matrixForce,
-                  molecule,
-                  lineSearchInitialEnergy,
-                  lineSearchCurrentEnergy,
-                  maxGradientThreshold,
-                  rmsGradientThreshold)){
-            *obtainesOptimizedStructure = true;
-            break;
-         }
-
-         //Calculate displacement (K_k at Eq. (15) in [SJTO_1983])
-         this->CalcDisplacement(matrixDisplacement, matrixOldCoordinates, molecule);
-
-         matrixForce = electronicStructure->GetForce(elecState);
-         vectorForce = &matrixForce[0][0];
-
-         history.AddEntry(lineSearchCurrentEnergy, molecule, matrixForce);
-
-         // Update Hessian
-         this->UpdateHessian(matrixHessian, dimension, vectorForce, vectorOldForce, &matrixDisplacement[0][0]);
-
-         // Check for hill climbing
-         if(lineSearchCurrentEnergy > lineSearchInitialEnergy){
-            this->OutputLog(this->messageHillClimbing);
-            this->RollbackMolecularGeometry(molecule, matrixOldCoordinates);
-            lineSearchCurrentEnergy = lineSearchInitialEnergy;
-         }
-
-      }
-      *lineSearchedEnergy = lineSearchCurrentEnergy;
+      bool tempCanOutputLogs = false;
+      bool requireGuess = false;
+      this->UpdateElectronicStructure(electronicStructure, molecule, requireGuess, tempCanOutputLogs);
+      state.SetIsGEDIISStepTaken(true);
    }
    catch(MolDSException ex){
-      MallocerFreer::GetInstance()->Free(&matrixHessian, dimension, dimension);
-      MallocerFreer::GetInstance()->Free(&vectorOldForce, dimension);
-      MallocerFreer::GetInstance()->Free(&matrixStep             , molecule.GetNumberAtoms(), CartesianType_end);
-      MallocerFreer::GetInstance()->Free(&matrixDisplacement     , molecule.GetNumberAtoms(), CartesianType_end);
-      MallocerFreer::GetInstance()->Free(&matrixOldCoordinates   , molecule.GetNumberAtoms(), CartesianType_end);
-      MallocerFreer::GetInstance()->Free(&matrixGEDIISCoordinates, molecule.GetNumberAtoms(), CartesianType_end);
-      MallocerFreer::GetInstance()->Free(&matrixGEDIISForce      , molecule.GetNumberAtoms(), CartesianType_end);
-      throw ex;
+      //Check whether the exception is from GEDIIS routine
+      if(!ex.HasKey(GEDIISErrorID)){
+         throw ex;
+      }
+      else{
+         // Show GEDIIS error message
+         this->OutputLog(ex.What());
+         this->OutputLog("\n");
+
+         // If the error is not about insufficient history
+         if(ex.GetKeyValue<int>(GEDIISErrorID) != GEDIISNotSufficientHistory){
+            state.GetHistory().DiscardEntries();
+         }
+
+         // Skip GEDIIS step and proceed to RFO step
+         state.SetIsGEDIISStepTaken(false);
+      }
    }
-   MallocerFreer::GetInstance()->Free(&matrixHessian, dimension, dimension);
-   MallocerFreer::GetInstance()->Free(&vectorOldForce, dimension);
-   MallocerFreer::GetInstance()->Free(&matrixStep             , molecule.GetNumberAtoms(), CartesianType_end);
-   MallocerFreer::GetInstance()->Free(&matrixDisplacement     , molecule.GetNumberAtoms(), CartesianType_end);
-   MallocerFreer::GetInstance()->Free(&matrixOldCoordinates   , molecule.GetNumberAtoms(), CartesianType_end);
-   MallocerFreer::GetInstance()->Free(&matrixGEDIISCoordinates, molecule.GetNumberAtoms(), CartesianType_end);
-   MallocerFreer::GetInstance()->Free(&matrixGEDIISForce      , molecule.GetNumberAtoms(), CartesianType_end);
+   this->OutputLog(messageTakingRFOStep);
+   this->BFGS::CalcNextStepGeometry(molecule, stateOrig, electronicStructure, elecState, dt);
 }
+
+void GEDIIS::UpdateState(OptimizerState& stateOrig) const{
+   GEDIISState& state = stateOrig.CastRef<GEDIISState>();
+
+   state.GetHistory().AddEntry(state.GetCurrentEnergy(), state.GetMolecule(), state.GetMatrixForce());
+
+   this->BFGS::UpdateState(state);
+}
+
 
 GEDIIS::GEDIISHistory::GEDIISHistory():maxEntryCount(5){
    this->SetMessages();
@@ -259,7 +159,7 @@ GEDIIS::GEDIISHistory::GEDIISHistory():maxEntryCount(5){
 
 GEDIIS::GEDIISHistory::~GEDIISHistory(){
    for(entryList_t::iterator i = this->entryList.begin(); i != this->entryList.end(); i++){
-     delete *i;
+      delete *i;
    }
 }
 
@@ -287,12 +187,12 @@ void GEDIIS::GEDIISHistory::DiscardEntries(){
 GEDIIS::GEDIISHistory::Entry::Entry(double energy,
                                     const MolDS_base::Molecule& molecule,
                                     double const* const* matrixForce):
-   energy(energy),numAtoms(molecule.GetNumberAtoms()),matrixCoordinate(NULL),matrixForce(NULL) {
+   energy(energy),numAtoms(molecule.GetAtomVect().size()),matrixCoordinate(NULL),matrixForce(NULL) {
    MallocerFreer::GetInstance()->Malloc(&this->matrixCoordinate, this->numAtoms, CartesianType_end);
    MallocerFreer::GetInstance()->Malloc(&this->matrixForce,      this->numAtoms, CartesianType_end);
 #pragma omp parallel for schedule(dynamic, MOLDS_OMP_DYNAMIC_CHUNK_SIZE)
    for(int i = 0; i < this->numAtoms; i++){
-      const Atom*   atom = molecule.GetAtom(i);
+      const Atom*   atom = molecule.GetAtomVect()[i];
       const double* xyz  = atom->GetXyz();
       for(int j = 0; j < CartesianType_end; j++){
          this->matrixCoordinate[i][j] = xyz[j];

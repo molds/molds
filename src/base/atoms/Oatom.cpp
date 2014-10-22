@@ -1,5 +1,5 @@
 //************************************************************************//
-// Copyright (C) 2011-2012 Mikiya Fujii                                   // 
+// Copyright (C) 2011-2014 Mikiya Fujii                                   // 
 //                                                                        // 
 // This file is part of MolDS.                                            // 
 //                                                                        // 
@@ -42,12 +42,14 @@ Oatom::Oatom(int index) : Atom(index){
    this->SetAtomicParameters();
 }
 
+Oatom::~Oatom(){}
+
 void Oatom::SetAtomicParameters(){
    this->atomType = O;
    this->atomicMass = 15.9994*Parameters::GetInstance()->GetGMolin2AU();
    this->coreCharge = 6.0;
    this->numberValenceElectrons = 6;
-   this->valenceShellType = l;
+   this->valenceShellType = lShell;
    this->valence.push_back(s);
    this->valence.push_back(py);
    this->valence.push_back(pz);

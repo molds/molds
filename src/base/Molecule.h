@@ -1,5 +1,5 @@
 //************************************************************************//
-// Copyright (C) 2011-2013 Mikiya Fujii                                   //
+// Copyright (C) 2011-2014 Mikiya Fujii                                   //
 //                                                                        // 
 // This file is part of MolDS.                                            // 
 //                                                                        // 
@@ -26,34 +26,37 @@ public:
    explicit Molecule(const Molecule& rhs);
    Molecule& operator=(const Molecule& rhs);
    ~Molecule();
-   inline int GetNumberAtoms() const{
+   inline const std::vector<MolDS_base_atoms::Atom*>& GetAtomVect() const{
 #ifdef MOLDS_DBG
-      if(this->atomVect==NULL) throw MolDS_base::MolDSException(this->errorMessageGetNumberAtomsNull);
+      if(this->atomVect==NULL) throw MolDS_base::MolDSException(this->errorMessageGetAtomVectNull);
 #endif
-      return this->atomVect->size();
+      return *this->atomVect;
    }
-   inline MolDS_base_atoms::Atom* GetAtom(int atomIndex) const{
+   inline const std::vector<MolDS_base_atoms::Atom*>& GetRealAtomVect() const{
 #ifdef MOLDS_DBG
-      if(this->atomVect==NULL) throw MolDS_base::MolDSException(this->errorMessageGetAtomNull);
+      if(this->realAtomVect==NULL) throw MolDS_base::MolDSException(this->errorMessageGetRealAtomVectNull);
 #endif
-      return (*this->atomVect)[atomIndex];
+      return *this->realAtomVect;
    }
-   inline int GetNumberEpcs() const{
+   inline const std::vector<MolDS_base_atoms::Atom*>& GetGhostAtomVect() const{
 #ifdef MOLDS_DBG
-      if(this->epcVect==NULL) throw MolDS_base::MolDSException(this->errorMessageGetNumberEPCsNull);
+      if(this->ghostAtomVect==NULL) throw MolDS_base::MolDSException(this->errorMessageGetGhostAtomVectNull);
 #endif
-      return this->epcVect->size();
+      return *this->ghostAtomVect;
    }
-   inline MolDS_base_atoms::Atom* GetEpc(int epcIndex) const{
+   inline const std::vector<MolDS_base_atoms::Atom*>& GetEpcVect() const{
 #ifdef MOLDS_DBG
-      if(this->epcVect==NULL) throw MolDS_base::MolDSException(this->errorMessageGetEPCNull);
+      if(this->epcVect==NULL) throw MolDS_base::MolDSException(this->errorMessageGetEPCVectNull);
 #endif
-      return (*this->epcVect)[epcIndex];
+      return *this->epcVect;
    }
    void AddAtom(MolDS_base_atoms::Atom* atom);
+   void AddRealAtom(MolDS_base_atoms::Atom* atom);
+   void AddGhostAtom(MolDS_base_atoms::Atom* atom);
    void AddEpc(MolDS_base_atoms::Atom* epc);
-   double const* GetXyzCOM() const;
-   double const* GetXyzCOC() const;
+   double const* GetXyzCOM() const; // Get the Cartesian coordinates of the center of atom's mass
+   double const* GetXyzCOC() const; // Get the Cartesian coordinates of the cneter of core's mass
+   double const* GetXyzDipoleCenter() const{return this->GetXyzCOC();}
    void CalcBasics();
    void CalcBasicsConfiguration();
    int GetTotalNumberAOs() const{return this->totalNumberAOs;}
@@ -68,12 +71,12 @@ public:
    void CalcPrincipalAxes();
    void Rotate();
    void Translate();
-   double GetDistanceAtoms(int indexAtomA, int indexAtomB) const{return this->distanceAtoms[indexAtomA][indexAtomB];};
-   double GetDistanceAtoms(const MolDS_base_atoms::Atom& atomA, 
-                           const MolDS_base_atoms::Atom& atomB) const{return this->GetDistanceAtoms(atomA.GetIndex(), atomB.GetIndex());};
-   double GetDistanceEpcs(int indexEpcA, int indexEpcB) const{return this->distanceEpcs[indexEpcA][indexEpcB];};
-   double GetDistanceEpcs(const MolDS_base_atoms::Atom& epcA, 
-                          const MolDS_base_atoms::Atom& epcB) const{return this->GetDistanceEpcs(epcA.GetIndex(), epcB.GetIndex());};
+   inline double GetDistanceAtoms(int indexAtomA, int indexAtomB) const{return this->distanceAtoms[indexAtomA][indexAtomB];};
+   inline double GetDistanceAtoms(const MolDS_base_atoms::Atom& atomA, 
+                                  const MolDS_base_atoms::Atom& atomB) const{return this->GetDistanceAtoms(atomA.GetIndex(), atomB.GetIndex());};
+   inline double GetDistanceEpcs(int indexEpcA, int indexEpcB) const{return this->distanceEpcs[indexEpcA][indexEpcB];};
+   inline double GetDistanceEpcs(const MolDS_base_atoms::Atom& epcA, 
+                                 const MolDS_base_atoms::Atom& epcB) const{return this->GetDistanceEpcs(epcA.GetIndex(), epcB.GetIndex());};
    double GetDistanceAtomEpc(int indexAtom, int indexEpc) const{return this->distanceAtomsEpcs[indexAtom][indexEpc];};
    double GetDistanceAtomEpc(const MolDS_base_atoms::Atom& atom, 
                              const MolDS_base_atoms::Atom& epc) const{return this->GetDistanceAtomEpc(atom.GetIndex(), epc.GetIndex());};
@@ -85,9 +88,11 @@ public:
    void BroadcastPhaseSpacePointToAllProcesses(int root) const;
 private:
    std::vector<MolDS_base_atoms::Atom*>* atomVect;
-   std::vector<MolDS_base_atoms::Atom*>* epcVect;   // Vector of Environmental Point Charges
-   double*  xyzCOM; // x, y, z coordinates of Center of Mass;
-   double*  xyzCOC; // x, y, z coordinates of Center of Core;
+   std::vector<MolDS_base_atoms::Atom*>* realAtomVect; // Vector of real (=not ghost) atoms
+   std::vector<MolDS_base_atoms::Atom*>* ghostAtomVect;   // Vector of ghost atoms
+   std::vector<MolDS_base_atoms::Atom*>* epcVect;      // Vector of Environmental Point Charges
+   double*  xyzCOM; // x, y, z coordinates of the center of atomic mass;
+   double*  xyzCOC; // x, y, z coordinates of the center of core's mass;
    double** distanceAtoms;    // distance between each atom;
    double** distanceEpcs;     // distance between each environmental point charge;
    double** distanceAtomsEpcs;// distance between each atom and environmental point charge;
@@ -97,6 +102,8 @@ private:
    void Initialize();
    void CopyInitialize(const Molecule& rhs);
    void Finalize(std::vector<MolDS_base_atoms::Atom*>** atomVect, 
+                 std::vector<MolDS_base_atoms::Atom*>** realAtomVect,
+                 std::vector<MolDS_base_atoms::Atom*>** ghostAtomVect,
                  std::vector<MolDS_base_atoms::Atom*>** epcVect,
                  double** xyzCOM, 
                  double** xyzCOC, 
@@ -104,8 +111,9 @@ private:
                  double*** distanceEpcs,
                  double*** distanceAtomsEpcs);
    void SetMessages();
-   void CalcTotalNumberValenceElectrons();
+   void CopyRealGhostAtom2Atom();
    void CalcTotalNumberAOs();
+   void CalcTotalNumberValenceElectrons();
    void CalcTotalCoreMass();
    void CalcXyzCOM();
    void CalcXyzCOC();
@@ -128,12 +136,15 @@ private:
                                  double rotatingAngle, 
                                  MolDS_base::EularAngle rotatingEularAngles)const;
    void OutputTranslatingConditions(double const* translatingDifference) const;
-   std::string errorMessageGetAtomNull;
-   std::string errorMessageGetEPCNull;
+   std::string errorMessageGetAtomVectNull;
+   std::string errorMessageGetRealAtomVectNull;
+   std::string errorMessageGetGhostAtomVectNull;
+   std::string errorMessageGetEPCVectNull;
    std::string errorMessageAddAtomNull;
+   std::string errorMessageAddRealAtomNull;
+   std::string errorMessageAddGhostAtomNull;
    std::string errorMessageAddEPCNull;
-   std::string errorMessageGetNumberAtomsNull;
-   std::string errorMessageGetNumberEPCsNull;
+   std::string errorMessageCopyRealGhostAtom2AtomNotEmpty;
    std::string errorMessageGetXyzCOMNull;
    std::string errorMessageGetXyzCOCNull;
    std::string errorMessageCalcXyzCOMNull;

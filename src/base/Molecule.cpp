@@ -1,5 +1,5 @@
 //************************************************************************//
-// Copyright (C) 2011-2013 Mikiya Fujii                                   //
+// Copyright (C) 2011-2014 Mikiya Fujii                                   //
 //                                                                        // 
 // This file is part of MolDS.                                            // 
 //                                                                        // 
@@ -24,6 +24,7 @@
 #include<string>
 #include<vector>
 #include<stdexcept>
+#include<algorithm>
 #include<omp.h>
 #include<boost/format.hpp>
 #include"Enums.h"
@@ -60,10 +61,14 @@ Molecule& Molecule::operator=(const Molecule& rhs){
    double** oldDistanceAtoms     = this->distanceAtoms;
    double** oldDistanceEpcs      = this->distanceEpcs;
    double** oldDistanceAtomsEpcs = this->distanceAtomsEpcs;
-   vector<Atom*>* oldAtomVect = this->atomVect;
-   vector<Atom*>* oldEpcVect  = this->epcVect;
+   vector<Atom*>* oldAtomVect     = this->atomVect;
+   vector<Atom*>* oldRealAtomVect = this->realAtomVect;
+   vector<Atom*>* oldGhostAtomVect= this->ghostAtomVect;
+   vector<Atom*>* oldEpcVect      = this->epcVect;
    this->CopyInitialize(rhs);
    this->Finalize(&oldAtomVect, 
+                  &oldRealAtomVect, 
+                  &oldGhostAtomVect, 
                   &oldEpcVect, 
                   &oldXyzCOM, 
                   &oldXyzCOC, 
@@ -75,6 +80,8 @@ Molecule& Molecule::operator=(const Molecule& rhs){
 
 Molecule::~Molecule(){
    this->Finalize(&this->atomVect, 
+                  &this->realAtomVect, 
+                  &this->ghostAtomVect, 
                   &this->epcVect, 
                   &this->xyzCOM, 
                   &this->xyzCOC, 
@@ -93,20 +100,39 @@ void Molecule::CopyInitialize(const Molecule& rhs){
    this->totalNumberAOs = rhs.totalNumberAOs;
    this->totalNumberValenceElectrons = rhs.totalNumberValenceElectrons;
    this->totalCoreMass = rhs.totalCoreMass;
-   if(rhs.atomVect != NULL){
-      int atomNum = rhs.atomVect->size();
-      for(int i=0; i<atomNum; i++){
-         Atom* atom = (*rhs.atomVect)[i];
-         this->atomVect->push_back(AtomFactory::Create(atom->GetAtomType(),
-                                                       atom->GetIndex(),
-                                                       atom->GetXyz()[XAxis],
-                                                       atom->GetXyz()[YAxis],
-                                                       atom->GetXyz()[ZAxis],
-                                                       atom->GetPxyz()[XAxis],
-                                                       atom->GetPxyz()[YAxis],
-                                                       atom->GetPxyz()[ZAxis]));
-         (*this->atomVect)[i]->SetFirstAOIndex(atom->GetFirstAOIndex());
+   if(rhs.realAtomVect != NULL){
+      int realAtomNum = rhs.realAtomVect->size();
+      for(int i=0; i<realAtomNum; i++){
+         Atom* atom = (*rhs.realAtomVect)[i];
+         this->realAtomVect->push_back(AtomFactory::Create(atom->GetAtomType(),
+                                                           atom->GetIndex(),
+                                                           atom->GetXyz()[XAxis],
+                                                           atom->GetXyz()[YAxis],
+                                                           atom->GetXyz()[ZAxis],
+                                                           atom->GetPxyz()[XAxis],
+                                                           atom->GetPxyz()[YAxis],
+                                                           atom->GetPxyz()[ZAxis]));
+         (*this->realAtomVect)[i]->SetFirstAOIndex(atom->GetFirstAOIndex());
       }
+   }
+   if(rhs.ghostAtomVect != NULL){
+      int ghostAtomNum = rhs.ghostAtomVect->size();
+      for(int i=0; i<ghostAtomNum; i++){
+         Atom* atom = (*rhs.ghostAtomVect)[i];
+         this->ghostAtomVect->push_back(AtomFactory::Create(atom->GetAtomType(),
+                                                         atom->GetIndex(),
+                                                         atom->GetXyz()[XAxis],
+                                                         atom->GetXyz()[YAxis],
+                                                         atom->GetXyz()[ZAxis],
+                                                         atom->GetPxyz()[XAxis],
+                                                         atom->GetPxyz()[YAxis],
+                                                         atom->GetPxyz()[ZAxis]));
+         (*this->realAtomVect)[i]->SetFirstAOIndex(atom->GetFirstAOIndex());
+      }
+   }
+   if(rhs.atomVect != NULL){
+      this->CopyRealGhostAtom2Atom();
+      int atomNum = this->atomVect->size();
       MallocerFreer::GetInstance()->Malloc<double>(&this->distanceAtoms, atomNum, atomNum);
       for(int i=0; i<atomNum; i++){
          for(int j=0; j<atomNum; j++){
@@ -157,15 +183,21 @@ void Molecule::Initialize(){
    this->distanceEpcs       = NULL;
    this->distanceAtomsEpcs  = NULL;
    this->atomVect           = NULL;
+   this->realAtomVect       = NULL;
+   this->ghostAtomVect         = NULL;
    this->epcVect            = NULL;
    try{
-      this->atomVect = new vector<Atom*>;
-      this->epcVect  = new vector<Atom*>;
+      this->atomVect     = new vector<Atom*>;
+      this->realAtomVect = new vector<Atom*>;
+      this->ghostAtomVect= new vector<Atom*>;
+      this->epcVect      = new vector<Atom*>;
       MallocerFreer::GetInstance()->Malloc<double>(&this->xyzCOM, CartesianType_end);
       MallocerFreer::GetInstance()->Malloc<double>(&this->xyzCOC, CartesianType_end);
    }
    catch(exception ex){
       this->Finalize(&this->atomVect, 
+                     &this->realAtomVect, 
+                     &this->ghostAtomVect, 
                      &this->epcVect, 
                      &this->xyzCOM, 
                      &this->xyzCOC, 
@@ -177,6 +209,8 @@ void Molecule::Initialize(){
 }
 
 void Molecule::Finalize(vector<Atom*>** atomVect, 
+                        vector<Atom*>** realAtomVect, 
+                        vector<Atom*>** ghostAtomVect, 
                         vector<Atom*>** epcVect, 
                         double** xyzCOM, 
                         double** xyzCOC, 
@@ -193,18 +227,37 @@ void Molecule::Finalize(vector<Atom*>** atomVect,
       MallocerFreer::GetInstance()->Free<double>(distanceAtomsEpcs, atomNum, epcNum);
    }
    if(*atomVect != NULL){
-      atomNum = (*atomVect)->size();
-      for(int i=0; i<atomNum; i++){
-         if((**atomVect)[i] != NULL){
-            delete (**atomVect)[i];
-            (**atomVect)[i] = NULL;
-         }
-      }
       (*atomVect)->clear();
       delete *atomVect;
       *atomVect = NULL;
       //this->OutputLog("atomVect deleted\n");
       MallocerFreer::GetInstance()->Free<double>(distanceAtoms, atomNum, atomNum);
+   }
+   if(*realAtomVect != NULL){
+      int realAtomNum = (*realAtomVect)->size();
+      for(int i=0; i<realAtomNum; i++){
+         if((**realAtomVect)[i] != NULL){
+            delete (**realAtomVect)[i];
+            (**realAtomVect)[i] = NULL;
+         }
+      }
+      (*realAtomVect)->clear();
+      delete *realAtomVect;
+      *realAtomVect = NULL;
+      //this->OutputLog("realAtomVect deleted\n");
+   }
+   if(*ghostAtomVect != NULL){
+      int ghostAtomNum = (*ghostAtomVect)->size();
+      for(int i=0; i<ghostAtomNum; i++){
+         if((**ghostAtomVect)[i] != NULL){
+            delete (**ghostAtomVect)[i];
+            (**ghostAtomVect)[i] = NULL;
+         }
+      }
+      (*ghostAtomVect)->clear();
+      delete *ghostAtomVect;
+      *ghostAtomVect = NULL;
+      //this->OutputLog("ghostAtomVect deleted\n");
    }
    if(*epcVect != NULL){
       epcNum = (*epcVect)->size();
@@ -223,29 +276,32 @@ void Molecule::Finalize(vector<Atom*>** atomVect,
 }
 
 void Molecule::SetMessages(){
-   this->errorMessageGetAtomNull = "Error in base::Molecule::GetAtom: atomVect is NULL.\n";
-   this->errorMessageGetEPCNull  = "Error in base::Molecule::GetEnviromentalPointCharge: enviromentalPointChargeVect is NULL.\n";
+   this->errorMessageGetAtomVectNull  = "Error in base::Molecule::GetAtomVect: atomVect is NULL.\n";
+   this->errorMessageGetRealAtomVectNull  = "Error in base::Molecule::GetRealAtomVect: realAtomVect is NULL.\n";
+   this->errorMessageGetGhostAtomVectNull  = "Error in base::Molecule::GetGhostAtomVect: ghostAtomVect is NULL.\n";
+   this->errorMessageGetEPCVectNull  = "Error in base::Molecule::GetEpcVect: epcVect is NULL.\n";
    this->errorMessageAddAtomNull = "Error in base::Molecule::AddAtom: atomVect is NULL.\n";
-   this->errorMessageAddEPCNull  = "Error in base::Molecule::AddEnviromentalPointCharge: enviromentalPointChargeVect is NULL.\n";
-   this->errorMessageGetNumberAtomsNull = "Error in base::Molecule::GetNumberAtoms: atomVect is NULL.\n";
-   this->errorMessageGetNumberEPCsNull  = "Error in base::Molecule::GetNumberEnviromentalPointChargess: epcVect is NULL.\n";
+   this->errorMessageAddRealAtomNull = "Error in base::Molecule::AddAtom: realAtomVect is NULL.\n";
+   this->errorMessageAddGhostAtomNull = "Error in base::Molecule::AddAtom: ghostAtomVect is NULL.\n";
+   this->errorMessageAddEPCNull  = "Error in base::Molecule::AddEnviromentalPointCharge: epcVect is NULL.\n";
+   this->errorMessageCopyRealGhostAtom2AtomNotEmpty = "Error in base::Molecule::CopyRealGhostAtom2Atom: atomVect is not empty.\n";
    this->errorMessageGetXyzCOMNull = "Error in base::Molecule::GetXyzCOM: xyzCOM is NULL.\n";
    this->errorMessageGetXyzCOCNull = "Error in base::Molecule::GetXyzCOC: xyzCOC is NULL.\n";
    this->errorMessageCalcXyzCOMNull = "Error in base::Molecule::CalcXyzCOM: xyzCOM is NULL.\n";
    this->errorMessageCalcXyzCOCNull = "Error in base::Molecule::CalcXyzCOC: xyzCOC is NULL.\n";
-   this->messageTotalNumberAOs = "\tTotal number of valence AOs: ";
-   this->messageTotalNumberAtoms = "\tTotal number of atoms: ";
-   this->messageTotalNumberValenceElectrons = "\tTotal number of valence electrons: ";
-   this->messageAtomCoordinatesTitle = "\t\t\t\t| i-th | atom type |   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |\t\t|  x[angst.]  |  y[angst.]  |  z[angst.]  |\n";
-   this->messageAtomCoordinates = "\tAtom coordinates:";
-   this->messageAtomMomenta = "\tAtom momenta:";
-   this->messageAtomMomentaTitle = "\t\t\t| i-th | atom type |   px[a.u.]   |   py[a.u.]   |   pz[a.u.]   |\t\t|   px[u]   |   py[u]   |   pz[u]   | [u] = [(g/Mol)*(angst/fs)]\n";
+   this->messageTotalNumberAOs = "\t\tTotal number of valence AOs: ";
+   this->messageTotalNumberAtoms = "\t\tTotal number of atoms: ";
+   this->messageTotalNumberValenceElectrons = "\t\tTotal number of valence electrons: ";
+   this->messageAtomCoordinatesTitle = "\t\t\t\t\t| i-th | atom type |   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |\t\t|  x[angst.]  |  y[angst.]  |  z[angst.]  |\n";
+   this->messageAtomCoordinates = "\t\tAtom coordinates:";
+   this->messageAtomMomenta = "\t\tAtom momenta:";
+   this->messageAtomMomentaTitle = "\t\t\t\t| i-th | atom type |   px[a.u.]   |   py[a.u.]   |   pz[a.u.]   |\t\t|   px[u]   |   py[u]   |   pz[u]   | [u] = [(g/Mol)*(angst/fs)]\n";
+   this->messageCOM = "\t\tCenter of Mass:";
+   this->messageCOC = "\t\tCenter of Core:";
+   this->messageCOMTitle = "\t\t\t\t|   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |\t\t|  x[angst.]  |  y[angst.]  |  z[angst.]  |\n";
    this->messageEpcConfiguration = "\tEnvironmental Point Charge(EPC) configuration:\n";
    this->messageEpcCoordinates = "\tEPC coordinates:";
    this->messageEpcCoordinatesTitle = "\t\t\t\t| i-th |  charge[a.u.]  |   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |\t\t|  x[angst.]  |  y[angst.]  |  z[angst.]  |\n";
-   this->messageCOM = "\tCenter of Mass:";
-   this->messageCOC = "\tCenter of Core:";
-   this->messageCOMTitle = "\t\t\t|   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |\t\t|  x[angst.]  |  y[angst.]  |  z[angst.]  |\n";
    this->messageStartPrincipalAxes = "**********  START: Principal Axes of Inertia  **********\n";
    this->messageDonePrincipalAxes =  "**********  DONE: Principal Axes of Inertia  ***********\n\n\n";
    this->messagePrincipalAxes = "\tPrincipal Axis:";
@@ -274,6 +330,20 @@ void Molecule::AddAtom(Atom* atom){
    if(this->atomVect==NULL) throw MolDSException(this->errorMessageAddAtomNull);
 #endif
    this->atomVect->push_back(atom);
+}
+
+void Molecule::AddRealAtom(Atom* atom){
+#ifdef MOLDS_DBG
+   if(this->realAtomVect==NULL) throw MolDSException(this->errorMessageAddRealAtomNull);
+#endif
+   this->realAtomVect->push_back(atom);
+}
+
+void Molecule::AddGhostAtom(Atom* atom){
+#ifdef MOLDS_DBG
+   if(this->ghostAtomVect==NULL) throw MolDSException(this->errorMessageAddGhostAtomNull);
+#endif
+   this->ghostAtomVect->push_back(atom);
 }
 
 void Molecule::AddEpc(Atom* epc){
@@ -309,8 +379,8 @@ void Molecule::CalcXyzCOM(){
       this->xyzCOM[j] = 0.0;
    }
       
-   for(int i=0; i<this->atomVect->size(); i++){
-      const Atom& atom = *(*this->atomVect)[i]; 
+   for(int i=0; i<this->realAtomVect->size(); i++){
+      const Atom& atom = *(*this->realAtomVect)[i]; 
       atomicXyz = atom.GetXyz();
       atomicMass = atom.GetAtomicMass();
       totalAtomicMass += atomicMass;
@@ -335,8 +405,8 @@ void Molecule::CalcXyzCOC(){
       this->xyzCOC[j] = 0.0;
    }
       
-   for(int i=0; i<this->atomVect->size(); i++){
-      const Atom& atom = *(*this->atomVect)[i]; 
+   for(int i=0; i<this->realAtomVect->size(); i++){
+      const Atom& atom = *(*this->realAtomVect)[i]; 
       atomicXyz = atom.GetXyz();
       coreMass  = atom.GetCoreMass();
       totalCoreMass += coreMass;
@@ -405,6 +475,7 @@ void Molecule::CalcDistanceAtomsEpcs(){
 }
 
 void Molecule::CalcBasics(){
+   this->CopyRealGhostAtom2Atom();
    this->CalcTotalNumberAOs();
    this->CalcTotalNumberValenceElectrons();
    this->CalcTotalCoreMass();
@@ -417,6 +488,25 @@ void Molecule::CalcBasicsConfiguration(){
    this->CalcDistanceAtoms();
    this->CalcDistanceEpcs();
    this->CalcDistanceAtomsEpcs();
+}
+
+void Molecule::CopyRealGhostAtom2Atom(){
+   if(!this->atomVect->empty()){
+      throw MolDSException(this->errorMessageCopyRealGhostAtom2AtomNotEmpty);
+   }
+   int realAtomNum = this->realAtomVect->size();
+   int ghostAtomNum   = this->ghostAtomVect->size();
+   for(int i=0; i<realAtomNum; i++){
+      Atom* atom = (*this->realAtomVect)[i];
+      this->atomVect->push_back(atom);
+   }
+   for(int i=0; i<ghostAtomNum; i++){
+      Atom* atom = (*this->ghostAtomVect)[i];
+      this->atomVect->push_back(atom);
+   }
+   std::sort(this->realAtomVect->begin(),  this->realAtomVect->end(),  MolDS_base_atoms::LessAtomIndex());
+   std::sort(this->ghostAtomVect->begin(), this->ghostAtomVect->end(), MolDS_base_atoms::LessAtomIndex());
+   std::sort(this->atomVect->begin(),      this->atomVect->end(),      MolDS_base_atoms::LessAtomIndex());
 }
 
 void Molecule::CalcTotalNumberAOs(){
@@ -438,7 +528,7 @@ void Molecule::CalcTotalCoreMass(){
    this->totalCoreMass = 0; 
    for(int i=0; i<this->atomVect->size(); i++){
       const Atom& atom = *(*this->atomVect)[i]; 
-      double coreMass = atom.GetAtomicMass() - static_cast<double>(atom.GetNumberValenceElectrons());
+      double coreMass = atom.GetCoreMass();
       this->totalCoreMass += coreMass;
    }
 }
@@ -617,8 +707,8 @@ void Molecule::CalcInertiaTensor(double** inertiaTensor, const double* inertiaTe
    double y;
    double z;
    double atomicMass;
-   for(int a=0; a<this->atomVect->size(); a++){
-      const Atom& atom = *(*this->atomVect)[a];
+   for(int a=0; a<this->realAtomVect->size(); a++){
+      const Atom& atom = *(*this->realAtomVect)[a];
       atomicMass = atom.GetAtomicMass();
       x = atom.GetXyz()[0] - inertiaTensorOrigin[0];
       y = atom.GetXyz()[1] - inertiaTensorOrigin[1];
@@ -832,9 +922,9 @@ void Molecule::OutputTranslatingConditions(double const* translatingDifference) 
 }
 
 void Molecule::SynchronizeConfigurationTo(const Molecule& ref){
-   for(int a=0; a<this->GetNumberAtoms(); a++){
-      Atom& atom = *this->GetAtom(a);
-      const Atom& refAtom = *ref.GetAtom(a);
+   for(int a=0; a<this->GetAtomVect().size(); a++){
+      Atom& atom = *this->GetAtomVect()[a];
+      const Atom& refAtom = *ref.GetAtomVect()[a];
       for(int i=0; i<CartesianType_end; i++){
          atom.GetXyz()[i] = refAtom.GetXyz()[i];
       }
@@ -843,9 +933,9 @@ void Molecule::SynchronizeConfigurationTo(const Molecule& ref){
 }
 
 void Molecule::SynchronizeMomentaTo(const Molecule& ref){
-   for(int a=0; a<this->GetNumberAtoms(); a++){
-      Atom& atom = *this->GetAtom(a);
-      const Atom& refAtom = *ref.GetAtom(a);
+   for(int a=0; a<this->GetAtomVect().size(); a++){
+      Atom& atom = *this->GetAtomVect()[a];
+      const Atom& refAtom = *ref.GetAtomVect()[a];
       for(int i=0; i<CartesianType_end; i++){
          atom.GetPxyz()[i] = refAtom.GetPxyz()[i];
       }
@@ -853,9 +943,9 @@ void Molecule::SynchronizeMomentaTo(const Molecule& ref){
 }
 
 void Molecule::SynchronizePhaseSpacePointTo(const Molecule& ref){
-   for(int a=0; a<this->GetNumberAtoms(); a++){
-      Atom& atom = *this->GetAtom(a);
-      const Atom& refAtom = *ref.GetAtom(a);
+   for(int a=0; a<this->GetAtomVect().size(); a++){
+      Atom& atom = *this->GetAtomVect()[a];
+      const Atom& refAtom = *ref.GetAtomVect()[a];
       for(int i=0; i<CartesianType_end; i++){
          atom.GetXyz() [i] = refAtom.GetXyz() [i];
          atom.GetPxyz()[i] = refAtom.GetPxyz()[i];
@@ -865,19 +955,19 @@ void Molecule::SynchronizePhaseSpacePointTo(const Molecule& ref){
 }
 
 void Molecule::BroadcastConfigurationToAllProcesses(int root) const{
-   int numTransported = this->GetNumberAtoms()*CartesianType_end;
+   int numTransported = this->GetAtomVect().size()*CartesianType_end;
    double* tmp=NULL;
    try{
       MolDS_base::MallocerFreer::GetInstance()->Malloc<double>(&tmp, numTransported);
-      for(int a=0; a<this->GetNumberAtoms(); a++){
-         Atom& atom = *this->GetAtom(a);
+      for(int a=0; a<this->GetAtomVect().size(); a++){
+         Atom& atom = *this->GetAtomVect()[a];
          for(int i=0; i<CartesianType_end; i++){
             tmp[a*CartesianType_end+i] = atom.GetXyz()[i];
          }
       }
       MolDS_mpi::MpiProcess::GetInstance()->Broadcast(tmp, numTransported, root);
-      for(int a=0; a<this->GetNumberAtoms(); a++){
-         Atom& atom = *this->GetAtom(a);
+      for(int a=0; a<this->GetAtomVect().size(); a++){
+         Atom& atom = *this->GetAtomVect()[a];
          for(int i=0; i<CartesianType_end; i++){
             atom.GetXyz()[i] = tmp[a*CartesianType_end+i];
          }
@@ -891,19 +981,19 @@ void Molecule::BroadcastConfigurationToAllProcesses(int root) const{
 }
 
 void Molecule::BroadcastMomentaToAllProcesses(int root) const{
-   int numTransported = this->GetNumberAtoms()*CartesianType_end;
+   int numTransported = this->GetAtomVect().size()*CartesianType_end;
    double* tmp=NULL;
    try{
       MolDS_base::MallocerFreer::GetInstance()->Malloc<double>(&tmp, numTransported);
-      for(int a=0; a<this->GetNumberAtoms(); a++){
-         Atom& atom = *this->GetAtom(a);
+      for(int a=0; a<this->GetAtomVect().size(); a++){
+         Atom& atom = *this->GetAtomVect()[a];
          for(int i=0; i<CartesianType_end; i++){
             tmp[a*CartesianType_end+i] = atom.GetPxyz()[i];
          }
       }
       MolDS_mpi::MpiProcess::GetInstance()->Broadcast(tmp, numTransported, root);
-      for(int a=0; a<this->GetNumberAtoms(); a++){
-         Atom& atom = *this->GetAtom(a);
+      for(int a=0; a<this->GetAtomVect().size(); a++){
+         Atom& atom = *this->GetAtomVect()[a];
          for(int i=0; i<CartesianType_end; i++){
             atom.GetPxyz()[i] = tmp[a*CartesianType_end+i];
          }
@@ -917,12 +1007,12 @@ void Molecule::BroadcastMomentaToAllProcesses(int root) const{
 }
 
 void Molecule::BroadcastPhaseSpacePointToAllProcesses(int root) const{
-   int numTransported = 2*this->GetNumberAtoms()*CartesianType_end;
+   int numTransported = 2*this->GetAtomVect().size()*CartesianType_end;
    double* tmp=NULL;
    try{
       MolDS_base::MallocerFreer::GetInstance()->Malloc<double>(&tmp, numTransported);
-      for(int a=0; a<this->GetNumberAtoms(); a++){
-         Atom& atom = *this->GetAtom(a);
+      for(int a=0; a<this->GetAtomVect().size(); a++){
+         Atom& atom = *this->GetAtomVect()[a];
          for(int i=0; i<CartesianType_end; i++){
             int k = a*CartesianType_end+i;
             tmp[2*k  ] = atom.GetXyz() [i];
@@ -930,8 +1020,8 @@ void Molecule::BroadcastPhaseSpacePointToAllProcesses(int root) const{
          }
       }
       MolDS_mpi::MpiProcess::GetInstance()->Broadcast(tmp, numTransported, root);
-      for(int a=0; a<this->GetNumberAtoms(); a++){
-         Atom& atom = *this->GetAtom(a);
+      for(int a=0; a<this->GetAtomVect().size(); a++){
+         Atom& atom = *this->GetAtomVect()[a];
          for(int i=0; i<CartesianType_end; i++){
             int k = a*CartesianType_end+i;
             atom.GetXyz() [i] = tmp[2*k  ];

@@ -1,5 +1,5 @@
 //************************************************************************//
-// Copyright (C) 2011-2012 Mikiya Fujii                                   // 
+// Copyright (C) 2011-2014 Mikiya Fujii                                   // 
 //                                                                        // 
 // This file is part of MolDS.                                            // 
 //                                                                        // 
@@ -41,6 +41,7 @@
 #include"../base/atoms/Catom.h"
 #include"../base/atoms/Natom.h"
 #include"../base/atoms/Oatom.h"
+#include"../base/atoms/Fatom.h"
 #include"../base/atoms/Satom.h"
 #include"../base/Molecule.h"
 #include"../base/ElectronicStructure.h"
@@ -71,6 +72,8 @@ void Indo::SetMessages(){
       = "Error in indo::Indo::SetMolecule: Total number of valence electrons is odd. totalNumberValenceElectrons=";
    this->errorMessageNotEnebleAtomType  
       = "Error in indo::Indo::CheckEnableAtomType: Non available atom is contained.\n";
+   this->errorMessageNotEnebleAtomTypeVdW
+      = "Error in indo::Indo::CheckEnableAtomTypeVdW: Non available atom to add VdW correction is contained.\n";
    this->errorMessageCoulombInt = "Error in base_indo::Indo::GetCoulombInt: Invalid orbitalType.\n";
    this->errorMessageExchangeInt = "Error in base_indo::Indo::GetExchangeInt: Invalid orbitalType.\n";
    this->errorMessageMolecularIntegralElement
@@ -103,7 +106,7 @@ void Indo::SetEnableAtomTypes(){
    this->enableAtomTypes.push_back(C);
    this->enableAtomTypes.push_back(N);
    this->enableAtomTypes.push_back(O);
-   //this->enableAtomTypes.push_back(F);
+   this->enableAtomTypes.push_back(F);
 }
 
 double Indo::GetFockDiagElement(const Atom& atomA, 
@@ -137,9 +140,9 @@ double Indo::GetFockDiagElement(const Atom& atomA,
       value += temp;
    
       temp = 0.0;
-      for(int B=0; B<molecule.GetNumberAtoms(); B++){
+      for(int B=0; B<molecule.GetAtomVect().size(); B++){
          if(B != indexAtomA){
-            const Atom& atomB = *molecule.GetAtom(B);
+            const Atom& atomB = *molecule.GetAtomVect()[B];
             temp += ( atomicElectronPopulation[B] - atomB.GetCoreCharge()  )
                      *gammaAB[indexAtomA][B];
          }
@@ -207,8 +210,8 @@ double Indo::GetMolecularIntegralElement(int moI, int moJ, int moK, int moL,
    value = Cndo2::GetMolecularIntegralElement(moI, moJ, moK, moL, molecule, fockMatrix, gammaAB);
 
    // Aditional terms for INDO, see Eq. (10) in [RZ_1973]
-   for(int A=0; A<molecule.GetNumberAtoms(); A++){
-      const Atom& atomA = *molecule.GetAtom(A);
+   for(int A=0; A<molecule.GetAtomVect().size(); A++){
+      const Atom& atomA = *molecule.GetAtomVect()[A];
       firstAOIndexA = atomA.GetFirstAOIndex();
       numberAOsA = atomA.GetValenceSize();
 

@@ -1,5 +1,5 @@
 //************************************************************************//
-// Copyright (C) 2011-2013 Mikiya Fujii                                   // 
+// Copyright (C) 2011-2014 Mikiya Fujii                                   // 
 //                                                                        // 
 // This file is part of MolDS.                                            // 
 //                                                                        // 
@@ -29,7 +29,6 @@ public:
    AsyncCommunicator();
    ~AsyncCommunicator();
    template<typename T> void Run(){
-      int mpiRank = MolDS_mpi::MpiProcess::GetInstance()->GetRank();
       while(true){
          boost::mutex::scoped_lock lk(this->stateGuard);
          try{
@@ -60,10 +59,10 @@ public:
             this->stateChange.notify_all();
          }
          catch(MolDS_base::MolDSException ex){
-            if(ex.HasKey(MolDS_base::EmptyQueue && this->hasAllMessagesSet)){
+            if(ex.HasKey(MolDS_base::EmptyQueue) && this->hasAllMessagesSet){
                break;
             }
-            else if(ex.HasKey(MolDS_base::EmptyQueue && !this->hasAllMessagesSet)){
+            else if(ex.HasKey(MolDS_base::EmptyQueue) && !this->hasAllMessagesSet){
                this->stateChange.wait(lk);
                continue;
             }

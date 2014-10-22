@@ -1,7 +1,7 @@
 //************************************************************************//
-// Copyright (C) 2011-2013 Mikiya Fujii                                   //
-// Copyright (C) 2012-2012 Katsuhiko Nishimra                             // 
-// Copyright (C) 2012-2013 Michihiro Okuyama
+// Copyright (C) 2011-2014 Mikiya Fujii                                   //
+// Copyright (C) 2012-2014 Katsuhiko Nishimra                             // 
+// Copyright (C) 2012-2014 Michihiro Okuyama
 //                                                                        // 
 // This file is part of MolDS.                                            // 
 //                                                                        // 
@@ -48,6 +48,7 @@ const double Parameters::kcalMolin2AU  = 0.00159360175;
 const double Parameters::angstrom2AU   = 1.0/0.5291772;
 const double Parameters::nm2AU         = 10.0*Parameters::angstrom2AU;
 const double Parameters::kayser2AU     = 4.556336e-6;
+const double Parameters::nmin2AU       = 4.556336e01;
 const double Parameters::fs2AU         = 1.0/(2.418884326505e-2);
 const double Parameters::gMolin2AU     = 1.0e5/(6.0221415*9.1095);
 const double Parameters::degree2Radian = M_PI / 180.0;
@@ -67,6 +68,9 @@ Parameters::Parameters(){
    this->elecIndecesHolePlot     = NULL;
    this->elecIndecesParticlePlot = NULL;
    this->electronicStateIndecesMullikenCIS = NULL;
+   this->sumChargesIndexPairsSCF = NULL;
+   this->sumChargesIndexPairsCIS = NULL;
+   this->spaceFixedAtomsIndexPairsOptimization = NULL;
 }
 
 Parameters::~Parameters(){
@@ -93,6 +97,18 @@ Parameters::~Parameters(){
       delete this->electronicStateIndecesMullikenCIS;
       this->electronicStateIndecesMullikenCIS= NULL;
       //this->OutputLog("electronicStateIndecesMullikenCIS deleted\n");
+   }
+   if(this->sumChargesIndexPairsSCF != NULL){
+      delete this->sumChargesIndexPairsSCF;
+      //this->OutputLog("sumChargesIndexPairsSCF deleted\n");
+   }
+   if(this->sumChargesIndexPairsCIS != NULL){
+      delete this->sumChargesIndexPairsCIS;
+      //this->OutputLog("sumChargesIndexPairsCIS deleted\n");
+   }
+   if(this->spaceFixedAtomsIndexPairsOptimization != NULL){
+      delete this->spaceFixedAtomsIndexPairsOptimization;
+      //this->OutputLog("spacefixedatomsindexpairsoptimization deleted\n");
    }
 }
 
@@ -124,6 +140,7 @@ void Parameters::SetDefaultValues(){
    this->requiresVdWSCF      = false;
    this->vdWScalingFactorSCF = 1.40;
    this->vdWDampingFactorSCF = 23.0;
+   this->requiresMpiSCF      = true;
    // MOPlot
    this->fileNamePrefixMOPlot     = "MO_";
    this->gridNumberMOPlot[XAxis]  = 25;
@@ -219,12 +236,18 @@ void Parameters::SetDefaultValues(){
 void Parameters::SetMessages(){
    this->errorMessageGetIndecesMOPlotNull
       = "Error in base::Parameters::GetIndecesMOPlot: indecesMOPlot is NULL.\n";
+   this->errorMessageGetSumChargesIndexPairsSCFNull
+      = "Error in base::Parameters::GetSumChargesIndexPairsSCF: sumChargesIndexPairsSCF is NULL.\n";
+   this->errorMessageGetSumChargesIndexPairsCISNull
+      = "Error in base::Parameters::GetSumChargesIndexPairsCIS: sumChargesIndexPairsCIS is NULL.\n";
    this->errorMessageGetIndecesHolePlotNull
       = "Error in base::Parameters::GetIndecesHolePlot: elecIndecesHolePlot is NULL.\n";
    this->errorMessageGetIndecesParticlePlotNull
       = "Error in base::Parameters::GetIndecesParticlePlot: elecIndecesParticlePlot is NULL.\n";
    this->errorMessageGetElectronicStateIndecesMullikenCISNull
       = "Error in base::Parameters::GetElectronicStateIndecesMullikenCIS: electronicStateIndecesMullikenCIS is NULL.\n";
+   this->errorMessageGetSpaceFixedAtomIndexPairsOptimizationNull
+      = "Error in base::Parameters::GetSpaceFixedAtomIndexPairsOptimization: spacefixedatomsindexpairsoptimization is NULL.\n";
 }
 
 // methods for translation
@@ -260,6 +283,27 @@ void Parameters::SetRotatingEularAngles(double alpha, double beta, double gamma)
    this->rotatingEularAngles.SetAlpha(alpha);
    this->rotatingEularAngles.SetBeta(beta);
    this->rotatingEularAngles.SetGamma(gamma);
+}
+
+// methods for SCF
+bool Parameters::RequiresSumChargesSCF() const{
+   return (this->sumChargesIndexPairsSCF!=NULL && 
+           0<this->sumChargesIndexPairsSCF->size());
+}
+
+const vector<AtomIndexPair>* Parameters::GetSumChargesIndexPairsSCF() const{
+#ifdef MOLDS_DBG
+   if(this->sumChargesIndexPairsSCF==NULL) throw MolDSException(this->errorMessageGetSumChargesIndexPairsSCFNull);
+#endif
+   return this->sumChargesIndexPairsSCF;
+}
+
+void Parameters::AddSumChargesIndexPairsSCF(int firstAtomIndex, int lastAtomIndex){
+   if(this->sumChargesIndexPairsSCF==NULL){
+      this->sumChargesIndexPairsSCF = new vector<AtomIndexPair>;
+   }
+   AtomIndexPair atomIndexPair = {firstAtomIndex, lastAtomIndex};
+   this->sumChargesIndexPairsSCF->push_back(atomIndexPair);
 }
 
 // methods for MOPlot
@@ -361,6 +405,47 @@ void Parameters::AddElectronicStateIndexMullikenCIS(int electronicStateIndex){
 bool Parameters::RequiresMullikenCIS() const{
    return (this->electronicStateIndecesMullikenCIS!=NULL && 
            0<this->electronicStateIndecesMullikenCIS->size());
+}
+
+bool Parameters::RequiresSumChargesCIS() const{
+   return (this->sumChargesIndexPairsCIS!=NULL && 
+           0<this->sumChargesIndexPairsCIS->size());
+}
+
+const vector<AtomIndexPair>* Parameters::GetSumChargesIndexPairsCIS() const{
+#ifdef MOLDS_DBG
+   if(this->sumChargesIndexPairsCIS==NULL) throw MolDSException(this->errorMessageGetSumChargesIndexPairsCISNull);
+#endif
+   return this->sumChargesIndexPairsCIS;
+}
+
+void Parameters::AddSumChargesIndexPairsCIS(int firstAtomIndex, int lastAtomIndex){
+   if(this->sumChargesIndexPairsCIS==NULL){
+      this->sumChargesIndexPairsCIS = new vector<AtomIndexPair>;
+   }
+   AtomIndexPair atomIndexPair = {firstAtomIndex, lastAtomIndex};
+   this->sumChargesIndexPairsCIS->push_back(atomIndexPair);
+}
+
+// methods for Optimization
+bool Parameters::RequiresSpaceFixedAtomsOptimization() const{
+   return (this->spaceFixedAtomsIndexPairsOptimization!=NULL && 
+           0<this->spaceFixedAtomsIndexPairsOptimization->size());
+}
+
+const vector<AtomIndexPair>* Parameters::GetSpaceFixedAtomIndexPairsOptimization() const{
+#ifdef MOLDS_DBG
+   if(this->spaceFixedAtomsIndexPairsOptimization==NULL) throw MolDSException(this->errorMessageGetSpaceFixedAtomIndexPairsOptimizationNull);
+#endif
+   return this->spaceFixedAtomsIndexPairsOptimization;
+}
+
+void Parameters::AddSpaceFixedAtomsIndexPairOptimization(int firstAtomIndex, int lastAtomIndex){
+   if(this->spaceFixedAtomsIndexPairsOptimization==NULL){
+      this->spaceFixedAtomsIndexPairsOptimization = new vector<AtomIndexPair>;
+   }
+   AtomIndexPair atomIndexPair = {firstAtomIndex, lastAtomIndex};
+   this->spaceFixedAtomsIndexPairsOptimization->push_back(atomIndexPair);
 }
 
 }

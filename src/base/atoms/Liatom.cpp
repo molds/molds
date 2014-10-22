@@ -1,5 +1,5 @@
 //************************************************************************//
-// Copyright (C) 2011-2012 Mikiya Fujii                                   // 
+// Copyright (C) 2011-2014 Mikiya Fujii                                   // 
 //                                                                        // 
 // This file is part of MolDS.                                            // 
 //                                                                        // 
@@ -43,12 +43,14 @@ Liatom::Liatom(int index) : Atom(index){
    this->SetAtomicParameters();
 }
 
+Liatom::~Liatom(){}
+
 void Liatom::SetAtomicParameters(){
    this->atomType = Li;
    this->atomicMass = 6.941*Parameters::GetInstance()->GetGMolin2AU();
    this->coreCharge = 1.0;
    this->numberValenceElectrons = 1;
-   this->valenceShellType = l;
+   this->valenceShellType = lShell;
    this->valence.push_back(s);
    this->valence.push_back(py);
    this->valence.push_back(pz);

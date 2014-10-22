@@ -1,7 +1,7 @@
 //************************************************************************//
-// Copyright (C) 2011-2012 Mikiya Fujii                                   // 
-// Copyright (C) 2012-2012 Katsuhiko Nishimra                             // 
-// Copyright (C) 2013-2013 Michihiro Okuyama                              // 
+// Copyright (C) 2011-2014 Mikiya Fujii                                   // 
+// Copyright (C) 2012-2014 Katsuhiko Nishimra                             // 
+// Copyright (C) 2013-2014 Michihiro Okuyama                              // 
 //                                                                        // 
 // This file is part of MolDS.                                            // 
 //                                                                        // 
@@ -182,15 +182,18 @@ CAPABILITIES:
       i.e., MD(gs) and MD(es) mean Born-Oppenheimer Molecular Dynamics on ground and excited states, respectively. 
 
    -Elements
-    CNDO2    | H, Li, C, N, O, and S
-    INDO     | H, Li, C, N, and O
-    ZINDO/S  | H, C, N, O, and S
-    MNDO     | H, C, N, O, and S 
-    AM1      | H, C, N, O, and S 
-    AM1-D    | H, C, N, O, and S 
-    PM3      | H, C, N, O, and S 
-    PM3-D    | H, C, N, O, and S 
-    PM3/PDDG | H, C, N, O, and S 
+    CNDO2    | H, Li, C, N, O, F, S, Cl
+    INDO     | H, Li, C, N, O, F, 
+    ZINDO/S  | H,     C, N, O, F, S, Cl
+    MNDO     | H,     C, N, O, F, S, Cl, Zn
+    AM1      | H,     C, N, O, F, S, Cl, Zn
+    AM1-D    | H,     C, N, O, F, S, Cl       *
+    PM3      | H,     C, N, O, F, S, Cl, Zn
+    PM3-D    | H,     C, N, O, F, S, Cl       *
+    PM3/PDDG | H,     C, N, O,    S 
+
+    * For fluorine(F) and chlorine(Cl), semiempirical parameters used in SCF of AM1-D and PM3-D are same with 
+      the original semiempirical parameters used in SCF of AM1 and PM3, respectively.
 
    -Parallelization
     Open MP parallelization: everywhere in MolDS
@@ -228,9 +231,9 @@ HOW TO WRITE INPUT:
       -options
        Write below options in SCF-directive.
        "max_iter", "rms_density", "damping_thresh", "damping_weight", 
-       "diis_num_error_vect", "diis_start_error", "diis_end_error",
-       "vdW", "vdW_s6", and "vdW_d" are prepared as options.
-       SCF module outputs also the dipole moment arrond the center of cores of the molecule.
+       "diis_num_error_vect", "diis_start_error", "diis_end_error", "sum_charges"
+       "vdW", "vdW_s6", "vdW_d", "mpi" are prepared as options.
+       SCF module outputs also the dipole moment arrond the center of core's mass
        To calculate the dipole moment, STO-6G [DY_1977] is used.
 
        The default value of the "max_iter" is 100.
@@ -240,11 +243,13 @@ HOW TO WRITE INPUT:
        The default value of the "diis_num_error_vect" is 5.
        The default value of the "diis_start_error" is 0.01.
        The default value of the "diis_end_error" is 10**(-8.0).
+       The default value of the "mpi" is "yes"
 
        "vdW" should be set as "yes" or "no". 
-       When "yes" is set, Grimmes's empirical van der Waals correction([G_2004]) is applied.
+       When "yes" is set, Grimmes's empirical van der Waals correction(D1, [G_2004]) is applied.
        Note that this empirical van der Waals correction is applied to the semiempirical theories 
        of which semiempirical parameters are not modified.
+       This "vdw" option can be used for H, C, N, O, F, S, and Cl.
        If user wants to use PM3-D or AM1-D of which semiempirical parameters are modified to be suite for vdW, 
        set theory-directive as "PM3-D" or "AM1-D". 
        When PM3-D or AM1-D is used, users do not need to set "vdW", "vdW_s6", and "vdW_d".
@@ -261,27 +266,49 @@ HOW TO WRITE INPUT:
        The default value of the "vdW_d" is 23.0.
        For PM3-D and AM1-D, this "vdW_s6" is forced to be set as 23.0.
 
+       "sum_charges" is an option to calculate of summation of atomic charges in the ground state.
+       To use this option, write
+       "sum_charges first_atom_index last_atom_index"
+       in the SCF-directive.
+       The index starts from 0 for atoms written in geometry-directive.
+       The atoms indicated with first_atom_index and last_atom_index are also included in the atoms which charge is summed.
+       Multiple setting of this "sum_charges" option is approvable, of course.
+       If you want to calculate summation, same "sum_charges" option is available in CIS-directive.
+
+       "mpi" is an option to indicate wheter the MPI is used or not in SCF module
+       even if MolDS is carried on multiple processors with command "mpirun(or mpiexec)".
+       This "mpi" should be set as yes or no as. So to use this option, 
+       write "mpi yes" or "mpi no" in SCF-directive.
+       If "mpi" is set to "no", SCF module does not use the MPI.
+       This option can change the setting of parallelization for SCF module only. Namely, 
+       this option cannot change the setting of parallelization for 1st(2nd) gradients, CIS, etc.
+
        E.g.
          SCF
             max_iter 200
-            rms_density 0.00000001
+            rms_density 1e-8
             damping_thresh 0.1
             damping_weight 0.7
             diis_num_error_vect 6
             diis_start_error 0.01
-            diis_end_error 0.00000001
+            diis_end_error 1e-8
+            sum_charges 0 4
+            sum_charges 3 7
             vdW yes
             vdW_s6 0.75
             vdW_d 30
+            mpi no
          SCF_END
 
    <GEOMETRY>
-      To set geometry of the system calculated by MolDS should be written in geometry-directive.
+      To set geometry(configuration) of a system calculated by MolDS, 
+      the configuration should be written in geometry-directive.
       Each line inside the geometry-directive indicates each atom of the system.  
       Namely, each line should containe one character and three doubles.
       The character indicates atomtype and three doubles indicate the cartesian coordinates of
       each atom in angstrom unit.
 
+       E.g.
          GEOMETRY
             C -0.1000 0.1000 0.0000
             C 1.6938 0.0000 -0.1000
@@ -415,7 +442,7 @@ HOW TO WRITE INPUT:
       -options
        "davidson", "active_occ", "active_vir", "max_iter", "max_dim", "norm_tol", 
        "nstates", "exciton_energies", "all_transition_dipole_moments", 
-       "mulliken", "unpaired_electron_population", and "num_print_coefficients" are prepared as options.
+       "mulliken", "unpaired_electron_population", "sum_charges", and "num_print_coefficients" are prepared as options.
 
        "davidson" should be set as "yes" or "no". 
        The default value of the "davidson" is "yes".
@@ -454,19 +481,28 @@ HOW TO WRITE INPUT:
        If user set this "all_transition_dipole" as "yes", all transition dipole moments 
        including between excited states would be calculated. 
        Otherwise "no", transition dipole moments from ground state to each excited state are calculated.
+       The center of the transition dipole moments is same with 
+       the center of the dipole moment of the ground state. 
+       The dipole moments and transition dipole moments are calculated 
+       with GTO expansion of STO orbiltals(ST0-6G in [S_1970] is used).
+       Besides, oscillator strength is also shown with each transition dipole moment.
 
-       "mulliken" is a option of mulliken popultaion analysis of the excited state.
+       "mulliken" is an option of mulliken popultaion analysis of the excited state.
        When "mulliken x" is included in CIS-directive, the mulliken popultaion of xth excited state is calculated.
        Multiple indication of these mulliken options is possible. 
        Note that "mulliken 0" is ignored because 0th excited state is the ground state.
        Default setting of this "mulliken" option is nothing.
 
-       "unpaired_electron_population" is a option of unpaired electron population(UEP) analysis of the excited state.
+       "unpaired_electron_population" is an option of unpaired electron population(UEP) analysis of the excited state.
        When "unpaired electron population yes" and "mulliken x" are included in CIS-directive, 
        the UEP of xth excited state is calculated.
        By multiple indication of these mulliken option, the UEP on multiple excited states are possible.
        Note that the UEP on ground state is ignored. 
        Default setting is "unpaired_electron_population" option is nothing.
+
+       "sum_charges" is an option to calculate of summation of the mulliken charges and unpaired electron population
+       in each excited state which indicated with "mulliken" option.
+       How to set this option is same way with the ground state.
 
        "num_print_coefficients" is a number of the coefficients of CIS-eigenvector shown in output.
        The default value of the "num_print_coefficients" is 1.
@@ -483,6 +519,8 @@ HOW TO WRITE INPUT:
             mulliken 1 
             mulliken 2
 	         unpaired_electron_population yes
+            sum_charges 0 4
+            sum_charges 3 7
          CIS_END
 
    <Hole Plot>
@@ -569,7 +607,7 @@ HOW TO WRITE INPUT:
   
       -options
        "method", "total_steps", "electronic_state", "max_gradient", "rms_gradient", 
-        "dt", "initial_trust_radius" and "max_norm_step" are prepared as options.
+        "dt", "initial_trust_radius", "max_norm_step", and "space_fixed_atoms" are prepared as options.
 
        "method" should be set as "conjugate_gradient", "steepest_descent", "bfgs" or "gediis". 
        The default of the "method" is conjugate gradient.
@@ -603,6 +641,18 @@ HOW TO WRITE INPUT:
       The default value of the "max_norm_step" is 0.3.
       This parameter have no effect if method is "steepest_descent" or "conjugate_gradient".
 
+      "space_fixed_atom" or "space_fixed_atoms" mean specification of 
+      fixed atom or atoms in space during optimization.
+      The implementation to fix the atom or atoms is ignoreing force of specified atoms.
+      To use this option, write
+      "space_fixed_atom atom_index"
+      or
+      "space_fixed_atoms first_atom_index last_atom_index"
+      in the OPTIMIZATION-directive.
+      Note that the index starts from 0 for atoms written in geometry-directive.
+      The atoms indicated with first_atom_index and last_atom_index are also included in the atoms fixed to space.
+      Multiple setting of this "space_fixed_atom" or "space_fixed_atoms" option is approvable, of course.
+
       E.g.
          OPTIMIZATION
             method steepest_descent
@@ -611,6 +661,9 @@ HOW TO WRITE INPUT:
             max_gradient 0.00045
             rms_gradient 0.00030
             dt 50
+            space_fixed_atoms 2 4 // 2nd 3rd 4th atoms are fixed. Note that first atom is indexed with 0.
+            space_fixed_atoms 5 5 // Only 5th atom is fixed.      Note that first atom is indexed with 0.
+            space_fixed_atom  6   // Only 6th atom is fixed.      Note that first atom is indexed with 0.
          OPTIMIZATION_END
 
    <MD (Molecular dynamics)>

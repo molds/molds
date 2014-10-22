@@ -1,28 +1,29 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2013/2/12(Thu.) 4:55:32  <<<<<
+     >>>>>  Welcome to the MolDS world at 2014/7/16(Wed.) 11:43:32  <<<<<
 
 
 **********  START: Parse input  **********
-	Total number of atoms: 8
-	Total number of valence AOs: 14
-	Total number of valence electrons: 14
+	System conditions:
+		Total number of atoms: 8
+		Total number of valence AOs: 14
+		Total number of valence electrons: 14
 
-				| i-th | atom type |   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
-	Atom coordinates:	0	C	0.000000e+00	3.779452e-02	0.000000e+00		0.000000e+00	2.000000e-02	0.000000e+00
-	Atom coordinates:	1	C	2.822873e+00	-2.834589e-02	3.779452e-03		1.493800e+00	-1.500000e-02	2.000000e-03
-	Atom coordinates:	2	H	-6.614042e-01	1.967394e+00	1.889726e-03		-3.500000e-01	1.041100e+00	1.000000e-03
-	Atom coordinates:	3	H	-6.956082e-01	-9.836025e-01	-1.738548e+00		-3.681000e-01	-5.205000e-01	-9.200000e-01
-	Atom coordinates:	4	H	-6.991987e-01	-9.841694e-01	1.703777e+00		-3.700000e-01	-5.208000e-01	9.016000e-01
-	Atom coordinates:	5	H	3.499584e+00	9.826576e-01	-1.702076e+00		1.851900e+00	5.200000e-01	-9.007000e-01
-	Atom coordinates:	6	H	3.458199e+00	9.902165e-01	1.719651e+00		1.830000e+00	5.240000e-01	9.100000e-01
-	Atom coordinates:	7	H	3.514891e+00	-1.965504e+00	0.000000e+00		1.860000e+00	-1.040100e+00	0.000000e+00
+					| i-th | atom type |   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
+		Atom coordinates:	0	C	0.000000e+00	3.779452e-02	0.000000e+00		0.000000e+00	2.000000e-02	0.000000e+00
+		Atom coordinates:	1	C	2.822873e+00	-2.834589e-02	3.779452e-03		1.493800e+00	-1.500000e-02	2.000000e-03
+		Atom coordinates:	2	H	-6.614042e-01	1.967394e+00	1.889726e-03		-3.500000e-01	1.041100e+00	1.000000e-03
+		Atom coordinates:	3	H	-6.956082e-01	-9.836025e-01	-1.738548e+00		-3.681000e-01	-5.205000e-01	-9.200000e-01
+		Atom coordinates:	4	H	-6.991987e-01	-9.841694e-01	1.703777e+00		-3.700000e-01	-5.208000e-01	9.016000e-01
+		Atom coordinates:	5	H	3.499584e+00	9.826576e-01	-1.702076e+00		1.851900e+00	5.200000e-01	-9.007000e-01
+		Atom coordinates:	6	H	3.458199e+00	9.902165e-01	1.719651e+00		1.830000e+00	5.240000e-01	9.100000e-01
+		Atom coordinates:	7	H	3.514891e+00	-1.965504e+00	0.000000e+00		1.860000e+00	-1.040100e+00	0.000000e+00
 
-			|   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
-	Center of Mass:	1.409688e+00	4.008514e-03	9.965583e-04		7.459748e-01	2.121214e-03	5.273559e-04
+				|   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
+		Center of Mass:	1.409688e+00	4.008514e-03	9.965583e-04		7.459748e-01	2.121214e-03	5.273559e-04
 
-			|   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
-	Center of Core:	1.409689e+00	4.008721e-03	9.968163e-04		7.459751e-01	2.121324e-03	5.274925e-04
+				|   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
+		Center of Core:	1.409689e+00	4.008721e-03	9.968163e-04		7.459751e-01	2.121324e-03	5.274925e-04
 
 	SCF conditions:
 		Max iterations: 50
@@ -33,6 +34,7 @@
 		DIIS starting error: 1.000000e-01
 		DIIS ending error: 2.000000e-08
 		van der Waals (vdW) correction: no
+		MPI in SCF: no
 
 	Memory conditions:
 		Heap limit: 2.560000e+02[MB]
@@ -137,13 +139,13 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 	Mulliken charge(SCF):	0	6	H	1.000000e+00	8.796538e-02
 	Mulliken charge(SCF):	0	7	H	1.000000e+00	9.335306e-02
 
-	Elapsed time(omp) for the SCF = 0.050971[s].
+	Elapsed time(omp) for the SCF = 0.003976[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.074585[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.006619[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -221,11 +223,11 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 	======  DONE: Davidson-CIS  =====
 
 
-				|   i-th   |   e[a.u.]   |   e[eV]   | dominant eigenvector coefficients (occ. -> vir.) |
-	Excitation energies:	1	2.784048e-01	7.575841e+00	-6.052166e-01 (6 -> 9)	
-	Excitation energies:	2	2.786854e-01	7.583475e+00	7.961128e-01 (6 -> 7)	
-	Excitation energies:	3	2.840534e-01	7.729549e+00	8.977023e-01 (5 -> 7)	
-	Excitation energies:	4	2.894151e-01	7.875449e+00	8.658274e-01 (6 -> 8)	
+				|   i-th   |   e[a.u.]   |   e[eV]   |   e[nm]   | dominant eigenvector coefficients (occ. -> vir.) |
+	Excitation energies:	1	2.784048e-01	7.575841e+00	1.636587e+02	-6.052166e-01 (6 -> 9)	
+	Excitation energies:	2	2.786854e-01	7.583475e+00	1.634939e+02	7.961128e-01 (6 -> 7)	
+	Excitation energies:	3	2.840534e-01	7.729549e+00	1.604042e+02	8.977023e-01 (5 -> 7)	
+	Excitation energies:	4	2.894151e-01	7.875449e+00	1.574326e+02	8.658274e-01 (6 -> 8)	
 
 				| i-th eigenstate |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
 	Total dipole moment:	0	-4.146491e-02	-3.786438e-02	-9.690314e-03	5.698204e-02		-1.053933e-01	-9.624168e-02	-2.463033e-02	1.448339e-01
@@ -241,14 +243,14 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 	Electronic dipole moment:	3	-8.807123e-02	-1.435657e-02	-7.026251e-03	8.950990e-02		-2.238548e-01	-3.649076e-02	-1.785895e-02	2.275115e-01
 	Electronic dipole moment:	4	6.930020e-02	-4.395029e-02	-1.786682e-02	8.398434e-02		1.761436e-01	-1.117105e-01	-4.541293e-02	2.134669e-01
 
-					| from and to eigenstates |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
-	Transition dipole moment:	0 -> 1		1.592238e-01	3.050807e-01	6.733018e-01	7.561493e-01		4.047066e-01	7.754379e-01	1.711363e+00	1.921940e+00
-	Transition dipole moment:	0 -> 2		1.968330e-02	7.334975e-02	1.098300e+00	1.100923e+00		5.002996e-02	1.864365e-01	2.791602e+00	2.798268e+00
-	Transition dipole moment:	0 -> 3		1.730502e-01	1.275400e+00	-2.317130e-01	1.307778e+00		4.398498e-01	3.241745e+00	-5.889559e-01	3.324041e+00
-	Transition dipole moment:	0 -> 4		9.387913e-03	3.209049e-02	1.259508e-01	1.303132e-01		2.386170e-02	8.156591e-02	3.201349e-01	3.312231e-01
+					| from and to eigenstates |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |  oscillator strength[a.u.]  |
+	Transition dipole moment:	0 -> 1		1.592238e-01	3.050807e-01	6.733018e-01	7.561493e-01		4.047066e-01	7.754379e-01	1.711363e+00	1.921940e+00	1.061208e-01
+	Transition dipole moment:	0 -> 2		1.968330e-02	7.334975e-02	1.098300e+00	1.100923e+00		5.002996e-02	1.864365e-01	2.791602e+00	2.798268e+00	2.251836e-01
+	Transition dipole moment:	0 -> 3		1.730502e-01	1.275400e+00	-2.317130e-01	1.307778e+00		4.398498e-01	3.241745e+00	-5.889559e-01	3.324041e+00	3.238745e-01
+	Transition dipole moment:	0 -> 4		9.387913e-03	3.209049e-02	1.259508e-01	1.303132e-01		2.386170e-02	8.156591e-02	3.201349e-01	3.312231e-01	3.276473e-03
 
 
-	Elapsed time(omp) for the CIS = 0.287687[s].
+	Elapsed time(omp) for the CIS = 0.035627[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
@@ -314,13 +316,13 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 	Mulliken charge(SCF):	0	6	H	1.000000e+00	8.975585e-02
 	Mulliken charge(SCF):	0	7	H	1.000000e+00	9.209450e-02
 
-	Elapsed time(omp) for the SCF = 0.057931[s].
+	Elapsed time(omp) for the SCF = 0.004008[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.064119[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.007094[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -392,11 +394,11 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 	======  DONE: Davidson-CIS  =====
 
 
-				|   i-th   |   e[a.u.]   |   e[eV]   | dominant eigenvector coefficients (occ. -> vir.) |
-	Excitation energies:	1	2.777865e-01	7.559017e+00	-6.164769e-01 (6 -> 9)	
-	Excitation energies:	2	2.792249e-01	7.598156e+00	8.903907e-01 (6 -> 7)	
-	Excitation energies:	3	2.825126e-01	7.687622e+00	8.884748e-01 (5 -> 7)	
-	Excitation energies:	4	2.906636e-01	7.909423e+00	8.425806e-01 (6 -> 8)	
+				|   i-th   |   e[a.u.]   |   e[eV]   |   e[nm]   | dominant eigenvector coefficients (occ. -> vir.) |
+	Excitation energies:	1	2.777865e-01	7.559017e+00	1.640229e+02	-6.164769e-01 (6 -> 9)	
+	Excitation energies:	2	2.792249e-01	7.598156e+00	1.631780e+02	8.903907e-01 (6 -> 7)	
+	Excitation energies:	3	2.825126e-01	7.687622e+00	1.612790e+02	8.884748e-01 (5 -> 7)	
+	Excitation energies:	4	2.906636e-01	7.909423e+00	1.567563e+02	8.425806e-01 (6 -> 8)	
 
 				| i-th eigenstate |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
 	Total dipole moment:	0	-2.919233e-02	-3.833149e-02	-3.166028e-02	5.765300e-02		-7.419951e-02	-9.742894e-02	-8.047242e-02	1.465393e-01
@@ -412,14 +414,14 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 	Electronic dipole moment:	3	-4.232034e-02	-2.991849e-02	7.777856e-03	5.240823e-02		-1.075676e-01	-7.604523e-02	1.976934e-02	1.332085e-01
 	Electronic dipole moment:	4	1.529337e-01	-5.088238e-02	-3.464270e-02	1.648571e-01		3.887188e-01	-1.293301e-01	-8.805299e-02	4.190250e-01
 
-					| from and to eigenstates |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
-	Transition dipole moment:	0 -> 1		-1.730946e-01	-2.568549e-01	-2.758185e-01	4.147433e-01		-4.399628e-01	-6.528601e-01	-7.010607e-01	1.054173e+00
-	Transition dipole moment:	0 -> 2		9.233002e-04	-1.415446e-01	-1.268441e+00	1.276315e+00		2.346795e-03	-3.597705e-01	-3.224057e+00	3.244069e+00
-	Transition dipole moment:	0 -> 3		8.253589e-02	1.278429e+00	-2.114541e-01	1.298425e+00		2.097854e-01	3.249444e+00	-5.374628e-01	3.300267e+00
-	Transition dipole moment:	0 -> 4		1.122289e-03	-1.093359e-01	-1.462527e-01	1.826074e-01		2.852575e-03	-2.779042e-01	-3.717374e-01	4.641418e-01
+					| from and to eigenstates |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |  oscillator strength[a.u.]  |
+	Transition dipole moment:	0 -> 1		-1.730946e-01	-2.568549e-01	-2.758185e-01	4.147433e-01		-4.399628e-01	-6.528601e-01	-7.010607e-01	1.054173e+00	3.185508e-02
+	Transition dipole moment:	0 -> 2		9.233002e-04	-1.415446e-01	-1.268441e+00	1.276315e+00		2.346795e-03	-3.597705e-01	-3.224057e+00	3.244069e+00	3.032344e-01
+	Transition dipole moment:	0 -> 3		8.253589e-02	1.278429e+00	-2.114541e-01	1.298425e+00		2.097854e-01	3.249444e+00	-5.374628e-01	3.300267e+00	3.175265e-01
+	Transition dipole moment:	0 -> 4		1.122289e-03	-1.093359e-01	-1.462527e-01	1.826074e-01		2.852575e-03	-2.779042e-01	-3.717374e-01	4.641418e-01	6.461541e-03
 
 
-	Elapsed time(omp) for the CIS = 0.226962[s].
+	Elapsed time(omp) for the CIS = 0.030082[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
@@ -484,13 +486,13 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 	Mulliken charge(SCF):	0	6	H	1.000000e+00	8.763985e-02
 	Mulliken charge(SCF):	0	7	H	1.000000e+00	9.254781e-02
 
-	Elapsed time(omp) for the SCF = 0.065866[s].
+	Elapsed time(omp) for the SCF = 0.003801[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.057018[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.006772[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -568,11 +570,11 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 	======  DONE: Davidson-CIS  =====
 
 
-				|   i-th   |   e[a.u.]   |   e[eV]   | dominant eigenvector coefficients (occ. -> vir.) |
-	Excitation energies:	1	2.779770e-01	7.564199e+00	6.419120e-01 (6 -> 9)	
-	Excitation energies:	2	2.786179e-01	7.581641e+00	8.820037e-01 (6 -> 7)	
-	Excitation energies:	3	2.832583e-01	7.707912e+00	8.987327e-01 (5 -> 7)	
-	Excitation energies:	4	2.893216e-01	7.872906e+00	8.724954e-01 (6 -> 8)	
+				|   i-th   |   e[a.u.]   |   e[eV]   |   e[nm]   | dominant eigenvector coefficients (occ. -> vir.) |
+	Excitation energies:	1	2.779770e-01	7.564199e+00	1.639106e+02	6.419120e-01 (6 -> 9)	
+	Excitation energies:	2	2.786179e-01	7.581641e+00	1.635335e+02	8.820037e-01 (6 -> 7)	
+	Excitation energies:	3	2.832583e-01	7.707912e+00	1.608545e+02	8.987327e-01 (5 -> 7)	
+	Excitation energies:	4	2.893216e-01	7.872906e+00	1.574834e+02	8.724954e-01 (6 -> 8)	
 
 				| i-th eigenstate |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
 	Total dipole moment:	0	5.489089e-03	-1.377223e-02	-1.816963e-02	2.345080e-02		1.395188e-02	-3.500553e-02	-4.618261e-02	5.960600e-02
@@ -588,14 +590,14 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 	Electronic dipole moment:	3	-2.204202e-02	-4.567533e-03	-2.185533e-02	3.137465e-02		-5.602525e-02	-1.160951e-02	-5.555073e-02	7.974643e-02
 	Electronic dipole moment:	4	1.989272e-02	-1.545524e-02	-3.752027e-02	4.519243e-02		5.056227e-02	-3.928330e-02	-9.536703e-02	1.148677e-01
 
-					| from and to eigenstates |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
-	Transition dipole moment:	0 -> 1		-1.723508e-01	-2.820369e-01	-3.623511e-01	4.904568e-01		-4.380721e-01	-7.168664e-01	-9.210047e-01	1.246617e+00
-	Transition dipole moment:	0 -> 2		1.335578e-02	8.341189e-02	1.259226e+00	1.262056e+00		3.394702e-02	2.120119e-01	3.200634e+00	3.207828e+00
-	Transition dipole moment:	0 -> 3		1.521686e-01	1.280612e+00	-1.607352e-01	1.299600e+00		3.867740e-01	3.254993e+00	-4.085481e-01	3.303254e+00
-	Transition dipole moment:	0 -> 4		-1.850367e-03	1.975637e-02	3.444704e-02	3.975345e-02		-4.703164e-03	5.021571e-02	8.755566e-02	1.010432e-01
+					| from and to eigenstates |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |  oscillator strength[a.u.]  |
+	Transition dipole moment:	0 -> 1		-1.723508e-01	-2.820369e-01	-3.623511e-01	4.904568e-01		-4.380721e-01	-7.168664e-01	-9.210047e-01	1.246617e+00	4.457785e-02
+	Transition dipole moment:	0 -> 2		1.335578e-02	8.341189e-02	1.259226e+00	1.262056e+00		3.394702e-02	2.120119e-01	3.200634e+00	3.207828e+00	2.958525e-01
+	Transition dipole moment:	0 -> 3		1.521686e-01	1.280612e+00	-1.607352e-01	1.299600e+00		3.867740e-01	3.254993e+00	-4.085481e-01	3.303254e+00	3.189411e-01
+	Transition dipole moment:	0 -> 4		-1.850367e-03	1.975637e-02	3.444704e-02	3.975345e-02		-4.703164e-03	5.021571e-02	8.755566e-02	1.010432e-01	3.048171e-04
 
 
-	Elapsed time(omp) for the CIS = 0.233437[s].
+	Elapsed time(omp) for the CIS = 0.038390[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
@@ -674,13 +676,13 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 	Mulliken charge(SCF):	0	6	H	1.000000e+00	8.796469e-02
 	Mulliken charge(SCF):	0	7	H	1.000000e+00	9.335261e-02
 
-	Elapsed time(omp) for the SCF = 0.034306[s].
+	Elapsed time(omp) for the SCF = 0.003984[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.057696[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.006627[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -747,7 +749,7 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 	Davidson iter=10
 	  1-th excited: norm of the residual = 1.074695e-07
 	  2-th excited: norm of the residual = 6.304564e-08
-	  3-th excited: norm of the residual = 1.593222e-08
+	  3-th excited: norm of the residual = 1.593221e-08
 	  4-th excited: norm of the residual = 1.306444e-07
 
 
@@ -758,11 +760,11 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 	======  DONE: Davidson-CIS  =====
 
 
-				|   i-th   |   e[a.u.]   |   e[eV]   | dominant eigenvector coefficients (occ. -> vir.) |
-	Excitation energies:	1	2.784036e-01	7.575809e+00	-6.049866e-01 (6 -> 9)	
-	Excitation energies:	2	2.786847e-01	7.583458e+00	7.956469e-01 (6 -> 7)	
-	Excitation energies:	3	2.840524e-01	7.729521e+00	8.977067e-01 (5 -> 7)	
-	Excitation energies:	4	2.894145e-01	7.875432e+00	8.658260e-01 (6 -> 8)	
+				|   i-th   |   e[a.u.]   |   e[eV]   |   e[nm]   | dominant eigenvector coefficients (occ. -> vir.) |
+	Excitation energies:	1	2.784036e-01	7.575809e+00	1.636594e+02	-6.049866e-01 (6 -> 9)	
+	Excitation energies:	2	2.786847e-01	7.583458e+00	1.634943e+02	7.956469e-01 (6 -> 7)	
+	Excitation energies:	3	2.840524e-01	7.729521e+00	1.604048e+02	8.977067e-01 (5 -> 7)	
+	Excitation energies:	4	2.894145e-01	7.875432e+00	1.574329e+02	8.658260e-01 (6 -> 8)	
 
 				| i-th eigenstate |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
 	Total dipole moment:	0	-4.145596e-02	-3.785323e-02	-9.692350e-03	5.696846e-02		-1.053706e-01	-9.621333e-02	-2.463550e-02	1.447994e-01
@@ -778,14 +780,14 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 	Electronic dipole moment:	3	-8.805383e-02	-1.435155e-02	-7.025333e-03	8.949190e-02		-2.238106e-01	-3.647801e-02	-1.785662e-02	2.274658e-01
 	Electronic dipole moment:	4	6.930236e-02	-4.394324e-02	-1.787096e-02	8.398331e-02		1.761491e-01	-1.116926e-01	-4.542346e-02	2.134643e-01
 
-					| from and to eigenstates |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
-	Transition dipole moment:	0 -> 1		1.592804e-01	3.051511e-01	6.744291e-01	7.571935e-01		4.048506e-01	7.756168e-01	1.714228e+00	1.924594e+00
-	Transition dipole moment:	0 -> 2		1.949267e-02	7.313010e-02	1.097596e+00	1.100202e+00		4.954544e-02	1.858782e-01	2.789811e+00	2.796436e+00
-	Transition dipole moment:	0 -> 3		1.730053e-01	1.275410e+00	-2.317809e-01	1.307794e+00		4.397357e-01	3.241770e+00	-5.891284e-01	3.324081e+00
-	Transition dipole moment:	0 -> 4		9.384489e-03	3.209791e-02	1.259394e-01	1.303038e-01		2.385300e-02	8.158477e-02	3.201060e-01	3.311992e-01
+					| from and to eigenstates |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |  oscillator strength[a.u.]  |
+	Transition dipole moment:	0 -> 1		1.592804e-01	3.051511e-01	6.744291e-01	7.571935e-01		4.048506e-01	7.756168e-01	1.714228e+00	1.924594e+00	1.064137e-01
+	Transition dipole moment:	0 -> 2		1.949267e-02	7.313010e-02	1.097596e+00	1.100202e+00		4.954544e-02	1.858782e-01	2.789811e+00	2.796436e+00	2.248883e-01
+	Transition dipole moment:	0 -> 3		1.730053e-01	1.275410e+00	-2.317809e-01	1.307794e+00		4.397357e-01	3.241770e+00	-5.891284e-01	3.324081e+00	3.238812e-01
+	Transition dipole moment:	0 -> 4		9.384489e-03	3.209791e-02	1.259394e-01	1.303038e-01		2.385300e-02	8.158477e-02	3.201060e-01	3.311992e-01	3.275993e-03
 
 
-	Elapsed time(omp) for the CIS = 0.225000[s].
+	Elapsed time(omp) for the CIS = 0.035664[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
@@ -851,13 +853,13 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 	Mulliken charge(SCF):	0	6	H	1.000000e+00	8.975537e-02
 	Mulliken charge(SCF):	0	7	H	1.000000e+00	9.209396e-02
 
-	Elapsed time(omp) for the SCF = 0.034963[s].
+	Elapsed time(omp) for the SCF = 0.003940[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.043172[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.006796[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -929,11 +931,11 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 	======  DONE: Davidson-CIS  =====
 
 
-				|   i-th   |   e[a.u.]   |   e[eV]   | dominant eigenvector coefficients (occ. -> vir.) |
-	Excitation energies:	1	2.777858e-01	7.558996e+00	-6.164759e-01 (6 -> 9)	
-	Excitation energies:	2	2.792241e-01	7.598134e+00	8.903656e-01 (6 -> 7)	
-	Excitation energies:	3	2.825116e-01	7.687593e+00	8.884821e-01 (5 -> 7)	
-	Excitation energies:	4	2.906630e-01	7.909406e+00	8.425856e-01 (6 -> 8)	
+				|   i-th   |   e[a.u.]   |   e[eV]   |   e[nm]   | dominant eigenvector coefficients (occ. -> vir.) |
+	Excitation energies:	1	2.777858e-01	7.558996e+00	1.640234e+02	-6.164759e-01 (6 -> 9)	
+	Excitation energies:	2	2.792241e-01	7.598134e+00	1.631785e+02	8.903656e-01 (6 -> 7)	
+	Excitation energies:	3	2.825116e-01	7.687593e+00	1.612796e+02	8.884821e-01 (5 -> 7)	
+	Excitation energies:	4	2.906630e-01	7.909406e+00	1.567567e+02	8.425856e-01 (6 -> 8)	
 
 				| i-th eigenstate |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
 	Total dipole moment:	0	-2.918059e-02	-3.832191e-02	-3.165191e-02	5.763609e-02		-7.416968e-02	-9.740460e-02	-8.045115e-02	1.464964e-01
@@ -949,14 +951,14 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 	Electronic dipole moment:	3	-4.230771e-02	-2.991317e-02	7.785199e-03	5.239608e-02		-1.075355e-01	-7.603170e-02	1.978801e-02	1.331776e-01
 	Electronic dipole moment:	4	1.529284e-01	-5.087706e-02	-3.463282e-02	1.648484e-01		3.887052e-01	-1.293166e-01	-8.802787e-02	4.190029e-01
 
-					| from and to eigenstates |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
-	Transition dipole moment:	0 -> 1		-1.731313e-01	-2.568473e-01	-2.759653e-01	4.148515e-01		-4.400559e-01	-6.528408e-01	-7.014339e-01	1.054448e+00
-	Transition dipole moment:	0 -> 2		9.507768e-04	-1.415992e-01	-1.268401e+00	1.276281e+00		2.416634e-03	-3.599093e-01	-3.223955e+00	3.243983e+00
-	Transition dipole moment:	0 -> 3		8.251437e-02	1.278434e+00	-2.115248e-01	1.298440e+00		2.097306e-01	3.249456e+00	-5.376426e-01	3.300305e+00
-	Transition dipole moment:	0 -> 4		1.118843e-03	-1.093312e-01	-1.462370e-01	1.825920e-01		2.843815e-03	-2.778922e-01	-3.716975e-01	4.641026e-01
+					| from and to eigenstates |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |  oscillator strength[a.u.]  |
+	Transition dipole moment:	0 -> 1		-1.731313e-01	-2.568473e-01	-2.759653e-01	4.148515e-01		-4.400559e-01	-6.528408e-01	-7.014339e-01	1.054448e+00	3.187162e-02
+	Transition dipole moment:	0 -> 2		9.507768e-04	-1.415992e-01	-1.268401e+00	1.276281e+00		2.416634e-03	-3.599093e-01	-3.223955e+00	3.243983e+00	3.032174e-01
+	Transition dipole moment:	0 -> 3		8.251437e-02	1.278434e+00	-2.115248e-01	1.298440e+00		2.097306e-01	3.249456e+00	-5.376426e-01	3.300305e+00	3.175328e-01
+	Transition dipole moment:	0 -> 4		1.118843e-03	-1.093312e-01	-1.462370e-01	1.825920e-01		2.843815e-03	-2.778922e-01	-3.716975e-01	4.641026e-01	6.460436e-03
 
 
-	Elapsed time(omp) for the CIS = 0.151567[s].
+	Elapsed time(omp) for the CIS = 0.029638[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
@@ -1021,13 +1023,13 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 	Mulliken charge(SCF):	0	6	H	1.000000e+00	8.763938e-02
 	Mulliken charge(SCF):	0	7	H	1.000000e+00	9.254732e-02
 
-	Elapsed time(omp) for the SCF = 0.029352[s].
+	Elapsed time(omp) for the SCF = 0.003785[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.046622[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.006821[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -1105,11 +1107,11 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 	======  DONE: Davidson-CIS  =====
 
 
-				|   i-th   |   e[a.u.]   |   e[eV]   | dominant eigenvector coefficients (occ. -> vir.) |
-	Excitation energies:	1	2.779762e-01	7.564178e+00	6.418890e-01 (6 -> 9)	
-	Excitation energies:	2	2.786173e-01	7.581624e+00	8.819449e-01 (6 -> 7)	
-	Excitation energies:	3	2.832571e-01	7.707880e+00	8.987384e-01 (5 -> 7)	
-	Excitation energies:	4	2.893214e-01	7.872898e+00	8.724943e-01 (6 -> 8)	
+				|   i-th   |   e[a.u.]   |   e[eV]   |   e[nm]   | dominant eigenvector coefficients (occ. -> vir.) |
+	Excitation energies:	1	2.779762e-01	7.564178e+00	1.639110e+02	6.418890e-01 (6 -> 9)	
+	Excitation energies:	2	2.786173e-01	7.581624e+00	1.635338e+02	8.819449e-01 (6 -> 7)	
+	Excitation energies:	3	2.832571e-01	7.707880e+00	1.608551e+02	8.987384e-01 (5 -> 7)	
+	Excitation energies:	4	2.893214e-01	7.872898e+00	1.574836e+02	8.724943e-01 (6 -> 8)	
 
 				| i-th eigenstate |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
 	Total dipole moment:	0	5.484051e-03	-1.376863e-02	-1.816611e-02	2.344478e-02		1.393907e-02	-3.499637e-02	-4.617366e-02	5.959069e-02
@@ -1125,14 +1127,14 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 	Electronic dipole moment:	3	-2.204534e-02	-4.568526e-03	-2.185129e-02	3.137431e-02		-5.603368e-02	-1.161204e-02	-5.554045e-02	7.974556e-02
 	Electronic dipole moment:	4	1.989689e-02	-1.545156e-02	-3.751232e-02	4.518640e-02		5.057286e-02	-3.927395e-02	-9.534683e-02	1.148524e-01
 
-					| from and to eigenstates |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
-	Transition dipole moment:	0 -> 1		-1.723882e-01	-2.820099e-01	-3.626460e-01	4.906724e-01		-4.381672e-01	-7.167979e-01	-9.217543e-01	1.247165e+00
-	Transition dipole moment:	0 -> 2		1.330325e-02	8.341701e-02	1.259134e+00	1.261964e+00		3.381351e-02	2.120249e-01	3.200400e+00	3.207594e+00
-	Transition dipole moment:	0 -> 3		1.521316e-01	1.280630e+00	-1.607860e-01	1.299619e+00		3.866801e-01	3.255038e+00	-4.086774e-01	3.303303e+00
-	Transition dipole moment:	0 -> 4		-1.850264e-03	1.975135e-02	3.445152e-02	3.975483e-02		-4.702904e-03	5.020293e-02	8.756705e-02	1.010467e-01
+					| from and to eigenstates |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |  oscillator strength[a.u.]  |
+	Transition dipole moment:	0 -> 1		-1.723882e-01	-2.820099e-01	-3.626460e-01	4.906724e-01		-4.381672e-01	-7.167979e-01	-9.217543e-01	1.247165e+00	4.461692e-02
+	Transition dipole moment:	0 -> 2		1.330325e-02	8.341701e-02	1.259134e+00	1.261964e+00		3.381351e-02	2.120249e-01	3.200400e+00	3.207594e+00	2.958087e-01
+	Transition dipole moment:	0 -> 3		1.521316e-01	1.280630e+00	-1.607860e-01	1.299619e+00		3.866801e-01	3.255038e+00	-4.086774e-01	3.303303e+00	3.189493e-01
+	Transition dipole moment:	0 -> 4		-1.850264e-03	1.975135e-02	3.445152e-02	3.975483e-02		-4.702904e-03	5.020293e-02	8.756705e-02	1.010467e-01	3.048380e-04
 
 
-	Elapsed time(omp) for the CIS = 0.182326[s].
+	Elapsed time(omp) for the CIS = 0.035653[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
@@ -1143,7 +1145,7 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 		Electronic
 		(inc. core rep.)	-3.606213e+01	-9.813082e+02
 		Total            	-3.606196e+01	-9.813036e+02
-		Error            	1.336531e-11	3.636915e-10
+		Error            	1.357137e-11	3.692986e-10
 
 ==========  DONE: RPMD step 1
 
@@ -1210,13 +1212,13 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 	Mulliken charge(SCF):	0	6	H	1.000000e+00	8.796261e-02
 	Mulliken charge(SCF):	0	7	H	1.000000e+00	9.335126e-02
 
-	Elapsed time(omp) for the SCF = 0.084191[s].
+	Elapsed time(omp) for the SCF = 0.003964[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.046172[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.006725[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -1294,11 +1296,11 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 	======  DONE: Davidson-CIS  =====
 
 
-				|   i-th   |   e[a.u.]   |   e[eV]   | dominant eigenvector coefficients (occ. -> vir.) |
-	Excitation energies:	1	2.784002e-01	7.575714e+00	-6.042966e-01 (6 -> 9)	
-	Excitation energies:	2	2.786828e-01	7.583405e+00	7.942513e-01 (6 -> 7)	
-	Excitation energies:	3	2.840493e-01	7.729437e+00	8.977196e-01 (5 -> 7)	
-	Excitation energies:	4	2.894126e-01	7.875381e+00	8.658216e-01 (6 -> 8)	
+				|   i-th   |   e[a.u.]   |   e[eV]   |   e[nm]   | dominant eigenvector coefficients (occ. -> vir.) |
+	Excitation energies:	1	2.784002e-01	7.575714e+00	1.636614e+02	-6.042966e-01 (6 -> 9)	
+	Excitation energies:	2	2.786828e-01	7.583405e+00	1.634954e+02	7.942513e-01 (6 -> 7)	
+	Excitation energies:	3	2.840493e-01	7.729437e+00	1.604065e+02	8.977196e-01 (5 -> 7)	
+	Excitation energies:	4	2.894126e-01	7.875381e+00	1.574339e+02	8.658216e-01 (6 -> 8)	
 
 				| i-th eigenstate |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
 	Total dipole moment:	0	-4.142911e-02	-3.781978e-02	-9.698461e-03	5.692774e-02		-1.053023e-01	-9.612832e-02	-2.465103e-02	1.446959e-01
@@ -1314,14 +1316,14 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 	Electronic dipole moment:	3	-8.800170e-02	-1.433650e-02	-7.022575e-03	8.943797e-02		-2.236780e-01	-3.643975e-02	-1.784961e-02	2.273287e-01
 	Electronic dipole moment:	4	6.930885e-02	-4.392206e-02	-1.788342e-02	8.398024e-02		1.761656e-01	-1.116388e-01	-4.545513e-02	2.134565e-01
 
-					| from and to eigenstates |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
-	Transition dipole moment:	0 -> 1		1.594488e-01	3.053605e-01	6.777891e-01	7.603072e-01		4.052785e-01	7.761490e-01	1.722769e+00	1.932509e+00
-	Transition dipole moment:	0 -> 2		1.892276e-02	7.247573e-02	1.095486e+00	1.098044e+00		4.809686e-02	1.842150e-01	2.784448e+00	2.790949e+00
-	Transition dipole moment:	0 -> 3		1.728707e-01	1.275440e+00	-2.319847e-01	1.307842e+00		4.393935e-01	3.241847e+00	-5.896465e-01	3.324202e+00
-	Transition dipole moment:	0 -> 4		9.374227e-03	3.212016e-02	1.259053e-01	1.302756e-01		2.382691e-02	8.164132e-02	3.200194e-01	3.311276e-01
+					| from and to eigenstates |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |  oscillator strength[a.u.]  |
+	Transition dipole moment:	0 -> 1		1.594488e-01	3.053605e-01	6.777891e-01	7.603072e-01		4.052785e-01	7.761490e-01	1.722769e+00	1.932509e+00	1.072893e-01
+	Transition dipole moment:	0 -> 2		1.892276e-02	7.247573e-02	1.095486e+00	1.098044e+00		4.809686e-02	1.842150e-01	2.784448e+00	2.790949e+00	2.240052e-01
+	Transition dipole moment:	0 -> 3		1.728707e-01	1.275440e+00	-2.319847e-01	1.307842e+00		4.393935e-01	3.241847e+00	-5.896465e-01	3.324202e+00	3.239013e-01
+	Transition dipole moment:	0 -> 4		9.374227e-03	3.212016e-02	1.259053e-01	1.302756e-01		2.382691e-02	8.164132e-02	3.200194e-01	3.311276e-01	3.274555e-03
 
 
-	Elapsed time(omp) for the CIS = 0.259655[s].
+	Elapsed time(omp) for the CIS = 0.035785[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
@@ -1387,13 +1389,13 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 	Mulliken charge(SCF):	0	6	H	1.000000e+00	8.975393e-02
 	Mulliken charge(SCF):	0	7	H	1.000000e+00	9.209235e-02
 
-	Elapsed time(omp) for the SCF = 0.029288[s].
+	Elapsed time(omp) for the SCF = 0.003924[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.057336[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.006719[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -1465,11 +1467,11 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 	======  DONE: Davidson-CIS  =====
 
 
-				|   i-th   |   e[a.u.]   |   e[eV]   | dominant eigenvector coefficients (occ. -> vir.) |
-	Excitation energies:	1	2.777835e-01	7.558933e+00	-6.164728e-01 (6 -> 9)	
-	Excitation energies:	2	2.792216e-01	7.598068e+00	8.902903e-01 (6 -> 7)	
-	Excitation energies:	3	2.825085e-01	7.687509e+00	8.885039e-01 (5 -> 7)	
-	Excitation energies:	4	2.906611e-01	7.909355e+00	8.426006e-01 (6 -> 8)	
+				|   i-th   |   e[a.u.]   |   e[eV]   |   e[nm]   | dominant eigenvector coefficients (occ. -> vir.) |
+	Excitation energies:	1	2.777835e-01	7.558933e+00	1.640247e+02	-6.164728e-01 (6 -> 9)	
+	Excitation energies:	2	2.792216e-01	7.598068e+00	1.631799e+02	8.902903e-01 (6 -> 7)	
+	Excitation energies:	3	2.825085e-01	7.687509e+00	1.612814e+02	8.885039e-01 (5 -> 7)	
+	Excitation energies:	4	2.906611e-01	7.909355e+00	1.567577e+02	8.426006e-01 (6 -> 8)	
 
 				| i-th eigenstate |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
 	Total dipole moment:	0	-2.914539e-02	-3.829319e-02	-3.162681e-02	5.758539e-02		-7.408020e-02	-9.733161e-02	-8.038734e-02	1.463675e-01
@@ -1485,14 +1487,14 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 	Electronic dipole moment:	3	-4.226982e-02	-2.989720e-02	7.807232e-03	5.235965e-02		-1.074392e-01	-7.599111e-02	1.984401e-02	1.330850e-01
 	Electronic dipole moment:	4	1.529123e-01	-5.086106e-02	-3.460317e-02	1.648223e-01		3.886643e-01	-1.292759e-01	-8.795252e-02	4.189366e-01
 
-					| from and to eigenstates |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
-	Transition dipole moment:	0 -> 1		-1.732410e-01	-2.568245e-01	-2.764059e-01	4.151765e-01		-4.403349e-01	-6.527830e-01	-7.025540e-01	1.055274e+00
-	Transition dipole moment:	0 -> 2		1.033283e-03	-1.417631e-01	-1.268280e+00	1.276179e+00		2.626345e-03	-3.603259e-01	-3.223647e+00	3.243723e+00
-	Transition dipole moment:	0 -> 3		8.244984e-02	1.278449e+00	-2.117372e-01	1.298485e+00		2.095666e-01	3.249495e+00	-5.381824e-01	3.300421e+00
-	Transition dipole moment:	0 -> 4		1.108506e-03	-1.093170e-01	-1.461900e-01	1.825457e-01		2.817542e-03	-2.778561e-01	-3.715780e-01	4.639850e-01
+					| from and to eigenstates |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |  oscillator strength[a.u.]  |
+	Transition dipole moment:	0 -> 1		-1.732410e-01	-2.568245e-01	-2.764059e-01	4.151765e-01		-4.403349e-01	-6.527830e-01	-7.025540e-01	1.055274e+00	3.192131e-02
+	Transition dipole moment:	0 -> 2		1.033283e-03	-1.417631e-01	-1.268280e+00	1.276179e+00		2.626345e-03	-3.603259e-01	-3.223647e+00	3.243723e+00	3.031662e-01
+	Transition dipole moment:	0 -> 3		8.244984e-02	1.278449e+00	-2.117372e-01	1.298485e+00		2.095666e-01	3.249495e+00	-5.381824e-01	3.300421e+00	3.175515e-01
+	Transition dipole moment:	0 -> 4		1.108506e-03	-1.093170e-01	-1.461900e-01	1.825457e-01		2.817542e-03	-2.778561e-01	-3.715780e-01	4.639850e-01	6.457122e-03
 
 
-	Elapsed time(omp) for the CIS = 0.209346[s].
+	Elapsed time(omp) for the CIS = 0.029686[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
@@ -1557,13 +1559,13 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 	Mulliken charge(SCF):	0	6	H	1.000000e+00	8.763797e-02
 	Mulliken charge(SCF):	0	7	H	1.000000e+00	9.254585e-02
 
-	Elapsed time(omp) for the SCF = 0.040139[s].
+	Elapsed time(omp) for the SCF = 0.003725[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.082909[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.006625[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -1641,11 +1643,11 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 	======  DONE: Davidson-CIS  =====
 
 
-				|   i-th   |   e[a.u.]   |   e[eV]   | dominant eigenvector coefficients (occ. -> vir.) |
-	Excitation energies:	1	2.779739e-01	7.564115e+00	6.418197e-01 (6 -> 9)	
-	Excitation energies:	2	2.786154e-01	7.581573e+00	8.817682e-01 (6 -> 7)	
-	Excitation energies:	3	2.832535e-01	7.707783e+00	8.987556e-01 (5 -> 7)	
-	Excitation energies:	4	2.893205e-01	7.872875e+00	8.724910e-01 (6 -> 8)	
+				|   i-th   |   e[a.u.]   |   e[eV]   |   e[nm]   | dominant eigenvector coefficients (occ. -> vir.) |
+	Excitation energies:	1	2.779739e-01	7.564115e+00	1.639124e+02	6.418197e-01 (6 -> 9)	
+	Excitation energies:	2	2.786154e-01	7.581573e+00	1.635349e+02	8.817682e-01 (6 -> 7)	
+	Excitation energies:	3	2.832535e-01	7.707783e+00	1.608572e+02	8.987556e-01 (5 -> 7)	
+	Excitation energies:	4	2.893205e-01	7.872875e+00	1.574840e+02	8.724910e-01 (6 -> 8)	
 
 				| i-th eigenstate |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
 	Total dipole moment:	0	5.468940e-03	-1.375783e-02	-1.815555e-02	2.342672e-02		1.390066e-02	-3.496893e-02	-4.614681e-02	5.954480e-02
@@ -1661,14 +1663,14 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 	Electronic dipole moment:	3	-2.205530e-02	-4.571499e-03	-2.183916e-02	3.137329e-02		-5.605899e-02	-1.161959e-02	-5.550961e-02	7.974297e-02
 	Electronic dipole moment:	4	1.990938e-02	-1.544051e-02	-3.748848e-02	4.516834e-02		5.060461e-02	-3.924587e-02	-9.528624e-02	1.148065e-01
 
-					| from and to eigenstates |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
-	Transition dipole moment:	0 -> 1		-1.725004e-01	-2.819291e-01	-3.635306e-01	4.913195e-01		-4.384523e-01	-7.165924e-01	-9.240028e-01	1.248810e+00
-	Transition dipole moment:	0 -> 2		1.314559e-02	8.343268e-02	1.258857e+00	1.261687e+00		3.341277e-02	2.120648e-01	3.199696e+00	3.206890e+00
-	Transition dipole moment:	0 -> 3		1.520208e-01	1.280683e+00	-1.609388e-01	1.299677e+00		3.863985e-01	3.255172e+00	-4.090657e-01	3.303450e+00
-	Transition dipole moment:	0 -> 4		-1.849959e-03	1.973627e-02	3.446496e-02	3.975898e-02		-4.702129e-03	5.016461e-02	8.760122e-02	1.010573e-01
+					| from and to eigenstates |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |  oscillator strength[a.u.]  |
+	Transition dipole moment:	0 -> 1		-1.725004e-01	-2.819291e-01	-3.635306e-01	4.913195e-01		-4.384523e-01	-7.165924e-01	-9.240028e-01	1.248810e+00	4.473432e-02
+	Transition dipole moment:	0 -> 2		1.314559e-02	8.343268e-02	1.258857e+00	1.261687e+00		3.341277e-02	2.120648e-01	3.199696e+00	3.206890e+00	2.956770e-01
+	Transition dipole moment:	0 -> 3		1.520208e-01	1.280683e+00	-1.609388e-01	1.299677e+00		3.863985e-01	3.255172e+00	-4.090657e-01	3.303450e+00	3.189738e-01
+	Transition dipole moment:	0 -> 4		-1.849959e-03	1.973627e-02	3.446496e-02	3.975898e-02		-4.702129e-03	5.016461e-02	8.760122e-02	1.010573e-01	3.049007e-04
 
 
-	Elapsed time(omp) for the CIS = 0.290985[s].
+	Elapsed time(omp) for the CIS = 0.035513[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
@@ -1679,7 +1681,7 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 		Electronic
 		(inc. core rep.)	-3.606214e+01	-9.813086e+02
 		Total            	-3.606196e+01	-9.813036e+02
-		Error            	6.147616e-11	1.672865e-09
+		Error            	6.145484e-11	1.672285e-09
 
 ==========  DONE: RPMD step 2
 
@@ -1746,13 +1748,13 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 	Mulliken charge(SCF):	0	6	H	1.000000e+00	8.795914e-02
 	Mulliken charge(SCF):	0	7	H	1.000000e+00	9.334901e-02
 
-	Elapsed time(omp) for the SCF = 0.032785[s].
+	Elapsed time(omp) for the SCF = 0.003900[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.048962[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.006627[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -1818,7 +1820,7 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 
 	Davidson iter=10
 	  1-th excited: norm of the residual = 1.107181e-07
-	  2-th excited: norm of the residual = 6.625945e-08
+	  2-th excited: norm of the residual = 6.625946e-08
 	  3-th excited: norm of the residual = 1.597444e-08
 	  4-th excited: norm of the residual = 1.315109e-07
 
@@ -1830,11 +1832,11 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 	======  DONE: Davidson-CIS  =====
 
 
-				|   i-th   |   e[a.u.]   |   e[eV]   | dominant eigenvector coefficients (occ. -> vir.) |
-	Excitation energies:	1	2.783943e-01	7.575556e+00	-6.031469e-01 (6 -> 9)	
-	Excitation energies:	2	2.786796e-01	7.583318e+00	7.919319e-01 (6 -> 7)	
-	Excitation energies:	3	2.840441e-01	7.729296e+00	8.977411e-01 (5 -> 7)	
-	Excitation energies:	4	2.894095e-01	7.875295e+00	8.658144e-01 (6 -> 8)	
+				|   i-th   |   e[a.u.]   |   e[eV]   |   e[nm]   | dominant eigenvector coefficients (occ. -> vir.) |
+	Excitation energies:	1	2.783943e-01	7.575556e+00	1.636648e+02	-6.031469e-01 (6 -> 9)	
+	Excitation energies:	2	2.786796e-01	7.583318e+00	1.634973e+02	7.919319e-01 (6 -> 7)	
+	Excitation energies:	3	2.840441e-01	7.729296e+00	1.604094e+02	8.977411e-01 (5 -> 7)	
+	Excitation energies:	4	2.894095e-01	7.875295e+00	1.574356e+02	8.658144e-01 (6 -> 8)	
 
 				| i-th eigenstate |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
 	Total dipole moment:	0	-4.138448e-02	-3.776407e-02	-9.708656e-03	5.685998e-02		-1.051889e-01	-9.598671e-02	-2.467695e-02	1.445237e-01
@@ -1850,14 +1852,14 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 	Electronic dipole moment:	3	-8.791500e-02	-1.431143e-02	-7.017965e-03	8.934829e-02		-2.234577e-01	-3.637602e-02	-1.783789e-02	2.271007e-01
 	Electronic dipole moment:	4	6.931974e-02	-4.388673e-02	-1.790429e-02	8.397520e-02		1.761932e-01	-1.115490e-01	-4.550818e-02	2.134437e-01
 
-					| from and to eigenstates |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
-	Transition dipole moment:	0 -> 1		1.597241e-01	3.057038e-01	6.833179e-01	7.654345e-01		4.059782e-01	7.770217e-01	1.736821e+00	1.945541e+00
-	Transition dipole moment:	0 -> 2		1.797942e-02	7.140032e-02	1.091981e+00	1.094461e+00		4.569915e-02	1.814815e-01	2.775540e+00	2.781843e+00
-	Transition dipole moment:	0 -> 3		1.726465e-01	1.275490e+00	-2.323253e-01	1.307921e+00		4.388238e-01	3.241973e+00	-5.905122e-01	3.324404e+00
-	Transition dipole moment:	0 -> 4		9.357153e-03	3.215721e-02	1.258488e-01	1.302289e-01		2.378352e-02	8.173550e-02	3.198757e-01	3.310088e-01
+					| from and to eigenstates |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |  oscillator strength[a.u.]  |
+	Transition dipole moment:	0 -> 1		1.597241e-01	3.057038e-01	6.833179e-01	7.654345e-01		4.059782e-01	7.770217e-01	1.736821e+00	1.945541e+00	1.087390e-01
+	Transition dipole moment:	0 -> 2		1.797942e-02	7.140032e-02	1.091981e+00	1.094461e+00		4.569915e-02	1.814815e-01	2.775540e+00	2.781843e+00	2.225432e-01
+	Transition dipole moment:	0 -> 3		1.726465e-01	1.275490e+00	-2.323253e-01	1.307921e+00		4.388238e-01	3.241973e+00	-5.905122e-01	3.324404e+00	3.239347e-01
+	Transition dipole moment:	0 -> 4		9.357153e-03	3.215721e-02	1.258488e-01	1.302289e-01		2.378352e-02	8.173550e-02	3.198757e-01	3.310088e-01	3.272171e-03
 
 
-	Elapsed time(omp) for the CIS = 0.178234[s].
+	Elapsed time(omp) for the CIS = 0.035478[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
@@ -1923,13 +1925,13 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 	Mulliken charge(SCF):	0	6	H	1.000000e+00	8.975153e-02
 	Mulliken charge(SCF):	0	7	H	1.000000e+00	9.208966e-02
 
-	Elapsed time(omp) for the SCF = 0.029306[s].
+	Elapsed time(omp) for the SCF = 0.003924[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.040646[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.006655[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -2001,11 +2003,11 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 	======  DONE: Davidson-CIS  =====
 
 
-				|   i-th   |   e[a.u.]   |   e[eV]   | dominant eigenvector coefficients (occ. -> vir.) |
-	Excitation energies:	1	2.777796e-01	7.558828e+00	-6.164675e-01 (6 -> 9)	
-	Excitation energies:	2	2.792176e-01	7.597958e+00	8.901645e-01 (6 -> 7)	
-	Excitation energies:	3	2.825033e-01	7.687368e+00	8.885402e-01 (5 -> 7)	
-	Excitation energies:	4	2.906579e-01	7.909269e+00	8.426255e-01 (6 -> 8)	
+				|   i-th   |   e[a.u.]   |   e[eV]   |   e[nm]   | dominant eigenvector coefficients (occ. -> vir.) |
+	Excitation energies:	1	2.777796e-01	7.558828e+00	1.640270e+02	-6.164675e-01 (6 -> 9)	
+	Excitation energies:	2	2.792176e-01	7.597958e+00	1.631823e+02	8.901645e-01 (6 -> 7)	
+	Excitation energies:	3	2.825033e-01	7.687368e+00	1.612843e+02	8.885402e-01 (5 -> 7)	
+	Excitation energies:	4	2.906579e-01	7.909269e+00	1.567594e+02	8.426255e-01 (6 -> 8)	
 
 				| i-th eigenstate |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
 	Total dipole moment:	0	-2.908675e-02	-3.824535e-02	-3.158499e-02	5.750093e-02		-7.393115e-02	-9.721001e-02	-8.028105e-02	1.461528e-01
@@ -2021,14 +2023,14 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 	Electronic dipole moment:	3	-4.220671e-02	-2.987059e-02	7.843974e-03	5.229901e-02		-1.072788e-01	-7.592349e-02	1.993740e-02	1.329309e-01
 	Electronic dipole moment:	4	1.528854e-01	-5.083437e-02	-3.455379e-02	1.647788e-01		3.885961e-01	-1.292081e-01	-8.782699e-02	4.188261e-01
 
-					| from and to eigenstates |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
-	Transition dipole moment:	0 -> 1		-1.734239e-01	-2.567870e-01	-2.771412e-01	4.157194e-01		-4.407996e-01	-6.526875e-01	-7.044227e-01	1.056654e+00
-	Transition dipole moment:	0 -> 2		1.171051e-03	-1.420366e-01	-1.268077e+00	1.276008e+00		2.976515e-03	-3.610211e-01	-3.223132e+00	3.243289e+00
-	Transition dipole moment:	0 -> 3		8.234242e-02	1.278475e+00	-2.120916e-01	1.298561e+00		2.092936e-01	3.249559e+00	-5.390831e-01	3.300613e+00
-	Transition dipole moment:	0 -> 4		1.091284e-03	-1.092933e-01	-1.461116e-01	1.824687e-01		2.773768e-03	-2.777959e-01	-3.713788e-01	4.637893e-01
+					| from and to eigenstates |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |  oscillator strength[a.u.]  |
+	Transition dipole moment:	0 -> 1		-1.734239e-01	-2.567870e-01	-2.771412e-01	4.157194e-01		-4.407996e-01	-6.526875e-01	-7.044227e-01	1.056654e+00	3.200440e-02
+	Transition dipole moment:	0 -> 2		1.171051e-03	-1.420366e-01	-1.268077e+00	1.276008e+00		2.976515e-03	-3.610211e-01	-3.223132e+00	3.243289e+00	3.030807e-01
+	Transition dipole moment:	0 -> 3		8.234242e-02	1.278475e+00	-2.120916e-01	1.298561e+00		2.092936e-01	3.249559e+00	-5.390831e-01	3.300613e+00	3.175827e-01
+	Transition dipole moment:	0 -> 4		1.091284e-03	-1.092933e-01	-1.461116e-01	1.824687e-01		2.773768e-03	-2.777959e-01	-3.713788e-01	4.637893e-01	6.451604e-03
 
 
-	Elapsed time(omp) for the CIS = 0.130157[s].
+	Elapsed time(omp) for the CIS = 0.029578[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
@@ -2093,13 +2095,13 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 	Mulliken charge(SCF):	0	6	H	1.000000e+00	8.763561e-02
 	Mulliken charge(SCF):	0	7	H	1.000000e+00	9.254340e-02
 
-	Elapsed time(omp) for the SCF = 0.027976[s].
+	Elapsed time(omp) for the SCF = 0.003704[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.042895[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.006601[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -2177,11 +2179,11 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 	======  DONE: Davidson-CIS  =====
 
 
-				|   i-th   |   e[a.u.]   |   e[eV]   | dominant eigenvector coefficients (occ. -> vir.) |
-	Excitation energies:	1	2.779700e-01	7.564010e+00	6.417036e-01 (6 -> 9)	
-	Excitation energies:	2	2.786123e-01	7.581488e+00	8.814727e-01 (6 -> 7)	
-	Excitation energies:	3	2.832476e-01	7.707621e+00	8.987841e-01 (5 -> 7)	
-	Excitation energies:	4	2.893191e-01	7.872836e+00	8.724856e-01 (6 -> 8)	
+				|   i-th   |   e[a.u.]   |   e[eV]   |   e[nm]   | dominant eigenvector coefficients (occ. -> vir.) |
+	Excitation energies:	1	2.779700e-01	7.564010e+00	1.639147e+02	6.417036e-01 (6 -> 9)	
+	Excitation energies:	2	2.786123e-01	7.581488e+00	1.635368e+02	8.814727e-01 (6 -> 7)	
+	Excitation energies:	3	2.832476e-01	7.707621e+00	1.608605e+02	8.987841e-01 (5 -> 7)	
+	Excitation energies:	4	2.893191e-01	7.872836e+00	1.574848e+02	8.724856e-01 (6 -> 8)	
 
 				| i-th eigenstate |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
 	Total dipole moment:	0	5.443769e-03	-1.373984e-02	-1.813795e-02	2.339665e-02		1.383668e-02	-3.492320e-02	-4.610209e-02	5.946837e-02
@@ -2197,14 +2199,14 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 	Electronic dipole moment:	3	-2.207190e-02	-4.576439e-03	-2.181894e-02	3.137162e-02		-5.610119e-02	-1.163215e-02	-5.545821e-02	7.973872e-02
 	Electronic dipole moment:	4	1.993022e-02	-1.542211e-02	-3.744876e-02	4.513829e-02		5.065756e-02	-3.919910e-02	-9.518528e-02	1.147301e-01
 
-					| from and to eigenstates |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
-	Transition dipole moment:	0 -> 1		-1.726870e-01	-2.817948e-01	-3.650046e-01	4.923996e-01		-4.389265e-01	-7.162510e-01	-9.277492e-01	1.251555e+00
-	Transition dipole moment:	0 -> 2		1.288256e-02	8.345982e-02	1.258394e+00	1.261225e+00		3.274420e-02	2.121337e-01	3.198520e+00	3.205714e+00
-	Transition dipole moment:	0 -> 3		1.518364e-01	1.280771e+00	-1.611941e-01	1.299774e+00		3.859296e-01	3.255396e+00	-4.097146e-01	3.303696e+00
-	Transition dipole moment:	0 -> 4		-1.849455e-03	1.971116e-02	3.448738e-02	3.976594e-02		-4.700846e-03	5.010078e-02	8.765819e-02	1.010749e-01
+					| from and to eigenstates |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |  oscillator strength[a.u.]  |
+	Transition dipole moment:	0 -> 1		-1.726870e-01	-2.817948e-01	-3.650046e-01	4.923996e-01		-4.389265e-01	-7.162510e-01	-9.277492e-01	1.251555e+00	4.493059e-02
+	Transition dipole moment:	0 -> 2		1.288256e-02	8.345982e-02	1.258394e+00	1.261225e+00		3.274420e-02	2.121337e-01	3.198520e+00	3.205714e+00	2.954568e-01
+	Transition dipole moment:	0 -> 3		1.518364e-01	1.280771e+00	-1.611941e-01	1.299774e+00		3.859296e-01	3.255396e+00	-4.097146e-01	3.303696e+00	3.190146e-01
+	Transition dipole moment:	0 -> 4		-1.849455e-03	1.971116e-02	3.448738e-02	3.976594e-02		-4.700846e-03	5.010078e-02	8.765819e-02	1.010749e-01	3.050059e-04
 
 
-	Elapsed time(omp) for the CIS = 0.166533[s].
+	Elapsed time(omp) for the CIS = 0.039638[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
@@ -2215,7 +2217,7 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 		Electronic
 		(inc. core rep.)	-3.606216e+01	-9.813091e+02
 		Total            	-3.606196e+01	-9.813036e+02
-		Error            	1.656701e-10	4.508150e-09
+		Error            	1.656559e-10	4.507763e-09
 
 ==========  DONE: RPMD step 3
 
@@ -2282,13 +2284,13 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 	Mulliken charge(SCF):	0	6	H	1.000000e+00	8.795427e-02
 	Mulliken charge(SCF):	0	7	H	1.000000e+00	9.334588e-02
 
-	Elapsed time(omp) for the SCF = 0.039120[s].
+	Elapsed time(omp) for the SCF = 0.003943[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.054774[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.006645[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -2349,7 +2351,7 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 	Davidson iter=9
 	  1-th excited: norm of the residual = 1.775645e-06
 	  2-th excited: norm of the residual = 1.084591e-06
-	  3-th excited: norm of the residual = 2.067143e-07
+	  3-th excited: norm of the residual = 2.067142e-07
 	  4-th excited: norm of the residual = 7.840100e-07
 
 	Davidson iter=10
@@ -2366,11 +2368,11 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 	======  DONE: Davidson-CIS  =====
 
 
-				|   i-th   |   e[a.u.]   |   e[eV]   | dominant eigenvector coefficients (occ. -> vir.) |
-	Excitation energies:	1	2.783862e-01	7.575333e+00	-6.015385e-01 (6 -> 9)	
-	Excitation energies:	2	2.786751e-01	7.583195e+00	7.886998e-01 (6 -> 7)	
-	Excitation energies:	3	2.840369e-01	7.729100e+00	8.977710e-01 (5 -> 7)	
-	Excitation energies:	4	2.894050e-01	7.875175e+00	8.658042e-01 (6 -> 8)	
+				|   i-th   |   e[a.u.]   |   e[eV]   |   e[nm]   | dominant eigenvector coefficients (occ. -> vir.) |
+	Excitation energies:	1	2.783862e-01	7.575333e+00	1.636696e+02	-6.015385e-01 (6 -> 9)	
+	Excitation energies:	2	2.786751e-01	7.583195e+00	1.634999e+02	7.886998e-01 (6 -> 7)	
+	Excitation energies:	3	2.840369e-01	7.729100e+00	1.604135e+02	8.977710e-01 (5 -> 7)	
+	Excitation energies:	4	2.894050e-01	7.875175e+00	1.574380e+02	8.658042e-01 (6 -> 8)	
 
 				| i-th eigenstate |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
 	Total dipole moment:	0	-4.132219e-02	-3.768612e-02	-9.722949e-03	5.676534e-02		-1.050306e-01	-9.578859e-02	-2.471328e-02	1.442831e-01
@@ -2386,14 +2388,14 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 	Electronic dipole moment:	3	-8.779406e-02	-1.427636e-02	-7.011481e-03	8.922316e-02		-2.231503e-01	-3.628689e-02	-1.782141e-02	2.267827e-01
 	Electronic dipole moment:	4	6.933509e-02	-4.383718e-02	-1.793374e-02	8.396828e-02		1.762323e-01	-1.114230e-01	-4.558304e-02	2.134261e-01
 
-					| from and to eigenstates |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
-	Transition dipole moment:	0 -> 1		1.600986e-01	3.061730e-01	6.909100e-01	7.724830e-01		4.069301e-01	7.782142e-01	1.756118e+00	1.963456e+00
-	Transition dipole moment:	0 -> 2		1.667249e-02	6.992651e-02	1.087102e+00	1.089477e+00		4.237725e-02	1.777355e-01	2.763139e+00	2.769174e+00
-	Transition dipole moment:	0 -> 3		1.723332e-01	1.275559e+00	-2.328039e-01	1.308032e+00		4.380275e-01	3.242149e+00	-5.917286e-01	3.324686e+00
-	Transition dipole moment:	0 -> 4		9.333312e-03	3.220903e-02	1.257701e-01	1.301639e-01		2.372292e-02	8.186719e-02	3.196758e-01	3.308438e-01
+					| from and to eigenstates |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |  oscillator strength[a.u.]  |
+	Transition dipole moment:	0 -> 1		1.600986e-01	3.061730e-01	6.909100e-01	7.724830e-01		4.069301e-01	7.782142e-01	1.756118e+00	1.963456e+00	1.107476e-01
+	Transition dipole moment:	0 -> 2		1.667249e-02	6.992651e-02	1.087102e+00	1.089477e+00		4.237725e-02	1.777355e-01	2.763139e+00	2.769174e+00	2.205173e-01
+	Transition dipole moment:	0 -> 3		1.723332e-01	1.275559e+00	-2.328039e-01	1.308032e+00		4.380275e-01	3.242149e+00	-5.917286e-01	3.324686e+00	3.239815e-01
+	Transition dipole moment:	0 -> 4		9.333312e-03	3.220903e-02	1.257701e-01	1.301639e-01		2.372292e-02	8.186719e-02	3.196758e-01	3.308438e-01	3.268860e-03
 
 
-	Elapsed time(omp) for the CIS = 0.241380[s].
+	Elapsed time(omp) for the CIS = 0.035609[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
@@ -2459,13 +2461,13 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 	Mulliken charge(SCF):	0	6	H	1.000000e+00	8.974818e-02
 	Mulliken charge(SCF):	0	7	H	1.000000e+00	9.208590e-02
 
-	Elapsed time(omp) for the SCF = 0.054606[s].
+	Elapsed time(omp) for the SCF = 0.004019[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.056254[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.006628[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -2537,11 +2539,11 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 	======  DONE: Davidson-CIS  =====
 
 
-				|   i-th   |   e[a.u.]   |   e[eV]   | dominant eigenvector coefficients (occ. -> vir.) |
-	Excitation energies:	1	2.777742e-01	7.558680e+00	-6.164600e-01 (6 -> 9)	
-	Excitation energies:	2	2.792119e-01	7.597804e+00	8.899875e-01 (6 -> 7)	
-	Excitation energies:	3	2.824961e-01	7.687171e+00	8.885910e-01 (5 -> 7)	
-	Excitation energies:	4	2.906535e-01	7.909148e+00	8.426603e-01 (6 -> 8)	
+				|   i-th   |   e[a.u.]   |   e[eV]   |   e[nm]   | dominant eigenvector coefficients (occ. -> vir.) |
+	Excitation energies:	1	2.777742e-01	7.558680e+00	1.640302e+02	-6.164600e-01 (6 -> 9)	
+	Excitation energies:	2	2.792119e-01	7.597804e+00	1.631856e+02	8.899875e-01 (6 -> 7)	
+	Excitation energies:	3	2.824961e-01	7.687171e+00	1.612885e+02	8.885910e-01 (5 -> 7)	
+	Excitation energies:	4	2.906535e-01	7.909148e+00	1.567618e+02	8.426603e-01 (6 -> 8)	
 
 				| i-th eigenstate |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
 	Total dipole moment:	0	-2.900472e-02	-3.817842e-02	-3.152648e-02	5.738279e-02		-7.372267e-02	-9.703988e-02	-8.013233e-02	1.458525e-01
@@ -2557,14 +2559,14 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 	Electronic dipole moment:	3	-4.211845e-02	-2.983335e-02	7.895454e-03	5.221428e-02		-1.070545e-01	-7.582884e-02	2.006825e-02	1.327155e-01
 	Electronic dipole moment:	4	1.528479e-01	-5.079695e-02	-3.448470e-02	1.647179e-01		3.885007e-01	-1.291130e-01	-8.765139e-02	4.186713e-01
 
-					| from and to eigenstates |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
-	Transition dipole moment:	0 -> 1		-1.736796e-01	-2.567351e-01	-2.781720e-01	4.164819e-01		-4.414496e-01	-6.525556e-01	-7.070429e-01	1.058592e+00
-	Transition dipole moment:	0 -> 2		1.364464e-03	-1.424202e-01	-1.267792e+00	1.275768e+00		3.468122e-03	-3.619961e-01	-3.222407e+00	3.242678e+00
-	Transition dipole moment:	0 -> 3		8.219233e-02	1.278509e+00	-2.125885e-01	1.298667e+00		2.089121e-01	3.249647e+00	-5.403461e-01	3.300882e+00
-	Transition dipole moment:	0 -> 4		1.067187e-03	-1.092601e-01	-1.460021e-01	1.823610e-01		2.712519e-03	-2.777116e-01	-3.711004e-01	4.635155e-01
+					| from and to eigenstates |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |  oscillator strength[a.u.]  |
+	Transition dipole moment:	0 -> 1		-1.736796e-01	-2.567351e-01	-2.781720e-01	4.164819e-01		-4.414496e-01	-6.525556e-01	-7.070429e-01	1.058592e+00	3.212128e-02
+	Transition dipole moment:	0 -> 2		1.364464e-03	-1.424202e-01	-1.267792e+00	1.275768e+00		3.468122e-03	-3.619961e-01	-3.222407e+00	3.242678e+00	3.029603e-01
+	Transition dipole moment:	0 -> 3		8.219233e-02	1.278509e+00	-2.125885e-01	1.298667e+00		2.089121e-01	3.249647e+00	-5.403461e-01	3.300882e+00	3.176264e-01
+	Transition dipole moment:	0 -> 4		1.067187e-03	-1.092601e-01	-1.460021e-01	1.823610e-01		2.712519e-03	-2.777116e-01	-3.711004e-01	4.635155e-01	6.443891e-03
 
 
-	Elapsed time(omp) for the CIS = 0.246386[s].
+	Elapsed time(omp) for the CIS = 0.029449[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
@@ -2629,13 +2631,13 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 	Mulliken charge(SCF):	0	6	H	1.000000e+00	8.763232e-02
 	Mulliken charge(SCF):	0	7	H	1.000000e+00	9.253998e-02
 
-	Elapsed time(omp) for the SCF = 0.042359[s].
+	Elapsed time(omp) for the SCF = 0.003736[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.057041[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.006623[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -2713,11 +2715,11 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 	======  DONE: Davidson-CIS  =====
 
 
-				|   i-th   |   e[a.u.]   |   e[eV]   | dominant eigenvector coefficients (occ. -> vir.) |
-	Excitation energies:	1	2.779646e-01	7.563863e+00	6.415401e-01 (6 -> 9)	
-	Excitation energies:	2	2.786080e-01	7.581369e+00	8.810569e-01 (6 -> 7)	
-	Excitation energies:	3	2.832393e-01	7.707395e+00	8.988240e-01 (5 -> 7)	
-	Excitation energies:	4	2.893171e-01	7.872782e+00	8.724780e-01 (6 -> 8)	
+				|   i-th   |   e[a.u.]   |   e[eV]   |   e[nm]   | dominant eigenvector coefficients (occ. -> vir.) |
+	Excitation energies:	1	2.779646e-01	7.563863e+00	1.639178e+02	6.415401e-01 (6 -> 9)	
+	Excitation energies:	2	2.786080e-01	7.581369e+00	1.635393e+02	8.810569e-01 (6 -> 7)	
+	Excitation energies:	3	2.832393e-01	7.707395e+00	1.608653e+02	8.988240e-01 (5 -> 7)	
+	Excitation energies:	4	2.893171e-01	7.872782e+00	1.574859e+02	8.724780e-01 (6 -> 8)	
 
 				| i-th eigenstate |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
 	Total dipole moment:	0	5.408556e-03	-1.371468e-02	-1.811334e-02	2.335461e-02		1.374718e-02	-3.485924e-02	-4.603952e-02	5.936151e-02
@@ -2733,14 +2735,14 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 	Electronic dipole moment:	3	-2.209516e-02	-4.583318e-03	-2.179063e-02	3.136932e-02		-5.616031e-02	-1.164963e-02	-5.538627e-02	7.973289e-02
 	Electronic dipole moment:	4	1.995940e-02	-1.539636e-02	-3.739319e-02	4.509630e-02		5.073174e-02	-3.913365e-02	-9.504403e-02	1.146234e-01
 
-					| from and to eigenstates |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
-	Transition dipole moment:	0 -> 1		-1.729475e-01	-2.816074e-01	-3.670672e-01	4.939149e-01		-4.395888e-01	-7.157749e-01	-9.329921e-01	1.255407e+00
-	Transition dipole moment:	0 -> 2		1.251374e-02	8.349994e-02	1.257743e+00	1.260574e+00		3.180677e-02	2.122357e-01	3.196865e+00	3.204060e+00
-	Transition dipole moment:	0 -> 3		1.515786e-01	1.280894e+00	-1.615528e-01	1.299909e+00		3.852744e-01	3.255708e+00	-4.106263e-01	3.304041e+00
-	Transition dipole moment:	0 -> 4		-1.848757e-03	1.967604e-02	3.451878e-02	3.977575e-02		-4.699072e-03	5.001151e-02	8.773800e-02	1.010999e-01
+					| from and to eigenstates |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |  oscillator strength[a.u.]  |
+	Transition dipole moment:	0 -> 1		-1.729475e-01	-2.816074e-01	-3.670672e-01	4.939149e-01		-4.395888e-01	-7.157749e-01	-9.329921e-01	1.255407e+00	4.520667e-02
+	Transition dipole moment:	0 -> 2		1.251374e-02	8.349994e-02	1.257743e+00	1.260574e+00		3.180677e-02	2.122357e-01	3.196865e+00	3.204060e+00	2.951474e-01
+	Transition dipole moment:	0 -> 3		1.515786e-01	1.280894e+00	-1.615528e-01	1.299909e+00		3.852744e-01	3.255708e+00	-4.106263e-01	3.304041e+00	3.190718e-01
+	Transition dipole moment:	0 -> 4		-1.848757e-03	1.967604e-02	3.451878e-02	3.977575e-02		-4.699072e-03	5.001151e-02	8.773800e-02	1.010999e-01	3.051544e-04
 
 
-	Elapsed time(omp) for the CIS = 0.245479[s].
+	Elapsed time(omp) for the CIS = 0.035215[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
@@ -2751,7 +2753,7 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 		Electronic
 		(inc. core rep.)	-3.606219e+01	-9.813099e+02
 		Total            	-3.606196e+01	-9.813036e+02
-		Error            	3.619363e-10	9.848866e-09
+		Error            	3.619576e-10	9.849446e-09
 
 ==========  DONE: RPMD step 4
 
@@ -2818,13 +2820,13 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 	Mulliken charge(SCF):	0	6	H	1.000000e+00	8.794798e-02
 	Mulliken charge(SCF):	0	7	H	1.000000e+00	9.334187e-02
 
-	Elapsed time(omp) for the SCF = 0.038915[s].
+	Elapsed time(omp) for the SCF = 0.003981[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.056335[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.007001[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -2902,11 +2904,11 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 	======  DONE: Davidson-CIS  =====
 
 
-				|   i-th   |   e[a.u.]   |   e[eV]   | dominant eigenvector coefficients (occ. -> vir.) |
-	Excitation energies:	1	2.783756e-01	7.575045e+00	-5.994748e-01 (6 -> 9)	
-	Excitation energies:	2	2.786693e-01	7.583039e+00	7.845725e-01 (6 -> 7)	
-	Excitation energies:	3	2.840277e-01	7.728848e+00	8.978090e-01 (5 -> 7)	
-	Excitation energies:	4	2.893993e-01	7.875020e+00	8.657910e-01 (6 -> 8)	
+				|   i-th   |   e[a.u.]   |   e[eV]   |   e[nm]   | dominant eigenvector coefficients (occ. -> vir.) |
+	Excitation energies:	1	2.783756e-01	7.575045e+00	1.636759e+02	-5.994748e-01 (6 -> 9)	
+	Excitation energies:	2	2.786693e-01	7.583039e+00	1.635033e+02	7.845725e-01 (6 -> 7)	
+	Excitation energies:	3	2.840277e-01	7.728848e+00	1.604187e+02	8.978090e-01 (5 -> 7)	
+	Excitation energies:	4	2.893993e-01	7.875020e+00	1.574411e+02	8.657910e-01 (6 -> 8)	
 
 				| i-th eigenstate |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
 	Total dipole moment:	0	-4.124248e-02	-3.758600e-02	-9.741358e-03	5.664401e-02		-1.048279e-01	-9.553411e-02	-2.476007e-02	1.439747e-01
@@ -2922,14 +2924,14 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 	Electronic dipole moment:	3	-8.763929e-02	-1.423133e-02	-7.003087e-03	8.906300e-02		-2.227569e-01	-3.617244e-02	-1.780008e-02	2.263756e-01
 	Electronic dipole moment:	4	6.935504e-02	-4.377334e-02	-1.797199e-02	8.395963e-02		1.762830e-01	-1.112608e-01	-4.568026e-02	2.134041e-01
 
-					| from and to eigenstates |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
-	Transition dipole moment:	0 -> 1		1.605621e-01	3.067574e-01	7.004212e-01	7.813259e-01		4.081083e-01	7.796997e-01	1.780293e+00	1.985933e+00
-	Transition dipole moment:	0 -> 2		1.501569e-02	6.808566e-02	1.080879e+00	1.083126e+00		3.816609e-02	1.730565e-01	2.747322e+00	2.753031e+00
-	Transition dipole moment:	0 -> 3		1.719313e-01	1.275647e+00	-2.334220e-01	1.308175e+00		4.370058e-01	3.242371e+00	-5.932998e-01	3.325049e+00
-	Transition dipole moment:	0 -> 4		9.302770e-03	3.227554e-02	1.256698e-01	1.300813e-01		2.364529e-02	8.203626e-02	3.194208e-01	3.306338e-01
+					| from and to eigenstates |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |  oscillator strength[a.u.]  |
+	Transition dipole moment:	0 -> 1		1.605621e-01	3.067574e-01	7.004212e-01	7.813259e-01		4.081083e-01	7.796997e-01	1.780293e+00	1.985933e+00	1.132933e-01
+	Transition dipole moment:	0 -> 2		1.501569e-02	6.808566e-02	1.080879e+00	1.083126e+00		3.816609e-02	1.730565e-01	2.747322e+00	2.753031e+00	2.179494e-01
+	Transition dipole moment:	0 -> 3		1.719313e-01	1.275647e+00	-2.334220e-01	1.308175e+00		4.370058e-01	3.242371e+00	-5.932998e-01	3.325049e+00	3.240416e-01
+	Transition dipole moment:	0 -> 4		9.302770e-03	3.227554e-02	1.256698e-01	1.300813e-01		2.364529e-02	8.203626e-02	3.194208e-01	3.306338e-01	3.264647e-03
 
 
-	Elapsed time(omp) for the CIS = 0.227379[s].
+	Elapsed time(omp) for the CIS = 0.036271[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
@@ -2995,13 +2997,13 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 	Mulliken charge(SCF):	0	6	H	1.000000e+00	8.974386e-02
 	Mulliken charge(SCF):	0	7	H	1.000000e+00	9.208107e-02
 
-	Elapsed time(omp) for the SCF = 0.035001[s].
+	Elapsed time(omp) for the SCF = 0.003982[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.066878[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.006690[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -3073,11 +3075,11 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 	======  DONE: Davidson-CIS  =====
 
 
-				|   i-th   |   e[a.u.]   |   e[eV]   | dominant eigenvector coefficients (occ. -> vir.) |
-	Excitation energies:	1	2.777672e-01	7.558491e+00	-6.164498e-01 (6 -> 9)	
-	Excitation energies:	2	2.792046e-01	7.597605e+00	8.897585e-01 (6 -> 7)	
-	Excitation energies:	3	2.824867e-01	7.686917e+00	8.886561e-01 (5 -> 7)	
-	Excitation energies:	4	2.906478e-01	7.908993e+00	8.427050e-01 (6 -> 8)	
+				|   i-th   |   e[a.u.]   |   e[eV]   |   e[nm]   | dominant eigenvector coefficients (occ. -> vir.) |
+	Excitation energies:	1	2.777672e-01	7.558491e+00	1.640343e+02	-6.164498e-01 (6 -> 9)	
+	Excitation energies:	2	2.792046e-01	7.597605e+00	1.631898e+02	8.897585e-01 (6 -> 7)	
+	Excitation energies:	3	2.824867e-01	7.686917e+00	1.612938e+02	8.886561e-01 (5 -> 7)	
+	Excitation energies:	4	2.906478e-01	7.908993e+00	1.567648e+02	8.427050e-01 (6 -> 8)	
 
 				| i-th eigenstate |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
 	Total dipole moment:	0	-2.889939e-02	-3.809244e-02	-3.145132e-02	5.723106e-02		-7.345493e-02	-9.682135e-02	-7.994129e-02	1.454669e-01
@@ -3093,14 +3095,14 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 	Electronic dipole moment:	3	-4.200513e-02	-2.978549e-02	7.961715e-03	5.210562e-02		-1.067664e-01	-7.570719e-02	2.023666e-02	1.324393e-01
 	Electronic dipole moment:	4	1.527996e-01	-5.074874e-02	-3.439596e-02	1.646397e-01		3.883779e-01	-1.289905e-01	-8.742582e-02	4.184724e-01
 
-					| from and to eigenstates |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
-	Transition dipole moment:	0 -> 1		-1.740079e-01	-2.566696e-01	-2.795001e-01	4.174666e-01		-4.422840e-01	-6.523892e-01	-7.104186e-01	1.061094e+00
-	Transition dipole moment:	0 -> 2		1.614063e-03	-1.429146e-01	-1.267423e+00	1.275456e+00		4.102540e-03	-3.632526e-01	-3.221469e+00	3.241887e+00
-	Transition dipole moment:	0 -> 3		8.199984e-02	1.278553e+00	-2.132288e-01	1.298803e+00		2.084229e-01	3.249759e+00	-5.419736e-01	3.301228e+00
-	Transition dipole moment:	0 -> 4		1.036227e-03	-1.092175e-01	-1.458615e-01	1.822227e-01		2.633828e-03	-2.776032e-01	-3.707430e-01	4.631639e-01
+					| from and to eigenstates |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |  oscillator strength[a.u.]  |
+	Transition dipole moment:	0 -> 1		-1.740079e-01	-2.566696e-01	-2.795001e-01	4.174666e-01		-4.422840e-01	-6.523892e-01	-7.104186e-01	1.061094e+00	3.227254e-02
+	Transition dipole moment:	0 -> 2		1.614063e-03	-1.429146e-01	-1.267423e+00	1.275456e+00		4.102540e-03	-3.632526e-01	-3.221469e+00	3.241887e+00	3.028046e-01
+	Transition dipole moment:	0 -> 3		8.199984e-02	1.278553e+00	-2.132288e-01	1.298803e+00		2.084229e-01	3.249759e+00	-5.419736e-01	3.301228e+00	3.176825e-01
+	Transition dipole moment:	0 -> 4		1.036227e-03	-1.092175e-01	-1.458615e-01	1.822227e-01		2.633828e-03	-2.776032e-01	-3.707430e-01	4.631639e-01	6.433993e-03
 
 
-	Elapsed time(omp) for the CIS = 0.232010[s].
+	Elapsed time(omp) for the CIS = 0.029478[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
@@ -3165,13 +3167,13 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 	Mulliken charge(SCF):	0	6	H	1.000000e+00	8.762807e-02
 	Mulliken charge(SCF):	0	7	H	1.000000e+00	9.253557e-02
 
-	Elapsed time(omp) for the SCF = 0.029140[s].
+	Elapsed time(omp) for the SCF = 0.003746[s].
 **********  DONE: PM3/PDDG-SCF  **********
 
 
 **********  START: PM3/PDDG-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.055979[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.006593[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -3237,7 +3239,7 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 
 	Davidson iter=10
 	  1-th excited: norm of the residual = 1.678956e-07
-	  2-th excited: norm of the residual = 4.626972e-08
+	  2-th excited: norm of the residual = 4.626973e-08
 	  3-th excited: norm of the residual = 1.526493e-08
 	  4-th excited: norm of the residual = 3.089652e-08
 
@@ -3249,11 +3251,11 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 	======  DONE: Davidson-CIS  =====
 
 
-				|   i-th   |   e[a.u.]   |   e[eV]   | dominant eigenvector coefficients (occ. -> vir.) |
-	Excitation energies:	1	2.779577e-01	7.563673e+00	6.413281e-01 (6 -> 9)	
-	Excitation energies:	2	2.786024e-01	7.581217e+00	8.805187e-01 (6 -> 7)	
-	Excitation energies:	3	2.832286e-01	7.707104e+00	8.988751e-01 (5 -> 7)	
-	Excitation energies:	4	2.893145e-01	7.872713e+00	8.724682e-01 (6 -> 8)	
+				|   i-th   |   e[a.u.]   |   e[eV]   |   e[nm]   | dominant eigenvector coefficients (occ. -> vir.) |
+	Excitation energies:	1	2.779577e-01	7.563673e+00	1.639219e+02	6.413281e-01 (6 -> 9)	
+	Excitation energies:	2	2.786024e-01	7.581217e+00	1.635426e+02	8.805187e-01 (6 -> 7)	
+	Excitation energies:	3	2.832286e-01	7.707104e+00	1.608713e+02	8.988751e-01 (5 -> 7)	
+	Excitation energies:	4	2.893145e-01	7.872713e+00	1.574873e+02	8.724682e-01 (6 -> 8)	
 
 				| i-th eigenstate |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
 	Total dipole moment:	0	5.363328e-03	-1.368236e-02	-1.808171e-02	2.330065e-02		1.363222e-02	-3.477709e-02	-4.595913e-02	5.922437e-02
@@ -3269,14 +3271,14 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 	Electronic dipole moment:	3	-2.212509e-02	-4.592100e-03	-2.175425e-02	3.136645e-02		-5.623639e-02	-1.167196e-02	-5.529379e-02	7.972558e-02
 	Electronic dipole moment:	4	1.999695e-02	-1.536326e-02	-3.732179e-02	4.504246e-02		5.082718e-02	-3.904953e-02	-9.486254e-02	1.144865e-01
 
-					| from and to eigenstates |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
-	Transition dipole moment:	0 -> 1		-1.732813e-01	-2.813680e-01	-3.697177e-01	4.958685e-01		-4.404371e-01	-7.151662e-01	-9.397289e-01	1.260372e+00
-	Transition dipole moment:	0 -> 2		1.203861e-02	8.355520e-02	1.256900e+00	1.259732e+00		3.059910e-02	2.123762e-01	3.194723e+00	3.201920e+00
-	Transition dipole moment:	0 -> 3		1.512479e-01	1.281051e+00	-1.620163e-01	1.300083e+00		3.844339e-01	3.256107e+00	-4.118044e-01	3.304483e+00
-	Transition dipole moment:	0 -> 4		-1.847873e-03	1.963093e-02	3.455918e-02	3.978851e-02		-4.696826e-03	4.989687e-02	8.784069e-02	1.011323e-01
+					| from and to eigenstates |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |  oscillator strength[a.u.]  |
+	Transition dipole moment:	0 -> 1		-1.732813e-01	-2.813680e-01	-3.697177e-01	4.958685e-01		-4.404371e-01	-7.151662e-01	-9.397289e-01	1.260372e+00	4.556384e-02
+	Transition dipole moment:	0 -> 2		1.203861e-02	8.355520e-02	1.256900e+00	1.259732e+00		3.059910e-02	2.123762e-01	3.194723e+00	3.201920e+00	2.947474e-01
+	Transition dipole moment:	0 -> 3		1.512479e-01	1.281051e+00	-1.620163e-01	1.300083e+00		3.844339e-01	3.256107e+00	-4.118044e-01	3.304483e+00	3.191452e-01
+	Transition dipole moment:	0 -> 4		-1.847873e-03	1.963093e-02	3.455918e-02	3.978851e-02		-4.696826e-03	4.989687e-02	8.784069e-02	1.011323e-01	3.053474e-04
 
 
-	Elapsed time(omp) for the CIS = 0.226478[s].
+	Elapsed time(omp) for the CIS = 0.035514[s].
 **********  DONE: PM3/PDDG-CIS  **********
 
 
@@ -3287,19 +3289,19 @@ h | 1.8519 | 0.5200 | -0.9007 | h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 |
 		Electronic
 		(inc. core rep.)	-3.606223e+01	-9.813110e+02
 		Total            	-3.606196e+01	-9.813036e+02
-		Error            	6.995009e-10	1.903454e-08
+		Error            	6.994938e-10	1.903435e-08
 
 ==========  DONE: RPMD step 5
 **********  DONE: Ring Polymer Molecular dynamics  **********
 	Summary for memory usage:
-		Max Heap: 1.032680[MB].
+		Max Heap: 1.335880[MB].
 		Current Heap(Leaked): 0.000000[MB].
 
 
      >>>>>  The MolDS finished normally!  <<<<<
-     >>>>>  CPU time: 25.28[s].  <<<<<
-     >>>>>  Elapsed time: 26[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 25.4234[s].  <<<<<
+     >>>>>  CPU time: 2.51744[s].  <<<<<
+     >>>>>  Elapsed time: 2[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 2.50067[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

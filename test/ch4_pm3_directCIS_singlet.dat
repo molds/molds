@@ -1,25 +1,26 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2013/2/12(Thu.) 4:54:12  <<<<<
+     >>>>>  Welcome to the MolDS world at 2014/7/16(Wed.) 11:43:38  <<<<<
 
 
 **********  START: Parse input  **********
-	Total number of atoms: 5
-	Total number of valence AOs: 8
-	Total number of valence electrons: 8
+	System conditions:
+		Total number of atoms: 5
+		Total number of valence AOs: 8
+		Total number of valence electrons: 8
 
-				| i-th | atom type |   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
-	Atom coordinates:	0	C	1.223388e+00	1.549823e+00	0.000000e+00		6.473890e-01	8.201310e-01	0.000000e+00
-	Atom coordinates:	1	H	1.897366e+00	-3.565516e-01	1.889726e-01		1.004043e+00	-1.886790e-01	1.000000e-01
-	Atom coordinates:	2	H	1.897402e+00	2.502997e+00	1.650963e+00		1.004062e+00	1.324529e+00	8.736520e-01
-	Atom coordinates:	3	H	1.897402e+00	2.502997e+00	-1.650963e+00		1.004062e+00	1.324529e+00	-8.736520e-01
-	Atom coordinates:	4	H	-7.986191e-01	1.549848e+00	0.000000e+00		-4.226110e-01	8.201440e-01	0.000000e+00
+					| i-th | atom type |   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
+		Atom coordinates:	0	C	1.223388e+00	1.549823e+00	0.000000e+00		6.473890e-01	8.201310e-01	0.000000e+00
+		Atom coordinates:	1	H	1.897366e+00	-3.565516e-01	1.889726e-01		1.004043e+00	-1.886790e-01	1.000000e-01
+		Atom coordinates:	2	H	1.897402e+00	2.502997e+00	1.650963e+00		1.004062e+00	1.324529e+00	8.736520e-01
+		Atom coordinates:	3	H	1.897402e+00	2.502997e+00	-1.650963e+00		1.004062e+00	1.324529e+00	-8.736520e-01
+		Atom coordinates:	4	H	-7.986191e-01	1.549848e+00	0.000000e+00		-4.226110e-01	8.201440e-01	0.000000e+00
 
-			|   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
-	Center of Mass:	1.223388e+00	1.549823e+00	1.187306e-02		6.473890e-01	8.201309e-01	6.282952e-03
+				|   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
+		Center of Mass:	1.223388e+00	1.549823e+00	1.187306e-02		6.473890e-01	8.201309e-01	6.282952e-03
 
-			|   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
-	Center of Core:	1.223388e+00	1.549823e+00	1.186984e-02		6.473890e-01	8.201309e-01	6.281250e-03
+				|   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
+		Center of Core:	1.223388e+00	1.549823e+00	1.186984e-02		6.473890e-01	8.201309e-01	6.281250e-03
 
 	SCF conditions:
 		Max iterations: 50
@@ -30,6 +31,7 @@
 		DIIS starting error: 1.000000e-01
 		DIIS ending error: 2.000000e-08
 		van der Waals (vdW) correction: no
+		MPI in SCF: no
 
 	Memory conditions:
 		Heap limit: 2.560000e+02[MB]
@@ -106,13 +108,13 @@ geometry_end |
 	Mulliken charge(SCF):	0	3	H	1.000000e+00	3.244126e-02
 	Mulliken charge(SCF):	0	4	H	1.000000e+00	2.649410e-02
 
-	Elapsed time(omp) for the SCF = 0.022920[s].
+	Elapsed time(omp) for the SCF = 0.007603[s].
 **********  DONE: PM3-SCF  **********
 
 
 **********  START: PM3-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.002318[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.000310[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Direct-CIS  =====
@@ -120,23 +122,23 @@ geometry_end |
 	======  DONE: Direct-CIS  =====
 
 
-				|   i-th   |   e[a.u.]   |   e[eV]   | dominant eigenvector coefficients (occ. -> vir.) |
-	Excitation energies:	1	2.913751e-01	7.928783e+00	6.180865e-01 (3 -> 5)	
-	Excitation energies:	2	3.119333e-01	8.488205e+00	-8.064884e-01 (3 -> 4)	
-	Excitation energies:	3	3.179904e-01	8.653029e+00	7.959224e-01 (2 -> 4)	
-	Excitation energies:	4	3.230216e-01	8.789935e+00	8.534780e-01 (1 -> 4)	
-	Excitation energies:	5	3.682928e-01	1.002184e+01	-7.454379e-01 (3 -> 6)	
-	Excitation energies:	6	3.739780e-01	1.017654e+01	7.572917e-01 (3 -> 7)	
-	Excitation energies:	7	3.811557e-01	1.037186e+01	7.485343e-01 (2 -> 7)	
-	Excitation energies:	8	3.855238e-01	1.049072e+01	5.709500e-01 (2 -> 5)	
-	Excitation energies:	9	3.958999e-01	1.077307e+01	5.457927e-01 (1 -> 6)	
-	Excitation energies:	10	4.039948e-01	1.099335e+01	4.323351e-01 (3 -> 4)	
-	Excitation energies:	11	4.095557e-01	1.114467e+01	5.292990e-01 (2 -> 6)	
-	Excitation energies:	12	4.142463e-01	1.127230e+01	-4.426891e-01 (1 -> 7)	
-	Excitation energies:	13	9.524866e-01	2.591869e+01	9.766059e-01 (0 -> 4)	
-	Excitation energies:	14	9.624148e-01	2.618885e+01	9.724311e-01 (0 -> 5)	
-	Excitation energies:	15	9.665275e-01	2.630076e+01	9.809125e-01 (0 -> 6)	
-	Excitation energies:	16	9.702363e-01	2.640168e+01	9.854693e-01 (0 -> 7)	
+				|   i-th   |   e[a.u.]   |   e[eV]   |   e[nm]   | dominant eigenvector coefficients (occ. -> vir.) |
+	Excitation energies:	1	2.913751e-01	7.928783e+00	1.563736e+02	6.180865e-01 (3 -> 5)	
+	Excitation energies:	2	3.119333e-01	8.488205e+00	1.460676e+02	-8.064884e-01 (3 -> 4)	
+	Excitation energies:	3	3.179904e-01	8.653029e+00	1.432853e+02	7.959224e-01 (2 -> 4)	
+	Excitation energies:	4	3.230216e-01	8.789935e+00	1.410536e+02	8.534780e-01 (1 -> 4)	
+	Excitation energies:	5	3.682928e-01	1.002184e+01	1.237150e+02	-7.454379e-01 (3 -> 6)	
+	Excitation energies:	6	3.739780e-01	1.017654e+01	1.218343e+02	7.572917e-01 (3 -> 7)	
+	Excitation energies:	7	3.811557e-01	1.037186e+01	1.195400e+02	7.485343e-01 (2 -> 7)	
+	Excitation energies:	8	3.855238e-01	1.049072e+01	1.181856e+02	5.709500e-01 (2 -> 5)	
+	Excitation energies:	9	3.958999e-01	1.077307e+01	1.150881e+02	5.457927e-01 (1 -> 6)	
+	Excitation energies:	10	4.039948e-01	1.099335e+01	1.127820e+02	4.323351e-01 (3 -> 4)	
+	Excitation energies:	11	4.095557e-01	1.114467e+01	1.112507e+02	5.292990e-01 (2 -> 6)	
+	Excitation energies:	12	4.142463e-01	1.127230e+01	1.099910e+02	-4.426891e-01 (1 -> 7)	
+	Excitation energies:	13	9.524866e-01	2.591869e+01	4.783622e+01	9.766059e-01 (0 -> 4)	
+	Excitation energies:	14	9.624148e-01	2.618885e+01	4.734275e+01	9.724311e-01 (0 -> 5)	
+	Excitation energies:	15	9.665275e-01	2.630076e+01	4.714129e+01	9.809125e-01 (0 -> 6)	
+	Excitation energies:	16	9.702363e-01	2.640168e+01	4.696110e+01	9.854693e-01 (0 -> 7)	
 
 				| i-th eigenstate |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
 	Total dipole moment:	0	3.257989e-03	-8.196636e-03	-6.853238e-02	6.909765e-02		8.280984e-03	-2.083378e-02	-1.741920e-01	1.756288e-01
@@ -176,38 +178,38 @@ geometry_end |
 	Electronic dipole moment:	15	-1.563058e-01	2.054260e-02	-2.337331e-01	2.819302e-01		-3.972897e-01	5.221409e-02	-5.940903e-01	7.165953e-01
 	Electronic dipole moment:	16	9.377002e-02	-4.719241e-02	-2.989392e-01	3.168352e-01		2.383397e-01	-1.199512e-01	-7.598277e-01	8.053150e-01
 
-					| from and to eigenstates |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
-	Transition dipole moment:	0 -> 1		-9.631903e-03	6.368507e-03	-1.012227e-01	1.018792e-01		-2.448186e-02	1.618713e-02	-2.572826e-01	2.589512e-01
-	Transition dipole moment:	0 -> 2		2.335171e-01	-8.610199e-01	-7.636609e-01	1.174335e+00		5.935414e-01	-2.188495e+00	-1.941033e+00	2.984863e+00
-	Transition dipole moment:	0 -> 3		1.192594e+00	3.245526e-01	5.684314e-03	1.235980e+00		3.031271e+00	8.249305e-01	1.444809e-02	3.141548e+00
-	Transition dipole moment:	0 -> 4		2.256340e-01	-8.233474e-01	9.739749e-01	1.295160e+00		5.735046e-01	-2.092741e+00	2.475598e+00	3.291968e+00
-	Transition dipole moment:	0 -> 5		-2.664628e-02	-1.395893e-02	-2.739973e-02	4.068933e-02		-6.772811e-02	-3.548008e-02	-6.964319e-02	1.034220e-01
-	Transition dipole moment:	0 -> 6		7.473686e-03	6.617306e-02	-1.786957e-02	6.894963e-02		1.899622e-02	1.681952e-01	-4.541994e-02	1.752525e-01
-	Transition dipole moment:	0 -> 7		-1.509227e-02	-1.328830e-02	1.770594e-02	2.679283e-02		-3.836072e-02	-3.377549e-02	4.500403e-02	6.810060e-02
-	Transition dipole moment:	0 -> 8		-2.405941e-02	9.358000e-03	1.714597e-03	2.587213e-02		-6.115293e-02	2.378567e-02	4.358073e-03	6.576041e-02
-	Transition dipole moment:	0 -> 9		1.278114e-03	2.522213e-02	-9.767428e-03	2.707752e-02		3.248642e-03	6.410828e-02	-2.482633e-02	6.882421e-02
-	Transition dipole moment:	0 -> 10		-7.003567e-02	-1.331439e-01	-1.319828e-01	2.001293e-01		-1.780130e-01	-3.384181e-01	-3.354668e-01	5.086781e-01
-	Transition dipole moment:	0 -> 11		1.296838e-01	-1.341542e-01	-4.959089e-02	1.930660e-01		3.296233e-01	-3.409860e-01	-1.260475e-01	4.907250e-01
-	Transition dipole moment:	0 -> 12		1.135693e-01	5.120583e-02	-1.172487e-01	1.710769e-01		2.886644e-01	1.301523e-01	-2.980166e-01	4.348341e-01
-	Transition dipole moment:	0 -> 13		-4.327721e-04	9.902347e-05	2.828274e-02	2.828622e-02		-1.099997e-03	2.516926e-04	7.188757e-02	7.189643e-02
-	Transition dipole moment:	0 -> 14		-4.267860e-03	-2.970053e-02	-2.606393e-02	3.974499e-02		-1.084782e-02	-7.549122e-02	-6.624790e-02	1.010217e-01
-	Transition dipole moment:	0 -> 15		-6.179393e-02	-4.796721e-03	-1.401570e-02	6.354477e-02		-1.570645e-01	-1.219205e-02	-3.562436e-02	1.615147e-01
-	Transition dipole moment:	0 -> 16		-1.167652e-02	5.795673e-02	-6.328220e-02	8.660231e-02		-2.967875e-02	1.473113e-01	-1.608473e-01	2.201212e-01
+					| from and to eigenstates |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |  oscillator strength[a.u.]  |
+	Transition dipole moment:	0 -> 1		-9.631903e-03	6.368507e-03	-1.012227e-01	1.018792e-01		-2.448186e-02	1.618713e-02	-2.572826e-01	2.589512e-01	2.016193e-03
+	Transition dipole moment:	0 -> 2		2.335171e-01	-8.610199e-01	-7.636609e-01	1.174335e+00		5.935414e-01	-2.188495e+00	-1.941033e+00	2.984863e+00	2.867839e-01
+	Transition dipole moment:	0 -> 3		1.192594e+00	3.245526e-01	5.684314e-03	1.235980e+00		3.031271e+00	8.249305e-01	1.444809e-02	3.141548e+00	3.238513e-01
+	Transition dipole moment:	0 -> 4		2.256340e-01	-8.233474e-01	9.739749e-01	1.295160e+00		5.735046e-01	-2.092741e+00	2.475598e+00	3.291968e+00	3.612326e-01
+	Transition dipole moment:	0 -> 5		-2.664628e-02	-1.395893e-02	-2.739973e-02	4.068933e-02		-6.772811e-02	-3.548008e-02	-6.964319e-02	1.034220e-01	4.065023e-04
+	Transition dipole moment:	0 -> 6		7.473686e-03	6.617306e-02	-1.786957e-02	6.894963e-02		1.899622e-02	1.681952e-01	-4.541994e-02	1.752525e-01	1.185274e-03
+	Transition dipole moment:	0 -> 7		-1.509227e-02	-1.328830e-02	1.770594e-02	2.679283e-02		-3.836072e-02	-3.377549e-02	4.500403e-02	6.810060e-02	1.824099e-04
+	Transition dipole moment:	0 -> 8		-2.405941e-02	9.358000e-03	1.714597e-03	2.587213e-02		-6.115293e-02	2.378567e-02	4.358073e-03	6.576041e-02	1.720380e-04
+	Transition dipole moment:	0 -> 9		1.278114e-03	2.522213e-02	-9.767428e-03	2.707752e-02		3.248642e-03	6.410828e-02	-2.482633e-02	6.882421e-02	1.935138e-04
+	Transition dipole moment:	0 -> 10		-7.003567e-02	-1.331439e-01	-1.319828e-01	2.001293e-01		-1.780130e-01	-3.384181e-01	-3.354668e-01	5.086781e-01	1.078713e-02
+	Transition dipole moment:	0 -> 11		1.296838e-01	-1.341542e-01	-4.959089e-02	1.930660e-01		3.296233e-01	-3.409860e-01	-1.260475e-01	4.907250e-01	1.017732e-02
+	Transition dipole moment:	0 -> 12		1.135693e-01	5.120583e-02	-1.172487e-01	1.710769e-01		2.886644e-01	1.301523e-01	-2.980166e-01	4.348341e-01	8.082577e-03
+	Transition dipole moment:	0 -> 13		-4.327721e-04	9.902347e-05	2.828274e-02	2.828622e-02		-1.099997e-03	2.516926e-04	7.188757e-02	7.189643e-02	5.080630e-04
+	Transition dipole moment:	0 -> 14		-4.267860e-03	-2.970053e-02	-2.606393e-02	3.974499e-02		-1.084782e-02	-7.549122e-02	-6.624790e-02	1.010217e-01	1.013528e-03
+	Transition dipole moment:	0 -> 15		-6.179393e-02	-4.796721e-03	-1.401570e-02	6.354477e-02		-1.570645e-01	-1.219205e-02	-3.562436e-02	1.615147e-01	2.601852e-03
+	Transition dipole moment:	0 -> 16		-1.167652e-02	5.795673e-02	-6.328220e-02	8.660231e-02		-2.967875e-02	1.473113e-01	-1.608473e-01	2.201212e-01	4.851156e-03
 
 
-	Elapsed time(omp) for the CIS = 0.007097[s].
+	Elapsed time(omp) for the CIS = 0.001482[s].
 **********  DONE: PM3-CIS  **********
 
 
 	Summary for memory usage:
-		Max Heap: 0.094520[MB].
+		Max Heap: 0.122888[MB].
 		Current Heap(Leaked): 0.000000[MB].
 
 
      >>>>>  The MolDS finished normally!  <<<<<
-     >>>>>  CPU time: 0.03[s].  <<<<<
+     >>>>>  CPU time: 0.010767[s].  <<<<<
      >>>>>  Elapsed time: 0[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 0.0337441[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 0.0100272[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

@@ -1,28 +1,29 @@
 
 
-     >>>>>  Welcome to the MolDS world at 2013/2/12(Thu.) 4:53:41  <<<<<
+     >>>>>  Welcome to the MolDS world at 2014/7/16(Wed.) 11:43:28  <<<<<
 
 
 **********  START: Parse input  **********
-	Total number of atoms: 8
-	Total number of valence AOs: 14
-	Total number of valence electrons: 14
+	System conditions:
+		Total number of atoms: 8
+		Total number of valence AOs: 14
+		Total number of valence electrons: 14
 
-				| i-th | atom type |   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
-	Atom coordinates:	0	C	0.000000e+00	3.779452e-02	0.000000e+00		0.000000e+00	2.000000e-02	0.000000e+00
-	Atom coordinates:	1	C	2.822873e+00	-2.834589e-02	3.779452e-03		1.493800e+00	-1.500000e-02	2.000000e-03
-	Atom coordinates:	2	H	-6.614042e-01	1.967394e+00	1.889726e-03		-3.500000e-01	1.041100e+00	1.000000e-03
-	Atom coordinates:	3	H	-6.956082e-01	-9.836025e-01	-1.738548e+00		-3.681000e-01	-5.205000e-01	-9.200000e-01
-	Atom coordinates:	4	H	-6.991987e-01	-9.841694e-01	1.703777e+00		-3.700000e-01	-5.208000e-01	9.016000e-01
-	Atom coordinates:	5	H	3.499584e+00	9.826576e-01	-1.702076e+00		1.851900e+00	5.200000e-01	-9.007000e-01
-	Atom coordinates:	6	H	3.458199e+00	9.902165e-01	1.719651e+00		1.830000e+00	5.240000e-01	9.100000e-01
-	Atom coordinates:	7	H	3.514891e+00	-1.965504e+00	0.000000e+00		1.860000e+00	-1.040100e+00	0.000000e+00
+					| i-th | atom type |   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
+		Atom coordinates:	0	C	0.000000e+00	3.779452e-02	0.000000e+00		0.000000e+00	2.000000e-02	0.000000e+00
+		Atom coordinates:	1	C	2.822873e+00	-2.834589e-02	3.779452e-03		1.493800e+00	-1.500000e-02	2.000000e-03
+		Atom coordinates:	2	H	-6.614042e-01	1.967394e+00	1.889726e-03		-3.500000e-01	1.041100e+00	1.000000e-03
+		Atom coordinates:	3	H	-6.956082e-01	-9.836025e-01	-1.738548e+00		-3.681000e-01	-5.205000e-01	-9.200000e-01
+		Atom coordinates:	4	H	-6.991987e-01	-9.841694e-01	1.703777e+00		-3.700000e-01	-5.208000e-01	9.016000e-01
+		Atom coordinates:	5	H	3.499584e+00	9.826576e-01	-1.702076e+00		1.851900e+00	5.200000e-01	-9.007000e-01
+		Atom coordinates:	6	H	3.458199e+00	9.902165e-01	1.719651e+00		1.830000e+00	5.240000e-01	9.100000e-01
+		Atom coordinates:	7	H	3.514891e+00	-1.965504e+00	0.000000e+00		1.860000e+00	-1.040100e+00	0.000000e+00
 
-			|   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
-	Center of Mass:	1.409688e+00	4.008514e-03	9.965583e-04		7.459748e-01	2.121214e-03	5.273559e-04
+				|   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
+		Center of Mass:	1.409688e+00	4.008514e-03	9.965583e-04		7.459748e-01	2.121214e-03	5.273559e-04
 
-			|   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
-	Center of Core:	1.409689e+00	4.008721e-03	9.968163e-04		7.459751e-01	2.121324e-03	5.274925e-04
+				|   x[a.u.]   |   y[a.u.]   |   z[a.u.]   |		|  x[angst.]  |  y[angst.]  |  z[angst.]  |
+		Center of Core:	1.409689e+00	4.008721e-03	9.968163e-04		7.459751e-01	2.121324e-03	5.274925e-04
 
 	SCF conditions:
 		Max iterations: 50
@@ -33,6 +34,7 @@
 		DIIS starting error: 1.000000e-01
 		DIIS ending error: 2.000000e-08
 		van der Waals (vdW) correction: no
+		MPI in SCF: no
 
 	Memory conditions:
 		Heap limit: 2.560000e+02[MB]
@@ -124,13 +126,13 @@ h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 | -1.0401 | 0.0000 | geometry_end |
 				|  [a.u.]  |  [Kcal/mol]  | 
 	Heats of formation:	-2.736798e-02	-1.717367e+01
 
-	Elapsed time(omp) for the SCF = 0.079837[s].
+	Elapsed time(omp) for the SCF = 0.008914[s].
 **********  DONE: MNDO-SCF  **********
 
 
 **********  START: MNDO-CIS  **********
 ----------- START: Calculation of the CIS matrix -----------
-	Elapsed time(omp) for the calc. of the CIS matrix = 0.114006[s].
+	Elapsed time(omp) for the calc. of the CIS matrix = 0.007094[s].
 ----------- DONE: Calculation of the CIS matrix -----------
 
 	======  START: Davidson-CIS  =====
@@ -214,11 +216,11 @@ h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 | -1.0401 | 0.0000 | geometry_end |
 	======  DONE: Davidson-CIS  =====
 
 
-				|   i-th   |   e[a.u.]   |   e[eV]   | dominant eigenvector coefficients (occ. -> vir.) |
-	Excitation energies:	1	3.011267e-01	8.194141e+00	6.653826e-01 (6 -> 7)	
-	Excitation energies:	2	3.326270e-01	9.051315e+00	5.822900e-01 (5 -> 7)	
-	Excitation energies:	3	3.369532e-01	9.169038e+00	-3.906344e-01 (6 -> 10)	
-	Excitation energies:	4	3.393677e-01	9.234738e+00	4.965738e-01 (6 -> 8)	
+				|   i-th   |   e[a.u.]   |   e[eV]   |   e[nm]   | dominant eigenvector coefficients (occ. -> vir.) |
+	Excitation energies:	1	3.011267e-01	8.194141e+00	1.513096e+02	6.653826e-01 (6 -> 7)	
+	Excitation energies:	2	3.326270e-01	9.051315e+00	1.369803e+02	5.822900e-01 (5 -> 7)	
+	Excitation energies:	3	3.369532e-01	9.169038e+00	1.352216e+02	-3.906344e-01 (6 -> 10)	
+	Excitation energies:	4	3.393677e-01	9.234738e+00	1.342596e+02	4.965738e-01 (6 -> 8)	
 
 				| i-th eigenstate |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
 	Total dipole moment:	0	-1.995847e-02	-3.192655e-02	-1.222776e-02	3.958742e-02		-5.072938e-02	-8.114922e-02	-3.107987e-02	1.006212e-01
@@ -234,26 +236,26 @@ h | 1.8300 | 0.5240 | 0.9100 | h | 1.8600 | -1.0401 | 0.0000 | geometry_end |
 	Electronic dipole moment:	3	6.422312e-02	-7.270683e-03	1.624818e-02	6.664440e-02		1.632389e-01	-1.848024e-02	4.129876e-02	1.693932e-01
 	Electronic dipole moment:	4	6.389365e-02	-9.728068e-03	1.443746e-02	6.622291e-02		1.624015e-01	-2.472629e-02	3.669638e-02	1.683219e-01
 
-					| from and to eigenstates |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |
-	Transition dipole moment:	0 -> 1		-2.360388e-01	-2.256699e-01	-4.342440e-02	3.294342e-01		-5.999508e-01	-5.735959e-01	-1.103738e-01	8.373384e-01
-	Transition dipole moment:	0 -> 2		-4.875580e-02	-3.176505e-02	-5.235532e-02	7.827660e-02		-1.239249e-01	-8.073871e-02	-1.330740e-01	1.989593e-01
-	Transition dipole moment:	0 -> 3		-2.744886e-01	-2.689793e-01	-7.443261e-01	8.376844e-01		-6.976805e-01	-6.836774e-01	-1.891889e+00	2.129182e+00
-	Transition dipole moment:	0 -> 4		3.996160e-01	5.793969e-01	-5.636634e-01	9.017262e-01		1.015723e+00	1.472680e+00	-1.432690e+00	2.291960e+00
+					| from and to eigenstates |  x[a.u.]  |  y[a.u.]  |  z[a.u.]  |  magnitude[a.u.]  |		|  x[debye]  |  y[debye]  |  z[debye]  |  magnitude[debye]  |  oscillator strength[a.u.]  |
+	Transition dipole moment:	0 -> 1		-2.360388e-01	-2.256699e-01	-4.342440e-02	3.294342e-01		-5.999508e-01	-5.735959e-01	-1.103738e-01	8.373384e-01	2.178690e-02
+	Transition dipole moment:	0 -> 2		-4.875580e-02	-3.176505e-02	-5.235532e-02	7.827660e-02		-1.239249e-01	-8.073871e-02	-1.330740e-01	1.989593e-01	1.358721e-03
+	Transition dipole moment:	0 -> 3		-2.744886e-01	-2.689793e-01	-7.443261e-01	8.376844e-01		-6.976805e-01	-6.836774e-01	-1.891889e+00	2.129182e+00	1.576301e-01
+	Transition dipole moment:	0 -> 4		3.996160e-01	5.793969e-01	-5.636634e-01	9.017262e-01		1.015723e+00	1.472680e+00	-1.432690e+00	2.291960e+00	1.839622e-01
 
 
-	Elapsed time(omp) for the CIS = 0.523562[s].
+	Elapsed time(omp) for the CIS = 0.046034[s].
 **********  DONE: MNDO-CIS  **********
 
 
 	Summary for memory usage:
-		Max Heap: 0.248520[MB].
+		Max Heap: 0.322552[MB].
 		Current Heap(Leaked): 0.000000[MB].
 
 
      >>>>>  The MolDS finished normally!  <<<<<
-     >>>>>  CPU time: 0.6[s].  <<<<<
-     >>>>>  Elapsed time: 1[s].  <<<<<
-     >>>>>  Elapsed time(OMP): 0.61087[s].  <<<<<
+     >>>>>  CPU time: 0.057085[s].  <<<<<
+     >>>>>  Elapsed time: 0[s].  <<<<<
+     >>>>>  Elapsed time(OMP): 0.0561609[s].  <<<<<
      >>>>>  See you.  <<<<<
 
 

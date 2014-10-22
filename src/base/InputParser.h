@@ -1,7 +1,7 @@
 //************************************************************************//
-// Copyright (C) 2011-2012 Mikiya Fujii                                   // 
-// Copyright (C) 2012-2012 Katsuhiko Nishimra                             // 
-// Copyright (C) 2012-2013 Michihiro Okuyama                              //
+// Copyright (C) 2011-2014 Mikiya Fujii                                   // 
+// Copyright (C) 2012-2014 Katsuhiko Nishimra                             // 
+// Copyright (C) 2012-2014 Michihiro Okuyama                              //
 //                                                                        // 
 // This file is part of MolDS.                                            // 
 //                                                                        // 
@@ -46,6 +46,9 @@ private:
    std::string errorMessageNonValidInitialElectronicStateNASCO;
    std::string errorMessageNonValidTheoriesOptimization;
    std::string errorMessageNonValidExcitedStatesOptimization;
+   std::string errorMessageNonValidSpaceFixedAtomsOptimization;
+   std::string errorMessageNonValidSpaceFixedFirstAtomOptimization;
+   std::string errorMessageNonValidSpaceFixedLastAtomOptimization;
    std::string errorMessageNonValidElectronicStateFrequencies;
    std::string errorMessageNonValidTheoryFrequencies;
    std::string errorMessageElecState;
@@ -56,9 +59,13 @@ private:
    std::string errorMessageInitialElectronicStateNASCO;
    std::string messageStartParseInput;
    std::string messageDoneParseInput;
-   std::string messageTotalNumberAOs;
-   std::string messageTotalNumberAtoms;
-   std::string messageTotalNumberValenceElectrons;
+   std::string messageMpiConditions;
+   std::string messageMpiSize;
+   std::string messageOmpConditions;
+   std::string messageOmpNumProcs;
+   std::string messageOmpMaxThreads;
+   std::string messageMklMaxThreads;
+   std::string messageSystemConditions;
    std::string messageInputTerms;
    // SCF
    std::string messageScfConditions;
@@ -69,9 +76,13 @@ private:
    std::string messageScfDiisNumErrorVect;
    std::string messageScfDiisStartError;
    std::string messageScfDiisEndError;
+   std::string messageScfSumCharges;
+   std::string messageScfSumCharges2;
+   std::string messageScfSumCharges3;
    std::string messageScfVdW;
    std::string messageScfVdWScalingFactor;
    std::string messageScfVdWDampingFactor;
+   std::string messageScfMpi;
    // CIS
    std::string messageCisConditions;
    std::string messageCisNumberActiveOcc;
@@ -85,6 +96,9 @@ private:
    std::string messageCisAllTransitionDipoleMoments;
    std::string messageCisNumPrintCoefficients;
    std::string messageCisMulliken;
+   std::string messageCisSumCharges;
+   std::string messageCisSumCharges2;
+   std::string messageCisSumCharges3;
    // Memory
    std::string messageMemoryConditions;
    std::string messageMemoryLimitHeap;
@@ -126,6 +140,10 @@ private:
    std::string messageOptimizationMaxGradient;
    std::string messageOptimizationInitialTrustRadius;
    std::string messageOptimizationMaxNormStep;
+   std::string messageOptimizationSpaceFixedAtom;
+   std::string messageOptimizationSpaceFixedAtoms;
+   std::string messageOptimizationSpaceFixedAtoms2;
+   std::string messageOptimizationSpaceFixedAtoms3;
    // Frequencies (Normal modes)
    std::string messageFrequenciesConditions;
    std::string messageFrequenciesElecState;
@@ -152,7 +170,6 @@ private:
    std::string messageK;
    std::string messageAngst;
    std::string messageMB;
-
    // others
    std::string stringYES;
    std::string stringNO;
@@ -171,9 +188,12 @@ private:
    std::string stringTheoryPM3;
    std::string stringTheoryPM3D;
    std::string stringTheoryPM3PDDG;
-   // geometry
+   // molecular configuraion(geometry)
    std::string stringGeometry;
    std::string stringGeometryEnd;
+   // Ghost
+   std::string stringGhost;
+   std::string stringGhostEnd;
    // EPC
    std::string stringEpc;
    std::string stringEpcEnd;
@@ -188,9 +208,11 @@ private:
    std::string stringScfDiisNumErrorVect;
    std::string stringScfDiisStartError;
    std::string stringScfDiisEndError;
+   std::string stringScfSumCharges;
    std::string stringScfVdW;
    std::string stringScfVdWScalingFactor;
    std::string stringScfVdWDampingFactor;
+   std::string stringScfMpi;
    // MOPlot
    std::string stringMO;
    std::string stringMOPlot;
@@ -245,6 +267,7 @@ private:
    std::string stringCISNumPrintCoefficients;
    std::string stringCISMulliken;
    std::string stringCISUnpairedPop;
+   std::string stringCISSumCharges;
    // Memory
    std::string stringMemory;
    std::string stringMemoryEnd;
@@ -296,11 +319,14 @@ private:
    std::string stringOptimizationTimeWidth;
    std::string stringOptimizationInitialTrustRadius;
    std::string stringOptimizationMaxNormStep;
+   std::string stringOptimizationSpaceFixedAtom;
+   std::string stringOptimizationSpaceFixedAtoms;
    // Frequencies (Normal modes)
    std::string stringFrequencies;
    std::string stringFrequenciesEnd;
    std::string stringFrequenciesElecState;
    void CalcMolecularBasics(Molecule* molecule) const;
+   void ValidateScfConditions() const;
    void ValidateVdWConditions() const;
    void ValidateEpcConditions(const Molecule& molecule) const;
    void ValidateCisConditions(const Molecule& molecule) const;
@@ -310,6 +336,8 @@ private:
    void ValidateNascoConditions(const Molecule& molecule) const;
    void ValidateOptimizationConditions(const Molecule& molecule) const;
    void ValidateFrequenciesConditions() const;
+   void OutputMpiConditions() const;
+   void OutputOmpConditions() const;
    void OutputMolecularBasics(Molecule* molecule) const;
    void OutputScfConditions() const;
    void OutputMemoryConditions() const;
@@ -329,7 +357,8 @@ private:
    void StoreInputTermsFromRedirect(std::vector<std::string>& inputTerms) const;
    void StoreInputTermsFromFile(std::vector<std::string>& inputTerms, char* fileName) const;
    void AddInputTermsFromString(std::vector<std::string>& inputTerms, std::string str) const;
-   int ParseMolecularGeometry(Molecule* molecule, std::vector<std::string>* inputTerms, int parseIndex) const;
+   int ParseMolecularConfiguration(Molecule* molecule, std::vector<std::string>* inputTerms, int parseIndex) const;
+   int ParseGhostsConfiguration(Molecule* molecule, std::vector<std::string>* inputTerms, int parseIndex) const;
    int ParseEpcsConfiguration(Molecule* molecule, std::vector<std::string>* inputTerms, int parseIndex) const;
    int ParseTheory(std::vector<std::string>* inputTerms, int parseIndex) const;
    int ParseConditionsSCF(std::vector<std::string>* inputTerms, int parseIndex) const;
