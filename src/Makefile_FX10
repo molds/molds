@@ -18,7 +18,7 @@
 #// along with MolDS.  If not, see <http://www.gnu.org/licenses/>.         // 
 #//************************************************************************//
 CC = mpiFCCpx
-CFLAGS = -Kfast,openmp -SSL2BLAMP -Xg
+CFLAGS = -Kfast,openmp -SCALAPACK -SSL2BLAMP -Xg
 BOOST_TOP_DIR = /home/n0011/n001101/opt/boost/boost1.49.0/
 BOOST_INC_DIR = $(BOOST_TOP_DIR)include/
 BOOST_LIB_DIR = $(BOOST_TOP_DIR)lib/
@@ -26,7 +26,7 @@ BOOST_LIBS    = -lboost
 LIBS = $(BOOST_LIBS) 
 EXENAME = molds
 DEPFILE = obj/objfile.dep
-LDFLAGS = -Kfast,openmp -SSL2BLAMP -Xg -Wl,-rpath=$(BOOST_LIB_DIR)
+LDFLAGS = -Kfast,openmp -SCALAPACK -SSL2BLAMP -Xg -Wl,-rpath=$(BOOST_LIB_DIR)
 THIS_MAKEFILE := $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST))
 
 ALL_CPP_FILES  =          base/Enums.cpp                   base/PrintController.cpp base/MolDSException.cpp                                     base/MallocerFreer.cpp              mpi/MpiProcess.cpp mpi/AsyncCommunicator.cpp wrappers/Blas.cpp wrappers/Lapack.cpp wrappers/ScaLapack.cpp base/Utilities.cpp base/MathUtilities.cpp base/EularAngle.cpp base/Parameters.cpp base/RealSphericalHarmonicsIndex.cpp base/atoms/Atom.cpp base/atoms/Hatom.cpp base/atoms/Liatom.cpp base/atoms/Catom.cpp base/atoms/Natom.cpp base/atoms/Oatom.cpp base/atoms/Fatom.cpp base/atoms/Satom.cpp base/atoms/Clatom.cpp base/atoms/Znatom.cpp base/atoms/ghost/Ghost.cpp base/atoms/ghost/GhostHatom.cpp base/atoms/ghost/GhostLiatom.cpp base/atoms/ghost/GhostCatom.cpp base/atoms/ghost/GhostNatom.cpp base/atoms/ghost/GhostOatom.cpp base/atoms/ghost/GhostFatom.cpp base/atoms/ghost/GhostSatom.cpp base/atoms/ghost/GhostClatom.cpp base/atoms/ghost/GhostZnatom.cpp base/atoms/mm/EnvironmentalPointCharge.cpp base/factories/AtomFactory.cpp base/Molecule.cpp base/InputParser.cpp base/GTOExpansionSTO.cpp base/loggers/MOLogger.cpp base/loggers/DensityLogger.cpp base/loggers/HoleDensityLogger.cpp base/loggers/ParticleDensityLogger.cpp                            cndo/Cndo2.cpp                                    indo/Indo.cpp zindo/ZindoS.cpp mndo/Mndo.cpp am1/Am1.cpp am1/Am1D.cpp pm3/Pm3.cpp pm3/Pm3D.cpp pm3/Pm3Pddg.cpp base/factories/ElectronicStructureFactory.cpp base/constraints/Constraint.cpp base/constraints/SpaceFixedAtoms.cpp base/constraints/NonConstraint.cpp base/factories/ConstraintFactory.cpp  md/MD.cpp mc/MC.cpp rpmd/RPMD.cpp nasco/NASCO.cpp optimization/Optimizer.cpp optimization/ConjugateGradient.cpp optimization/SteepestDescent.cpp optimization/BFGS.cpp optimization/GEDIIS.cpp base/factories/OptimizerFactory.cpp  base/MolDS.cpp     Main.cpp
