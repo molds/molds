@@ -45,6 +45,7 @@ class Tester
    @@command = "command: "
    @@mpiCommand = "mpiexec -n "
    @@mpiProcesses = "2"
+   @@mpiOptions = " -mca common_tofu_medium_recv_buf_size 262144 "
    @@deleteDiff = " | gawk '{if(($2!=\"SCF\")&&($3!=\"iter\")){print $0}}' | gawk '{if(($4!=\"time:\")){print $0}}' | gawk '{if(($3!=\"Elapsed\")){print $0}}' | gawk '{if(($2!=\"Elapsed\")){print $0}}' | gawk '{if(($3!=\"Welcome\")){print $0}}' | gawk '{if(($7!=\"residual\")){print $0}}' | gawk '{if(($3!=\"mode(nmw):\") ){print $0}}' | gawk '{if( !(($3==\"mode(mw):\")&&($4<6)) ){print $0}}'" 
 	 @@printed_section = []
    def doesTestOmp(mklNumThreads, ompNumThreads)
@@ -89,7 +90,7 @@ EOS
       @inputFile = prefix + @@surfixInp
       @outputFile = prefix + @@surfixDat
       @moldsCommand = @@moldsBin + " < " + @inputFile + " > " + @@tempFile 
-      @moldsCommandMPI = @@mpiCommand + @@mpiProcesses + " " + @@moldsBin + " "  + @inputFile + " > " + @@tempFile 
+      @moldsCommandMPI = @@mpiCommand + @@mpiProcesses + " " + @@mpiOptions + @@moldsBin + " "  + @inputFile + " >& " + @@tempFile 
       @diffCommand = "diff " + @outputFile + " " + @@tempFile
 			@title = title
 			# Update section title if given, otherwise reuse previous one.
@@ -269,7 +270,7 @@ mklNumThreads = "4"
 ompNumThreads = "16"
 tester.doesTestMpi(mklNumThreads,ompNumThreads)
 
-prefix = "c2h6_zindos_directCIS_singlet"
+prefix = "c2h6_zindos_directCIS_singlet_allTrans"
 tester = Tester.new(prefix, <<"TITLE")
 \t\t\t>>> C2H6 <<<
 TITLE
@@ -330,7 +331,7 @@ mklNumThreads = "4"
 ompNumThreads = "16"
 tester.doesTestMpi(mklNumThreads,ompNumThreads)
 
-prefix = "c2h6_zindos_davidsonCIS_singlet"
+prefix = "c2h6_zindos_davidsonCIS_singlet_allTrans"
 tester = Tester.new(prefix, <<"TITLE")
 \t\t\t>>> C2H6 <<<
 TITLE
@@ -754,7 +755,7 @@ mklNumThreads = "4"
 ompNumThreads = "16"
 tester.doesTestMpi(mklNumThreads,ompNumThreads)
 
-prefix = "c2h6_pm3_directCIS_singlet"
+prefix = "c2h6_pm3_directCIS_singlet_UEP_sumCharges"
 tester = Tester.new(prefix, <<"TITLE")
 \t\t\t>>> C2H6 <<<
 TITLE
