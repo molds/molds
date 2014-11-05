@@ -21,18 +21,21 @@
 
 ==============================================================================
 
-
-   MolDS ("Mol"ecular "D"ynamics "S"imulation package) ver. 0.4.0 (Under developement)
+   MolDS ("Mol"ecular "D"ynamics simulation package with "S"emiempirical quantum chemistry) ver. 0.4.0 (Under developement)
       Developers: Mikiya Fujii, Ph.D.(project lead), Katsuhiko Nishimra, and Michihiro Okuyama, Ph.D..
       Other contributors: Michael Banck 
       Questions and bug reports: molds-dev@lists.sourceforge.jp
 
 
+   The goal of MolDS is classical/semiclassical/quantum molecular dynamics simulations 
+   based on semiempirical quantum chemistry. Besides, MolDS is implemented to be able 
+   to run on huge cluster system by using OpenMP/MPI hybrid parallelization technique.
+
 ==============================================================================
 REQUIREMENTS:
    -Compilers:
-    MolDS requires c++ mpi compiler (e.g. Intel MPI or Open MPI) 
-    that is wrapping Intel (icpc with MKL) or GNU (g++) c++ compiler.
+    MolDS requires C++ mpi compiler (e.g. Intel MPI or Open MPI) 
+    that is wrapping Intel (icpc with MKL) or GNU (g++) C++ compiler.
     Valid versions of the mpi compilers are Intel MPI 4.0.2, Open MPI 1.4.5, or later.
     Valid versions of the wrapped c++ compilers are icpc 12.0.4(MkL 10.3 update 4), 
     g++ 4.4, or later because the MolDS is implemented with openMP 3.0. 
@@ -196,8 +199,8 @@ CAPABILITIES:
       the original semiempirical parameters used in SCF of AM1 and PM3, respectively.
 
    -Parallelization
-    Open MP parallelization: everywhere in MolDS
-    MPI parallelization: CIS is only parallelized with MPI. 
+    Open MP parallelization: Everywhere in MolDS
+    MPI parallelization: Everywhere in MolDS, basically. But some modules do not parallelized yet.
 
 ==============================================================================
 HOW TO WRITE INPUT:
@@ -232,18 +235,17 @@ HOW TO WRITE INPUT:
        Write below options in SCF-directive.
        "max_iter", "rms_density", "damping_thresh", "damping_weight", 
        "diis_num_error_vect", "diis_start_error", "diis_end_error", "sum_charges"
-       "vdW", "vdW_s6", "vdW_d", "mpi" are prepared as options.
+       "vdW", "vdW_s6", "vdW_d", "mpi", and "scalapack" are prepared as options.
        SCF module outputs also the dipole moment arrond the center of core's mass
        To calculate the dipole moment, STO-6G [DY_1977] is used.
 
        The default value of the "max_iter" is 100.
        The default value of the "rms_density" is 10**(-8.0).
        The default value of the "damping_thresh" is 1.
-       The default value of the "damping_weight" is 0.8.
+       The default value of the "damping_weight" is 0.8. For systems consisting of several hundreds of atoms, the developers recommend setting "damping_weight" more than 0.95.
        The default value of the "diis_num_error_vect" is 5.
        The default value of the "diis_start_error" is 0.01.
        The default value of the "diis_end_error" is 10**(-8.0).
-       The default value of the "mpi" is "yes"
 
        "vdW" should be set as "yes" or "no". 
        When "yes" is set, Grimmes's empirical van der Waals correction(D1, [G_2004]) is applied.
@@ -282,6 +284,12 @@ HOW TO WRITE INPUT:
        If "mpi" is set to "no", SCF module does not use the MPI.
        This option can change the setting of parallelization for SCF module only. Namely, 
        this option cannot change the setting of parallelization for 1st(2nd) gradients, CIS, etc.
+       The default value of the "mpi" is "yes". 
+
+       "scalapack" should be set as "yes" or "no". 
+       When "scalapack yes", the diagonalizing SCF matrix is carried out with ScaLapack.
+       The default setting of "scalapack" option is "NO".
+       Note that "scalapack" is supported on FX10 only.
 
        E.g.
          SCF
@@ -491,18 +499,18 @@ HOW TO WRITE INPUT:
        When "mulliken x" is included in CIS-directive, the mulliken popultaion of xth excited state is calculated.
        Multiple indication of these mulliken options is possible. 
        Note that "mulliken 0" is ignored because 0th excited state is the ground state.
-       Default setting of this "mulliken" option is nothing.
+       The default setting of this "mulliken" option is nothing.
 
        "unpaired_electron_population" is an option of unpaired electron population(UEP) analysis of the excited state.
        When "unpaired electron population yes" and "mulliken x" are included in CIS-directive, 
        the UEP of xth excited state is calculated.
        By multiple indication of these mulliken option, the UEP on multiple excited states are possible.
        Note that the UEP on ground state is ignored. 
-       Default setting is "unpaired_electron_population" option is nothing.
+       The default setting is "unpaired_electron_population" option is nothing.
 
        "scalapack" should be set as "yes" or "no". 
        When "scalapack yes", the diagonalizing CIS matrix is carried out with ScaLapack.
-       Default setting is "scalapack" option is "NO".
+       The Default setting of "scalapack" option is "NO".
        Note that "scalapack" is supported on FX10 only.
 
        "sum_charges" is an option to calculate of summation of the mulliken charges and unpaired electron population
