@@ -23,6 +23,7 @@ CFLAGS =
 CXXFLAGS =
 LDFLAGS =
 BUILDDIR = build
+SRCDIR = $(shell pwd)
 override CXXFLAGS += $(CFLAGS)
 ifeq ($(OPENBLASDIR),)
    ifeq ($(BLASLIB),openblas)
@@ -44,7 +45,7 @@ all: $(OUTPUT)
 $(BUILDDIR)/Makefile:
 	mkdir -p $(BUILDDIR)
 	cd $(BUILDDIR); \
-	../configure $(CONFIGURE_OPTIONS) CXXFLAGS='$(CXXFLAGS)' LDFLAGS='$(LDFLAGS)'
+	$(SRCDIR)/configure $(CONFIGURE_OPTIONS) CXXFLAGS='$(CXXFLAGS)' LDFLAGS='$(LDFLAGS)'
 
 $(BUILDDIR)/$(OUTPUT): $(BUILDDIR)/Makefile $(wildcard *.cpp) $(wildcard */*.cpp) $(wildcard */*.h)
 	+make -C $(BUILDDIR)
