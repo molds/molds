@@ -41,6 +41,9 @@ private:
    std::string errorMessageNonValidExcitedStatesMC;
    std::string errorMessageNonValidTheoriesRPMD;
    std::string errorMessageNonValidExcitedStatesRPMD;
+   std::string errorMessageNonValidTheoriesEhrenfest;
+   std::string errorMessageNonValidInitialElectronicStateEhrenfest;
+   std::string errorMessageNonValidNumberExcitedStatesEhrenfest;
    std::string errorMessageNonValidTheoriesNASCO;
    std::string errorMessageNonValidNumberExcitedStatesNASCO;
    std::string errorMessageNonValidInitialElectronicStateNASCO;
@@ -50,11 +53,16 @@ private:
    std::string errorMessageNonValidSpaceFixedFirstAtomOptimization;
    std::string errorMessageNonValidSpaceFixedLastAtomOptimization;
    std::string errorMessageNonValidElectronicStateFrequencies;
+   std::string errorMessageNonValidElectronicStateNumericalFrequencies;
    std::string errorMessageNonValidTheoryFrequencies;
    std::string errorMessageElecState;
    std::string errorMessageInputFile; 
    std::string errorMessageTheory;
+   std::string errorMessageHessianType;
    std::string errorMessageNumberExcitedStateCIS;
+   std::string errorMessageInitialElectronicStateEhrenfest;
+   std::string errorMessageHighestElectronicStateEhrenfest;
+   std::string errorMessageLowestElectronicStateEhrenfest;
    std::string errorMessageNumberElectronicStatesNASCO;
    std::string errorMessageInitialElectronicStateNASCO;
    std::string messageStartParseInput;
@@ -83,6 +91,7 @@ private:
    std::string messageScfVdWScalingFactor;
    std::string messageScfVdWDampingFactor;
    std::string messageScfMpi;
+   std::string messageScfScaLapack;
    // CIS
    std::string messageCisConditions;
    std::string messageCisNumberActiveOcc;
@@ -99,6 +108,7 @@ private:
    std::string messageCisSumCharges;
    std::string messageCisSumCharges2;
    std::string messageCisSumCharges3;
+   std::string messageCisScaLapack;
    // Memory
    std::string messageMemoryConditions;
    std::string messageMemoryLimitHeap;
@@ -123,6 +133,13 @@ private:
    std::string messageRpmdTemperature;
    std::string messageRpmdNumBeads;
    std::string messageRpmdSeed;
+   // Ehrenfest
+   std::string messageEhrenfestConditions;    
+   std::string messageEhrenfestTotalSteps;    
+   std::string messageEhrenfestIniElecState;  
+   std::string messageEhrenfestHighestElecState; 
+   std::string messageEhrenfestLowestElecState; 
+   std::string messageEhrenfestTimeWidth;    
    // NASCO
    std::string messageNascoConditions;
    std::string messageNascoTotalSteps;
@@ -147,6 +164,8 @@ private:
    // Frequencies (Normal modes)
    std::string messageFrequenciesConditions;
    std::string messageFrequenciesElecState;
+   std::string messageFrequenciesHessianType;
+   std::string messageFrequenciesNumericalDr;
    // MOPlot
    std::string messageMOPlotConditions;
    std::string messageMOPlotIndex;
@@ -213,6 +232,7 @@ private:
    std::string stringScfVdWScalingFactor;
    std::string stringScfVdWDampingFactor;
    std::string stringScfMpi;
+   std::string stringScfScaLapack;
    // MOPlot
    std::string stringMO;
    std::string stringMOPlot;
@@ -268,6 +288,7 @@ private:
    std::string stringCISMulliken;
    std::string stringCISUnpairedPop;
    std::string stringCISSumCharges;
+   std::string stringCISScaLapack;
    // Memory
    std::string stringMemory;
    std::string stringMemoryEnd;
@@ -296,6 +317,14 @@ private:
    std::string stringRPMDTemperature;
    std::string stringRPMDNumBeads;
    std::string stringRPMDSeed;
+   // Ehrenfest
+   std::string stringEhrenfest;              
+   std::string stringEhrenfestEnd;           
+   std::string stringEhrenfestTotalSteps;    
+   std::string stringEhrenfestInitialElecState;   
+   std::string stringEhrenfestHighestElecState; 
+   std::string stringEhrenfestLowestElecState; 
+   std::string stringEhrenfestTimeWidth;     
    // NASCO
    std::string stringNASCO;
    std::string stringNASCOEnd;
@@ -325,6 +354,10 @@ private:
    std::string stringFrequencies;
    std::string stringFrequenciesEnd;
    std::string stringFrequenciesElecState;
+   std::string stringFrequenciesHessianType;
+   std::string stringFrequenciesAnalytic;
+   std::string stringFrequenciesNumerical;
+   std::string stringFrequenciesNumericalDr;
    void CalcMolecularBasics(Molecule* molecule) const;
    void ValidateScfConditions() const;
    void ValidateVdWConditions() const;
@@ -333,9 +366,10 @@ private:
    void ValidateMdConditions(const Molecule& molecule) const;
    void ValidateMcConditions(const Molecule& molecule) const;
    void ValidateRpmdConditions(const Molecule& molecule) const;
+   void ValidateEhrenfestConditions(const Molecule& molecule) const;
    void ValidateNascoConditions(const Molecule& molecule) const;
    void ValidateOptimizationConditions(const Molecule& molecule) const;
-   void ValidateFrequenciesConditions() const;
+   void ValidateFrequenciesConditions(const Molecule& molecule) const;
    void OutputMpiConditions() const;
    void OutputOmpConditions() const;
    void OutputMolecularBasics(Molecule* molecule) const;
@@ -345,6 +379,7 @@ private:
    void OutputMdConditions() const;
    void OutputMcConditions() const;
    void OutputRpmdConditions() const;
+   void OutputEhrenfestConditions() const;
    void OutputNascoConditions() const;
    void OutputOptimizationConditions() const;
    void OutputFrequenciesConditions() const;
@@ -372,6 +407,7 @@ private:
    int ParseConditionsMC(std::vector<std::string>* inputTerms, int parseIndex) const;
    int ParseConditionsMD(std::vector<std::string>* inputTerms, int parseIndex) const;
    int ParseConditionsRPMD(std::vector<std::string>* inputTerms, int parseIndex) const;
+   int ParseConditionsEhrenfest(std::vector<std::string>* inputTerms, int parseIndex) const;
    int ParseConditionsNASCO(std::vector<std::string>* inputTerms, int parseIndex) const;
    int ParseConditionsOptimization(std::vector<std::string>* inputTerms, int parseIndex) const;
    int ParseConditionsFrequencies(std::vector<std::string>* inputTerms, int parseIndex) const;

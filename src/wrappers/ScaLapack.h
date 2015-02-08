@@ -1,5 +1,5 @@
 //************************************************************************//
-// Copyright (C) 2011-2014 Mikiya Fujii                                   //
+// Copyright (C) 2011-2014 Mikiya Fujii                                   // 
 //                                                                        // 
 // This file is part of MolDS.                                            // 
 //                                                                        // 
@@ -16,31 +16,29 @@
 // You should have received a copy of the GNU General Public License      // 
 // along with MolDS.  If not, see <http://www.gnu.org/licenses/>.         // 
 //************************************************************************//
-#ifndef INCLUDED_MOLDS
-#define INCLUDED_MOLDS
-namespace MolDS_base{
-class MolDS: public PrintController{
+#ifndef INCLUDED_SCALAPACK
+#define INCLUDED_SCALAPACK
+namespace MolDS_wrappers{
+//typedef intptr_t molds_scalapack_int;
+#ifdef __FCC_VERSION
+typedef int molds_scalapack_int;
+#else
+typedef intptr_t molds_scalapack_int;
+#endif
+// ScaLapacke is singleton
+class ScaLapack: public MolDS_base::PrintController, private MolDS_base::Uncopyable{
 public:
-   void Run(int argc, char *argv[]);
+   static ScaLapack* GetInstance();
+   static void DeleteInstance();
+   molds_scalapack_int Pdsyevd(double** matrix, double* eigenValues, molds_scalapack_int size, bool calcEigenVectors);
 private:
-   time_t  startTime;
-   clock_t startTick;
-   double  ompStartTime;
-   void Initialize();
-   void Finalize(bool runsNormally) const;
-   void CalculateElectronicStructureOnce(Molecule* molecule, bool* runsNormally) const;
-   void DoMC(Molecule* molecule, bool* runsNormally) const;
-   void DoMD(Molecule* molecule, bool* runsNormally) const;
-   void DoRPMD(Molecule* molecule, bool* runsNormally) const;
-   void DoEhrenfest(Molecule* molecule, bool* runsNormally) const;
-   void DoNASCO(Molecule* molecule, bool* runsNormally) const;
-   void OptimizeGeometry(Molecule* molecule, bool* runsNormally) const;
-   void DiagonalizePrincipalAxes(Molecule* molecule, bool* runsNormally) const;
-   void TranslateMolecule(Molecule* molecule, bool* runsNormally) const;
-   void RotateMolecule(Molecule* molecule, bool* runsNormally) const;
+   ScaLapack();
+   ~ScaLapack();
+   static ScaLapack* scaLapack;
+   std::string errorMessagePdsyevdInfo;
+   std::string errorMessagePdsyevdSize;
+   std::string errorMessagePdsyevdNotSupported;
+   std::string errorMessagePdsyevdMpiSquare;
 };
 }
 #endif
-
-
-

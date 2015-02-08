@@ -125,6 +125,9 @@ protected:
                                int moB) const;
    bool RequiresExcitedStatesForce(const std::vector<int>& elecStates) const;
    virtual void CalcForce(const std::vector<int>& elecStates);
+   virtual void CalcNormalModes(double** normalModes, double* normalForceConstants, const MolDS_base::Molecule& molecule) const;
+   virtual void CalcHessian(double** hessian, bool isMassWeighted, int elecState)const;
+   virtual void CalcHessianNumerical(double** hessian, bool isMassWeighted, int elecState)const;
    int GetSlaterDeterminantIndex(int activeOccIndex, int activeVirIndex) const;
    int GetActiveOccIndex(const MolDS_base::Molecule& molecule, int matrixCISIndex) const;
    int GetActiveVirIndex(const MolDS_base::Molecule& molecule, int matrixCISIndex) const;
@@ -153,7 +156,6 @@ protected:
                                        int indexAtomB,
                                        double const* const* const* diatomicOverlapAOs1stDerivs) const;
 private:
-   std::string errorMessageElecState;
    std::string errorMessageNishimotoMataga;
    std::string errorMessageDavidsonMaxIter;
    std::string errorMessageDavidsonMaxDim;
@@ -283,7 +285,9 @@ private:
                                     double***  tmpRotatedDiatomicOverlap,
                                     double**   tmpRotatedDiatomicOverlapVec,
                                     double***  tmpMatrixBC,
-                                    double**   tmpVectorBC) const;         
+                                    double**   tmpVectorBC,
+                                    double**** tmpMatrixForce,
+                                    std::vector<int> elecStates) const;         
    void FreeTempMatricesCalcForce(double**** diatomicOverlapAOs1stDerivs, 
                                   double**** diatomicTwoElecsTwoCores1stDerivs,
                                   double***  tmpDiaOverlapAOsInDiaFrame,       
@@ -294,7 +298,9 @@ private:
                                   double***  tmpRotatedDiatomicOverlap,
                                   double**   tmpRotatedDiatomicOverlapVec,
                                   double***  tmpMatrixBC,
-                                  double**   tmpVectorBC) const;         
+                                  double**   tmpVectorBC,
+                                  double**** tmpMatrixForce,
+                                  std::vector<int> elecStates) const;         
    void CalcForceExcitedStaticPart(double* force, 
                                    int elecStateIndex,
                                    int indexAtomA,

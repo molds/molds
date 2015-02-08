@@ -104,11 +104,6 @@ Mndo::~Mndo(){
                                               this->molecule->GetEpcVect().size(),
                                               numBuff,
                                               numBuff);
-   MallocerFreer::GetInstance()->Free<double>(&this->normalForceConstants,
-                                              CartesianType_end*molecule->GetAtomVect().size());
-   MallocerFreer::GetInstance()->Free<double>(&this->normalModes,
-                                              CartesianType_end*molecule->GetAtomVect().size(),
-                                              CartesianType_end*molecule->GetAtomVect().size());
 }
 
 void Mndo::SetMolecule(Molecule* molecule){
@@ -139,11 +134,6 @@ void Mndo::SetMolecule(Molecule* molecule){
                                                 this->molecule->GetEpcVect().size(),
                                                 numBuff,
                                                 numBuff);
-   MallocerFreer::GetInstance()->Malloc<double>(&this->normalForceConstants,
-                                                CartesianType_end*molecule->GetAtomVect().size());
-   MallocerFreer::GetInstance()->Malloc<double>(&this->normalModes,
-                                                CartesianType_end*molecule->GetAtomVect().size(),
-                                                CartesianType_end*molecule->GetAtomVect().size());
 }
 void Mndo::SetMessages(){
    this->errorMessageSCFNotConverged 
@@ -203,6 +193,8 @@ void Mndo::SetMessages(){
       = "Error in mndo::Mndo::GetElectronicEnergy: excitedEnergies is NULL\n";
    this->errorMessageCalcZMatrixForceEtaNull 
       = "Error in mndo::Mndo::CalcZMatrixForce: Nndo::etaMatrixForce is NULL. Call Mndo::CalcEtaMatrixForce before calling Mndo::CalcZMatrixForce.\n";
+   this->errorMessageCalcHessian
+      = "Error in mndo::Mndo::CalcHessian::Conditions for calculation are wrong.\n";
    this->messageSCFMetConvergence = "\n\n\n\t\tMNDO-SCF met convergence criterion(^^b\n\n\n";
    this->messageStartSCF = "**********  START: MNDO-SCF  **********\n";
    this->messageDoneSCF = "**********  DONE: MNDO-SCF  **********\n\n\n";
@@ -211,6 +203,8 @@ void Mndo::SetMessages(){
    this->messageStartCIS = "**********  START: MNDO-CIS  **********\n";
    this->messageDoneCIS = "**********  DONE: MNDO-CIS  **********\n\n\n";
    this->messageDavidsonConverge = "\n\n\t\tDavidson for MNDO-CIS met convergence criterion(^^b\n\n\n";
+   this->debugMessageHessianMatrix 
+      = "Debug in mndo::Mndo::CalcHessian\n-----  Hessian matrix  --------\n";
 }
 
 void Mndo::SetEnableAtomTypes(){
@@ -412,17 +406,6 @@ void Mndo::CalcSCFProperties(){
    MolDS_cndo::Cndo2::CalcSCFProperties();
    this->CalcHeatsFormation(&this->heatsFormation, *this->molecule);
  
-}
-
-void Mndo::CalcNormalModes(double** normalModes, double* normalForceConstants, const Molecule& molecule) const{
-   bool isMassWeighted = true;
-   this->CalcHessianSCF(normalModes, isMassWeighted);
-   bool calcEigenVectors = true;
-   int hessianDim = CartesianType_end*molecule.GetAtomVect().size();
-   MolDS_wrappers::Lapack::GetInstance()->Dsyevd(normalModes,
-                                                 normalForceConstants,
-                                                 hessianDim,
-                                                 calcEigenVectors);
 }
 
 void Mndo::OutputSCFResults() const{
@@ -1776,6 +1759,43 @@ double Mndo::GetHessianElementDifferentAtomsSCF(int indexAtomA,
    return value;
 }
 
+void Mndo::CalcHessian(double** hessian, bool isMassWeighted, int elecState) const{
+   int groundState = 0;
+   HessianType hType= Parameters::GetInstance()->GetHessianTypeFrequencies();
+   if(hType == Analytic){
+      if(elecState == groundState){
+         this->CalcHessianSCF(hessian, isMassWeighted);
+      }
+      else{
+         stringstream ss;
+         ss << this->errorMessageCalcHessian;
+         ss << this->errorMessageTheory      << TheoryTypeStr(this->theory) << endl;
+         ss << this->errorMessageHessianType << HessianTypeStr(hType) << endl;
+         ss << this->errorMessageElecState   << elecState << endl;
+         throw MolDSException(ss.str());
+      }
+   }
+   else if(hType == Numerical){
+      this->CalcHessianNumerical(hessian, isMassWeighted, elecState);
+   }
+
+#ifdef MOLDS_DBG
+   this->OutputLog(this->debugMessageHessianMatrix);
+   for(int A=0; A<this->molecule->GetAtomVect().size(); A++){
+      for(int axisA=0; axisA<CartesianType_end; axisA++){
+         int k=A*CartesianType_end+axisA;
+         for(int B=0; B<this->molecule->GetAtomVect().size(); B++){
+            for(int axisB=0; axisB<CartesianType_end; axisB++){
+               int l=B*CartesianType_end+axisB;
+               this->OutputLog(boost::format("%e\t") % hessian[k][l]);
+            }
+         }
+         this->OutputLog("\n");
+      }
+   }
+#endif
+}
+
 void Mndo::CalcHessianSCF(double** hessianSCF, bool isMassWeighted) const{
    int totalNumberAOs = this->molecule->GetTotalNumberAOs();
    double**** orbitalElectronPopulation1stDerivs = NULL;
@@ -2650,204 +2670,279 @@ void Mndo::CalcForceExcitedTwoElecPart(double* force,
 // electronicStateIndex is index of the electroinc eigen state.
 // "electronicStateIndex = 0" means electronic ground state. 
 void Mndo::CalcForce(const vector<int>& elecStates){
-   int mpiRank = MolDS_mpi::MpiProcess::GetInstance()->GetRank();
-   int mpiSize = MolDS_mpi::MpiProcess::GetInstance()->GetSize();
+   int mpiRank     = MolDS_mpi::MpiProcess::GetInstance()->GetRank();
+   int mpiSize     = MolDS_mpi::MpiProcess::GetInstance()->GetSize();
+   int mpiHeadRank = MolDS_mpi::MpiProcess::GetInstance()->GetHeadRank();
    this->CheckMatrixForce(elecStates);
    if(this->RequiresExcitedStatesForce(elecStates)){
       this->CalcEtaMatrixForce(elecStates);
       this->CalcZMatrixForce(elecStates);
    }
 
-   // this loop is MPI-parallelized
-   for(int a=0; a<this->molecule->GetAtomVect().size(); a++){
-      if(a%mpiSize != mpiRank){continue;}
-      const Atom& atomA = *molecule->GetAtomVect()[a];
-      int firstAOIndexA = atomA.GetFirstAOIndex();
-      int lastAOIndexA  = atomA.GetLastAOIndex();
-      stringstream ompErrors;
+   bool*     forceAdded     = NULL;
+   double*** comMatrixForce = NULL;
+   try{
+      MallocerFreer::GetInstance()->Malloc<bool>(&forceAdded, this->molecule->GetAtomVect().size());
+      MallocerFreer::GetInstance()->Malloc<double>(&comMatrixForce, elecStates.size(), this->molecule->GetAtomVect().size(), CartesianType_end);
+      // this loop is MPI-parallelized
+      for(int a=0; a<this->molecule->GetAtomVect().size(); a++){
+         int calcRank = a%mpiSize;
+         if(calcRank == mpiRank){
+            MallocerFreer::GetInstance()->Initialize<bool>(forceAdded, this->molecule->GetAtomVect().size());
+            MallocerFreer::GetInstance()->Initialize<double>(comMatrixForce, elecStates.size(), this->molecule->GetAtomVect().size(), CartesianType_end);
+            const Atom& atomA = *molecule->GetAtomVect()[a];
+            int firstAOIndexA = atomA.GetFirstAOIndex();
+            int lastAOIndexA  = atomA.GetLastAOIndex();
+            stringstream ompErrors;
 #pragma omp parallel
-      {
-         double***   diatomicOverlapAOs1stDerivs = NULL;
-         double***** diatomicTwoElecsTwoCores1stDerivs = NULL;
-         double**    tmpRotMat                         = NULL;
-         double***   tmpRotMat1stDerivs                = NULL;
-         double****  tmpDiatomicTwoElecsTwoCores       = NULL;
-
-         double**  tmpDiaOverlapAOsInDiaFrame         = NULL; // diatomic overlapAOs in diatomic frame
-         double**  tmpDiaOverlapAOs1stDerivInDiaFrame = NULL; // first derivative of the diaOverlapAOs. This derivative is related to the distance between two atoms.
-         double**  tmpRotMat1stDeriv                  = NULL;
-         double**  tmpRotatedDiatomicOverlap          = NULL; // used in dgemmm
-         double*   tmpRotatedDiatomicOverlapVec       = NULL; // used in dgemmm
-         double**  tmpMatrixBC                        = NULL; // used in dgemmm
-         double*   tmpVectorBC                        = NULL; // used in dgemmm
-         try{
-            this->MallocTempMatricesCalcForce(&diatomicOverlapAOs1stDerivs, 
-                                              &diatomicTwoElecsTwoCores1stDerivs,
-                                              &tmpDiaOverlapAOsInDiaFrame,
-                                              &tmpDiaOverlapAOs1stDerivInDiaFrame,
-                                              &tmpRotMat,
-                                              &tmpRotMat1stDeriv,
-                                              &tmpRotMat1stDerivs,
-                                              &tmpRotatedDiatomicOverlap,
-                                              &tmpRotatedDiatomicOverlapVec,
-                                              &tmpMatrixBC,
-                                              &tmpVectorBC,
-                                              &tmpDiatomicTwoElecsTwoCores);
+            {
+               double***   diatomicOverlapAOs1stDerivs        = NULL;
+               double***** diatomicTwoElecsTwoCores1stDerivs  = NULL;
+               double**    tmpRotMat                          = NULL;
+               double***   tmpRotMat1stDerivs                 = NULL;
+               double****  tmpDiatomicTwoElecsTwoCores        = NULL;
+               double**    tmpDiaOverlapAOsInDiaFrame         = NULL; // diatomic overlapAOs in diatomic frame
+               double**    tmpDiaOverlapAOs1stDerivInDiaFrame = NULL; // first derivative of the diaOverlapAOs. This derivative is related to the distance between two atoms.
+               double**    tmpRotMat1stDeriv                  = NULL;
+               double**    tmpRotatedDiatomicOverlap          = NULL; // used in dgemmm
+               double*     tmpRotatedDiatomicOverlapVec       = NULL; // used in dgemmm
+               double**    tmpMatrixBC                        = NULL; // used in dgemmm
+               double*     tmpVectorBC                        = NULL; // used in dgemmm
+               double***   tmpMatrixForce                     = NULL;
+               try{
+                  this->MallocTempMatricesCalcForce(&diatomicOverlapAOs1stDerivs, 
+                                                    &diatomicTwoElecsTwoCores1stDerivs,
+                                                    &tmpDiaOverlapAOsInDiaFrame,
+                                                    &tmpDiaOverlapAOs1stDerivInDiaFrame,
+                                                    &tmpRotMat,
+                                                    &tmpRotMat1stDeriv,
+                                                    &tmpRotMat1stDerivs,
+                                                    &tmpRotatedDiatomicOverlap,
+                                                    &tmpRotatedDiatomicOverlapVec,
+                                                    &tmpMatrixBC,
+                                                    &tmpVectorBC,
+                                                    &tmpDiatomicTwoElecsTwoCores,
+                                                    &tmpMatrixForce,
+                                                    elecStates);
 
 #pragma omp for schedule(dynamic, MOLDS_OMP_DYNAMIC_CHUNK_SIZE)
-            for(int b=0; b<this->molecule->GetAtomVect().size(); b++){
-               if(a == b){continue;}
-               const Atom& atomB = *molecule->GetAtomVect()[b];
-               int firstAOIndexB = atomB.GetFirstAOIndex();
-               int lastAOIndexB  = atomB.GetLastAOIndex();
+                  for(int b=0; b<this->molecule->GetAtomVect().size(); b++){
+                     if(a == b){continue;}
+                     const Atom& atomB = *molecule->GetAtomVect()[b];
+                     int firstAOIndexB = atomB.GetFirstAOIndex();
+                     int lastAOIndexB  = atomB.GetLastAOIndex();
 
-               // calc. first derivative of overlapAOs.
-               this->CalcDiatomicOverlapAOs1stDerivatives(diatomicOverlapAOs1stDerivs, 
-                                                          tmpDiaOverlapAOsInDiaFrame,        
-                                                          tmpDiaOverlapAOs1stDerivInDiaFrame,
-                                                          tmpRotMat,                         
-                                                          tmpRotMat1stDeriv,                 
-                                                          tmpRotMat1stDerivs,                
-                                                          tmpRotatedDiatomicOverlap,         
-                                                          tmpRotatedDiatomicOverlapVec,         
-                                                          tmpMatrixBC,                         
-                                                          tmpVectorBC,                         
-                                                          atomA, 
-                                                          atomB);
-               // calc. first derivative of two elec two core interaction
-               this->CalcDiatomicTwoElecsTwoCores1stDerivatives(diatomicTwoElecsTwoCores1stDerivs, 
-                                                                tmpRotMat,
-                                                                tmpRotMat1stDerivs,
-                                                                tmpDiatomicTwoElecsTwoCores,
-                                                                a, b);
+                     MallocerFreer::GetInstance()->Initialize<double>(tmpMatrixForce, 
+                                                                      elecStates.size(), 
+                                                                      this->molecule->GetAtomVect().size(),
+                                                                      CartesianType_end);
+                     // calc. first derivative of overlapAOs.
+                     this->CalcDiatomicOverlapAOs1stDerivatives(diatomicOverlapAOs1stDerivs, 
+                                                                tmpDiaOverlapAOsInDiaFrame,        
+                                                                tmpDiaOverlapAOs1stDerivInDiaFrame,
+                                                                tmpRotMat,                         
+                                                                tmpRotMat1stDeriv,                 
+                                                                tmpRotMat1stDerivs,                
+                                                                tmpRotatedDiatomicOverlap,         
+                                                                tmpRotatedDiatomicOverlapVec,         
+                                                                tmpMatrixBC,                         
+                                                                tmpVectorBC,                         
+                                                                atomA, 
+                                                                atomB);
+                     // calc. first derivative of two elec two core interaction
+                     this->CalcDiatomicTwoElecsTwoCores1stDerivatives(diatomicTwoElecsTwoCores1stDerivs, 
+                                                                      tmpRotMat,
+                                                                      tmpRotMat1stDerivs,
+                                                                      tmpDiatomicTwoElecsTwoCores,
+                                                                      a, b);
 
-               // core repulsion part
-               double coreRepulsion[CartesianType_end] = {0.0,0.0,0.0};
-               for(int i=0; i<CartesianType_end; i++){
-                  coreRepulsion[i] += this->GetDiatomCoreRepulsion1stDerivative(
-                                            atomA, atomB, (CartesianType)i);
-                  if(Parameters::GetInstance()->RequiresVdWSCF()){
-                     coreRepulsion[i] += this->GetDiatomVdWCorrection1stDerivative(
-                                               atomA, atomB, (CartesianType)i);
-                  }
-               }  
-               // electron core attraction part (ground state)
-               double forceElecCoreAttPart[CartesianType_end] = {0.0,0.0,0.0};
-               this->CalcForceSCFElecCoreAttractionPart(forceElecCoreAttPart,
-                                                        a,
-                                                        b,
-                                                        diatomicTwoElecsTwoCores1stDerivs);
-               // overlapAOs part (ground state)
-               double forceOverlapAOsPart[CartesianType_end] = {0.0,0.0,0.0};
-               this->CalcForceSCFOverlapAOsPart(forceOverlapAOsPart, 
-                                                a,
-                                                b,
-                                                diatomicOverlapAOs1stDerivs);
-               // two electron part (ground state)
-               double forceTwoElecPart[CartesianType_end] = {0.0,0.0,0.0};
-               this->CalcForceSCFTwoElecPart(forceTwoElecPart,
-                                             a,
-                                             b,
-                                             diatomicTwoElecsTwoCores1stDerivs);
-               // sum up contributions from each part (ground state)
-#pragma omp critical
-               {
-                  for(int n=0; n<elecStates.size(); n++){
+                     // core repulsion part
+                     double coreRepulsion[CartesianType_end] = {0.0,0.0,0.0};
                      for(int i=0; i<CartesianType_end; i++){
-                        this->matrixForce[n][a][i] -= coreRepulsion[i];
-                        this->matrixForce[n][a][i] += forceElecCoreAttPart[i];
-                        this->matrixForce[n][a][i] += forceOverlapAOsPart[i];
-                        this->matrixForce[n][a][i] += forceTwoElecPart[i];
-                        this->matrixForce[n][b][i] -= forceElecCoreAttPart[i];
-                        this->matrixForce[n][b][i] -= forceOverlapAOsPart[i];
-                        this->matrixForce[n][b][i] -= forceTwoElecPart[i];
-                     }
-                  }
-               }
-               // excited state force
-               for(int n=0; n<elecStates.size(); n++){
-                  if(elecStates[n]<=0){continue;}
-                  // static part
-                  double forceExcitedStaticPart[CartesianType_end] = {0.0,0.0,0.0};
-                  this->CalcForceExcitedStaticPart(forceExcitedStaticPart,
-                                                   n,
+                        coreRepulsion[i] += this->GetDiatomCoreRepulsion1stDerivative(atomA, 
+                                                                                      atomB, 
+                                                                                      (CartesianType)i);
+                        if(Parameters::GetInstance()->RequiresVdWSCF()){
+                           coreRepulsion[i] += this->GetDiatomVdWCorrection1stDerivative(atomA, 
+                                                                                         atomB, 
+                                                                                         (CartesianType)i);
+                        }
+                     }  
+                     // electron core attraction part (ground state)
+                     double forceElecCoreAttPart[CartesianType_end] = {0.0,0.0,0.0};
+                     this->CalcForceSCFElecCoreAttractionPart(forceElecCoreAttPart,
+                                                              a,
+                                                              b,
+                                                              diatomicTwoElecsTwoCores1stDerivs);
+                     // overlapAOs part (ground state)
+                     double forceOverlapAOsPart[CartesianType_end] = {0.0,0.0,0.0};
+                     this->CalcForceSCFOverlapAOsPart(forceOverlapAOsPart, 
+                                                      a,
+                                                      b,
+                                                      diatomicOverlapAOs1stDerivs);
+                     // two electron part (ground state)
+                     double forceTwoElecPart[CartesianType_end] = {0.0,0.0,0.0};
+                     this->CalcForceSCFTwoElecPart(forceTwoElecPart,
                                                    a,
                                                    b,
                                                    diatomicTwoElecsTwoCores1stDerivs);
-                  // sum up contributions from static part (excited state)
-#pragma omp critical
-                  {
-                     for(int i=0; i<CartesianType_end; i++){
-                        this->matrixForce[n][b][i] += forceExcitedStaticPart[i];
-                        this->matrixForce[n][a][i] -= forceExcitedStaticPart[i];
-                     }
-                  }
 
-                  // response part
-                  // electron core attraction part (excited states)
-                  double forceExcitedElecCoreAttPart[CartesianType_end]={0.0,0.0,0.0};
-                  this->CalcForceExcitedElecCoreAttractionPart(
-                                             forceExcitedElecCoreAttPart,
-                                             n,
-                                             a,
-                                             b,
-                                             diatomicTwoElecsTwoCores1stDerivs);
-                  // overlapAOs part (excited states)
-                  double forceExcitedOverlapAOsPart[CartesianType_end] = {0.0,0.0,0.0};
-                  this->CalcForceExcitedOverlapAOsPart(forceExcitedOverlapAOsPart, 
-                                                       n,
-                                                       a,
-                                                       b,
-                                                       diatomicOverlapAOs1stDerivs);
-                  // two electron part (excited states)
-                  double forceExcitedTwoElecPart[CartesianType_end] = {0.0,0.0,0.0};
-                  this->CalcForceExcitedTwoElecPart(forceExcitedTwoElecPart,
-                                                       n,
-                                                       a,
-                                                       b,
-                                                       diatomicTwoElecsTwoCores1stDerivs);
-                  // sum up contributions from response part (excited state)
-#pragma omp critical
-                  {
-                     for(int i=0; i<CartesianType_end; i++){
-                        this->matrixForce[n][a][i] += forceExcitedElecCoreAttPart[i];
-                        this->matrixForce[n][a][i] += forceExcitedOverlapAOsPart[i];
-                        this->matrixForce[n][a][i] += forceExcitedTwoElecPart[i];
-                        this->matrixForce[n][b][i] -= forceExcitedElecCoreAttPart[i];
-                        this->matrixForce[n][b][i] -= forceExcitedOverlapAOsPart[i];
-                        this->matrixForce[n][b][i] -= forceExcitedTwoElecPart[i];
+                     for(int n=0; n<elecStates.size(); n++){
+                        for(int i=0; i<CartesianType_end; i++){
+                           tmpMatrixForce[n][a][i] -= coreRepulsion[i];
+                           tmpMatrixForce[n][a][i] += forceElecCoreAttPart[i];
+                           tmpMatrixForce[n][a][i] += forceOverlapAOsPart[i];
+                           tmpMatrixForce[n][a][i] += forceTwoElecPart[i];
+                           tmpMatrixForce[n][b][i] -= forceElecCoreAttPart[i];
+                           tmpMatrixForce[n][b][i] -= forceOverlapAOsPart[i];
+                           tmpMatrixForce[n][b][i] -= forceTwoElecPart[i];
+                        }
                      }
-                  }
-               } // end of excited state force
-            }    // end of for(int b) with omp parallelization
+                     // excited state force
+                     for(int n=0; n<elecStates.size(); n++){
+                        if(elecStates[n]<=0){continue;}
+                        // static part
+                        double forceExcitedStaticPart[CartesianType_end] = {0.0,0.0,0.0};
+                        this->CalcForceExcitedStaticPart(forceExcitedStaticPart,
+                                                         n,
+                                                         a,
+                                                         b,
+                                                         diatomicTwoElecsTwoCores1stDerivs);
+                        // response part
+                        // electron core attraction part (excited states)
+                        double forceExcitedElecCoreAttPart[CartesianType_end]={0.0,0.0,0.0};
+                        this->CalcForceExcitedElecCoreAttractionPart(forceExcitedElecCoreAttPart,
+                                                                     n,
+                                                                     a,
+                                                                     b,
+                                                                     diatomicTwoElecsTwoCores1stDerivs);
+                        // overlapAOs part (excited states)
+                        double forceExcitedOverlapAOsPart[CartesianType_end] = {0.0,0.0,0.0};
+                        this->CalcForceExcitedOverlapAOsPart(forceExcitedOverlapAOsPart, 
+                                                             n,
+                                                             a,
+                                                             b,
+                                                             diatomicOverlapAOs1stDerivs);
+                        // two electron part (excited states)
+                        double forceExcitedTwoElecPart[CartesianType_end] = {0.0,0.0,0.0};
+                        this->CalcForceExcitedTwoElecPart(forceExcitedTwoElecPart,
+                                                          n,
+                                                          a,
+                                                          b,
+                                                          diatomicTwoElecsTwoCores1stDerivs);
+                        for(int i=0; i<CartesianType_end; i++){
+                           // sum up contributions from static part (excited state)
+                           tmpMatrixForce[n][b][i] += forceExcitedStaticPart[i];
+                           tmpMatrixForce[n][a][i] -= forceExcitedStaticPart[i];
+                           // sum up contributions from response part (excited state)
+                           tmpMatrixForce[n][a][i] += forceExcitedElecCoreAttPart[i];
+                           tmpMatrixForce[n][a][i] += forceExcitedOverlapAOsPart[i];
+                           tmpMatrixForce[n][a][i] += forceExcitedTwoElecPart[i];
+                           tmpMatrixForce[n][b][i] -= forceExcitedElecCoreAttPart[i];
+                           tmpMatrixForce[n][b][i] -= forceExcitedOverlapAOsPart[i];
+                           tmpMatrixForce[n][b][i] -= forceExcitedTwoElecPart[i];
+                        }
+                     } // end of excited state force
 
-         }          // end of try for omp-for
-         catch(MolDSException ex){
+                     // update force
+                     // ensure the order of summation 
+                     if(b==0 || (a==0 && b==1)){
+                     }
+                     else{
+                        bool added=false;
+                        int  waitTime=10;
+                        while(!added){
+                           if(b == a+1){
+                              if(!forceAdded[b-2]){
+                                 usleep(waitTime);
+                              }
+                              else{
+                                 added = true;
+                              }
+                           }
+                           else{
+                              if(!forceAdded[b-1]){
+                                 usleep(waitTime);
+                              }
+                              else{
+                                 added = true;
+                              }
+                           }
+                        }
+                     }
 #pragma omp critical
-            ex.Serialize(ompErrors);
+                     {
+                        for(int n=0; n<elecStates.size(); n++){
+                           for(int aa=0; aa<this->molecule->GetAtomVect().size(); aa++){
+                              for(int i=0; i<CartesianType_end; i++){
+                                 comMatrixForce[n][aa][i] += tmpMatrixForce[n][aa][i];
+                              }
+                           }
+                        }
+                        forceAdded[b]=true;
+                     }
+                  }// end of for(int b) with omp parallelization
+
+               }// end of try for omp-for
+               catch(MolDSException ex){
+#pragma omp critical
+                  ex.Serialize(ompErrors);
+               }
+               this->FreeTempMatricesCalcForce(&diatomicOverlapAOs1stDerivs, 
+                                               &diatomicTwoElecsTwoCores1stDerivs,
+                                               &tmpDiaOverlapAOsInDiaFrame,
+                                               &tmpDiaOverlapAOs1stDerivInDiaFrame,
+                                               &tmpRotMat,
+                                               &tmpRotMat1stDeriv,
+                                               &tmpRotMat1stDerivs,
+                                               &tmpRotatedDiatomicOverlap,
+                                               &tmpRotatedDiatomicOverlapVec,
+                                               &tmpMatrixBC,
+                                               &tmpVectorBC,
+                                               &tmpDiatomicTwoElecsTwoCores,
+                                               &tmpMatrixForce,
+                                               elecStates);
+            } // end of omp-parallelized region
+            // Exception throwing for omp-region
+            if(!ompErrors.str().empty()){
+               throw MolDSException::Deserialize(ompErrors);
+            }
+         } // end of if(calcRank == mpiRank)
+
+         // communication to collect all matrix data on head-rank
+         int tag    = a;
+         int source = calcRank;
+         int dest   = mpiHeadRank;
+         int num    = elecStates.size()*this->molecule->GetAtomVect().size()*CartesianType_end;
+         if(mpiRank == mpiHeadRank){
+            if(mpiRank != calcRank){
+               MolDS_mpi::MpiProcess::GetInstance()->Recv(source, tag, &comMatrixForce[0][0][0], num);
+            }
+            for(int n=0; n<elecStates.size(); n++){
+               for(int aa=0; aa<this->molecule->GetAtomVect().size(); aa++){
+                  for(int i=0; i<CartesianType_end; i++){
+                     this->matrixForce[n][aa][i] += comMatrixForce[n][aa][i];
+                  }
+               }
+            }
          }
-         this->FreeTempMatricesCalcForce(&diatomicOverlapAOs1stDerivs, 
-                                         &diatomicTwoElecsTwoCores1stDerivs,
-                                         &tmpDiaOverlapAOsInDiaFrame,
-                                         &tmpDiaOverlapAOs1stDerivInDiaFrame,
-                                         &tmpRotMat,
-                                         &tmpRotMat1stDeriv,
-                                         &tmpRotMat1stDerivs,
-                                         &tmpRotatedDiatomicOverlap,
-                                         &tmpRotatedDiatomicOverlapVec,
-                                         &tmpMatrixBC,
-                                         &tmpVectorBC,
-                                         &tmpDiatomicTwoElecsTwoCores);
-      } // end of omp-parallelized region
-      // Exception throwing for omp-region
-      if(!ompErrors.str().empty()){
-         throw MolDSException::Deserialize(ompErrors);
-      }
-   }// end of for(int a) with MPI parallelization
+         if(mpiRank != mpiHeadRank && mpiRank == calcRank){
+            MolDS_mpi::MpiProcess::GetInstance()->Send(dest, tag, &comMatrixForce[0][0][0], num);
+         }
+      }// end of for(int a) with MPI parallelization
+   }
+   catch(MolDSException ex){
+      MallocerFreer::GetInstance()->Free<bool>(&forceAdded, this->molecule->GetAtomVect().size());
+      MallocerFreer::GetInstance()->Free<double>(&comMatrixForce, elecStates.size(), this->molecule->GetAtomVect().size(), CartesianType_end);
+      throw ex;
+   }
+   MallocerFreer::GetInstance()->Free<bool>(&forceAdded, this->molecule->GetAtomVect().size());
+   MallocerFreer::GetInstance()->Free<double>(&comMatrixForce, elecStates.size(), this->molecule->GetAtomVect().size(), CartesianType_end);
 
    // communication to reduce thsi->matrixForce on all node (namely, all_reduce)
-   int numTransported = elecStates.size()*this->molecule->GetAtomVect().size()*CartesianType_end;
-   MolDS_mpi::MpiProcess::GetInstance()->AllReduce(&this->matrixForce[0][0][0], numTransported, std::plus<double>());
+   int num = elecStates.size()*this->molecule->GetAtomVect().size()*CartesianType_end;
+   MolDS_mpi::MpiProcess::GetInstance()->Broadcast(&this->matrixForce[0][0][0], num, mpiHeadRank);
+
 }
 
 void Mndo::MallocTempMatricesCalcForce(double****   diatomicOverlapAOs1stDerivs, 
@@ -2861,7 +2956,9 @@ void Mndo::MallocTempMatricesCalcForce(double****   diatomicOverlapAOs1stDerivs,
                                        double**     tmpRotatedDiatomicOverlapVec,
                                        double***    tmpMatrixBC,
                                        double**     tmpVectorBC,
-                                       double*****  tmpDiatomicTwoElecsTwoCores) const{
+                                       double*****  tmpDiatomicTwoElecsTwoCores,
+                                       double****   tmpMatrixForce,
+                                       const vector<int>& elecStates) const{
    MallocerFreer::GetInstance()->Malloc<double>(diatomicOverlapAOs1stDerivs, 
                                                 OrbitalType_end,
                                                 OrbitalType_end,
@@ -2903,6 +3000,10 @@ void Mndo::MallocTempMatricesCalcForce(double****   diatomicOverlapAOs1stDerivs,
                                                 dxy, 
                                                 dxy, 
                                                 dxy);
+   MallocerFreer::GetInstance()->Malloc<double>(tmpMatrixForce, 
+                                                elecStates.size(), 
+                                                this->molecule->GetAtomVect().size(),
+                                                CartesianType_end);
 }
 
 void Mndo::FreeTempMatricesCalcForce(double****   diatomicOverlapAOs1stDerivs, 
@@ -2916,7 +3017,9 @@ void Mndo::FreeTempMatricesCalcForce(double****   diatomicOverlapAOs1stDerivs,
                                      double**     tmpRotatedDiatomicOverlapVec,
                                      double***    tmpMatrixBC,
                                      double**     tmpVectorBC,
-                                     double*****  tmpDiatomicTwoElecsTwoCores) const{
+                                     double*****  tmpDiatomicTwoElecsTwoCores,
+                                     double****   tmpMatrixForce,
+                                     const vector<int>& elecStates) const{
    MallocerFreer::GetInstance()->Free<double>(diatomicOverlapAOs1stDerivs, 
                                               OrbitalType_end,
                                               OrbitalType_end,
@@ -2958,6 +3061,10 @@ void Mndo::FreeTempMatricesCalcForce(double****   diatomicOverlapAOs1stDerivs,
                                               dxy, 
                                               dxy, 
                                               dxy);
+   MallocerFreer::GetInstance()->Free<double>(tmpMatrixForce, 
+                                              elecStates.size(), 
+                                              this->molecule->GetAtomVect().size(),
+                                              CartesianType_end);
 }
 
 // see (18) in [PT_1997]

@@ -21,18 +21,21 @@
 
 ==============================================================================
 
-
-   MolDS ("Mol"ecular "D"ynamics "S"imulation package) ver. 0.4.0 (Under developement)
+   MolDS ("Mol"ecular "D"ynamics simulation package with "S"emiempirical quantum chemistry) ver. 0.4.0 (Under developement)
       Developers: Mikiya Fujii, Ph.D.(project lead), Katsuhiko Nishimra, and Michihiro Okuyama, Ph.D..
       Other contributors: Michael Banck 
       Questions and bug reports: molds-dev@lists.sourceforge.jp
 
 
+   The goal of MolDS is classical/semiclassical/quantum molecular dynamics simulations 
+   based on semiempirical quantum chemistry. Besides, MolDS is implemented to be able 
+   to run on huge cluster system by using OpenMP/MPI hybrid parallelization technique.
+
 ==============================================================================
 REQUIREMENTS:
    -Compilers:
-    MolDS requires c++ mpi compiler (e.g. Intel MPI or Open MPI) 
-    that is wrapping Intel (icpc with MKL) or GNU (g++) c++ compiler.
+    MolDS requires C++ mpi compiler (e.g. Intel MPI or Open MPI) 
+    that is wrapping Intel (icpc with MKL) or GNU (g++) C++ compiler.
     Valid versions of the mpi compilers are Intel MPI 4.0.2, Open MPI 1.4.5, or later.
     Valid versions of the wrapped c++ compilers are icpc 12.0.4(MkL 10.3 update 4), 
     g++ 4.4, or later because the MolDS is implemented with openMP 3.0. 
@@ -157,26 +160,27 @@ SAMPLE and TEST
 CAPABILITIES:
 
    -Electronic state and molecular dynamics
-             | HF  | CIS | MD(gs) | MD(es) | MC(gs) | MC(es) | RPMD(gs) | RPMD(es) | Optimize(gs) | Optimize(es) | Frequencies(gs) |
-    ---------|-----|-----|--------|--------|--------|--------|----------|----------|--------------|--------------|-----------------|
-    CNDO2    | OK  | --  | --     | --     | OK     | --     | --       | --       | --           | --           | --              |
-    ---------|-----|-----|--------|--------|--------|--------|----------|----------|--------------|--------------|-----------------|
-    INDO     | OK  | --  | --     | --     | OK     | --     | --       | --       | --           | --           | --              |
-    ---------|-----|-----|--------|--------|--------|--------|----------|----------|--------------|--------------|-----------------|
-    ZINDO/S  | OK  | OK  | OK     | OK     | OK     | OK     | OK       | OK       | OK           | OK           | --              |
-    ---------|-----|-----|--------|--------|--------|--------|----------|----------|--------------|--------------|-----------------|
-    MNDO     | OK  | OK  | OK     | OK     | OK     | OK     | OK       | OK       | OK           | OK           | OK              |
-    ---------|-----|-----|--------|--------|--------|--------|----------|----------|--------------|--------------|-----------------|
-    AM1      | OK  | OK  | OK     | OK     | OK     | OK     | OK       | OK       | OK           | OK           | OK              |
-    ---------|-----|-----|--------|--------|--------|--------|----------|----------|--------------|--------------|-----------------|
-    AM1-D    | OK  | OK  | OK     | OK     | OK     | OK     | OK       | OK       | OK           | OK           | OK              |
-    ---------|-----|-----|--------|--------|--------|--------|----------|----------|--------------|--------------|-----------------|
-    PM3      | OK  | OK  | OK     | OK     | OK     | OK     | OK       | OK       | OK           | OK           | OK              |
-    ---------|-----|-----|--------|--------|--------|--------|----------|----------|--------------|--------------|-----------------|
-    PM3-D    | OK  | OK  | OK     | OK     | OK     | OK     | OK       | OK       | OK           | OK           | OK              |
-    ---------|-----|-----|--------|--------|--------|--------|----------|----------|--------------|--------------|-----------------|
-    PM3/PDDG | OK  | OK  | OK     | OK     | OK     | OK     | OK       | OK       | OK           | OK           | OK              |
-
+             | HF  | CIS |   MD    |   MC    |  RPMD   | Optimize | Frequencies      | Frequencies       |
+             |     |     | (gs,es) | (gs,es) | (gs,es) | (gs,es)  | analytic (gs,es) | numerical (gs,es) |
+    ---------|-----|-----|---------|---------|---------|----------|------------------|-------------------|
+    CNDO2    | OK  | --  | --,--   | OK,--   | --,--   | --,--    | --,--            | --,--             |
+    ---------|-----|-----|---------|---------|---------|----------|------------------|-------------------|
+    INDO     | OK  | --  | --,--   | OK,--   | --,--   | --,--    | --,--            | --,--             |
+    ---------|-----|-----|---------|---------|---------|----------|------------------|-------------------|
+    ZINDO/S  | OK  | OK  | OK,OK   | OK,OK   | OK,OK   | OK,OK    | --,--            | OK,OK             |
+    ---------|-----|-----|---------|---------|---------|----------|------------------|-------------------|
+    MNDO     | OK  | OK  | OK,OK   | OK,OK   | OK,OK   | OK,OK    | OK,--            | OK,OK             |
+    ---------|-----|-----|---------|---------|---------|----------|------------------|-------------------|
+    AM1      | OK  | OK  | OK,OK   | OK,OK   | OK,OK   | OK,OK    | OK,--            | OK,OK             |
+    ---------|-----|-----|---------|---------|---------|----------|------------------|-------------------|
+    AM1-D    | OK  | OK  | OK,OK   | OK,OK   | OK,OK   | OK,OK    | OK,--            | OK,OK             |
+    ---------|-----|-----|---------|---------|---------|----------|------------------|-------------------|
+    PM3      | OK  | OK  | OK,OK   | OK,OK   | OK,OK   | OK,OK    | OK,--            | OK,OK             |
+    ---------|-----|-----|---------|---------|---------|----------|------------------|-------------------|
+    PM3-D    | OK  | OK  | OK,OK   | OK,OK   | OK,OK   | OK,OK    | OK,--            | OK,OK             |
+    ---------|-----|-----|---------|---------|---------|----------|------------------|-------------------|
+    PM3/PDDG | OK  | OK  | OK,OK   | OK,OK   | OK,OK   | OK,OK    | OK,--            | OK,OK             |
+                                                                      
       "OK", "Sch", and "--" mean available, shceduled, and non-scheduled methods, respectively.
       "gs" and "es" mean ground and excited states, respectively.
       i.e., MD(gs) and MD(es) mean Born-Oppenheimer Molecular Dynamics on ground and excited states, respectively. 
@@ -196,8 +200,8 @@ CAPABILITIES:
       the original semiempirical parameters used in SCF of AM1 and PM3, respectively.
 
    -Parallelization
-    Open MP parallelization: everywhere in MolDS
-    MPI parallelization: CIS is only parallelized with MPI. 
+    Open MP parallelization: Everywhere in MolDS
+    MPI parallelization: Everywhere in MolDS, basically. But some modules do not parallelized yet.
 
 ==============================================================================
 HOW TO WRITE INPUT:
@@ -232,18 +236,17 @@ HOW TO WRITE INPUT:
        Write below options in SCF-directive.
        "max_iter", "rms_density", "damping_thresh", "damping_weight", 
        "diis_num_error_vect", "diis_start_error", "diis_end_error", "sum_charges"
-       "vdW", "vdW_s6", "vdW_d", "mpi" are prepared as options.
+       "vdW", "vdW_s6", "vdW_d", "mpi", and "scalapack" are prepared as options.
        SCF module outputs also the dipole moment arrond the center of core's mass
        To calculate the dipole moment, STO-6G [DY_1977] is used.
 
        The default value of the "max_iter" is 100.
        The default value of the "rms_density" is 10**(-8.0).
        The default value of the "damping_thresh" is 1.
-       The default value of the "damping_weight" is 0.8.
+       The default value of the "damping_weight" is 0.8. For systems consisting of several hundreds of atoms, the developers recommend setting "damping_weight" more than 0.95.
        The default value of the "diis_num_error_vect" is 5.
        The default value of the "diis_start_error" is 0.01.
        The default value of the "diis_end_error" is 10**(-8.0).
-       The default value of the "mpi" is "yes"
 
        "vdW" should be set as "yes" or "no". 
        When "yes" is set, Grimmes's empirical van der Waals correction(D1, [G_2004]) is applied.
@@ -282,6 +285,12 @@ HOW TO WRITE INPUT:
        If "mpi" is set to "no", SCF module does not use the MPI.
        This option can change the setting of parallelization for SCF module only. Namely, 
        this option cannot change the setting of parallelization for 1st(2nd) gradients, CIS, etc.
+       The default value of the "mpi" is "yes". 
+
+       "scalapack" should be set as "yes" or "no". 
+       When "scalapack yes", the diagonalizing SCF matrix is carried out with ScaLapack.
+       The default setting of "scalapack" option is "NO".
+       Note that "scalapack" is supported on FX10 only.
 
        E.g.
          SCF
@@ -420,15 +429,27 @@ HOW TO WRITE INPUT:
          FREQUENCIES_END
 
       -options
-       "electronic_state" is only prepared.
+       "electronic_state", "derivative", "numerical_dr" are prepared.
+
        "electronic_state" is index of the electronic state used for calculating the normal modes. 
        electronic_state=0 means the electronic ground state.
        electronic_state=1 means, then, first electornic excited state.
        The default value of the "electronic_state" is 0.
 
+       "derivative" is how to calculate the hessian matrix, then
+       "derivative" should be "analytic" or "numerical".
+       Note that the analytic derivative can calcute 
+       the hessian matrix for the grond state only.
+       The default value of the "derivative" is "analytic".
+
+       "numerical_dr" means numerical displacement to calculate the Hessian matrix.
+       "numerical_dr" is valid in the numerical derivative.
+       The default value of the "numerical_dr" is 5.3*10^{-5} angstrom (10^{-4} atomi unit).
+
        E.g. 
          FREQUENCIES
             electronic_state 0
+
          FREQUENCIES_END
 
    <CIS>
@@ -442,7 +463,7 @@ HOW TO WRITE INPUT:
       -options
        "davidson", "active_occ", "active_vir", "max_iter", "max_dim", "norm_tol", 
        "nstates", "exciton_energies", "all_transition_dipole_moments", 
-       "mulliken", "unpaired_electron_population", "sum_charges", and "num_print_coefficients" are prepared as options.
+       "mulliken", "unpaired_electron_population", "sum_charges", "scalapack", and "num_print_coefficients" are prepared as options.
 
        "davidson" should be set as "yes" or "no". 
        The default value of the "davidson" is "yes".
@@ -491,14 +512,19 @@ HOW TO WRITE INPUT:
        When "mulliken x" is included in CIS-directive, the mulliken popultaion of xth excited state is calculated.
        Multiple indication of these mulliken options is possible. 
        Note that "mulliken 0" is ignored because 0th excited state is the ground state.
-       Default setting of this "mulliken" option is nothing.
+       The default setting of this "mulliken" option is nothing.
 
        "unpaired_electron_population" is an option of unpaired electron population(UEP) analysis of the excited state.
        When "unpaired electron population yes" and "mulliken x" are included in CIS-directive, 
        the UEP of xth excited state is calculated.
        By multiple indication of these mulliken option, the UEP on multiple excited states are possible.
        Note that the UEP on ground state is ignored. 
-       Default setting is "unpaired_electron_population" option is nothing.
+       The default setting is "unpaired_electron_population" option is nothing.
+
+       "scalapack" should be set as "yes" or "no". 
+       When "scalapack yes", the diagonalizing CIS matrix is carried out with ScaLapack.
+       The Default setting of "scalapack" option is "NO".
+       Note that "scalapack" is supported on FX10 only.
 
        "sum_charges" is an option to calculate of summation of the mulliken charges and unpaired electron population
        in each excited state which indicated with "mulliken" option.
@@ -746,7 +772,7 @@ HOW TO WRITE INPUT:
          RPMD_END
   
       -options
-       "total_steps", "electronic_state", "num_electonic_states", "temperature", 
+       "total_steps", "electronic_state", "num_electronic_states", "temperature", 
        "num_beads", "seed", and "dt" are prepared as options.
 
        The default value of the "total_steps" is 10. 
@@ -787,6 +813,48 @@ HOW TO WRITE INPUT:
             num_beads 20
             dt 0.5
          RPMD_END
+
+   <Ehrenfest MD>
+      Write Ehrenfest-directive. Namely, mean-field dyamics for nonadiabatic systems.
+      *Implementation of Ehrenfest in MolDS is based on MF's unpublished algorythm.
+
+      E.g.
+         Ehrenfest 
+            (options)
+         Ehrenfest_END
+  
+      -options
+       "initial_electronic_state","highest_electronic_state",
+       "lowest_electronic_state", "total_steps", and "dt" are prepared as options.
+
+       "initial_electronic_state" means the electronic eigenstate 
+       on which the system start to run.
+       The default value of the "electronic_state" is 1. That is, 
+       the electronic ground state is default.
+
+       "highest_electronic_state" and "lowest_electronic_state" are
+       the highest and lowest adiabatic surfaces, respectively, which are included calculations.
+       Namely, a number of adiabatic surfaces used in the calculations is 
+       "highest_electronic_state - lowest_electronic_state +1".
+       Note that a state indicated by "highest(lowest)_electronic_state 0" means the ground states.
+       The default values of "highest_electronic_state" and "lowest_electronic_state"
+       are 2 and 0, respectively.
+
+       The default value of the "total_steps" is 10. 
+
+       "dt" means the time width of molecular dynamics.
+       "dt" should be set in femto-second.
+       The default value of the "dt" is 0.1[fs].
+
+      E.g.
+         EHRENFEST
+            initial_electronic_state 1   // Ehrenfest start from the first electronic state
+            highest_electronic_state 10
+            lowest_electronic_state  0   // this is the ground state.
+            total_steps 50
+            dt 0.05
+         EHRENFEST_END
+
 
    <Principal Axes (Diagonalizing the inertia tensor)>
       Write inertia-directive.

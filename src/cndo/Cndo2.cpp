@@ -41,6 +41,7 @@
 #include"../mpi/AsyncCommunicator.h"
 #include"../wrappers/Blas.h"
 #include"../wrappers/Lapack.h"
+#include"../wrappers/ScaLapack.h"
 #include"../base/MathUtilities.h"
 #include"../base/MallocerFreer.h"
 #include"../base/EularAngle.h"
@@ -175,6 +176,8 @@ void Cndo2::SetMessages(){
       = "Error in cndo::Cndo2: CIS is not implemented for CNDO2.\n";
    this->errorMessageCalcForceNotImplemented
       = "Error in cndo::Cndo2::CalcForce: Force is not available in CNDO2.\n";
+   this->errorMessageCalcHessianNotImplemented
+      = "Error in cndo::Cndo2::CalcHessian: Hessian is not available in CNDO2.\n";
    this->errorMessageGetElectronicEnergyNumberCISStates 
       = "\tNumber of calculated CIS states (excluding ground state) = ";
    this->errorMessageGetElectronicEnergySetElecState
@@ -213,10 +216,15 @@ void Cndo2::SetMessages(){
       = "Error in cndo::Cndo2::CalcOverlapAOsDifferentConfigurations: ovelrapAOs is NULL.\n";
    this->errorMessageNonExcitedStates 
       = "Error in cndo::CNDO2::Excited states can not be calculated with CNDO2.\n";
+   this->errorMessageCalcHessian
+      = "Error in cndo::CNDO2::CalcHessian::Conditions for calculation are wrong.\n";
    this->errorMessageLhs = "lhs: ";
    this->errorMessageRhs = "rhs: ";
    this->errorMessageFromState = "\tfrom state = ";
    this->errorMessageToState = "\tto state = ";
+   this->errorMessageTheory = "\tTheory: ";
+   this->errorMessageHessianType = "\tSecond derivative: ";
+   this->errorMessageElecState   = "\tElectronic state: ";
    this->messageSCFMetConvergence = "\n\n\n\t\tCNDO/2-SCF met convergence criterion(^^b\n\n\n";
    this->messageStartSCF = "**********  START: CNDO/2-SCF  **********\n";
    this->messageDoneSCF = "**********  DONE: CNDO/2-SCF  **********\n\n\n";
@@ -633,10 +641,19 @@ void Cndo2::DoSCF(bool requiresGuess){
 
          // diagonalization of the Fock matrix
          bool calcEigenVectors = true;
-         MolDS_wrappers::Lapack::GetInstance()->Dsyevd(this->fockMatrix, 
-                                                       this->energiesMO, 
-                                                       this->molecule->GetTotalNumberAOs(), 
-                                                       calcEigenVectors);
+
+         if(Parameters::GetInstance()->RequiresScaLapackSCF()){
+            MolDS_wrappers::ScaLapack::GetInstance()->Pdsyevd(this->fockMatrix, 
+                                                              this->energiesMO, 
+                                                              this->molecule->GetTotalNumberAOs(), 
+                                                              calcEigenVectors);
+         }
+         else{
+            MolDS_wrappers::Lapack::GetInstance()->Dsyevd(this->fockMatrix, 
+                                                          this->energiesMO, 
+                                                          this->molecule->GetTotalNumberAOs(), 
+                                                          calcEigenVectors);
+         }
 
          this->CalcOrbitalElectronPopulation(this->orbitalElectronPopulation, 
                                              *this->molecule, 
@@ -709,8 +726,8 @@ void Cndo2::DoSCF(bool requiresGuess){
                                                 % (ompEndTime - ompStartTime)
                                                 % this->messageUnitSec.c_str()
                                                 % this->messageDoneSCF.c_str());
-
 }
+
 
 void Cndo2::CalcSCFProperties(){
    this->CalcAtomicElectronPopulation(this->atomicElectronPopulation, 
@@ -734,11 +751,12 @@ void Cndo2::CalcSCFProperties(){
                                                *this->molecule, 
                                                this->orbitalElectronPopulation,
                                                this->overlapAOs);
-   const int groundState = 0;
-   if(Parameters::GetInstance()->RequiresFrequencies() && 
-      Parameters::GetInstance()->GetElectronicStateIndexFrequencies() == groundState){
-      this->CalcNormalModes(this->normalModes, this->normalForceConstants, *this->molecule);
-   }
+}
+
+void Cndo2::DoFrequencis(){
+   if(!Parameters::GetInstance()->RequiresFrequencies()){return;}
+   this->CalcNormalModes(this->normalModes, this->normalForceConstants, *this->molecule);
+   this->OutputNormalModes(this->normalModes, this->normalForceConstants, *this->molecule);
 }
 
 void Cndo2::CalcNormalModes(double** normalModes, double* normalForceConstants, const Molecule& molecule) const{
@@ -828,6 +846,12 @@ void Cndo2::CalcTwoElecsTwoCores(double****** twoElecsTwoAtomCores,
 void Cndo2::CalcForce(const vector<int>& elecStates){
    stringstream ss;
    ss << this->errorMessageCalcForceNotImplemented;
+   throw MolDSException(ss.str());
+}
+
+void Cndo2::CalcHessian(double** hessian, bool isMassWeighted, int elecState)const{
+   stringstream ss;
+   ss << this->errorMessageCalcHessianNotImplemented;
    throw MolDSException(ss.str());
 }
 
@@ -1278,12 +1302,13 @@ void Cndo2::OutputSCFResults() const{
    // ToDo: output eigen-vectors of the Hartree Fock matrix
 
    // Normal modes and frequencies  
+   /*
    const int groundState = 0;
    if(Parameters::GetInstance()->RequiresFrequencies() && 
       Parameters::GetInstance()->GetElectronicStateIndexFrequencies() == groundState){
       this->OutputNormalModes(this->normalModes, this->normalForceConstants, *this->molecule);
    }
-
+   */
    // output MOs
    if(Parameters::GetInstance()->RequiresMOPlot()){
       MolDS_base_loggers::MOLogger* moLogger = new MolDS_base_loggers::MOLogger(*this->molecule, 
@@ -3901,36 +3926,19 @@ void Cndo2::CalcOverlapAOsWithAnotherConfiguration(double** overlapAOs,
    MallocerFreer::GetInstance()->Initialize<double>(overlapAOs, totalAONumber, totalAONumber);
 
    stringstream ompErrors;
-#pragma omp parallel 
-   {
-      double** diatomicOverlapAOs = NULL;
-      double** rotatingMatrix = NULL;
+#pragma omp parallel for schedule(dynamic, MOLDS_OMP_DYNAMIC_CHUNK_SIZE)
+   for(int A=0; A<totalAtomNumber; A++){
       try{
-         // malloc
-         MallocerFreer::GetInstance()->Malloc<double>(&diatomicOverlapAOs,
-                                                      OrbitalType_end, 
-                                                      OrbitalType_end);
-         MallocerFreer::GetInstance()->Malloc<double>(&rotatingMatrix,
-                                                      OrbitalType_end, 
-                                                      OrbitalType_end);
-         // calculation overlapAOs matrix
-         for(int mu=0; mu<totalAONumber; mu++){
-            overlapAOs[mu][mu] = 1.0;
-         }
-         bool isSymmetricOverlapAOs = false;
-#pragma omp for schedule(dynamic, MOLDS_OMP_DYNAMIC_CHUNK_SIZE)
-         for(int A=0; A<totalAtomNumber; A++){
-            const Atom& lhsAtom = *lhsMolecule.GetAtomVect()[A];
-            const Atom& rhsAtom = *rhsMolecule->GetAtomVect()[A];
-            int firstAOIndexLhsAtom = lhsAtom.GetFirstAOIndex();
-            int firstAOIndexRhsAtom = rhsAtom.GetFirstAOIndex();
-            for(int i=0; i<lhsAtom.GetValenceSize(); i++){
-               for(int j=0; j<rhsAtom.GetValenceSize(); j++){
-                  int mu = firstAOIndexLhsAtom + i;      
-                  int nu = firstAOIndexRhsAtom + j;      
-                  double value = this->GetOverlapAOsElementByGTOExpansion(lhsAtom, i, rhsAtom, j, STO6G);
-                  overlapAOs[mu][nu] = value;
-               }
+         const Atom& lhsAtom = *lhsMolecule.GetAtomVect()[A];
+         const Atom& rhsAtom = *rhsMolecule->GetAtomVect()[A];
+         int firstAOIndexLhsAtom = lhsAtom.GetFirstAOIndex();
+         int firstAOIndexRhsAtom = rhsAtom.GetFirstAOIndex();
+         for(int i=0; i<lhsAtom.GetValenceSize(); i++){
+            for(int j=0; j<rhsAtom.GetValenceSize(); j++){
+               int mu = firstAOIndexLhsAtom + i;      
+               int nu = firstAOIndexRhsAtom + j;      
+               double value = this->GetOverlapAOsElementByGTOExpansion(lhsAtom, i, rhsAtom, j, STO6G);
+               overlapAOs[mu][nu] = value;
             }
          }
       }
@@ -3938,7 +3946,6 @@ void Cndo2::CalcOverlapAOsWithAnotherConfiguration(double** overlapAOs,
 #pragma omp critical
          ex.Serialize(ompErrors);
       }
-      this->FreeDiatomicOverlapAOsAndRotatingMatrix(&diatomicOverlapAOs, &rotatingMatrix);
    }
    // Exception throwing for omp-region
    if(!ompErrors.str().empty()){

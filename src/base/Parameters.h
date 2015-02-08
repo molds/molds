@@ -75,6 +75,8 @@ public:
    inline void   SetVdWDampingFactorSCF(double vdWDamp){this->vdWDampingFactorSCF = vdWDamp;}
    inline bool   RequiresMpiSCF() const                {return this->requiresMpiSCF;}
    inline void   SetRequiresMpiSCF(bool requires)      {this->requiresMpiSCF = requires;}
+   inline bool   RequiresScaLapackSCF() const          {return this->requiresScaLapackSCF;}
+   inline void   SetRequiresScaLapackSCF(bool requires){this->requiresScaLapackSCF = requires;}
    // MOPlot
    inline bool          RequiresMOPlot() const                     {return (this->indecesMOPlot!=NULL && 0<this->indecesMOPlot->size());}
    inline std::string   GetFileNamePrefixMOPlot() const            {return this->fileNamePrefixMOPlot;}
@@ -153,6 +155,8 @@ public:
    const std::vector<AtomIndexPair>* GetSumChargesIndexPairsCIS() const;
    void              AddSumChargesIndexPairsCIS(int fistAtomIndex, int lastAtomIndex);
    inline void       SetRequiresUnpairedPopCIS(bool requires)               {this->requiresUnpairedPopCIS = requires;}
+   inline bool       RequiresScaLapackCIS() const                           {return this->requiresScaLapackCIS;}
+   inline void       SetRequiresScaLapackCIS(bool requires)                 {this->requiresScaLapackCIS = requires;}
    // Memory
    double GetLimitHeapMemory() const          {return this->limitHeapMemory;}
    void   SetLimitHeapMemory(double limitHeap){this->limitHeapMemory = limitHeap;}
@@ -189,6 +193,17 @@ public:
    void          SetNumberBeadsRPMD(int b)            {this->numberBeadsRPMD = b;}
    unsigned long GetSeedRPMD() const                  {return this->seedRPMD;}
    void          SetSeedRPMD(unsigned long seed)      {this->seedRPMD = seed;}
+   // Ehrenfest
+   int           GetInitialElectronicStateIndexEhrenfest() const{return this->initialElectronicStateIndexEhrenfest;}
+   void          SetInitialElectronicStateIndexEhrenfest(int i) {this->initialElectronicStateIndexEhrenfest = i;}
+   int           GetHighestElectronicStateIndexEhrenfest() const{return this->highestElectronicStateIndexEhrenfest;}
+   void          SetHighestElectronicStateIndexEhrenfest(int i) {this->highestElectronicStateIndexEhrenfest = i;}
+   int           GetLowestElectronicStateIndexEhrenfest() const {return this->lowestElectronicStateIndexEhrenfest;}
+   void          SetLowestElectronicStateIndexEhrenfest(int i)  {this->lowestElectronicStateIndexEhrenfest = i;}
+   int           GetTotalStepsEhrenfest() const                 {return this->totalStepsEhrenfest;}
+   void          SetTotalStepsEhrenfest(int steps)              {this->totalStepsEhrenfest = steps;}
+   double        GetTimeWidthEhrenfest() const                  {return this->timeWidthEhrenfest;}
+   void          SetTimeWidthEhrenfest(double dt)               {this->timeWidthEhrenfest = dt;}
    // NASCO
    int           GetTotalStepsNASCO() const            {return this->totalStepsNASCO;}
    void          SetTotalStepsNASCO(int steps)         {this->totalStepsNASCO = steps;}
@@ -225,7 +240,10 @@ public:
    void SetRequiresFrequencies(bool b)            {this->requiresFrequencies = b;}
    int  GetElectronicStateIndexFrequencies() const{return this->electronicStateIndexFrequencies;}
    void SetElectronicStateIndexFrequencies(int i) {this->electronicStateIndexFrequencies = i;}
-
+   HessianType GetHessianTypeFrequencies() const{return this->hessianTypeFrequencies;}
+   void        SetHessianTypeFrequencies(HessianType t){this->hessianTypeFrequencies = t;}
+   void   SetNumericalDrFrequencies(double dr){this->numericalDrFrequencies = dr;}
+   double GetNumericalDrFrequencies(){return this->numericalDrFrequencies;}
 private:
    static Parameters* parameters;
    Parameters();
@@ -268,6 +286,7 @@ private:
    static const double vdWScalingFactorSCFPM3DAM1D;
    static const double vdWDampingFactorSCFPM3DAM1D;
    bool   requiresMpiSCF;
+   bool   requiresScaLapackSCF;
    // MOPlot
    std::string       fileNamePrefixMOPlot;
    int               gridNumberMOPlot[CartesianType_end];
@@ -308,6 +327,7 @@ private:
    std::vector<int>* electronicStateIndecesMullikenCIS;
    bool              requiresUnpairedPopCIS;
    std::vector<AtomIndexPair>* sumChargesIndexPairsCIS;
+   bool              requiresScaLapackCIS;
    // Memory
    double limitHeapMemory; // in [MB]
    // MD
@@ -328,6 +348,12 @@ private:
    double        timeWidthRPMD;
    int           numberBeadsRPMD;
    unsigned long seedRPMD;
+   // Ehrenfest
+   int           initialElectronicStateIndexEhrenfest;
+   int           highestElectronicStateIndexEhrenfest;
+   int           lowestElectronicStateIndexEhrenfest;
+   int           totalStepsEhrenfest;
+   double        timeWidthEhrenfest;
    // NASCO
    int           totalStepsNASCO;
    int           numberElectronicStatesNASCO;
@@ -347,6 +373,8 @@ private:
    // Frequencies
    bool requiresFrequencies;
    int  electronicStateIndexFrequencies;
+   HessianType hessianTypeFrequencies;
+   double numericalDrFrequencies;
    // Other
    void SetDefaultValues();
    void SetMessages();

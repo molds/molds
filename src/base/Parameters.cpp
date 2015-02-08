@@ -141,6 +141,7 @@ void Parameters::SetDefaultValues(){
    this->vdWScalingFactorSCF = 1.40;
    this->vdWDampingFactorSCF = 23.0;
    this->requiresMpiSCF      = true;
+   this->requiresScaLapackSCF= false;
    // MOPlot
    this->fileNamePrefixMOPlot     = "MO_";
    this->gridNumberMOPlot[XAxis]  = 25;
@@ -193,6 +194,7 @@ void Parameters::SetDefaultValues(){
    this->requiresExcitonEnergiesCIS            = false;
    this->requiresAllTransitionDipoleMomentsCIS = false;
    this->requiresUnpairedPopCIS                = false;
+   this->requiresScaLapackCIS                  = false;
    // Memory
    this->limitHeapMemory = 256;
    // MD
@@ -213,6 +215,12 @@ void Parameters::SetDefaultValues(){
    this->temperatureRPMD            = 300;
    this->numberBeadsRPMD            = 10;
    this->seedRPMD                   = static_cast<unsigned long>(time(0));
+   // Ehrenfest
+   this->initialElectronicStateIndexEhrenfest = 1;
+   this->highestElectronicStateIndexEhrenfest = 2;
+   this->lowestElectronicStateIndexEhrenfest  = 0;
+   this->totalStepsEhrenfest = 10;
+   this->timeWidthEhrenfest = 0.1*this->fs2AU;
    // NASCO
    this->numberElectronicStatesNASCO = 3;
    this->initialElectronicStateNASCO = 0;
@@ -231,6 +239,8 @@ void Parameters::SetDefaultValues(){
    // Frequencies
    this->requiresFrequencies             = false;
    this->electronicStateIndexFrequencies = 0;
+   this->hessianTypeFrequencies          = Analytic;
+   this->numericalDrFrequencies          = 1e-4; // [a.u.]
 }
 
 void Parameters::SetMessages(){
