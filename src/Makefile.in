@@ -58,13 +58,17 @@ DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(top_srcdir)/configure AUTHORS COPYING ChangeLog INSTALL NEWS \
 	config.guess config.sub depcomp install-sh missing
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_namespaces.m4 \
-	$(top_srcdir)/m4/ax_blas.m4 $(top_srcdir)/m4/ax_boost_base.m4 \
-	$(top_srcdir)/m4/ax_boost_mpi.m4 \
-	$(top_srcdir)/m4/ax_boost_serialization.m4 \
-	$(top_srcdir)/m4/ax_boost_thread.m4 \
-	$(top_srcdir)/m4/ax_lapack.m4 $(top_srcdir)/m4/ax_mpi.m4 \
-	$(top_srcdir)/m4/ax_openmp.m4 $(top_srcdir)/configure.ac
+am__aclocal_m4_deps =  \
+	$(top_srcdir)/third_parties/m4/ac_cxx_namespaces.m4 \
+	$(top_srcdir)/third_parties/m4/ax_blas.m4 \
+	$(top_srcdir)/third_parties/m4/ax_boost_base.m4 \
+	$(top_srcdir)/third_parties/m4/ax_boost_mpi.m4 \
+	$(top_srcdir)/third_parties/m4/ax_boost_serialization.m4 \
+	$(top_srcdir)/third_parties/m4/ax_boost_thread.m4 \
+	$(top_srcdir)/third_parties/m4/ax_lapack.m4 \
+	$(top_srcdir)/third_parties/m4/ax_mpi.m4 \
+	$(top_srcdir)/third_parties/m4/ax_openmp.m4 \
+	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
@@ -350,7 +354,7 @@ molds_SOURCES = $(ALL_CPP_FILES) $(ALL_HEAD_FILES)
 @RPATH_TRUE@BOOST_LIBDIR = $(BOOST_LDFLAGS:-L%=%)
 @RPATH_FALSE@BOOST_RPATH = 
 @RPATH_TRUE@BOOST_RPATH = -Wl,-rpath=$(BOOST_LIBDIR)
-ACLOCAL_AMFLAGS = -I m4
+ACLOCAL_AMFLAGS = -I third_parties/m4
 AM_CXXFLAGS = $(OPENMP_CXXFLAGS)
 AM_CPPFLAGS = $(BOOST_CPPFLAGS)
 AM_LDFLAGS = $(BOOST_LDFLAGS) $(BOOST_RPATH)
