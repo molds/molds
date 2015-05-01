@@ -2454,13 +2454,8 @@ void ZindoS::CalcCISMatrix(double** matrixCIS) const{
    boost::thread communicationThread( boost::bind(&MolDS_mpi::AsyncCommunicator::Run<double>, &asyncCommunicator) );
 
    for(int k=0; k<this->matrixCISdimension; k++){
-      int calcRank;
-      if(this->matrixCISdimension <= this->matrixCISdimension/2){
-         calcRank = k%mpiSize;
-      }
-      else{
-         calcRank = (mpiSize-1) - (k%mpiSize);
-      }
+      int blockIndex = k/mpiSize;
+      int calcRank   = blockIndex%2==0 ? k%mpiSize : (mpiSize-1)-(k%mpiSize);
       if(calcRank == mpiRank){
          // single excitation from I-th (occupied)MO to A-th (virtual)MO
          int moI = this->GetActiveOccIndex(*this->molecule, k);
@@ -3456,13 +3451,8 @@ void ZindoS::CalcGammaNRMinusKNRMatrix(double** gammaNRMinusKNR, const vector<Mo
    boost::thread communicationThread( boost::bind(&MolDS_mpi::AsyncCommunicator::Run<double>, &asyncCommunicator) );
 
    for(int i=0; i<nonRedundantQIndecesSize; i++){
-      int calcRank;
-      if(nonRedundantQIndecesSize <= nonRedundantQIndecesSize/2){
-         calcRank = i%mpiSize;
-      }
-      else{
-         calcRank = (mpiSize-1) - (i%mpiSize);
-      }
+      int blockIndex = i/mpiSize;
+      int calcRank   = blockIndex%2==0 ? i%mpiSize : (mpiSize-1)-(i%mpiSize);
       if(mpiRank == calcRank){
          int moI = nonRedundantQIndeces[i].moI;
          int moJ = nonRedundantQIndeces[i].moJ;
@@ -4308,7 +4298,6 @@ void ZindoS::CalcNormalModes(double** normalModes, double* normalForceConstants,
 }
 
 void ZindoS::CalcHessian(double** hessian, bool isMassWeighted, int elecState) const{
-   int groundState = 0;
    HessianType hType= Parameters::GetInstance()->GetHessianTypeFrequencies();
    if(hType == Analytic){
       stringstream ss;
